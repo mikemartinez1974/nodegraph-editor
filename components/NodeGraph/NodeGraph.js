@@ -44,6 +44,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   // Add state for draggingHandlePos
   const [draggingHandlePos, setDraggingHandlePos] = useState(null);
+  // Add isNodeHovered state
+  const [isNodeHovered, setIsNodeHovered] = useState(false);
 
   // Pan/zoom logic via hook
 
@@ -193,27 +195,20 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
       // Do NOT modify hoveredNodeId here
     }
     function handleNodeMouseEnter({ id }) {
-      if (hoverTimeoutRef.current[id]) {
-        clearTimeout(hoverTimeoutRef.current[id]);
-        hoverTimeoutRef.current[id] = null;
-      }
       setHoveredNodeId(id);
+      setIsNodeHovered(true);
     }
     function handleNodeMouseLeave({ id }) {
+      setIsNodeHovered(false);
       if (hoverTimeoutRef.current[id]) {
         clearTimeout(hoverTimeoutRef.current[id]);
       }
       hoverTimeoutRef.current[id] = setTimeout(() => {
-        // Check if mouse is over any handle or node
-        const handleHovered = document.querySelector(`div[key*='${id}-'][style*='z-index: 30']`);
-        const nodeHovered = document.querySelector(`div[key='${id}']`);
-        const isHandleHovered = handleHovered && handleHovered.matches(':hover');
-        const isNodeHovered = nodeHovered && nodeHovered.matches(':hover');
-        if (!isHandleHovered && !isNodeHovered) {
+        if (!isNodeHovered && !isHandleHovered && !draggingHandle) {
           setHoveredNodeId(prev => (prev === id ? null : prev));
         }
         hoverTimeoutRef.current[id] = null;
-      }, 500);
+      }, 250);
     }
     eventBus.on('nodeMove', handleNodeMove);
     eventBus.on('nodeClick', handleNodeClick);
@@ -319,7 +314,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     window.addEventListener('mousemove', onHandleDragMove);
     window.addEventListener('mouseup', onHandleDragEnd);
     // Custom logic for handle drag start
-    console.log('Handle drag start:', { event: e, handle });
+    //console.log('Handle drag start:', { event: e, handle });
   }
 
   function onHandleDragMove(e) {
@@ -327,10 +322,28 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }
 
   function onHandleDragEnd(e) {
+    if (draggingHandle) {
+      console.log('Handle dropped:', draggingHandle);
+      setHoveredNodeId(null);
+      handleNodeMouseLeave({ id: draggingHandle.nodeId });
+    }
     setDraggingHandle(null);
     setDraggingHandlePos(null);
     window.removeEventListener('mousemove', onHandleDragMove);
     window.removeEventListener('mouseup', onHandleDragEnd);
+  }
+
+  // Add a placeholder for handleNodeMouseLeave if not defined
+  function handleNodeMouseLeave({ id }) {
+    // Implement node mouse leave logic here if needed
+    // For now, just log for debug
+    //console.log('handleNodeMouseLeave called for node', id);
+  }
+
+  function handleDrop(data) {
+    console.log('NodeGraph.js: handleDrop entered', data);
+    console.log('Drop handle event fired successfully in NodeGraph.js');
+    // ...existing code...
   }
 
   return (
@@ -367,10 +380,45 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         theme={theme}
         onHandleEvent={handle => {
           setIsHandleHovered(!!handle);
-          if (handle) setHoveredNodeId(handle.nodeId);
+          if (handle) {
+            setHoveredNodeId(handle.nodeId);
+            // Cancel retraction timer when hovering a handle
+            if (hoverTimeoutRef.current[handle.nodeId]) {
+              clearTimeout(hoverTimeoutRef.current[handle.nodeId]);
+              hoverTimeoutRef.current[handle.nodeId] = null;
+            }
+          }
         }}
         onHandleDragStart={onHandleDragStart}
         isDraggingHandle={!!draggingHandle}
+        onHandleDragEnd={(e, handle) => {
+          //console.log('NodeGraph.js: handle drop event fired', handle);
+          //console.log(e);
+          const mouseX = e.clientX;
+          const mouseY = e.clientY;
+          const nodeUnderMouse = nodeList.find(node => {
+            const { x, y } = node.position;
+            const width = node.width || 60;
+            const height = node.height || 60;
+            const screenX = x * zoom + pan.x;
+            const screenY = y * zoom + pan.y;
+            return mouseX >= screenX && mouseX <= screenX + width && mouseY >= screenY && mouseY <= screenY + height;
+          });
+          eventBus.emit('handleDrop', {
+            nodeId: handle?.nodeId,
+            edgeId: handle?.edgeId,
+            event: e,
+            mouse: { x: mouseX, y: mouseY },
+            nodeUnderMouse
+          });
+          //console.log('Drop handle event fired successfully in NodeGraph.js');
+          //console.log('Mouse position:', { x: mouseX, y: mouseY });
+          //console.log('Node under mouse:', nodeUnderMouse);
+          setHoveredNodeId(null);
+          handleNodeMouseLeave({ id: handle?.nodeId });
+          setDraggingHandle(null);
+          setDraggingHandlePos(null);
+        }}
       />
 
       <NodeLayer
@@ -442,15 +490,15 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
             startY = draggingHandle.y;
           }
           // Debug statements
-          console.log('Preview line debug:', {
-            nodeId: draggingHandle.nodeId,
-            nodePos: node ? node.position : null,
-            start: { x: startX, y: startY },
-            mouse: { x: mouseX, y: mouseY },
-            pan, zoom,
-            rect,
-            draggingHandlePos
-          });
+          // console.log('Preview line debug:', {
+          //   nodeId: draggingHandle.nodeId,
+          //   nodePos: node ? node.position : null,
+          //   start: { x: startX, y: startY },
+          //   mouse: { x: mouseX, y: mouseY },
+          //   pan, zoom,
+          //   rect,
+          //   draggingHandlePos
+          // });
           return (
             <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
               <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>

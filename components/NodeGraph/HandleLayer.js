@@ -45,9 +45,9 @@ function getBezierPerimeterPoint(node, otherNode, edge) {
   return best;
 }
 
-const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle }) => {
+const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle, onHandleDragEnd }) => {
   // Drag state
-  const [dragState, setDragState] = useState(null);
+  let dragState = null;
   const previewCanvasRef = useRef(null);
 
   useEffect(() => {
@@ -78,26 +78,40 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
 
   function handleMouseDown(e, handle) {
     e.stopPropagation();
-    setDragState({ nodeId: handle.nodeId, edgeId: handle.edgeId, start: { x: handle.x * zoom + pan.x, y: handle.y * zoom + pan.y } });
+    dragState = { nodeId: handle.nodeId, edgeId: handle.edgeId, start: { x: handle.x * zoom + pan.x, y: handle.y * zoom + pan.y } };
     eventBus.emit('handleDragStart', { nodeId: handle.nodeId, edgeId: handle.edgeId, start: { x: handle.x * zoom + pan.x, y: handle.y * zoom + pan.y }, event: e });
     window.addEventListener('mousemove', onDrag);
     window.addEventListener('mouseup', onDrop);
   }
 
-  function onDrag(e) {
+  function onDrag(event) {
     if (!dragState) return;
-    const mousePos = { x: e.clientX, y: e.clientY };
-    setDragState(ds => ({ ...ds, mouse: mousePos }));
-    eventBus.emit('handleDragMove', { ...dragState, mouse: mousePos, event: e });
+    const mousePos = { x: event.clientX, y: event.clientY };
+    // Update dragState with new properties, preserving existing ones
+    if (dragState) {
+      dragState = {
+        ...dragState,
+        // Add or update properties as needed, e.g.:
+        mousePos: { x: event.clientX, y: event.clientY }
+      };
+    }
+    eventBus.emit('handleDragMove', { ...dragState, mouse: mousePos, event });
   }
 
-  function onDrop(e) {
-    if (!dragState) return;
-    const mousePos = { x: e.clientX, y: e.clientY };
-    eventBus.emit('handleDragEnd', { ...dragState, mouse: mousePos, event: e });
-    setDragState(null);
+  const onDrop = (event) => {
+    const mousePos = { x: event.clientX, y: event.clientY };
+    if (typeof handleDrop === 'function') {
+      handleDrop(dragState);
+    }
+    dragState = null;
     window.removeEventListener('mousemove', onDrag);
     window.removeEventListener('mouseup', onDrop);
+    // Debug statement for drop event
+    //console.log('HandleLayer: handle drop event fired', { dragState, mousePos });
+    // Call parent callback for drag end
+    if (typeof onHandleDragEnd === 'function') {
+      onHandleDragEnd(event, dragState);
+    }
   }
 
   // Calculate handles for all nodes
@@ -166,6 +180,34 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
     });
   });
 
+  // Add debug log when handle is shown
+  function showHandle(handleId) {
+    console.log('HandleLayer.js: handle shown', handleId);
+    // ...existing code...
+  }
+
+  // Add debug log when handle is hidden
+  function hideHandle(handleId) {
+    console.log('HandleLayer.js: handle hidden', handleId);
+    // ...existing code...
+  }
+
+  const onDragStart = (event) => {
+    console.log('HandleLayer.js: drag start handler entered', event);
+    dragState = {/* ...set drag state... */};
+    console.log('HandleLayer.js: dragState set on drag start', dragState);
+    showHandle(dragState.handleId);
+    // ...existing code...
+  };
+
+  const onDragEnd = (event) => {
+    console.log('HandleLayer.js: drag end handler entered', event);
+    hideHandle(dragState ? dragState.handleId : null);
+    dragState = null;
+    console.log('HandleLayer.js: dragState reset on drag end', dragState);
+    // ...existing code...
+  };
+
   return (
     <>
       <div style={{ pointerEvents: 'none' }}>
@@ -220,13 +262,13 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
               onMouseEnter={() => {
                 if (isFullyExtended && !dragState) {
                   onHandleEvent && onHandleEvent(handle);
-                  console.log('Handle mouse enter:', {
-                    nodeId: handle.nodeId,
-                    edgeId: handle.edgeId,
-                    handlePos: { x: handle.x, y: handle.y },
-                    progress: handle.progress,
-                    type: handle.edgeId ? edgesSafe.find(e => e.id === handle.edgeId)?.type : 'default'
-                  });
+                //   console.log('Handle mouse enter:', {
+                //     nodeId: handle.nodeId,
+                //     edgeId: handle.edgeId,
+                //     handlePos: { x: handle.x, y: handle.y },
+                //     progress: handle.progress,
+                //     type: handle.edgeId ? edgesSafe.find(e => e.id === handle.edgeId)?.type : 'default'
+                //   });
                 }
               }}
               onMouseLeave={() => {
@@ -240,6 +282,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
                   }
                 }
               }}
+              className="handle"
             />
           );
         })}

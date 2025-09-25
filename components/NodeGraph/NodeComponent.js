@@ -78,7 +78,7 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
                 eventBus.emit('nodeClick', { id: node.id, event: e });
             }}
             onMouseEnter={e => {
-                console.log('Node mouse enter:', node.id);
+                //console.log('Node mouse enter:', node.id);
                 eventBus.emit('nodeMouseEnter', { id: node.id, event: e });
             }}
             onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}

@@ -1,13 +1,24 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NodeGraph from './NodeGraph';
 import { nodes as initialNodes, edges as initialEdges } from '../components/NodeGraph/graphData';
 import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
+import eventBus from './NodeGraph/eventBus';
 
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+
+  useEffect(() => {
+    function onHandleDrop(data) {
+      console.log('GraphEditor.js: handleDrop event received', data);
+    }
+    eventBus.on('handleDrop', onHandleDrop);
+    return () => {
+      eventBus.off('handleDrop', onHandleDrop);
+    };
+  }, []);
 
   function addNode() {
     const newId = `node${nodes.length + 1}`;

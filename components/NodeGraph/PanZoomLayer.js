@@ -59,7 +59,7 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, onBackgroundClick }) => {
             style={{
                 position: 'absolute',
                 inset: 0,
-                cursor: 'grab',
+                cursor: 'default',
                 zIndex: 1,
                 background: 'transparent',
             }}
