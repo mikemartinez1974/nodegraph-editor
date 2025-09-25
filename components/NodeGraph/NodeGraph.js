@@ -411,9 +411,9 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
             mouse: { x: mouseX, y: mouseY },
             nodeUnderMouse
           });
-          //console.log('Drop handle event fired successfully in NodeGraph.js');
-          //console.log('Mouse position:', { x: mouseX, y: mouseY });
-          //console.log('Node under mouse:', nodeUnderMouse);
+          // console.log('Drop handle event fired successfully in NodeGraph.js');
+          // console.log('Mouse position:', { x: mouseX, y: mouseY });
+          // console.log('Node under mouse:', nodeUnderMouse);
           setHoveredNodeId(null);
           handleNodeMouseLeave({ id: handle?.nodeId });
           setDraggingHandle(null);
@@ -520,15 +520,3 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   );
 }
 
-
-
-{/*
-  <EdgeHandles
-nodeList={nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }))}
-edges={edges}
-pan={pan}
-theme={theme}
-zoom={zoom}
-/>
-  
-  */}
