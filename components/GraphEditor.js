@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import NodeGraph from './NodeGraph';
 import { nodes as initialNodes, edges as initialEdges } from '../components/NodeGraph/graphData';
 import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
-
+import Toolbar from './Toolbar.js';
 
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -49,12 +49,7 @@ export default function GraphEditor() {
 
   return (
       <div>
-        <div style={{ marginBottom: 12 }}>
-          <button onClick={addNode}>Add Node</button>
-          <button onClick={addEdge}>Add Edge</button>
-          <button onClick={deleteNode}>Delete Node</button>
-          <button onClick={deleteEdge}>Delete Edge</button>
-        </div>
+        <Toolbar />
         <NodeGraph nodes={nodes} edges={edges} />
       </div>
   );

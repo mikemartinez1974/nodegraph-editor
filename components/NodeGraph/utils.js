@@ -1,14 +1,24 @@
 // Utility functions for NodeGraph
 
-export function getEdgeHandlePosition(node, handleType) {
+export function getEdgeHandlePosition(node, arg2, progress = 1, offset = { x: 0, y: 0 }, edgeType = 'straight') {
     // Support both node.x/y and node.position.x/y
     const x = node.x !== undefined ? node.x : node.position?.x;
     const y = node.y !== undefined ? node.y : node.position?.y;
-    if (handleType === 'source' || handleType === 'target') {
+    // If called with handleType ('source'/'target'), return node center
+    if (typeof arg2 === 'string' && (arg2 === 'source' || arg2 === 'target')) {
         return { x, y };
     }
-    // For mid/other handles, interpolate (fallback to node center)
-    return { x, y };
+    // If called with otherNode, calculate perimeter point
+    const otherNode = arg2;
+    if (!otherNode) return { x, y };
+    const dx = (otherNode.x !== undefined ? otherNode.x : otherNode.position?.x) - x;
+    const dy = (otherNode.y !== undefined ? otherNode.y : otherNode.position?.y) - y;
+    const angle = Math.atan2(dy, dx);
+    const radius = (node.width || 60) / 2;
+    return {
+        x: x + Math.cos(angle) * radius,
+        y: y + Math.sin(angle) * radius
+    };
 }
 
 export function isPointNearLine(px, py, x1, y1, x2, y2, tolerance = 8) {

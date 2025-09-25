@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ThemeDrawer from './Header/ThemeDrawer';
 import { useState } from 'react';
 
-export default function Header({ themeName, setThemeName, setTempTheme }) {
+export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   return (
     <div>
@@ -21,7 +21,7 @@ export default function Header({ themeName, setThemeName, setTempTheme }) {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <ThemeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} themeName={themeName} setThemeName={setThemeName} setTempTheme={setTempTheme} />
+      <ThemeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} themeName={themeName} setThemeName={setThemeName} theme={theme} />
     </div>
   );
 }

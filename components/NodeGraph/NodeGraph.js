@@ -40,6 +40,10 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const lastPanPos = useRef({ x: 0, y: 0 });
   const draggingNodeIdRef = useRef(null);
   const hoverTimeoutRef = useRef({});
+  const [draggingHandle, setDraggingHandle] = useState(null);
+  const [isHandleHovered, setIsHandleHovered] = useState(false);
+  // Add state for draggingHandlePos
+  const [draggingHandlePos, setDraggingHandlePos] = useState(null);
 
   // Pan/zoom logic via hook
 
@@ -209,7 +213,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           setHoveredNodeId(prev => (prev === id ? null : prev));
         }
         hoverTimeoutRef.current[id] = null;
-      }, 100);
+      }, 500);
     }
     eventBus.on('nodeMove', handleNodeMove);
     eventBus.on('nodeClick', handleNodeClick);
@@ -276,6 +280,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     const initial = { ...handleProgressMap };
     const target = {};
     nodeList.forEach(node => {
+      // Always animate handleProgress for all nodes when hovered
       target[node.id] = hoveredNodeId === node.id ? 1 : 0;
       if (initial[node.id] === undefined) initial[node.id] = 0;
     });
@@ -299,322 +304,33 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     return () => cancelAnimationFrame(animationFrame);
   }, [hoveredNodeId, nodeList]);
 
-  useEffect(() => {
-    function handleHandleDragEnd({ nodeId, edgeId, mouse, event }) {
-      // Convert mouse position to graph coordinates
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = (mouse.x - rect.left - pan.x) / zoom;
-      const y = (mouse.y - rect.top - pan.y) / zoom;
-      eventBus.emit('createEdgeOrNode', { sourceNodeId: nodeId, edgeId, x, y, event });
-      // You can use this event to show a node creation UI or create a new edge
-    }
-    eventBus.on('handleDragEnd', handleHandleDragEnd);
-    return () => {
-      eventBus.off('handleDragEnd', handleHandleDragEnd);
-    };
-  }, [pan, zoom]);
+  // Pass handleProgress to HandleLayer for all nodes
+  const nodesWithProgress = nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }));
 
-  // Top-level state
-  const { hoveredNode, setHoveredNode } = useNodeHover(nodes);
-  const { hoveredEdge, setHoveredEdge } = useEdgeHover(edges);
-  const handleProgress = useHandleAnimation(hoveredNode || hoveredEdge);
-
-  // console.log('NodeGraph nodes:', nodes);
-  // console.log('NodeGraph edges:', edges);
-
-  // Generate handles for each node using intersection with edge direction
-  function getCircleLineIntersection(cx, cy, r, x2, y2) {
-    // Returns intersection point on circle perimeter from center (cx,cy) toward (x2,y2)
-    const dx = x2 - cx;
-    const dy = y2 - cy;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    if (len === 0) return { x: cx, y: cy + r }; // fallback: bottom
-    const nx = dx / len;
-    const ny = dy / len;
-    return {
-      x: cx + nx * r,
-      y: cy + ny * r
-    };
-  }
-
-  const handles = [];
-  nodeList.forEach(node => {
-    const progress = handleProgressMap[node.id] || 0;
-    const centerX = node.position.x;
-    const centerY = node.position.y;
-    const nodeRadius = (node.width || 60) / 2;
-    edges.forEach(edge => {
-      let otherNode = null;
-      let isSource = false;
-      let targetPoint = null;
-      if (edge.source === node.id) {
-        otherNode = nodeList.find(n => n.id === edge.target);
-        isSource = true;
-        if (edge.type === 'curved' && otherNode) {
-          // For curved, use control point direction
-          const curveOffset = Math.max(Math.abs(otherNode.position.y - centerY), 100);
-          targetPoint = {
-            x: centerX + curveOffset,
-            y: centerY
-          };
-        } else if (otherNode) {
-          targetPoint = { x: otherNode.position.x, y: otherNode.position.y };
-        }
-      } else if (edge.target === node.id) {
-        otherNode = nodeList.find(n => n.id === edge.source);
-        isSource = false;
-        if (edge.type === 'curved' && otherNode) {
-          // For curved, use control point direction
-          const curveOffset = Math.max(Math.abs(centerY - otherNode.position.y), 100);
-          targetPoint = {
-            x: centerX - curveOffset,
-            y: centerY
-          };
-        } else if (otherNode) {
-          targetPoint = { x: otherNode.position.x, y: otherNode.position.y };
-        }
-      }
-      if (!otherNode || !targetPoint) return;
-      // Intersection point from center toward targetPoint
-      const intersect = getCircleLineIntersection(centerX, centerY, nodeRadius, targetPoint.x, targetPoint.y);
-      // Interpolate from center to intersection
-      const x = centerX + (intersect.x - centerX) * progress;
-      const y = centerY + (intersect.y - centerY) * progress;
-      handles.push({
-        id: `${node.id}-handle-${edge.id}`,
-        x,
-        y,
-        radius: 12,
-        color: theme.palette.primary.main,
-        progress,
-        isActive: hoveredNodeId === node.id,
-        nodeId: node.id,
-        edgeId: edge.id,
-        isSource
-      });
-    });
-  });
-
-  // Track hover state for nodes and handles
-  const [isNodeHovered, setIsNodeHovered] = useState(false);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
-
-  // Update hoveredNodeId only when neither node nor handle is hovered
-  useEffect(() => {
-    if (!isNodeHovered && !isHandleHovered) {
-      setHoveredNodeId(null);
-    }
-  }, [isNodeHovered, isHandleHovered]);
-
-  // Debounce handle retraction only when both node and handle are not hovered
-  useEffect(() => {
-    if (!isNodeHovered && !isHandleHovered) {
-      const timeout = setTimeout(() => {
-        setHoveredNodeId(null);
-      }, 30);
-      return () => clearTimeout(timeout);
-    }
-  }, [isNodeHovered, isHandleHovered]);
-
-  // Handle drag state
-  const [draggingHandle, setDraggingHandle] = useState(null);
-  const [draggingHandlePos, setDraggingHandlePos] = useState(null);
-  const lastMousePosRef = useRef(null);
-  const prevDraggingHandleRef = useRef(null);
-  const sourceNodeRef = useRef(null);
-
-  useEffect(() => {
-    prevDraggingHandleRef.current = draggingHandle;
-  }, [draggingHandle]);
-
-  useEffect(() => {
-    if (draggingHandle === null && lastMousePosRef.current) {
-      const { x, y } = lastMousePosRef.current;
-      // Convert mouse position to graph coordinates
-      const rect = canvasRef.current.getBoundingClientRect();
-      const graphX = (x - rect.left - pan.x) / zoom;
-      const graphY = (y - rect.top - pan.y) / zoom;
-      let targetNode = null;
-      for (const node of nodeList) {
-        const dx = graphX - node.position.x;
-        const dy = graphY - node.position.y;
-        const r = (node.width || 60) / 2;
-        if (dx * dx + dy * dy <= r * r) {
-          targetNode = node;
-          break;
-        }
-      }
-      const eventData = {
-        mouse: { x, y },
-        graph: { x: graphX, y: graphY },
-        targetNode: targetNode ? targetNode : null,
-        sourceNode: sourceNodeRef.current
-      };
-      eventBus.emit('handle-dropped', eventData);
-    }
-  }, [draggingHandle]);
-
-  function onHandleDragStart(e, handle) {
-    e.preventDefault();
-    console.log('Handle grabbed:', handle);
-    setDraggingHandle(handle);
-    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
-    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-    sourceNodeRef.current = nodeList.find(n => n.id === handle.nodeId) || null;
-    window.addEventListener('mousemove', onHandleDragMove);
-    window.addEventListener('mouseup', onHandleDragEnd);
-  }
-
-  function onHandleDragMove(e) {
-    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
-    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-  }
-
-  function cleanupHandleDrag() {
-    // console.log('cleanupHandleDrag called');
-    setDraggingHandle(null);
-    setDraggingHandlePos(null);
-    setIsHandleHovered(false);
-    setIsNodeHovered(false);
-  }
-
-  function onHandleDragEnd(e) {
-    console.log('Handle released (mouse up)', e);
-    window.removeEventListener('mousemove', onHandleDragMove);
-    window.removeEventListener('mouseup', onHandleDragEnd);
-    window.removeEventListener('mouseleave', cleanupHandleDrag);
-    window.removeEventListener('blur', cleanupHandleDrag);
-
-    // On handle drag end, emit drag/drop data and log it
-    if (draggingHandle) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left - pan.x) / zoom;
-      const y = (e.clientY - rect.top - pan.y) / zoom;
-      let targetNode = null;
-      for (const node of nodeList) {
-        const dx = x - node.position.x;
-        const dy = y - node.position.y;
-        const r = (node.width || 60) / 2;
-        if (dx * dx + dy * dy <= r * r) {
-          targetNode = node;
-          break;
-        }
-      }
-      eventBus.emit('handleDrop', {
-        sourceNodeId: draggingHandle.nodeId,
-        edgeId: draggingHandle.edgeId,
-        x,
-        y,
-        targetNode
-      });
-      console.log('Handle drag end at coordinates:', { x, y });
-    }
-    cleanupHandleDrag();
-  }
-
-  // During handle drag, show only the dragged handle at the mouse position, with pointerEvents: 'none'
-  const displayHandles = draggingHandle && draggingHandlePos
-    ? [
-        {
-          ...draggingHandle,
-          x: (() => {
-            const container = canvasRef.current?.parentElement;
-            const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
-            return (draggingHandlePos.x - rect.left - pan.x) / zoom;
-          })(),
-          y: (() => {
-            const container = canvasRef.current?.parentElement;
-            const rect = container ? container.getBoundingClientRect() : { top: 0 };
-            return (draggingHandlePos.y - rect.top - pan.y) / zoom;
-          })(),
-          progress: 1,
-          pointerEvents: 'none' // Custom property for HandleLayer
-        }
-      ]
-    : handles;
-
-  function handleClick(e) {
-    // Clear selection if clicking on background
-    if (e.target === e.currentTarget) {
-      setSelectedNodeId(null);
-      setSelectedEdgeId(null);
-    }
-    // Trigger background click handler if provided
-    if (e.target === e.currentTarget && typeof onBackgroundClick === 'function') {
-      onBackgroundClick();
-    }
-  }
-
-  function handleBackgroundClick(e) {
-    if (e.target === e.currentTarget && typeof onBackgroundClick === 'function') {
-      onBackgroundClick();
-    }
-  }
-
-  function handleNodeClick(id, e) {
-    if (onNodeClick) onNodeClick(id);
-    if (e) {
-      e.stopPropagation();
-    }
-  }
-
-  function handleAnyClick(e, nodeId = null) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    let selectedNode = null;
-    if (nodeId) {
-      selectedNode = nodes.find(n => n.id === nodeId);
-    } else if (selectedNodeId) {
-      selectedNode = nodes.find(n => n.id === selectedNodeId);
-    }
-    if (selectedNode) {
-      console.log('Selected node:', selectedNode);
-      console.log('Node position:', selectedNode.position);
-      console.log('Node size:', { width: selectedNode.width, height: selectedNode.height });
-      const rect = e.currentTarget.parentElement.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
-    } else {
-      console.log('No node selected');
-    }
-    console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
-  }
-
-  // Track mouse for distinguishing click vs drag (background only)
-  const mouseDownPosRef = useRef(null);
-
-  function handleBackgroundMouseDown(e) {
-    if (e.button !== 0) return; // Only left mouse
-    if (e.target !== e.currentTarget) return; // Only background
-    mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
-  }
-
-  function handleBackgroundMouseUp(e) {
-    if (e.button !== 0) return;
-    if (e.target !== e.currentTarget) return; // Only background
-    if (!mouseDownPosRef.current) return;
-    const dx = Math.abs(e.clientX - mouseDownPosRef.current.x);
-    const dy = Math.abs(e.clientY - mouseDownPosRef.current.y);
-    const moved = dx > 5 || dy > 5;
-    if (!moved) {
-      // Treat as click
-      if (typeof onBackgroundClick === 'function') onBackgroundClick();
-    }
-    mouseDownPosRef.current = null;
-  }
-
-  // Background click handler for PanZoomLayer
   function handleBackgroundClickFromPanZoom(e) {
     if (typeof onBackgroundClick === 'function') onBackgroundClick(e);
     setSelectedNodeId(null);
     setSelectedEdgeId && setSelectedEdgeId(null);
-    const rect = e.target.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    // console.log('No node selected');
-    // console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
+  }
+
+  function onHandleDragStart(e, handle) {
+    setDraggingHandle(handle);
+    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', onHandleDragMove);
+    window.addEventListener('mouseup', onHandleDragEnd);
+    // Custom logic for handle drag start
+    console.log('Handle drag start:', { event: e, handle });
+  }
+
+  function onHandleDragMove(e) {
+    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
+  }
+
+  function onHandleDragEnd(e) {
+    setDraggingHandle(null);
+    setDraggingHandlePos(null);
+    window.removeEventListener('mousemove', onHandleDragMove);
+    window.removeEventListener('mouseup', onHandleDragEnd);
   }
 
   return (
@@ -622,7 +338,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
       style={{ width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}
     >
       <PanZoomLayer pan={pan} zoom={zoom} onPanZoom={setPan} onBackgroundClick={handleBackgroundClickFromPanZoom} />
-      <EdgeLayer edges={edges} onEdgeEvent={setHoveredEdge} />
+      <EdgeLayer edges={edges} onEdgeEvent={setHoveredEdgeId} />
+      
       <canvas
         ref={canvasRef}
         width={canvasSize.width}
@@ -632,7 +349,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           width: '100vw',
           height: '100vh',
           background: theme.palette.background.paper,
-          cursor: hoveredEdgeId ? 'pointer' : (isPanning.current ? 'grabbing' : 'grab'),
+          cursor: 'default',
           pointerEvents: 'none'
         }}
         onMouseDown={handleCanvasMouseDown}
@@ -641,10 +358,13 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         onMouseMove={handleCanvasMouseMove}
         onClick={handleCanvasClick}
       />
+
       <HandleLayer
-        handles={displayHandles}
+        nodes={nodesWithProgress}
+        edges={edges}
         pan={pan}
         zoom={zoom}
+        theme={theme}
         onHandleEvent={handle => {
           setIsHandleHovered(!!handle);
           if (handle) setHoveredNodeId(handle.nodeId);
@@ -652,6 +372,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         onHandleDragStart={onHandleDragStart}
         isDraggingHandle={!!draggingHandle}
       />
+
       <NodeLayer
         nodes={nodeList}
         pan={pan}
@@ -660,50 +381,89 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         draggingNodeId={draggingNodeId}
         onNodeEvent={(id, e) => {
           if (onNodeClick) onNodeClick(id);
+          // Pass click to handles if extended
+          const node = nodesWithProgress.find(n => n.id === id);
+          if (node && node.handleProgress === 1) {
+            const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
+            connectedEdges.forEach(edge => {
+              const isSource = edge.source === id;
+              const otherNode = isSource ? nodeList.find(n => n.id === edge.target) : nodeList.find(n => n.id === edge.source);
+              if (!otherNode) return;
+              let handlePos;
+              if (edge.type === 'curved') {
+                handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
+              } else {
+                handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
+              }
+              if (handlePos && typeof handlePos === 'object') {
+                // Simulate handle event
+                if (typeof window !== 'undefined') {
+                  // You may want to trigger a custom event or callback here
+                  // For now, just log
+                  //console.log('Node click passed to handle:', { nodeId: id, edgeId: edge.id, handlePos });
+                }
+              }
+            });
+          }
           if (e) {
             e.stopPropagation();
             const node = nodes.find(n => n.id === id);
             if (node) {
-              // console.log('Selected node:', node);
-              // console.log('Node position:', node.position);
-              // console.log('Node size:', { width: node.width, height: node.height });
-              // const rect = e.currentTarget.parentElement.getBoundingClientRect();
-              // const mouseX = e.clientX - rect.left;
-              // const mouseY = e.clientY - rect.top;
-              //console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
+              console.log('Selected node:', node);
+              console.log('Node position:', node.position);
+              console.log('Node size:', { width: node.width, height: node.height });
+              const rect = e.currentTarget.parentElement.getBoundingClientRect();
+              const mouseX = e.clientX - rect.left;
+              const mouseY = e.clientY - rect.top;
+              console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
             }
           }
         }}
         onNodeDragStart={onNodeDragStart}
       />
-      <EdgeHandles
-        nodeList={nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }))}
-        edges={edges}
-        pan={pan}
-        theme={theme}
-        zoom={zoom}
-      />
+
       {/* Preview edge during handle drag */}
+      console.log('Preview line condition:', [ draggingHandle, draggingHandlePos ]);
       {draggingHandle && draggingHandlePos && (
         (() => {
           const container = canvasRef.current?.parentElement;
           const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
-          const mouseX = draggingHandlePos.x - rect.left;
-          const mouseY = draggingHandlePos.y - rect.top;
+          const mouseX = (draggingHandlePos.x - rect.left - pan.x) / zoom;
+          const mouseY = (draggingHandlePos.y - rect.top - pan.y) / zoom;
           const node = nodeList.find(n => n.id === draggingHandle.nodeId);
-          const startX = node ? node.position.x * zoom + pan.x : draggingHandle.x * zoom + pan.x;
-          const startY = node ? node.position.y * zoom + pan.y : draggingHandle.y * zoom + pan.y;
+          let startX, startY;
+          if (node) {
+            const otherNode = nodeList.find(n => n.id === draggingHandle.otherNodeId);
+            const handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, draggingHandle.edgeType || 'straight');
+            startX = handlePos.x;
+            startY = handlePos.y;
+          } else {
+            startX = draggingHandle.x;
+            startY = draggingHandle.y;
+          }
+          // Debug statements
+          console.log('Preview line debug:', {
+            nodeId: draggingHandle.nodeId,
+            nodePos: node ? node.position : null,
+            start: { x: startX, y: startY },
+            mouse: { x: mouseX, y: mouseY },
+            pan, zoom,
+            rect,
+            draggingHandlePos
+          });
           return (
             <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
-              <line
-                x1={startX}
-                y1={startY}
-                x2={mouseX}
-                y2={mouseY}
-                stroke={theme.palette.primary.main}
-                strokeWidth={2}
-                strokeDasharray="6,4"
-              />
+              <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
+                <line
+                  x1={startX}
+                  y1={startY}
+                  x2={mouseX}
+                  y2={mouseY}
+                  stroke={theme.palette.primary.main}
+                  strokeWidth={2}
+                  strokeDasharray="6,4"
+                />
+              </g>
             </svg>
           );
         })()
@@ -711,3 +471,16 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     </div>
   );
 }
+
+
+
+{/*
+  <EdgeHandles
+nodeList={nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }))}
+edges={edges}
+pan={pan}
+theme={theme}
+zoom={zoom}
+/>
+  
+  */}

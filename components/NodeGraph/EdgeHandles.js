@@ -1,5 +1,4 @@
-"use client"; // Uncomment this line if using React hooks in Next.js app directory
-// EdgeHandles.js
+"use client";
 import React, { useRef, useState, useEffect } from 'react';
 import eventBus from './eventBus';
 import { getEdgeHandlePosition } from './utils';
@@ -156,17 +155,21 @@ export default function EdgeHandles({ nodeList, edges, pan, theme, zoom = 1 }) {
   return (
     <>
       {nodeList.map(node => {
+        if (!node.handleProgress || node.handleProgress <= 0) return null;        
         const connectedEdges = edges.filter(e => e.source === node.id || e.target === node.id);
-        if (!node.handleProgress || node.handleProgress <= 0) return null;
+       
+        // Only render default handle if there are truly no connected edges
         if (connectedEdges.length === 0) {
+
           // Render a default handle at the bottom (6:00 position)
           const handleSize = 22;
           const radius = ((node.width || 60) / 2) * zoom;
-          const angle = Math.PI / 2; // 6:00 position
+          const angle = Math.PI / 2;
           const centerX = node.position.x * zoom + pan.x;
           const centerY = node.position.y * zoom + pan.y;
           const handleX = centerX + radius * Math.cos(angle) - handleSize / 2;
           const handleY = centerY + radius * Math.sin(angle) - handleSize / 2;
+
           return (
             <div
               key={`${node.id}-default-handle`}
@@ -190,66 +193,70 @@ export default function EdgeHandles({ nodeList, edges, pan, theme, zoom = 1 }) {
             />
           );
         }
-        return connectedEdges.map(edge => {
-          // Determine the other node
-          const isSource = edge.source === node.id;
-          const otherNode = isSource
-            ? nodeList.find(n => n.id === edge.target)
-            : nodeList.find(n => n.id === edge.source);
-          if (!otherNode) return null;
-          let connectionPoint;
-          if (edge.type === 'curved') {
-            // For curved edges, sample Bezier curve from node center to perimeter
-            connectionPoint = getBezierPerimeterPoint(node, otherNode, edge);
-          } else {
-            // Straight/dashed: use existing logic
-            connectionPoint = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-          }
-          const nodeCenterRaw = {
-            x: node.position.x,
-            y: node.position.y
-          };
-          const progress = node.handleProgress || 0;
-          // Interpolate between node center and connection point
-          const interpRaw = {
-            x: nodeCenterRaw.x + (connectionPoint.x - nodeCenterRaw.x) * progress,
-            y: nodeCenterRaw.y + (connectionPoint.y - nodeCenterRaw.y) * progress
-          };
-          // Center the handle on the connection point
-          const handleSize = 22;
-          const handlePos = {
-            x: interpRaw.x * zoom + pan.x - handleSize / 2,
-            y: interpRaw.y * zoom + pan.y - handleSize / 2
-          };
-          // Use edge.id from graphdata for handle key
-          const handleKey = `${node.id}-${edge.id}-handle`;
-          return (
-            <div
-              key={handleKey}
-              style={{
-                position: 'absolute',
-                left: handlePos.x,
-                top: handlePos.y,
-                width: handleSize,
-                height: handleSize,
-                borderRadius: 8,
-                background: theme.palette.secondary.main,
-                pointerEvents: 'auto',
-                cursor: dragState && dragState.nodeId === node.id && dragState.edgeId === edge.id ? 'grabbing' : 'grab',
-                zIndex: 30,
-                opacity: node.handleProgress
-              }}
-              onMouseDown={e => handleMouseDown(e, node.id, edge.id, handlePos)}
-              onMouseUp={e => eventBus.emit('edgeHandleMouseUp', { nodeId: node.id, edgeId: edge.id, event: e })}
-              onMouseEnter={e => {
-                eventBus.emit('edgeHandleMouseEnter', { nodeId: node.id, edgeId: edge.id, event: e });
-              }}
-              onMouseLeave={e => {
-                eventBus.emit('edgeHandleMouseLeave', { nodeId: node.id, edgeId: edge.id, event: e });
-              }}
-            />
-          );
-        });
+
+        // Only render handles for connected edges
+        if (connectedEdges.length > 0) {
+          return connectedEdges.map(edge => {
+            const isSource = edge.source === node.id;
+            const otherNode = isSource
+              ? nodeList.find(n => n.id === edge.target)
+              : nodeList.find(n => n.id === edge.source);
+            if (!otherNode) return null;
+            let connectionPoint;
+            if (edge.type === 'curved') {
+              connectionPoint = getBezierPerimeterPoint(node, otherNode, edge);
+            } else {
+              connectionPoint = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
+            }
+            const nodeCenterRaw = {
+              x: node.position.x,
+              y: node.position.y
+            };
+            const progress = node.handleProgress || 0;
+            const interpRaw = {
+              x: nodeCenterRaw.x + (connectionPoint.x - nodeCenterRaw.x) * progress,
+              y: nodeCenterRaw.y + (connectionPoint.y - nodeCenterRaw.y) * progress
+            };
+            const handleSize = 22;
+            const handlePos = {
+              x: interpRaw.x * zoom + pan.x - handleSize / 2,
+              y: interpRaw.y * zoom + pan.y - handleSize / 2
+            };
+            const handleKey = `${node.id}-${edge.id}-handle`;
+            return (
+              <div
+                key={handleKey}
+                style={{
+                  position: 'absolute',
+                  left: handlePos.x,
+                  top: handlePos.y,
+                  width: handleSize,
+                  height: handleSize,
+                  borderRadius: 8,
+                  background: theme.palette.secondary.main,
+                  pointerEvents: 'auto',
+                  cursor: dragState && dragState.nodeId === node.id && dragState.edgeId === edge.id ? 'grabbing' : 'grab',
+                  zIndex: 30,
+                  opacity: node.handleProgress
+                }}
+                onMouseDown={e => handleMouseDown(e, node.id, edge.id, handlePos)}
+                onMouseUp={e => eventBus.emit('edgeHandleMouseUp', { nodeId: node.id, edgeId: edge.id, event: e })}
+                onMouseEnter={e => {
+                  console.log('Handle mouse enter:', {
+                    nodeId: node.id,
+                    edgeId: edge ? edge.id : null,
+                    handlePos
+                  }
+                );
+                  eventBus.emit('edgeHandleMouseEnter', { nodeId: node.id, edgeId: edge ? edge.id : null, event: e });
+                }}
+                onMouseLeave={e => eventBus.emit('edgeHandleMouseLeave', { nodeId: node.id, edgeId: edge.id, event: e })}
+              />
+            );
+          });
+        }
+        
+        return null;
       })}
       {/* Preview edge during drag, drawn on canvas */}
       {dragState && dragState.start && dragState.mouse ? (
