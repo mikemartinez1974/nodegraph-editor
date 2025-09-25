@@ -94,6 +94,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }, []);
 
   useEffect(() => {
+    // Always use nodes and edges from props for rendering
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -102,8 +103,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
 
-    // Always use nodeList for edge rendering
-    edgeListRef.current.forEach(edge => {
+    edges.forEach(edge => {
       const sourceNode = nodeList.find(n => n.id === edge.source);
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) return;
@@ -407,6 +407,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           eventBus.emit('handleDrop', {
             nodeId: handle?.nodeId,
             edgeId: handle?.edgeId,
+            edgeType: handle?.edgeType,
             event: e,
             mouse: { x: mouseX, y: mouseY },
             nodeUnderMouse

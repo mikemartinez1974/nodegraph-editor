@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NodeGraph from './NodeGraph';
 import { nodes as initialNodes, edges as initialEdges } from '../components/NodeGraph/graphData';
 import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
@@ -9,10 +9,66 @@ import eventBus from './NodeGraph/eventBus';
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const nodesRef = useRef(nodes);
+  const edgesRef = useRef(edges);
+
+  useEffect(() => {
+    nodesRef.current = nodes;
+    edgesRef.current = edges;
+  }, [nodes, edges]);
 
   useEffect(() => {
     function onHandleDrop(data) {
       console.log('GraphEditor.js: handleDrop event received', data);
+      const { nodeId, edgeId, mouse, nodeUnderMouse, edgeType } = data;
+      if (!nodeId) return;
+      let newEdgeType = 'straight';
+      if (edgeId) {
+        const foundEdge = edgesRef.current.find(e => e.id === edgeId);
+        if (foundEdge && foundEdge.type) {
+          newEdgeType = foundEdge.type;
+        }
+      } else if (edgeType) {
+        newEdgeType = edgeType;
+      }
+      if (!nodeUnderMouse || nodeUnderMouse.id === nodeId) {
+        // Drop on blank field or self: create new node and edge
+        const newNodeId = uuidv4();
+        const newNode = createNode({
+          id: newNodeId,
+          type: 'default',
+          label: `Node ${nodesRef.current.length + 1}`,
+          data: {},
+          position: { x: mouse.x, y: mouse.y },
+          showLabel: true
+        });
+        setNodes(prev => [...prev, newNode]);
+        console.log('Added node:', newNode);
+
+        const newEdgeId = uuidv4();
+        const newEdge = createEdge({
+          id: newEdgeId,
+          source: nodeId,
+          target: newNodeId,
+          label: `Edge ${edgesRef.current.length + 1}`,
+          type: newEdgeType
+        });
+        setEdges(prev => [...prev, newEdge]);
+        console.log('Added edge:', newEdge);
+      } else {
+        // Drop on another node: create edge between source and target
+        if (nodeUnderMouse.id !== nodeId) {
+          const newEdgeId = uuidv4();
+          const newEdge = createEdge({
+            id: newEdgeId,
+            source: nodeId,
+            target: nodeUnderMouse.id,
+            label: `Edge ${edgesRef.current.length + 1}`,
+            type: newEdgeType
+          });
+          setEdges(prev => [...prev, newEdge]);
+        }
+      }
     }
     eventBus.on('handleDrop', onHandleDrop);
     return () => {
@@ -20,8 +76,15 @@ export default function GraphEditor() {
     };
   }, []);
 
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   function addNode() {
-    const newId = `node${nodes.length + 1}`;
+    const newId = uuidv4();
     const newNode = createNode({
       id: newId,
       type: 'default',
@@ -31,11 +94,12 @@ export default function GraphEditor() {
       showLabel: true
     });
     setNodes(prev => [...prev, newNode]);
+    console.log('Added node:', newNode.id);
   }
   
   function addEdge() {
     if (nodes.length < 2) return;
-    const newId = `edge${edges.length + 1}`;
+    const newId = uuidv4();
     const newEdge = createEdge({
       id: newId,
       source: nodes[nodes.length - 2].id,
@@ -44,6 +108,7 @@ export default function GraphEditor() {
       type: 'straight'
     });
     setEdges(prev => [...prev, newEdge]);
+    console.log('Added edge:', newEdge.id);
   }
   
   function deleteNode() {
