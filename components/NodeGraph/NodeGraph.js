@@ -396,6 +396,9 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           //console.log(e);
           const mouseX = e.clientX;
           const mouseY = e.clientY;
+          const rect = canvasRef.current ? canvasRef.current.getBoundingClientRect() : { left: 0, top: 0 };
+          console.log('canvasRef.current:', canvasRef.current);
+          console.log('canvas bounding rect:', rect);
           const nodeUnderMouse = nodeList.find(node => {
             const { x, y } = node.position;
             const width = node.width || 60;
@@ -410,8 +413,13 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
             edgeType: handle?.edgeType,
             event: e,
             mouse: { x: mouseX, y: mouseY },
-            nodeUnderMouse
+            nodeUnderMouse,
+            rectLeft: rect.left,
+            rectTop: rect.top,
+            pan,
+            zoom
           });
+          console.log('handleDrop emit mouse:', { x: mouseX, y: mouseY }, 'pan:', pan, 'zoom:', zoom);
           // console.log('Drop handle event fired successfully in NodeGraph.js');
           // console.log('Mouse position:', { x: mouseX, y: mouseY });
           // console.log('Node under mouse:', nodeUnderMouse);

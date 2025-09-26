@@ -5,6 +5,7 @@ import { nodes as initialNodes, edges as initialEdges } from '../components/Node
 import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
+import { screenToGraphCoords } from './NodeGraph/utils/coords';
 
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -33,11 +34,23 @@ export default function GraphEditor() {
       } else if (edgeType) {
         newEdgeType = edgeType;
       }
+      // Debug logs for coordinate conversion
+      const rectLeft = typeof data.rectLeft === 'number' ? data.rectLeft : 0;
+      const rectTop = typeof data.rectTop === 'number' ? data.rectTop : 0;
+      console.log('mouse.x:', mouse.x, 'mouse.y:', mouse.y);
+      console.log('rectLeft:', rectLeft, 'rectTop:', rectTop);
+      console.log('pan.x:', pan.x, 'pan.y:', pan.y);
+      console.log('zoom:', zoom);
+      const { x: graphX, y: graphY } = screenToGraphCoords(mouse, {
+        pan: data.pan,
+        zoom: typeof data.zoom === 'number' ? data.zoom : zoom,
+        rectLeft,
+        rectTop
+      });
+      console.log('graphX:', graphX, 'graphY:', graphY);
+      console.log('Final node position:', { x: graphX, y: graphY });
       if (!nodeUnderMouse || nodeUnderMouse.id === nodeId) {
         // Drop on blank field or self: create new node and edge
-        // Convert mouse position to graph space
-        const graphX = (mouse.x - pan.x) / zoom;
-        const graphY = (mouse.y - pan.y) / zoom;
         const newNodeId = uuidv4();
         const newNode = createNode({
           id: newNodeId,
