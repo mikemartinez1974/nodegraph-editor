@@ -9,6 +9,8 @@ import eventBus from './NodeGraph/eventBus';
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
 
@@ -33,13 +35,16 @@ export default function GraphEditor() {
       }
       if (!nodeUnderMouse || nodeUnderMouse.id === nodeId) {
         // Drop on blank field or self: create new node and edge
+        // Convert mouse position to graph space
+        const graphX = (mouse.x - pan.x) / zoom;
+        const graphY = (mouse.y - pan.y) / zoom;
         const newNodeId = uuidv4();
         const newNode = createNode({
           id: newNodeId,
           type: 'default',
           label: `Node ${nodesRef.current.length + 1}`,
           data: {},
-          position: { x: mouse.x, y: mouse.y },
+          position: { x: graphX, y: graphY },
           showLabel: true
         });
         setNodes(prev => [...prev, newNode]);
@@ -74,7 +79,7 @@ export default function GraphEditor() {
     return () => {
       eventBus.off('handleDrop', onHandleDrop);
     };
-  }, []);
+  }, [pan, zoom]);
 
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -126,7 +131,7 @@ export default function GraphEditor() {
   return (
       <div>
         <Toolbar />
-        <NodeGraph nodes={nodes} edges={edges} />
+        <NodeGraph nodes={nodes} edges={edges} pan={pan} zoom={zoom} setPan={setPan} setZoom={setZoom} />
       </div>
   );
 }
