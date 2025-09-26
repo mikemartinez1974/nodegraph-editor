@@ -21,13 +21,11 @@ import { useHandleProgress } from './hooks/useHandleProgress';
 import { useEventBusHandlers } from './hooks/useEventBusHandlers';
 import eventBus from './eventBus';
 
-export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick }) {
+export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove }) {
   const theme = useTheme();
   const canvasRef = useRef(null);
   const edgeListRef = useRef(edges);
   const canvasSize = useCanvasSize();
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
   const [nodeList, setNodeList] = useState(nodes);
   const [selectedNodeIdState, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
@@ -48,13 +46,12 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const [isNodeHovered, setIsNodeHovered] = useState(false);
 
   // Pan/zoom logic via hook
-
   const {
     handleMouseDown,
     handleMouseUp,
     handleMouseMove,
     handleWheel
-  } = usePanZoom({ minZoom: 0.8, maxZoom: 1.5, zoomFactor: 1.05, panBound: 1000 });
+  } = usePanZoom({ minZoom: 0.8, maxZoom: 1.5, zoomFactor: 1.05, panBound: 1000, pan, zoom, setPan, setZoom });
 
   useEffect(() => {
     // Only update nodeList if nodes have actually changed
@@ -69,28 +66,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   );
 
   useEffect(() => {
-    
-    function handleCanvasPan({ dx, dy }) {
-      setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-    }
-
-    function handleCanvasZoom({ direction }) {
-      setZoom(prev => {
-        const zoomFactor = 1.005; // gentler zoom
-        if (direction > 0) {
-          return Math.min(prev * zoomFactor, 2);
-        } else {
-          return Math.max(prev / zoomFactor, 0.5);
-        }
-      });
-    }
-
-    eventBus.on('canvasPan', handleCanvasPan);
-    eventBus.on('canvasZoom', handleCanvasZoom);
-    return () => {
-      eventBus.off('canvasPan', handleCanvasPan);
-      eventBus.off('canvasZoom', handleCanvasZoom);
-    };
+    // Remove local pan/zoom update logic
   }, []);
 
   useEffect(() => {
@@ -227,9 +203,13 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   // Node drag logic (already updates nodeList)
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current) {
-      const newX = (e.clientX - dragOffset.current.x - pan.x) / zoom;
-      const newY = (e.clientY - dragOffset.current.y - pan.y) / zoom;
-      setNodeList(prev => prev.map(n => n.id === draggingNodeIdRef.current ? { ...n, position: { x: newX, y: newY } } : n));
+      const newX = (e.clientX - dragOffset.current.x - (typeof pan?.x === 'number' ? pan.x : 0)) / (typeof zoom === 'number' ? zoom : 1);
+      const newY = (e.clientY - dragOffset.current.y - (typeof pan?.y === 'number' ? pan.y : 0)) / (typeof zoom === 'number' ? zoom : 1);
+      if (typeof onNodeMove === 'function') {
+        onNodeMove(draggingNodeIdRef.current, { x: newX, y: newY });
+      } else {
+        setNodeList(prev => prev.map(n => n.id === draggingNodeIdRef.current ? { ...n, position: { x: newX, y: newY } } : n));
+      }
     }
   }
 

@@ -55,7 +55,7 @@ export default function GraphEditor() {
         const newNode = createNode({
           id: newNodeId,
           type: 'default',
-          label: `Node ${nodesRef.current.length + 1}`,
+          label: `Node ${nodes.length + 1}`,
           data: {},
           position: { x: graphX, y: graphY },
           showLabel: true
@@ -68,7 +68,7 @@ export default function GraphEditor() {
           id: newEdgeId,
           source: nodeId,
           target: newNodeId,
-          label: `Edge ${edgesRef.current.length + 1}`,
+          label: `Edge ${edges.length + 1}`,
           type: newEdgeType
         });
         setEdges(prev => [...prev, newEdge]);
@@ -81,7 +81,7 @@ export default function GraphEditor() {
             id: newEdgeId,
             source: nodeId,
             target: nodeUnderMouse.id,
-            label: `Edge ${edgesRef.current.length + 1}`,
+            label: `Edge ${edges.length + 1}`,
             type: newEdgeType
           });
           setEdges(prev => [...prev, newEdge]);
@@ -144,7 +144,17 @@ export default function GraphEditor() {
   return (
       <div>
         <Toolbar />
-        <NodeGraph nodes={nodes} edges={edges} pan={pan} zoom={zoom} setPan={setPan} setZoom={setZoom} />
+        <NodeGraph 
+          nodes={nodes} 
+          edges={edges} 
+          pan={pan} 
+          zoom={zoom} 
+          setPan={setPan} 
+          setZoom={setZoom}
+          onNodeMove={(id, position) => {
+            setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
+          }}
+        />
       </div>
   );
 }
