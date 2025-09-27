@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const PanZoomLayer = ({ pan, zoom, onPanZoom, onBackgroundClick }) => {
+const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, children, theme }) => {
     const dragging = useRef(false);
     const lastPos = useRef({ x: 0, y: 0 });
     const mouseDownPosRef = React.useRef(null);
@@ -44,14 +44,17 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, onBackgroundClick }) => {
         if (!el) return;
         function handleWheel(e) {
             e.preventDefault();
-            const delta = e.deltaY < 0 ? 0.1 : -0.1;
-            onPanZoom((prev) => ({ ...prev, zoom: Math.max(0.1, zoom + delta) }));
+            const change = 0.01;
+            const delta = e.deltaY < 0 ? change : -change;
+            if (typeof setZoom === 'function') {
+                setZoom((prev) => Math.max(0.1, Math.min(2, prev + delta)));
+            }
         }
         el.addEventListener('wheel', handleWheel, { passive: false });
         return () => {
             el.removeEventListener('wheel', handleWheel, { passive: false });
         };
-    }, [zoom, onPanZoom]);
+    }, [zoom, setZoom]);
 
     return (
         <div
@@ -61,10 +64,13 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, onBackgroundClick }) => {
                 inset: 0,
                 cursor: 'default',
                 zIndex: 1,
-                background: 'transparent',
+                background: theme?.palette?.background?.default || '#f5f5f5',
+                transition: 'background 0.2s',
             }}
             onMouseDown={handleMouseDown}
-        />
+        >
+            {children}
+        </div>
     );
 };
 

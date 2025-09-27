@@ -75,7 +75,7 @@ function getBezierPerimeterPoint(node, otherNode, edge) {
   return best;
 }
 
-export default function EdgeHandles({ nodeList, edges, pan, theme, zoom = 1 }) {
+export default function EdgeHandles({ nodeList = [], edges = [], pan = { x: 0, y: 0 }, theme = {}, zoom = 1 }) {
   const [dragState, setDragState] = useState(null);
   const hoverCountRef = useRef({});
   const previewCanvasRef = useRef(null);
@@ -258,15 +258,7 @@ export default function EdgeHandles({ nodeList, edges, pan, theme, zoom = 1 }) {
         
         return null;
       })}
-      {/* Preview edge during drag, drawn on canvas */}
-      {dragState && dragState.start && dragState.mouse ? (
-        <canvas
-          ref={previewCanvasRef}
-          width={typeof window !== 'undefined' ? window.innerWidth : 800}
-          height={typeof window !== 'undefined' ? window.innerHeight : 600}
-          style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', zIndex: 40 }}
-        />
-      ) : null}
+
     </>
   );
 }

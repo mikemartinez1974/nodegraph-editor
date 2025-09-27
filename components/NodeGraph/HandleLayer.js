@@ -45,7 +45,7 @@ function getBezierPerimeterPoint(node, otherNode, edge) {
   return best;
 }
 
-const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle, onHandleDragEnd }) => {
+const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle, onHandleDragEnd, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) => {
   // Drag state
   const dragStateRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -117,7 +117,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
   const edgesSafe = Array.isArray(edges) ? edges : [];
   const handles = [];
   nodesSafe.forEach(node => {
-    if (!node.handleProgress || node.handleProgress <= 0) return;
+    // Only show handles for hovered node or hovered edge endpoints
     const connectedEdges = edgesSafe.filter(e => e.source === node.id || e.target === node.id);
     if (connectedEdges.length === 0) {
       // Default handle at bottom
@@ -150,16 +150,20 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
       let connectionPoint;
       if (edge.type === 'curved') {
         connectionPoint = getBezierPerimeterPoint(node, otherNode, edge);
-        //console.log('Curved handle:', { nodeId: node.id, edgeId: edge.id, connectionPoint });
       } else {
         connectionPoint = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-        //console.log('Straight handle:', { nodeId: node.id, edgeId: edge.id, connectionPoint, edgeType: edge.type });
       }
       const nodeCenterRaw = {
         x: node.position.x,
         y: node.position.y
       };
-      const progress = node.handleProgress || 0;
+      // Only extend handle if node is hovered or this handle's edge is hovered
+      let progress = 0;
+      if (node.handleProgress === 1 && (!hoveredEdgeId || edge.id === hoveredEdgeId)) {
+        progress = 1;
+      } else if (node.handleProgress > 0 && (!hoveredEdgeId || edge.id === hoveredEdgeId)) {
+        progress = node.handleProgress;
+      }
       const interpRaw = {
         x: nodeCenterRaw.x + (connectionPoint.x - nodeCenterRaw.x) * progress,
         y: nodeCenterRaw.y + (connectionPoint.y - nodeCenterRaw.y) * progress
@@ -215,8 +219,6 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
           const top = handle.y * zoom + pan.y - scaledRadius;
           const isFullyExtended = handle.progress === 1;
           const pointerEvents = handle.pointerEvents || (isFullyExtended ? 'auto' : 'none');
-          //console.log('Rendering handle:', { nodeId: handle.nodeId, edgeId: handle.edgeId, position: { x: handle.x, y: handle.y }, left, top, isFullyExtended, pointerEvents }); 
-          // If dragging this handle, show it at mouse position
           if (dragStateRef.current && dragStateRef.current.nodeId === handle.nodeId && dragStateRef.current.edgeId === handle.edgeId && dragStateRef.current.mouse) {
             const mouseGraphX = (dragStateRef.current.mouse.x - pan.x) / zoom;
             const mouseGraphY = (dragStateRef.current.mouse.y - pan.y) / zoom;
@@ -274,6 +276,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
               }}
               onMouseDown={e => {
                 if (isFullyExtended) {
+                  console.log('HandleLayer: handle clicked', handle);
                   handleMouseDown(e, handle);
                   if (typeof onHandleDragStart === 'function') {
                     onHandleDragStart(e, handle);
@@ -285,8 +288,6 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
           );
         })}
       </div>
-      {/* Preview edge during drag, drawn on canvas */}
-      {/* Canvas preview line removed to avoid duplicate preview lines */}
     </>
   );
 };

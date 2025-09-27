@@ -11,7 +11,6 @@ import PanZoomLayer from './PanZoomLayer';
 import { useNodeHover } from './hooks/useNodeHover';
 import { useEdgeHover } from './hooks/useEdgeHover';
 import { useHandleAnimation } from './hooks/useHandleAnimation';
-import EdgeOverlay from './EdgeOverlay';
 import EdgeHandles from './EdgeHandles';
 import NodeLayer from './NodeLayer';
 import { isPointNearLine, isPointNearBezier } from './utils';
@@ -21,7 +20,7 @@ import { useHandleProgress } from './hooks/useHandleProgress';
 import { useEventBusHandlers } from './hooks/useEventBusHandlers';
 import eventBus from './eventBus';
 
-export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove }) {
+export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
   const theme = useTheme();
   const canvasRef = useRef(null);
   const edgeListRef = useRef(edges);
@@ -31,7 +30,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const [isPanningState, setIsPanningState] = useState(false);
   const isPanning = useRef(false);
@@ -45,16 +43,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   // Add isNodeHovered state
   const [isNodeHovered, setIsNodeHovered] = useState(false);
 
-  // Pan/zoom logic via hook
-  const {
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseMove,
-    handleWheel
-  } = usePanZoom({ minZoom: 0.8, maxZoom: 1.5, zoomFactor: 1.05, panBound: 1000, pan, zoom, setPan, setZoom });
-
+  // Only update nodeList if nodes have actually changed
   useEffect(() => {
-    // Only update nodeList if nodes have actually changed
     if (JSON.stringify(nodeList) !== JSON.stringify(nodes)) {
       setNodeList(nodes.map(node => ({
         ...node,
@@ -65,10 +55,20 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }, [nodes]
   );
 
-  useEffect(() => {
-    // Remove local pan/zoom update logic
-  }, []);
+  //Draws Debug Nodes
+  function drawDebugNodes(ctx, nodes, theme) {
+    nodes.forEach(node => {
+      ctx.save();
+      ctx.strokeStyle = theme.palette.info.main;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 2]);
+      ctx.strokeRect(node.position.x, node.position.y, node.width || 60, node.height || 60);
+      ctx.restore();
+    });
+  } 
 
+
+  //Draw Debug Nodes
   useEffect(() => {
     // Always use nodes and edges from props for rendering
     const canvas = canvasRef.current;
@@ -79,80 +79,14 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
 
-    edges.forEach(edge => {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) return;
-      const sourceHandle = getEdgeHandlePosition(sourceNode, 'source');
-      const targetHandle = getEdgeHandlePosition(targetNode, 'target');
-      ctx.save();
-      // Edge style logic
-      if (edge.type === 'dashed') {
-        ctx.setLineDash([8, 6]);
-        ctx.strokeStyle = theme.palette.warning.main;
-      } else if (edge.type === 'curved') {
-        ctx.strokeStyle = theme.palette.info.main;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(sourceHandle.x, sourceHandle.y);
-        // More pronounced curve
-        const curveOffset = Math.max(Math.abs(targetHandle.y - sourceHandle.y), 100);
-        ctx.bezierCurveTo(
-          sourceHandle.x + curveOffset, sourceHandle.y,
-          targetHandle.x - curveOffset, targetHandle.y,
-          targetHandle.x, targetHandle.y
-        );
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.restore();
-        // Draw edge label for curved
-        if (edge.label) {
-          const midX = (sourceHandle.x + targetHandle.x) / 2;
-          const midY = (sourceHandle.y + targetHandle.y) / 2 - curveOffset / 4;
-          ctx.fillStyle = theme.palette.text.secondary;
-          ctx.font = '14px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(edge.label, midX, midY);
-        }
-        return;
-      } else {
-        ctx.setLineDash([]);
-        ctx.strokeStyle = theme.palette.secondary.main;
-      }
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(sourceHandle.x, sourceHandle.y);
-      ctx.lineTo(targetHandle.x, targetHandle.y);
-      ctx.stroke();
-      ctx.restore();
-      // Draw edge label for straight/dashed
-      if (edge.label) {
-        const midX = (sourceHandle.x + targetHandle.x) / 2;
-        const midY = (sourceHandle.y + targetHandle.y) / 2;
-        ctx.fillStyle = theme.palette.text.secondary;
-        ctx.font = '14px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(edge.label, midX, midY - 8);
-      }
-    });
-
-    // Draw nodes as circles for debugging/tracking
-    nodeList.forEach(node => {
-      const x = node.position.x;
-      const y = node.position.y;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, 10, 0, 2 * Math.PI);
-      ctx.fillStyle = theme.palette.primary.light;
-      ctx.globalAlpha = 0.5;
-      ctx.fill();
-      ctx.restore();
-    });
+    // drawEdges(ctx, nodes, edges, theme); // Removed: edge drawing now handled by EdgeLayer
+    drawDebugNodes(ctx, nodes, theme);
 
     ctx.restore();
-  }, [canvasSize, theme, pan, zoom, nodeList, edges]);
+  }, [canvasSize, theme, pan, zoom, nodes, edges]);
 
 
+  // Event bus handlers for node/edge events
   useEffect(() => {
     function handleNodeMove({ id, position }) {
       setNodeList(prev => prev.map(n => n.id === id ? { ...n, position } : n));
@@ -167,7 +101,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     }
     // Only node/handle hover controls handle extension/retraction
     function handleEdgeHover(id) {
-      setHoveredEdgeId(id);
+      setHoveredNodeId(id);
       // Do NOT modify hoveredNodeId here
     }
     function handleNodeMouseEnter({ id }) {
@@ -212,8 +146,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
       }
     }
   }
-
-  // Node drag logic
   function onNodeDragStart(e, node) {
     e.preventDefault();
     setDraggingNodeId(node.id);
@@ -225,26 +157,12 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     window.addEventListener('mousemove', onNodeDragMove);
     window.addEventListener('mouseup', onNodeDragEnd);
   }
-
   function onNodeDragEnd() {
     setDraggingNodeId(null);
     draggingNodeIdRef.current = null;
     window.removeEventListener('mousemove', onNodeDragMove);
     window.removeEventListener('mouseup', onNodeDragEnd);
   }
-
-  useEffect(() => {
-    const container = canvasRef.current?.parentElement;
-    if (container) {
-      const wheelHandler = (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.02 : 0.02;
-        setZoom(prev => Math.max(0.1, Math.min(2, prev + delta)));
-      };
-      container.addEventListener('wheel', wheelHandler, { passive: false });
-      return () => container.removeEventListener('wheel', wheelHandler);
-    }
-  }, []);
 
   // Animated handleProgress for smooth handle extension/retraction
   const [handleProgressMap, setHandleProgressMap] = useState({});
@@ -255,8 +173,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     const initial = { ...handleProgressMap };
     const target = {};
     nodeList.forEach(node => {
-      // Always animate handleProgress for all nodes when hovered
-      target[node.id] = hoveredNodeId === node.id ? 1 : 0;
+      // Extend handle if node is hovered, or if it's the source/target of the hovered edge
+      target[node.id] = (hoveredNodeId === node.id || hoveredEdgeSource === node.id || hoveredEdgeTarget === node.id) ? 1 : 0;
       if (initial[node.id] === undefined) initial[node.id] = 0;
     });
     function animate(now) {
@@ -277,7 +195,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     }
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
-  }, [hoveredNodeId, nodeList]);
+  }, [hoveredNodeId, hoveredEdgeSource, hoveredEdgeTarget, nodeList]);
 
   // Pass handleProgress to HandleLayer for all nodes
   const nodesWithProgress = nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }));
@@ -288,6 +206,9 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     setSelectedEdgeId && setSelectedEdgeId(null);
   }
 
+
+
+  //Edge Handle Events
   function onHandleDragStart(e, handle) {
     setDraggingHandle(handle);
     setDraggingHandlePos({ x: e.clientX, y: e.clientY });
@@ -320,49 +241,21 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     //console.log('handleNodeMouseLeave called for node', id);
   }
 
-  function handleDrop(data) {
-    console.log('NodeGraph.js: handleDrop entered', data);
-    console.log('Drop handle event fired successfully in NodeGraph.js');
-    // ...existing code...
-  }
-
   return (
-    <div
-      style={{ width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}
-    >
-      <PanZoomLayer pan={pan} zoom={zoom} onPanZoom={setPan} onBackgroundClick={handleBackgroundClickFromPanZoom} />
-      <EdgeLayer edges={edges} onEdgeEvent={setHoveredEdgeId} />
-      
-      <canvas
-        ref={canvasRef}
-        width={canvasSize.width}
-        height={canvasSize.height}
-        style={{
-          display: 'block',
-          width: '100vw',
-          height: '100vh',
-          background: theme.palette.background.paper,
-          cursor: 'default',
-          pointerEvents: 'none'
-        }}
-        onMouseDown={handleCanvasMouseDown}
-        onMouseUp={handleCanvasMouseUp}
-        onMouseLeave={handleCanvasMouseUp}
-        onMouseMove={handleCanvasMouseMove}
-        onClick={handleCanvasClick}
-      />
-
+    <PanZoomLayer pan={pan} zoom={zoom} onPanZoom={setPan} setZoom={setZoom} onBackgroundClick={handleBackgroundClickFromPanZoom} theme={theme}>
       <HandleLayer
         nodes={nodesWithProgress}
         edges={edges}
         pan={pan}
         zoom={zoom}
         theme={theme}
+        hoveredEdgeId={hoveredEdgeId}
+        hoveredEdgeSource={hoveredEdgeSource}
+        hoveredEdgeTarget={hoveredEdgeTarget}
         onHandleEvent={handle => {
           setIsHandleHovered(!!handle);
           if (handle) {
             setHoveredNodeId(handle.nodeId);
-            // Cancel retraction timer when hovering a handle
             if (hoverTimeoutRef.current[handle.nodeId]) {
               clearTimeout(hoverTimeoutRef.current[handle.nodeId]);
               hoverTimeoutRef.current[handle.nodeId] = null;
@@ -371,54 +264,33 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         }}
         onHandleDragStart={onHandleDragStart}
         isDraggingHandle={!!draggingHandle}
-        onHandleDragEnd={(e, handle) => {
-          //console.log('NodeGraph.js: handle drop event fired', handle);
-          //console.log(e);
-          const mouseX = e.clientX;
-          const mouseY = e.clientY;
-          const rect = canvasRef.current ? canvasRef.current.getBoundingClientRect() : { left: 0, top: 0 };
-          console.log('canvasRef.current:', canvasRef.current);
-          console.log('canvas bounding rect:', rect);
-          const nodeUnderMouse = nodeList.find(node => {
-            const { x, y } = node.position;
-            const width = node.width || 60;
-            const height = node.height || 60;
-            const screenX = x * zoom + pan.x;
-            const screenY = y * zoom + pan.y;
-            return mouseX >= screenX && mouseX <= screenX + width && mouseY >= screenY && mouseY <= screenY + height;
-          });
-          eventBus.emit('handleDrop', {
-            nodeId: handle?.nodeId,
-            edgeId: handle?.edgeId,
-            edgeType: handle?.edgeType,
-            event: e,
-            mouse: { x: mouseX, y: mouseY },
-            nodeUnderMouse,
-            rectLeft: rect.left,
-            rectTop: rect.top,
-            pan,
-            zoom
-          });
-          console.log('handleDrop emit mouse:', { x: mouseX, y: mouseY }, 'pan:', pan, 'zoom:', zoom);
-          // console.log('Drop handle event fired successfully in NodeGraph.js');
-          // console.log('Mouse position:', { x: mouseX, y: mouseY });
-          // console.log('Node under mouse:', nodeUnderMouse);
-          setHoveredNodeId(null);
-          handleNodeMouseLeave({ id: handle?.nodeId });
-          setDraggingHandle(null);
-          setDraggingHandlePos(null);
-        }}
+        onHandleDragEnd={onHandleDragEnd}
       />
 
+      <EdgeLayer
+        edgeList={edges}
+        nodeList={nodeList}
+        pan={pan}
+        zoom={zoom}
+        selectedEdgeId={selectedEdgeId}
+        theme={theme}
+        onEdgeClick={(edge, event) => {
+          setSelectedEdgeId(edge?.id);
+          eventBus.emit('edgeClick', { id: edge?.id });
+          if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
+        }}
+        onEdgeHover={onEdgeHover}
+      />
+      <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} />
       <NodeLayer
         nodes={nodeList}
         pan={pan}
         zoom={zoom}
         selectedNodeId={selectedNodeId}
         draggingNodeId={draggingNodeId}
+        theme={theme}
         onNodeEvent={(id, e) => {
           if (onNodeClick) onNodeClick(id);
-          // Pass click to handles if extended
           const node = nodesWithProgress.find(n => n.id === id);
           if (node && node.handleProgress === 1) {
             const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
@@ -434,33 +306,17 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
               }
               if (handlePos && typeof handlePos === 'object') {
                 // Simulate handle event
-                if (typeof window !== 'undefined') {
-                  // You may want to trigger a custom event or callback here
-                  // For now, just log
-                  //console.log('Node click passed to handle:', { nodeId: id, edgeId: edge.id, handlePos });
-                }
               }
             });
           }
           if (e) {
             e.stopPropagation();
             const node = nodes.find(n => n.id === id);
-            if (node) {
-              console.log('Selected node:', node);
-              console.log('Node position:', node.position);
-              console.log('Node size:', { width: node.width, height: node.height });
-              const rect = e.currentTarget.parentElement.getBoundingClientRect();
-              const mouseX = e.clientX - rect.left;
-              const mouseY = e.clientY - rect.top;
-              console.log('Mouse coordinates:', { x: mouseX, y: mouseY });
-            }
           }
         }}
         onNodeDragStart={onNodeDragStart}
       />
-
       {/* Preview edge during handle drag */}
-      console.log('Preview line condition:', [ draggingHandle, draggingHandlePos ]);
       {draggingHandle && draggingHandlePos && (
         (() => {
           const container = canvasRef.current?.parentElement;
@@ -478,16 +334,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
             startX = draggingHandle.x;
             startY = draggingHandle.y;
           }
-          // Debug statements
-          // console.log('Preview line debug:', {
-          //   nodeId: draggingHandle.nodeId,
-          //   nodePos: node ? node.position : null,
-          //   start: { x: startX, y: startY },
-          //   mouse: { x: mouseX, y: mouseY },
-          //   pan, zoom,
-          //   rect,
-          //   draggingHandlePos
-          // });
           return (
             <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
               <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
@@ -505,7 +351,9 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           );
         })()
       )}
-    </div>
+    </PanZoomLayer>
   );
 }
 
+
+//<EdgeLayer edges={edges} onEdgeEvent={setHoveredEdgeId} />

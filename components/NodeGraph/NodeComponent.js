@@ -59,7 +59,7 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
                 height,
                 cursor: 'grab',
                 border: isSelected ? `2px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
-                background: isSelected ? theme.palette.action.selected : theme.palette.background.paper,
+                background: isSelected ? theme.palette.primary.main : theme.palette.secondary.main,
                 borderRadius: 8,
                 boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
                 color: theme.palette.text.primary,
@@ -69,6 +69,7 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
             }}
             tabIndex={0}
             onMouseDown={e => {
+                e.stopPropagation();
                 if (onMouseDown) onMouseDown(e);
                 eventBus.emit('nodeMouseDown', { id: node.id, event: e });
             }}
