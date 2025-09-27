@@ -242,116 +242,126 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }
 
   return (
-    <PanZoomLayer pan={pan} zoom={zoom} onPanZoom={setPan} setZoom={setZoom} onBackgroundClick={handleBackgroundClickFromPanZoom} theme={theme}>
-      <HandleLayer
-        nodes={nodesWithProgress}
-        edges={edges}
+    <div id="graph-canvas" style={{ position: 'absolute', inset: 0, width: '100vw', height: '100vh', pointerEvents: 'none', background: 'none', zIndex: 0 }}>
+      <PanZoomLayer
         pan={pan}
         zoom={zoom}
+        onPanZoom={setPan}
+        setZoom={setZoom}
+        onBackgroundClick={handleBackgroundClickFromPanZoom}
         theme={theme}
-        hoveredEdgeId={hoveredEdgeId}
-        hoveredEdgeSource={hoveredEdgeSource}
-        hoveredEdgeTarget={hoveredEdgeTarget}
-        onHandleEvent={handle => {
-          setIsHandleHovered(!!handle);
-          if (handle) {
-            setHoveredNodeId(handle.nodeId);
-            if (hoverTimeoutRef.current[handle.nodeId]) {
-              clearTimeout(hoverTimeoutRef.current[handle.nodeId]);
-              hoverTimeoutRef.current[handle.nodeId] = null;
+        style={{ pointerEvents: 'auto', width: '100%', height: '100%' }}
+      >
+        <HandleLayer
+          nodes={nodesWithProgress}
+          edges={edges}
+          pan={pan}
+          zoom={zoom}
+          theme={theme}
+          hoveredEdgeId={hoveredEdgeId}
+          hoveredEdgeSource={hoveredEdgeSource}
+          hoveredEdgeTarget={hoveredEdgeTarget}
+          onHandleEvent={handle => {
+            setIsHandleHovered(!!handle);
+            if (handle) {
+              setHoveredNodeId(handle.nodeId);
+              if (hoverTimeoutRef.current[handle.nodeId]) {
+                clearTimeout(hoverTimeoutRef.current[handle.nodeId]);
+                hoverTimeoutRef.current[handle.nodeId] = null;
+              }
             }
-          }
-        }}
-        onHandleDragStart={onHandleDragStart}
-        isDraggingHandle={!!draggingHandle}
-        onHandleDragEnd={onHandleDragEnd}
-      />
-
-      <EdgeLayer
-        edgeList={edges}
-        nodeList={nodeList}
-        pan={pan}
-        zoom={zoom}
-        selectedEdgeId={selectedEdgeId}
-        theme={theme}
-        onEdgeClick={(edge, event) => {
-          setSelectedEdgeId(edge?.id);
-          eventBus.emit('edgeClick', { id: edge?.id });
-          if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
-        }}
-        onEdgeHover={onEdgeHover}
-      />
-      <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} />
-      <NodeLayer
-        nodes={nodeList}
-        pan={pan}
-        zoom={zoom}
-        selectedNodeId={selectedNodeId}
-        draggingNodeId={draggingNodeId}
-        theme={theme}
-        onNodeEvent={(id, e) => {
-          if (onNodeClick) onNodeClick(id);
-          const node = nodesWithProgress.find(n => n.id === id);
-          if (node && node.handleProgress === 1) {
-            const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
-            connectedEdges.forEach(edge => {
-              const isSource = edge.source === id;
-              const otherNode = isSource ? nodeList.find(n => n.id === edge.target) : nodeList.find(n => n.id === edge.source);
-              if (!otherNode) return;
-              let handlePos;
-              if (edge.type === 'curved') {
-                handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-              } else {
-                handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-              }
-              if (handlePos && typeof handlePos === 'object') {
-                // Simulate handle event
-              }
-            });
-          }
-          if (e) {
-            e.stopPropagation();
-            const node = nodes.find(n => n.id === id);
-          }
-        }}
-        onNodeDragStart={onNodeDragStart}
-      />
-      {/* Preview edge during handle drag */}
-      {draggingHandle && draggingHandlePos && (
-        (() => {
-          const container = canvasRef.current?.parentElement;
-          const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
-          const mouseX = (draggingHandlePos.x - rect.left - pan.x) / zoom;
-          const mouseY = (draggingHandlePos.y - rect.top - pan.y) / zoom;
-          const node = nodeList.find(n => n.id === draggingHandle.nodeId);
-          let startX, startY;
-          if (node) {
-            const otherNode = nodeList.find(n => n.id === draggingHandle.otherNodeId);
-            const handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, draggingHandle.edgeType || 'straight');
-            startX = handlePos.x;
-            startY = handlePos.y;
-          } else {
-            startX = draggingHandle.x;
-            startY = draggingHandle.y;
-          }
-          return (
-            <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
-              <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
-                <line
-                  x1={startX}
-                  y1={startY}
-                  x2={mouseX}
-                  y2={mouseY}
-                  stroke={theme.palette.primary.main}
-                  strokeWidth={2}
-                  strokeDasharray="6,4"
-                />
-              </g>
-            </svg>
-          );
-        })()
-      )}
-    </PanZoomLayer>
+          }}
+          onHandleDragStart={onHandleDragStart}
+          isDraggingHandle={!!draggingHandle}
+          onHandleDragEnd={onHandleDragEnd}
+        />
+        <EdgeLayer
+          edgeList={edges}
+          nodeList={nodeList}
+          pan={pan}
+          zoom={zoom}
+          selectedEdgeId={selectedEdgeId}
+          theme={theme}
+          hoveredNodeId={hoveredNodeId}
+          onEdgeClick={(edge, event) => {
+            setSelectedEdgeId(edge?.id);
+            eventBus.emit('edgeClick', { id: edge?.id });
+            if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
+          }}
+          onEdgeHover={onEdgeHover}
+        />
+        <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} />
+        <NodeLayer
+          nodes={nodeList}
+          pan={pan}
+          zoom={zoom}
+          selectedNodeId={selectedNodeId}
+          draggingNodeId={draggingNodeId}
+          theme={theme}
+          onNodeEvent={(id, e) => {
+            if (onNodeClick) onNodeClick(id);
+            const node = nodesWithProgress.find(n => n.id === id);
+            if (node && node.handleProgress === 1) {
+              const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
+              connectedEdges.forEach(edge => {
+                const isSource = edge.source === id;
+                const otherNode = isSource ? nodeList.find(n => n.id === edge.target) : nodeList.find(n => n.id === edge.source);
+                if (!otherNode) return;
+                let handlePos;
+                if (edge.type === 'curved') {
+                  handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
+                } else {
+                  handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
+                }
+                if (handlePos && typeof handlePos === 'object') {
+                  // Simulate handle event
+                }
+              });
+            }
+            if (e) {
+              e.stopPropagation();
+              const node = nodes.find(n => n.id === id);
+            }
+          }}
+          onNodeDragStart={onNodeDragStart}
+        />
+        {/* Preview edge during handle drag */}
+        {draggingHandle && draggingHandlePos && (
+          (() => {
+            const container = canvasRef.current?.parentElement;
+            const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
+            const mouseX = (draggingHandlePos.x - rect.left - pan.x) / zoom;
+            const mouseY = (draggingHandlePos.y - rect.top - pan.y) / zoom;
+            const node = nodeList.find(n => n.id === draggingHandle.nodeId);
+            let startX, startY;
+            if (node) {
+              const otherNode = nodeList.find(n => n.id === draggingHandle.otherNodeId);
+              const handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, draggingHandle.edgeType || 'straight');
+              startX = handlePos.x;
+              startY = handlePos.y;
+            } else {
+              startX = draggingHandle.x;
+              startY = draggingHandle.y;
+            }
+            return (
+              <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
+                <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
+                  <line
+                    x1={startX}
+                    y1={startY}
+                    x2={mouseX}
+                    y2={mouseY}
+                    stroke={theme.palette.primary.main}
+                    strokeWidth={2}
+                    strokeDasharray="6,4"
+                  />
+                </g>
+              </svg>
+            );
+          })()
+        )}
+      </PanZoomLayer>
+    </div>
   );
 }
 

@@ -96,8 +96,9 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
 
   const onDrop = (event) => {
     const mousePos = { x: event.clientX, y: event.clientY };
-    // Calculate graph coordinates
-    const rect = event.target.getBoundingClientRect();
+    // Use the main graph container for coordinate conversion
+    const graphContainer = document.getElementById('graph-canvas') || event.target.closest('#graph-canvas');
+    const rect = graphContainer ? graphContainer.getBoundingClientRect() : event.target.getBoundingClientRect();
     const graphX = (event.clientX - pan.x - rect.left) / zoom;
     const graphY = (event.clientY - pan.y - rect.top) / zoom;
     // Find node under mouse (if any)
@@ -107,15 +108,20 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
         const dx = graphX - n.position.x;
         const dy = graphY - n.position.y;
         const r = (n.width || 60) / 2;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // console.log(`Testing node ${n.id}: center=(${n.position.x},${n.position.y}), drop=(${graphX},${graphY}), dist=${dist}, r=${r}`);
         return dx * dx + dy * dy <= r * r;
       });
     }
     eventBus.emit('handleDrop', {
       graph: { x: graphX, y: graphY },
       screen: { x: event.clientX, y: event.clientY },
-      nodeId: nodeUnderMouse ? nodeUnderMouse.id : null,
+      sourceNode: dragStateRef.current ? dragStateRef.current.nodeId : null,
+      targetNode: nodeUnderMouse ? nodeUnderMouse.id : null,
+      edgeId: dragStateRef.current ? dragStateRef.current.edgeId : null,
       // ...add any other data you want to pass
     });
+    console.log('HandleLayer.js: handle dropped at graph coords', { x: graphX, y: graphY, nodeId: nodeUnderMouse ? nodeUnderMouse.id : null, edgeId: dragStateRef.current ? dragStateRef.current.edgeId : null });
     window.removeEventListener('mousemove', onDrag);
     window.removeEventListener('mouseup', onDrop);
     if (typeof onHandleDragEnd === 'function') {
@@ -216,9 +222,9 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
 
   const onDragEnd = (event) => {
     console.log('HandleLayer.js: drag end handler entered', event);
-    hideHandle(dragState ? dragState.handleId : null);
-    dragState = null;
-    console.log('HandleLayer.js: dragState reset on drag end', dragState);
+    hideHandle(dragStateRef.current ? dragStateRef.current.handleId : null);
+    dragStateRef.current = null;
+    console.log('HandleLayer.js: dragState reset on drag end',  dragStateRef.current);
     // ...existing code...
   };
 
@@ -288,7 +294,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
               }}
               onMouseDown={e => {
                 if (isFullyExtended) {
-                  console.log('HandleLayer: handle clicked', handle);
+                  // console.log('HandleLayer: handle clicked', handle);
                   handleMouseDown(e, handle);
                   if (typeof onHandleDragStart === 'function') {
                     onHandleDragStart(e, handle);

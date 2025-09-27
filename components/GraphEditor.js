@@ -15,6 +15,7 @@ export default function GraphEditor() {
   const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
   // Compute which handles should be extended for hovered edge
   let hoveredEdgeSource = null;
@@ -38,36 +39,19 @@ export default function GraphEditor() {
   useEffect(() => {
     function onHandleDrop(data) {
       console.log('GraphEditor.js: handleDrop event received', data);
-      const { nodeId, edgeId, mouse, nodeUnderMouse, edgeType } = data;
-      if (!nodeId) return;
+      console.log('Event data:', data);
+      const { graph, screen, sourceNode, targetNode, edgeId } = data;
       let newEdgeType = 'straight';
       if (edgeId) {
         const foundEdge = edgesRef.current.find(e => e.id === edgeId);
         if (foundEdge && foundEdge.type) {
           newEdgeType = foundEdge.type;
         }
-      } else if (edgeType) {
-        newEdgeType = edgeType;
       }
+      const graphX = graph.x;
+      const graphY = graph.y;
 
-      // // Debug logs for coordinate conversion
-      const rectLeft = typeof data.rectLeft === 'number' ? data.rectLeft : 0;
-      const rectTop = typeof data.rectTop === 'number' ? data.rectTop : 0;
-      // console.log('mouse.x:', mouse.x, 'mouse.y:', mouse.y);
-      // console.log('rectLeft:', rectLeft, 'rectTop:', rectTop);
-      // console.log('pan.x:', pan.x, 'pan.y:', pan.y);
-      // console.log('zoom:', zoom);
-
-      const { x: graphX, y: graphY } = screenToGraphCoords(mouse, {
-        pan: data.pan,
-        zoom: typeof data.zoom === 'number' ? data.zoom : zoom,
-        rectLeft,
-        rectTop
-      });
-      // console.log('graphX:', graphX, 'graphY:', graphY);
-      // console.log('Final node position:', { x: graphX, y: graphY });
-
-      if (!nodeUnderMouse || nodeUnderMouse.id === nodeId) {
+      if (!targetNode || targetNode === sourceNode) {
         // Drop on blank field or self: create new node and edge
         const newNodeId = uuidv4();
         const newNode = createNode({
@@ -84,7 +68,7 @@ export default function GraphEditor() {
         const newEdgeId = uuidv4();
         const newEdge = createEdge({
           id: newEdgeId,
-          source: nodeId,
+          source: sourceNode,
           target: newNodeId,
           label: `Edge ${edges.length + 1}`,
           type: newEdgeType
@@ -93,12 +77,12 @@ export default function GraphEditor() {
         console.log('Added edge:', newEdge);
       } else {
         // Drop on another node: create edge between source and target
-        if (nodeUnderMouse.id !== nodeId) {
+        if (targetNode !== sourceNode) {
           const newEdgeId = uuidv4();
           const newEdge = createEdge({
             id: newEdgeId,
-            source: nodeId,
-            target: nodeUnderMouse.id,
+            source: sourceNode,
+            target: targetNode,
             label: `Edge ${edges.length + 1}`,
             type: newEdgeType
           });
@@ -170,11 +154,13 @@ export default function GraphEditor() {
           setPan={setPan} 
           setZoom={setZoom}
           selectedNodeId={selectedNodeId}
+          hoveredNodeId={hoveredNodeId}
           onNodeMove={(id, position) => {
             setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
           }}
           onEdgeClick={(edge, event) => {
             console.log('GraphEditor onEdgeClick', edge, event);
+            setSelectedEdgeId(edge.id);
           }}
           onNodeClick={nodeId => {
             setSelectedNodeId(nodeId);
