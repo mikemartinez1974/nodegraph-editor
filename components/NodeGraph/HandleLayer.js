@@ -96,17 +96,29 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
 
   const onDrop = (event) => {
     const mousePos = { x: event.clientX, y: event.clientY };
-    if (typeof handleDrop === 'function') {
-      handleDrop(dragStateRef.current);
+    // Calculate graph coordinates
+    const rect = event.target.getBoundingClientRect();
+    const graphX = (event.clientX - pan.x - rect.left) / zoom;
+    const graphY = (event.clientY - pan.y - rect.top) / zoom;
+    // Find node under mouse (if any)
+    let nodeUnderMouse = null;
+    if (Array.isArray(nodes)) {
+      nodeUnderMouse = nodes.find(n => {
+        const dx = graphX - n.position.x;
+        const dy = graphY - n.position.y;
+        const r = (n.width || 60) / 2;
+        return dx * dx + dy * dy <= r * r;
+      });
     }
+    eventBus.emit('handleDrop', {
+      graph: { x: graphX, y: graphY },
+      screen: { x: event.clientX, y: event.clientY },
+      nodeId: nodeUnderMouse ? nodeUnderMouse.id : null,
+      // ...add any other data you want to pass
+    });
     window.removeEventListener('mousemove', onDrag);
     window.removeEventListener('mouseup', onDrop);
-    // Debug statement for drop event
-    //console.log('HandleLayer: handle drop event fired', { dragState: dragStateRef.current, mousePos });
-    // Call parent callback for drag end
     if (typeof onHandleDragEnd === 'function') {
-      // Debug statement for drop event
-      //console.log('HandleLayer: handle drop event fired', { dragState: dragStateRef.current, mousePos });
       onHandleDragEnd(event, dragStateRef.current);
     }
     dragStateRef.current = null;

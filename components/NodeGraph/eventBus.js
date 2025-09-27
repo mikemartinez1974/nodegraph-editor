@@ -14,6 +14,7 @@ class EventBus {
         this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
     }
     emit(event, data) {
+        //console.log(`[eventBus] emit: ${event}`, data); // Debug log for all emitted events
         if (!this.listeners[event]) return;
         this.listeners[event].forEach(cb => cb(data));
     }
