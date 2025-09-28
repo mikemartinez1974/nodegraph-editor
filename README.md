@@ -69,4 +69,4 @@ Contributions are welcome! Please open issues or pull requests to suggest featur
 
 ## License
 
-MIT
+All Rights Reserved under the [Less Grossman License](https://www.youtube.com/watch?v=dROwEc4VyJA).
