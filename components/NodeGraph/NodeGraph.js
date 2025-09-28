@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
 import { usePanZoom } from './hooks/usePanZoom';
-import NodeComponent from './NodeComponent';
+import NodeComponent from '../GraphEditor/Nodes/NodeComponent';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
 import PanZoomLayer from './PanZoomLayer';
@@ -235,8 +235,18 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     //console.log('handleNodeMouseLeave called for node', id);
   }
 
+  // Ensure the graph resizes with the window
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  useEffect(() => {
+    function handleResize() {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div id="graph-canvas" style={{ position: 'absolute', inset: 0, width: '100vw', height: '100vh', pointerEvents: 'none', background: 'none', zIndex: 0 }}>
+    <div id="graph-canvas" style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', pointerEvents: 'none', background: 'none', zIndex: 0 }}>
       <PanZoomLayer
         pan={pan}
         zoom={zoom}
@@ -244,7 +254,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         setZoom={setZoom}
         onBackgroundClick={handleBackgroundClickFromPanZoom}
         theme={theme}
-        style={{ pointerEvents: 'auto', width: '100%', height: '100%' }}
+        style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
         <HandleLayer
           nodes={nodesWithProgress}
@@ -284,7 +294,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           }}
           onEdgeHover={onEdgeHover}
         />
-        {/* <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} /> */}
         <NodeLayer
           nodes={nodeList}
           pan={pan}

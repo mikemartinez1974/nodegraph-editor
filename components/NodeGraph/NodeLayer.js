@@ -1,5 +1,5 @@
 import React from 'react';
-import NodeComponent from './NodeComponent';
+import NodeComponent from '../GraphEditor/Nodes/NodeComponent';
 
 const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, draggingNodeId, onNodeEvent, onNodeDragStart }) => {
     return (

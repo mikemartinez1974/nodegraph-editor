@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
-import eventBus from './eventBus';
+import eventBus from '../../NodeGraph/eventBus';
 
 const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, children, draggingHandle }) => {
     const theme = useTheme();

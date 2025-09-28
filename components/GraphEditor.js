@@ -5,8 +5,12 @@ import { nodes as initialNodes, edges as initialEdges } from '../components/Node
 import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
-import { screenToGraphCoords } from './NodeGraph/utils/coords';
+//import { screenToGraphCoords } from './NodeGraph/utils/coords';
 import { edgeTypes } from './GraphEditor/edgeTypes';
+
+import DefaultNode from '../components/GraphEditor/Nodes/NodeComponent';
+import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
+import ListNode from '../components/GraphEditor/Nodes/ListNode';
 
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -98,7 +102,6 @@ export default function GraphEditor() {
             }
           }
           const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
-          console.log('DEBUG: Handle dropped on node', { sourceNode, targetNode, edgeId, edgeTypeKey, data });
           const newEdgeId = uuidv4();
           const newEdge = addEdge({
             id: newEdgeId,
@@ -158,6 +161,13 @@ export default function GraphEditor() {
     setEdges(prev => prev.slice(0, -1));
   }
 
+  // Node types mapping for the editor
+  const nodeTypes = {
+    default: DefaultNode,
+    display: DisplayNode,
+    list: ListNode
+  };
+
   return (
       <div>
         <Toolbar />
@@ -170,6 +180,7 @@ export default function GraphEditor() {
           setZoom={setZoom}
           selectedNodeId={selectedNodeId}
           hoveredNodeId={hoveredNodeId}
+          nodeTypes={nodeTypes}
           onNodeMove={(id, position) => {
             setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
           }}

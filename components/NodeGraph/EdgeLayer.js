@@ -36,13 +36,23 @@ function isPointNearBezier(x, y, x1, y1, cx1, cy1, cx2, cy2, x2, y2, threshold =
 
 function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 1, selectedEdgeId, theme, onEdgeClick, onEdgeHover }) {
   const canvasRef = useRef(null);
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCanvasSize({ width: window.innerWidth, height: window.innerHeight * 0.9 });
     }
+  }, []);
+
+  // Resize canvas when window size changes
+  useEffect(() => {
+    function handleResize() {
+      setCanvasSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+    handleResize(); // Set initial size
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Mouse event handlers
