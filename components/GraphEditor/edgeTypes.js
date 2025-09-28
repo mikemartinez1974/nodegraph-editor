@@ -1,5 +1,24 @@
 // Edge types for the graph editor
-export const EDGE_TYPES = {
-    child:
-}
+
+export const edgeTypes = {
+  child: {
+    label: 'Child',
+    style: {
+      color: undefined, // Use theme default
+      width: 2,
+      dash: [],
+      curved: true
+    }
+  },
+  peer: {
+    label: 'Peer',
+    style: {
+      color: undefined, // Use theme default
+      width: 2,
+      dash: [1, 4],
+      curved: true
+    }
+  }
+};
+
 

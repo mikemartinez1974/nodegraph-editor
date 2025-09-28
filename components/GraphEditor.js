@@ -6,6 +6,7 @@ import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
 import { screenToGraphCoords } from './NodeGraph/utils/coords';
+import { edgeTypes } from './GraphEditor/edgeTypes';
 
 export default function GraphEditor() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -66,25 +67,28 @@ export default function GraphEditor() {
         console.log('Added node:', newNode);
 
         const newEdgeId = uuidv4();
-        const newEdge = createEdge({
+        const newEdge = addEdge({
           id: newEdgeId,
+          type: edgeTypes.child,
           source: sourceNode,
           target: newNodeId,
-          label: `Edge ${edges.length + 1}`,
-          type: newEdgeType
+          label: `Child ${edges.length + 1}`,
+          showLabel: false,
+          style: edgeTypes.child.style
         });
-        setEdges(prev => [...prev, newEdge]);
         console.log('Added edge:', newEdge);
       } else {
         // Drop on another node: create edge between source and target
         if (targetNode !== sourceNode) {
           const newEdgeId = uuidv4();
-          const newEdge = createEdge({
+          const newEdge = addEdge({
             id: newEdgeId,
-            source: sourceNode,
-            target: targetNode,
-            label: `Edge ${edges.length + 1}`,
-            type: newEdgeType
+            type: edgeTypes.peer,
+          source: sourceNode,
+          target: newNodeId,
+          label: `Peer ${edges.length + 1}`,
+          showLabel: false,
+          style: edgeTypes.child.style
           });
           setEdges(prev => [...prev, newEdge]);
         }
@@ -117,18 +121,10 @@ export default function GraphEditor() {
     console.log('Added node:', newNode.id);
   }
   
-  function addEdge() {
-    if (nodes.length < 2) return;
-    const newId = uuidv4();
-    const newEdge = createEdge({
-      id: newId,
-      source: nodes[nodes.length - 2].id,
-      target: nodes[nodes.length - 1].id,
-      label: `Edge ${edges.length + 1}`,
-      type: 'straight'
-    });
-    setEdges(prev => [...prev, newEdge]);
-    console.log('Added edge:', newEdge.id);
+  function addEdge(edgeProps) {
+    const edge = createEdge(edgeProps);
+    setEdges(prev => [...prev, edge]);
+    return edge;
   }
   
   function deleteNode() {

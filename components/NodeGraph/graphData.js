@@ -1,5 +1,6 @@
 // graphData.js
-import { createNode, createEdge } from './nodeEdgeBase';
+import { createNode, addEdge } from './nodeEdgeBase';
+import { edgeTypes } from '../GraphEditor/edgeTypes';
 
 export const nodes = [
   createNode({ id: 'node1', type: 'default', label: 'Start', data: {}, position: { x: 100, y: 100 }, showLabel: true }),
@@ -9,7 +10,7 @@ export const nodes = [
 ];
 
 export const edges = [
-  createEdge({ id: 'edge1', source: 'node1', target: 'node2', label: 'Next', style: { color: undefined, width: 2, dash: [], curved: false } }),
-  createEdge({ id: 'edge2', source: 'node2', target: 'node3', label: 'Evaluate', style: { color: undefined, width: 2, dash: [6, 4], curved: true } }),
-  createEdge({ id: 'edge3', source: 'node3', target: 'node4', label: 'Finish', style: { color: undefined, width: 2, dash: [], curved: true } })
+  addEdge({ id: 'edge1', source: 'node1', target: 'node2', label: edgeTypes.child.label, type: 'child', style: { ...edgeTypes.child.style } }),
+  addEdge({ id: 'edge2', source: 'node2', target: 'node3', label: edgeTypes.peer.label, type: 'peer', style: { ...edgeTypes.peer.style } }),
+  addEdge({ id: 'edge3', source: 'node3', target: 'node4', label: edgeTypes.child.label, type: 'child', style: { ...edgeTypes.child.style, curved: true } })
 ];

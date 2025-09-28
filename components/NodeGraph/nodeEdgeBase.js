@@ -41,8 +41,10 @@ export function createNode(props) {
 }
 
 // Edge factory
-export function createEdge(props) {
-  // Remove data property if present
-  const { data, ...rest } = props;
-  return new Edge(rest);
+export function addEdge({ id, source, target, label = '', type = 'default', showLabel = false, style = {} }) {
+  // You can add logic here to merge with edgeTypes defaults if needed
+  return new Edge({ id, source, target, label, type, showLabel, style });
 }
+
+// For backward compatibility
+export const createEdge = addEdge;
