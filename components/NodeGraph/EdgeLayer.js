@@ -57,21 +57,16 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) continue;
       let hit = false;
-      if (edge.type === 'curved') {
-        const x1 = sourceNode.position.x, y1 = sourceNode.position.y;
-        const x2 = targetNode.position.x, y2 = targetNode.position.y;
-        const dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
-        let cx1, cy1, cx2, cy2;
-        if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
-          cx1 = x1 + dx; cy1 = y1; cx2 = x2 - dx; cy2 = y2;
-        } else {
-          cx1 = x1; cy1 = y1 + dy; cx2 = x2; cy2 = y2 - dy;
-        }
-        hit = isPointNearBezier(mouseX, mouseY, x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+      // Determine if edge should be curved
+      const isCurved = edge.style?.curved === true;
+      if (isCurved) {
+        // Draw a bezier curve between source and target
+        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40; // Offset for curve
+        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
       } else {
-        const sourceHandle = sourceNode.position;
-        const targetHandle = targetNode.position;
-        hit = isPointNearLine(mouseX, mouseY, sourceHandle.x, sourceHandle.y, targetHandle.x, targetHandle.y);
+        // Draw a straight line
+        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
       }
       if (hit) {
         found = edge.id;
@@ -99,21 +94,16 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) continue;
       let hit = false;
-      if (edge.type === 'curved') {
-        const x1 = sourceNode.position.x, y1 = sourceNode.position.y;
-        const x2 = targetNode.position.x, y2 = targetNode.position.y;
-        const dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
-        let cx1, cy1, cx2, cy2;
-        if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
-          cx1 = x1 + dx; cy1 = y1; cx2 = x2 - dx; cy2 = y2;
-        } else {
-          cx1 = x1; cy1 = y1 + dy; cx2 = x2; cy2 = y2 - dy;
-        }
-        hit = isPointNearBezier(mouseX, mouseY, x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+      // Determine if edge should be curved
+      const isCurved = edge.style?.curved === true;
+      if (isCurved) {
+        // Draw a bezier curve between source and target
+        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40; // Offset for curve
+        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
       } else {
-        const sourceHandle = sourceNode.position;
-        const targetHandle = targetNode.position;
-        hit = isPointNearLine(mouseX, mouseY, sourceHandle.x, sourceHandle.y, targetHandle.x, targetHandle.y);
+        // Draw a straight line
+        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
       }
       if (hit) {
         found = edge.id;
@@ -138,21 +128,16 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) continue;
       let hit = false;
-      if (edge.type === 'curved') {
-        const x1 = sourceNode.position.x, y1 = sourceNode.position.y;
-        const x2 = targetNode.position.x, y2 = targetNode.position.y;
-        const dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
-        let cx1, cy1, cx2, cy2;
-        if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
-          cx1 = x1 + dx; cy1 = y1; cx2 = x2 - dx; cy2 = y2;
-        } else {
-          cx1 = x1; cy1 = y1 + dy; cx2 = x2; cy2 = y2 - dy;
-        }
-        hit = isPointNearBezier(mouseX, mouseY, x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+      // Determine if edge should be curved
+      const isCurved = edge.style?.curved === true;
+      if (isCurved) {
+        // Draw a bezier curve between source and target
+        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40; // Offset for curve
+        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
       } else {
-        const sourceHandle = sourceNode.position;
-        const targetHandle = targetNode.position;
-        hit = isPointNearLine(mouseX, mouseY, sourceHandle.x, sourceHandle.y, targetHandle.x, targetHandle.y);
+        // Draw a straight line
+        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
       }
       if (hit) {
         e.stopPropagation();
@@ -174,33 +159,30 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) return;
       ctx.save();
+      ctx.strokeStyle = edge.style?.color || theme.palette.primary.main;
+      ctx.lineWidth = edge.style?.width || 2;
+      ctx.setLineDash(edge.style?.dash || []);
       ctx.beginPath();
-      let x1 = sourceNode.position.x;
-      let y1 = sourceNode.position.y;
-      let x2 = targetNode.position.x;
-      let y2 = targetNode.position.y;
-      if (edge.type === 'curved') {
-        const dx = (x2 - x1) / 3;
-        const dy = (y2 - y1) / 3;
-        ctx.moveTo(x1, y1);
-        if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
-          ctx.bezierCurveTo(x1 + dx, y1, x2 - dx, y2, x2, y2);
-        } else {
-          ctx.bezierCurveTo(x1, y1 + dy, x2, y2 - dy, x2, y2);
-        }
+      let sourcePos = { x: sourceNode.position.x, y: sourceNode.position.y };
+      let targetPos = { x: targetNode.position.x, y: targetNode.position.y };
+      // Determine if edge should be curved
+      const isCurved = edge.style?.curved === true;
+      if (isCurved) {
+        // Draw a bezier curve between source and target
+        const midX = (sourcePos.x + targetPos.x) / 2;
+        const midY = (sourcePos.y + targetPos.y) / 2 - 40; // Offset for curve
+        ctx.beginPath();
+        ctx.moveTo(sourcePos.x, sourcePos.y);
+        ctx.bezierCurveTo(midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
+        ctx.stroke();
       } else {
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
+        // Draw a straight line
+        ctx.beginPath();
+        ctx.moveTo(sourcePos.x, sourcePos.y);
+        ctx.lineTo(targetPos.x, targetPos.y);
+        ctx.stroke();
       }
-      let isHovered = hoveredEdge === edge.id;
-      ctx.strokeStyle = edge.id === selectedEdgeId ? (theme?.palette?.primary?.main || '#2196f3') : isHovered ? (theme?.palette?.secondary?.main || '#f50057') : (theme?.palette?.text?.disabled || '#888');
-      ctx.lineWidth = edge.id === selectedEdgeId ? 3 : isHovered ? 2.5 : 1.5;
-      if (edge.type === 'dashed') {
-        ctx.setLineDash([10, 8]);
-      } else {
-        ctx.setLineDash([]);
-      }
-      ctx.stroke();
+      ctx.setLineDash([]);
       ctx.restore();
     });
     ctx.restore();

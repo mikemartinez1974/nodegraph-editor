@@ -214,8 +214,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
 
   const onDragStart = (event) => {
     console.log('HandleLayer.js: drag start handler entered', event);
-    dragState = {/* ...set drag state... */};
-    console.log('HandleLayer.js: dragState set on drag start', dragState);
+    console.log('HandleLayer.js: dragState set on drag start', dragStateRef.current);
     showHandle(dragState.handleId);
     // ...existing code...
   };

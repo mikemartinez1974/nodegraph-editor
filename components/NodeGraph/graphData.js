@@ -9,7 +9,7 @@ export const nodes = [
 ];
 
 export const edges = [
-  createEdge({ id: 'edge1', source: 'node1', target: 'node2', label: 'Next', type: 'straight' }),
-  createEdge({ id: 'edge2', source: 'node2', target: 'node3', label: 'Evaluate', type: 'dashed' }),
-  createEdge({ id: 'edge3', source: 'node3', target: 'node4', label: 'Finish', type: 'curved' })
+  createEdge({ id: 'edge1', source: 'node1', target: 'node2', label: 'Next', style: { color: undefined, width: 2, dash: [], curved: false } }),
+  createEdge({ id: 'edge2', source: 'node2', target: 'node3', label: 'Evaluate', style: { color: undefined, width: 2, dash: [6, 4], curved: true } }),
+  createEdge({ id: 'edge3', source: 'node3', target: 'node4', label: 'Finish', style: { color: undefined, width: 2, dash: [], curved: true } })
 ];

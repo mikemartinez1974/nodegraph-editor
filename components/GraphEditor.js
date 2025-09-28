@@ -159,11 +159,13 @@ export default function GraphEditor() {
             setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
           }}
           onEdgeClick={(edge, event) => {
-            console.log('GraphEditor onEdgeClick', edge, event);
             setSelectedEdgeId(edge.id);
+            setSelectedNodeId(null); // Deselect any node
+            console.log('GraphEditor onEdgeClick', edge, event);
           }}
           onNodeClick={nodeId => {
             setSelectedNodeId(nodeId);
+            setSelectedEdgeId(null); // Deselect any edge
             const node = nodes.find(n => n.id === nodeId);
             if (node) {
               console.log('Node clicked:', node);
@@ -171,6 +173,7 @@ export default function GraphEditor() {
           }}
           onBackgroundClick={() => {
             setSelectedNodeId(null);
+            setSelectedEdgeId(null); // Deselect both
             console.log('GraphEditor onBackgroundClick (empty field clicked)');
           }}
           onEdgeHover={id => setHoveredEdgeId(id)}

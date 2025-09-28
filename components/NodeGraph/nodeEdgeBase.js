@@ -17,13 +17,19 @@ export class Node {
 
 // Base Edge class
 export class Edge {
-  constructor({ id, source, target, label = '', type = 'default', showLabel = false }) {
+  constructor({ id, source, target, label = '', type = 'default', showLabel = false, style = {} }) {
     this.id = id;
     this.source = source;
     this.target = target;
     this.label = label;
     this.type = type;
     this.showLabel = showLabel;
+    this.style = {
+      color: style.color || undefined, // Let EdgeLayer use theme if undefined
+      width: style.width || 2,
+      dash: style.dash || [],
+      curved: style.curved || false
+    };
   }
 }
 
