@@ -159,7 +159,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
       });
       return;
     }
-    connectedEdges.forEach(edge => {
+    connectedEdges.forEach((edge, edgeIdx) => {
       const isSource = edge.source === node.id;
       const otherNode = isSource
         ? nodes.find(n => n.id === edge.target)
@@ -187,7 +187,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
         y: nodeCenterRaw.y + (connectionPoint.y - nodeCenterRaw.y) * progress
       };
       handles.push({
-        id: `${node.id}-handle-${edge.id}`,
+        id: `${node.id}-handle-${edge.id}-${isSource ? 'source' : 'target'}-${edgeIdx}`,
         x: interpRaw.x,
         y: interpRaw.y,
         radius: 11,

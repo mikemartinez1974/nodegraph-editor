@@ -15,7 +15,7 @@
   - [x] Support different edge styles (straight, curved)
 
 - [ ] **Interaction**
-  - [ ] Add, select, move, and delete nodes/edges
+  - [x] Add, select, move, and delete nodes/edges
   - [ ] Multi-select and group nodes
 
 - [ ] **State Management**

@@ -15,7 +15,7 @@ export const edgeTypes = {
     style: {
       color: undefined, // Use theme default
       width: 2,
-      dash: [1, 4],
+      dash: [2, 4],
       curved: true
     }
   }

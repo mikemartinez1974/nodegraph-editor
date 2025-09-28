@@ -52,8 +52,8 @@ export default function GraphEditor() {
       const graphX = graph.x;
       const graphY = graph.y;
 
-      if (!targetNode || targetNode === sourceNode) {
-        // Drop on blank field or self: create new node and edge
+      if (!targetNode) {
+        // Drop on blank field: create new node and edge
         const newNodeId = uuidv4();
         const newNode = createNode({
           id: newNodeId,
@@ -66,29 +66,48 @@ export default function GraphEditor() {
         setNodes(prev => [...prev, newNode]);
         console.log('Added node:', newNode);
 
+        // Determine edge type from the handle's associated edge, or default to 'child'
+        let edgeTypeKey = 'child';
+        if (edgeId) {
+          const foundEdge = edgesRef.current.find(e => e.id === edgeId);
+          if (foundEdge && foundEdge.type && edgeTypes[foundEdge.type]) {
+            edgeTypeKey = foundEdge.type;
+          }
+        }
+        const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
         const newEdgeId = uuidv4();
         const newEdge = addEdge({
           id: newEdgeId,
-          type: edgeTypes.child,
+          type: edgeTypeKey,
           source: sourceNode,
           target: newNodeId,
-          label: `Child ${edges.length + 1}`,
+          label: `${edgeTypePreset.label} ${edges.length + 1}`,
           showLabel: false,
-          style: edgeTypes.child.style
+          style: edgeTypePreset.style
         });
         console.log('Added edge:', newEdge);
       } else {
         // Drop on another node: create edge between source and target
         if (targetNode !== sourceNode) {
+          // Determine edge type from the handle's associated edge, or default to 'child'
+          let edgeTypeKey = 'child';
+          if (edgeId) {
+            const foundEdge = edgesRef.current.find(e => e.id === edgeId);
+            if (foundEdge && foundEdge.type && edgeTypes[foundEdge.type]) {
+              edgeTypeKey = foundEdge.type;
+            }
+          }
+          const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
+          console.log('DEBUG: Handle dropped on node', { sourceNode, targetNode, edgeId, edgeTypeKey, data });
           const newEdgeId = uuidv4();
           const newEdge = addEdge({
             id: newEdgeId,
-            type: edgeTypes.peer,
-          source: sourceNode,
-          target: newNodeId,
-          label: `Peer ${edges.length + 1}`,
-          showLabel: false,
-          style: edgeTypes.child.style
+            type: edgeTypeKey,
+            source: sourceNode,
+            target: targetNode,
+            label: `${edgeTypePreset.label} ${edges.length + 1}`,
+            showLabel: false,
+            style: edgeTypePreset.style
           });
           setEdges(prev => [...prev, newEdge]);
         }

@@ -55,18 +55,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }, [nodes]
   );
 
-  //Draws Debug Nodes
-  function drawDebugNodes(ctx, nodes, theme) {
-    nodes.forEach(node => {
-      ctx.save();
-      ctx.strokeStyle = theme.palette.info.main;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 2]);
-      ctx.strokeRect(node.position.x, node.position.y, node.width || 60, node.height || 60);
-      ctx.restore();
-    });
-  } 
-
 
   //Draw Debug Nodes
   useEffect(() => {
@@ -79,8 +67,14 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
 
-    // drawEdges(ctx, nodes, edges, theme); // Removed: edge drawing now handled by EdgeLayer
-    drawDebugNodes(ctx, nodes, theme);
+    nodes.forEach(node => {
+      ctx.save();
+      ctx.strokeStyle = theme.palette.info.main;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 2]);
+      ctx.strokeRect(node.position.x, node.position.y, node.width || 60, node.height || 60);
+      ctx.restore();
+    });
 
     ctx.restore();
   }, [canvasSize, theme, pan, zoom, nodes, edges]);
@@ -290,7 +284,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           }}
           onEdgeHover={onEdgeHover}
         />
-        <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} />
+        {/* <EdgeHandles nodes={nodesWithProgress} edges={edges} theme={theme} pan={pan} zoom={zoom} /> */}
         <NodeLayer
           nodes={nodeList}
           pan={pan}
@@ -364,6 +358,3 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     </div>
   );
 }
-
-
-//<EdgeLayer edges={edges} onEdgeEvent={setHoveredEdgeId} />
