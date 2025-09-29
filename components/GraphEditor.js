@@ -167,7 +167,14 @@ export default function GraphEditor() {
   };
 
   return (
-      <div>
+      <div style={{
+        minHeight: '100vh',
+        minWidth: '100vw',
+        backgroundImage: "url('/background art/background11.jpg')",
+        backgroundSize: 'auto',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}>
         <Toolbar />
         <NodeGraph 
           nodes={nodes} 

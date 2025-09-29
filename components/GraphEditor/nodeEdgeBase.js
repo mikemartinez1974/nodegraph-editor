@@ -3,15 +3,26 @@
 // Base Node class
 export class Node {
   constructor({ id, label = '', position = { x: 0, y: 0 }, type = 'default', width = 60, height = 60, resizable = false, handlePosition = 'center', showLabel = false }) {
+    // Basic Properties
     this.id = id;
     this.label = label;
-    this.position = position;
     this.type = type;
     this.width = width;
     this.height = height;
+    
+    // Data Properties
+    this.data = {
+      // Add any relevant data properties here
+      memo: '',
+      link: '',
+    };
+
+    // Internal properties
     this.resizable = resizable;
     this.handlePosition = handlePosition;
     this.showLabel = showLabel;
+    this.position = position;
+
   }
 }
 

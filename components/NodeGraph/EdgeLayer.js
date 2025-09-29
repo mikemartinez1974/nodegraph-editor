@@ -175,8 +175,8 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       let targetPos = { x: targetNode.position.x, y: targetNode.position.y };
       // Create a linear gradient for the edge
       const grad = ctx.createLinearGradient(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
-      grad.addColorStop(0, theme.palette.primary.dark);
-      grad.addColorStop(1, theme.palette.primary.light);
+      grad.addColorStop(0, theme.palette.primary.light);
+      grad.addColorStop(1, theme.palette.primary.dark);
       ctx.strokeStyle = grad;
       ctx.lineWidth = edge.style?.width || 2;
       ctx.setLineDash(edge.style?.dash || []);

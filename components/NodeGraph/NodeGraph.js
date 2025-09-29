@@ -3,35 +3,22 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
-import { usePanZoom } from './hooks/usePanZoom';
-import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
 import PanZoomLayer from './PanZoomLayer';
-import { useNodeHover } from './hooks/useNodeHover';
-import { useEdgeHover } from './hooks/useEdgeHover';
-import { useHandleAnimation } from './hooks/useHandleAnimation';
-import EdgeHandles from './EdgeHandles';
 import NodeLayer from './NodeLayer';
-import { isPointNearLine, isPointNearBezier } from './utils';
-import { handleCanvasClick, handleCanvasMouseDown, handleCanvasMouseMove, handleCanvasMouseUp, handleNodeMouseDown, handleNodeMouseMove, handleNodeMouseUp, onNodeDragStart, onNodeDragEnd } from './eventHandlers';
 import { useCanvasSize } from './hooks/useCanvasSize';
-import { useHandleProgress } from './hooks/useHandleProgress';
-import { useEventBusHandlers } from './hooks/useEventBusHandlers';
 import eventBus from './eventBus';
 
 export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
   const theme = useTheme();
   const canvasRef = useRef(null);
-  const edgeListRef = useRef(edges);
-  const canvasSize = useCanvasSize();
   const [nodeList, setNodeList] = useState(nodes);
   const [selectedNodeIdState, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
-  
   const draggingNodeIdRef = useRef(null);
   const hoverTimeoutRef = useRef({});
   const [draggingHandle, setDraggingHandle] = useState(null);
@@ -220,7 +207,15 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   }, []);
 
   return (
-    <div id="graph-canvas" style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', pointerEvents: 'none', background: 'none', zIndex: 0 }}>
+    <div id="graph-canvas" style={{
+      position: 'fixed',
+      inset: 0,
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      background: "none",
+      zIndex: 0
+    }}>
       <PanZoomLayer
         pan={pan}
         zoom={zoom}

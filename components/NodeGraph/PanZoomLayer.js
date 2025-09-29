@@ -64,7 +64,7 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, childr
                 inset: 0,
                 cursor: 'default',
                 zIndex: 1,
-                background: theme?.palette?.background?.default || '#f5f5f5',
+                background: 'transparent',
                 transition: 'background 0.2s',
             }}
             onMouseDown={handleMouseDown}

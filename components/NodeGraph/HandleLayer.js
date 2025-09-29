@@ -228,84 +228,82 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
   };
 
   return (
-    <>
-      <div style={{ pointerEvents: 'none' }}>
-        {handles.map(handle => {
-          const scaledRadius = handle.radius * zoom;
-          const left = handle.x * zoom + pan.x - scaledRadius;
-          const top = handle.y * zoom + pan.y - scaledRadius;
-          const isFullyExtended = handle.progress === 1;
-          const pointerEvents = handle.pointerEvents || (isFullyExtended ? 'auto' : 'none');
-          if (dragStateRef.current && dragStateRef.current.nodeId === handle.nodeId && dragStateRef.current.edgeId === handle.edgeId && dragStateRef.current.mouse) {
-            const mouseGraphX = (dragStateRef.current.mouse.x - pan.x) / zoom;
-            const mouseGraphY = (dragStateRef.current.mouse.y - pan.y) / zoom;
-            return (
-              <div
-                key={handle.id + '-dragging'}
-                style={{
-                  position: 'absolute',
-                  left: dragStateRef.current.mouse.x - handle.radius * zoom,
-                  top: dragStateRef.current.mouse.y - handle.radius * zoom,
-                  width: handle.radius * 2 * zoom,
-                  height: handle.radius * 2 * zoom,
-                  borderRadius: '50%',
-                  background: theme?.palette?.primary?.main || '#f00',
-                  opacity: 1,
-                  pointerEvents: 'none',
-                  boxShadow: '0 0 8px #00f',
-                  zIndex: 20
-                }}
-              />
-            );
-          }
+    <div style={{ pointerEvents: 'none' }}>
+      {handles.map(handle => {
+        const scaledRadius = handle.radius * zoom;
+        const left = handle.x * zoom + pan.x - scaledRadius;
+        const top = handle.y * zoom + pan.y - scaledRadius;
+        const isFullyExtended = handle.progress === 1;
+        const pointerEvents = handle.pointerEvents || (isFullyExtended ? 'auto' : 'none');
+        if (dragStateRef.current && dragStateRef.current.nodeId === handle.nodeId && dragStateRef.current.edgeId === handle.edgeId && dragStateRef.current.mouse) {
+          const mouseGraphX = (dragStateRef.current.mouse.x - pan.x) / zoom;
+          const mouseGraphY = (dragStateRef.current.mouse.y - pan.y) / zoom;
           return (
             <div
-              key={handle.id}
+              key={handle.id + '-dragging'}
               style={{
                 position: 'absolute',
-                left,
-                top,
-                width: scaledRadius * 2,
-                height: scaledRadius * 2,
+                left: dragStateRef.current.mouse.x - handle.radius * zoom,
+                top: dragStateRef.current.mouse.y - handle.radius * zoom,
+                width: handle.radius * 2 * zoom,
+                height: handle.radius * 2 * zoom,
                 borderRadius: '50%',
-                background: handle.color || '#888',
-                opacity: handle.progress !== undefined ? handle.progress : 1,
-                pointerEvents,
-                transition: 'opacity 0.2s',
-                boxShadow: handle.isActive ? '0 0 8px #00f' : undefined,
-                cursor: 'default',
-                zIndex: 10
+                background: theme?.palette?.primary?.main || '#f00',
+                opacity: 1,
+                pointerEvents: 'none',
+                boxShadow: '0 0 8px #00f',
+                zIndex: 20
               }}
-              onMouseEnter={() => {
-                if (isFullyExtended && !dragStateRef.current) {
-                  onHandleEvent && onHandleEvent(handle);
-                //   console.log('Handle mouse enter:', {
-                //     nodeId: handle.nodeId,
-                //     edgeId: handle.edgeId,
-                //     handlePos: { x: handle.x, y: handle.y },
-                //     progress: handle.progress,
-                //     type: handle.edgeId ? edgesSafe.find(e => e.id === handle.edgeId)?.type : 'default'
-                //   });
-                }
-              }}
-              onMouseLeave={() => {
-                if (isFullyExtended && !dragStateRef.current) onHandleEvent && onHandleEvent(null);
-              }}
-              onMouseDown={e => {
-                if (isFullyExtended) {
-                  // console.log('HandleLayer: handle clicked', handle);
-                  handleMouseDown(e, handle);
-                  if (typeof onHandleDragStart === 'function') {
-                    onHandleDragStart(e, handle);
-                  }
-                }
-              }}
-              className="handle"
             />
           );
-        })}
-      </div>
-    </>
+        }
+        return (
+          <div
+            key={handle.id}
+            style={{
+              position: 'absolute',
+              left,
+              top,
+              width: scaledRadius * 2,
+              height: scaledRadius * 2,
+              borderRadius: '50%',
+              background: handle.color || '#888',
+              opacity: handle.progress !== undefined ? handle.progress : 1,
+              pointerEvents,
+              transition: 'opacity 0.2s',
+              boxShadow: handle.isActive ? '0 0 8px #00f' : undefined,
+              cursor: 'default',
+              zIndex: 10
+            }}
+            onMouseEnter={() => {
+              if (isFullyExtended && !dragStateRef.current) {
+                onHandleEvent && onHandleEvent(handle);
+              //   console.log('Handle mouse enter:', {
+              //     nodeId: handle.nodeId,
+              //     edgeId: handle.edgeId,
+              //     handlePos: { x: handle.x, y: handle.y },
+              //     progress: handle.progress,
+              //     type: handle.edgeId ? edgesSafe.find(e => e.id === handle.edgeId)?.type : 'default'
+              //   });
+              }
+            }}
+            onMouseLeave={() => {
+              if (isFullyExtended && !dragStateRef.current) onHandleEvent && onHandleEvent(null);
+            }}
+            onMouseDown={e => {
+              if (isFullyExtended) {
+                // console.log('HandleLayer: handle clicked', handle);
+                handleMouseDown(e, handle);
+                if (typeof onHandleDragStart === 'function') {
+                  onHandleDragStart(e, handle);
+                }
+              }
+            }}
+            className="handle"
+          />
+        );
+      })}
+    </div>
   );
 };
 
