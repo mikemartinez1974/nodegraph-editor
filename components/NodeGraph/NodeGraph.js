@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
 import { usePanZoom } from './hooks/usePanZoom';
-import NodeComponent from '../GraphEditor/Nodes/NodeComponent';
+import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
 import PanZoomLayer from './PanZoomLayer';
@@ -31,9 +31,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
-  const [isPanningState, setIsPanningState] = useState(false);
-  const isPanning = useRef(false);
-  const lastPanPos = useRef({ x: 0, y: 0 });
+  
   const draggingNodeIdRef = useRef(null);
   const hoverTimeoutRef = useRef({});
   const [draggingHandle, setDraggingHandle] = useState(null);
@@ -54,30 +52,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     }
   }, [nodes]
   );
-
-
-  //Draw Debug Nodes
-  useEffect(() => {
-    // Always use nodes and edges from props for rendering
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-    ctx.save();
-    ctx.translate(pan.x, pan.y);
-    ctx.scale(zoom, zoom);
-
-    nodes.forEach(node => {
-      ctx.save();
-      ctx.strokeStyle = theme.palette.info.main;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 2]);
-      ctx.strokeRect(node.position.x, node.position.y, node.width || 60, node.height || 60);
-      ctx.restore();
-    });
-
-    ctx.restore();
-  }, [canvasSize, theme, pan, zoom, nodes, edges]);
 
 
   // Event bus handlers for node/edge events

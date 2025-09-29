@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 
-const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, children, draggingHandle }) => {
+const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, children, draggingHandle }) => {
     const theme = useTheme();
     const width = (node?.width || 60) * zoom;
     const height = (node?.height || 60) * zoom;
@@ -47,6 +47,8 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
         };
     }, []);
 
+    const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
+    const unselcted_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
     return (
         <div
             ref={nodeRef}
@@ -59,10 +61,10 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
                 height,
                 cursor: 'grab',
                 border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
-                background: isSelected ? theme.palette.secondary.main : theme.palette.primary.main,
+                background: isSelected ? selected_gradient : unselcted_gradient,
                 borderRadius: 8,
                 boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
-                color: isSelected ? `${theme.palette.text.secondary}` : `${theme.palette.text.primary}`,
+                color: isSelected ? `${theme.textColors.dark}` : `${theme.textColors.light}`,
                 zIndex: 100,
                 pointerEvents: 'auto',
                 ...style
@@ -95,4 +97,4 @@ const NodeComponent = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSel
     );
 };
 
-export default NodeComponent;
+export default DefaultNode;

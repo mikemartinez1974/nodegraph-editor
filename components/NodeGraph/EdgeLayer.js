@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+
 
 function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
   // Distance from point (x, y) to line segment (x1, y1)-(x2, y2)
@@ -169,12 +171,16 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) return;
       ctx.save();
-      ctx.strokeStyle = edge.style?.color || theme.palette.primary.main;
+      let sourcePos = { x: sourceNode.position.x, y: sourceNode.position.y };
+      let targetPos = { x: targetNode.position.x, y: targetNode.position.y };
+      // Create a linear gradient for the edge
+      const grad = ctx.createLinearGradient(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
+      grad.addColorStop(0, theme.palette.primary.dark);
+      grad.addColorStop(1, theme.palette.primary.light);
+      ctx.strokeStyle = grad;
       ctx.lineWidth = edge.style?.width || 2;
       ctx.setLineDash(edge.style?.dash || []);
       ctx.beginPath();
-      let sourcePos = { x: sourceNode.position.x, y: sourceNode.position.y };
-      let targetPos = { x: targetNode.position.x, y: targetNode.position.y };
       // Determine if edge should be curved
       const isCurved = edge.style?.curved === true;
       if (isCurved) {

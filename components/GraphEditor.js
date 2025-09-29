@@ -2,13 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import NodeGraph from './NodeGraph';
 import { nodes as initialNodes, edges as initialEdges } from '../components/NodeGraph/graphData';
-import { createNode, createEdge } from './NodeGraph/nodeEdgeBase';
+import { createNode, createEdge } from './GraphEditor/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
-//import { screenToGraphCoords } from './NodeGraph/utils/coords';
 import { edgeTypes } from './GraphEditor/edgeTypes';
-
-import DefaultNode from '../components/GraphEditor/Nodes/NodeComponent';
+import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 

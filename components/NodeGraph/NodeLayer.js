@@ -1,11 +1,11 @@
 import React from 'react';
-import NodeComponent from '../GraphEditor/Nodes/NodeComponent';
+import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 
 const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, draggingNodeId, onNodeEvent, onNodeDragStart }) => {
     return (
         <div style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0 }}>
             {nodes.map(node => (
-                <NodeComponent
+                <DefaultNode
                     key={node.id}
                     node={node}
                     pan={pan}

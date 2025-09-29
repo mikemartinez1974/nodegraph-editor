@@ -1,5 +1,5 @@
 // graphData.js
-import { createNode, addEdge } from './nodeEdgeBase';
+import { createNode, addEdge } from '../GraphEditor/nodeEdgeBase';
 import { edgeTypes } from '../GraphEditor/edgeTypes';
 
 export const nodes = [
