@@ -42,7 +42,7 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const { getHandlePositionForEdge } = useContext(HandlePositionContext);
-  console.log('[EdgeLayer] getHandlePositionForEdge from context:', getHandlePositionForEdge);
+  //console.log('[EdgeLayer] getHandlePositionForEdge from context:', getHandlePositionForEdge);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -89,11 +89,11 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     }
     if (prevHoveredEdgeRef.current !== found) {
       if (prevHoveredEdgeRef.current) {
-        console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
+        // console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
         eventBus.emit('edgeMouseLeave', { id: prevHoveredEdgeRef.current });
       }
       if (found) {
-        console.log('[EdgeLayer] emitting edgeMouseEnter', found);
+        // console.log('[EdgeLayer] emitting edgeMouseEnter', found);
         eventBus.emit('edgeMouseEnter', { id: found });
       }
       prevHoveredEdgeRef.current = found;
@@ -104,7 +104,7 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
 
   function handleMouseLeave() {
     if (prevHoveredEdgeRef.current) {
-      console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
+      // console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
       eventBus.emit('edgeMouseLeave', { id: prevHoveredEdgeRef.current });
       prevHoveredEdgeRef.current = null;
     }
@@ -191,7 +191,7 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
   useEffect(() => {
     // Wait for handle keys to be available before drawing
     if (getHandlePositionForEdge && getHandlePositionForEdge._handleKeys && getHandlePositionForEdge._handleKeys.length === 0) {
-      console.log('[EdgeLayer] Skipping edge draw, handles not ready');
+      // console.log('[EdgeLayer] Skipping edge draw, handles not ready');
       return;
     }
     const canvas = canvasRef.current;
@@ -204,24 +204,24 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     edgeList.forEach(edge => {
       // Log before calling getHandlePositionForEdge
       if (typeof getHandlePositionForEdge !== 'function') {
-        console.error('[EdgeLayer] getHandlePositionForEdge is not a function!', getHandlePositionForEdge);
+        // console.error('[EdgeLayer] getHandlePositionForEdge is not a function!', getHandlePositionForEdge);
       }
-      console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.source, edge.type, 'source');
+      // console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.source, edge.type, 'source');
       let sourcePos = getHandlePositionForEdge && getHandlePositionForEdge(edge.source, edge.type, 'source');
-      console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.target, edge.type, 'target');
+      // console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.target, edge.type, 'target');
       let targetPos = getHandlePositionForEdge && getHandlePositionForEdge(edge.target, edge.type, 'target');
       // Debug log for handle lookup
-      console.log('[EdgeLayer] edge', edge.id, 'source', edge.source, 'target', edge.target, 'type', edge.type, 'sourcePos', sourcePos, 'targetPos', targetPos);
+      // console.log('[EdgeLayer] edge', edge.id, 'source', edge.source, 'target', edge.target, 'type', edge.type, 'sourcePos', sourcePos, 'targetPos', targetPos);
       // Fallback if not found
       if (!sourcePos) {
         const sourceNode = nodeList.find(n => n.id === edge.source);
         sourcePos = sourceNode ? { x: sourceNode.position.x, y: sourceNode.position.y } : { x: 0, y: 0 };
-        console.log('[EdgeLayer] Fallback to node center for source', edge.source, sourcePos);
+        // console.log('[EdgeLayer] Fallback to node center for source', edge.source, sourcePos);
       }
       if (!targetPos) {
         const targetNode = nodeList.find(n => n.id === edge.target);
         targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
-        console.log('[EdgeLayer] Fallback to node center for target', edge.target, targetPos);
+        // console.log('[EdgeLayer] Fallback to node center for target', edge.target, targetPos);
       }
       ctx.save();
       // Create a linear gradient for the edge

@@ -1,13 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Drawer from '@mui/material/Drawer';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import themeMap, { themeNames } from './themes';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
 const fallbackTheme = themeMap.default;
 
-export default function ThemeDrawer({ open, onClose, themeName, setThemeName, theme }) {
+// List your background images here (JPG, PNG, etc.)
+const backgroundImages = [
+  '1.png',
+  '2.png',
+  '3.png',
+  '4.png',
+  '5.png',
+  '6.png',
+  '7.png',
+  '8.png',
+  '9.png',
+  '10.png',
+  'background1.jpg',
+  'background2.jpg',
+  'background3.jpg',
+  'background4.jpg',
+  'background5.jpg',
+  'background6.jpg',
+  'background7.jpg',
+  'background8.jpg',
+  'background9.jpg',
+  'background10.jpg',
+  'background11.jpg'
+];
+
+export default function ThemeDrawer(props) {
+  //console.log('ThemeDrawer props:', props);
+  const { open, onClose, themeName, setThemeName, theme, setBackgroundImage } = props;
+  //console.log('ThemeDrawer setBackgroundImage:', setBackgroundImage);
+  const safeSetBackgroundImage = typeof setBackgroundImage === 'function' 
+    ? (file) => { 
+      //console.log('ThemeDrawer safeSetBackgroundImage called with:', file); 
+      setBackgroundImage(file); }
+    : () => {};
   const activeTheme = theme || fallbackTheme;
   // Preview theme on hover by setting themeName
   const handleMouseEnter = (name) => {
@@ -19,32 +61,131 @@ export default function ThemeDrawer({ open, onClose, themeName, setThemeName, th
     onClose();
   };
 
+  const getBgOption = (key, def) => {
+    const val = localStorage.getItem(key);
+    return val === null ? def : val === 'true';
+  };
+  const [tiled, setTiled] = useState(getBgOption('backgroundTiled', false));
+  const [stretched, setStretched] = useState(getBgOption('backgroundStretched', false));
+  const [centered, setCentered] = useState(getBgOption('backgroundCentered', true));
+
+  const updateBackgroundStyle = () => {
+    const bgDiv = document.getElementById('graph-editor-background');
+    if (!bgDiv) return;
+    let size = 'auto';
+    let repeat = 'no-repeat';
+    let position = 'center';
+    if (tiled) {
+      size = 'auto';
+      repeat = 'repeat';
+      position = 'top left';
+    } else if (stretched) {
+      size = '100% 100%';
+      repeat = 'no-repeat';
+      position = 'center';
+    } else if (centered) {
+      size = 'auto';
+      repeat = 'no-repeat';
+      position = 'center';
+    }
+    bgDiv.style.backgroundSize = size;
+    bgDiv.style.backgroundRepeat = repeat;
+    bgDiv.style.backgroundPosition = position;
+  };
+
+  useEffect(() => {
+    // Only run once on mount to set initial checkbox states from localStorage
+    setTiled(getBgOption('backgroundTiled', false));
+    setStretched(getBgOption('backgroundStretched', false));
+    setCentered(getBgOption('backgroundCentered', true));
+    updateBackgroundStyle();
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    // Only update background style when checkboxes change
+    updateBackgroundStyle();
+  }, [tiled, stretched, centered]);
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ BackdropProps: { invisible: true } }}>
       <Box sx={{ width: 350, p: 2, background: activeTheme.palette.background.paper, color: activeTheme.palette.text?.primary }}>
-        <Typography variant="h6" sx={{ mb: 2, color: activeTheme.palette.text?.primary }}>
-          Select Theme
-        </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {themeNames.map((name) => (
-            <Button
-              key={name}
-              onClick={() => handleClick(name)}
-              onMouseEnter={() => handleMouseEnter(name)}
-              sx={{
-                flex: '1 1 80px',
-                background: themeMap[name].palette.primary.main,
-                color: themeMap[name].palette.mode === 'dark' ? '#fff' : '#222',
-                border: themeName === name ? '2px solid #fff' : undefined,
-                minWidth: 80,
-                height: 40,
-                marginBottom: 1
-              }}
-            >
-              {name.charAt(0).toUpperCase() + name.slice(1)}
-            </Button>
-          ))}
-        </Box>
+        <Accordion sx={{ width: '100%' }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Theme Options</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 0 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, width: '100%', maxWidth: '100%', color: activeTheme.palette.text?.primary, fontSize: '1rem' }}>
+              {themeNames.map((name) => (
+                <Button
+                  key={name}
+                  onClick={() => handleClick(name)}
+                  onMouseEnter={() => handleMouseEnter(name)}
+                  sx={{
+                    flex: '1 1 80px',
+                    background: themeMap[name].palette.primary.main,
+                    color: themeMap[name].palette.mode === 'dark' ? '#fff' : '#222',
+                    border: themeName === name ? '2px solid #fff' : undefined,
+                    minWidth: 80,
+                    height: 40,
+                    marginBottom: 1,
+                    maxWidth: '100%'
+                  }}
+                >
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </Button>
+              ))}
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+        {/* Background Art Accordion */}
+        <Accordion sx={{ width: '100%' }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Background Art</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 0 }}>
+            <Box sx={{ width: '100%' }}>
+              <FormControlLabel
+                control={<Checkbox checked={tiled} onChange={e => {
+                  setTiled(e.target.checked);
+                  localStorage.setItem('backgroundTiled', e.target.checked);
+                  updateBackgroundStyle();
+                }} />}
+                label="Tiled"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={stretched} onChange={e => {
+                  setStretched(e.target.checked);
+                  localStorage.setItem('backgroundStretched', e.target.checked);
+                  updateBackgroundStyle();
+                }} />}
+                label="Stretched"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={centered} onChange={e => {
+                  setCentered(e.target.checked);
+                  localStorage.setItem('backgroundCentered', e.target.checked);
+                  updateBackgroundStyle();
+                }} />}
+                label="Centered"
+              />
+              <ImageList cols={3} gap={8} sx={{ width: '100%' }}>
+                {backgroundImages.map((file) => {
+                  const imgSrc = `/background art/${file}`;
+                  return (
+                    <ImageListItem key={file} onClick={() => {
+                      document.getElementById('graph-editor-background').style.backgroundImage = `url('/background art/${file}')`;
+                      localStorage.setItem('backgroundImage', file);
+                      //console.log('ImageListItem clicked:', file);
+                    }}>
+                      <img src={imgSrc} alt={file} style={{ width: '100%', borderRadius: 8, cursor: 'pointer' }} />
+                    </ImageListItem>
+                  );
+                })}
+              </ImageList>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
       </Box>
     </Drawer>
   );

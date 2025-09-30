@@ -10,7 +10,7 @@ import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 
-export default function GraphEditor() {
+export default function GraphEditor({ backgroundImage }) {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -19,7 +19,7 @@ export default function GraphEditor() {
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
-
+ 
   // Compute which handles should be extended for hovered edge
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
@@ -120,6 +120,13 @@ export default function GraphEditor() {
     };
   }, [pan, zoom]);
 
+  useEffect(() => {
+    const savedBg = localStorage.getItem('backgroundImage');
+    if (savedBg) {
+      document.getElementById('graph-editor-background').style.backgroundImage = `url('/background art/${savedBg}')`;
+    }
+  }, []);
+
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -167,53 +174,49 @@ export default function GraphEditor() {
   };
 
   return (
-      <div style={{
-        minHeight: '100vh',
-        minWidth: '100vw',
-        backgroundImage: "url('/background art/background11.jpg')",
-        backgroundSize: 'auto',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}>
-        <Toolbar />
-        <NodeGraph 
-          nodes={nodes} 
-          edges={edges} 
-          pan={pan} 
-          zoom={zoom} 
-          setPan={setPan} 
-          setZoom={setZoom}
-          selectedNodeId={selectedNodeId}
-          hoveredNodeId={hoveredNodeId}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onNodeMove={(id, position) => {
-            setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
-          }}
-          onEdgeClick={(edge, event) => {
-            setSelectedEdgeId(edge.id);
-            setSelectedNodeId(null); // Deselect any node
-            console.log('GraphEditor onEdgeClick', edge, event);
-          }}
-          onNodeClick={nodeId => {
-            setSelectedNodeId(nodeId);
-            setSelectedEdgeId(null); // Deselect any edge
-            const node = nodes.find(n => n.id === nodeId);
-            if (node) {
-              console.log('Node clicked:', node);
-            }
-          }}
-          onBackgroundClick={() => {
-            setSelectedNodeId(null);
-            setSelectedEdgeId(null); // Deselect both
-            console.log('GraphEditor onBackgroundClick (empty field clicked)');
-          }}
-          onEdgeHover={id => setHoveredEdgeId(id)}
-          onNodeHover={id => setHoveredNodeId(id)}
-          hoveredEdgeId={hoveredEdgeId}
-          hoveredEdgeSource={hoveredEdgeSource}
-          hoveredEdgeTarget={hoveredEdgeTarget}
-        />
-      </div>
+    <div id="graph-editor-background" style={{
+      minHeight: '100vh',
+      minWidth: '100vw',
+      backgroundImage: backgroundImage ? `url('/background art/${backgroundImage}')` : undefined,
+      backgroundSize: 'auto',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }}>
+      <Toolbar />
+      <NodeGraph 
+        nodes={nodes} 
+        edges={edges} 
+        pan={pan} 
+        zoom={zoom} 
+        setPan={setPan} 
+        setZoom={setZoom}
+        selectedNodeId={selectedNodeId}
+        hoveredNodeId={hoveredNodeId}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onNodeMove={(id, position) => {
+          setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
+        }}
+        onEdgeClick={(edge, event) => {
+          setSelectedEdgeId(edge.id);
+          setSelectedNodeId(null); // Deselect any node
+          //console.log('GraphEditor onEdgeClick', edge, event);
+        }}
+        onNodeClick={nodeId => {
+          setSelectedNodeId(nodeId);
+          setSelectedEdgeId(null); // Deselect any edge
+        }}
+        onBackgroundClick={() => {
+          setSelectedNodeId(null);
+          setSelectedEdgeId(null); // Deselect both
+          //console.log('GraphEditor onBackgroundClick (empty field clicked)');
+        }}
+        onEdgeHover={id => setHoveredEdgeId(id)}
+        onNodeHover={id => setHoveredNodeId(id)}
+        hoveredEdgeId={hoveredEdgeId}
+        hoveredEdgeSource={hoveredEdgeSource}
+        hoveredEdgeTarget={hoveredEdgeTarget}
+      />
+    </div>
   );
 }

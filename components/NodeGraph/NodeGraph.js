@@ -5,7 +5,6 @@ import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
-import HandleLayerCanvas from './HandleLayerCanvas';
 import PanZoomLayer from './PanZoomLayer';
 import NodeLayer from './NodeLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
@@ -194,12 +193,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
     setHoveredNodeId(null);
   };
 
-  // // Debug log for nodeTypes and edgeTypes after mount
-  // useEffect(() => {
-  //   console.log('NodeGraph nodeTypes:', nodeTypes);
-  //   console.log('NodeGraph edgeTypes:', edgeTypes);
-  // }, []);
-
   return (
     <div id="graph-canvas" style={{
       position: 'fixed',
@@ -219,7 +212,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
-        <HandleLayerCanvas
+        <HandleLayer
           nodes={nodeList}
           edges={edges}
           pan={pan}
@@ -245,7 +238,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
             }}
             onEdgeHover={onEdgeHover}
           />
-        </HandleLayerCanvas>
+        </HandleLayer>
         {/* <HandleLayer
           nodes={nodeList}
           edges={edges}
