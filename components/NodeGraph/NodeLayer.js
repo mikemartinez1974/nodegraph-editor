@@ -1,5 +1,6 @@
 import React from 'react';
 import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
+import eventBus from './eventBus';
 
 const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, draggingNodeId, onNodeEvent, onNodeDragStart }) => {
     return (
@@ -14,6 +15,8 @@ const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, drag
                     draggingHandle={draggingNodeId === node.id}
                     onMouseDown={e => onNodeDragStart && onNodeDragStart(e, node)}
                     onClick={onNodeEvent ? (e) => onNodeEvent(node.id, e) : undefined}
+                    onMouseEnter={() => eventBus.emit('nodeHover', { id: node.id })}
+                    onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                 />
             ))}
         </div>

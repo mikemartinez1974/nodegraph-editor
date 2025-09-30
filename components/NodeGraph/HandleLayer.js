@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { getEdgeHandlePosition } from './utils';
 import eventBus from './eventBus';
 
@@ -45,95 +45,81 @@ function getBezierPerimeterPoint(node, otherNode, edge) {
   return best;
 }
 
-const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle, onHandleDragEnd, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) => {
-  // Drag state
-  const dragStateRef = useRef(null);
-  const previewCanvasRef = useRef(null);
+const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHandleDragStart, isDraggingHandle, onHandleDragEnd, hoveredNodeId, hoveredEdgeSource, hoveredEdgeTarget, onHandlePositionsChange }) => {
+  // Imperative handle progress map (not state)
+  const handleProgressRef = useRef({});
+  const animationRef = useRef();
+  const [, forceUpdate] = useState(0);
 
+  // Imperative animation function
+  const animateHandle = (nodeId, target) => {
+    if (!animationRef.current) animationRef.current = {};
+    cancelAnimationFrame(animationRef.current[nodeId]);
+    const start = performance.now();
+    const initial = handleProgressRef.current[nodeId] || 0;
+    const duration = 125;
+    function animate(now) {
+      const elapsed = Math.min(now - start, duration);
+      const progress = elapsed / duration;
+      handleProgressRef.current[nodeId] = initial + (target - initial) * progress;
+      forceUpdate(f => f + 1); // trigger re-render
+      if (elapsed < duration) {
+        animationRef.current[nodeId] = requestAnimationFrame(animate);
+      } else {
+        handleProgressRef.current[nodeId] = target;
+        forceUpdate(f => f + 1); // final re-render
+      }
+    }
+    animationRef.current[nodeId] = requestAnimationFrame(animate);
+  };
+
+  // Listen for extend/retract events
   useEffect(() => {
-    if (!dragStateRef.current || !dragStateRef.current.start || !dragStateRef.current.mouse) return;
-    const canvas = previewCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(pan.x, pan.y);
-    ctx.scale(zoom, zoom);
-    // Convert mouse position to graph coordinates
-    const rect = canvas.getBoundingClientRect();
-    let startX = dragStateRef.current.start.x;
-    let startY = dragStateRef.current.start.y;
-    const mouseX = dragStateRef.current.mouse.x;
-    const mouseY = dragStateRef.current.mouse.y;
-    ctx.strokeStyle = theme?.palette?.secondary?.main || '#888';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([6, 4]);
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(mouseX, mouseY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-  }, [pan, zoom]);
-
-  function handleMouseDown(e, handle) {
-    e.stopPropagation();
-    dragStateRef.current = { nodeId: handle.nodeId, edgeId: handle.edgeId, start: { x: handle.x * zoom + pan.x, y: handle.y * zoom + pan.y } };
-    eventBus.emit('handleDragStart', { nodeId: handle.nodeId, edgeId: handle.edgeId, start: { x: handle.x * zoom + pan.x, y: handle.y * zoom + pan.y }, event: e });
-    window.addEventListener('mousemove', onDrag);
-    window.addEventListener('mouseup', onDrop);
-  }
-
-  function onDrag(event) {
-    if (!dragStateRef.current) return;
-    const mousePos = { x: event.clientX, y: event.clientY };
-    dragStateRef.current = {
-      ...dragStateRef.current,
-      mouse: mousePos
+    const onNodeMouseEnter = ({ id }) => {
+      handleProgressRef.current[id] = 1;
+      forceUpdate(f => f + 1);
     };
-    eventBus.emit('handleDragMove', { ...dragStateRef.current, event });
-  }
+    const onNodeMouseLeave = ({ id }) => {
+      handleProgressRef.current[id] = 0;
+      forceUpdate(f => f + 1);
+    };
+    const onEdgeMouseEnter = ({ id }) => {
+      // Extend handles for nodes connected to this edge only
+      const edge = edges.find(e => e.id === id);
+      if (edge) {
+        handleProgressRef.current[edge.source] = 1;
+        handleProgressRef.current[edge.target] = 1;
+        forceUpdate(f => f + 1);
+      }
+    };
+    const onEdgeMouseLeave = ({ id }) => {
+      // Retract handles for nodes connected to this edge only
+      const edge = edges.find(e => e.id === id);
+      if (edge) {
+        handleProgressRef.current[edge.source] = 0;
+        handleProgressRef.current[edge.target] = 0;
+        forceUpdate(f => f + 1);
+      }
+    };
+    eventBus.on('nodeMouseEnter', onNodeMouseEnter);
+    eventBus.on('nodeMouseLeave', onNodeMouseLeave);
+    eventBus.on('edgeMouseEnter', onEdgeMouseEnter);
+    eventBus.on('edgeMouseLeave', onEdgeMouseLeave);
+    return () => {
+      eventBus.off('nodeMouseEnter', onNodeMouseEnter);
+      eventBus.off('nodeMouseLeave', onNodeMouseLeave);
+      eventBus.off('edgeMouseEnter', onEdgeMouseEnter);
+      eventBus.off('edgeMouseLeave', onEdgeMouseLeave);
+    };
+  }, [edges]
+  );
 
-  const onDrop = (event) => {
-    const mousePos = { x: event.clientX, y: event.clientY };
-    // Use the main graph container for coordinate conversion
-    const graphContainer = document.getElementById('graph-canvas') || event.target.closest('#graph-canvas');
-    const rect = graphContainer ? graphContainer.getBoundingClientRect() : event.target.getBoundingClientRect();
-    const graphX = (event.clientX - pan.x - rect.left) / zoom;
-    const graphY = (event.clientY - pan.y - rect.top) / zoom;
-    // Find node under mouse (if any)
-    let nodeUnderMouse = null;
-    if (Array.isArray(nodes)) {
-      nodeUnderMouse = nodes.find(n => {
-        const dx = graphX - n.position.x;
-        const dy = graphY - n.position.y;
-        const r = (n.width || 60) / 2;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        // console.log(`Testing node ${n.id}: center=(${n.position.x},${n.position.y}), drop=(${graphX},${graphY}), dist=${dist}, r=${r}`);
-        return dx * dx + dy * dy <= r * r;
-      });
-    }
-    eventBus.emit('handleDrop', {
-      graph: { x: graphX, y: graphY },
-      screen: { x: event.clientX, y: event.clientY },
-      sourceNode: dragStateRef.current ? dragStateRef.current.nodeId : null,
-      targetNode: nodeUnderMouse ? nodeUnderMouse.id : null,
-      edgeId: dragStateRef.current ? dragStateRef.current.edgeId : null,
-      // ...add any other data you want to pass
-    });
-    console.log('HandleLayer.js: handle dropped at graph coords', { x: graphX, y: graphY, nodeId: nodeUnderMouse ? nodeUnderMouse.id : null, edgeId: dragStateRef.current ? dragStateRef.current.edgeId : null });
-    window.removeEventListener('mousemove', onDrag);
-    window.removeEventListener('mouseup', onDrop);
-    if (typeof onHandleDragEnd === 'function') {
-      onHandleDragEnd(event, dragStateRef.current);
-    }
-    dragStateRef.current = null;
-  }
 
   // Calculate handles for all nodes
   const nodesSafe = Array.isArray(nodes) ? nodes : [];
   const edgesSafe = Array.isArray(edges) ? edges : [];
   const handles = [];
+  const handlePositions = {};
   nodesSafe.forEach(node => {
     // Only show handles for hovered node or hovered edge endpoints
     const connectedEdges = edgesSafe.filter(e => e.source === node.id || e.target === node.id);
@@ -146,13 +132,18 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
       const centerY = node.position.y * zoom + pan.y;
       const handleX = centerX + radius * Math.cos(angle) - handleSize / 2;
       const handleY = centerY + radius * Math.sin(angle) - handleSize / 2;
+      const interpRaw = {
+        x: centerX + radius * Math.cos(angle) - handleSize / 2,
+        y: centerY + radius * Math.sin(angle) - handleSize / 2
+      };
+      handlePositions[`${node.id}-default-handle`] = { x: interpRaw.x, y: interpRaw.y };
       handles.push({
         id: `${node.id}-default-handle`,
-        x: (centerX + radius * Math.cos(angle) - handleSize / 2) / zoom,
-        y: (centerY + radius * Math.sin(angle) - handleSize / 2) / zoom,
+        x: interpRaw.x,
+        y: interpRaw.y,
         radius: handleSize / 2,
         color: theme?.palette?.secondary?.main || '#888',
-        progress: node.handleProgress,
+        progress: handleProgressRef.current[node.id] || 0,
         nodeId: node.id,
         edgeId: null,
         isActive: false
@@ -175,17 +166,13 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
         x: node.position.x,
         y: node.position.y
       };
-      // Only extend handle if node is hovered or this handle's edge is hovered
-      let progress = 0;
-      if (node.handleProgress === 1 && (!hoveredEdgeId || edge.id === hoveredEdgeId)) {
-        progress = 1;
-      } else if (node.handleProgress > 0 && (!hoveredEdgeId || edge.id === hoveredEdgeId)) {
-        progress = node.handleProgress;
-      }
+      // Use progress for handle extension
+      let progress = handleProgressRef.current[node.id] || 0;
       const interpRaw = {
-        x: nodeCenterRaw.x + (connectionPoint.x - nodeCenterRaw.x) * progress,
-        y: nodeCenterRaw.y + (connectionPoint.y - nodeCenterRaw.y) * progress
+        x: node.position.x + (connectionPoint.x - node.position.x) * progress,
+        y: node.position.y + (connectionPoint.y - node.position.y) * progress
       };
+      handlePositions[`${node.id}-handle-${edge.id}-${isSource ? 'source' : 'target'}-${edgeIdx}`] = { x: interpRaw.x, y: interpRaw.y };
       handles.push({
         id: `${node.id}-handle-${edge.id}-${isSource ? 'source' : 'target'}-${edgeIdx}`,
         x: interpRaw.x,
@@ -212,21 +199,6 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
     // ...existing code...
   }
 
-  const onDragStart = (event) => {
-    console.log('HandleLayer.js: drag start handler entered', event);
-    console.log('HandleLayer.js: dragState set on drag start', dragStateRef.current);
-    showHandle(dragState.handleId);
-    // ...existing code...
-  };
-
-  const onDragEnd = (event) => {
-    console.log('HandleLayer.js: drag end handler entered', event);
-    hideHandle(dragStateRef.current ? dragStateRef.current.handleId : null);
-    dragStateRef.current = null;
-    console.log('HandleLayer.js: dragState reset on drag end',  dragStateRef.current);
-    // ...existing code...
-  };
-
   return (
     <div style={{ pointerEvents: 'none' }}>
       {handles.map(handle => {
@@ -235,28 +207,7 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
         const top = handle.y * zoom + pan.y - scaledRadius;
         const isFullyExtended = handle.progress === 1;
         const pointerEvents = handle.pointerEvents || (isFullyExtended ? 'auto' : 'none');
-        if (dragStateRef.current && dragStateRef.current.nodeId === handle.nodeId && dragStateRef.current.edgeId === handle.edgeId && dragStateRef.current.mouse) {
-          const mouseGraphX = (dragStateRef.current.mouse.x - pan.x) / zoom;
-          const mouseGraphY = (dragStateRef.current.mouse.y - pan.y) / zoom;
-          return (
-            <div
-              key={handle.id + '-dragging'}
-              style={{
-                position: 'absolute',
-                left: dragStateRef.current.mouse.x - handle.radius * zoom,
-                top: dragStateRef.current.mouse.y - handle.radius * zoom,
-                width: handle.radius * 2 * zoom,
-                height: handle.radius * 2 * zoom,
-                borderRadius: '50%',
-                background: theme?.palette?.primary?.main || '#f00',
-                opacity: 1,
-                pointerEvents: 'none',
-                boxShadow: '0 0 8px #00f',
-                zIndex: 20
-              }}
-            />
-          );
-        }
+        // Remove dragStateRef-dependent drag preview logic
         return (
           <div
             key={handle.id}
@@ -276,23 +227,19 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
               zIndex: 10
             }}
             onMouseEnter={() => {
-              if (isFullyExtended && !dragStateRef.current) {
+              if (isFullyExtended) {
                 onHandleEvent && onHandleEvent(handle);
-              //   console.log('Handle mouse enter:', {
-              //     nodeId: handle.nodeId,
-              //     edgeId: handle.edgeId,
-              //     handlePos: { x: handle.x, y: handle.y },
-              //     progress: handle.progress,
-              //     type: handle.edgeId ? edgesSafe.find(e => e.id === handle.edgeId)?.type : 'default'
-              //   });
+                eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
               }
             }}
             onMouseLeave={() => {
-              if (isFullyExtended && !dragStateRef.current) onHandleEvent && onHandleEvent(null);
+              if (isFullyExtended) {
+                onHandleEvent && onHandleEvent(null);
+                eventBus.emit('handleUnhover', { nodeId: handle.nodeId, handleId: handle.id });
+              }
             }}
             onMouseDown={e => {
               if (isFullyExtended) {
-                // console.log('HandleLayer: handle clicked', handle);
                 handleMouseDown(e, handle);
                 if (typeof onHandleDragStart === 'function') {
                   onHandleDragStart(e, handle);
@@ -305,6 +252,6 @@ const HandleLayer = ({ nodes, edges, pan, zoom = 1, theme, onHandleEvent, onHand
       })}
     </div>
   );
-};
+}
 
 export default HandleLayer;

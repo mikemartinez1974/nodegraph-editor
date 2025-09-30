@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { useTheme } from '@mui/material/styles';
-
+import eventBus from './eventBus';
+import HandlePositionContext from './HandlePositionContext';
 
 function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
   // Distance from point (x, y) to line segment (x1, y1)-(x2, y2)
@@ -40,6 +41,8 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
   const canvasRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
+  const { getHandlePositionForEdge } = useContext(HandlePositionContext);
+  console.log('[EdgeLayer] getHandlePositionForEdge from context:', getHandlePositionForEdge);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -58,6 +61,8 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
   }, []);
 
   // Mouse event handlers
+  const prevHoveredEdgeRef = useRef(null);
+
   function handleMouseMove(e) {
     if (!canvasRef.current) return;
     const rect = canvasRef.current.getBoundingClientRect();
@@ -69,15 +74,12 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       const targetNode = nodeList.find(n => n.id === edge.target);
       if (!sourceNode || !targetNode) continue;
       let hit = false;
-      // Determine if edge should be curved
       const isCurved = edge.style?.curved === true;
       if (isCurved) {
-        // Draw a bezier curve between source and target
         const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40; // Offset for curve
+        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40;
         hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
       } else {
-        // Draw a straight line
         hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
       }
       if (hit) {
@@ -85,17 +87,41 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
         break;
       }
     }
+    if (prevHoveredEdgeRef.current !== found) {
+      if (prevHoveredEdgeRef.current) {
+        console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
+        eventBus.emit('edgeMouseLeave', { id: prevHoveredEdgeRef.current });
+      }
+      if (found) {
+        console.log('[EdgeLayer] emitting edgeMouseEnter', found);
+        eventBus.emit('edgeMouseEnter', { id: found });
+      }
+      prevHoveredEdgeRef.current = found;
+    }
     setHoveredEdge(found);
     if (onEdgeHover) onEdgeHover(found);
   }
 
   function handleMouseLeave() {
-    setHoveredEdge(null);
-    if (onEdgeHover) onEdgeHover(null);
-  }
+    if (prevHoveredEdgeRef.current) {
+      console.log('[EdgeLayer] emitting edgeMouseLeave', prevHoveredEdgeRef.current);
+      eventBus.emit('edgeMouseLeave', { id: prevHoveredEdgeRef.current });
+      prevHoveredEdgeRef.current = null;
+    }
 
+    setHoveredEdge(null);
+
+    if (onEdgeHover) {
+      onEdgeHover(null);
+    }
+    
+  }
+  
   function handleClick(e) {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      return;
+    }
+
     const rect = canvasRef.current.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left - pan.x) / zoom;
     const mouseY = (e.clientY - rect.top - pan.y) / zoom;
@@ -104,10 +130,14 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     for (const edge of edgeList) {
       const sourceNode = nodeList.find(n => n.id === edge.source);
       const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) continue;
+      if (!sourceNode || !targetNode) {
+        continue;
+      }
+
       let hit = false;
       // Determine if edge should be curved
       const isCurved = edge.style?.curved === true;
+
       if (isCurved) {
         // Draw a bezier curve between source and target
         const midX = (sourceNode.position.x + targetNode.position.x) / 2;
@@ -159,6 +189,11 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
   }
 
   useEffect(() => {
+    // Wait for handle keys to be available before drawing
+    if (getHandlePositionForEdge && getHandlePositionForEdge._handleKeys && getHandlePositionForEdge._handleKeys.length === 0) {
+      console.log('[EdgeLayer] Skipping edge draw, handles not ready');
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -167,12 +202,28 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
     edgeList.forEach(edge => {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) return;
+      // Log before calling getHandlePositionForEdge
+      if (typeof getHandlePositionForEdge !== 'function') {
+        console.error('[EdgeLayer] getHandlePositionForEdge is not a function!', getHandlePositionForEdge);
+      }
+      console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.source, edge.type, 'source');
+      let sourcePos = getHandlePositionForEdge && getHandlePositionForEdge(edge.source, edge.type, 'source');
+      console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.target, edge.type, 'target');
+      let targetPos = getHandlePositionForEdge && getHandlePositionForEdge(edge.target, edge.type, 'target');
+      // Debug log for handle lookup
+      console.log('[EdgeLayer] edge', edge.id, 'source', edge.source, 'target', edge.target, 'type', edge.type, 'sourcePos', sourcePos, 'targetPos', targetPos);
+      // Fallback if not found
+      if (!sourcePos) {
+        const sourceNode = nodeList.find(n => n.id === edge.source);
+        sourcePos = sourceNode ? { x: sourceNode.position.x, y: sourceNode.position.y } : { x: 0, y: 0 };
+        console.log('[EdgeLayer] Fallback to node center for source', edge.source, sourcePos);
+      }
+      if (!targetPos) {
+        const targetNode = nodeList.find(n => n.id === edge.target);
+        targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
+        console.log('[EdgeLayer] Fallback to node center for target', edge.target, targetPos);
+      }
       ctx.save();
-      let sourcePos = { x: sourceNode.position.x, y: sourceNode.position.y };
-      let targetPos = { x: targetNode.position.x, y: targetNode.position.y };
       // Create a linear gradient for the edge
       const grad = ctx.createLinearGradient(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
       grad.addColorStop(0, theme.palette.primary.light);
@@ -202,7 +253,7 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       ctx.restore();
     });
     ctx.restore();
-  }, [edgeList, nodeList, pan, zoom, selectedEdgeId, canvasSize, hoveredEdge, theme]);
+  }, [edgeList, nodeList, pan, zoom, selectedEdgeId, canvasSize, hoveredEdge, theme, getHandlePositionForEdge]);
 
   return (
     <canvas

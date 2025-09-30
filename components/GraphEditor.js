@@ -186,6 +186,7 @@ export default function GraphEditor() {
           selectedNodeId={selectedNodeId}
           hoveredNodeId={hoveredNodeId}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onNodeMove={(id, position) => {
             setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
           }}

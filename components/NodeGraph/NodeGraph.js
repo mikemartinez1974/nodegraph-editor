@@ -5,12 +5,13 @@ import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
+import HandleLayerCanvas from './HandleLayerCanvas';
 import PanZoomLayer from './PanZoomLayer';
 import NodeLayer from './NodeLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
 
-export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
+export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edgeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
   const theme = useTheme();
   const canvasRef = useRef(null);
   const [nodeList, setNodeList] = useState(nodes);
@@ -23,12 +24,12 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
   const hoverTimeoutRef = useRef({});
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
-  // Add state for draggingHandlePos
   const [draggingHandlePos, setDraggingHandlePos] = useState(null);
-  // Add isNodeHovered state
   const [isNodeHovered, setIsNodeHovered] = useState(false);
+  // Add state for handlePositions
+  const [handlePositions, setHandlePositions] = useState({});
 
-  // Only update nodeList if nodes have actually changed
+  // Only update nodeList if nodes prop actually changes (avoid infinite loop)
   useEffect(() => {
     if (JSON.stringify(nodeList) !== JSON.stringify(nodes)) {
       setNodeList(nodes.map(node => ({
@@ -37,8 +38,9 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         showHandlesOnHover: node.showHandlesOnHover !== undefined ? node.showHandlesOnHover : true
       })));
     }
-  }, [nodes]
-  );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(nodes)]);
+
 
 
   // Event bus handlers for node/edge events
@@ -89,6 +91,24 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     };
   }, []);
 
+  // Listen for node/handle hover events from the event bus
+  useEffect(() => {
+    const handleNodeHover = ({ id }) => setHoveredNodeId(id);
+    const handleNodeUnhover = () => setHoveredNodeId(null);
+    const handleHandleHover = ({ nodeId }) => setHoveredNodeId(nodeId);
+    const handleHandleUnhover = () => setHoveredNodeId(null);
+    eventBus.on('nodeHover', handleNodeHover);
+    eventBus.on('nodeUnhover', handleNodeUnhover);
+    eventBus.on('handleHover', handleHandleHover);
+    eventBus.on('handleUnhover', handleHandleUnhover);
+    return () => {
+      eventBus.off('nodeHover', handleNodeHover);
+      eventBus.off('nodeUnhover', handleNodeUnhover);
+      eventBus.off('handleHover', handleHandleHover);
+      eventBus.off('handleUnhover', handleHandleUnhover);
+    };
+  }, []);
+
   // Node drag logic (already updates nodeList)
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current) {
@@ -119,41 +139,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     window.removeEventListener('mouseup', onNodeDragEnd);
   }
 
-  // Animated handleProgress for smooth handle extension/retraction
-  const [handleProgressMap, setHandleProgressMap] = useState({});
-  useEffect(() => {
-    let animationFrame;
-    const duration = 125; // ms
-    const start = performance.now();
-    const initial = { ...handleProgressMap };
-    const target = {};
-    nodeList.forEach(node => {
-      // Extend handle if node is hovered, or if it's the source/target of the hovered edge
-      target[node.id] = (hoveredNodeId === node.id || hoveredEdgeSource === node.id || hoveredEdgeTarget === node.id) ? 1 : 0;
-      if (initial[node.id] === undefined) initial[node.id] = 0;
-    });
-    function animate(now) {
-      const elapsed = Math.min(now - start, duration);
-      const progress = elapsed / duration;
-      const next = {};
-      nodeList.forEach(node => {
-        const from = initial[node.id];
-        const to = target[node.id];
-        next[node.id] = from + (to - from) * progress;
-      });
-      setHandleProgressMap(next);
-      if (elapsed < duration) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setHandleProgressMap(target);
-      }
-    }
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [hoveredNodeId, hoveredEdgeSource, hoveredEdgeTarget, nodeList]);
-
   // Pass handleProgress to HandleLayer for all nodes
-  const nodesWithProgress = nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }));
+  // const nodesWithProgress = nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }));
 
   function handleBackgroundClickFromPanZoom(e) {
     if (typeof onBackgroundClick === 'function') onBackgroundClick(e);
@@ -189,13 +176,6 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     window.removeEventListener('mouseup', onHandleDragEnd);
   }
 
-  // Add a placeholder for handleNodeMouseLeave if not defined
-  function handleNodeMouseLeave({ id }) {
-    // Implement node mouse leave logic here if needed
-    // For now, just log for debug
-    //console.log('handleNodeMouseLeave called for node', id);
-  }
-
   // Ensure the graph resizes with the window
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
@@ -205,6 +185,20 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Mouse event handlers for node hover
+  const handleNodeMouseEnter = (nodeId) => {
+    setHoveredNodeId(nodeId);
+  };
+  const handleNodeMouseLeave = () => {
+    setHoveredNodeId(null);
+  };
+
+  // // Debug log for nodeTypes and edgeTypes after mount
+  // useEffect(() => {
+  //   console.log('NodeGraph nodeTypes:', nodeTypes);
+  //   console.log('NodeGraph edgeTypes:', edgeTypes);
+  // }, []);
 
   return (
     <div id="graph-canvas" style={{
@@ -225,13 +219,40 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
-        <HandleLayer
-          nodes={nodesWithProgress}
+        <HandleLayerCanvas
+          nodes={nodeList}
+          edges={edges}
+          pan={pan}
+          zoom={zoom}
+          edgeTypes={edgeTypes}
+          onDragStart={onHandleDragStart}
+          onDragMove={onHandleDragMove}
+          onDragEnd={onHandleDragEnd}
+        >
+          <EdgeLayer
+            edgeList={edges}
+            nodeList={nodeList}
+            pan={pan}
+            zoom={zoom}
+            selectedEdgeId={selectedEdgeId}
+            theme={theme}
+            hoveredNodeId={hoveredNodeId}
+            handlePositions={handlePositions}
+            onEdgeClick={(edge, event) => {
+              setSelectedEdgeId(edge?.id);
+              eventBus.emit('edgeClick', { id: edge?.id });
+              if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
+            }}
+            onEdgeHover={onEdgeHover}
+          />
+        </HandleLayerCanvas>
+        {/* <HandleLayer
+          nodes={nodeList}
           edges={edges}
           pan={pan}
           zoom={zoom}
           theme={theme}
-          hoveredEdgeId={hoveredEdgeId}
+          hoveredNodeId={hoveredNodeId}
           hoveredEdgeSource={hoveredEdgeSource}
           hoveredEdgeTarget={hoveredEdgeTarget}
           onHandleEvent={handle => {
@@ -247,22 +268,13 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           onHandleDragStart={onHandleDragStart}
           isDraggingHandle={!!draggingHandle}
           onHandleDragEnd={onHandleDragEnd}
-        />
-        <EdgeLayer
-          edgeList={edges}
-          nodeList={nodeList}
-          pan={pan}
-          zoom={zoom}
-          selectedEdgeId={selectedEdgeId}
-          theme={theme}
-          hoveredNodeId={hoveredNodeId}
-          onEdgeClick={(edge, event) => {
-            setSelectedEdgeId(edge?.id);
-            eventBus.emit('edgeClick', { id: edge?.id });
-            if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
-          }}
-          onEdgeHover={onEdgeHover}
-        />
+          onHandlePositionsChange={setHandlePositions}
+        /> */}
+
+        
+
+     
+
         <NodeLayer
           nodes={nodeList}
           pan={pan}
@@ -272,7 +284,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
           theme={theme}
           onNodeEvent={(id, e) => {
             if (onNodeClick) onNodeClick(id);
-            const node = nodesWithProgress.find(n => n.id === id);
+            const node = nodes.find(n => n.id === id);
             if (node && node.handleProgress === 1) {
               const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
               connectedEdges.forEach(edge => {
@@ -295,8 +307,11 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, sele
               const node = nodes.find(n => n.id === id);
             }
           }}
+          onNodeMouseEnter={handleNodeMouseEnter}
+          onNodeMouseLeave={handleNodeMouseLeave}
           onNodeDragStart={onNodeDragStart}
         />
+
         {/* Preview edge during handle drag */}
         {draggingHandle && draggingHandlePos && (
           (() => {

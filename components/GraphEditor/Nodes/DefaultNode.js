@@ -84,15 +84,17 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                 //console.log('Node mouse enter:', node.id);
                 eventBus.emit('nodeMouseEnter', { id: node.id, event: e });
             }}
-            onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
-        >
+            onMouseLeave={e => {
+                //console.log('Node mouse leave:', node.id);
+                eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
+            }}>
             {/* Render node label if present */}
             {node?.label && (
                 <div style={{ textAlign: 'center', fontWeight: 500, fontSize: 14, marginTop: 8 }}>
                     {node.label}
                 </div>
             )}
-            {children}
+            {children}  
         </div>
     );
 };

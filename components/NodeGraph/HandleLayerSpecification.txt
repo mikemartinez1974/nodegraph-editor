@@ -1,0 +1,164 @@
+Handle System Design Specification
+Architecture Overview
+Create a HandleLayer component that renders all handles for all visible nodes on a canvas layer. Handles are positioned relative to their parent nodes and manage edge creation/reconnection through drag interactions.
+Data Structure
+Handle Definition:
+javascript{
+  id: string,              // unique handle id: `${nodeId}-${edgeType}-${direction}`
+  nodeId: string,          // parent node id
+  edgeType: string,        // 'parent-child' | 'peer' | future types
+  direction: 'source' | 'target',
+  position: { x, y },      // absolute canvas coordinates
+  color: string            // visual indicator of edge type
+}
+Handle Positioning Rules
+
+Target handles (left side of node):
+
+X position: node.x - node.width/2 - handleOffset
+Y positions: Stack vertically, starting from node.y - (totalHandles-1) * spacing/2
+Order from top to bottom: parent-child target, peer target, [future types]
+
+
+Source handles (right side of node):
+
+X position: node.x + node.width/2 + handleOffset
+Y positions: Mirror the target side stacking
+Order from top to bottom: parent-child source, peer source, [future types]
+
+
+Constants:
+
+handleOffset = 15 (distance from node edge)
+handleSpacing = 30 (vertical spacing between handle pairs)
+handleRadius = 6 (visual size)
+
+
+
+Edge Type Configuration
+Create a configuration object that defines all edge types:
+javascriptconst EDGE_TYPES = {
+  'parent-child': {
+    color: '#1976d2',      // blue
+    curveStrength: 0.5,
+    dashArray: [],
+    width: 2
+  },
+  'peer': {
+    color: '#dc004e',      // red
+    curveStrength: 0.3,
+    dashArray: [],
+    width: 2
+  }
+  // Future types can be added here
+};
+HandleLayer Component
+Props:
+
+nodes: Array of node objects with {id, x, y, width, height, visible}
+edges: Array of edge objects with {id, source, target, type, curved, width, dashArray}
+onDragStart: (handleId, edgeType, direction, position) => void
+onDragMove: (position) => void
+onDragEnd: (position, targetNodeId) => void
+
+Rendering:
+
+Calculate handle positions for all visible nodes
+Render handles as circles with fill color matching edge type
+Render hollow circle if no edges of that type/direction exist on the node
+Filled circle if edges exist
+
+Interaction Flow
+Drag Start (mousedown on handle):
+
+Store: dragState = { handleId, edgeType, direction, startPosition, sourceNodeId }
+Set cursor to crosshair globally
+Call onDragStart(handleId, edgeType, direction, position)
+
+Drag Move (mousemove while dragging):
+
+Calculate current canvas position
+Draw preview line from handle position to cursor position
+Use edge type's curve/width/dash properties for preview
+Call onDragMove(position)
+
+Drag End (mouseup):
+
+Perform hit test at drop position:
+
+Check if over any node → call onDragEnd(position, nodeId)
+Check if over any handle → treat as node hit
+Otherwise → call onDragEnd(position, null)
+
+
+Clear preview line
+Reset cursor
+Clear drag state
+
+Preview Line Rendering
+Create a separate canvas layer or use the handle layer for preview:
+
+If curved is true: Draw S-curve from source to cursor
+If curved is false: Draw straight line
+Use strokeStyle, lineWidth, and setLineDash from edge type config
+Alpha = 0.6 for preview
+
+Hit Detection
+Node hit test:
+javascriptfunction isPointInNode(point, node) {
+  return point.x >= node.x - node.width/2 &&
+         point.x <= node.x + node.width/2 &&
+         point.y >= node.y - node.height/2 &&
+         point.y <= node.y + node.height/2;
+}
+Handle hit test:
+javascriptfunction isPointInHandle(point, handle) {
+  const dx = point.x - handle.position.x;
+  const dy = point.y - handle.position.y;
+  return Math.sqrt(dx*dx + dy*dy) <= handleRadius + 2; // 2px tolerance
+}
+Handle Visibility Logic
+A handle should be visible if:
+
+Its parent node is visible, AND
+Either:
+
+It's in edit/creation mode (show all handles)
+OR it has at least one connected edge
+OR its node is selected
+
+
+
+Events to Emit
+The HandleLayer should emit these events for the editor to handle:
+
+createEdge: { sourceNodeId, targetNodeId, edgeType, direction }
+
+When dragging from source handle, dropping on different node
+
+
+reconnectEdge: { edgeId, newTargetNodeId } or { edgeId, newSourceNodeId }
+
+When dragging from handle with existing edge, dropping on different node
+
+
+createNodeAndEdge: { sourceNodeId, position, edgeType, direction }
+
+When dropping on empty canvas
+
+
+
+Implementation Notes
+
+Use requestAnimationFrame for smooth preview line updates during drag
+Cache handle positions - only recalculate when nodes move or edges change
+Use canvas isPointInPath for efficient hit testing if needed
+Consider adding visual feedback: handle enlarges on hover, glows when valid drop target
+Z-index: Handles should render above edges but below any selection UI
+
+Extension Points
+To add new edge types in the future:
+
+Add entry to EDGE_TYPES configuration
+No code changes needed in HandleLayer - it automatically generates handles
+Editor component handles the semantic meaning of the new edge type
