@@ -2,6 +2,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import NoteIcon from '@mui/icons-material/Note';
+import LinkIcon from '@mui/icons-material/Link';
 
 const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, children, draggingHandle }) => {
     const theme = useTheme();
@@ -12,6 +14,9 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
 
     const lastMousePos = useRef(null);
     const nodeRef = useRef(null);
+
+    const hasMemo = node?.data?.memo && node.data.memo.trim().length > 0;
+    const hasLink = node?.data?.link && node.data.link.trim().length > 0;
 
     useEffect(() => {
         function handleMouseMove(e) {
@@ -28,18 +33,10 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
     }, [draggingHandle]);
 
     useEffect(() => {
-        if (draggingHandle === null && lastMousePos.current) {
-            // Removed debug log
-        }
-    }, [draggingHandle]);
-
-    useEffect(() => {
         const nodeDiv = nodeRef.current;
         if (!nodeDiv) return;
         function handleWheel(e) {
-            // Prevent default only if needed (e.g., custom zoom/pan logic)
             e.preventDefault();
-            // You can add your custom wheel logic here
         }
         nodeDiv.addEventListener('wheel', handleWheel, { passive: false });
         return () => {
@@ -48,7 +45,8 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
     }, []);
 
     const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
-    const unselcted_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
+    const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
+    
     return (
         <div
             ref={nodeRef}
@@ -61,12 +59,16 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                 height,
                 cursor: 'grab',
                 border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
-                background: isSelected ? selected_gradient : unselcted_gradient,
+                background: isSelected ? selected_gradient : unselected_gradient,
                 borderRadius: 8,
                 boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
                 color: isSelected ? `${theme.textColors.dark}` : `${theme.textColors.light}`,
                 zIndex: 100,
                 pointerEvents: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 ...style
             }}
             tabIndex={0}
@@ -81,19 +83,70 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                 eventBus.emit('nodeClick', { id: node.id, event: e });
             }}
             onMouseEnter={e => {
-                //console.log('Node mouse enter:', node.id);
                 eventBus.emit('nodeMouseEnter', { id: node.id, event: e });
             }}
             onMouseLeave={e => {
-                //console.log('Node mouse leave:', node.id);
                 eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
             }}>
+            
             {/* Render node label if present */}
             {node?.label && (
-                <div style={{ textAlign: 'center', fontWeight: 500, fontSize: 14, marginTop: 8 }}>
+                <div style={{ 
+                    textAlign: 'center', 
+                    fontWeight: 500, 
+                    fontSize: Math.max(12, 14 * zoom), 
+                    marginTop: 4,
+                    padding: '0 4px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%'
+                }}>
                     {node.label}
                 </div>
             )}
+
+            {/* Data indicators */}
+            {(hasMemo || hasLink) && (
+                <div style={{
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    display: 'flex',
+                    gap: 4,
+                    opacity: 0.9
+                }}>
+                    {hasMemo && (
+                        <div style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            borderRadius: '50%',
+                            width: 20,
+                            height: 20,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                        }}>
+                            <NoteIcon sx={{ fontSize: 14, color: theme.palette.primary.main }} />
+                        </div>
+                    )}
+                    {hasLink && (
+                        <div style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            borderRadius: '50%',
+                            width: 20,
+                            height: 20,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                        }}>
+                            <LinkIcon sx={{ fontSize: 14, color: theme.palette.primary.main }} />
+                        </div>
+                    )}
+                </div>
+            )}
+
             {children}  
         </div>
     );

@@ -1,16 +1,30 @@
+"use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SaveIcon from '@mui/icons-material/Save';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import CheckIcon from '@mui/icons-material/Check';
+import Tooltip from '@mui/material/Tooltip';
+import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 
-const Toolbar = ({ theme }) => {
+const Toolbar = ({ nodes = [], edges = [], onLoadGraph }) => {
+  const theme = useTheme();
   const palette = theme?.palette || {};
   const primary = palette.primary || {};
-  const [pos, setPos] = useState({ x: 0, y: 88 }); // initial position
+  const [pos, setPos] = useState({ x: 0, y: 88 });
+  const [copied, setCopied] = useState(false);
+  const [metadataCopied, setMetadataCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setPos({ x: window.innerWidth - 272, y: 88 });
+      setPos({ x: window.innerWidth - 352, y: 88 });
     }
   }, []);
 
@@ -38,6 +52,183 @@ const Toolbar = ({ theme }) => {
     document.removeEventListener('mouseup', onMouseUp);
   };
 
+  const handleLoadFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const jsonData = JSON.parse(event.target.result);
+        
+        // Validate the structure
+        if (!jsonData.nodes || !jsonData.edges) {
+          console.error('Invalid graph file format');
+          alert('Invalid graph file format. Missing nodes or edges.');
+          return;
+        }
+
+        // Call the callback to update the graph
+        if (onLoadGraph) {
+          onLoadGraph(jsonData.nodes, jsonData.edges);
+          console.log('Graph loaded successfully!');
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        alert('Error loading file. Please ensure it\'s a valid JSON graph file.');
+      }
+    };
+
+    reader.readAsText(file);
+    // Reset the input so the same file can be loaded again
+    e.target.value = '';
+  };
+
+  const handleSaveToFile = () => {
+    const schema = {
+      nodes: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        data: node.data
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target,
+        label: edge.label,
+        style: edge.style
+      }))
+    };
+
+    const jsonString = JSON.stringify(schema, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    console.log('Graph saved to file!');
+  };
+
+  const handleCopyMetadata = async () => {
+    // Extract only metadata - node/edge types and data structure
+    const edgeTypesUsed = [...new Set(edges.map(e => e.type))];
+    const edgeMetadata = {};
+    
+    edgeTypesUsed.forEach(type => {
+      const edgesOfType = edges.filter(e => e.type === type);
+      const sampleEdge = edgesOfType[0];
+      edgeMetadata[type] = {
+        count: edgesOfType.length,
+        style: sampleEdge?.style || {},
+        label: sampleEdge?.label || '',
+        showLabel: sampleEdge?.showLabel || false
+      };
+    });
+
+    const metadata = {
+      nodeTypes: [...new Set(nodes.map(n => n.type))],
+      nodeCount: nodes.length,
+      edgeTypes: edgeTypesUsed,
+      edgeCount: edges.length,
+      edgeMetadata: edgeMetadata,
+      dataFields: {
+        memo: nodes.some(n => n.data?.memo),
+        link: nodes.some(n => n.data?.link)
+      }
+    };
+
+    const jsonString = JSON.stringify(metadata, null, 2);
+
+    try {
+      await navigator.clipboard.writeText(jsonString);
+      setMetadataCopied(true);
+      setTimeout(() => setMetadataCopied(false), 2000);
+      console.log('Graph metadata copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = jsonString;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setMetadataCopied(true);
+        setTimeout(() => setMetadataCopied(false), 2000);
+      } catch (err2) {
+        console.error('Fallback copy failed:', err2);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handleCopyJSON = async () => {
+    const schema = {
+      nodes: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        data: node.data
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target,
+        label: edge.label,
+        style: edge.style
+      }))
+    };
+
+    const jsonString = JSON.stringify(schema, null, 2);
+
+    try {
+      await navigator.clipboard.writeText(jsonString);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      console.log('Graph schema copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = jsonString;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err2) {
+        console.error('Fallback copy failed:', err2);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
   return (
     <Paper
       elevation={6}
@@ -45,27 +236,110 @@ const Toolbar = ({ theme }) => {
         position: 'fixed',
         left: pos.x,
         top: pos.y,
-        minWidth: 240,
+        minWidth: 320,
         height: 56,
         backgroundColor: primary.main,
         color: primary.contrastText,
         display: 'flex',
         alignItems: 'center',
-        px: 3,
+        justifyContent: 'space-between',
+        px: 2,
         borderRadius: 2,
         zIndex: 1200,
-        fontWeight: 600,
-        fontSize: 18,
         pointerEvents: 'auto',
         userSelect: 'none',
-        cursor: 'move',
         transition: 'background-color 0.2s, color 0.2s',
       }}
       tabIndex={0}
-      onMouseDown={onMouseDown}
     >
-      Floating Toolbar
-      {/* Add MUI buttons/controls here */}
+      {/* Draggable area */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          cursor: 'move',
+          display: 'flex',
+          alignItems: 'center',
+          fontWeight: 600,
+          fontSize: 16,
+          mr: 2
+        }}
+        onMouseDown={onMouseDown}
+      >
+        Graph Tools
+      </Box>
+
+      {/* Load File Button */}
+      <Tooltip title="Load graph from file" arrow>
+        <IconButton
+          onClick={handleLoadFile}
+          sx={{
+            color: primary.contrastText,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+          size="small"
+        >
+          <FolderOpenIcon />
+        </IconButton>
+      </Tooltip>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
+      {/* Save to File Button */}
+      <Tooltip title={saved ? "Saved!" : "Save graph to file"} arrow>
+        <IconButton
+          onClick={handleSaveToFile}
+          sx={{
+            color: primary.contrastText,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+          size="small"
+        >
+          {saved ? <CheckIcon /> : <SaveIcon />}
+        </IconButton>
+      </Tooltip>
+
+      {/* Copy Metadata Button */}
+      <Tooltip title={metadataCopied ? "Copied!" : "Copy metadata"} arrow>
+        <IconButton
+          onClick={handleCopyMetadata}
+          sx={{
+            color: primary.contrastText,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+          size="small"
+        >
+          {metadataCopied ? <CheckIcon /> : <ContentCopyIcon fontSize="small" />}
+        </IconButton>
+      </Tooltip>
+
+      {/* Copy Full JSON Button */}
+      <Tooltip title={copied ? "Copied!" : "Export full graph JSON"} arrow>
+        <IconButton
+          onClick={handleCopyJSON}
+          sx={{
+            color: primary.contrastText,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+          size="small"
+        >
+          {copied ? <CheckIcon /> : <ContentCopyIcon />}
+        </IconButton>
+      </Tooltip>
     </Paper>
   );
 };
