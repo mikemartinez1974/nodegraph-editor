@@ -7,13 +7,20 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClose, theme }) {
   const [memo, setMemo] = useState('');
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
+  const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
 
   // Update local state when selected node changes
   useEffect(() => {
@@ -119,31 +126,125 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
 
         {/* Memo */}
         <Box sx={{ mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <NoteIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-            <Typography variant="subtitle2" color="text.secondary">
-              Memo
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <NoteIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+              <Typography variant="subtitle2" color="text.secondary">
+                Memo (Markdown)
+              </Typography>
+            </Box>
+            <ToggleButtonGroup
+              value={memoView}
+              exclusive
+              onChange={(e, newView) => newView && setMemoView(newView)}
+              size="small"
+            >
+              <ToggleButton value="edit" sx={{ py: 0.5, px: 1 }}>
+                <EditIcon sx={{ fontSize: 16 }} />
+              </ToggleButton>
+              <ToggleButton value="preview" sx={{ py: 0.5, px: 1 }}>
+                <VisibilityIcon sx={{ fontSize: 16 }} />
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Box>
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            value={memo}
-            onChange={handleMemoChange}
-            variant="outlined"
-            placeholder="Add notes about this node..."
-            sx={{ 
-              '& .MuiOutlinedInput-root': {
-                fontFamily: 'monospace',
-                fontSize: 13
-              }
-            }}
-          />
-          {memo && (
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-              {memo.length} characters
-            </Typography>
+
+          {memoView === 'edit' ? (
+            <>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                value={memo}
+                onChange={handleMemoChange}
+                variant="outlined"
+                placeholder="Add notes about this node... (Markdown supported)"
+                sx={{ 
+                  '& .MuiOutlinedInput-root': {
+                    fontFamily: 'monospace',
+                    fontSize: 13
+                  }
+                }}
+              />
+              {memo && (
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                  {memo.length} characters
+                </Typography>
+              )}
+            </>
+          ) : (
+            <Box
+              sx={{
+                minHeight: 160,
+                maxHeight: 300,
+                overflowY: 'auto',
+                p: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                backgroundColor: 'background.default',
+                '& h1': { fontSize: 20, fontWeight: 700, mt: 2, mb: 1 },
+                '& h2': { fontSize: 18, fontWeight: 600, mt: 1.5, mb: 1 },
+                '& h3': { fontSize: 16, fontWeight: 600, mt: 1.5, mb: 0.5 },
+                '& p': { mb: 1 },
+                '& ul, & ol': { pl: 3, mb: 1 },
+                '& li': { mb: 0.5 },
+                '& code': { 
+                  backgroundColor: 'action.hover', 
+                  padding: '2px 4px', 
+                  borderRadius: 0.5,
+                  fontFamily: 'monospace',
+                  fontSize: 12
+                },
+                '& pre': { 
+                  backgroundColor: 'action.hover', 
+                  p: 1.5, 
+                  borderRadius: 1,
+                  overflowX: 'auto',
+                  mb: 1
+                },
+                '& pre code': {
+                  backgroundColor: 'transparent',
+                  padding: 0
+                },
+                '& blockquote': {
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main',
+                  pl: 2,
+                  ml: 0,
+                  fontStyle: 'italic',
+                  color: 'text.secondary'
+                },
+                '& a': {
+                  color: 'primary.main',
+                  textDecoration: 'underline'
+                },
+                '& table': {
+                  borderCollapse: 'collapse',
+                  width: '100%',
+                  mb: 1
+                },
+                '& th, & td': {
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  padding: '6px 8px',
+                  textAlign: 'left'
+                },
+                '& th': {
+                  backgroundColor: 'action.hover',
+                  fontWeight: 600
+                }
+              }}
+            >
+              {memo ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {memo}
+                </ReactMarkdown>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                  No content to preview
+                </Typography>
+              )}
+            </Box>
           )}
         </Box>
 
