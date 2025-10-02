@@ -11,6 +11,7 @@ import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
+import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
 
 
 
@@ -190,6 +191,32 @@ export default function GraphEditor({ backgroundImage }) {
     console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
   }
 
+  function handleUpdateEdge(edgeId, updates) {
+    setEdges(prev => prev.map(edge => {
+      if (edge.id === edgeId) {
+        return { 
+          ...edge, 
+          ...updates,
+          style: updates.style ? { ...edge.style, ...updates.style } : edge.style
+        };
+      }
+      return edge;
+    }));
+    // Save to history after edge update
+    const updatedEdges = edges.map(edge => {
+      if (edge.id === edgeId) {
+        return { 
+          ...edge, 
+          ...updates,
+          style: updates.style ? { ...edge.style, ...updates.style } : edge.style
+        };
+      }
+      return edge;
+    });
+    saveToHistory(nodes, updatedEdges);
+  }
+
+
   // Save current state to history (for undo/redo)
 const saveToHistory = (newNodes, newEdges) => {
   const newHistory = history.slice(0, historyIndex + 1);
@@ -350,14 +377,30 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         hoveredEdgeSource={hoveredEdgeSource}
         hoveredEdgeTarget={hoveredEdgeTarget}
       />
-      {selectedNodeId && (
+      {selectedNodeId && !selectedEdgeId && (
         <NodePropertiesPanel
           selectedNode={nodes.find(n => n.id === selectedNodeId)}
           onUpdateNode={handleUpdateNodeData}
           onClose={() => setSelectedNodeId(null)}
           theme={theme}
-       />
+        />
       )}
+            
+      {selectedEdgeId && (
+        <EdgePropertiesPanel
+          selectedEdge={{
+            ...edges.find(e => e.id === selectedEdgeId),
+            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.source),
+            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.target)
+          }}
+          edgeTypes={edgeTypes}
+          onUpdateEdge={handleUpdateEdge}
+          onClose={() => setSelectedEdgeId(null)}
+          theme={theme}
+        />
+      )}
+
+      
     </div>
 
   );
