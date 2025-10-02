@@ -13,37 +13,85 @@ function getHandlePositions(node, edgeTypes) {
   const x = node.position ? node.position.x : node.x;
   const y = node.position ? node.position.y : node.y;
   const width = node.width || 60;
-  
-  // Target handles (left)
+  const height = node.height || 60;
+
   visibleEdgeTypes.forEach((type, i) => {
-    handles.push({
-      id: `${node.id}-${type}-target`,
-      nodeId: node.id,
-      edgeType: type,
-      direction: 'target',
-      position: {
-        x: x - width / 2 - handleOffset,
-        y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
-      },
-      color: edgeTypes[type].style?.color || '#1976d2'
-    });
+    if (type === 'child' || type === 'parent') {
+      // Target handle (top)
+      handles.push({
+        id: `${node.id}-${type}-target`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'target',
+        position: {
+          x: x,
+          y: y - height / 2 - handleOffset
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+      // Source handle (bottom)
+      handles.push({
+        id: `${node.id}-${type}-source`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'source',
+        position: {
+          x: x,
+          y: y + height / 2 + handleOffset
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+    } else if (type === 'peer') {
+      // Target handle (left)
+      handles.push({
+        id: `${node.id}-${type}-target`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'target',
+        position: {
+          x: x - width / 2 - handleOffset,
+          y: y
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+      // Source handle (right)
+      handles.push({
+        id: `${node.id}-${type}-source`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'source',
+        position: {
+          x: x + width / 2 + handleOffset,
+          y: y
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+    } else {
+      // Default: left/right
+      handles.push({
+        id: `${node.id}-${type}-target`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'target',
+        position: {
+          x: x - width / 2 - handleOffset,
+          y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+      handles.push({
+        id: `${node.id}-${type}-source`,
+        nodeId: node.id,
+        edgeType: type,
+        direction: 'source',
+        position: {
+          x: x + width / 2 + handleOffset,
+          y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
+        },
+        color: edgeTypes[type].style?.color || '#1976d2'
+      });
+    }
   });
-  
-  // Source handles (right)
-  visibleEdgeTypes.forEach((type, i) => {
-    handles.push({
-      id: `${node.id}-${type}-source`,
-      nodeId: node.id,
-      edgeType: type,
-      direction: 'source',
-      position: {
-        x: x + width / 2 + handleOffset,
-        y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
-      },
-      color: edgeTypes[type].style?.color || '#1976d2'
-    });
-  });
-  
   return handles;
 }
 

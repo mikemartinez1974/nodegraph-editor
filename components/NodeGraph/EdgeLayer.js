@@ -234,14 +234,33 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       ctx.beginPath();
       // Determine if edge should be curved
       const isCurved = edge.style?.curved === true;
+      // Dynamically choose curve direction based on handle positions
+      const dx = Math.abs(targetPos.x - sourcePos.x);
+      const dy = Math.abs(targetPos.y - sourcePos.y);
       if (isCurved) {
-        // Draw a bezier curve between source and target
-        const midX = (sourcePos.x + targetPos.x) / 2;
-        const midY = (sourcePos.y + targetPos.y) / 2 - 40; // Offset for curve
-        ctx.beginPath();
-        ctx.moveTo(sourcePos.x, sourcePos.y);
-        ctx.bezierCurveTo(midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
-        ctx.stroke();
+        let midX = (sourcePos.x + targetPos.x) / 2;
+        let midY = (sourcePos.y + targetPos.y) / 2;
+        if (dx > dy) {
+          // Horizontal S-curve
+          ctx.beginPath();
+          ctx.moveTo(sourcePos.x, sourcePos.y);
+          ctx.bezierCurveTo(
+            midX, sourcePos.y,
+            midX, targetPos.y,
+            targetPos.x, targetPos.y
+          );
+          ctx.stroke();
+        } else {
+          // Vertical S-curve
+          ctx.beginPath();
+          ctx.moveTo(sourcePos.x, sourcePos.y);
+          ctx.bezierCurveTo(
+            sourcePos.x, midY,
+            targetPos.x, midY,
+            targetPos.x, targetPos.y
+          );
+          ctx.stroke();
+        }
       } else {
         // Draw a straight line
         ctx.beginPath();
