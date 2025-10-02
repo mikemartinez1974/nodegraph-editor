@@ -13,6 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 
 
+
 export default function GraphEditor({ backgroundImage }) {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
@@ -22,6 +23,8 @@ export default function GraphEditor({ backgroundImage }) {
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
+  const [historyIndex, setHistoryIndex] = useState(0);
  
   // Compute which handles should be extended for hovered edge
   let hoveredEdgeSource = null;
@@ -99,12 +102,14 @@ export default function GraphEditor({ backgroundImage }) {
               style: edgeTypePreset.style
             });
             setEdges(prev => [...prev, newEdge]);
+
             //console.log('Created edge between nodes:', newEdge.id);
           } else {
             //console.log('Edge already exists, skipping creation');
           }
         }
       }
+      saveToHistory(nodesRef.current, edgesRef.current);
     }
     eventBus.on('handleDrop', onHandleDrop);
     return () => {
@@ -168,6 +173,7 @@ export default function GraphEditor({ backgroundImage }) {
         // Update only the data property
         return { ...node, data: { ...node.data, ...newData } };
       }
+      saveToHistory(nodes, edges);
       return node;
     }));
   }
@@ -183,6 +189,101 @@ export default function GraphEditor({ backgroundImage }) {
     
     console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
   }
+
+  // Save current state to history (for undo/redo)
+const saveToHistory = (newNodes, newEdges) => {
+  const newHistory = history.slice(0, historyIndex + 1);
+  newHistory.push({ nodes: newNodes, edges: newEdges });
+  setHistory(newHistory);
+  setHistoryIndex(newHistory.length - 1);
+};
+
+// Undo handler
+const handleUndo = () => {
+  if (historyIndex > 0) {
+    const newIndex = historyIndex - 1;
+    setHistoryIndex(newIndex);
+    setNodes(history[newIndex].nodes);
+    setEdges(history[newIndex].edges);
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+    console.log('Undo performed');
+  }
+};
+
+// Redo handler
+const handleRedo = () => {
+  if (historyIndex < history.length - 1) {
+    const newIndex = historyIndex + 1;
+    setHistoryIndex(newIndex);
+    setNodes(history[newIndex].nodes);
+    setEdges(history[newIndex].edges);
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+    console.log('Redo performed');
+  }
+};
+
+// Add node handler
+const handleAddNode = () => {
+  const newId = uuidv4();
+  const newNode = createNode({
+    id: newId,
+    type: 'default',
+    label: `Node ${nodes.length + 1}`,
+    data: {},
+    position: { 
+      x: 100 + (nodes.length * 20), 
+      y: 100 + (nodes.length * 20) 
+    },
+    showLabel: true
+  });
+  const newNodes = [...nodes, newNode];
+  setNodes(newNodes);
+  saveToHistory(newNodes, edges);
+  console.log('Added node:', newNode.id);
+};
+
+// Delete selected handler
+const handleDeleteSelected = () => {
+  if (selectedNodeId) {
+    const newNodes = nodes.filter(n => n.id !== selectedNodeId);
+    const newEdges = edges.filter(e => e.source !== selectedNodeId && e.target !== selectedNodeId);
+    setNodes(newNodes);
+    setEdges(newEdges);
+    setSelectedNodeId(null);
+    saveToHistory(newNodes, newEdges);
+    console.log('Deleted node:', selectedNodeId);
+  } else if (selectedEdgeId) {
+    const newEdges = edges.filter(e => e.id !== selectedEdgeId);
+    setEdges(newEdges);
+    setSelectedEdgeId(null);
+    saveToHistory(nodes, newEdges);
+    console.log('Deleted edge:', selectedEdgeId);
+  }
+};
+
+// Clear graph handler
+const handleClearGraph = () => {
+  const newNodes = [];
+  const newEdges = [];
+  setNodes(newNodes);
+  setEdges(newEdges);
+  setSelectedNodeId(null);
+  setSelectedEdgeId(null);
+  saveToHistory(newNodes, newEdges);
+  console.log('Graph cleared');
+};
+
+// Update the handleLoadGraph function to save to history:
+function handleLoadGraph(loadedNodes, loadedEdges) {
+  setNodes(loadedNodes);
+  setEdges(loadedEdges);
+  setSelectedNodeId(null);
+  setSelectedEdgeId(null);
+  saveToHistory(loadedNodes, loadedEdges);
+  console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
+}
   
 
   // Node types mapping for the editor
@@ -201,7 +302,20 @@ export default function GraphEditor({ backgroundImage }) {
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
     }}>
-      <Toolbar nodes={nodes} edges={edges} onLoadGraph={handleLoadGraph} />
+      <Toolbar 
+        nodes={nodes} 
+        edges={edges} 
+        onLoadGraph={handleLoadGraph}
+        onAddNode={handleAddNode}
+        onDeleteSelected={handleDeleteSelected}
+        onClearGraph={handleClearGraph}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        selectedNodeId={selectedNodeId}
+        selectedEdgeId={selectedEdgeId}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+      />
       <NodeGraph 
         nodes={nodes} 
         edges={edges} 
