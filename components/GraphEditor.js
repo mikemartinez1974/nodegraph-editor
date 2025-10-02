@@ -12,8 +12,7 @@ import ListNode from '../components/GraphEditor/Nodes/ListNode';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
-
-
+import { GraphCRUD } from './GraphEditor/GraphCrud.js';
 
 export default function GraphEditor({ backgroundImage }) {
   const [nodes, setNodes] = useState(initialNodes);
@@ -26,7 +25,11 @@ export default function GraphEditor({ backgroundImage }) {
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
   const [historyIndex, setHistoryIndex] = useState(0);
- 
+  const nodesRef = useRef(nodes);
+  const edgesRef = useRef(edges);
+  const theme = useTheme();
+  const graphAPI = useRef(null);
+
   // Compute which handles should be extended for hovered edge
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
@@ -38,10 +41,7 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }
 
-  const nodesRef = useRef(nodes);
-  const edgesRef = useRef(edges);
-  const theme = useTheme();
-
+  // Update refs when state changes
   useEffect(() => {
     nodesRef.current = nodes;
     edgesRef.current = edges;
@@ -125,6 +125,37 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, []);
 
+  // Initialize the API
+useEffect(() => {
+  graphAPI.current = new GraphCRUD(
+    () => nodesRef.current,  // getNodes
+    setNodes,                 // setNodes
+    () => edgesRef.current,  // getEdges
+    setEdges,                 // setEdges
+    saveToHistory            // saveToHistory
+  );
+
+  // Expose API to window for LLM/console access
+  if (typeof window !== 'undefined') {
+    window.graphAPI = graphAPI.current;
+    console.log('Graph CRUD API available at window.graphAPI');
+    console.log('Examples:');
+    console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
+    console.log('  window.graphAPI.readNode() // Get all nodes');
+    console.log('  window.graphAPI.getStats() // Get graph statistics');
+  }
+}, []);
+
+
+  // Optionally, create helper functions that use the API:
+  const apiCreateNode = (options) => graphAPI.current?.createNode(options);
+  const apiUpdateNode = (id, updates) => graphAPI.current?.updateNode(id, updates);
+  const apiDeleteNode = (id) => graphAPI.current?.deleteNode(id);
+  const apiCreateEdge = (options) => graphAPI.current?.createEdge(options);
+  const apiUpdateEdge = (id, updates) => graphAPI.current?.updateEdge(id, updates);
+  const apiDeleteEdge = (id) => graphAPI.current?.deleteEdge(id);
+  const apiGetStats = () => graphAPI.current?.getStats();
+  
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
