@@ -9,6 +9,7 @@ import { edgeTypes } from './GraphEditor/edgeTypes';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
+import NodeListPanel from './GraphEditor/NodeListPanel';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
@@ -23,6 +24,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [showNodeList, setShowNodeList] = useState(true);
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const nodesRef = useRef(nodes);
@@ -351,6 +353,26 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
     list: ListNode
   };
 
+  // Handle node selection from NodeListPanel
+  const handleNodeListSelect = (nodeId) => {
+    setSelectedNodeId(nodeId);
+    setSelectedEdgeId(null);
+  };
+
+  // Handle focusing on a node from NodeListPanel
+  const handleNodeFocus = (nodeId) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (node) {
+      // Center the view on the node
+      setPan({
+        x: window.innerWidth / 2 - node.position.x * zoom,
+        y: window.innerHeight / 2 - node.position.y * zoom
+      });
+      setSelectedNodeId(nodeId);
+      setSelectedEdgeId(null);
+    }
+  };
+
   return (
     <div id="graph-editor-background" style={{
       minHeight: '100vh',
@@ -361,6 +383,8 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
       backgroundRepeat: 'no-repeat',
     }}>
       <Toolbar 
+        onToggleNodeList={() => setShowNodeList(!showNodeList)}
+        showNodeList={showNodeList}
         nodes={nodes} 
         edges={edges} 
         onLoadGraph={handleLoadGraph}
@@ -374,6 +398,17 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         canUndo={historyIndex > 0}
         canRedo={historyIndex < history.length - 1}
       />
+      
+      {/* Node List Panel */}
+      <NodeListPanel
+        nodes={nodes}
+        selectedNodeId={selectedNodeId}
+        onNodeSelect={handleNodeListSelect}
+        onNodeFocus={handleNodeFocus}
+        onClose={() => setShowNodeList(false)}
+        isOpen={showNodeList}
+      />
+      
       <NodeGraph 
         nodes={nodes} 
         edges={edges} 
@@ -387,6 +422,8 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         edgeTypes={edgeTypes}
         onNodeMove={(id, position) => {
           setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
+          // Emit event so HandleLayer updates in real-time
+          eventBus.emit('nodeDrag', { nodeId: id, position });
         }}
         onEdgeClick={(edge, event) => {
           setSelectedEdgeId(edge.id);
@@ -407,6 +444,15 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         hoveredEdgeId={hoveredEdgeId}
         hoveredEdgeSource={hoveredEdgeSource}
         hoveredEdgeTarget={hoveredEdgeTarget}
+        onNodeDragEnd={(id, position) => {
+          setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
+          // Emit event and save to history when drag completes
+          eventBus.emit('nodeDragEnd', { nodeId: id, position });
+          saveToHistory(
+            nodes.map(n => n.id === id ? { ...n, position } : n),
+            edges
+          );
+        }}
       />
       {selectedNodeId && !selectedEdgeId && (
         <NodePropertiesPanel

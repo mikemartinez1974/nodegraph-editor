@@ -1,5 +1,5 @@
-// HandleLayer.js - Complete drag and drop implementation
-import React, { useEffect, useState, useRef } from 'react';
+// HandleLayer.js - Optimized for real-time performance
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
@@ -55,8 +55,6 @@ const HandleLayer = ({
   edgeTypes = {}, 
   children 
 }) => {
-  const [handlePositions, setHandlePositions] = useState([]);
-  const [handlePositionMap, setHandlePositionMap] = useState({});
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [previewLine, setPreviewLine] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
@@ -64,18 +62,8 @@ const HandleLayer = ({
   const dragStartPosRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Calculate handle positions for all visible nodes
-  // Use JSON.stringify to create a stable dependency that only changes when actual data changes
-  const nodesKey = JSON.stringify(nodes.map(n => ({ 
-    id: n.id, 
-    x: n.position?.x || n.x, 
-    y: n.position?.y || n.y,
-    width: n.width,
-    visible: n.visible 
-  })));
-  const edgeTypesKey = JSON.stringify(Object.keys(edgeTypes));
-
-  useEffect(() => {
+  // Calculate handles and position map directly - no state, pure computation
+  const { handlePositions, handlePositionMap } = useMemo(() => {
     const allHandles = [];
     const handleMap = {};
     nodes.filter(n => n.visible !== false).forEach(node => {
@@ -85,9 +73,8 @@ const HandleLayer = ({
       });
       allHandles.push(...handles);
     });
-    setHandlePositions(allHandles);
-    setHandlePositionMap(handleMap);
-  }, [nodesKey, edgeTypesKey]);
+    return { handlePositions: allHandles, handlePositionMap: handleMap };
+  }, [nodes, edgeTypes]);
 
   // Provide function to get handle position by id
   const getHandlePosition = handleId => handlePositionMap[handleId];
@@ -228,7 +215,7 @@ const HandleLayer = ({
           zIndex: 20 
         }}
       >
-        {/* Render handles */}
+        {/* Render handles - positions calculated in useMemo, updates automatically with nodes */}
         {handlePositions.map(handle => {
           const left = handle.position.x * zoom + pan.x - handleRadius;
           const top = handle.position.y * zoom + pan.y - handleRadius;

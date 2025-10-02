@@ -12,6 +12,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ClearIcon from '@mui/icons-material/Clear';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
@@ -28,7 +29,9 @@ const Toolbar = ({
   selectedNodeId,
   selectedEdgeId,
   canUndo = false,
-  canRedo = false
+  canRedo = false,
+  onToggleNodeList,
+  showNodeList = true
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -542,6 +545,23 @@ const Toolbar = ({
           size="small"
         >
           {copied ? <CheckIcon /> : <ContentCopyIcon />}
+        </IconButton>
+      </Tooltip>
+
+      {/* Toggle Node List Button */}
+      <Tooltip title={showNodeList ? "Hide Node List" : "Show Node List"} arrow>
+        <IconButton 
+          onClick={onToggleNodeList}
+          color={showNodeList ? "primary" : "default"}
+          sx={{
+            color: primary.contrastText,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+          size="small"
+        >
+          <ViewListIcon />
         </IconButton>
       </Tooltip>
     </Paper>
