@@ -407,6 +407,7 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         onNodeFocus={handleNodeFocus}
         onClose={() => setShowNodeList(false)}
         isOpen={showNodeList}
+        theme={theme}
       />
       
       <NodeGraph 

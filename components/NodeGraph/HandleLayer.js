@@ -1,5 +1,5 @@
-// HandleLayer.js - Optimized for real-time performance
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+// HandleLayer.js - Canvas-based handles for maximum performance
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
@@ -55,14 +55,16 @@ const HandleLayer = ({
   edgeTypes = {}, 
   children 
 }) => {
-  const [draggingHandle, setDraggingHandle] = useState(null);
-  const [previewLine, setPreviewLine] = useState(null);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  
-  const dragStartPosRef = useRef(null);
+  const canvasRef = useRef(null);
   const containerRef = useRef(null);
+  const draggingHandleRef = useRef(null);
+  const hoveredHandleRef = useRef(null);
+  const previewLineRef = useRef({ visible: false });
+  const animationFrameRef = useRef(null);
+  
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  // Calculate handles and position map directly - no state, pure computation
+  // Calculate handles and position map with pure computation
   const { handlePositions, handlePositionMap } = useMemo(() => {
     const allHandles = [];
     const handleMap = {};
@@ -76,130 +78,296 @@ const HandleLayer = ({
     return { handlePositions: allHandles, handlePositionMap: handleMap };
   }, [nodes, edgeTypes]);
 
-  // Provide function to get handle position by id
-  const getHandlePosition = handleId => handlePositionMap[handleId];
+  // Context functions
+  const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
 
-  const getHandlePositionForEdge = (nodeId, edgeType, direction) => {
+  const getHandlePositionForEdge = useCallback((nodeId, edgeType, direction) => {
     const nodeStr = String(nodeId).trim();
     const typeStr = String(edgeType).trim();
     const dirStr = String(direction).trim();
     const handleId = `${nodeStr}-${typeStr}-${dirStr}`;
     return handlePositionMap[handleId];
-  };
+  }, [handlePositionMap]);
+  
   getHandlePositionForEdge._handleKeys = Object.keys(handlePositionMap);
 
-  // Handle drag start
-  const onHandleDragStart = (e, handle) => {
-    e.stopPropagation();
-    setDraggingHandle(handle);
-    dragStartPosRef.current = { x: e.clientX, y: e.clientY };
+  // Find handle at screen coordinates
+  const findHandleAt = useCallback((clientX, clientY) => {
+    if (!canvasRef.current) return null;
     
-    // Set initial preview line
-    setPreviewLine({
-      x1: handle.position.x,
-      y1: handle.position.y,
-      x2: handle.position.x,
-      y2: handle.position.y
-    });
-
-    window.addEventListener('mousemove', onHandleDragMove);
-    window.addEventListener('mouseup', onHandleDragEnd);
+    const rect = canvasRef.current.getBoundingClientRect();
+    const canvasX = clientX - rect.left;
+    const canvasY = clientY - rect.top;
     
-    eventBus.emit('handleDragStart', { handle });
-  };
-
-  // Handle drag move
-  const onHandleDragMove = (e) => {
-    if (!draggingHandle) return;
-    
-    // Convert screen coordinates to graph coordinates
-    const graphX = (e.clientX - pan.x) / zoom;
-    const graphY = (e.clientY - pan.y) / zoom;
-    
-    // Update preview line
-    setPreviewLine({
-      x1: draggingHandle.position.x,
-      y1: draggingHandle.position.y,
-      x2: graphX,
-      y2: graphY
-    });
-
-    // Check if hovering over a node
-    const hoveredNode = nodes.find(node => {
-      if (node.id === draggingHandle.nodeId) return false; // Can't connect to self
-      const nodeX = node.position?.x || node.x;
-      const nodeY = node.position?.y || node.y;
-      const nodeWidth = node.width || 60;
-      const nodeHeight = node.height || 60;
+    for (const handle of handlePositions) {
+      const screenX = handle.position.x * zoom + pan.x;
+      const screenY = handle.position.y * zoom + pan.y;
       
-      return (
-        graphX >= nodeX - nodeWidth / 2 &&
-        graphX <= nodeX + nodeWidth / 2 &&
-        graphY >= nodeY - nodeHeight / 2 &&
-        graphY <= nodeY + nodeHeight / 2
+      const distance = Math.sqrt(
+        Math.pow(canvasX - screenX, 2) + 
+        Math.pow(canvasY - screenY, 2)
       );
-    });
-
-    setHoveredNodeId(hoveredNode?.id || null);
-  };
-
-  // Handle drag end
-  const onHandleDragEnd = (e) => {
-    if (!draggingHandle) return;
-
-    window.removeEventListener('mousemove', onHandleDragMove);
-    window.removeEventListener('mouseup', onHandleDragEnd);
-
-    // Convert screen coordinates to graph coordinates
-    const graphX = (e.clientX - pan.x) / zoom;
-    const graphY = (e.clientY - pan.y) / zoom;
-    const screenX = e.clientX;
-    const screenY = e.clientY;
-
-    // Find if dropped on a node
-    const targetNode = nodes.find(node => {
-      if (node.id === draggingHandle.nodeId) return false;
-      const nodeX = node.position?.x || node.x;
-      const nodeY = node.position?.y || node.y;
-      const nodeWidth = node.width || 60;
-      const nodeHeight = node.height || 60;
       
-      return (
-        graphX >= nodeX - nodeWidth / 2 &&
-        graphX <= nodeX + nodeWidth / 2 &&
-        graphY >= nodeY - nodeHeight / 2 &&
-        graphY <= nodeY + nodeHeight / 2
-      );
-    });
+      if (distance <= handleRadius + 2) { // Add small padding for easier clicking
+        return handle;
+      }
+    }
+    
+    return null;
+  }, [handlePositions, pan, zoom]);
 
-    // Find the associated edge ID if this handle is from an existing edge
-    const associatedEdge = edges.find(edge => {
-      if (draggingHandle.direction === 'source') {
-        return edge.source === draggingHandle.nodeId && edge.type === draggingHandle.edgeType;
-      } else {
-        return edge.target === draggingHandle.nodeId && edge.type === draggingHandle.edgeType;
+  // Canvas drawing function
+  const drawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw handles
+    handlePositions.forEach(handle => {
+      const screenX = handle.position.x * zoom + pan.x;
+      const screenY = handle.position.y * zoom + pan.y;
+      
+      // Skip if outside visible area (performance optimization)
+      if (screenX < -handleRadius || screenX > canvas.width + handleRadius || 
+          screenY < -handleRadius || screenY > canvas.height + handleRadius) {
+        return;
+      }
+      
+      const isHovered = hoveredHandleRef.current?.id === handle.id;
+      const radius = isHovered ? handleRadius * 1.2 : handleRadius;
+      
+      // Drop shadow
+      if (isHovered) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 2;
+      }
+      
+      // Handle circle
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = handle.color;
+      ctx.fill();
+      
+      // Border
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = isHovered ? 3 : 2;
+      ctx.stroke();
+      
+      if (isHovered) {
+        ctx.restore();
       }
     });
+    
+    // Draw preview line if dragging
+    if (previewLineRef.current.visible && draggingHandleRef.current) {
+      const preview = previewLineRef.current;
+      const startX = draggingHandleRef.current.position.x * zoom + pan.x;
+      const startY = draggingHandleRef.current.position.y * zoom + pan.y;
+      
+      // Dashed line
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = draggingHandleRef.current.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.6;
+      
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(preview.endX, preview.endY);
+      ctx.stroke();
+      
+      // End circle
+      ctx.beginPath();
+      ctx.arc(preview.endX, preview.endY, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = draggingHandleRef.current.color;
+      ctx.fill();
+      
+      ctx.restore();
+    }
+  }, [handlePositions, pan, zoom]);
 
-    // Emit handleDrop event with all necessary data
+  // Optimized render loop
+  const scheduleRender = useCallback(() => {
+    if (animationFrameRef.current) return;
+    
+    animationFrameRef.current = requestAnimationFrame(() => {
+      drawCanvas();
+      animationFrameRef.current = null;
+    });
+  }, [drawCanvas]);
+
+  // Event handlers
+  const handleMouseDown = useCallback((e) => {
+    const handle = findHandleAt(e.clientX, e.clientY);
+    if (!handle) return;
+    
+    e.stopPropagation();
+    e.preventDefault();
+    
+    draggingHandleRef.current = handle;
+    previewLineRef.current = {
+      visible: true,
+      endX: handle.position.x * zoom + pan.x,
+      endY: handle.position.y * zoom + pan.y
+    };
+    
+    scheduleRender();
+    eventBus.emit('handleDragStart', { handle });
+  }, [findHandleAt, scheduleRender, pan, zoom]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (draggingHandleRef.current) {
+      // Update preview line
+      const rect = canvasRef.current.getBoundingClientRect();
+      previewLineRef.current.endX = e.clientX - rect.left;
+      previewLineRef.current.endY = e.clientY - rect.top;
+      
+      scheduleRender();
+      
+      // Check for target node hover
+      const graphX = (e.clientX - pan.x) / zoom;
+      const graphY = (e.clientY - pan.y) / zoom;
+      
+      const hoveredNode = nodes.find(node => {
+        if (node.id === draggingHandleRef.current.nodeId) return false;
+        const nodeX = node.position?.x || node.x;
+        const nodeY = node.position?.y || node.y;
+        const nodeWidth = node.width || 60;
+        const nodeHeight = node.height || 60;
+        
+        return (
+          graphX >= nodeX - nodeWidth / 2 &&
+          graphX <= nodeX + nodeWidth / 2 &&
+          graphY >= nodeY - nodeHeight / 2 &&
+          graphY <= nodeY + nodeHeight / 2
+        );
+      });
+      
+      // Could emit node hover events here if needed
+      return;
+    }
+    
+    // Handle hover detection
+    const handle = findHandleAt(e.clientX, e.clientY);
+    
+    if (hoveredHandleRef.current !== handle) {
+      if (hoveredHandleRef.current) {
+        eventBus.emit('handleUnhover', { 
+          nodeId: hoveredHandleRef.current.nodeId, 
+          handleId: hoveredHandleRef.current.id 
+        });
+      }
+      
+      hoveredHandleRef.current = handle;
+      
+      if (handle) {
+        eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
+        canvasRef.current.style.cursor = 'pointer';
+      } else {
+        canvasRef.current.style.cursor = 'default';
+      }
+      
+      scheduleRender();
+    }
+  }, [findHandleAt, scheduleRender, nodes, pan, zoom]);
+
+  const handleMouseUp = useCallback((e) => {
+    if (!draggingHandleRef.current) return;
+    
+    const handle = draggingHandleRef.current;
+    const graphX = (e.clientX - pan.x) / zoom;
+    const graphY = (e.clientY - pan.y) / zoom;
+    
+    // Find target node
+    const targetNode = nodes.find(node => {
+      if (node.id === handle.nodeId) return false;
+      const nodeX = node.position?.x || node.x;
+      const nodeY = node.position?.y || node.y;
+      const nodeWidth = node.width || 60;
+      const nodeHeight = node.height || 60;
+      
+      return (
+        graphX >= nodeX - nodeWidth / 2 &&
+        graphX <= nodeX + nodeWidth / 2 &&
+        graphY >= nodeY - nodeHeight / 2 &&
+        graphY <= nodeY + nodeHeight / 2
+      );
+    });
+    
+    // Find associated edge
+    const associatedEdge = edges.find(edge => {
+      if (handle.direction === 'source') {
+        return edge.source === handle.nodeId && edge.type === handle.edgeType;
+      } else {
+        return edge.target === handle.nodeId && edge.type === handle.edgeType;
+      }
+    });
+    
+    // Emit drop event
     eventBus.emit('handleDrop', {
       graph: { x: graphX, y: graphY },
-      screen: { x: screenX, y: screenY },
-      sourceNode: draggingHandle.nodeId,
+      screen: { x: e.clientX, y: e.clientY },
+      sourceNode: handle.nodeId,
       targetNode: targetNode?.id || null,
-      edgeType: draggingHandle.edgeType,
+      edgeType: handle.edgeType,
       edgeId: associatedEdge?.id || null,
-      direction: draggingHandle.direction
+      direction: handle.direction
     });
-
+    
     // Clean up
-    setDraggingHandle(null);
-    setPreviewLine(null);
-    setHoveredNodeId(null);
-    dragStartPosRef.current = null;
+    draggingHandleRef.current = null;
+    previewLineRef.current.visible = false;
+    scheduleRender();
+    
+    eventBus.emit('handleDragEnd', { handle });
+  }, [nodes, edges, pan, zoom, scheduleRender]);
 
-    eventBus.emit('handleDragEnd', { handle: draggingHandle });
-  };
+  // Canvas setup and resize handling
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
+        canvasRef.current.width = width;
+        canvasRef.current.height = height;
+        
+        setCanvasSize({ width, height });
+        scheduleRender();
+      }
+    };
+    
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, [scheduleRender]);
+
+  // Redraw when handles, pan, or zoom change
+  useEffect(() => {
+    scheduleRender();
+  }, [handlePositions, pan, zoom, scheduleRender]);
+
+  // Global mouse event handlers for dragging
+  useEffect(() => {
+    if (draggingHandleRef.current) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [handleMouseMove, handleMouseUp]);
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
@@ -215,73 +383,19 @@ const HandleLayer = ({
           zIndex: 20 
         }}
       >
-        {/* Render handles - positions calculated in useMemo, updates automatically with nodes */}
-        {handlePositions.map(handle => {
-          const left = handle.position.x * zoom + pan.x - handleRadius;
-          const top = handle.position.y * zoom + pan.y - handleRadius;
-          const isHovered = hoveredNodeId === handle.nodeId;
-          
-          return (
-            <div
-              key={handle.id}
-              style={{
-                position: 'absolute',
-                left,
-                top,
-                width: handleRadius * 2,
-                height: handleRadius * 2,
-                borderRadius: '50%',
-                background: handle.color,
-                border: isHovered ? '3px solid #fff' : '2px solid #fff',
-                pointerEvents: 'auto',
-                zIndex: 21,
-                boxShadow: isHovered ? '0 0 8px rgba(0,0,0,0.3)' : '0 0 4px rgba(0,0,0,0.2)',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                transform: isHovered ? 'scale(1.2)' : 'scale(1)',
-              }}
-              onMouseEnter={() => eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id })}
-              onMouseLeave={() => eventBus.emit('handleUnhover', { nodeId: handle.nodeId, handleId: handle.id })}
-              onMouseDown={e => onHandleDragStart(e, handle)}
-              title={`${handle.edgeType} - ${handle.direction}`}
-            />
-          );
-        })}
-
-        {/* Preview line during drag */}
-        {previewLine && draggingHandle && (
-          <svg 
-            style={{ 
-              position: 'absolute', 
-              left: 0, 
-              top: 0, 
-              width: '100%', 
-              height: '100%',
-              pointerEvents: 'none',
-              zIndex: 19
-            }}
-          >
-            <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
-              <line
-                x1={previewLine.x1}
-                y1={previewLine.y1}
-                x2={previewLine.x2}
-                y2={previewLine.y2}
-                stroke={draggingHandle.color}
-                strokeWidth={2}
-                strokeDasharray="6,4"
-                opacity={0.6}
-              />
-              <circle
-                cx={previewLine.x2}
-                cy={previewLine.y2}
-                r={4}
-                fill={draggingHandle.color}
-                opacity={0.6}
-              />
-            </g>
-          </svg>
-        )}
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'auto',
+            cursor: 'default'
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        />
       </div>
       {children}
     </HandlePositionContext.Provider>
