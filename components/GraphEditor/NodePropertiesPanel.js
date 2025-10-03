@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -15,12 +15,22 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import EmojiPicker from 'emoji-picker-react';
+import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 
 export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClose, theme }) {
   const [memo, setMemo] = useState('');
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
+  const [panelPos, setPanelPos] = useState({ top: 88, right: 16 });
+  const [panelSize, setPanelSize] = useState({ width: 320, height: 520 });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const draggingRef = useRef(false);
+  const resizingRef = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ x: 0, y: 0, width: 320, height: 520 });
+  const memoInputRef = useRef();
 
   // Update local state when selected node changes
   useEffect(() => {
@@ -67,31 +77,119 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
     }
   };
 
+  const handleEmojiClick = () => {
+    setShowEmojiPicker(val => !val);
+  };
+
+  const handleEmojiSelect = (emojiData) => {
+    const emoji = emojiData.emoji;
+    // Insert emoji at cursor position in memo
+    const input = memoInputRef.current;
+    if (input) {
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const newMemo = memo.slice(0, start) + emoji + memo.slice(end);
+      setMemo(newMemo);
+      onUpdateNode(selectedNode.id, { ...selectedNode.data, memo: newMemo });
+      // Move cursor after emoji
+      setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(start + emoji.length, start + emoji.length);
+      }, 0);
+    } else {
+      setMemo(memo + emoji);
+      onUpdateNode(selectedNode.id, { ...selectedNode.data, memo: memo + emoji });
+    }
+    setShowEmojiPicker(false);
+  };
+
+  // Drag handlers
+  const onHeaderMouseDown = (e) => {
+    draggingRef.current = true;
+    dragOffset.current = {
+      x: e.clientX,
+      y: e.clientY,
+      top: panelPos.top,
+      right: panelPos.right
+    };
+    document.addEventListener('mousemove', onHeaderMouseMove);
+    document.addEventListener('mouseup', onHeaderMouseUp);
+  };
+  const onHeaderMouseMove = (e) => {
+    if (!draggingRef.current) return;
+    const dx = e.clientX - dragOffset.current.x;
+    const dy = e.clientY - dragOffset.current.y;
+    setPanelPos(pos => ({
+      top: Math.max(0, dragOffset.current.top + dy),
+      right: Math.max(0, dragOffset.current.right - dx)
+    }));
+  };
+  const onHeaderMouseUp = () => {
+    draggingRef.current = false;
+    document.removeEventListener('mousemove', onHeaderMouseMove);
+    document.removeEventListener('mouseup', onHeaderMouseUp);
+  };
+
+  // Resize handlers
+  const onResizeMouseDown = (e) => {
+    e.stopPropagation();
+    resizingRef.current = true;
+    resizeStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: panelSize.width,
+      height: panelSize.height
+    };
+    document.addEventListener('mousemove', onResizeMouseMove);
+    document.addEventListener('mouseup', onResizeMouseUp);
+  };
+  const onResizeMouseMove = (e) => {
+    if (!resizingRef.current) return;
+    const dx = e.clientX - resizeStart.current.x;
+    const dy = e.clientY - resizeStart.current.y;
+    setPanelSize(size => ({
+      width: Math.max(240, resizeStart.current.width + dx),
+      height: Math.max(320, resizeStart.current.height + dy)
+    }));
+  };
+  const onResizeMouseUp = () => {
+    resizingRef.current = false;
+    document.removeEventListener('mousemove', onResizeMouseMove);
+    document.removeEventListener('mouseup', onResizeMouseUp);
+  };
+
   return (
     <Paper
       elevation={8}
       sx={{
         position: 'fixed',
-        right: 16,
-        top: 88,
-        width: 320,
-        maxHeight: 'calc(100vh - 104px)',
+        top: panelPos.top,
+        right: panelPos.right,
+        width: panelSize.width,
+        height: panelSize.height,
+        maxHeight: 'calc(100vh - 24px)',
         backgroundColor: theme?.palette?.background?.paper || '#fff',
         zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        resize: 'none',
+        userSelect: 'none'
       }}
     >
-      {/* Header */}
-      <Box sx={{ 
-        p: 2, 
-        display: 'flex', 
-        alignItems: 'center', 
+      {/* Header (draggable) */}
+      <Box sx={{
+        p: 2,
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff'
-      }}>
+        color: theme?.palette?.primary?.contrastText || '#fff',
+        cursor: 'move',
+        userSelect: 'none'
+      }}
+        onMouseDown={onHeaderMouseDown}
+      >
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Node Properties
         </Typography>
@@ -103,7 +201,6 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
           <CloseIcon />
         </IconButton>
       </Box>
-
       <Divider />
 
       {/* Content */}
@@ -133,21 +230,39 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
                 Memo (Markdown)
               </Typography>
             </Box>
-            <ToggleButtonGroup
-              value={memoView}
-              exclusive
-              onChange={(e, newView) => newView && setMemoView(newView)}
-              size="small"
-            >
-              <ToggleButton value="edit" sx={{ py: 0.5, px: 1 }}>
-                <EditIcon sx={{ fontSize: 16 }} />
-              </ToggleButton>
-              <ToggleButton value="preview" sx={{ py: 0.5, px: 1 }}>
-                <VisibilityIcon sx={{ fontSize: 16 }} />
-              </ToggleButton>
-            </ToggleButtonGroup>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton size="small" onClick={handleEmojiClick} sx={{ p: 0.5 }}>
+                <InsertEmoticonIcon fontSize="small" />
+              </IconButton>
+              <ToggleButtonGroup
+                value={memoView}
+                exclusive
+                onChange={(e, newView) => newView && setMemoView(newView)}
+                size="small"
+              >
+                <ToggleButton value="edit" sx={{ py: 0.5, px: 1 }}>
+                  <EditIcon sx={{ fontSize: 16 }} />
+                </ToggleButton>
+                <ToggleButton value="preview" sx={{ py: 0.5, px: 1 }}>
+                  <VisibilityIcon sx={{ fontSize: 16 }} />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
           </Box>
-
+          {showEmojiPicker && (
+            <Box sx={{ position: 'absolute', zIndex: 1500, right: 40, top: 80 }}>
+              <EmojiPicker 
+                onEmojiClick={handleEmojiSelect}
+                height={350}
+                width={320}
+                theme={theme?.palette?.mode === 'dark' ? 'dark' : 'light'}
+                style={{
+                  backgroundColor: theme?.palette?.background?.paper,
+                  color: theme?.palette?.text?.primary
+                }}
+              />
+            </Box>
+          )}
           {memoView === 'edit' ? (
             <>
               <TextField
@@ -158,6 +273,7 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
                 onChange={handleMemoChange}
                 variant="outlined"
                 placeholder="Add notes about this node... (Markdown supported)"
+                inputRef={memoInputRef}
                 sx={{ 
                   '& .MuiOutlinedInput-root': {
                     fontFamily: 'monospace',
@@ -282,6 +398,26 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
             </Box>
           )}
         </Box>
+      </Box>
+
+      {/* Resize handle */}
+      <Box
+        sx={{
+          position: 'absolute',
+          right: 2,
+          bottom: 2,
+          width: 16,
+          height: 16,
+          cursor: 'nwse-resize',
+          zIndex: 1400,
+          background: 'transparent',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end'
+        }}
+        onMouseDown={onResizeMouseDown}
+      >
+        <Box sx={{ width: 16, height: 16, borderRight: '2px solid #888', borderBottom: '2px solid #888', borderRadius: 2 }} />
       </Box>
     </Paper>
   );

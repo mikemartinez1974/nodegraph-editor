@@ -25,9 +25,11 @@ export class GraphCRUD {
    * @param {string} options.label - Node label
    * @param {Object} options.position - {x, y} coordinates
    * @param {Object} options.data - {memo, link} data object
+   * @param {number} options.width - Node width
+   * @param {number} options.height - Node height
    * @returns {Object} Result with created node
    */
-  createNode({ id, type = 'default', label = '', position = { x: 100, y: 100 }, data = {} } = {}) {
+  createNode({ id, type = 'default', label = '', position = { x: 100, y: 100 }, data = {}, width, height } = {}) {
     try {
       const nodeId = id || this._generateId();
       const newNode = {
@@ -35,8 +37,8 @@ export class GraphCRUD {
         type,
         label,
         position,
-        width: 60,
-        height: 60,
+        width: width !== undefined ? width : 80,
+        height: height !== undefined ? height : 48,
         data: {
           memo: data.memo || '',
           link: data.link || ''

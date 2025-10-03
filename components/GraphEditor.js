@@ -27,12 +27,28 @@ export default function GraphEditor({ backgroundImage }) {
   const [showNodeList, setShowNodeList] = useState(true);
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
   const [historyIndex, setHistoryIndex] = useState(0);
+
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
+  const historyIndexRef = useRef(historyIndex);
+
   const theme = useTheme();
   const graphAPI = useRef(null);
 
-  // Compute which handles should be extended for hovered edge
+  // Keep refs in sync with state
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+
+  useEffect(() => {
+    edgesRef.current = edges;
+  }, [edges]);
+
+  useEffect(() => {
+    historyIndexRef.current = historyIndex;
+  }, [historyIndex]);
+
+  // Compute hovered edge endpoints
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
   if (hoveredEdgeId) {
@@ -43,121 +59,7 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }
 
-  // Update refs when state changes
-  useEffect(() => {
-    nodesRef.current = nodes;
-    edgesRef.current = edges;
-  }, [nodes, edges]);
-
-  useEffect(() => {
-    function onHandleDrop(data) {
-      //console.log('GraphEditor.js: handleDrop event received', data);
-      const { graph, sourceNode, targetNode, edgeType, direction } = data;
-  
-      // Use the edgeType from the handle directly
-      const edgeTypeKey = edgeType || 'child';
-      const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
-  
-      if (!targetNode) {
-        // Drop on blank field: create new node and edge
-        const newNodeId = uuidv4();
-        const newNode = createNode({
-          id: newNodeId,
-          type: 'default',
-          label: `Node ${nodesRef.current.length + 1}`,
-          data: {},
-          position: { x: graph.x, y: graph.y },
-          showLabel: true
-        });
-        setNodes(prev => [...prev, newNode]);
-        //console.log('Created new node:', newNode.id);
-  
-        // Create edge - respect the direction of the handle
-        const newEdgeId = uuidv4();
-        const newEdge = addEdge({
-          id: newEdgeId,
-          type: edgeTypeKey,
-          source: direction === 'source' ? sourceNode : newNodeId,
-          target: direction === 'source' ? newNodeId : sourceNode,
-          label: '',
-          showLabel: false,
-          style: edgeTypePreset.style
-        });
-        //console.log('Created new edge:', newEdge.id);
-      } else {
-        // Drop on another node: create edge between source and target
-        if (targetNode !== sourceNode) {
-          // Check if edge already exists
-          const edgeExists = edgesRef.current.some(e => 
-            (e.source === sourceNode && e.target === targetNode && e.type === edgeTypeKey) ||
-            (e.source === targetNode && e.target === sourceNode && e.type === edgeTypeKey)
-          );
-  
-          if (!edgeExists) {
-            const newEdgeId = uuidv4();
-            const newEdge = addEdge({
-              id: newEdgeId,
-              type: edgeTypeKey,
-              source: direction === 'source' ? sourceNode : targetNode,
-              target: direction === 'source' ? targetNode : sourceNode,
-              label: '',
-              showLabel: false,
-              style: edgeTypePreset.style
-            });
-            setEdges(prev => [...prev, newEdge]);
-
-            //console.log('Created edge between nodes:', newEdge.id);
-          } else {
-            //console.log('Edge already exists, skipping creation');
-          }
-        }
-      }
-      saveToHistory(nodesRef.current, edgesRef.current);
-    }
-    eventBus.on('handleDrop', onHandleDrop);
-    return () => {
-      eventBus.off('handleDrop', onHandleDrop);
-    };
-  }, [edgeTypes]);
-
-  useEffect(() => {
-    const savedBg = localStorage.getItem('backgroundImage');
-    if (savedBg) {
-      document.getElementById('graph-editor-background').style.backgroundImage = `url('/background art/${savedBg}')`;
-    }
-  }, []);
-
-  // Initialize the API
-useEffect(() => {
-  graphAPI.current = new GraphCRUD(
-    () => nodesRef.current,  // getNodes
-    setNodes,                 // setNodes
-    () => edgesRef.current,  // getEdges
-    setEdges,                 // setEdges
-    saveToHistory            // saveToHistory
-  );
-
-  // Expose API to window for LLM/console access
-  if (typeof window !== 'undefined') {
-    window.graphAPI = graphAPI.current;
-    console.log('Graph CRUD API available at window.graphAPI');
-    console.log('Examples:');
-    console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
-    console.log('  window.graphAPI.readNode() // Get all nodes');
-    console.log('  window.graphAPI.getStats() // Get graph statistics');
-  }
-}, []);
-
-
-  // Optionally, create helper functions that use the API:
-  const apiCreateNode = (options) => graphAPI.current?.createNode(options);
-  const apiUpdateNode = (id, updates) => graphAPI.current?.updateNode(id, updates);
-  const apiDeleteNode = (id) => graphAPI.current?.deleteNode(id);
-  const apiCreateEdge = (options) => graphAPI.current?.createEdge(options);
-  const apiUpdateEdge = (id, updates) => graphAPI.current?.updateEdge(id, updates);
-  const apiDeleteEdge = (id) => graphAPI.current?.deleteEdge(id);
-  const apiGetStats = () => graphAPI.current?.getStats();
-  
+  // Utility: UUID
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -165,205 +67,332 @@ useEffect(() => {
     });
   }
 
-  function addNode() {
+  // Centralized saveToHistory using refs and functional updates to avoid stale closure issues
+  const saveToHistory = (newNodes, newEdges) => {
+    setHistory(prevHistory => {
+      const truncated = prevHistory.slice(0, historyIndexRef.current + 1);
+      const next = [...truncated, { nodes: newNodes, edges: newEdges }];
+      // update historyIndex after history set
+      setHistoryIndex(next.length - 1);
+      // sync ref
+      historyIndexRef.current = next.length - 1;
+      return next;
+    });
+  };
+
+  // addNode/addEdge helpers (ensure refs are updated synchronously from within updater)
+  function addNode(nodeProps) {
+    const node = createNode(nodeProps);
+    setNodes(prev => {
+      const next = [...prev, node];
+      nodesRef.current = next;
+      return next;
+    });
+    return node;
+  }
+
+  function addEdge(edgeProps) {
+    const edge = createEdge(edgeProps);
+    setEdges(prev => {
+      const next = [...prev, edge];
+      edgesRef.current = next;
+      return next;
+    });
+    return edge;
+  }
+
+  // Handle drop events from handles (avoid double setEdges and race conditions)
+  useEffect(() => {
+    function onHandleDrop(data) {
+      const { graph, sourceNode, targetNode, edgeType, direction } = data;
+      const edgeTypeKey = edgeType || 'child';
+      const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
+
+      if (!targetNode) {
+        // Drop on blank: create new node and connect
+        const newNodeId = uuidv4();
+        const newNode = graphAPI.current.createNode({
+          id: newNodeId,
+          type: 'default',
+          label: `Node ${nodesRef.current.length + 1}`,
+          data: {},
+          position: { x: graph.x, y: graph.y },
+          width: 80,
+          height: 48,
+          showLabel: true
+        });
+
+        // create new node and update ref
+        setNodes(prev => {
+          const next = [...prev, newNode];
+          nodesRef.current = next;
+          return next;
+        });
+
+        // create edge respecting direction
+        const newEdge = createEdge({
+          id: uuidv4(),
+          type: edgeTypeKey,
+          source: direction === 'source' ? sourceNode : newNodeId,
+          target: direction === 'source' ? newNodeId : sourceNode,
+          label: '',
+          showLabel: false,
+          style: edgeTypePreset.style
+        });
+
+        setEdges(prev => {
+          const next = [...prev, newEdge];
+          edgesRef.current = next;
+          return next;
+        });
+
+        // save history with latest refs
+        saveToHistory(nodesRef.current, edgesRef.current);
+      } else {
+        // Drop on another node: create edge between source and target, avoid duplicates
+        if (targetNode !== sourceNode) {
+          const edgeExists = edgesRef.current.some(e =>
+            (e.source === sourceNode && e.target === targetNode && e.type === edgeTypeKey) ||
+            (e.source === targetNode && e.target === sourceNode && e.type === edgeTypeKey)
+          );
+
+          if (!edgeExists) {
+            const newEdge = createEdge({
+              id: uuidv4(),
+              type: edgeTypeKey,
+              source: direction === 'source' ? sourceNode : targetNode,
+              target: direction === 'source' ? targetNode : sourceNode,
+              label: '',
+              showLabel: false,
+              style: edgeTypePreset.style
+            });
+
+            setEdges(prev => {
+              const next = [...prev, newEdge];
+              edgesRef.current = next;
+              return next;
+            });
+
+            saveToHistory(nodesRef.current, edgesRef.current);
+          }
+        }
+      }
+    }
+
+    eventBus.on('handleDrop', onHandleDrop);
+    return () => eventBus.off('handleDrop', onHandleDrop);
+  }, []); // edgeTypes is static import, no need to include in deps
+
+  // Load background from localStorage (DOM access is safe in useEffect)
+  useEffect(() => {
+    const savedBg = localStorage.getItem('backgroundImage');
+    if (savedBg) {
+      const el = document.getElementById('graph-editor-background');
+      if (el) el.style.backgroundImage = `url('/background art/${savedBg}')`;
+    }
+  }, []);
+
+  // Initialize the GraphCRUD API and expose to window
+  useEffect(() => {
+    graphAPI.current = new GraphCRUD(
+      () => nodesRef.current,
+      setNodes,
+      () => edgesRef.current,
+      setEdges,
+      saveToHistory
+    );
+
+    if (typeof window !== 'undefined') {
+      window.graphAPI = graphAPI.current;
+      console.log('Graph CRUD API available at window.graphAPI');
+      console.log('Examples:');
+      console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
+      console.log('  window.graphAPI.readNode() // Get all nodes');
+      console.log('  window.graphAPI.getStats() // Get graph statistics');
+    }
+  }, []);
+
+
+  // API convenience wrappers
+  const apiCreateNode = (options) => graphAPI.current?.createNode(options);
+  const apiUpdateNode = (id, updates) => graphAPI.current?.updateNode(id, updates);
+  const apiDeleteNode = (id) => graphAPI.current?.deleteNode(id);
+  const apiCreateEdge = (options) => graphAPI.current?.createEdge(options);
+  const apiUpdateEdge = (id, updates) => graphAPI.current?.updateEdge(id, updates);
+  const apiDeleteEdge = (id) => graphAPI.current?.deleteEdge(id);
+  const apiGetStats = () => graphAPI.current?.getStats();
+
+  // Node update from properties panel (corrected: single saveToHistory after computing new nodes)
+  function handleUpdateNodeData(nodeId, newData, isLabelUpdate = false) {
+    setNodes(prev => {
+      const next = prev.map(node => {
+        if (node.id === nodeId) {
+          if (isLabelUpdate) {
+            return { ...node, label: newData.label, data: { ...node.data, ...newData } };
+          }
+          return { ...node, data: { ...node.data, ...newData } };
+        }
+        return node;
+      });
+      nodesRef.current = next;
+      // persist history with current edges
+      saveToHistory(next, edgesRef.current);
+      return next;
+    });
+  }
+
+  // Load a graph (replace nodes and edges), single implementation only
+  function handleLoadGraph(loadedNodes, loadedEdges) {
+    setNodes(loadedNodes);
+    setEdges(loadedEdges);
+    nodesRef.current = loadedNodes;
+    edgesRef.current = loadedEdges;
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+    saveToHistory(loadedNodes, loadedEdges);
+    console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
+  }
+
+  // Update edge data and save history reliably
+  function handleUpdateEdge(edgeId, updates) {
+    setEdges(prev => {
+      const next = prev.map(edge => {
+        if (edge.id === edgeId) {
+          return {
+            ...edge,
+            ...updates,
+            style: updates.style ? { ...edge.style, ...updates.style } : edge.style
+          };
+        }
+        return edge;
+      });
+      edgesRef.current = next;
+      saveToHistory(nodesRef.current, next);
+      return next;
+    });
+  }
+
+  // History handlers
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      historyIndexRef.current = newIndex;
+      const snapshot = history[newIndex];
+      if (snapshot) {
+        setNodes(snapshot.nodes);
+        nodesRef.current = snapshot.nodes;
+        setEdges(snapshot.edges);
+        edgesRef.current = snapshot.edges;
+        setSelectedNodeId(null);
+        setSelectedEdgeId(null);
+        console.log('Undo performed');
+      }
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      historyIndexRef.current = newIndex;
+      const snapshot = history[newIndex];
+      if (snapshot) {
+        setNodes(snapshot.nodes);
+        nodesRef.current = snapshot.nodes;
+        setEdges(snapshot.edges);
+        edgesRef.current = snapshot.edges;
+        setSelectedNodeId(null);
+        setSelectedEdgeId(null);
+        console.log('Redo performed');
+      }
+    }
+  };
+
+  // Add node handler (keeps refs & history consistent)
+  const handleAddNode = () => {
     const newId = uuidv4();
     const newNode = createNode({
       id: newId,
       type: 'default',
-      label: `Node ${nodes.length + 1}`,
+      label: `Node ${nodesRef.current.length + 1}`,
       data: {},
-      position: { x: 100 + nodes.length * 100, y: 100 },
+      position: {
+        x: 100 + (nodesRef.current.length * 20),
+        y: 100 + (nodesRef.current.length * 20)
+      },
       showLabel: true
     });
-    setNodes(prev => [...prev, newNode]);
-    //  console.log('Added node:', newNode.id);
-  }
-  
-  function addEdge(edgeProps) {
-    const edge = createEdge(edgeProps);
-    setEdges(prev => [...prev, edge]);
-    return edge;
-  }
-  
-  function deleteNode() {
-    if (nodes.length === 0) return;
-    const nodeId = nodes[nodes.length - 1].id;
-    setNodes(prev => prev.slice(0, -1));
-    setEdges(prev => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
-  }
 
-  function deleteEdge() {
-    if (edges.length === 0) return;
-    setEdges(prev => prev.slice(0, -1));
-  }
-
-  function handleUpdateNodeData(nodeId, newData, isLabelUpdate = false) {
-    setNodes(prev => prev.map(node => {
-      if (node.id === nodeId) {
-        if (isLabelUpdate) {
-          // Update the label directly on the node
-          return { ...node, label: newData.label, data: { ...node.data, ...newData } };
-        }
-        // Update only the data property
-        return { ...node, data: { ...node.data, ...newData } };
-      }
-      saveToHistory(nodes, edges);
-      return node;
-    }));
-  }
-
-  function handleLoadGraph(loadedNodes, loadedEdges) {
-    // Replace current nodes and edges with loaded data
-    setNodes(loadedNodes);
-    setEdges(loadedEdges);
-    
-    // Clear selections
-    setSelectedNodeId(null);
-    setSelectedEdgeId(null);
-    
-    console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
-  }
-
-  function handleUpdateEdge(edgeId, updates) {
-    setEdges(prev => prev.map(edge => {
-      if (edge.id === edgeId) {
-        return { 
-          ...edge, 
-          ...updates,
-          style: updates.style ? { ...edge.style, ...updates.style } : edge.style
-        };
-      }
-      return edge;
-    }));
-    // Save to history after edge update
-    const updatedEdges = edges.map(edge => {
-      if (edge.id === edgeId) {
-        return { 
-          ...edge, 
-          ...updates,
-          style: updates.style ? { ...edge.style, ...updates.style } : edge.style
-        };
-      }
-      return edge;
+    setNodes(prev => {
+      const next = [...prev, newNode];
+      nodesRef.current = next;
+      saveToHistory(next, edgesRef.current);
+      return next;
     });
-    saveToHistory(nodes, updatedEdges);
-  }
 
+    console.log('Added node:', newNode.id);
+  };
 
-  // Save current state to history (for undo/redo)
-const saveToHistory = (newNodes, newEdges) => {
-  const newHistory = history.slice(0, historyIndex + 1);
-  newHistory.push({ nodes: newNodes, edges: newEdges });
-  setHistory(newHistory);
-  setHistoryIndex(newHistory.length - 1);
-};
+  // Delete selected node or edge
+  const handleDeleteSelected = () => {
+    if (selectedNodeId) {
+      setNodes(prev => {
+        const newNodes = prev.filter(n => n.id !== selectedNodeId);
+        nodesRef.current = newNodes;
+        setEdges(prevE => {
+          const newEdges = prevE.filter(e => e.source !== selectedNodeId && e.target !== selectedNodeId);
+          edgesRef.current = newEdges;
+          // Save history after both nodes/edges updated
+          saveToHistory(newNodes, newEdges);
+          return newEdges;
+        });
+        setSelectedNodeId(null);
+        return newNodes;
+      });
+      console.log('Deleted node:', selectedNodeId);
+    } else if (selectedEdgeId) {
+      setEdges(prev => {
+        const newEdges = prev.filter(e => e.id !== selectedEdgeId);
+        edgesRef.current = newEdges;
+        saveToHistory(nodesRef.current, newEdges);
+        setSelectedEdgeId(null);
+        return newEdges;
+      });
+      console.log('Deleted edge:', selectedEdgeId);
+    }
+  };
 
-// Undo handler
-const handleUndo = () => {
-  if (historyIndex > 0) {
-    const newIndex = historyIndex - 1;
-    setHistoryIndex(newIndex);
-    setNodes(history[newIndex].nodes);
-    setEdges(history[newIndex].edges);
-    setSelectedNodeId(null);
-    setSelectedEdgeId(null);
-    console.log('Undo performed');
-  }
-};
-
-// Redo handler
-const handleRedo = () => {
-  if (historyIndex < history.length - 1) {
-    const newIndex = historyIndex + 1;
-    setHistoryIndex(newIndex);
-    setNodes(history[newIndex].nodes);
-    setEdges(history[newIndex].edges);
-    setSelectedNodeId(null);
-    setSelectedEdgeId(null);
-    console.log('Redo performed');
-  }
-};
-
-// Add node handler
-const handleAddNode = () => {
-  const newId = uuidv4();
-  const newNode = createNode({
-    id: newId,
-    type: 'default',
-    label: `Node ${nodes.length + 1}`,
-    data: {},
-    position: { 
-      x: 100 + (nodes.length * 20), 
-      y: 100 + (nodes.length * 20) 
-    },
-    showLabel: true
-  });
-  const newNodes = [...nodes, newNode];
-  setNodes(newNodes);
-  saveToHistory(newNodes, edges);
-  console.log('Added node:', newNode.id);
-};
-
-// Delete selected handler
-const handleDeleteSelected = () => {
-  if (selectedNodeId) {
-    const newNodes = nodes.filter(n => n.id !== selectedNodeId);
-    const newEdges = edges.filter(e => e.source !== selectedNodeId && e.target !== selectedNodeId);
+  // Clear graph
+  const handleClearGraph = () => {
+    const newNodes = [];
+    const newEdges = [];
     setNodes(newNodes);
     setEdges(newEdges);
+    nodesRef.current = newNodes;
+    edgesRef.current = newEdges;
     setSelectedNodeId(null);
-    saveToHistory(newNodes, newEdges);
-    console.log('Deleted node:', selectedNodeId);
-  } else if (selectedEdgeId) {
-    const newEdges = edges.filter(e => e.id !== selectedEdgeId);
-    setEdges(newEdges);
     setSelectedEdgeId(null);
-    saveToHistory(nodes, newEdges);
-    console.log('Deleted edge:', selectedEdgeId);
-  }
-};
+    saveToHistory(newNodes, newEdges);
+    console.log('Graph cleared');
+  };
 
-// Clear graph handler
-const handleClearGraph = () => {
-  const newNodes = [];
-  const newEdges = [];
-  setNodes(newNodes);
-  setEdges(newEdges);
-  setSelectedNodeId(null);
-  setSelectedEdgeId(null);
-  saveToHistory(newNodes, newEdges);
-  console.log('Graph cleared');
-};
-
-// Update the handleLoadGraph function to save to history:
-function handleLoadGraph(loadedNodes, loadedEdges) {
-  setNodes(loadedNodes);
-  setEdges(loadedEdges);
-  setSelectedNodeId(null);
-  setSelectedEdgeId(null);
-  saveToHistory(loadedNodes, loadedEdges);
-  console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
-}
-  
-
-  // Node types mapping for the editor
+  // Node types mapping
   const nodeTypes = {
     default: DefaultNode,
     display: DisplayNode,
     list: ListNode
   };
 
-  // Handle node selection from NodeListPanel
+  // Node List Panel handlers
   const handleNodeListSelect = (nodeId) => {
     setSelectedNodeId(nodeId);
     setSelectedEdgeId(null);
   };
 
-  // Handle focusing on a node from NodeListPanel
   const handleNodeFocus = (nodeId) => {
-    const node = nodes.find(n => n.id === nodeId);
+    const node = nodesRef.current.find(n => n.id === nodeId);
     if (node) {
-      // Center the view on the node
       setPan({
         x: window.innerWidth / 2 - node.position.x * zoom,
         y: window.innerHeight / 2 - node.position.y * zoom
@@ -372,6 +401,23 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
       setSelectedEdgeId(null);
     }
   };
+
+  // Resize all nodes to 80x48 on Ctrl+Q
+  useEffect(() => {
+    function handleResizeAllNodes(e) {
+      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+        setNodes(prev => {
+          const updated = prev.map(n => ({ ...n, width: 80, height: 48 }));
+          nodesRef.current = updated;
+          saveToHistory(updated, edgesRef.current);
+          return updated;
+        });
+        console.log('All nodes resized to 80x48');
+      }
+    }
+    window.addEventListener('keydown', handleResizeAllNodes);
+    return () => window.removeEventListener('keydown', handleResizeAllNodes);
+  }, []);
 
   return (
     <div id="graph-editor-background" style={{
@@ -399,7 +445,6 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         canRedo={historyIndex < history.length - 1}
       />
       
-      {/* Node List Panel */}
       <NodeListPanel
         nodes={nodes}
         selectedNodeId={selectedNodeId}
@@ -422,23 +467,24 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onNodeMove={(id, position) => {
-          setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
-          // Emit event so HandleLayer updates in real-time
+          setNodes(prev => {
+            const next = prev.map(n => n.id === id ? { ...n, position } : n);
+            nodesRef.current = next;
+            return next;
+          });
           eventBus.emit('nodeDrag', { nodeId: id, position });
         }}
         onEdgeClick={(edge, event) => {
           setSelectedEdgeId(edge.id);
-          setSelectedNodeId(null); // Deselect any node
-          //console.log('GraphEditor onEdgeClick', edge, event);
+          setSelectedNodeId(null);
         }}
         onNodeClick={nodeId => {
           setSelectedNodeId(nodeId);
-          setSelectedEdgeId(null); // Deselect any edge
+          setSelectedEdgeId(null);
         }}
         onBackgroundClick={() => {
           setSelectedNodeId(null);
-          setSelectedEdgeId(null); // Deselect both
-          //console.log('GraphEditor onBackgroundClick (empty field clicked)');
+          setSelectedEdgeId(null);
         }}
         onEdgeHover={id => setHoveredEdgeId(id)}
         onNodeHover={id => setHoveredNodeId(id)}
@@ -446,13 +492,14 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
         hoveredEdgeSource={hoveredEdgeSource}
         hoveredEdgeTarget={hoveredEdgeTarget}
         onNodeDragEnd={(id, position) => {
-          setNodes(prev => prev.map(n => n.id === id ? { ...n, position } : n));
-          // Emit event and save to history when drag completes
-          eventBus.emit('nodeDragEnd', { nodeId: id, position });
-          saveToHistory(
-            nodes.map(n => n.id === id ? { ...n, position } : n),
-            edges
-          );
+          setNodes(prev => {
+            const next = prev.map(n => n.id === id ? { ...n, position } : n);
+            nodesRef.current = next;
+            // Emit event and save to history when drag completes
+            eventBus.emit('nodeDragEnd', { nodeId: id, position });
+            saveToHistory(next, edgesRef.current);
+            return next;
+          });
         }}
       />
       {selectedNodeId && !selectedEdgeId && (
@@ -477,9 +524,6 @@ function handleLoadGraph(loadedNodes, loadedEdges) {
           theme={theme}
         />
       )}
-
-      
     </div>
-
   );
 }

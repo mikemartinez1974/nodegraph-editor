@@ -134,7 +134,17 @@ const HandleLayer = ({
     const typeStr = String(edgeType).trim();
     const dirStr = String(direction).trim();
     const handleId = `${nodeStr}-${typeStr}-${dirStr}`;
-    return handlePositionMap[handleId];
+    const pos = handlePositionMap[handleId];
+    let curveDirection;
+    if (typeStr === 'parent' || typeStr === 'child') {
+      curveDirection = 'vertical';
+    } else if (typeStr === 'peer') {
+      curveDirection = 'horizontal';
+    }
+    if (pos) {
+      return { x: pos.x, y: pos.y, curveDirection };
+    }
+    return undefined;
   }, [handlePositionMap]);
   
   getHandlePositionForEdge._handleKeys = Object.keys(handlePositionMap);

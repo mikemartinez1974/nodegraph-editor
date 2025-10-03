@@ -17,6 +17,9 @@ import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
+// Helper to get GraphCRUD API
+const getGraphAPI = () => (typeof window !== 'undefined' ? window.graphAPI : null);
+
 const Toolbar = ({ 
   nodes = [], 
   edges = [], 
@@ -101,9 +104,21 @@ const Toolbar = ({
   };
 
   const handleAddNode = () => {
-    if (onAddNode) {
+    const graphAPI = getGraphAPI();
+    if (graphAPI) {
+      graphAPI.createNode({
+        type: 'default',
+        label: `Node ${nodes.length + 1}`,
+        data: {},
+        position: { x: 100 + (nodes.length * 20), y: 100 + (nodes.length * 20) },
+        showLabel: true,
+        width: 80,
+        height: 48
+      });
+      console.log('Add node clicked (GraphCRUD)');
+    } else if (onAddNode) {
       onAddNode();
-      console.log('Add node clicked');
+      console.log('Add node clicked (fallback)');
     }
   };
 

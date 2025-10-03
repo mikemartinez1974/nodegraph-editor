@@ -207,21 +207,32 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
         // console.error('[EdgeLayer] getHandlePositionForEdge is not a function!', getHandlePositionForEdge);
       }
       // console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.source, edge.type, 'source');
-      let sourcePos = getHandlePositionForEdge && getHandlePositionForEdge(edge.source, edge.type, 'source');
-      // console.log('[EdgeLayer] About to call getHandlePositionForEdge', edge.target, edge.type, 'target');
-      let targetPos = getHandlePositionForEdge && getHandlePositionForEdge(edge.target, edge.type, 'target');
-      // Debug log for handle lookup
-      // console.log('[EdgeLayer] edge', edge.id, 'source', edge.source, 'target', edge.target, 'type', edge.type, 'sourcePos', sourcePos, 'targetPos', targetPos);
+      let sourcePos, targetPos, curveDirectionOverride;
+      if (typeof getHandlePositionForEdge === 'function') {
+        const sourceResult = getHandlePositionForEdge(edge.source, edge.type, 'source');
+        const targetResult = getHandlePositionForEdge(edge.target, edge.type, 'target');
+        // Support object return: { x, y, curveDirection }
+        if (sourceResult && typeof sourceResult === 'object') {
+          sourcePos = { x: sourceResult.x, y: sourceResult.y };
+          if (sourceResult.curveDirection) curveDirectionOverride = sourceResult.curveDirection;
+        } else {
+          sourcePos = sourceResult;
+        }
+        if (targetResult && typeof targetResult === 'object') {
+          targetPos = { x: targetResult.x, y: targetResult.y };
+          if (targetResult.curveDirection) curveDirectionOverride = targetResult.curveDirection;
+        } else {
+          targetPos = targetResult;
+        }
+      }
       // Fallback if not found
       if (!sourcePos) {
         const sourceNode = nodeList.find(n => n.id === edge.source);
         sourcePos = sourceNode ? { x: sourceNode.position.x, y: sourceNode.position.y } : { x: 0, y: 0 };
-        // console.log('[EdgeLayer] Fallback to node center for source', edge.source, sourcePos);
       }
       if (!targetPos) {
         const targetNode = nodeList.find(n => n.id === edge.target);
         targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
-        // console.log('[EdgeLayer] Fallback to node center for target', edge.target, targetPos);
       }
       ctx.save();
       // Create a linear gradient for the edge
@@ -234,14 +245,17 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       ctx.beginPath();
       // Determine if edge should be curved
       const isCurved = edge.style?.curved === true;
-      // Dynamically choose curve direction based on handle positions
-      const dx = Math.abs(targetPos.x - sourcePos.x);
-      const dy = Math.abs(targetPos.y - sourcePos.y);
+      // Choose curve direction: override from handle, else auto
+      let curveDirection = curveDirectionOverride;
+      if (!curveDirection) {
+        const dx = Math.abs(targetPos.x - sourcePos.x);
+        const dy = Math.abs(targetPos.y - sourcePos.y);
+        curveDirection = dx > dy ? 'horizontal' : 'vertical';
+      }
       if (isCurved) {
         let midX = (sourcePos.x + targetPos.x) / 2;
         let midY = (sourcePos.y + targetPos.y) / 2;
-        if (dx > dy) {
-          // Horizontal S-curve
+        if (curveDirection === 'horizontal') {
           ctx.beginPath();
           ctx.moveTo(sourcePos.x, sourcePos.y);
           ctx.bezierCurveTo(
@@ -251,7 +265,6 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
           );
           ctx.stroke();
         } else {
-          // Vertical S-curve
           ctx.beginPath();
           ctx.moveTo(sourcePos.x, sourcePos.y);
           ctx.bezierCurveTo(
@@ -262,7 +275,6 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
           ctx.stroke();
         }
       } else {
-        // Draw a straight line
         ctx.beginPath();
         ctx.moveTo(sourcePos.x, sourcePos.y);
         ctx.lineTo(targetPos.x, targetPos.y);
