@@ -1,6 +1,6 @@
 "use client";
 // NodeGraph.js
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { getEdgeHandlePosition } from './utils';
 import EdgeLayer from './EdgeLayer';
@@ -13,7 +13,6 @@ import eventBus from './eventBus';
 export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edgeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
   const theme = useTheme();
   const canvasRef = useRef(null);
-  const [nodeList, setNodeList] = useState(nodes);
   const [selectedNodeIdState, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -21,6 +20,8 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
   const dragOffset = useRef({ x: 0, y: 0 });
   const draggingNodeIdRef = useRef(null);
   const hoverTimeoutRef = useRef({});
+  const dragRafRef = useRef(null);
+  const lastDragPosition = useRef(null);
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [draggingHandlePos, setDraggingHandlePos] = useState(null);
@@ -28,25 +29,17 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
   // Add state for handlePositions
   const [handlePositions, setHandlePositions] = useState({});
 
-  // Only update nodeList if nodes prop actually changes (avoid infinite loop)
-  useEffect(() => {
-    if (JSON.stringify(nodeList) !== JSON.stringify(nodes)) {
-      setNodeList(nodes.map(node => ({
-        ...node,
-        handleProgress: node.handleProgress !== undefined ? node.handleProgress : 0,
-        showHandlesOnHover: node.showHandlesOnHover !== undefined ? node.showHandlesOnHover : true
-      })));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(nodes)]);
+  // Process nodes with defaults
+  const nodeList = useMemo(() => nodes.map(node => ({
+    ...node,
+    handleProgress: node.handleProgress !== undefined ? node.handleProgress : 0,
+    showHandlesOnHover: node.showHandlesOnHover !== undefined ? node.showHandlesOnHover : true
+  })), [nodes]);
 
 
 
   // Event bus handlers for node/edge events
   useEffect(() => {
-    function handleNodeMove({ id, position }) {
-      setNodeList(prev => prev.map(n => n.id === id ? { ...n, position } : n));
-    }
     function handleNodeClick({ id }) {
       setSelectedNodeId(id);
       setSelectedEdgeId(null);
@@ -76,13 +69,11 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
         hoverTimeoutRef.current[id] = null;
       }, 250);
     }
-    eventBus.on('nodeMove', handleNodeMove);
     eventBus.on('nodeClick', handleNodeClick);
     eventBus.on('edgeClick', handleEdgeClick);
     eventBus.on('nodeMouseEnter', handleNodeMouseEnter);
     eventBus.on('nodeMouseLeave', handleNodeMouseLeave);
     return () => {
-      eventBus.off('nodeMove', handleNodeMove);
       eventBus.off('nodeClick', handleNodeClick);
       eventBus.off('edgeClick', handleEdgeClick);
       eventBus.off('nodeMouseEnter', handleNodeMouseEnter);
@@ -113,10 +104,14 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
     if (draggingNodeIdRef.current) {
       const newX = (e.clientX - dragOffset.current.x - (typeof pan?.x === 'number' ? pan.x : 0)) / (typeof zoom === 'number' ? zoom : 1);
       const newY = (e.clientY - dragOffset.current.y - (typeof pan?.y === 'number' ? pan.y : 0)) / (typeof zoom === 'number' ? zoom : 1);
-      if (typeof onNodeMove === 'function') {
-        onNodeMove(draggingNodeIdRef.current, { x: newX, y: newY });
-      } else {
-        setNodeList(prev => prev.map(n => n.id === draggingNodeIdRef.current ? { ...n, position: { x: newX, y: newY } } : n));
+      lastDragPosition.current = { x: newX, y: newY };
+      if (!dragRafRef.current) {
+        dragRafRef.current = requestAnimationFrame(() => {
+          if (typeof onNodeMove === 'function' && lastDragPosition.current) {
+            onNodeMove(draggingNodeIdRef.current, lastDragPosition.current);
+          }
+          dragRafRef.current = null;
+        });
       }
     }
   }
@@ -134,6 +129,10 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
   function onNodeDragEnd() {
     setDraggingNodeId(null);
     draggingNodeIdRef.current = null;
+    if (dragRafRef.current) {
+      cancelAnimationFrame(dragRafRef.current);
+      dragRafRef.current = null;
+    }
     window.removeEventListener('mousemove', onNodeDragMove);
     window.removeEventListener('mouseup', onNodeDragEnd);
   }
@@ -213,6 +212,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
         <HandleLayer
+          canvasRef={canvasRef}
           nodes={nodeList}
           edges={edges}
           pan={pan}

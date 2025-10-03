@@ -51,13 +51,18 @@ export default function ThemeDrawer(props) {
       setBackgroundImage(file); }
     : () => {};
   const activeTheme = theme || fallbackTheme;
+  const [cooldown, setCooldown] = useState(false);
   // Preview theme on hover by setting themeName
   const handleMouseEnter = (name) => {
-    setThemeName(name);
+    if (!cooldown) {
+      setThemeName(name);
+    }
   };
   // On click, set theme and close drawer
   const handleClick = (name) => {
     setThemeName(name);
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 500);
     onClose();
   };
 

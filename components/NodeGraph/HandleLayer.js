@@ -1,5 +1,5 @@
 // HandleLayer.js - Canvas-based handles for maximum performance
-import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
@@ -25,7 +25,7 @@ function getHandlePositions(node, edgeTypes) {
         direction: 'target',
         position: {
           x: x,
-          y: y - height / 2 - handleOffset
+          y: y - height / 2
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -37,7 +37,7 @@ function getHandlePositions(node, edgeTypes) {
         direction: 'source',
         position: {
           x: x,
-          y: y + height / 2 + handleOffset
+          y: y + height / 2
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -49,7 +49,7 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'target',
         position: {
-          x: x - width / 2 - handleOffset,
+          x: x - width / 2,
           y: y
         },
         color: edgeTypes[type].style?.color || '#1976d2'
@@ -61,7 +61,7 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'source',
         position: {
-          x: x + width / 2 + handleOffset,
+          x: x + width / 2,
           y: y
         },
         color: edgeTypes[type].style?.color || '#1976d2'
@@ -74,7 +74,7 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'target',
         position: {
-          x: x - width / 2 - handleOffset,
+          x: x - width / 2,
           y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
         },
         color: edgeTypes[type].style?.color || '#1976d2'
@@ -85,7 +85,7 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'source',
         position: {
-          x: x + width / 2 + handleOffset,
+          x: x + width / 2,
           y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
         },
         color: edgeTypes[type].style?.color || '#1976d2'
@@ -96,6 +96,7 @@ function getHandlePositions(node, edgeTypes) {
 }
 
 const HandleLayer = ({ 
+  canvasRef,
   nodes = [], 
   edges = [], 
   pan = { x: 0, y: 0 }, 
@@ -103,14 +104,10 @@ const HandleLayer = ({
   edgeTypes = {}, 
   children 
 }) => {
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
   const draggingHandleRef = useRef(null);
   const hoveredHandleRef = useRef(null);
   const previewLineRef = useRef({ visible: false });
   const animationFrameRef = useRef(null);
-  
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
   // Calculate handles and position map with pure computation
   const { handlePositions, handlePositionMap } = useMemo(() => {
@@ -147,8 +144,6 @@ const HandleLayer = ({
     return undefined;
   }, [handlePositionMap]);
   
-  getHandlePositionForEdge._handleKeys = Object.keys(handlePositionMap);
-
   // Find handle at screen coordinates
   const findHandleAt = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
@@ -398,7 +393,6 @@ const HandleLayer = ({
         canvasRef.current.width = width;
         canvasRef.current.height = height;
         
-        setCanvasSize({ width, height });
         scheduleRender();
       }
     };
@@ -430,7 +424,6 @@ const HandleLayer = ({
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
       <div 
-        ref={containerRef}
         style={{ 
           position: 'absolute', 
           top: 0, 
