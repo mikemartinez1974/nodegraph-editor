@@ -10,11 +10,19 @@ import NodeLayer from './NodeLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
 
-export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edgeTypes = {}, selectedNodeId, onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
+export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edgeTypes = {}, selectedNodeId, selectedNodeIds = [], selectedEdgeId, selectedEdgeIds = [], onNodeClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget }) {
   const theme = useTheme();
+  
+  // Debug logging for multi-selection
+  useEffect(() => {
+    if (selectedNodeIds.length > 0) {
+      console.log('NodeGraph received selectedNodeIds:', selectedNodeIds);
+      console.log('NodeGraph received selectedNodeId:', selectedNodeId);
+    }
+  }, [selectedNodeIds, selectedNodeId]);
   const canvasRef = useRef(null);
   const [selectedNodeIdState, setSelectedNodeId] = useState(null);
-  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [selectedEdgeIdState, setSelectedEdgeIdState] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -45,7 +53,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
       setSelectedEdgeId(null);
     }
     function handleEdgeClick({ id }) {
-      setSelectedEdgeId(id);
+      setSelectedEdgeIdState(id);
       setSelectedNodeId(null);
     }
     // Only node/handle hover controls handle extension/retraction
@@ -143,7 +151,7 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
   function handleBackgroundClickFromPanZoom(e) {
     if (typeof onBackgroundClick === 'function') onBackgroundClick(e);
     setSelectedNodeId(null);
-    setSelectedEdgeId && setSelectedEdgeId(null);
+    setSelectedEdgeIdState(null);
   }
 
 
@@ -228,11 +236,12 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
             pan={pan}
             zoom={zoom}
             selectedEdgeId={selectedEdgeId}
+            selectedEdgeIds={selectedEdgeIds}
             theme={theme}
             hoveredNodeId={hoveredNodeId}
             handlePositions={handlePositions}
             onEdgeClick={(edge, event) => {
-              setSelectedEdgeId(edge?.id);
+              setSelectedEdgeIdState(edge?.id);
               eventBus.emit('edgeClick', { id: edge?.id });
               if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
             }}
@@ -273,10 +282,12 @@ export default function NodeGraph({ nodes = [], edges = [], nodeTypes = {}, edge
           pan={pan}
           zoom={zoom}
           selectedNodeId={selectedNodeId}
+          selectedNodeIds={selectedNodeIds}
           draggingNodeId={draggingNodeId}
           theme={theme}
+          nodeTypes={nodeTypes}
           onNodeEvent={(id, e) => {
-            if (onNodeClick) onNodeClick(id);
+            if (onNodeClick) onNodeClick(id, e);
             const node = nodes.find(n => n.id === id);
             if (node && node.handleProgress === 1) {
               const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);

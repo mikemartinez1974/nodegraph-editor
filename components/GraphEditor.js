@@ -21,8 +21,8 @@ export default function GraphEditor({ backgroundImage }) {
   const [zoom, setZoom] = useState(1);
   const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [selectedNodeIds, setSelectedNodeIds] = useState([]);
+  const [selectedEdgeIds, setSelectedEdgeIds] = useState([]);
   const [showNodeList, setShowNodeList] = useState(true);
   const [history, setHistory] = useState([{ nodes: [], edges: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -318,8 +318,8 @@ export default function GraphEditor({ backgroundImage }) {
     setEdges(loadedEdges);
     nodesRef.current = loadedNodes;
     edgesRef.current = loadedEdges;
-    setSelectedNodeId(null);
-    setSelectedEdgeId(null);
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
     saveToHistory(loadedNodes, loadedEdges);
     console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
   }
@@ -355,8 +355,8 @@ export default function GraphEditor({ backgroundImage }) {
         nodesRef.current = snapshot.nodes;
         setEdges(snapshot.edges);
         edgesRef.current = snapshot.edges;
-        setSelectedNodeId(null);
-        setSelectedEdgeId(null);
+        setSelectedNodeIds([]);
+        setSelectedEdgeIds([]);
         console.log('Undo performed');
       }
     }
@@ -373,8 +373,8 @@ export default function GraphEditor({ backgroundImage }) {
         nodesRef.current = snapshot.nodes;
         setEdges(snapshot.edges);
         edgesRef.current = snapshot.edges;
-        setSelectedNodeId(null);
-        setSelectedEdgeId(null);
+        setSelectedNodeIds([]);
+        setSelectedEdgeIds([]);
         console.log('Redo performed');
       }
     }
@@ -405,32 +405,39 @@ export default function GraphEditor({ backgroundImage }) {
     console.log('Added node:', newNode.id);
   };
 
-  // Delete selected node or edge
+  // Delete selected nodes or edges
   const handleDeleteSelected = () => {
-    if (selectedNodeId) {
-      setNodes(prev => {
-        const newNodes = prev.filter(n => n.id !== selectedNodeId);
-        nodesRef.current = newNodes;
-        setEdges(prevE => {
-          const newEdges = prevE.filter(e => e.source !== selectedNodeId && e.target !== selectedNodeId);
-          edgesRef.current = newEdges;
-          // Save history after both nodes/edges updated
-          saveToHistory(newNodes, newEdges);
-          return newEdges;
-        });
-        setSelectedNodeId(null);
-        return newNodes;
-      });
-      console.log('Deleted node:', selectedNodeId);
-    } else if (selectedEdgeId) {
-      setEdges(prev => {
-        const newEdges = prev.filter(e => e.id !== selectedEdgeId);
-        edgesRef.current = newEdges;
-        saveToHistory(nodesRef.current, newEdges);
-        setSelectedEdgeId(null);
-        return newEdges;
-      });
-      console.log('Deleted edge:', selectedEdgeId);
+    if (selectedNodeIds.length > 0) {
+      // Calculate both new nodes and edges first, then save history once
+      const newNodes = nodes.filter(n => !selectedNodeIds.includes(n.id));
+      const newEdges = edges.filter(e => 
+        !selectedNodeIds.includes(e.source) && !selectedNodeIds.includes(e.target)
+      );
+      
+      // Update state
+      setNodes(newNodes);
+      setEdges(newEdges);
+      
+      // Update refs
+      nodesRef.current = newNodes;
+      edgesRef.current = newEdges;
+      
+      // Clear selection
+      setSelectedNodeIds([]);
+      
+      // Save to history once
+      saveToHistory(newNodes, newEdges);
+      
+      console.log('Deleted nodes:', selectedNodeIds);
+    } else if (selectedEdgeIds.length > 0) {
+      const newEdges = edges.filter(e => !selectedEdgeIds.includes(e.id));
+      
+      setEdges(newEdges);
+      edgesRef.current = newEdges;
+      setSelectedEdgeIds([]);
+      saveToHistory(nodesRef.current, newEdges);
+      
+      console.log('Deleted edges:', selectedEdgeIds);
     }
   };
 
@@ -442,8 +449,8 @@ export default function GraphEditor({ backgroundImage }) {
     setEdges(newEdges);
     nodesRef.current = newNodes;
     edgesRef.current = newEdges;
-    setSelectedNodeId(null);
-    setSelectedEdgeId(null);
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
     saveToHistory(newNodes, newEdges);
     console.log('Graph cleared');
   };
@@ -455,10 +462,47 @@ export default function GraphEditor({ backgroundImage }) {
     list: ListNode
   };
 
+  // Selection handlers for multi-select
+  const handleNodeSelection = (nodeId, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      setSelectedNodeIds(prev => {
+        const newSelection = prev.includes(nodeId) 
+          ? prev.filter(id => id !== nodeId) // Deselect if already selected
+          : [...prev, nodeId]; // Add to selection
+        console.log('Multi-select nodes:', newSelection);
+        return newSelection;
+      });
+    } else {
+      setSelectedNodeIds([nodeId]); // Single select
+      console.log('Single-select node:', nodeId);
+    }
+    setSelectedEdgeIds([]); // Clear edge selection
+  };
+
+  const handleEdgeSelection = (edgeId, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      setSelectedEdgeIds(prev => {
+        if (prev.includes(edgeId)) {
+          return prev.filter(id => id !== edgeId); // Deselect if already selected
+        } else {
+          return [...prev, edgeId]; // Add to selection
+        }
+      });
+    } else {
+      setSelectedEdgeIds([edgeId]); // Single select
+    }
+    setSelectedNodeIds([]); // Clear node selection
+  };
+
+  const clearSelection = () => {
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+  };
+
   // Node List Panel handlers
   const handleNodeListSelect = (nodeId) => {
-    setSelectedNodeId(nodeId);
-    setSelectedEdgeId(null);
+    setSelectedNodeIds([nodeId]);
+    setSelectedEdgeIds([]);
   };
 
   const handleNodeFocus = (nodeId) => {
@@ -468,14 +512,15 @@ export default function GraphEditor({ backgroundImage }) {
         x: window.innerWidth / 2 - node.position.x * zoom,
         y: window.innerHeight / 2 - node.position.y * zoom
       });
-      setSelectedNodeId(nodeId);
-      setSelectedEdgeId(null);
+      setSelectedNodeIds([nodeId]);
+      setSelectedEdgeIds([]);
     }
   };
 
-  // Resize all nodes to 80x48 on Ctrl+Q
+  // Keyboard shortcuts
   useEffect(() => {
-    function handleResizeAllNodes(e) {
+    function handleKeyboardShortcuts(e) {
+      // Resize all nodes to 80x48 on Ctrl+Q
       if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
         setNodes(prev => {
           const updated = prev.map(n => ({ ...n, width: 80, height: 48 }));
@@ -485,10 +530,27 @@ export default function GraphEditor({ backgroundImage }) {
         });
         console.log('All nodes resized to 80x48');
       }
+      // Select all nodes on Ctrl+A
+      else if (e.ctrlKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        setSelectedNodeIds(nodesRef.current.map(n => n.id));
+        setSelectedEdgeIds([]);
+        console.log(`Selected ${nodesRef.current.length} nodes`);
+      }
+      // Delete selected on Delete key
+      else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedNodeIds.length > 0 || selectedEdgeIds.length > 0) {
+          handleDeleteSelected();
+        }
+      }
+      // Escape to clear selection
+      else if (e.key === 'Escape') {
+        clearSelection();
+      }
     }
-    window.addEventListener('keydown', handleResizeAllNodes);
-    return () => window.removeEventListener('keydown', handleResizeAllNodes);
-  }, []);
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
+  }, [selectedNodeIds, selectedEdgeIds]);
 
   // Remove safeSetNodes wrapper since GraphCRUD handles ID assignment
 
@@ -512,15 +574,15 @@ export default function GraphEditor({ backgroundImage }) {
         onClearGraph={handleClearGraph}
         onUndo={handleUndo}
         onRedo={handleRedo}
-        selectedNodeId={selectedNodeId}
-        selectedEdgeId={selectedEdgeId}
+        selectedNodeId={selectedNodeIds[0] || null}
+        selectedEdgeId={selectedEdgeIds[0] || null}
         canUndo={historyIndex > 0}
         canRedo={historyIndex < history.length - 1}
       />
       
       <NodeListPanel
         nodes={nodes}
-        selectedNodeId={selectedNodeId}
+        selectedNodeId={selectedNodeIds[0] || null}
         onNodeSelect={handleNodeListSelect}
         onNodeFocus={handleNodeFocus}
         onClose={() => setShowNodeList(false)}
@@ -535,7 +597,10 @@ export default function GraphEditor({ backgroundImage }) {
         zoom={zoom} 
         setPan={setPan} 
         setZoom={setZoom}
-        selectedNodeId={selectedNodeId}
+        selectedNodeId={selectedNodeIds[0] || null}
+        selectedEdgeId={selectedEdgeIds[0] || null}
+        selectedNodeIds={selectedNodeIds}
+        selectedEdgeIds={selectedEdgeIds}
         hoveredNodeId={hoveredNodeId}
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
@@ -548,17 +613,14 @@ export default function GraphEditor({ backgroundImage }) {
           eventBus.emit('nodeDrag', { nodeId: id, position });
         }}
         onEdgeClick={(edge, event) => {
-          setSelectedEdgeId(edge.id);
-          setSelectedNodeId(null);
+          const isMultiSelect = event.ctrlKey || event.metaKey;
+          handleEdgeSelection(edge.id, isMultiSelect);
         }}
-        onNodeClick={nodeId => {
-          setSelectedNodeId(nodeId);
-          setSelectedEdgeId(null);
+        onNodeClick={(nodeId, event) => {
+          const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
+          handleNodeSelection(nodeId, isMultiSelect);
         }}
-        onBackgroundClick={() => {
-          setSelectedNodeId(null);
-          setSelectedEdgeId(null);
-        }}
+        onBackgroundClick={clearSelection}
         onEdgeHover={id => setHoveredEdgeId(id)}
         onNodeHover={id => setHoveredNodeId(id)}
         hoveredEdgeId={hoveredEdgeId}
@@ -575,25 +637,27 @@ export default function GraphEditor({ backgroundImage }) {
           });
         }}
       />
-      {selectedNodeId && !selectedEdgeId && (
+      
+
+      {selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
         <NodePropertiesPanel
-          selectedNode={nodes.find(n => n.id === selectedNodeId)}
+          selectedNode={nodes.find(n => n.id === selectedNodeIds[0])}
           onUpdateNode={handleUpdateNodeData}
-          onClose={() => setSelectedNodeId(null)}
+          onClose={() => setSelectedNodeIds([])}
           theme={theme}
         />
       )}
             
-      {selectedEdgeId && (
+      {selectedEdgeIds.length === 1 && selectedNodeIds.length === 0 && (
         <EdgePropertiesPanel
           selectedEdge={{
-            ...edges.find(e => e.id === selectedEdgeId),
-            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.source),
-            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.target)
+            ...edges.find(e => e.id === selectedEdgeIds[0]),
+            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
+            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
           }}
           edgeTypes={EdgeTypes}
           onUpdateEdge={handleUpdateEdge}
-          onClose={() => setSelectedEdgeId(null)}
+          onClose={() => setSelectedEdgeIds([])}
           theme={theme}
         />
       )}
