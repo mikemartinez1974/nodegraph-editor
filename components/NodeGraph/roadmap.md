@@ -14,23 +14,24 @@
   - [x] Connect nodes with edges
   - [x] Support different edge styles (straight, curved)
 
-- [ ] **Interaction**
+- [x] **Interaction**
   - [x] Add, select, move, and delete nodes/edges
-  - [ ] Multi-select and group nodes
+  - [x] Multi-select and group nodes
 
-- [ ] **State Management**
-  - [ ] Store graph data (nodes, edges, positions)
-  - [ ] Undo/redo functionality
+- [x] **State Management**
+  - [x] Store graph data (nodes, edges, positions)
+  - [x] Undo/redo functionality
 
-- [ ] **UI Features**
+- [x] **UI Features**
   - [ ] Minimap for navigation
-  - [ ] Sidebar or toolbar for actions
+  - [x] Sidebar or toolbar for actions
 
 - [ ] **Collaboration (optional)**
   - [ ] Real-time editing with multiple users
+  - [ ] Copy/Paste Workflow
 
-- [ ] **Persistence**
-  - [ ] Save/load graphs (local storage, backend)
+- [x] **Persistence**
+  - [x] Save/load graphs (local storage, backend)
 
 - [ ] **Extensibility**
   - [ ] Plugin system for custom features
