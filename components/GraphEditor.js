@@ -500,9 +500,15 @@ export default function GraphEditor({ backgroundImage }) {
   };
 
   // Node List Panel handlers
-  const handleNodeListSelect = (nodeId) => {
-    setSelectedNodeIds([nodeId]);
-    setSelectedEdgeIds([]);
+  const handleNodeListSelect = (nodeId, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      // Use the same multi-select logic as the graph
+      handleNodeSelection(nodeId, true);
+    } else {
+      // Single select
+      setSelectedNodeIds([nodeId]);
+      setSelectedEdgeIds([]);
+    }
   };
 
   const handleNodeFocus = (nodeId) => {
@@ -583,6 +589,7 @@ export default function GraphEditor({ backgroundImage }) {
       <NodeListPanel
         nodes={nodes}
         selectedNodeId={selectedNodeIds[0] || null}
+        selectedNodeIds={selectedNodeIds}
         onNodeSelect={handleNodeListSelect}
         onNodeFocus={handleNodeFocus}
         onClose={() => setShowNodeList(false)}

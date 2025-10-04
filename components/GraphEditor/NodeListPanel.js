@@ -32,6 +32,7 @@ import {
 export default function NodeListPanel({ 
   nodes = [], 
   selectedNodeId, 
+  selectedNodeIds = [],
   onNodeSelect, 
   onNodeFocus, 
   onClose, 
@@ -123,7 +124,8 @@ export default function NodeListPanel({
         borderBottom: `1px solid ${theme?.palette?.primary?.dark || '#1565c0'}`
       }}>
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-          Node List ({filteredNodes.length})
+          Node List ({filteredNodes.length}
+          {selectedNodeIds.length > 0 && ` • ${selectedNodeIds.length} selected`})
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title="Filter nodes">
@@ -283,94 +285,125 @@ export default function NodeListPanel({
           </Box>
         ) : (
           <List sx={{ py: 0 }}>
-            {filteredNodes.map((node) => (
-              <ListItem key={node.id} disablePadding>
-                <ListItemButton
-                  selected={selectedNodeId === node.id}
-                  onClick={() => onNodeSelect?.(node.id)}
-                  sx={{
-                    py: 1,
-                    px: 2,
-                    borderBottom: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-                    '&.Mui-selected': {
-                      backgroundColor: theme?.palette?.primary?.main + '20' || 'rgba(25, 118, 210, 0.12)',
-                      '&:hover': {
-                        backgroundColor: theme?.palette?.primary?.main + '30' || 'rgba(25, 118, 210, 0.18)',
+            {filteredNodes.map((node) => {
+              const isSelected = selectedNodeIds.includes(node.id);
+              const isMultiSelect = selectedNodeIds.length > 1;
+              
+              return (
+                <ListItem key={node.id} disablePadding>
+                  <ListItemButton
+                    selected={isSelected}
+                    onClick={(e) => {
+                      const isCtrlClick = e.ctrlKey || e.metaKey;
+                      if (isCtrlClick) {
+                        // For multi-select, we need a different handler
+                        // For now, we'll use the existing handler but indicate it's a multi-select
+                        onNodeSelect?.(node.id, true);
+                      } else {
+                        onNodeSelect?.(node.id, false);
                       }
-                    },
-                    '&:hover': {
-                      backgroundColor: theme?.palette?.action?.hover || 'rgba(0,0,0,0.04)',
-                    }
-                  }}
-                >
-                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                      <Typography 
-                        variant="subtitle2" 
-                        sx={{ 
-                          fontWeight: selectedNodeId === node.id ? 600 : 500,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          flexGrow: 1,
-                          color: theme?.palette?.text?.primary || '#000'
-                        }}
-                      >
-                        {node.label || node.id}
-                      </Typography>
-                      {node.visible === false && (
-                        <VisibilityOffIcon sx={{ fontSize: 16, color: theme?.palette?.text?.disabled || '#999', ml: 1 }} />
-                      )}
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ 
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          color: theme?.palette?.text?.secondary || '#666'
-                        }}
-                      >
-                        {node.type || 'default'}
-                      </Typography>
-                      {node.data?.memo && (
-                        <Typography variant="caption" color="text.secondary" sx={{ color: theme?.palette?.text?.secondary || '#666' }}>
-                          📝
+                    }}
+                    sx={{
+                      py: 1,
+                      px: 2,
+                      borderBottom: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
+                      backgroundColor: isSelected 
+                        ? (isMultiSelect 
+                          ? theme?.palette?.secondary?.main + '20' || 'rgba(156, 39, 176, 0.12)'
+                          : theme?.palette?.primary?.main + '20' || 'rgba(25, 118, 210, 0.12)')
+                        : 'transparent',
+                      '&.Mui-selected': {
+                        backgroundColor: isSelected 
+                          ? (isMultiSelect 
+                            ? theme?.palette?.secondary?.main + '20' || 'rgba(156, 39, 176, 0.12)'
+                            : theme?.palette?.primary?.main + '20' || 'rgba(25, 118, 210, 0.12)')
+                          : theme?.palette?.primary?.main + '20' || 'rgba(25, 118, 210, 0.12)',
+                        '&:hover': {
+                          backgroundColor: isSelected 
+                            ? (isMultiSelect 
+                              ? theme?.palette?.secondary?.main + '30' || 'rgba(156, 39, 176, 0.18)'
+                              : theme?.palette?.primary?.main + '30' || 'rgba(25, 118, 210, 0.18)')
+                            : theme?.palette?.primary?.main + '30' || 'rgba(25, 118, 210, 0.18)',
+                        }
+                      },
+                      '&:hover': {
+                        backgroundColor: isSelected 
+                          ? (isMultiSelect 
+                            ? theme?.palette?.secondary?.main + '30' || 'rgba(156, 39, 176, 0.18)'
+                            : theme?.palette?.primary?.main + '30' || 'rgba(25, 118, 210, 0.18)')
+                          : theme?.palette?.action?.hover || 'rgba(0,0,0,0.04)',
+                      }
+                    }}
+                  >
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                        <Typography 
+                          variant="subtitle2" 
+                          sx={{ 
+                            fontWeight: selectedNodeId === node.id ? 600 : 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            flexGrow: 1,
+                            color: theme?.palette?.text?.primary || '#000'
+                          }}
+                        >
+                          {node.label || node.id}
                         </Typography>
-                      )}
-                      {node.data?.link && (
-                        <Typography variant="caption" color="text.secondary" sx={{ color: theme?.palette?.text?.secondary || '#666' }}>
-                          🔗
+                        {node.visible === false && (
+                          <VisibilityOffIcon sx={{ fontSize: 16, color: theme?.palette?.text?.disabled || '#999', ml: 1 }} />
+                        )}
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          sx={{ 
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            color: theme?.palette?.text?.secondary || '#666'
+                          }}
+                        >
+                          {node.type || 'default'}
                         </Typography>
-                      )}
+                        {node.data?.memo && (
+                          <Typography variant="caption" color="text.secondary" sx={{ color: theme?.palette?.text?.secondary || '#666' }}>
+                            📝
+                          </Typography>
+                        )}
+                        {node.data?.link && (
+                          <Typography variant="caption" color="text.secondary" sx={{ color: theme?.palette?.text?.secondary || '#666' }}>
+                            🔗
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
-                  </Box>
-                  {onNodeFocus && (
-                    <Tooltip title="Focus on node">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNodeFocus(node.id);
-                        }}
-                        sx={{ 
-                          ml: 1,
-                          color: theme?.palette?.text?.secondary || '#666',
-                          '&:hover': {
-                            backgroundColor: theme?.palette?.action?.hover || 'rgba(0,0,0,0.04)',
-                            color: theme?.palette?.primary?.main || '#1976d2'
-                          }
-                        }}
-                      >
-                        <LocationIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </ListItemButton>
-              </ListItem>
-            ))}
+                    {onNodeFocus && (
+                      <Tooltip title="Focus on node">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onNodeFocus(node.id);
+                          }}
+                          sx={{ 
+                            ml: 1,
+                            color: theme?.palette?.text?.secondary || '#666',
+                            '&:hover': {
+                              backgroundColor: theme?.palette?.action?.hover || 'rgba(0,0,0,0.04)',
+                              color: theme?.palette?.primary?.main || '#1976d2'
+                            }
+                          }}
+                        >
+                          <LocationIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
           </List>
         )}
       </Box>
