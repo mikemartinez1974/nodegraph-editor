@@ -5,6 +5,7 @@ import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
 import GraphCRUD from './GraphEditor/GraphCrud.js';
 import EdgeTypes from './GraphEditor/edgeTypes';
+import GroupManager from './GraphEditor/GroupManager';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
@@ -23,8 +24,10 @@ export default function GraphEditor({ backgroundImage }) {
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [selectedEdgeIds, setSelectedEdgeIds] = useState([]);
+  const [selectedGroupIds, setSelectedGroupIds] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [showNodeList, setShowNodeList] = useState(true);
-  const [history, setHistory] = useState([{ nodes: [], edges: [] }]);
+  const [history, setHistory] = useState([{ nodes: [], edges: [], groups: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
   const nodesRef = useRef(nodes);
@@ -34,6 +37,7 @@ export default function GraphEditor({ backgroundImage }) {
 
   const theme = useTheme();
   const graphAPI = useRef(null);
+  const groupManager = useRef(new GroupManager());
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -438,6 +442,17 @@ export default function GraphEditor({ backgroundImage }) {
       saveToHistory(nodesRef.current, newEdges);
       
       console.log('Deleted edges:', selectedEdgeIds);
+    } else if (selectedGroupIds.length > 0) {
+      // Delete groups
+      selectedGroupIds.forEach(groupId => {
+        groupManager.current.removeGroup(groupId);
+      });
+      
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds([]);
+      saveToHistory(nodes, edges);
+      
+      console.log('Deleted groups:', selectedGroupIds);
     }
   };
 
@@ -497,6 +512,110 @@ export default function GraphEditor({ backgroundImage }) {
   const clearSelection = () => {
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
+  };
+
+  // Group operations
+  const handleCreateGroup = () => {
+    if (selectedNodeIds.length < 2) {
+      console.log('At least 2 nodes must be selected to create a group');
+      return;
+    }
+
+    const result = groupManager.current.createGroup(selectedNodeIds, {
+      nodes: nodes,
+      label: `Group ${groups.length + 1}`
+    });
+
+    if (result.success) {
+      const newGroups = [...groups, result.data];
+      setGroups(newGroups);
+      setSelectedNodeIds([]); // Clear node selection
+      setSelectedGroupIds([result.data.id]); // Select the new group
+      saveToHistory(nodes, edges);
+      console.log('Created group:', result.data.id);
+    } else {
+      console.error('Failed to create group:', result.error);
+    }
+  };
+
+  const handleUngroupSelected = () => {
+    if (selectedGroupIds.length === 0) {
+      console.log('No groups selected to ungroup');
+      return;
+    }
+
+    let updated = false;
+    selectedGroupIds.forEach(groupId => {
+      const result = groupManager.current.removeGroup(groupId);
+      if (result.success) {
+        updated = true;
+        console.log('Removed group:', groupId);
+      }
+    });
+
+    if (updated) {
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds([]);
+      saveToHistory(nodes, edges);
+    }
+  };
+
+  const handleGroupSelection = (groupId, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      setSelectedGroupIds(prev => {
+        if (prev.includes(groupId)) {
+          return prev.filter(id => id !== groupId);
+        } else {
+          return [...prev, groupId];
+        }
+      });
+    } else {
+      setSelectedGroupIds([groupId]);
+    }
+    // Clear other selections when selecting groups
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+  };
+
+  // Toggle group collapse/expand
+  const handleToggleGroupCollapse = (groupId) => {
+    const result = groupManager.current.toggleGroupCollapse(groupId);
+    if (result.success) {
+      const group = result.data;
+      
+      // Update nodes visibility
+      setNodes(prev => {
+        const updated = prev.map(node => {
+          if (group.nodeIds.includes(node.id)) {
+            return { ...node, visible: !group.collapsed };
+          }
+          return node;
+        });
+        nodesRef.current = updated;
+        return updated;
+      });
+      
+      // Update group state
+      setGroups(groupManager.current.getAllGroups());
+      
+      console.log(`Group ${groupId} ${group.collapsed ? 'collapsed' : 'expanded'}`);
+    }
+  };
+
+  // Update group bounds when nodes move
+  const updateGroupBounds = () => {
+    let updated = false;
+    groups.forEach(group => {
+      const result = groupManager.current.updateGroupBounds(group.id, nodes);
+      if (result.success) {
+        updated = true;
+      }
+    });
+    
+    if (updated) {
+      setGroups(groupManager.current.getAllGroups());
+    }
   };
 
   // Node List Panel handlers
@@ -545,7 +664,7 @@ export default function GraphEditor({ backgroundImage }) {
       }
       // Delete selected on Delete key
       else if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedNodeIds.length > 0 || selectedEdgeIds.length > 0) {
+        if (selectedNodeIds.length > 0 || selectedEdgeIds.length > 0 || selectedGroupIds.length > 0) {
           handleDeleteSelected();
         }
       }
@@ -553,10 +672,20 @@ export default function GraphEditor({ backgroundImage }) {
       else if (e.key === 'Escape') {
         clearSelection();
       }
+      // Create group on Ctrl+G
+      else if (e.ctrlKey && (e.key === 'g' || e.key === 'G')) {
+        e.preventDefault();
+        handleCreateGroup();
+      }
+      // Ungroup on Ctrl+Shift+G
+      else if (e.ctrlKey && e.shiftKey && (e.key === 'g' || e.key === 'G')) {
+        e.preventDefault();
+        handleUngroupSelected();
+      }
     }
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  }, [selectedNodeIds, selectedEdgeIds]);
+  }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
 
   // Remove safeSetNodes wrapper since GraphCRUD handles ID assignment
 
@@ -600,6 +729,7 @@ export default function GraphEditor({ backgroundImage }) {
       <NodeGraph 
         nodes={nodes} 
         edges={edges} 
+        groups={groups}
         pan={pan} 
         zoom={zoom} 
         setPan={setPan} 
@@ -608,6 +738,9 @@ export default function GraphEditor({ backgroundImage }) {
         selectedEdgeId={selectedEdgeIds[0] || null}
         selectedNodeIds={selectedNodeIds}
         selectedEdgeIds={selectedEdgeIds}
+        selectedGroupIds={selectedGroupIds}
+        setSelectedNodeIds={setSelectedNodeIds}
+        setSelectedEdgeIds={setSelectedEdgeIds}
         hoveredNodeId={hoveredNodeId}
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
@@ -617,6 +750,8 @@ export default function GraphEditor({ backgroundImage }) {
             nodesRef.current = next;
             return next;
           });
+          // Update group bounds after node movement
+          setTimeout(() => updateGroupBounds(), 0);
           eventBus.emit('nodeDrag', { nodeId: id, position });
         }}
         onEdgeClick={(edge, event) => {
@@ -626,6 +761,14 @@ export default function GraphEditor({ backgroundImage }) {
         onNodeClick={(nodeId, event) => {
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
           handleNodeSelection(nodeId, isMultiSelect);
+        }}
+        onGroupClick={(groupId, event, action) => {
+          if (action === 'toggle-collapse') {
+            handleToggleGroupCollapse(groupId);
+          } else {
+            const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
+            handleGroupSelection(groupId, isMultiSelect);
+          }
         }}
         onBackgroundClick={clearSelection}
         onEdgeHover={id => setHoveredEdgeId(id)}
