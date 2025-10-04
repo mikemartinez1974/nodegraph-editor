@@ -1,12 +1,13 @@
 // GraphCRUD.js
 // LLM-friendly CRUD API for graph manipulation
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * CRUD API for Node Graph Editor
  * All functions return { success: boolean, data?: any, error?: string }
  */
 
-export class GraphCRUD {
+export default class GraphCRUD {
   constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory) {
     this.getNodes = getNodes;
     this.setNodes = setNodes;
@@ -32,6 +33,7 @@ export class GraphCRUD {
   createNode({ id, type = 'default', label = '', position = { x: 100, y: 100 }, data = {}, width, height } = {}) {
     try {
       const nodeId = id || this._generateId();
+      
       const newNode = {
         id: nodeId,
         type,
@@ -161,7 +163,10 @@ export class GraphCRUD {
         return { success: false, error: 'Source and target are required' };
       }
 
+      // Get fresh node state to ensure we have the latest nodes
       const nodes = this.getNodes();
+      console.log('Available nodes for edge creation:', nodes.map(n => n.id));
+      console.log('Looking for source:', source, 'target:', target);
       const sourceExists = nodes.some(n => n.id === source);
       const targetExists = nodes.some(n => n.id === target);
 
@@ -425,6 +430,16 @@ export class GraphCRUD {
       return v.toString(16);
     });
   }
+}
+
+// Export createNode as a standalone function for convenience
+export function createNode(nodeData) {
+  // Always assign a unique id if not provided
+  const id = nodeData.id || uuidv4();
+  return {
+    ...nodeData,
+    id,
+  };
 }
 
 // Example usage for LLM:

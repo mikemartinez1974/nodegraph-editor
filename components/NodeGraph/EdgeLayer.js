@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useContext } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
+import edgeTypes from '../GraphEditor/edgeTypes';
 
 function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
   // Distance from point (x, y) to line segment (x1, y1)-(x2, y2)
@@ -235,16 +236,17 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
         targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
       }
       ctx.save();
-      // Create a linear gradient for the edge
-      const grad = ctx.createLinearGradient(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
-      grad.addColorStop(0, theme.palette.primary.light);
-      grad.addColorStop(1, theme.palette.primary.dark);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = edge.style?.width || 2;
-      ctx.setLineDash(edge.style?.dash || []);
+      // Look up style from edgeTypes
+      const typeDef = edgeTypes[edge.type] || {};
+      const styleDef = typeDef.style || {};
+      // Use theme color if not specified
+      const color = styleDef.color || theme.palette.primary.main;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = styleDef.width || 2;
+      ctx.setLineDash(styleDef.dash || []);
       ctx.beginPath();
       // Determine if edge should be curved
-      const isCurved = edge.style?.curved === true;
+      const isCurved = styleDef.curved === true;
       // Choose curve direction: override from handle, else auto
       let curveDirection = curveDirectionOverride;
       if (!curveDirection) {

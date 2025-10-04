@@ -1,6 +1,6 @@
 // Edge types for the graph editor
 
-export const edgeTypes = {
+const edgeTypes = {
   child: {
     label: 'Child',
     style: {
@@ -20,5 +20,6 @@ export const edgeTypes = {
     }
   }
 };
+export default edgeTypes;
 
 

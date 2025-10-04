@@ -1,6 +1,6 @@
 // graphData.js
 import { createNode, addEdge } from '../GraphEditor/nodeEdgeBase';
-import { edgeTypes } from '../GraphEditor/edgeTypes';
+import edgeTypes from '../GraphEditor/edgeTypes';
 
 export const nodes = [
   createNode({ id: 'node1', type: 'default', label: 'Start', data: {}, position: { x: 100, y: 100 }, showLabel: true }),

@@ -1,11 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import NodeGraph from './NodeGraph';
-import { nodes as initialNodes, edges as initialEdges } from '../components/NodeGraph/graphData';
-import { createNode, createEdge } from './GraphEditor/nodeEdgeBase';
 import Toolbar from './Toolbar.js';
 import eventBus from './NodeGraph/eventBus';
-import { edgeTypes } from './GraphEditor/edgeTypes';
+import GraphCRUD from './GraphEditor/GraphCrud.js';
+import EdgeTypes from './GraphEditor/edgeTypes';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
@@ -13,11 +12,11 @@ import NodeListPanel from './GraphEditor/NodeListPanel';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
-import { GraphCRUD } from './GraphEditor/GraphCrud.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function GraphEditor({ backgroundImage }) {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
@@ -25,12 +24,13 @@ export default function GraphEditor({ backgroundImage }) {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [showNodeList, setShowNodeList] = useState(true);
-  const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
+  const [history, setHistory] = useState([{ nodes: [], edges: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
   const historyIndexRef = useRef(historyIndex);
+  const lastHandleDropTime = useRef(0);
 
   const theme = useTheme();
   const graphAPI = useRef(null);
@@ -67,6 +67,22 @@ export default function GraphEditor({ backgroundImage }) {
     });
   }
 
+  function ensureNodeId(node) {
+    if (!node.id) {
+      node.id = uuidv4();
+    }
+    return node;
+  }
+
+  function ensureAllNodeIds(nodes) {
+    return nodes.map(node => {
+      if (!node.id) {
+        return { ...node, id: uuidv4() };
+      }
+      return node;
+    });
+  }
+
   // Centralized saveToHistory using refs and functional updates to avoid stale closure issues
   const saveToHistory = (newNodes, newEdges) => {
     setHistory(prevHistory => {
@@ -82,7 +98,7 @@ export default function GraphEditor({ backgroundImage }) {
 
   // addNode/addEdge helpers (ensure refs are updated synchronously from within updater)
   function addNode(nodeProps) {
-    const node = createNode(nodeProps);
+    const node = GraphCRUD.createNode(nodeProps);
     setNodes(prev => {
       const next = [...prev, node];
       nodesRef.current = next;
@@ -92,7 +108,7 @@ export default function GraphEditor({ backgroundImage }) {
   }
 
   function addEdge(edgeProps) {
-    const edge = createEdge(edgeProps);
+    const edge = graphAPI.current.createEdge(edgeProps);
     setEdges(prev => {
       const next = [...prev, edge];
       edgesRef.current = next;
@@ -103,24 +119,59 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Handle drop events from handles (avoid double setEdges and race conditions)
   useEffect(() => {
-    function onHandleDrop(data) {
+    const onHandleDrop_OLD_DISABLED = (data) => {
+      if (!data) return;
+      
+      // Simple debounce - prevent rapid duplicate calls
+      const now = Date.now();
+      if (now - lastHandleDropTime.current < 200) {
+        console.log('Ignoring rapid handle drop event');
+        return;
+      }
+      lastHandleDropTime.current = now;
+
       const { graph, sourceNode, targetNode, edgeType, direction } = data;
       const edgeTypeKey = edgeType || 'child';
-      const edgeTypePreset = edgeTypes[edgeTypeKey] || edgeTypes.child;
+      const edgeTypePreset = EdgeTypes[edgeTypeKey] || EdgeTypes.child;
 
       if (!targetNode) {
-        // Drop on blank: create new node and connect
-        const newNodeId = uuidv4();
-        const newNode = graphAPI.current.createNode({
-          id: newNodeId,
+        // Drop on blank: create new node and connect using GraphCRUD API
+        const nodeResult = graphAPI.current.createNode({
           type: 'default',
           label: `Node ${nodesRef.current.length + 1}`,
           data: {},
           position: { x: graph.x, y: graph.y },
           width: 80,
-          height: 48,
-          showLabel: true
+          height: 48
         });
+        
+        if (!nodeResult.success) {
+          console.error('Failed to create node:', nodeResult.error);
+          // If it's a duplicate error, don't continue with edge creation
+          return;
+        }
+        
+        const newNode = nodeResult.data;
+        
+        // Create edge using GraphCRUD API  
+        // Check if we have valid source node ID
+        const sourceNodeId = data.sourceNode || data.nodeId || data.id;
+        console.log('Creating edge from', sourceNodeId, 'to', newNode.id);
+        
+        if (!sourceNodeId) {
+          console.error('No valid source node ID found in data:', data);
+          return;
+        }
+        
+        const edgeResult = graphAPI.current.createEdge({
+          source: sourceNodeId,
+          target: newNode.id,
+          type: 'child'
+        });
+        
+        if (!edgeResult.success) {
+          console.error('Failed to create edge:', edgeResult.error);
+        }
 
         // create new node and update ref
         setNodes(prev => {
@@ -130,11 +181,11 @@ export default function GraphEditor({ backgroundImage }) {
         });
 
         // create edge respecting direction
-        const newEdge = createEdge({
+        const newEdge = graphAPI.current.createEdge({
           id: uuidv4(),
           type: edgeTypeKey,
-          source: direction === 'source' ? sourceNode : newNodeId,
-          target: direction === 'source' ? newNodeId : sourceNode,
+          source: direction === 'source' ? sourceNode : uuidv4(),
+          target: direction === 'source' ? uuidv4() : sourceNode,
           label: '',
           showLabel: false,
           style: edgeTypePreset.style
@@ -157,7 +208,7 @@ export default function GraphEditor({ backgroundImage }) {
           );
 
           if (!edgeExists) {
-            const newEdge = createEdge({
+            const newEdge = graphAPI.current.createEdge({
               id: uuidv4(),
               type: edgeTypeKey,
               source: direction === 'source' ? sourceNode : targetNode,
@@ -179,8 +230,28 @@ export default function GraphEditor({ backgroundImage }) {
       }
     }
 
-    eventBus.on('handleDrop', onHandleDrop);
-    return () => eventBus.off('handleDrop', onHandleDrop);
+    const handleDrop = (data) => {
+      if (!data || !data.sourceNode) return;
+      // Create node
+      const nodeResult = graphAPI.current.createNode({
+        label: data.label || `Node-${Date.now()}`,
+        position: data.graph,
+        data: data.nodeData || {}
+      });
+      if (!nodeResult.success) return;
+      // Delay edge creation to ensure node is in state
+      setTimeout(() => {
+        graphAPI.current.createEdge({
+          source: data.sourceNode,
+          target: nodeResult.data.id,
+          type: data.edgeType // Only set type
+        });
+      }, 50);
+    };
+    eventBus.on('handleDrop', handleDrop);
+    return () => {
+      eventBus.off('handleDrop', handleDrop);
+    };
   }, []); // edgeTypes is static import, no need to include in deps
 
   // Load background from localStorage (DOM access is safe in useEffect)
@@ -312,7 +383,7 @@ export default function GraphEditor({ backgroundImage }) {
   // Add node handler (keeps refs & history consistent)
   const handleAddNode = () => {
     const newId = uuidv4();
-    const newNode = createNode({
+    const newNode = GraphCRUD.createNode({
       id: newId,
       type: 'default',
       label: `Node ${nodesRef.current.length + 1}`,
@@ -419,6 +490,8 @@ export default function GraphEditor({ backgroundImage }) {
     return () => window.removeEventListener('keydown', handleResizeAllNodes);
   }, []);
 
+  // Remove safeSetNodes wrapper since GraphCRUD handles ID assignment
+
   return (
     <div id="graph-editor-background" style={{
       minHeight: '100vh',
@@ -465,7 +538,7 @@ export default function GraphEditor({ backgroundImage }) {
         selectedNodeId={selectedNodeId}
         hoveredNodeId={hoveredNodeId}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        edgeTypes={EdgeTypes}
         onNodeMove={(id, position) => {
           setNodes(prev => {
             const next = prev.map(n => n.id === id ? { ...n, position } : n);
@@ -518,7 +591,7 @@ export default function GraphEditor({ backgroundImage }) {
             sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.source),
             targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeId)?.target)
           }}
-          edgeTypes={edgeTypes}
+          edgeTypes={EdgeTypes}
           onUpdateEdge={handleUpdateEdge}
           onClose={() => setSelectedEdgeId(null)}
           theme={theme}

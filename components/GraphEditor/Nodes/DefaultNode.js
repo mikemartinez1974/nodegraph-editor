@@ -9,8 +9,8 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
     const theme = useTheme();
     const width = (node?.width || 60) * zoom;
     const height = (node?.height || 60) * zoom;
-    const left = node?.position?.x * zoom + pan.x - width / 2;
-    const top = node?.position?.y * zoom + pan.y - height / 2;
+    const left = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
+    const top = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
 
     const lastMousePos = useRef(null);
     const nodeRef = useRef(null);
@@ -88,7 +88,6 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
             onMouseLeave={e => {
                 eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
             }}>
-            
             {/* Render node label if present */}
             {node?.label && (
                 <div style={{ 
@@ -105,7 +104,6 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                     {node.label}
                 </div>
             )}
-
             {/* Data indicators */}
             {(hasMemo || hasLink) && (
                 <div style={{
@@ -146,7 +144,6 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                     )}
                 </div>
             )}
-
             {children}  
         </div>
     );
