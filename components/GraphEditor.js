@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import NodeGraph from './NodeGraph';
-import Toolbar from './Toolbar.js';
+import Toolbar from './ToolbarNew.js';
 import eventBus from './NodeGraph/eventBus';
 import GraphCRUD from './GraphEditor/GraphCrud.js';
 import EdgeTypes from './GraphEditor/edgeTypes';
@@ -18,6 +18,7 @@ import useSelection from './GraphEditor/useSelection';
 import useGraphHistory from './GraphEditor/useGraphHistory';
 import useGraphShortcuts from './GraphEditor/useGraphShortcuts';
 import useGroupManager from './GraphEditor/useGroupManager';
+import useGraphModes from './GraphEditor/useGraphModes';
 
 export default function GraphEditor({ backgroundImage }) {
   const [nodes, setNodes] = useState([]);
@@ -271,6 +272,20 @@ export default function GraphEditor({ backgroundImage }) {
     updateGroupBounds
   } = groupManagerHook;
 
+  // Use graph modes hook
+  const {
+    mode,
+    autoLayoutType,
+    handleModeChange,
+    handleAutoLayoutChange,
+    applyAutoLayout
+  } = useGraphModes({
+    nodes,
+    setNodes,
+    selectedNodeIds,
+    edges
+  });
+
   // Update group bounds when nodes move
   const updateGroupBoundsWrapper = () => {
     let updated = false;
@@ -316,6 +331,30 @@ export default function GraphEditor({ backgroundImage }) {
 
   const handleEdgeDoubleClick = (edgeId) => {
     setShowEdgeProperties(true);
+  };
+
+  // Node update from properties panel - using GraphCRUD API
+  const handleUpdateNodeData = (nodeId, newData, isLabelUpdate = false) => {
+    const updateData = isLabelUpdate 
+      ? { label: newData.label, data: newData }
+      : { data: newData };
+    
+    const result = graphAPI.current.updateNode(nodeId, updateData);
+    if (result.success) {
+      console.log('Updated node via GraphCRUD:', nodeId);
+    } else {
+      console.error('Failed to update node:', result.error);
+    }
+  };
+
+  // Update edge data - using GraphCRUD API
+  const handleUpdateEdge = (edgeId, updates) => {
+    const result = graphAPI.current.updateEdge(edgeId, updates);
+    if (result.success) {
+      console.log('Updated edge via GraphCRUD:', edgeId);
+    } else {
+      console.error('Failed to update edge:', result.error);
+    }
   };
 
   // Group operations
@@ -397,6 +436,11 @@ export default function GraphEditor({ backgroundImage }) {
         selectedEdgeId={selectedEdgeIds[0] || null}
         canUndo={canUndo}
         canRedo={canRedo}
+        mode={mode}
+        autoLayoutType={autoLayoutType}
+        onModeChange={handleModeChange}
+        onAutoLayoutChange={handleAutoLayoutChange}
+        onApplyLayout={applyAutoLayout}
       />
       
       <NodeListPanel

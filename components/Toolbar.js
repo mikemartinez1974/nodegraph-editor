@@ -16,6 +16,33 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import {
+  AppBar,
+  Toolbar as MuiToolbar,
+  Button,
+  ButtonGroup,
+  Typography,
+  Divider,
+  ToggleButton,
+  ToggleButtonGroup,
+  Menu,
+  MenuItem,
+  Chip
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Clear as ClearIcon,
+  Undo as UndoIcon,
+  Redo as RedoIcon,
+  List as ListIcon,
+  Save as SaveIcon,
+  Folder as LoadIcon,
+  TouchApp as ManualIcon,
+  Navigation as NavIcon,
+  GridOn as AutoIcon,
+  ExpandMore as ExpandMoreIcon
+} from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
 const getGraphAPI = () => (typeof window !== 'undefined' ? window.graphAPI : null);
@@ -34,7 +61,12 @@ const Toolbar = ({
   canUndo = false,
   canRedo = false,
   onToggleNodeList,
-  showNodeList = true
+  showNodeList = true,
+  mode,
+  autoLayoutType,
+  onModeChange,
+  onAutoLayoutChange,
+  onApplyLayout
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -44,6 +76,9 @@ const Toolbar = ({
   const [metadataCopied, setMetadataCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pasted, setPasted] = useState(false);
+  const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
+  const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
+  const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -330,256 +365,214 @@ const Toolbar = ({
     }
   };
 
+  const getModeIcon = (modeType) => {
+    switch (modeType) {
+      case 'manual': return <ManualIcon />;
+      case 'nav': return <NavIcon />;
+      case 'auto': return <AutoIcon />;
+      default: return <NavIcon />;
+    }
+  };
+
+  const getModeLabel = (modeType) => {
+    switch (modeType) {
+      case 'manual': return 'Manual';
+      case 'nav': return 'Nav';
+      case 'auto': return 'Auto';
+      default: return 'Nav';
+    }
+  };
+
   return (
-    <Paper
-      elevation={6}
-      sx={{
-        position: 'fixed',
-        left: pos.x,
-        top: pos.y,
-        minWidth: 560,
-        height: 56,
-        backgroundColor: primary.main,
-        color: primary.contrastText,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: 2,
-        gap: 0.5,
-        borderRadius: 2,
-        zIndex: 1200,
-        pointerEvents: 'auto',
-        userSelect: 'none',
-        transition: 'background-color 0.2s, color 0.2s',
-      }}
-      tabIndex={0}
-    >
-      {/* Draggable area */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          cursor: 'move',
-          display: 'flex',
-          alignItems: 'center',
-          fontWeight: 600,
-          fontSize: 16,
-          mr: 1
-        }}
-        onMouseDown={onMouseDown}
-      >
-        Tools
-      </Box>
-
-      {/* Add Node Button */}
-      <Tooltip title="Add new node" arrow>
-        <IconButton
-          onClick={handleAddNode}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          <AddCircleIcon />
-        </IconButton>
-      </Tooltip>
-
-      {/* Delete Selected Button */}
-      <Tooltip title={selectedNodeId || selectedEdgeId ? "Delete selected" : "No selection"} arrow>
-        <span>
-          <IconButton
-            onClick={handleDelete}
-            disabled={!selectedNodeId && !selectedEdgeId}
-            sx={{
-              color: primary.contrastText,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              },
-              '&.Mui-disabled': {
-                color: 'rgba(255, 255, 255, 0.3)'
-              }
-            }}
-            size="small"
+    <AppBar position="fixed" sx={{ zIndex: 1300 }}>
+      <MuiToolbar variant="dense">
+        {/* Left section - Main actions */}
+        <ButtonGroup variant="contained" size="small" sx={{ mr: 2 }}>
+          <Button
+            startIcon={<AddIcon />}
+            onClick={onAddNode}
           >
-            <DeleteIcon />
-          </IconButton>
-        </span>
-      </Tooltip>
+            Add Node
+          </Button>
+          <Button
+            startIcon={<DeleteIcon />}
+            onClick={onDeleteSelected}
+            disabled={!selectedNodeId && !selectedEdgeId}
+            color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
+          >
+            Delete
+          </Button>
+          <Button
+            startIcon={<ClearIcon />}
+            onClick={onClearGraph}
+            color="error"
+          >
+            Clear
+          </Button>
+        </ButtonGroup>
 
-      {/* Clear Graph Button */}
-      <Tooltip title="Clear entire graph" arrow>
-        <IconButton
-          onClick={handleClear}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          <ClearIcon />
-        </IconButton>
-      </Tooltip>
+        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
-      {/* Divider */}
-      <Box sx={{ width: 1, height: 32, backgroundColor: 'rgba(255,255,255,0.3)', mx: 0.5 }} />
-
-      {/* Undo Button */}
-      <Tooltip title={canUndo ? "Undo" : "Nothing to undo"} arrow>
-        <span>
-          <IconButton
-            onClick={handleUndo}
-            disabled={!canUndo}
-            sx={{
-              color: primary.contrastText,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              },
-              '&.Mui-disabled': {
-                color: 'rgba(255, 255, 255, 0.3)'
+        {/* Mode Selector */}
+        <Box sx={{ mr: 2 }}>
+          <Typography variant="caption" sx={{ display: 'block', mb: 0.5, opacity: 0.7 }}>
+            Positioning Mode
+          </Typography>
+          <ToggleButtonGroup
+            value={mode}
+            exclusive
+            onChange={(event, newMode) => {
+              if (newMode !== null) {
+                onModeChange(newMode);
               }
             }}
             size="small"
+            sx={{ height: 32 }}
+          >
+            <ToggleButton value="manual" aria-label="manual positioning">
+              <ManualIcon sx={{ mr: 0.5, fontSize: 16 }} />
+              Manual
+            </ToggleButton>
+            <ToggleButton value="nav" aria-label="navigation mode">
+              <NavIcon sx={{ mr: 0.5, fontSize: 16 }} />
+              Nav
+            </ToggleButton>
+            <ToggleButton value="auto" aria-label="auto layout">
+              <AutoIcon sx={{ mr: 0.5, fontSize: 16 }} />
+              Auto
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
+        {/* Auto Layout Type Selector (only visible in auto mode) */}
+        {mode === 'auto' && (
+          <Box sx={{ mr: 2 }}>
+            <Button
+              endIcon={<ExpandMoreIcon />}
+              onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
+              size="small"
+              variant="outlined"
+            >
+              {autoLayoutType}
+            </Button>
+            <Menu
+              anchorEl={autoLayoutMenuAnchor}
+              open={Boolean(autoLayoutMenuAnchor)}
+              onClose={() => setAutoLayoutMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  onAutoLayoutChange('hierarchical');
+                  setAutoLayoutMenuAnchor(null);
+                }}
+                selected={autoLayoutType === 'hierarchical'}
+              >
+                Hierarchical
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  onAutoLayoutChange('radial');
+                  setAutoLayoutMenuAnchor(null);
+                }}
+                selected={autoLayoutType === 'radial'}
+              >
+                Radial
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  onAutoLayoutChange('grid');
+                  setAutoLayoutMenuAnchor(null);
+                }}
+                selected={autoLayoutType === 'grid'}
+              >
+                Grid
+              </MenuItem>
+            </Menu>
+            <Button
+              onClick={onApplyLayout}
+              size="small"
+              variant="contained"
+              sx={{ ml: 1 }}
+            >
+              Apply Layout
+            </Button>
+          </Box>
+        )}
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+
+        {/* History controls */}
+        <ButtonGroup variant="outlined" size="small" sx={{ mr: 2 }}>
+          <IconButton
+            onClick={onUndo}
+            disabled={!canUndo}
+            title="Undo"
           >
             <UndoIcon />
           </IconButton>
-        </span>
-      </Tooltip>
-
-      {/* Redo Button */}
-      <Tooltip title={canRedo ? "Redo" : "Nothing to redo"} arrow>
-        <span>
           <IconButton
-            onClick={handleRedo}
+            onClick={onRedo}
             disabled={!canRedo}
-            sx={{
-              color: primary.contrastText,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              },
-              '&.Mui-disabled': {
-                color: 'rgba(255, 255, 255, 0.3)'
-              }
-            }}
-            size="small"
+            title="Redo"
           >
             <RedoIcon />
           </IconButton>
-        </span>
-      </Tooltip>
+        </ButtonGroup>
 
-      {/* Divider */}
-      <Box sx={{ width: 1, height: 32, backgroundColor: 'rgba(255,255,255,0.3)', mx: 0.5 }} />
+        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
-      {/* Paste Graph Button */}
-      <Tooltip title={pasted ? "Pasted!" : "Paste graph from clipboard"} arrow>
-        <IconButton
-          onClick={handlePasteGraph}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          {pasted ? <CheckIcon /> : <ContentPasteIcon />}
-        </IconButton>
-      </Tooltip>
+        {/* File operations */}
+        <ButtonGroup variant="outlined" size="small" sx={{ mr: 2 }}>
+          <Button
+            startIcon={<SaveIcon />}
+            onClick={handleSaveGraph}
+          >
+            Save
+          </Button>
+          <Button
+            component="label"
+            startIcon={<LoadIcon />}
+          >
+            Load
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleLoadGraph}
+              style={{ display: 'none' }}
+            />
+          </Button>
+        </ButtonGroup>
 
-      {/* Load File Button */}
-      <Tooltip title="Load graph from file" arrow>
-        <IconButton
-          onClick={handleLoadFile}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          <FolderOpenIcon />
-        </IconButton>
-      </Tooltip>
+        {/* Spacer */}
+        <Box sx={{ flexGrow: 1 }} />
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
+        {/* Right section - Info and toggles */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Current mode indicator */}
+          <Chip
+            icon={getModeIcon(mode)}
+            label={getModeLabel(mode)}
+            size="small"
+            color={mode === 'nav' ? 'primary' : mode === 'auto' ? 'secondary' : 'default'}
+            variant="outlined"
+          />
 
-      {/* Save to File Button */}
-      <Tooltip title={saved ? "Saved!" : "Save graph to file"} arrow>
-        <IconButton
-          onClick={handleSaveToFile}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          {saved ? <CheckIcon /> : <SaveIcon />}
-        </IconButton>
-      </Tooltip>
+          {/* Graph stats */}
+          <Typography variant="caption" sx={{ opacity: 0.8 }}>
+            {nodes.length} nodes, {edges.length} edges
+          </Typography>
 
-      {/* Copy Metadata Button */}
-      <Tooltip title={metadataCopied ? "Copied!" : "Copy metadata"} arrow>
-        <IconButton
-          onClick={handleCopyMetadata}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          {metadataCopied ? <CheckIcon /> : <ContentCopyIcon fontSize="small" />}
-        </IconButton>
-      </Tooltip>
-
-      {/* Copy Full JSON Button */}
-      <Tooltip title={copied ? "Copied!" : "Export full graph JSON"} arrow>
-        <IconButton
-          onClick={handleCopyJSON}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          {copied ? <CheckIcon /> : <ContentCopyIcon />}
-        </IconButton>
-      </Tooltip>
-
-      {/* Toggle Node List Button */}
-      <Tooltip title={showNodeList ? "Hide Node List" : "Show Node List"} arrow>
-        <IconButton 
-          onClick={onToggleNodeList}
-          color={showNodeList ? "primary" : "default"}
-          sx={{
-            color: primary.contrastText,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          size="small"
-        >
-          <ViewListIcon />
-        </IconButton>
-      </Tooltip>
-    </Paper>
+          {/* Node list toggle */}
+          <IconButton
+            onClick={onToggleNodeList}
+            color={showNodeList ? "primary" : "inherit"}
+            title="Toggle Node List"
+          >
+            <ListIcon />
+          </IconButton>
+        </Box>
+      </MuiToolbar>
+    </AppBar>
   );
 };
 

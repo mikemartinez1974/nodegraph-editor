@@ -1,0 +1,66 @@
+# Node Graph Modes
+
+Your node graph supports three main modes for positioning nodes: **Manual**, **Nav**, and **Auto**.  
+Each mode defines how node positions are set, updated, and displayed.
+
+---
+
+## 1. Manual Mode
+- **Behavior**
+  - Nodes are positioned explicitly by the user.
+  - No automatic repositioning occurs.
+- **Implementation Notes**
+  - Store `x, y` (or `x, y, z` for 3D) per node.
+  - Update coordinates when nodes are dragged or moved.
+  - Disable all auto-layout or physics simulations.
+- **Pros**
+  - Full control.
+- **Cons**
+  - Tedious for large graphs.
+
+---
+
+## 2. Nav Mode (Dynamic Auto-Layout)
+- **Behavior**
+  - Nodes move dynamically around a selected node.
+  - Positioning is determined by physics or force-directed layout.
+- **Implementation Notes**
+  - On each frame, calculate forces (spring/repulsion) between nodes.
+  - Selected node can be pinned at center.
+  - Use damping factors to keep movement smooth and stable.
+- **Pros**
+  - Intuitive exploration of relationships.
+- **Cons**
+  - Can feel chaotic with too many nodes.
+
+---
+
+## 3. Auto Mode (Algorithmic Layout)
+- **Behavior**
+  - Nodes are positioned by a chosen layout algorithm:
+    - Hierarchical
+    - Radial
+    - Grid
+  - Once laid out, nodes typically stay fixed until re-run.
+- **Implementation Notes**
+  - Provide layout options and spacing parameters.
+  - Compute node positions from scratch using node relationships.
+  - Allow re-running layout when graph changes.
+- **Pros**
+  - Neat and structured layouts.
+- **Cons**
+  - Less flexible than Nav Mode.
+
+---
+
+## Implementation Considerations
+- Maintain a **mode state variable**:  
+  let mode = "manual"; // "manual" | "nav" | "auto"
+Only run the positioning logic for the active mode.
+
+When switching from Nav/Auto → Manual, preserve the current node positions.
+
+Smoothly interpolate positions when changing modes to avoid abrupt jumps.
+
+
+Do you want me to also include a **pseudo-code class design** (like `GraphManager`) in this same markdow
