@@ -2,7 +2,18 @@ import React from 'react';
 import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 import eventBus from './eventBus';
 
-const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, selectedNodeIds = [], draggingNodeId, onNodeEvent, onNodeDragStart, nodeTypes = { default: DefaultNode } }) => {
+const NodeLayer = ({ 
+    nodes, 
+    pan = { x: 0, y: 0 }, 
+    zoom = 1, 
+    selectedNodeId, 
+    selectedNodeIds = [], 
+    draggingNodeId, 
+    onNodeEvent, 
+    onNodeDoubleClick,
+    onNodeDragStart, 
+    nodeTypes = { default: DefaultNode } 
+}) => {
     // Runtime check for duplicate node ids
     const idSet = new Set();
     const duplicates = [];
@@ -37,6 +48,10 @@ const NodeLayer = ({ nodes, pan = { x: 0, y: 0 }, zoom = 1, selectedNodeId, sele
                         draggingHandle={draggingNodeId === node.id}
                         onMouseDown={e => onNodeDragStart && onNodeDragStart(e, node)}
                         onClick={onNodeEvent ? (e) => onNodeEvent(node.id, e) : undefined}
+                        onDoubleClick={onNodeDoubleClick ? (e) => {
+                            e.stopPropagation();
+                            onNodeDoubleClick(node.id);
+                        } : undefined}
                         onMouseEnter={() => eventBus.emit('nodeHover', { id: node.id })}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                     />

@@ -38,7 +38,7 @@ function isPointNearBezier(x, y, x1, y1, cx1, cy1, cx2, cy2, x2, y2, threshold =
   return false;
 }
 
-function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 1, selectedEdgeId, theme, onEdgeClick, onEdgeHover }) {
+function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 1, selectedEdgeId, theme, onEdgeClick, onEdgeDoubleClick, onEdgeHover }) {
   const canvasRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
@@ -157,6 +157,49 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     if (found !== null && onEdgeClick) {
       e.stopPropagation();
       onEdgeClick(foundEdge, e);
+    }
+    // If no edge is found, do nothing (let event bubble up)
+  }
+
+  function handleDoubleClick(e) {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left - pan.x) / zoom;
+    const mouseY = (e.clientY - rect.top - pan.y) / zoom;
+    let found = null;
+    let foundEdge = null;
+    for (const edge of edgeList) {
+      const sourceNode = nodeList.find(n => n.id === edge.source);
+      const targetNode = nodeList.find(n => n.id === edge.target);
+      if (!sourceNode || !targetNode) {
+        continue;
+      }
+
+      let hit = false;
+      // Determine if edge should be curved
+      const isCurved = edge.style?.curved === true;
+
+      if (isCurved) {
+        // Draw a bezier curve between source and target
+        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40; // Offset for curve
+        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
+      } else {
+        // Draw a straight line
+        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
+      }
+      if (hit) {
+        found = edge.id;
+        foundEdge = edge;
+        break;
+      }
+    }
+    if (found !== null && onEdgeDoubleClick) {
+      e.stopPropagation();
+      onEdgeDoubleClick(foundEdge, e);
     }
     // If no edge is found, do nothing (let event bubble up)
   }
@@ -298,6 +341,7 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
     />
   );
 }

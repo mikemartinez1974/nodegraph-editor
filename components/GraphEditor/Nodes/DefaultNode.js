@@ -5,7 +5,7 @@ import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 
-const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, children, draggingHandle }) => {
+const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelected, onMouseDown, onClick, onDoubleClick, children, draggingHandle }) => {
     const theme = useTheme();
     const width = (node?.width || 60) * zoom;
     const height = (node?.height || 60) * zoom;
@@ -81,6 +81,10 @@ const DefaultNode = ({ node, pan = { x: 0, y: 0 }, zoom = 1, style = {}, isSelec
                 e.stopPropagation();
                 if (typeof onClick === 'function') onClick(e);
                 eventBus.emit('nodeClick', { id: node.id, event: e });
+            }}
+            onDoubleClick={e => {
+                e.stopPropagation();
+                if (typeof onDoubleClick === 'function') onDoubleClick(e);
             }}
             onMouseEnter={e => {
                 eventBus.emit('nodeMouseEnter', { id: node.id, event: e });

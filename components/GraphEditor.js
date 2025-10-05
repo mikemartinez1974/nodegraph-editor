@@ -27,6 +27,8 @@ export default function GraphEditor({ backgroundImage }) {
   const [selectedGroupIds, setSelectedGroupIds] = useState([]);
   const [groups, setGroups] = useState([]);
   const [showNodeList, setShowNodeList] = useState(true);
+  const [showNodeProperties, setShowNodeProperties] = useState(false);
+  const [showEdgeProperties, setShowEdgeProperties] = useState(false);
   const [history, setHistory] = useState([{ nodes: [], edges: [], groups: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
@@ -61,30 +63,6 @@ export default function GraphEditor({ backgroundImage }) {
       hoveredEdgeSource = hoveredEdge.source;
       hoveredEdgeTarget = hoveredEdge.target;
     }
-  }
-
-  // Utility: UUID
-  function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
-
-  function ensureNodeId(node) {
-    if (!node.id) {
-      node.id = uuidv4();
-    }
-    return node;
-  }
-
-  function ensureAllNodeIds(nodes) {
-    return nodes.map(node => {
-      if (!node.id) {
-        return { ...node, id: uuidv4() };
-      }
-      return node;
-    });
   }
 
   // Centralized saveToHistory using refs and functional updates to avoid stale closure issues
@@ -123,117 +101,6 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Handle drop events from handles (avoid double setEdges and race conditions)
   useEffect(() => {
-    const onHandleDrop_OLD_DISABLED = (data) => {
-      if (!data) return;
-      
-      // Simple debounce - prevent rapid duplicate calls
-      const now = Date.now();
-      if (now - lastHandleDropTime.current < 200) {
-        console.log('Ignoring rapid handle drop event');
-        return;
-      }
-      lastHandleDropTime.current = now;
-
-      const { graph, sourceNode, targetNode, edgeType, direction } = data;
-      const edgeTypeKey = edgeType || 'child';
-      const edgeTypePreset = EdgeTypes[edgeTypeKey] || EdgeTypes.child;
-
-      if (!targetNode) {
-        // Drop on blank: create new node and connect using GraphCRUD API
-        const nodeResult = graphAPI.current.createNode({
-          type: 'default',
-          label: `Node ${nodesRef.current.length + 1}`,
-          data: {},
-          position: { x: graph.x, y: graph.y },
-          width: 80,
-          height: 48
-        });
-        
-        if (!nodeResult.success) {
-          console.error('Failed to create node:', nodeResult.error);
-          // If it's a duplicate error, don't continue with edge creation
-          return;
-        }
-        
-        const newNode = nodeResult.data;
-        
-        // Create edge using GraphCRUD API  
-        // Check if we have valid source node ID
-        const sourceNodeId = data.sourceNode || data.nodeId || data.id;
-        console.log('Creating edge from', sourceNodeId, 'to', newNode.id);
-        
-        if (!sourceNodeId) {
-          console.error('No valid source node ID found in data:', data);
-          return;
-        }
-        
-        const edgeResult = graphAPI.current.createEdge({
-          source: sourceNodeId,
-          target: newNode.id,
-          type: 'child'
-        });
-        
-        if (!edgeResult.success) {
-          console.error('Failed to create edge:', edgeResult.error);
-        }
-
-        // create new node and update ref
-        setNodes(prev => {
-          const next = [...prev, newNode];
-          nodesRef.current = next;
-          return next;
-        });
-
-        // create edge respecting direction
-        const newEdge = graphAPI.current.createEdge({
-          id: uuidv4(),
-          type: edgeTypeKey,
-          source: direction === 'source' ? sourceNode : uuidv4(),
-          target: direction === 'source' ? uuidv4() : sourceNode,
-          label: '',
-          showLabel: false,
-          style: edgeTypePreset.style
-        });
-
-        setEdges(prev => {
-          const next = [...prev, newEdge];
-          edgesRef.current = next;
-          return next;
-        });
-
-        // save history with latest refs
-        saveToHistory(nodesRef.current, edgesRef.current);
-      } else {
-        // Drop on another node: create edge between source and target, avoid duplicates
-        if (targetNode !== sourceNode) {
-          const edgeExists = edgesRef.current.some(e =>
-            (e.source === sourceNode && e.target === targetNode && e.type === edgeTypeKey) ||
-            (e.source === targetNode && e.target === sourceNode && e.type === edgeTypeKey)
-          );
-
-          if (!edgeExists) {
-            const newEdge = graphAPI.current.createEdge({
-              id: uuidv4(),
-              type: edgeTypeKey,
-              source: direction === 'source' ? sourceNode : targetNode,
-              target: direction === 'source' ? targetNode : sourceNode,
-              label: '',
-              showLabel: false,
-              style: edgeTypePreset.style
-            });
-
-            setEdges(prev => {
-              const next = [...prev, newEdge];
-              edgesRef.current = next;
-              return next;
-            });
-
-            saveToHistory(nodesRef.current, edgesRef.current);
-          }
-        }
-      }
-    }
-
     const handleDrop = (data) => {
       if (!data || !data.sourceNode) return;
       // Create node
@@ -256,7 +123,7 @@ export default function GraphEditor({ backgroundImage }) {
     return () => {
       eventBus.off('handleDrop', handleDrop);
     };
-  }, []); // edgeTypes is static import, no need to include in deps
+  }, []);
 
   // Load background from localStorage (DOM access is safe in useEffect)
   useEffect(() => {
@@ -286,16 +153,6 @@ export default function GraphEditor({ backgroundImage }) {
       console.log('  window.graphAPI.getStats() // Get graph statistics');
     }
   }, []);
-
-
-  // API convenience wrappers
-  const apiCreateNode = (options) => graphAPI.current?.createNode(options);
-  const apiUpdateNode = (id, updates) => graphAPI.current?.updateNode(id, updates);
-  const apiDeleteNode = (id) => graphAPI.current?.deleteNode(id);
-  const apiCreateEdge = (options) => graphAPI.current?.createEdge(options);
-  const apiUpdateEdge = (id, updates) => graphAPI.current?.updateEdge(id, updates);
-  const apiDeleteEdge = (id) => graphAPI.current?.deleteEdge(id);
-  const apiGetStats = () => graphAPI.current?.getStats();
 
   // Node update from properties panel (corrected: single saveToHistory after computing new nodes)
   function handleUpdateNodeData(nodeId, newData, isLabelUpdate = false) {
@@ -386,18 +243,22 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Add node handler (keeps refs & history consistent)
   const handleAddNode = () => {
-    const newId = uuidv4();
-    const newNode = GraphCRUD.createNode({
+    const newId = `node-${Date.now()}`;
+    const newNode = {
       id: newId,
       type: 'default',
       label: `Node ${nodesRef.current.length + 1}`,
-      data: {},
+      data: { memo: '', link: '' },
       position: {
         x: 100 + (nodesRef.current.length * 20),
         y: 100 + (nodesRef.current.length * 20)
       },
+      width: 80,
+      height: 48,
+      resizable: false,
+      handlePosition: 'center',
       showLabel: true
-    });
+    };
 
     setNodes(prev => {
       const next = [...prev, newNode];
@@ -492,6 +353,7 @@ export default function GraphEditor({ backgroundImage }) {
       console.log('Single-select node:', nodeId);
     }
     setSelectedEdgeIds([]); // Clear edge selection
+    setShowEdgeProperties(false); // Close edge properties panel
   };
 
   const handleEdgeSelection = (edgeId, isMultiSelect = false) => {
@@ -507,12 +369,15 @@ export default function GraphEditor({ backgroundImage }) {
       setSelectedEdgeIds([edgeId]); // Single select
     }
     setSelectedNodeIds([]); // Clear node selection
+    setShowNodeProperties(false); // Close node properties panel
   };
 
   const clearSelection = () => {
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
+    setShowNodeProperties(false);
+    setShowEdgeProperties(false);
   };
 
   // Group operations
@@ -642,6 +507,14 @@ export default function GraphEditor({ backgroundImage }) {
     }
   };
 
+  const handleNodeDoubleClick = (nodeId) => {
+    setShowNodeProperties(true);
+  };
+
+  const handleEdgeDoubleClick = (edgeId) => {
+    setShowEdgeProperties(true);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyboardShortcuts(e) {
@@ -686,8 +559,6 @@ export default function GraphEditor({ backgroundImage }) {
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
   }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
-
-  // Remove safeSetNodes wrapper since GraphCRUD handles ID assignment
 
   return (
     <div id="graph-editor-background" style={{
@@ -762,6 +633,8 @@ export default function GraphEditor({ backgroundImage }) {
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
           handleNodeSelection(nodeId, isMultiSelect);
         }}
+        onNodeDoubleClick={handleNodeDoubleClick}
+        onEdgeDoubleClick={handleEdgeDoubleClick}
         onGroupClick={(groupId, event, action) => {
           if (action === 'toggle-collapse') {
             handleToggleGroupCollapse(groupId);
@@ -788,17 +661,16 @@ export default function GraphEditor({ backgroundImage }) {
         }}
       />
       
-
-      {selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
+      {showNodeProperties && selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
         <NodePropertiesPanel
           selectedNode={nodes.find(n => n.id === selectedNodeIds[0])}
           onUpdateNode={handleUpdateNodeData}
-          onClose={() => setSelectedNodeIds([])}
+          onClose={() => setShowNodeProperties(false)}
           theme={theme}
         />
       )}
             
-      {selectedEdgeIds.length === 1 && selectedNodeIds.length === 0 && (
+      {showEdgeProperties && selectedEdgeIds.length === 1 && selectedNodeIds.length === 0 && (
         <EdgePropertiesPanel
           selectedEdge={{
             ...edges.find(e => e.id === selectedEdgeIds[0]),
@@ -807,7 +679,7 @@ export default function GraphEditor({ backgroundImage }) {
           }}
           edgeTypes={EdgeTypes}
           onUpdateEdge={handleUpdateEdge}
-          onClose={() => setSelectedEdgeIds([])}
+          onClose={() => setShowEdgeProperties(false)}
           theme={theme}
         />
       )}

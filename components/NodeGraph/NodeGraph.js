@@ -11,7 +11,37 @@ import GroupLayer from './GroupLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
 
-export default function NodeGraph({ nodes = [], edges = [], groups = [], nodeTypes = {}, edgeTypes = {}, selectedNodeId, selectedNodeIds = [], selectedEdgeId, selectedEdgeIds = [], selectedGroupIds = [], setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, onGroupClick, onBackgroundClick, pan, zoom, setPan, setZoom, onNodeMove, onEdgeClick, onEdgeHover, onNodeHover, hoveredEdgeId, hoveredEdgeSource, hoveredEdgeTarget, onNodeDragEnd }) {
+export default function NodeGraph({ 
+  nodes = [], 
+  edges = [], 
+  groups = [], 
+  nodeTypes = {}, 
+  edgeTypes = {}, 
+  selectedNodeId, 
+  selectedNodeIds = [], 
+  selectedEdgeId, 
+  selectedEdgeIds = [], 
+  selectedGroupIds = [], 
+  setSelectedNodeIds, 
+  setSelectedEdgeIds, 
+  onNodeClick, 
+  onNodeDoubleClick,
+  onEdgeDoubleClick,
+  onGroupClick, 
+  onBackgroundClick, 
+  pan, 
+  zoom, 
+  setPan, 
+  setZoom, 
+  onNodeMove, 
+  onEdgeClick, 
+  onEdgeHover, 
+  onNodeHover, 
+  hoveredEdgeId, 
+  hoveredEdgeSource, 
+  hoveredEdgeTarget, 
+  onNodeDragEnd 
+}) {
   const theme = useTheme();
   
   // Debug logging for multi-selection
@@ -313,9 +343,13 @@ export default function NodeGraph({ nodes = [], edges = [], groups = [], nodeTyp
           hoveredNodeId={hoveredNodeId}
           handlePositions={handlePositions}
           onEdgeClick={(edge, event) => {
-            setSelectedEdgeIdState(edge?.id);
             eventBus.emit('edgeClick', { id: edge?.id });
             if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
+          }}
+          onEdgeDoubleClick={(edge, event) => {
+            if (typeof onEdgeDoubleClick === 'function') {
+              onEdgeDoubleClick(edge.id);
+            }
           }}
           onEdgeHover={onEdgeHover}
         />
@@ -364,6 +398,11 @@ export default function NodeGraph({ nodes = [], edges = [], groups = [], nodeTyp
             if (e) {
               e.stopPropagation();
               const node = nodes.find(n => n.id === id);
+            }
+          }}
+          onNodeDoubleClick={(id) => {
+            if (typeof onNodeDoubleClick === 'function') {
+              onNodeDoubleClick(id);
             }
           }}
           onNodeMouseEnter={handleNodeMouseEnter}
