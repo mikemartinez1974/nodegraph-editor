@@ -14,6 +14,10 @@ import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
 import { v4 as uuidv4 } from 'uuid';
+import useSelection from './GraphEditor/useSelection';
+import useGraphHistory from './GraphEditor/useGraphHistory';
+import useGraphShortcuts from './GraphEditor/useGraphShortcuts';
+import useGroupManager from './GraphEditor/useGroupManager';
 
 export default function GraphEditor({ backgroundImage }) {
   const [nodes, setNodes] = useState([]);
@@ -29,12 +33,10 @@ export default function GraphEditor({ backgroundImage }) {
   const [showNodeList, setShowNodeList] = useState(true);
   const [showNodeProperties, setShowNodeProperties] = useState(false);
   const [showEdgeProperties, setShowEdgeProperties] = useState(false);
-  const [history, setHistory] = useState([{ nodes: [], edges: [], groups: [] }]);
-  const [historyIndex, setHistoryIndex] = useState(0);
 
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
-  const historyIndexRef = useRef(historyIndex);
+  const historyIndexRef = useRef(0);
   const lastHandleDropTime = useRef(0);
 
   const theme = useTheme();
@@ -50,10 +52,6 @@ export default function GraphEditor({ backgroundImage }) {
     edgesRef.current = edges;
   }, [edges]);
 
-  useEffect(() => {
-    historyIndexRef.current = historyIndex;
-  }, [historyIndex]);
-
   // Compute hovered edge endpoints
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
@@ -65,39 +63,16 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }
 
-  // Centralized saveToHistory using refs and functional updates to avoid stale closure issues
-  const saveToHistory = (newNodes, newEdges) => {
-    setHistory(prevHistory => {
-      const truncated = prevHistory.slice(0, historyIndexRef.current + 1);
-      const next = [...truncated, { nodes: newNodes, edges: newEdges }];
-      // update historyIndex after history set
-      setHistoryIndex(next.length - 1);
-      // sync ref
-      historyIndexRef.current = next.length - 1;
-      return next;
-    });
-  };
-
-  // addNode/addEdge helpers (ensure refs are updated synchronously from within updater)
-  function addNode(nodeProps) {
-    const node = GraphCRUD.createNode(nodeProps);
-    setNodes(prev => {
-      const next = [...prev, node];
-      nodesRef.current = next;
-      return next;
-    });
-    return node;
-  }
-
-  function addEdge(edgeProps) {
-    const edge = graphAPI.current.createEdge(edgeProps);
-    setEdges(prev => {
-      const next = [...prev, edge];
-      edgesRef.current = next;
-      return next;
-    });
-    return edge;
-  }
+  // Use history hook
+  const {
+    history,
+    historyIndex,
+    saveToHistory,
+    handleUndo,
+    handleRedo,
+    canUndo,
+    canRedo
+  } = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
 
   // Handle drop events from handles (avoid double setEdges and race conditions)
   useEffect(() => {
@@ -154,25 +129,6 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, []);
 
-  // Node update from properties panel (corrected: single saveToHistory after computing new nodes)
-  function handleUpdateNodeData(nodeId, newData, isLabelUpdate = false) {
-    setNodes(prev => {
-      const next = prev.map(node => {
-        if (node.id === nodeId) {
-          if (isLabelUpdate) {
-            return { ...node, label: newData.label, data: { ...node.data, ...newData } };
-          }
-          return { ...node, data: { ...node.data, ...newData } };
-        }
-        return node;
-      });
-      nodesRef.current = next;
-      // persist history with current edges
-      saveToHistory(next, edgesRef.current);
-      return next;
-    });
-  }
-
   // Load a graph (replace nodes and edges), single implementation only
   function handleLoadGraph(loadedNodes, loadedEdges) {
     setNodes(loadedNodes);
@@ -185,66 +141,10 @@ export default function GraphEditor({ backgroundImage }) {
     console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
   }
 
-  // Update edge data and save history reliably
-  function handleUpdateEdge(edgeId, updates) {
-    setEdges(prev => {
-      const next = prev.map(edge => {
-        if (edge.id === edgeId) {
-          return {
-            ...edge,
-            ...updates,
-            style: updates.style ? { ...edge.style, ...updates.style } : edge.style
-          };
-        }
-        return edge;
-      });
-      edgesRef.current = next;
-      saveToHistory(nodesRef.current, next);
-      return next;
-    });
-  }
-
-  // History handlers
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      historyIndexRef.current = newIndex;
-      const snapshot = history[newIndex];
-      if (snapshot) {
-        setNodes(snapshot.nodes);
-        nodesRef.current = snapshot.nodes;
-        setEdges(snapshot.edges);
-        edgesRef.current = snapshot.edges;
-        setSelectedNodeIds([]);
-        setSelectedEdgeIds([]);
-        console.log('Undo performed');
-      }
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      historyIndexRef.current = newIndex;
-      const snapshot = history[newIndex];
-      if (snapshot) {
-        setNodes(snapshot.nodes);
-        nodesRef.current = snapshot.nodes;
-        setEdges(snapshot.edges);
-        edgesRef.current = snapshot.edges;
-        setSelectedNodeIds([]);
-        setSelectedEdgeIds([]);
-        console.log('Redo performed');
-      }
-    }
-  };
-
   // Add node handler (keeps refs & history consistent)
   const handleAddNode = () => {
     const newId = `node-${Date.now()}`;
-    const newNode = {
+    const newNode = GraphCRUD.createNode({
       id: newId,
       type: 'default',
       label: `Node ${nodesRef.current.length + 1}`,
@@ -258,7 +158,7 @@ export default function GraphEditor({ backgroundImage }) {
       resizable: false,
       handlePosition: 'center',
       showLabel: true
-    };
+    });
 
     setNodes(prev => {
       const next = [...prev, newNode];
@@ -338,138 +238,41 @@ export default function GraphEditor({ backgroundImage }) {
     list: ListNode
   };
 
-  // Selection handlers for multi-select
-  const handleNodeSelection = (nodeId, isMultiSelect = false) => {
-    if (isMultiSelect) {
-      setSelectedNodeIds(prev => {
-        const newSelection = prev.includes(nodeId) 
-          ? prev.filter(id => id !== nodeId) // Deselect if already selected
-          : [...prev, nodeId]; // Add to selection
-        console.log('Multi-select nodes:', newSelection);
-        return newSelection;
-      });
-    } else {
-      setSelectedNodeIds([nodeId]); // Single select
-      console.log('Single-select node:', nodeId);
-    }
-    setSelectedEdgeIds([]); // Clear edge selection
-    setShowEdgeProperties(false); // Close edge properties panel
-  };
+  // Use selection hook
+  const {
+    handleNodeSelection,
+    handleEdgeSelection,
+    handleGroupSelection,
+    clearSelection
+  } = useSelection({
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    setSelectedGroupIds,
+    setShowNodeProperties,
+    setShowEdgeProperties
+  });
 
-  const handleEdgeSelection = (edgeId, isMultiSelect = false) => {
-    if (isMultiSelect) {
-      setSelectedEdgeIds(prev => {
-        if (prev.includes(edgeId)) {
-          return prev.filter(id => id !== edgeId); // Deselect if already selected
-        } else {
-          return [...prev, edgeId]; // Add to selection
-        }
-      });
-    } else {
-      setSelectedEdgeIds([edgeId]); // Single select
-    }
-    setSelectedNodeIds([]); // Clear node selection
-    setShowNodeProperties(false); // Close node properties panel
-  };
-
-  const clearSelection = () => {
-    setSelectedNodeIds([]);
-    setSelectedEdgeIds([]);
-    setSelectedGroupIds([]);
-    setShowNodeProperties(false);
-    setShowEdgeProperties(false);
-  };
-
-  // Group operations
-  const handleCreateGroup = () => {
-    if (selectedNodeIds.length < 2) {
-      console.log('At least 2 nodes must be selected to create a group');
-      return;
-    }
-
-    const result = groupManager.current.createGroup(selectedNodeIds, {
-      nodes: nodes,
-      label: `Group ${groups.length + 1}`
-    });
-
-    if (result.success) {
-      const newGroups = [...groups, result.data];
-      setGroups(newGroups);
-      setSelectedNodeIds([]); // Clear node selection
-      setSelectedGroupIds([result.data.id]); // Select the new group
-      saveToHistory(nodes, edges);
-      console.log('Created group:', result.data.id);
-    } else {
-      console.error('Failed to create group:', result.error);
-    }
-  };
-
-  const handleUngroupSelected = () => {
-    if (selectedGroupIds.length === 0) {
-      console.log('No groups selected to ungroup');
-      return;
-    }
-
-    let updated = false;
-    selectedGroupIds.forEach(groupId => {
-      const result = groupManager.current.removeGroup(groupId);
-      if (result.success) {
-        updated = true;
-        console.log('Removed group:', groupId);
-      }
-    });
-
-    if (updated) {
-      setGroups(groupManager.current.getAllGroups());
-      setSelectedGroupIds([]);
-      saveToHistory(nodes, edges);
-    }
-  };
-
-  const handleGroupSelection = (groupId, isMultiSelect = false) => {
-    if (isMultiSelect) {
-      setSelectedGroupIds(prev => {
-        if (prev.includes(groupId)) {
-          return prev.filter(id => id !== groupId);
-        } else {
-          return [...prev, groupId];
-        }
-      });
-    } else {
-      setSelectedGroupIds([groupId]);
-    }
-    // Clear other selections when selecting groups
-    setSelectedNodeIds([]);
-    setSelectedEdgeIds([]);
-  };
-
-  // Toggle group collapse/expand
-  const handleToggleGroupCollapse = (groupId) => {
-    const result = groupManager.current.toggleGroupCollapse(groupId);
-    if (result.success) {
-      const group = result.data;
-      
-      // Update nodes visibility
-      setNodes(prev => {
-        const updated = prev.map(node => {
-          if (group.nodeIds.includes(node.id)) {
-            return { ...node, visible: !group.collapsed };
-          }
-          return node;
-        });
-        nodesRef.current = updated;
-        return updated;
-      });
-      
-      // Update group state
-      setGroups(groupManager.current.getAllGroups());
-      
-      console.log(`Group ${groupId} ${group.collapsed ? 'collapsed' : 'expanded'}`);
-    }
-  };
+  const groupManagerHook = useGroupManager({
+    groups,
+    setGroups,
+    nodes,
+    setSelectedNodeIds,
+    setSelectedGroupIds,
+    selectedNodeIds,
+    selectedGroupIds,
+    groupManager,
+    saveToHistory,
+    edges
+  });
+  const {
+    handleCreateGroup,
+    handleUngroupSelected,
+    handleToggleGroupCollapse,
+    updateGroupBounds
+  } = groupManagerHook;
 
   // Update group bounds when nodes move
-  const updateGroupBounds = () => {
+  const updateGroupBoundsWrapper = () => {
     let updated = false;
     groups.forEach(group => {
       const result = groupManager.current.updateGroupBounds(group.id, nodes);
@@ -515,50 +318,60 @@ export default function GraphEditor({ backgroundImage }) {
     setShowEdgeProperties(true);
   };
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    function handleKeyboardShortcuts(e) {
-      // Resize all nodes to 80x48 on Ctrl+Q
-      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
-        setNodes(prev => {
-          const updated = prev.map(n => ({ ...n, width: 80, height: 48 }));
-          nodesRef.current = updated;
-          saveToHistory(updated, edgesRef.current);
-          return updated;
-        });
-        console.log('All nodes resized to 80x48');
-      }
-      // Select all nodes on Ctrl+A
-      else if (e.ctrlKey && (e.key === 'a' || e.key === 'A')) {
-        e.preventDefault();
-        setSelectedNodeIds(nodesRef.current.map(n => n.id));
-        setSelectedEdgeIds([]);
-        console.log(`Selected ${nodesRef.current.length} nodes`);
-      }
-      // Delete selected on Delete key
-      else if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedNodeIds.length > 0 || selectedEdgeIds.length > 0 || selectedGroupIds.length > 0) {
-          handleDeleteSelected();
-        }
-      }
-      // Escape to clear selection
-      else if (e.key === 'Escape') {
-        clearSelection();
-      }
-      // Create group on Ctrl+G
-      else if (e.ctrlKey && (e.key === 'g' || e.key === 'G')) {
-        e.preventDefault();
-        handleCreateGroup();
-      }
-      // Ungroup on Ctrl+Shift+G
-      else if (e.ctrlKey && e.shiftKey && (e.key === 'g' || e.key === 'G')) {
-        e.preventDefault();
-        handleUngroupSelected();
-      }
+  // Group operations
+  const handleCreateGroupWrapper = () => {
+    if (selectedNodeIds.length < 2) {
+      console.log('At least 2 nodes must be selected to create a group');
+      return;
     }
-    window.addEventListener('keydown', handleKeyboardShortcuts);
-    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
+    const result = groupManager.current.createGroup(selectedNodeIds, {
+      nodes: nodes,
+      label: `Group ${groups.length + 1}`
+    });
+    if (result.success) {
+      const newGroups = [...groups, result.data];
+      setGroups(newGroups);
+      setSelectedNodeIds([]);
+      setSelectedGroupIds([result.data.id]);
+      saveToHistory(nodes, edges);
+      console.log('Created group:', result.data.id);
+    } else {
+      console.error('Failed to create group:', result.error);
+    }
+  };
+
+  const handleUngroupSelectedWrapper = () => {
+    if (selectedGroupIds.length === 0) {
+      console.log('No groups selected to ungroup');
+      return;
+    }
+    let updated = false;
+    selectedGroupIds.forEach(groupId => {
+      const result = groupManager.current.removeGroup(groupId);
+      if (result.success) {
+        updated = true;
+        console.log('Removed group:', groupId);
+      }
+    });
+    if (updated) {
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds([]);
+      saveToHistory(nodes, edges);
+    }
+  };
+
+  useGraphShortcuts({
+    setNodes,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    handleDeleteSelected,
+    clearSelection,
+    handleCreateGroup,
+    handleUngroupSelected,
+    saveToHistory,
+    edgesRef,
+    nodesRef
+  });
 
   return (
     <div id="graph-editor-background" style={{
@@ -582,8 +395,8 @@ export default function GraphEditor({ backgroundImage }) {
         onRedo={handleRedo}
         selectedNodeId={selectedNodeIds[0] || null}
         selectedEdgeId={selectedEdgeIds[0] || null}
-        canUndo={historyIndex > 0}
-        canRedo={historyIndex < history.length - 1}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
       
       <NodeListPanel
