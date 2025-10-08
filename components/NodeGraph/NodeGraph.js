@@ -233,28 +233,25 @@ export default function NodeGraph({
     if (setSelectedEdgeIds) setSelectedEdgeIds([]);
   }
 
-  // Edge Handle Events
-  function onHandleDragStart(e, handle) {
-    setDraggingHandle(handle);
-    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', onHandleDragMove);
-    window.addEventListener('mouseup', onHandleDragEnd);
-  }
-
-  function onHandleDragMove(e) {
-    setDraggingHandlePos({ x: e.clientX, y: e.clientY });
-  }
-
-  function onHandleDragEnd(e) {
-    if (draggingHandle) {
-      setHoveredNodeId(null);
-      handleNodeMouseLeave({ id: draggingHandle.nodeId });
-    }
-    setDraggingHandle(null);
-    setDraggingHandlePos(null);
-    window.removeEventListener('mousemove', onHandleDragMove);
-    window.removeEventListener('mouseup', onHandleDragEnd);
-  }
+  // Edge Handle Events - HandleLayer manages its own events, we just track state
+  useEffect(() => {
+    const handleHandleDragStart = ({ handle }) => {
+      setDraggingHandle(handle);
+    };
+    
+    const handleHandleDragEnd = ({ handle }) => {
+      setDraggingHandle(null);
+      setDraggingHandlePos(null);
+    };
+    
+    eventBus.on('handleDragStart', handleHandleDragStart);
+    eventBus.on('handleDragEnd', handleHandleDragEnd);
+    
+    return () => {
+      eventBus.off('handleDragStart', handleHandleDragStart);
+      eventBus.off('handleDragEnd', handleHandleDragEnd);
+    };
+  }, []);
 
   // Window resize handler
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -333,21 +330,19 @@ export default function NodeGraph({
           pan={pan}
           zoom={zoom}
           edgeTypes={edgeTypes}
-          onDragStart={onHandleDragStart}
-          onDragMove={onHandleDragMove}
-          onDragEnd={onHandleDragEnd}
         />
 
-        <NodeLayer
-          nodes={nodeList.filter(node => node.visible !== false)}
-          pan={pan}
-          zoom={zoom}
-          selectedNodeId={selectedNodeId}
-          selectedNodeIds={selectedNodeIds}
-          draggingNodeId={draggingNodeId}
-          theme={theme}
-          nodeTypes={nodeTypes}
-          onNodeEvent={(id, e) => {
+        <div style={{ pointerEvents: draggingHandle ? 'none' : 'auto' }}>
+          <NodeLayer
+            nodes={nodeList.filter(node => node.visible !== false)}
+            pan={pan}
+            zoom={zoom}
+            selectedNodeId={selectedNodeId}
+            selectedNodeIds={selectedNodeIds}
+            draggingNodeId={draggingNodeId}
+            theme={theme}
+            nodeTypes={nodeTypes}
+            onNodeEvent={(id, e) => {
             if (onNodeClick) onNodeClick(id, e);
             const node = nodes.find(n => n.id === id);
             if (node && node.handleProgress === 1) {
@@ -376,7 +371,8 @@ export default function NodeGraph({
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           onNodeDragStart={onNodeDragStart}
-        />
+          />
+        </div>
 
         {/* Preview edge during handle drag */}
         {draggingHandle && draggingHandlePos && (

@@ -271,9 +271,86 @@ const HandleLayer = ({
       endY: handle.position.y * zoom + pan.y
     };
     
+    // Add global document listeners immediately
+    const handleGlobalMouseMove = (e) => {
+      if (!draggingHandleRef.current) return;
+      
+      const rect = canvasRef.current.getBoundingClientRect();
+      previewLineRef.current.endX = e.clientX - rect.left;
+      previewLineRef.current.endY = e.clientY - rect.top;
+      scheduleRender();
+    };
+    
+    const handleGlobalMouseUp = (e) => {
+      if (!draggingHandleRef.current) return;
+      
+      const handle = draggingHandleRef.current;
+      
+      // Get canvas bounds for proper coordinate conversion
+      const rect = canvasRef.current.getBoundingClientRect();
+      const graphX = (e.clientX - rect.left - pan.x) / zoom;
+      const graphY = (e.clientY - rect.top - pan.y) / zoom;
+      
+      console.log('Drop at graph coords:', graphX, graphY);
+      
+      // Find target node with proper coordinate checking
+      const targetNode = nodes.find(node => {
+        if (node.id === handle.nodeId) return false;
+        
+        const nodeX = node.position?.x || node.x;
+        const nodeY = node.position?.y || node.y;
+        const nodeWidth = node.width || 60;
+        const nodeHeight = node.height || 60;
+        
+        const nodeLeft = nodeX - nodeWidth / 2;
+        const nodeRight = nodeX + nodeWidth / 2;
+        const nodeTop = nodeY - nodeHeight / 2;
+        const nodeBottom = nodeY + nodeHeight / 2;
+        
+        const isInside = (
+          graphX >= nodeLeft && 
+          graphX <= nodeRight && 
+          graphY >= nodeTop && 
+          graphY <= nodeBottom
+        );
+        
+        if (isInside) {
+          console.log('Target found:', node.id, 'at', nodeX, nodeY);
+        }
+        
+        return isInside;
+      });
+      
+      console.log('Final target:', targetNode?.id || 'none');
+      
+      // Emit drop event
+      const dropEvent = {
+        graph: { x: graphX, y: graphY },
+        screen: { x: e.clientX, y: e.clientY },
+        sourceNode: handle.nodeId,
+        targetNode: targetNode?.id || null,
+        edgeType: handle.edgeType,
+        direction: handle.direction
+      };
+      
+      console.log('Emitting handleDrop event:', dropEvent);
+      eventBus.emit('handleDrop', dropEvent);
+      
+      // Clean up
+      document.removeEventListener('mousemove', handleGlobalMouseMove, true);
+      document.removeEventListener('mouseup', handleGlobalMouseUp, true);
+      draggingHandleRef.current = null;
+      previewLineRef.current.visible = false;
+      scheduleRender();
+      eventBus.emit('handleDragEnd', { handle });
+    };
+    
+    document.addEventListener('mousemove', handleGlobalMouseMove, true);
+    document.addEventListener('mouseup', handleGlobalMouseUp, true);
+    
     scheduleRender();
     eventBus.emit('handleDragStart', { handle });
-  }, [findHandleAt, scheduleRender, pan, zoom]);
+  }, [findHandleAt, scheduleRender, pan, zoom, nodes]);
 
   const handleMouseMove = useCallback((e) => {
     if (draggingHandleRef.current) {
@@ -408,18 +485,7 @@ const HandleLayer = ({
     scheduleRender();
   }, [handlePositions, pan, zoom, scheduleRender]);
 
-  // Global mouse event handlers for dragging
-  useEffect(() => {
-    if (draggingHandleRef.current) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [handleMouseMove, handleMouseUp]);
+  // No longer need the old useEffect for global events - handled in mouseDown now
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>

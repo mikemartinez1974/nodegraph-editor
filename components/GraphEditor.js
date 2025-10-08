@@ -75,26 +75,42 @@ export default function GraphEditor({ backgroundImage }) {
     canRedo
   } = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
 
-  // Handle drop events from handles (avoid double setEdges and race conditions)
+  // Handle drop events from handles
   useEffect(() => {
     const handleDrop = (data) => {
+      console.log('GraphEditor received handleDrop:', data);
+      
       if (!data || !data.sourceNode) return;
-      // Create node
-      const nodeResult = graphAPI.current.createNode({
-        label: data.label || `Node-${Date.now()}`,
-        position: data.graph,
-        data: data.nodeData || {}
-      });
-      if (!nodeResult.success) return;
-      // Delay edge creation to ensure node is in state
-      setTimeout(() => {
+      
+      if (data.targetNode) {
+        // Drop on existing node - create edge directly
+        console.log('Creating edge to existing node:', data.targetNode);
         graphAPI.current.createEdge({
           source: data.sourceNode,
-          target: nodeResult.data.id,
-          type: data.edgeType // Only set type
+          target: data.targetNode,
+          type: data.edgeType
         });
-      }, 50);
+      } else {
+        // Drop on empty space - create new node and edge
+        console.log('Creating new node and edge');
+        const nodeResult = graphAPI.current.createNode({
+          label: data.label || `Node-${Date.now()}`,
+          position: data.graph,
+          data: data.nodeData || {}
+        });
+        
+        if (nodeResult.success) {
+          setTimeout(() => {
+            graphAPI.current.createEdge({
+              source: data.sourceNode,
+              target: nodeResult.data.id,
+              type: data.edgeType
+            });
+          }, 50);
+        }
+      }
     };
+    
     eventBus.on('handleDrop', handleDrop);
     return () => {
       eventBus.off('handleDrop', handleDrop);
