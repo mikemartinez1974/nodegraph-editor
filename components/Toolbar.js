@@ -1,27 +1,13 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import SaveIcon from '@mui/icons-material/Save';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import CheckIcon from '@mui/icons-material/Check';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ClearIcon from '@mui/icons-material/Clear';
-import UndoIcon from '@mui/icons-material/Undo';
-import RedoIcon from '@mui/icons-material/Redo';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import {
-  AppBar,
-  Toolbar as MuiToolbar,
+  Paper,
+  IconButton,
   Button,
   ButtonGroup,
   Typography,
+  Box,
   Divider,
   ToggleButton,
   ToggleButtonGroup,
@@ -384,8 +370,29 @@ const Toolbar = ({
   };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: 1300 }}>
-      <MuiToolbar variant="dense">
+    <Paper
+      elevation={3}
+      sx={{
+        position: 'fixed',
+        top: pos.y,
+        left: pos.x,
+        zIndex: 1300,
+        backgroundColor: theme.palette.background.paper,
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none',
+        maxWidth: '90vw'
+      }}
+      onMouseDown={onMouseDown}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 1, 
+        p: 1,
+        flexWrap: 'wrap'
+      }}>
         {/* Left section - Main actions */}
         <ButtonGroup variant="contained" size="small" sx={{ mr: 2 }}>
           <Button
@@ -525,29 +532,103 @@ const Toolbar = ({
         <ButtonGroup variant="outlined" size="small" sx={{ mr: 2 }}>
           <Button
             startIcon={<SaveIcon />}
-            onClick={handleSaveGraph}
+            onClick={(event) => setSaveMenuAnchor(event.currentTarget)}
           >
             Save
           </Button>
           <Button
-            component="label"
             startIcon={<LoadIcon />}
+            onClick={(event) => setLoadMenuAnchor(event.currentTarget)}
           >
             Load
             <input
               type="file"
               accept=".json"
-              onChange={handleLoadGraph}
+              onChange={handleFileChange}
               style={{ display: 'none' }}
             />
           </Button>
         </ButtonGroup>
+
+        {/* Save Menu */}
+        <Menu
+          anchorEl={saveMenuAnchor}
+          open={Boolean(saveMenuAnchor)}
+          onClose={() => setSaveMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => { handleSaveToFile(); setSaveMenuAnchor(null); }}>
+            Save to File
+          </MenuItem>
+          <MenuItem onClick={() => { handleCopyJSON(); setSaveMenuAnchor(null); }}>
+            Copy JSON
+          </MenuItem>
+          <MenuItem onClick={() => { handleCopyMetadata(); setSaveMenuAnchor(null); }}>
+            Copy Metadata
+          </MenuItem>
+        </Menu>
+
+        {/* Load Menu */}
+        <Menu
+          anchorEl={loadMenuAnchor}
+          open={Boolean(loadMenuAnchor)}
+          onClose={() => setLoadMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => { handleLoadFile(); setLoadMenuAnchor(null); }}>
+            Load from File
+          </MenuItem>
+          <MenuItem onClick={() => { handlePasteGraph(); setLoadMenuAnchor(null); }}>
+            Paste Graph
+          </MenuItem>
+        </Menu>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
 
         {/* Spacer */}
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Right section - Info and toggles */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Status indicators */}
+          {copied && (
+            <Chip
+              label="JSON Copied!"
+              size="small"
+              color="success"
+              sx={{ animation: 'fadeInOut 2s' }}
+            />
+          )}
+          {metadataCopied && (
+            <Chip
+              label="Metadata Copied!"
+              size="small"
+              color="success"
+              sx={{ animation: 'fadeInOut 2s' }}
+            />
+          )}
+          {saved && (
+            <Chip
+              label="Saved!"
+              size="small"
+              color="success"
+              sx={{ animation: 'fadeInOut 2s' }}
+            />
+          )}
+          {pasted && (
+            <Chip
+              label="Pasted!"
+              size="small"
+              color="success"
+              sx={{ animation: 'fadeInOut 2s' }}
+            />
+          )}
+
           {/* Current mode indicator */}
           <Chip
             icon={getModeIcon(mode)}
@@ -571,8 +652,8 @@ const Toolbar = ({
             <ListIcon />
           </IconButton>
         </Box>
-      </MuiToolbar>
-    </AppBar>
+      </Box>
+    </Paper>
   );
 };
 

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import NodeGraph from './NodeGraph';
-import Toolbar from './ToolbarNew.js';
+import Toolbar from './Toolbar';
 import eventBus from './NodeGraph/eventBus';
 import GraphCRUD from './GraphEditor/GraphCrud.js';
 import EdgeTypes from './GraphEditor/edgeTypes';
@@ -144,9 +144,8 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Add node handler (keeps refs & history consistent)
   const handleAddNode = () => {
-    const newId = `node-${Date.now()}`;
-    const newNode = GraphCRUD.createNode({
-      id: newId,
+    // Use GraphCRUD API - the single source of truth for node creation
+    const result = graphAPI.current.createNode({
       type: 'default',
       label: `Node ${nodesRef.current.length + 1}`,
       data: { memo: '', link: '' },
@@ -161,14 +160,11 @@ export default function GraphEditor({ backgroundImage }) {
       showLabel: true
     });
 
-    setNodes(prev => {
-      const next = [...prev, newNode];
-      nodesRef.current = next;
-      saveToHistory(next, edgesRef.current);
-      return next;
-    });
-
-    console.log('Added node:', newNode.id);
+    if (result.success) {
+      console.log('Added node via GraphCRUD:', result.data.id);
+    } else {
+      console.error('Failed to create node:', result.error);
+    }
   };
 
   // Delete selected nodes or edges
@@ -472,6 +468,7 @@ export default function GraphEditor({ backgroundImage }) {
         hoveredNodeId={hoveredNodeId}
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
+        mode={mode}
         onNodeMove={(id, position) => {
           setNodes(prev => {
             const next = prev.map(n => n.id === id ? { ...n, position } : n);
