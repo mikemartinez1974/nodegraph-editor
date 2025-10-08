@@ -27,7 +27,10 @@ import {
   TouchApp as ManualIcon,
   Navigation as NavIcon,
   GridOn as AutoIcon,
-  ExpandMore as ExpandMoreIcon
+  ExpandMore as ExpandMoreIcon,
+  MoreHoriz as MoreIcon,
+  ChevronLeft as CollapseIcon,
+  ChevronRight as ExpandIcon
 } from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
@@ -65,6 +68,8 @@ const Toolbar = ({
   const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
   const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -124,32 +129,6 @@ const Toolbar = ({
     }
   };
 
-  const handleAddNode = () => {
-    const graphAPI = getGraphAPI();
-    if (graphAPI) {
-      graphAPI.createNode({
-        type: 'default',
-        label: `Node ${nodes.length + 1}`,
-        data: {},
-        position: { x: 100 + (nodes.length * 20), y: 100 + (nodes.length * 20) },
-        showLabel: true,
-        width: 80,
-        height: 48
-      });
-      console.log('Add node clicked (GraphCRUD)');
-    } else if (onAddNode) {
-      onAddNode();
-      console.log('Add node clicked (fallback)');
-    }
-  };
-
-  const handleDelete = () => {
-    if (onDeleteSelected) {
-      onDeleteSelected();
-      console.log('Delete selected clicked');
-    }
-  };
-
   const handleClear = () => {
     if (onClearGraph) {
       const confirmed = window.confirm('Are you sure you want to clear the entire graph? This cannot be undone.');
@@ -157,20 +136,6 @@ const Toolbar = ({
         onClearGraph();
         console.log('Graph cleared');
       }
-    }
-  };
-
-  const handleUndo = () => {
-    if (onUndo && canUndo) {
-      onUndo();
-      console.log('Undo clicked');
-    }
-  };
-
-  const handleRedo = () => {
-    if (onRedo && canRedo) {
-      onRedo();
-      console.log('Redo clicked');
     }
   };
 
@@ -351,23 +316,7 @@ const Toolbar = ({
     }
   };
 
-  const getModeIcon = (modeType) => {
-    switch (modeType) {
-      case 'manual': return <ManualIcon />;
-      case 'nav': return <NavIcon />;
-      case 'auto': return <AutoIcon />;
-      default: return <NavIcon />;
-    }
-  };
 
-  const getModeLabel = (modeType) => {
-    switch (modeType) {
-      case 'manual': return 'Manual';
-      case 'nav': return 'Nav';
-      case 'auto': return 'Auto';
-      default: return 'Nav';
-    }
-  };
 
   return (
     <Paper
@@ -391,164 +340,163 @@ const Toolbar = ({
         alignItems: 'center', 
         gap: 1, 
         p: 1,
-        flexWrap: 'wrap'
+        flexWrap: 'nowrap'
       }}>
-        {/* Left section - Main actions */}
-        <ButtonGroup variant="contained" size="small" sx={{ mr: 2 }}>
-          <Button
-            startIcon={<AddIcon />}
-            onClick={onAddNode}
-          >
-            Add Node
-          </Button>
-          <Button
-            startIcon={<DeleteIcon />}
-            onClick={onDeleteSelected}
-            disabled={!selectedNodeId && !selectedEdgeId}
-            color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
-          >
-            Delete
-          </Button>
-          <Button
-            startIcon={<ClearIcon />}
-            onClick={onClearGraph}
-            color="error"
-          >
-            Clear
-          </Button>
-        </ButtonGroup>
+        {/* Collapse/Expand toggle */}
+        <IconButton
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          size="small"
+          title={isCollapsed ? "Expand Toolbar" : "Collapse Toolbar"}
+        >
+          {isCollapsed ? <ExpandIcon /> : <CollapseIcon />}
+        </IconButton>
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+        {!isCollapsed ? (
+          <>
+            {/* Essential actions */}
+            <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
+              <IconButton
+                onClick={onAddNode}
+                title="Add Node (Ctrl+N)"
+                size="small"
+              >
+                <AddIcon />
+              </IconButton>
+              <IconButton
+                onClick={onDeleteSelected}
+                disabled={!selectedNodeId && !selectedEdgeId}
+                color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
+                title="Delete Selected (Delete)"
+                size="small"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </ButtonGroup>
 
-        {/* Mode Selector */}
-        <Box sx={{ mr: 2 }}>
-          <Typography variant="caption" sx={{ display: 'block', mb: 0.5, opacity: 0.7 }}>
-            Positioning Mode
-          </Typography>
-          <ToggleButtonGroup
-            value={mode}
-            exclusive
-            onChange={(event, newMode) => {
-              if (newMode !== null) {
-                onModeChange(newMode);
-              }
-            }}
-            size="small"
-            sx={{ height: 32 }}
-          >
-            <ToggleButton value="manual" aria-label="manual positioning">
-              <ManualIcon sx={{ mr: 0.5, fontSize: 16 }} />
-              Manual
-            </ToggleButton>
-            <ToggleButton value="nav" aria-label="navigation mode">
-              <NavIcon sx={{ mr: 0.5, fontSize: 16 }} />
-              Nav
-            </ToggleButton>
-            <ToggleButton value="auto" aria-label="auto layout">
-              <AutoIcon sx={{ mr: 0.5, fontSize: 16 }} />
-              Auto
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
-        {/* Auto Layout Type Selector (only visible in auto mode) */}
-        {mode === 'auto' && (
-          <Box sx={{ mr: 2 }}>
-            <Button
-              endIcon={<ExpandMoreIcon />}
-              onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
+            {/* Mode selector */}
+            <ToggleButtonGroup
+              value={mode}
+              exclusive
+              onChange={(event, newMode) => {
+                if (newMode !== null) {
+                  onModeChange(newMode);
+                }
+              }}
               size="small"
-              variant="outlined"
+              sx={{ mr: 1 }}
             >
-              {autoLayoutType}
-            </Button>
-            <Menu
-              anchorEl={autoLayoutMenuAnchor}
-              open={Boolean(autoLayoutMenuAnchor)}
-              onClose={() => setAutoLayoutMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  onAutoLayoutChange('hierarchical');
-                  setAutoLayoutMenuAnchor(null);
-                }}
-                selected={autoLayoutType === 'hierarchical'}
+              <ToggleButton value="manual" title="Manual Mode">
+                <ManualIcon fontSize="small" />
+              </ToggleButton>
+              <ToggleButton value="nav" title="Navigation Mode">
+                <NavIcon fontSize="small" />
+              </ToggleButton>
+              <ToggleButton value="auto" title="Auto Layout Mode">
+                <AutoIcon fontSize="small" />
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            {/* Auto layout options - only in auto mode */}
+            {mode === 'auto' && (
+              <ButtonGroup size="small" sx={{ mr: 1 }}>
+                <Button
+                  onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
+                  endIcon={<ExpandMoreIcon fontSize="small" />}
+                  size="small"
+                  variant="outlined"
+                >
+                  {autoLayoutType}
+                </Button>
+                <Button
+                  onClick={onApplyLayout}
+                  size="small"
+                  variant="contained"
+                  startIcon={<AutoIcon fontSize="small" />}
+                >
+                  Apply
+                </Button>
+              </ButtonGroup>
+            )}
+
+            {/* History controls */}
+            <ButtonGroup size="small" sx={{ mr: 1 }}>
+              <IconButton
+                onClick={onUndo}
+                disabled={!canUndo}
+                title="Undo (Ctrl+Z)"
+                size="small"
               >
-                Hierarchical
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  onAutoLayoutChange('radial');
-                  setAutoLayoutMenuAnchor(null);
-                }}
-                selected={autoLayoutType === 'radial'}
+                <UndoIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={onRedo}
+                disabled={!canRedo}
+                title="Redo (Ctrl+Y)"
+                size="small"
               >
-                Radial
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  onAutoLayoutChange('grid');
-                  setAutoLayoutMenuAnchor(null);
-                }}
-                selected={autoLayoutType === 'grid'}
-              >
-                Grid
-              </MenuItem>
-            </Menu>
-            <Button
-              onClick={onApplyLayout}
+                <RedoIcon fontSize="small" />
+              </IconButton>
+            </ButtonGroup>
+
+            {/* More actions menu */}
+            <IconButton
+              onClick={(event) => setMoreMenuAnchor(event.currentTarget)}
+              title="More Actions"
               size="small"
-              variant="contained"
-              sx={{ ml: 1 }}
             >
-              Apply Layout
-            </Button>
+              <MoreIcon />
+            </IconButton>
+          </>
+        ) : (
+          /* Collapsed state */
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              {nodes.length}N • {edges.length}E
+            </Typography>
+            <IconButton
+              onClick={onAddNode}
+              title="Add Node"
+              size="small"
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
         )}
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-
-        {/* History controls */}
-        <ButtonGroup variant="outlined" size="small" sx={{ mr: 2 }}>
-          <IconButton
-            onClick={onUndo}
-            disabled={!canUndo}
-            title="Undo"
+        {/* Auto Layout Menu */}
+        <Menu
+          anchorEl={autoLayoutMenuAnchor}
+          open={Boolean(autoLayoutMenuAnchor)}
+          onClose={() => setAutoLayoutMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              onAutoLayoutChange('hierarchical');
+              setAutoLayoutMenuAnchor(null);
+            }}
+            selected={autoLayoutType === 'hierarchical'}
           >
-            <UndoIcon />
-          </IconButton>
-          <IconButton
-            onClick={onRedo}
-            disabled={!canRedo}
-            title="Redo"
+            Hierarchical
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onAutoLayoutChange('radial');
+              setAutoLayoutMenuAnchor(null);
+            }}
+            selected={autoLayoutType === 'radial'}
           >
-            <RedoIcon />
-          </IconButton>
-        </ButtonGroup>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-
-        {/* File operations */}
-        <ButtonGroup variant="outlined" size="small" sx={{ mr: 2 }}>
-          <Button
-            startIcon={<SaveIcon />}
-            onClick={(event) => setSaveMenuAnchor(event.currentTarget)}
+            Radial
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onAutoLayoutChange('grid');
+              setAutoLayoutMenuAnchor(null);
+            }}
+            selected={autoLayoutType === 'grid'}
           >
-            Save
-          </Button>
-          <Button
-            startIcon={<LoadIcon />}
-            onClick={(event) => setLoadMenuAnchor(event.currentTarget)}
-          >
-            Load
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-          </Button>
-        </ButtonGroup>
+            Grid
+          </MenuItem>
+        </Menu>
 
         {/* Save Menu */}
         <Menu
@@ -581,6 +529,32 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
+        {/* More Menu */}
+        <Menu
+          anchorEl={moreMenuAnchor}
+          open={Boolean(moreMenuAnchor)}
+          onClose={() => setMoreMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => { handleClear(); setMoreMenuAnchor(null); }}>
+            <ClearIcon sx={{ mr: 1 }} />
+            Clear Graph
+          </MenuItem>
+          <MenuItem onClick={() => { setSaveMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
+            <SaveIcon sx={{ mr: 1 }} />
+            Save Options...
+          </MenuItem>
+          <MenuItem onClick={() => { setLoadMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
+            <LoadIcon sx={{ mr: 1 }} />
+            Load Options...
+          </MenuItem>
+          {mode === 'auto' && (
+            <MenuItem onClick={() => { setAutoLayoutMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
+              <AutoIcon sx={{ mr: 1 }} />
+              Layout Options...
+            </MenuItem>
+          )}
+        </Menu>
+
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
@@ -590,68 +564,43 @@ const Toolbar = ({
           style={{ display: 'none' }}
         />
 
-        {/* Spacer */}
-        <Box sx={{ flexGrow: 1 }} />
+        {/* Spacer - only in expanded mode */}
+        {!isCollapsed && <Box sx={{ flexGrow: 1 }} />}
 
-        {/* Right section - Info and toggles */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {/* Status indicators */}
-          {copied && (
-            <Chip
-              label="JSON Copied!"
-              size="small"
-              color="success"
-              sx={{ animation: 'fadeInOut 2s' }}
-            />
-          )}
-          {metadataCopied && (
-            <Chip
-              label="Metadata Copied!"
-              size="small"
-              color="success"
-              sx={{ animation: 'fadeInOut 2s' }}
-            />
-          )}
-          {saved && (
-            <Chip
-              label="Saved!"
-              size="small"
-              color="success"
-              sx={{ animation: 'fadeInOut 2s' }}
-            />
-          )}
-          {pasted && (
-            <Chip
-              label="Pasted!"
-              size="small"
-              color="success"
-              sx={{ animation: 'fadeInOut 2s' }}
-            />
-          )}
+        {/* Right section - only in expanded mode */}
+        {!isCollapsed && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Status indicators */}
+            {(copied || metadataCopied || saved || pasted) && (
+              <Chip
+                label={
+                  copied ? "JSON Copied!" :
+                  metadataCopied ? "Metadata Copied!" :
+                  saved ? "Saved!" :
+                  pasted ? "Pasted!" : ""
+                }
+                size="small"
+                color="success"
+                sx={{ animation: 'fadeInOut 2s' }}
+              />
+            )}
 
-          {/* Current mode indicator */}
-          <Chip
-            icon={getModeIcon(mode)}
-            label={getModeLabel(mode)}
-            size="small"
-            color={mode === 'nav' ? 'primary' : mode === 'auto' ? 'secondary' : 'default'}
-            variant="outlined"
-          />
+            {/* Graph stats */}
+            <Typography variant="caption" color="text.secondary">
+              {nodes.length}N • {edges.length}E
+            </Typography>
 
-          {/* Graph stats */}
-          <Typography variant="caption" sx={{ opacity: 0.8 }}>
-            {nodes.length} nodes, {edges.length} edges
-          </Typography>
-
-          {/* Node list toggle */}
-          <IconButton
-            onClick={onToggleNodeList}
-            color={showNodeList ? "primary" : "inherit"}
-            title="Toggle Node List"
-          >
-            <ListIcon />
-          </IconButton>
-        </Box>
+            {/* Node list toggle */}
+            <IconButton
+              onClick={onToggleNodeList}
+              color={showNodeList ? "primary" : "default"}
+              title="Toggle Node List"
+              size="small"
+            >
+              <ListIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        )}
       </Box>
     </Paper>
   );
