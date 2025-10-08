@@ -53,6 +53,19 @@ export default function GraphEditor({ backgroundImage }) {
     edgesRef.current = edges;
   }, [edges]);
 
+  useEffect(() => {
+    // Check if this is first visit
+    const hasSeenIntro = localStorage.getItem('hasSeenIntro');
+    
+    if (!hasSeenIntro) {
+      // Import the intro graph
+      import('./introGraph').then(({ introGraph }) => {
+        handleLoadGraph(introGraph.nodes, introGraph.edges);
+        localStorage.setItem('hasSeenIntro', 'true');
+      });
+    }
+  }, []);
+
   // Compute hovered edge endpoints
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
