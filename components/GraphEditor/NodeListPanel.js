@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Paper,
+  Drawer,
   TextField,
   Typography,
   IconButton,
@@ -92,25 +92,28 @@ export default function NodeListPanel({
 
   const activeFiltersCount = selectedTypes.size + (showVisible && showHidden ? 0 : 1);
 
-  if (!isOpen) return null;
-
   return (
-    <Paper
-      elevation={8}
+    <Drawer
+      anchor="left"
+      open={isOpen}
+      onClose={onClose}
+      variant="persistent"
       sx={{
-        position: 'fixed',
-        left: 16,
-        top: 88,
-        width: 320,
-        maxHeight: 'calc(100vh - 104px)',
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
-        border: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-        borderRadius: theme?.shape?.borderRadius || 4,
-        zIndex: 1300,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        boxShadow: theme?.shadows?.[8] || '0 8px 16px rgba(0,0,0,0.1)'
+        width: isOpen ? 320 : 0,
+        flexShrink: 0,
+        zIndex: 1200,
+        '& .MuiDrawer-paper': {
+          width: 320,
+          boxSizing: 'border-box',
+          backgroundColor: theme?.palette?.background?.paper || '#fff',
+          borderRight: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          top: 64, // Start below the AppBar (Material-UI default height)
+          height: 'calc(100vh - 64px)', // Full height minus AppBar
+          position: 'fixed'
+        }
       }}
     >
       {/* Header */}
@@ -489,6 +492,6 @@ export default function NodeListPanel({
           <Typography color="error" sx={{ color: theme?.palette?.error?.main || '#f44336' }}>Clear all filters</Typography>
         </MenuItem>
       </Menu>
-    </Paper>
+    </Drawer>
   );
 }
