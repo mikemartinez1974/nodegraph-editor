@@ -113,7 +113,9 @@ export default function ThemeDrawer(props) {
   }, [tiled, stretched, centered]);
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ BackdropProps: { invisible: true } }}>
+    <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ BackdropProps: { invisible: true } }}
+      sx={{ zIndex: 1500 }} // Ensure it is drawn on top of everything else
+    >
       <Box sx={{ width: 350, p: 2, background: activeTheme.palette.background.paper, color: activeTheme.palette.text?.primary }}>
         <Accordion sx={{ width: '100%' }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
