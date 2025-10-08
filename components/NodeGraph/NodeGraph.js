@@ -44,15 +44,7 @@ export default function NodeGraph({
 }) {
   const theme = useTheme();
   
-  // Debug logging for multi-selection
-  useEffect(() => {
-    if (selectedNodeIds.length > 0) {
-      console.log('NodeGraph received selectedNodeIds:', selectedNodeIds);
-      console.log('NodeGraph received selectedNodeId:', selectedNodeId);
-    }
-  }, [selectedNodeIds, selectedNodeId]);
   const canvasRef = useRef(null);
-  // Selection state is now managed by parent component
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [draggingGroupId, setDraggingGroupId] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
@@ -67,7 +59,6 @@ export default function NodeGraph({
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [draggingHandlePos, setDraggingHandlePos] = useState(null);
   const [isNodeHovered, setIsNodeHovered] = useState(false);
-  // Add state for handlePositions
   const [handlePositions, setHandlePositions] = useState({});
 
   // Process nodes with defaults
@@ -78,30 +69,22 @@ export default function NodeGraph({
     visible: node.visible !== undefined ? node.visible : true
   })), [nodes]);
 
-
-
   // Event bus handlers for node/edge events
   useEffect(() => {
-    // Disable event bus selection handlers since we're using direct props
-    // The onNodeClick and onEdgeClick props handle selection now
     function handleNodeClick({ id, event }) {
-      // Only handle if no parent handler exists
       if (!onNodeClick && setSelectedNodeIds) {
         setSelectedNodeIds([id]);
         if (setSelectedEdgeIds) setSelectedEdgeIds([]);
       }
     }
     function handleEdgeClick({ id, event }) {
-      // Only handle if no parent handler exists  
       if (!onEdgeClick && setSelectedEdgeIds) {
         setSelectedEdgeIds([id]);
         if (setSelectedNodeIds) setSelectedNodeIds([]);
       }
     }
-    // Only node/handle hover controls handle extension/retraction
     function handleEdgeHover(id) {
       setHoveredNodeId(id);
-      // Do NOT modify hoveredNodeId here
     }
     function handleNodeMouseEnter({ id }) {
       setHoveredNodeId(id);
@@ -149,7 +132,7 @@ export default function NodeGraph({
     };
   }, []);
 
-  // Node drag logic (already updates nodeList)
+  // Node drag logic
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current) {
       const newX = (e.clientX - dragOffset.current.x - (typeof pan?.x === 'number' ? pan.x : 0)) / (typeof zoom === 'number' ? zoom : 1);
@@ -201,11 +184,9 @@ export default function NodeGraph({
             const deltaX = currentX - dragOffset.current.x;
             const deltaY = currentY - dragOffset.current.y;
             
-            // Update drag offset for next frame
             dragOffset.current.x = currentX;
             dragOffset.current.y = currentY;
             
-            // Move all nodes in the group
             group.nodeIds.forEach(nodeId => {
               const node = nodes.find(n => n.id === nodeId);
               if (node && typeof onNodeMove === 'function') {
@@ -246,25 +227,18 @@ export default function NodeGraph({
     window.removeEventListener('mouseup', handleGroupDragEnd);
   }
 
-  // Pass handleProgress to HandleLayer for all nodes
-  // const nodesWithProgress = nodeList.map(node => ({ ...node, handleProgress: handleProgressMap[node.id] || 0 }));
-
   function handleBackgroundClickFromPanZoom(e) {
     if (typeof onBackgroundClick === 'function') onBackgroundClick(e);
     if (setSelectedNodeIds) setSelectedNodeIds([]);
     if (setSelectedEdgeIds) setSelectedEdgeIds([]);
   }
 
-
-
-  //Edge Handle Events
+  // Edge Handle Events
   function onHandleDragStart(e, handle) {
     setDraggingHandle(handle);
     setDraggingHandlePos({ x: e.clientX, y: e.clientY });
     window.addEventListener('mousemove', onHandleDragMove);
     window.addEventListener('mouseup', onHandleDragEnd);
-    // Custom logic for handle drag start
-    //console.log('Handle drag start:', { event: e, handle });
   }
 
   function onHandleDragMove(e) {
@@ -273,7 +247,6 @@ export default function NodeGraph({
 
   function onHandleDragEnd(e) {
     if (draggingHandle) {
-      console.log('Handle dropped:', draggingHandle);
       setHoveredNodeId(null);
       handleNodeMouseLeave({ id: draggingHandle.nodeId });
     }
@@ -283,7 +256,7 @@ export default function NodeGraph({
     window.removeEventListener('mouseup', onHandleDragEnd);
   }
 
-  // Ensure the graph resizes with the window
+  // Window resize handler
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
     function handleResize() {
@@ -320,7 +293,6 @@ export default function NodeGraph({
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
-        {/* Group Layer - renders behind everything */}
         <GroupLayer
           groups={groups}
           pan={pan}
@@ -390,14 +362,10 @@ export default function NodeGraph({
                 } else {
                   handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
                 }
-                if (handlePos && typeof handlePos === 'object') {
-                  // Simulate handle event
-                }
               });
             }
             if (e) {
               e.stopPropagation();
-              const node = nodes.find(n => n.id === id);
             }
           }}
           onNodeDoubleClick={(id) => {
