@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import Paper from '@mui/material/Paper';
+import Drawer from '@mui/material/Drawer';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -23,13 +23,7 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
-  const [panelPos, setPanelPos] = useState({ top: 88, right: 16 });
-  const [panelSize, setPanelSize] = useState({ width: 320, height: 520 });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const draggingRef = useRef(false);
-  const resizingRef = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const resizeStart = useRef({ x: 0, y: 0, width: 320, height: 520 });
   const memoInputRef = useRef();
 
   // Update local state when selected node changes
@@ -40,8 +34,6 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
       setLabel(selectedNode.label || '');
     }
   }, [selectedNode?.id]);
-
-  if (!selectedNode) return null;
 
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
@@ -103,81 +95,33 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
     setShowEmojiPicker(false);
   };
 
-  // Drag handlers
-  const onHeaderMouseDown = (e) => {
-    draggingRef.current = true;
-    dragOffset.current = {
-      x: e.clientX,
-      y: e.clientY,
-      top: panelPos.top,
-      right: panelPos.right
-    };
-    document.addEventListener('mousemove', onHeaderMouseMove);
-    document.addEventListener('mouseup', onHeaderMouseUp);
-  };
-  const onHeaderMouseMove = (e) => {
-    if (!draggingRef.current) return;
-    const dx = e.clientX - dragOffset.current.x;
-    const dy = e.clientY - dragOffset.current.y;
-    setPanelPos(pos => ({
-      top: Math.max(0, dragOffset.current.top + dy),
-      right: Math.max(0, dragOffset.current.right - dx)
-    }));
-  };
-  const onHeaderMouseUp = () => {
-    draggingRef.current = false;
-    document.removeEventListener('mousemove', onHeaderMouseMove);
-    document.removeEventListener('mouseup', onHeaderMouseUp);
-  };
 
-  // Resize handlers
-  const onResizeMouseDown = (e) => {
-    e.stopPropagation();
-    resizingRef.current = true;
-    resizeStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      width: panelSize.width,
-      height: panelSize.height
-    };
-    document.addEventListener('mousemove', onResizeMouseMove);
-    document.addEventListener('mouseup', onResizeMouseUp);
-  };
-  const onResizeMouseMove = (e) => {
-    if (!resizingRef.current) return;
-    const dx = e.clientX - resizeStart.current.x;
-    const dy = e.clientY - resizeStart.current.y;
-    setPanelSize(size => ({
-      width: Math.max(240, resizeStart.current.width + dx),
-      height: Math.max(320, resizeStart.current.height + dy)
-    }));
-  };
-  const onResizeMouseUp = () => {
-    resizingRef.current = false;
-    document.removeEventListener('mousemove', onResizeMouseMove);
-    document.removeEventListener('mouseup', onResizeMouseUp);
-  };
 
   return (
-    <Paper
-      elevation={8}
+    <Drawer
+      anchor="right"
+      open={Boolean(selectedNode)}
+      onClose={onClose}
+      variant="persistent"
       sx={{
-        position: 'fixed',
-        top: panelPos.top,
-        right: panelPos.right,
-        width: panelSize.width,
-        height: panelSize.height,
-        maxHeight: 'calc(100vh - 24px)',
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
-        zIndex: 1300,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        resize: 'none',
-        userSelect: 'none'
+        width: selectedNode ? 400 : 0,
+        flexShrink: 0,
+        zIndex: 1100, // Lower than theme drawer (1500) and toolbar (1300)
+        '& .MuiDrawer-paper': {
+          width: 400,
+          boxSizing: 'border-box',
+          backgroundColor: theme?.palette?.background?.paper || '#fff',
+          borderLeft: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          top: 64, // Start below the AppBar
+          height: 'calc(100vh - 64px)', // Full height minus AppBar
+          position: 'fixed'
+        }
       }}
     >
-      {/* Header (draggable) */}
+      {/* Header */}
       <Box sx={{
         p: 2,
         display: 'flex',
@@ -185,10 +129,8 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
         justifyContent: 'space-between',
         backgroundColor: theme?.palette?.primary?.main || '#1976d2',
         color: theme?.palette?.primary?.contrastText || '#fff',
-        cursor: 'move',
-        userSelect: 'none'
+        borderBottom: `1px solid ${theme?.palette?.primary?.dark || '#1565c0'}`
       }}
-        onMouseDown={onHeaderMouseDown}
       >
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Node Properties
@@ -400,25 +342,6 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
         </Box>
       </Box>
 
-      {/* Resize handle */}
-      <Box
-        sx={{
-          position: 'absolute',
-          right: 2,
-          bottom: 2,
-          width: 16,
-          height: 16,
-          cursor: 'nwse-resize',
-          zIndex: 1400,
-          background: 'transparent',
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'flex-end'
-        }}
-        onMouseDown={onResizeMouseDown}
-      >
-        <Box sx={{ width: 16, height: 16, borderRight: '2px solid #888', borderBottom: '2px solid #888', borderRadius: 2 }} />
-      </Box>
-    </Paper>
+    </Drawer>
   );
 }
