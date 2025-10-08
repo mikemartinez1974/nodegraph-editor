@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 import edgeTypes from '../GraphEditor/edgeTypes';
+import { setupHiDPICanvas, getCanvasContext, clearCanvas } from './canvasUtils';
 
 function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
   // Distance from point (x, y) to line segment (x1, y1)-(x2, y2)
@@ -240,8 +241,14 @@ function EdgeLayer({ edgeList = [], nodeList = [], pan = { x: 0, y: 0 }, zoom = 
     }
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const ctx = getCanvasContext(canvas);
+    
+    // Setup HiDPI scaling
+    const devicePixelRatio = setupHiDPICanvas(canvas, ctx, canvasSize.width, canvasSize.height);
+    
+    // Clear the canvas
+    clearCanvas(ctx, canvasSize.width, canvasSize.height);
+
     ctx.save();
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
