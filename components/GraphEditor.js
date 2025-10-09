@@ -54,16 +54,10 @@ export default function GraphEditor({ backgroundImage }) {
   }, [edges]);
 
   useEffect(() => {
-    // Check if this is first visit
-    const hasSeenIntro = localStorage.getItem('hasSeenIntro');
-    
-    if (!hasSeenIntro) {
-      // Import the intro graph
-      import('./introGraph').then(({ introGraph }) => {
-        handleLoadGraph(introGraph.nodes, introGraph.edges);
-        localStorage.setItem('hasSeenIntro', 'true');
-      });
-    }
+    // Always load the intro graph on startup
+    import('./introGraph').then(({ introGraph }) => {
+      handleLoadGraph(introGraph.nodes, introGraph.edges);
+    });
   }, []);
 
   // Compute hovered edge endpoints
