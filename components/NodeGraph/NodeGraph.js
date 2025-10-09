@@ -10,7 +10,7 @@ import NodeLayer from './NodeLayer';
 import GroupLayer from './GroupLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
-import { useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
+import { MarqueeOverlay } from './marqueeSelection';
 
 export default function NodeGraph({ 
   nodes = [], 

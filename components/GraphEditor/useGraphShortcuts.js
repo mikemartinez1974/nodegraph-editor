@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 
 export default function useGraphShortcuts({
   setNodes,
+  setEdges,
+  selectedNodeIds,
+  selectedEdgeIds,
   setSelectedNodeIds,
   setSelectedEdgeIds,
   handleDeleteSelected,
@@ -13,9 +16,182 @@ export default function useGraphShortcuts({
   nodesRef
 }) {
   useEffect(() => {
+    // Helper function to copy selected nodes and edges to clipboard as JSON
+    async function copyToClipboard() {
+      if (!selectedNodeIds || selectedNodeIds.length === 0) {
+        console.log('No nodes selected for copy');
+        return;
+      }
+
+      const nodes = nodesRef?.current || [];
+      const edges = edgesRef?.current || [];
+      
+      // Get selected nodes
+      const selectedNodes = nodes.filter(node => selectedNodeIds.includes(node.id));
+      
+      // Get edges that connect selected nodes (both source and target must be selected)
+      const selectedEdges = edges.filter(edge => 
+        selectedNodeIds.includes(edge.source) && selectedNodeIds.includes(edge.target)
+      );
+
+      // Clean the data to avoid JSON issues
+      const cleanNodes = selectedNodes.map(node => ({
+        ...node,
+        data: {
+          ...node.data,
+          // Ensure strings are properly escaped
+          memo: typeof node.data?.memo === 'string' ? node.data.memo.replace(/\n/g, '\\n').replace(/\r/g, '\\r') : node.data?.memo,
+          link: typeof node.data?.link === 'string' ? node.data.link.replace(/\n/g, '\\n').replace(/\r/g, '\\r') : node.data?.link
+        }
+      }));
+
+      const clipboardData = {
+        type: 'nodegraph-data',
+        nodes: cleanNodes,
+        edges: selectedEdges,
+        timestamp: new Date().toISOString(),
+        nodeCount: cleanNodes.length,
+        edgeCount: selectedEdges.length
+      };
+
+      try {
+        // Use compact JSON to reduce size
+        const jsonString = JSON.stringify(clipboardData);
+        await navigator.clipboard.writeText(jsonString);
+        console.log(`Copied ${selectedNodes.length} nodes and ${selectedEdges.length} edges to clipboard (${jsonString.length} chars)`);
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+        // Fallback: try without pretty printing
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(clipboardData));
+          console.log('Copied with compact format');
+        } catch (fallbackErr) {
+          console.error('Fallback copy also failed:', fallbackErr);
+        }
+      }
+    }
+
+    // Helper function to cut selected nodes and edges
+    async function cutToClipboard() {
+      if (!selectedNodeIds || selectedNodeIds.length === 0) {
+        console.log('No nodes selected for cut');
+        return;
+      }
+      await copyToClipboard();
+      handleDeleteSelected();
+    }
+
+    // Helper function to paste nodes and edges from clipboard
+    async function pasteFromClipboard() {
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        
+        // Validate JSON before parsing
+        if (!clipboardText || typeof clipboardText !== 'string') {
+          console.log('Clipboard is empty or invalid');
+          return;
+        }
+
+        let clipboardData;
+        try {
+          clipboardData = JSON.parse(clipboardText);
+        } catch (parseErr) {
+          console.error('Invalid JSON in clipboard:', parseErr.message);
+          console.log('First 100 chars of clipboard:', clipboardText.substring(0, 100));
+          return;
+        }
+        
+        // Check if it's our data format
+        if (!clipboardData || clipboardData.type !== 'nodegraph-data') {
+          console.log('Clipboard does not contain valid nodegraph data');
+          return;
+        }
+        
+        if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
+          console.log('Clipboard does not contain valid node array');
+          return;
+        }
+
+        const currentNodes = nodesRef?.current || [];
+        const currentEdges = edgesRef?.current || [];
+        
+        // Generate new IDs for pasted nodes to avoid conflicts
+        const idMapping = {};
+        const timestamp = Date.now();
+        
+        // First pass: create ID mapping for all nodes
+        clipboardData.nodes.forEach((node, index) => {
+          const newId = `node_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`;
+          idMapping[node.id] = newId;
+        });
+        
+        // Second pass: create nodes with new IDs and restore escaped characters
+        const pastedNodes = clipboardData.nodes.map(node => ({
+          ...node,
+          id: idMapping[node.id],
+          position: {
+            x: node.position.x + 50, // Offset position to avoid overlap
+            y: node.position.y + 50
+          },
+          data: {
+            ...node.data,
+            // Restore escaped newlines and carriage returns
+            memo: typeof node.data?.memo === 'string' ? node.data.memo.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.memo,
+            link: typeof node.data?.link === 'string' ? node.data.link.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.link
+          }
+        }));
+
+        // Update edge source/target IDs using the mapping
+        const pastedEdges = (clipboardData.edges || []).map((edge, index) => ({
+          ...edge,
+          id: `edge_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`,
+          source: idMapping[edge.source],
+          target: idMapping[edge.target]
+        })).filter(edge => edge.source && edge.target); // Only keep edges where both nodes were remapped
+
+        // Add pasted nodes and edges
+        const newNodes = [...currentNodes, ...pastedNodes];
+        const newEdges = [...currentEdges, ...pastedEdges];
+
+        setNodes(newNodes);
+        setEdges(newEdges);
+        
+        // Update refs
+        if (nodesRef) nodesRef.current = newNodes;
+        if (edgesRef) edgesRef.current = newEdges;
+        
+        // Select the newly pasted nodes
+        setSelectedNodeIds(pastedNodes.map(node => node.id));
+        setSelectedEdgeIds([]);
+        
+        // Save to history
+        if (saveToHistory) saveToHistory(newNodes, newEdges);
+        
+        console.log(`Pasted ${pastedNodes.length} nodes and ${pastedEdges.length} edges`);
+        
+      } catch (err) {
+        console.error('Failed to paste from clipboard:', err);
+      }
+    }
+
     function handleKeyboardShortcuts(e) {
+      // Copy selected nodes on Ctrl+C
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        copyToClipboard();
+      }
+      // Cut selected nodes on Ctrl+X
+      else if (e.ctrlKey && (e.key === 'x' || e.key === 'X')) {
+        e.preventDefault();
+        cutToClipboard();
+      }
+      // Paste nodes on Ctrl+V
+      else if (e.ctrlKey && (e.key === 'v' || e.key === 'V')) {
+        e.preventDefault();
+        pasteFromClipboard();
+      }
       // Resize all nodes to 80x48 on Ctrl+Q
-      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+      else if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
         setNodes(prev => {
           const updated = prev.map(n => ({ ...n, width: 80, height: 48 }));
           if (nodesRef) nodesRef.current = updated;
@@ -52,5 +228,5 @@ export default function useGraphShortcuts({
     }
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  }, [setNodes, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef]);
+  }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef]);
 }

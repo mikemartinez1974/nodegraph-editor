@@ -420,12 +420,15 @@ export default function GraphEditor({ backgroundImage }) {
 
   useGraphShortcuts({
     setNodes,
+    setEdges,
+    selectedNodeIds,
+    selectedEdgeIds,
     setSelectedNodeIds,
     setSelectedEdgeIds,
     handleDeleteSelected,
     clearSelection,
-    handleCreateGroup,
-    handleUngroupSelected,
+    handleCreateGroup: handleCreateGroupWrapper,
+    handleUngroupSelected: handleUngroupSelectedWrapper,
     saveToHistory,
     edgesRef,
     nodesRef
