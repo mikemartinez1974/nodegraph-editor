@@ -174,7 +174,22 @@ export default function useGraphShortcuts({
       }
     }
 
+    function isTextInputActive() {
+      const el = document.activeElement;
+      if (!el) return false;
+      const tag = el.tagName;
+      const editable = el.getAttribute('contenteditable');
+      return (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        editable === 'true' ||
+        el.isContentEditable
+      );
+    }
+
     function handleKeyboardShortcuts(e) {
+      // Only trigger graph shortcuts if not editing text
+      if (isTextInputActive()) return;
       // Copy selected nodes on Ctrl+C
       if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
         e.preventDefault();
@@ -207,8 +222,8 @@ export default function useGraphShortcuts({
         setSelectedEdgeIds([]);
         console.log(`Selected all nodes`);
       }
-      // Delete selected on Delete key
-      else if (e.key === 'Delete' || e.key === 'Backspace') {
+      // Delete selected on Delete key only (removed Backspace to avoid conflicts with text editing)
+      else if (e.key === 'Delete') {
         handleDeleteSelected();
       }
       // Escape to clear selection

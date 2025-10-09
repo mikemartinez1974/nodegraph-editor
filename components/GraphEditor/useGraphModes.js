@@ -25,7 +25,7 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges 
     if (!centerNode) return;
 
     // Physics parameters (tuned for springy, responsive behavior)
-    const repulsion = 100000; // Strong repulsion keeps nodes apart
+    const repulsion = 400000; // Strong repulsion keeps nodes apart
     const attraction = 0.08; // Increased attraction for bouncier springs
     const damping = 0.75; // Reduced damping for more movement
     const centerForce = 0.2; // Stronger center pull

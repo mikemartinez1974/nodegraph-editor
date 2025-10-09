@@ -28,7 +28,7 @@
 
 - [ ] **Collaboration (optional)**
   - [ ] Real-time editing with multiple users
-  - [ ] Copy/Paste Workflow
+  - [x] Copy/Paste Workflow
 
 - [x] **Persistence**
   - [x] Save/load graphs (local storage, backend)

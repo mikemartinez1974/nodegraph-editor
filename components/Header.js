@@ -14,7 +14,10 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
       <AppBar position="fixed" color="primary">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            NodeGraph
+            Copy/Paste w/ Me&nbsp;
+            <span style={{ marginLeft: 50 }}>
+              🎨 🖌️ 🖼️ 🧶 🧷
+            </span>
           </Typography>
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon />
