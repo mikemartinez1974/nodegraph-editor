@@ -163,6 +163,18 @@ export default function GraphEditor({ backgroundImage }) {
     setSelectedEdgeIds([]);
     saveToHistory(loadedNodes, loadedEdges);
     console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
+
+    // Center, select, and open properties for the first node
+    if (loadedNodes.length > 0) {
+      const firstNode = loadedNodes[0];
+      setPan({
+        x: window.innerWidth / 2 - firstNode.position.x * zoom,
+        y: window.innerHeight / 2 - firstNode.position.y * zoom
+      });
+      setSelectedNodeIds([firstNode.id]);
+      setSelectedEdgeIds([]);
+      setShowNodeProperties(true);
+    }
   }
 
   // Add node handler (keeps refs & history consistent)

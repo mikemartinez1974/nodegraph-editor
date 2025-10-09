@@ -1,5 +1,5 @@
 {
-  "name": "nodegraph-editor",
+  "name": "copy_paste_with_me",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,6 +7,7 @@
     "debug": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
+    "export": "next export",
     "lint": "eslint"
   },
   "dependencies": {

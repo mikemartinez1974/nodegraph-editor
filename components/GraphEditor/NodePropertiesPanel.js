@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Drawer from '@mui/material/Drawer';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -24,6 +24,7 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
   const [label, setLabel] = useState('');
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [markdownView, setMarkdownView] = useState(true); // true = view mode, false = edit mode
   const memoInputRef = useRef();
 
   // Update local state when selected node changes
