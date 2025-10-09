@@ -1,29 +1,20 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
-const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, children, theme }) => {
+const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarqueeStart, children, theme }) => {
     const dragging = useRef(false);
     const lastPos = useRef({ x: 0, y: 0 });
     const mouseDownPosRef = React.useRef(null);
     const layerRef = useRef(null);
 
-    const handleMouseDown = (e) => {
-        if (e.button !== 0) return;
-        dragging.current = true;
-        lastPos.current = { x: e.clientX, y: e.clientY };
-        mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-    };
-
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (!dragging.current) return;
         const dx = e.clientX - lastPos.current.x;
         const dy = e.clientY - lastPos.current.y;
         lastPos.current = { x: e.clientX, y: e.clientY };
         onPanZoom((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
-    };
+    }, [onPanZoom]);
 
-    const handleMouseUp = (e) => {
+    const handleMouseUp = useCallback((e) => {
         if (e.button !== 0) return;
         dragging.current = false;
         window.removeEventListener('mousemove', handleMouseMove);
@@ -37,7 +28,25 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, childr
             onBackgroundClick(e);
         }
         mouseDownPosRef.current = null;
-    };
+    }, [handleMouseMove, onBackgroundClick]);
+
+    const handleMouseDown = useCallback((e) => {
+        if (e.button !== 0) return;
+        
+        // Check if this should be handled by marquee selection
+        if (e.shiftKey && onMarqueeStart) {
+            // Try to start marquee selection
+            if (onMarqueeStart(e)) {
+                return; // Marquee selection started, don't handle pan
+            }
+        }
+        
+        dragging.current = true;
+        lastPos.current = { x: e.clientX, y: e.clientY };
+        mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+    }, [handleMouseMove, handleMouseUp, onMarqueeStart]);
 
     useEffect(() => {
         const el = layerRef.current;

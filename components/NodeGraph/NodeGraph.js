@@ -10,6 +10,7 @@ import NodeLayer from './NodeLayer';
 import GroupLayer from './GroupLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
+import { useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
 
 export default function NodeGraph({ 
   nodes = [], 
@@ -271,6 +272,156 @@ export default function NodeGraph({
     setHoveredNodeId(null);
   };
 
+  // Marquee selection state
+  const [isMarqueeSelecting, setIsMarqueeSelecting] = useState(false);
+  const [marqueeStart, setMarqueeStart] = useState(null);
+  const [marqueeEnd, setMarqueeEnd] = useState(null);
+  const [selectionRect, setSelectionRect] = useState(null);
+
+  // Convert screen coordinates to graph coordinates
+  const screenToGraph = useCallback((screenX, screenY) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    
+    return {
+      x: (screenX - rect.left - pan.x) / zoom,
+      y: (screenY - rect.top - pan.y) / zoom
+    };
+  }, [pan, zoom]);
+
+  // Convert graph coordinates to screen coordinates  
+  const graphToScreen = useCallback((graphX, graphY) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    
+    return {
+      x: graphX * zoom + pan.x + rect.left,
+      y: graphY * zoom + pan.y + rect.top
+    };
+  }, [pan, zoom]);
+
+  // Start marquee selection
+  const startMarqueeSelection = useCallback((event) => {
+    if (!event.shiftKey) return false;
+    
+    console.log('Starting marquee selection');
+    setIsMarqueeSelecting(true);
+    
+    const graphPos = screenToGraph(event.clientX, event.clientY);
+    setMarqueeStart(graphPos);
+    setMarqueeEnd(graphPos);
+    
+    // Calculate screen rect for overlay
+    const screenRect = {
+      x: event.clientX,
+      y: event.clientY,
+      width: 0,
+      height: 0
+    };
+    setSelectionRect(screenRect);
+    
+    return true;
+  }, [screenToGraph]);
+
+  // Update marquee selection
+  const updateMarqueeSelection = useCallback((event) => {
+    if (!isMarqueeSelecting || !marqueeStart) return;
+    
+    const graphPos = screenToGraph(event.clientX, event.clientY);
+    setMarqueeEnd(graphPos);
+    
+    // Calculate screen rect for overlay
+    const startScreen = graphToScreen(marqueeStart.x, marqueeStart.y);
+    const screenRect = {
+      x: Math.min(startScreen.x, event.clientX),
+      y: Math.min(startScreen.y, event.clientY),
+      width: Math.abs(event.clientX - startScreen.x),
+      height: Math.abs(event.clientY - startScreen.y)
+    };
+    setSelectionRect(screenRect);
+  }, [isMarqueeSelecting, marqueeStart, screenToGraph, graphToScreen]);
+
+  // End marquee selection
+  const endMarqueeSelection = useCallback((event) => {
+    if (!isMarqueeSelecting || !marqueeStart || !marqueeEnd) {
+      setIsMarqueeSelecting(false);
+      setMarqueeStart(null);
+      setMarqueeEnd(null);
+      setSelectionRect(null);
+      return;
+    }
+
+    console.log('Ending marquee selection', { marqueeStart, marqueeEnd });
+
+    // Calculate selection bounds in graph space
+    const bounds = {
+      x: Math.min(marqueeStart.x, marqueeEnd.x),
+      y: Math.min(marqueeStart.y, marqueeEnd.y),
+      width: Math.abs(marqueeEnd.x - marqueeStart.x),
+      height: Math.abs(marqueeEnd.y - marqueeStart.y)
+    };
+
+    // Only proceed if selection is large enough
+    if (bounds.width >= 10 / zoom || bounds.height >= 10 / zoom) {
+      // Find nodes within selection bounds
+      const selectedNodes = nodes.filter(node => {
+        const nodeX = node.position.x;
+        const nodeY = node.position.y;
+        const nodeWidth = node.width || 120;
+        const nodeHeight = node.height || 60;
+        
+        // Check if node intersects with selection rectangle
+        return !(
+          nodeX + nodeWidth < bounds.x ||
+          nodeX > bounds.x + bounds.width ||
+          nodeY + nodeHeight < bounds.y ||
+          nodeY > bounds.y + bounds.height
+        );
+      });
+
+      console.log('Selected nodes:', selectedNodes);
+
+      if (selectedNodes.length > 0 && setSelectedNodeIds) {
+        setSelectedNodeIds(selectedNodes.map(node => node.id));
+        if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+        
+        // Emit event
+        eventBus.emit('nodes-selected', selectedNodes);
+        
+        if (onNodeClick && selectedNodes.length === 1) {
+          onNodeClick(selectedNodes[0].id, event);
+        }
+      }
+    }
+
+    // Clean up
+    setIsMarqueeSelecting(false);
+    setMarqueeStart(null);
+    setMarqueeEnd(null);
+    setSelectionRect(null);
+  }, [isMarqueeSelecting, marqueeStart, marqueeEnd, nodes, zoom, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick]);
+
+  // Global mouse event listeners for marquee selection
+  useEffect(() => {
+    if (!isMarqueeSelecting) return;
+
+    const handleMouseMove = (e) => {
+      updateMarqueeSelection(e);
+    };
+
+    const handleMouseUp = (e) => {
+      endMarqueeSelection(e);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isMarqueeSelecting, updateMarqueeSelection, endMarqueeSelection]);
+
   return (
     <div id="graph-canvas" ref={containerRef} style={{
       position: 'fixed',
@@ -287,6 +438,7 @@ export default function NodeGraph({
         onPanZoom={setPan}
         setZoom={setZoom}
         onBackgroundClick={handleBackgroundClickFromPanZoom}
+        onMarqueeStart={startMarqueeSelection}
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
       >
@@ -410,6 +562,12 @@ export default function NodeGraph({
           })()
         )}
       </PanZoomLayer>
+
+      {/* Marquee selection overlay */}
+      <MarqueeOverlay 
+        selectionRect={selectionRect} 
+        theme={theme} 
+      />
     </div>
   );
 }
