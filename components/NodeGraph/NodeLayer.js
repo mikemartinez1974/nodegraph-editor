@@ -3,6 +3,8 @@ import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 import eventBus from './eventBus';
 
 const NodeLayer = ({ 
+    containerRef,
+    nodeRefs,
     nodes, 
     pan = { x: 0, y: 0 }, 
     zoom = 1, 
@@ -29,7 +31,7 @@ const NodeLayer = ({
     }
 
     return (
-        <div style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0 }}>
+        <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0 }}>
             {nodes.map(node => {
                 const NodeComponent = nodeTypes[node.type] || DefaultNode;
                 const isSelected = selectedNodeIds.includes(node.id);
@@ -54,6 +56,7 @@ const NodeLayer = ({
                         } : undefined}
                         onMouseEnter={() => eventBus.emit('nodeHover', { id: node.id })}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
+                        nodeRefs={nodeRefs}  // Pass nodeRefs to each node component
                     />
                 );
             })}

@@ -1,5 +1,6 @@
-// HandleLayer.js - Canvas-based handles for maximum performance
-import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
+"use client";
+
+import React, { useEffect, useRef, useMemo, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
@@ -7,13 +8,21 @@ const handleOffset = 15;
 const handleSpacing = 30;
 const handleRadius = 6;
 
-function getHandlePositions(node, edgeTypes) {
+function getHandlePositions(node, edgeTypes, draggingInfoRef) {
   const handles = [];
   const visibleEdgeTypes = Object.keys(edgeTypes);
   const x = node.position ? node.position.x : node.x;
   const y = node.position ? node.position.y : node.y;
   const width = node.width || 60;
   const height = node.height || 60;
+
+  // Apply dragging offset if applicable
+  let adjustedX = x;
+  let adjustedY = y;
+  if (draggingInfoRef.current && draggingInfoRef.current.nodeId === node.id) {
+    adjustedX += draggingInfoRef.current.offset.x;
+    adjustedY += draggingInfoRef.current.offset.y;
+  }
 
   visibleEdgeTypes.forEach((type, i) => {
     if (type === 'child' || type === 'parent') {
@@ -24,8 +33,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'target',
         position: {
-          x: x,
-          y: y - height / 2
+          x: adjustedX,
+          y: adjustedY - height / 2
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -36,8 +45,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'source',
         position: {
-          x: x,
-          y: y + height / 2
+          x: adjustedX,
+          y: adjustedY + height / 2
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -49,8 +58,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'target',
         position: {
-          x: x - width / 2,
-          y: y
+          x: adjustedX - width / 2,
+          y: adjustedY
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -61,8 +70,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'source',
         position: {
-          x: x + width / 2,
-          y: y
+          x: adjustedX + width / 2,
+          y: adjustedY
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -74,8 +83,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'target',
         position: {
-          x: x - width / 2,
-          y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
+          x: adjustedX - width / 2,
+          y: adjustedY - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -85,8 +94,8 @@ function getHandlePositions(node, edgeTypes) {
         edgeType: type,
         direction: 'source',
         position: {
-          x: x + width / 2,
-          y: y - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
+          x: adjustedX + width / 2,
+          y: adjustedY - ((visibleEdgeTypes.length - 1) * handleSpacing) / 2 + i * handleSpacing
         },
         color: edgeTypes[type].style?.color || '#1976d2'
       });
@@ -95,15 +104,16 @@ function getHandlePositions(node, edgeTypes) {
   return handles;
 }
 
-const HandleLayer = ({ 
+const HandleLayer = forwardRef(({ 
   canvasRef,
   nodes = [], 
   edges = [], 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
   edgeTypes = {}, 
-  children 
-}) => {
+  children,
+  draggingInfoRef 
+}, ref) => {
   const draggingHandleRef = useRef(null);
   const hoveredHandleRef = useRef(null);
   const previewLineRef = useRef({ visible: false });
@@ -111,80 +121,24 @@ const HandleLayer = ({
   const sensorRef = useRef(null);
   const [sensorActive, setSensorActive] = useState(false);
 
-  // Calculate handles and position map with pure computation
-  const { handlePositions, handlePositionMap } = useMemo(() => {
-    const allHandles = [];
+  // Expose redraw method via imperative handle
+  useImperativeHandle(ref, () => ({
+    redraw: () => {
+      scheduleRender();
+    }
+  }));
+
+  // Calculate handle position map for context (without dragging offsets)
+  const handlePositionMap = useMemo(() => {
     const handleMap = {};
     nodes.filter(n => n.visible !== false).forEach(node => {
-      const handles = getHandlePositions(node, edgeTypes);
+      const handles = getHandlePositions(node, edgeTypes, { current: null }); // Static positions for context
       handles.forEach(h => {
         handleMap[h.id] = h.position;
       });
-      allHandles.push(...handles);
     });
-    return { handlePositions: allHandles, handlePositionMap: handleMap };
+    return handleMap;
   }, [nodes, edgeTypes]);
-
-  // Listen for node/edge hover events to activate sensor
-  useEffect(() => {
-    const handleNodeHover = () => {
-      setSensorActive(true);
-    };
-    
-    const handleNodeUnhover = () => {
-      // Don't deactivate immediately if we're dragging
-      if (!draggingHandleRef.current) {
-        setSensorActive(false);
-      }
-    };
-    
-    const handleEdgeHover = () => {
-      setSensorActive(true);
-    };
-    
-    const handleEdgeUnhover = () => {
-      // Don't deactivate immediately if we're dragging
-      if (!draggingHandleRef.current) {
-        setSensorActive(false);
-      }
-    };
-
-    const handleNodeMouseEnter = () => {
-      setSensorActive(true);
-    };
-
-    const handleNodeMouseLeave = () => {
-      if (!draggingHandleRef.current) {
-        setSensorActive(false);
-      }
-    };
-
-    const handleEdgeMouseEnter = () => {
-      setSensorActive(true);
-    };
-
-    const handleEdgeMouseLeave = () => {
-      if (!draggingHandleRef.current) {
-        setSensorActive(false);
-      }
-    };
-    
-    eventBus.on('nodeHover', handleNodeHover);
-    eventBus.on('nodeUnhover', handleNodeUnhover);
-    eventBus.on('nodeMouseEnter', handleNodeMouseEnter);
-    eventBus.on('nodeMouseLeave', handleNodeMouseLeave);
-    eventBus.on('edgeMouseEnter', handleEdgeHover);
-    eventBus.on('edgeMouseLeave', handleEdgeUnhover);
-    
-    return () => {
-      eventBus.off('nodeHover', handleNodeHover);
-      eventBus.off('nodeUnhover', handleNodeUnhover);
-      eventBus.off('nodeMouseEnter', handleNodeMouseEnter);
-      eventBus.off('nodeMouseLeave', handleNodeMouseLeave);
-      eventBus.off('edgeMouseEnter', handleEdgeHover);
-      eventBus.off('edgeMouseLeave', handleEdgeUnhover);
-    };
-  }, []);
 
   // Context functions
   const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
@@ -206,7 +160,7 @@ const HandleLayer = ({
     }
     return undefined;
   }, [handlePositionMap]);
-  
+
   // Find handle at screen coordinates
   const findHandleAt = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
@@ -215,6 +169,11 @@ const HandleLayer = ({
     const canvasX = clientX - rect.left;
     const canvasY = clientY - rect.top;
     
+    // Compute handle positions dynamically for hit detection
+    const handlePositions = nodes.filter(n => n.visible !== false).flatMap(node => 
+      getHandlePositions(node, edgeTypes, draggingInfoRef)
+    );
+
     for (const handle of handlePositions) {
       const screenX = handle.position.x * zoom + pan.x;
       const screenY = handle.position.y * zoom + pan.y;
@@ -230,7 +189,7 @@ const HandleLayer = ({
     }
     
     return null;
-  }, [handlePositions, pan, zoom]);
+  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef]);
 
   // Canvas drawing function
   const drawCanvas = useCallback(() => {
@@ -240,6 +199,11 @@ const HandleLayer = ({
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Compute handle positions dynamically for drawing
+    const handlePositions = nodes.filter(n => n.visible !== false).flatMap(node => 
+      getHandlePositions(node, edgeTypes, draggingInfoRef)
+    );
+
     // Draw handles
     handlePositions.forEach(handle => {
       const screenX = handle.position.x * zoom + pan.x;
@@ -307,7 +271,7 @@ const HandleLayer = ({
       
       ctx.restore();
     }
-  }, [handlePositions, pan, zoom]);
+  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef]);
 
   // Optimized render loop
   const scheduleRender = useCallback(() => {
@@ -324,19 +288,15 @@ const HandleLayer = ({
     console.log('Sensor mousedown fired, sensorActive:', sensorActive);
     console.log('Hovered handle ref:', hoveredHandleRef.current);
     
-    // When sensor is active (hovering node/edge), we should check for handles
     const handle = findHandleAt(e.clientX, e.clientY);
     
     console.log('Handle found at mousedown:', handle?.id || 'NONE');
     
     if (!handle) {
-      // Not on a handle, but we're near a node/edge
-      // Let the event pass through to potentially select the node/edge
       console.log('No handle found - letting event through');
       return;
     }
     
-    // We found a handle - stop all event propagation
     console.log('Handle grabbed:', handle.id);
     e.stopPropagation();
     e.preventDefault();
@@ -349,10 +309,8 @@ const HandleLayer = ({
       endY: handle.position.y * zoom + pan.y
     };
     
-    // Keep sensor active while dragging
     setSensorActive(true);
     
-    // Add global document listeners immediately
     const handleGlobalMouseMove = (e) => {
       if (!draggingHandleRef.current) return;
       
@@ -367,12 +325,10 @@ const HandleLayer = ({
       
       const handle = draggingHandleRef.current;
       
-      // Get canvas bounds for proper coordinate conversion
       const rect = canvasRef.current.getBoundingClientRect();
       const graphX = (e.clientX - rect.left - pan.x) / zoom;
       const graphY = (e.clientY - rect.top - pan.y) / zoom;
       
-      // Find target node with proper coordinate checking
       const targetNode = nodes.find(node => {
         if (node.id === handle.nodeId) return false;
         
@@ -396,7 +352,6 @@ const HandleLayer = ({
         return isInside;
       });
       
-      // Emit drop event
       const dropEvent = {
         graph: { x: graphX, y: graphY },
         screen: { x: e.clientX, y: e.clientY },
@@ -408,13 +363,12 @@ const HandleLayer = ({
       
       eventBus.emit('handleDrop', dropEvent);
       
-      // Clean up
       document.removeEventListener('mousemove', handleGlobalMouseMove, true);
       document.removeEventListener('mouseup', handleGlobalMouseUp, true);
       draggingHandleRef.current = null;
       previewLineRef.current.visible = false;
-      setSensorActive(false); // Deactivate after drag ends
-      scheduleRender();
+      setSensorActive(false);
+      scheduleRender(); // Ensure immediate redraw on drop
       eventBus.emit('handleDragEnd', { handle });
     };
     
@@ -427,7 +381,6 @@ const HandleLayer = ({
 
   const handleSensorMouseMove = useCallback((e) => {
     if (draggingHandleRef.current) {
-      // Update preview line
       const rect = canvasRef.current.getBoundingClientRect();
       previewLineRef.current.endX = e.clientX - rect.left;
       previewLineRef.current.endY = e.clientY - rect.top;
@@ -436,7 +389,6 @@ const HandleLayer = ({
       return;
     }
     
-    // Handle hover detection
     const handle = findHandleAt(e.clientX, e.clientY);
     
     if (hoveredHandleRef.current !== handle) {
@@ -450,14 +402,12 @@ const HandleLayer = ({
       hoveredHandleRef.current = handle;
       
       if (handle) {
-        // Keep sensor active when over a handle!
         setSensorActive(true);
         eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
         if (sensorRef.current) {
           sensorRef.current.style.cursor = 'pointer';
         }
       } else {
-        // Only deactivate if we're not dragging
         if (!draggingHandleRef.current) {
           setSensorActive(false);
         }
@@ -490,10 +440,10 @@ const HandleLayer = ({
     return () => window.removeEventListener('resize', updateCanvasSize);
   }, [scheduleRender]);
 
-  // Redraw when handles, pan, or zoom change
+  // Redraw when nodes, edges, pan, or zoom change
   useEffect(() => {
     scheduleRender();
-  }, [handlePositions, pan, zoom, scheduleRender]);
+  }, [nodes, edges, pan, zoom, scheduleRender]);
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
@@ -529,7 +479,7 @@ const HandleLayer = ({
             left: 0,
             width: '100%',
             height: '100%',
-            pointerEvents: sensorActive ? 'auto' : 'none', // KEY: Only active when hovering nodes/edges
+            pointerEvents: sensorActive ? 'auto' : 'none',
             cursor: 'default',
             background: 'transparent'
           }}
@@ -540,6 +490,6 @@ const HandleLayer = ({
       {children}
     </HandlePositionContext.Provider>
   );
-};
+});
 
 export default HandleLayer;

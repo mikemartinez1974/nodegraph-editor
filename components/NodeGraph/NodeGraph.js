@@ -62,6 +62,26 @@ export default function NodeGraph({
   const [isNodeHovered, setIsNodeHovered] = useState(false);
   const [handlePositions, setHandlePositions] = useState({});
 
+  // Add refs for layers
+  const edgeCanvasRef = useRef(null);
+  const handleCanvasRef = useRef(null);
+  const groupRef = useRef(null);
+  const nodeContainerRef = useRef(null);
+
+  const layerRefs = {
+    edgeCanvas: edgeCanvasRef,
+    handleCanvas: handleCanvasRef,
+    group: groupRef,
+    nodeContainer: nodeContainerRef,
+  };
+
+  // New for transient dragging
+  const nodeRefs = useRef(new Map());  // Map<id, DOMElement>
+  const draggingInfoRef = useRef(null);  // {nodeId, offset: {x, y}} graph-space
+  const edgeLayerImperativeRef = useRef(null);
+  const handleLayerImperativeRef = useRef(null);
+  const lastMousePos = useRef(null); // New ref for mouse position
+
   // Process nodes with defaults
   const nodeList = useMemo(() => nodes.map(node => ({
     ...node,
@@ -70,39 +90,45 @@ export default function NodeGraph({
     visible: node.visible !== undefined ? node.visible : true
   })), [nodes]);
 
+  // Define handler functions outside useEffect
+  function handleNodeClick({ id, event }) {
+    if (!onNodeClick && setSelectedNodeIds) {
+      setSelectedNodeIds([id]);
+      if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+    }
+  }
+
+  function handleEdgeClick({ id, event }) {
+    if (!onEdgeClick && setSelectedEdgeIds) {
+      setSelectedEdgeIds([id]);
+      if (setSelectedNodeIds) setSelectedNodeIds([]);
+    }
+  }
+
+  function handleEdgeHover(id) {
+    setHoveredNodeId(id);
+  }
+
+  function handleNodeMouseEnter({ id }) {
+    setHoveredNodeId(id);
+    setIsNodeHovered(true);
+  }
+
+  function handleNodeMouseLeave({ id }) {
+    setIsNodeHovered(false);
+    if (hoverTimeoutRef.current[id]) {
+      clearTimeout(hoverTimeoutRef.current[id]);
+    }
+    hoverTimeoutRef.current[id] = setTimeout(() => {
+      if (!isNodeHovered && !isHandleHovered && !draggingHandle) {
+        setHoveredNodeId(prev => (prev === id ? null : prev));
+      }
+      hoverTimeoutRef.current[id] = null;
+    }, 250);
+  }
+
   // Event bus handlers for node/edge events
   useEffect(() => {
-    function handleNodeClick({ id, event }) {
-      if (!onNodeClick && setSelectedNodeIds) {
-        setSelectedNodeIds([id]);
-        if (setSelectedEdgeIds) setSelectedEdgeIds([]);
-      }
-    }
-    function handleEdgeClick({ id, event }) {
-      if (!onEdgeClick && setSelectedEdgeIds) {
-        setSelectedEdgeIds([id]);
-        if (setSelectedNodeIds) setSelectedNodeIds([]);
-      }
-    }
-    function handleEdgeHover(id) {
-      setHoveredNodeId(id);
-    }
-    function handleNodeMouseEnter({ id }) {
-      setHoveredNodeId(id);
-      setIsNodeHovered(true);
-    }
-    function handleNodeMouseLeave({ id }) {
-      setIsNodeHovered(false);
-      if (hoverTimeoutRef.current[id]) {
-        clearTimeout(hoverTimeoutRef.current[id]);
-      }
-      hoverTimeoutRef.current[id] = setTimeout(() => {
-        if (!isNodeHovered && !isHandleHovered && !draggingHandle) {
-          setHoveredNodeId(prev => (prev === id ? null : prev));
-        }
-        hoverTimeoutRef.current[id] = null;
-      }, 250);
-    }
     eventBus.on('nodeClick', handleNodeClick);
     eventBus.on('edgeClick', handleEdgeClick);
     eventBus.on('nodeMouseEnter', handleNodeMouseEnter);
@@ -136,19 +162,40 @@ export default function NodeGraph({
   // Node drag logic
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current) {
-      const newX = (e.clientX - dragOffset.current.x - (typeof pan?.x === 'number' ? pan.x : 0)) / (typeof zoom === 'number' ? zoom : 1);
-      const newY = (e.clientY - dragOffset.current.y - (typeof pan?.y === 'number' ? pan.y : 0)) / (typeof zoom === 'number' ? zoom : 1);
-      lastDragPosition.current = { x: newX, y: newY };
+      const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
+      const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
+      lastMousePos.current = { x: e.clientX, y: e.clientY };
+
+      if (!draggingInfoRef.current) {
+        draggingInfoRef.current = { nodeId: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
+      }
+      draggingInfoRef.current.offset.x += graphDx;
+      draggingInfoRef.current.offset.y += graphDy;
+
+      // Update lastDragPosition for onNodeDragEnd
+      lastDragPosition.current = {
+        x: lastDragPosition.current.x + graphDx,
+        y: lastDragPosition.current.y + graphDy
+      };
+
       if (!dragRafRef.current) {
         dragRafRef.current = requestAnimationFrame(() => {
-          if (typeof onNodeMove === 'function' && lastDragPosition.current) {
-            onNodeMove(draggingNodeIdRef.current, lastDragPosition.current);
+          // Move node DOM
+          const nodeEl = nodeRefs.current.get(draggingNodeIdRef.current);
+          if (nodeEl) {
+            nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
           }
+
+          // Redraw canvases
+          if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+          if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+
           dragRafRef.current = null;
         });
       }
     }
   }
+
   function onNodeDragStart(e, node) {
     e.preventDefault();
     setDraggingNodeId(node.id);
@@ -157,10 +204,37 @@ export default function NodeGraph({
       x: e.clientX - (node.position.x * zoom + pan.x),
       y: e.clientY - (node.position.y * zoom + pan.y)
     };
+    lastMousePos.current = { x: e.clientX, y: e.clientY };
+    lastDragPosition.current = { x: node.position.x, y: node.position.y }; // Initialize for onNodeDragEnd
     window.addEventListener('mousemove', onNodeDragMove);
     window.addEventListener('mouseup', handleNodeDragEnd);
   }
+
   function handleNodeDragEnd() {
+    if (draggingNodeIdRef.current && draggingInfoRef.current) {
+      const id = draggingNodeIdRef.current;
+      const offset = draggingInfoRef.current.offset;
+      const node = nodes.find(n => n.id === id);
+      if (node && typeof onNodeMove === 'function') {
+        const newPosition = { x: node.position.x + offset.x, y: node.position.y + offset.y };
+        onNodeMove(id, newPosition);
+      }
+
+      // Reset
+      const nodeEl = nodeRefs.current.get(id);
+      if (nodeEl) nodeEl.style.transform = '';
+      draggingInfoRef.current = null;
+
+      // Final redraw
+      if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+      if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+
+      // Call onNodeDragEnd if needed
+      if (typeof onNodeDragEnd === 'function') {
+        onNodeDragEnd(id, lastDragPosition.current);
+      }
+    }
+
     setDraggingNodeId(null);
     draggingNodeIdRef.current = null;
     if (dragRafRef.current) {
@@ -188,15 +262,34 @@ export default function NodeGraph({
             dragOffset.current.x = currentX;
             dragOffset.current.y = currentY;
             
-            group.nodeIds.forEach(nodeId => {
-              const node = nodes.find(n => n.id === nodeId);
-              if (node && typeof onNodeMove === 'function') {
-                onNodeMove(nodeId, {
-                  x: node.position.x + deltaX,
-                  y: node.position.y + deltaY
-                });
+            // Update node positions in the group
+            setNodes(prevNodes => prevNodes.map(node => {
+              if (group.nodeIds.includes(node.id)) {
+                return {
+                  ...node,
+                  position: {
+                    x: node.position.x + deltaX,
+                    y: node.position.y + deltaY
+                  }
+                };
               }
-            });
+              return node;
+            }));
+            
+            // Update group bounds
+            setGroups(prevGroups => prevGroups.map(g => {
+              if (g.id === group.id) {
+                return {
+                  ...g,
+                  bounds: {
+                    ...g.bounds,
+                    x: g.bounds.x + deltaX,
+                    y: g.bounds.y + deltaY
+                  }
+                };
+              }
+              return g;
+            }));
           }
         }
         dragRafRef.current = null;
@@ -208,7 +301,6 @@ export default function NodeGraph({
     e.preventDefault();
     setDraggingGroupId(group.id);
     draggingGroupIdRef.current = group.id;
-    
     const rect = containerRef.current?.getBoundingClientRect();
     if (rect) {
       dragOffset.current = {
@@ -216,7 +308,6 @@ export default function NodeGraph({
         y: (e.clientY - rect.top - pan.y) / zoom
       };
     }
-    
     window.addEventListener('mousemove', onGroupDragMove);
     window.addEventListener('mouseup', handleGroupDragEnd);
   }
@@ -224,173 +315,105 @@ export default function NodeGraph({
   function handleGroupDragEnd() {
     setDraggingGroupId(null);
     draggingGroupIdRef.current = null;
+    if (dragRafRef.current) {
+      cancelAnimationFrame(dragRafRef.current);
+      dragRafRef.current = null;
+    }
     window.removeEventListener('mousemove', onGroupDragMove);
     window.removeEventListener('mouseup', handleGroupDragEnd);
   }
 
-  function handleBackgroundClickFromPanZoom(e) {
-    if (typeof onBackgroundClick === 'function') onBackgroundClick(e);
+  // Handle background click from PanZoomLayer
+  function handleBackgroundClickFromPanZoom(event) {
+    if (typeof onBackgroundClick === 'function') {
+      onBackgroundClick(event);
+    }
     if (setSelectedNodeIds) setSelectedNodeIds([]);
     if (setSelectedEdgeIds) setSelectedEdgeIds([]);
   }
 
-  // Edge Handle Events - HandleLayer manages its own events, we just track state
-  useEffect(() => {
-    const handleHandleDragStart = ({ handle }) => {
-      setDraggingHandle(handle);
-    };
-    
-    const handleHandleDragEnd = ({ handle }) => {
-      setDraggingHandle(null);
-      setDraggingHandlePos(null);
-    };
-    
-    eventBus.on('handleDragStart', handleHandleDragStart);
-    eventBus.on('handleDragEnd', handleHandleDragEnd);
-    
-    return () => {
-      eventBus.off('handleDragStart', handleHandleDragStart);
-      eventBus.off('handleDragEnd', handleHandleDragEnd);
-    };
-  }, []);
-
-  // Window resize handler
-  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  useEffect(() => {
-    function handleResize() {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    }
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Mouse event handlers for node hover
-  const handleNodeMouseEnter = (nodeId) => {
-    setHoveredNodeId(nodeId);
-  };
-  const handleNodeMouseLeave = () => {
-    setHoveredNodeId(null);
-  };
-
-  // Marquee selection state
+  // Marquee selection logic
   const [isMarqueeSelecting, setIsMarqueeSelecting] = useState(false);
   const [marqueeStart, setMarqueeStart] = useState(null);
   const [marqueeEnd, setMarqueeEnd] = useState(null);
   const [selectionRect, setSelectionRect] = useState(null);
 
-  // Convert screen coordinates to graph coordinates
-  const screenToGraph = useCallback((screenX, screenY) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return { x: 0, y: 0 };
-    
-    return {
-      x: (screenX - rect.left - pan.x) / zoom,
-      y: (screenY - rect.top - pan.y) / zoom
-    };
-  }, [pan, zoom]);
+  const startMarqueeSelection = useCallback((e) => {
+    if (!e.shiftKey) return false;
 
-  // Convert graph coordinates to screen coordinates  
-  const graphToScreen = useCallback((graphX, graphY) => {
     const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return { x: 0, y: 0 };
-    
-    return {
-      x: graphX * zoom + pan.x + rect.left,
-      y: graphY * zoom + pan.y + rect.top
-    };
-  }, [pan, zoom]);
+    if (!rect) return false;
 
-  // Start marquee selection
-  const startMarqueeSelection = useCallback((event) => {
-    if (!event.shiftKey) return false;
-    
-    console.log('Starting marquee selection');
+    const startX = e.clientX - rect.left;
+    const startY = e.clientY - rect.top;
+
+    setMarqueeStart({ x: startX, y: startY });
+    setMarqueeEnd({ x: startX, y: startY });
     setIsMarqueeSelecting(true);
-    
-    const graphPos = screenToGraph(event.clientX, event.clientY);
-    setMarqueeStart(graphPos);
-    setMarqueeEnd(graphPos);
-    
-    // Calculate screen rect for overlay
-    const screenRect = {
-      x: event.clientX,
-      y: event.clientY,
-      width: 0,
-      height: 0
-    };
-    setSelectionRect(screenRect);
-    
+
     return true;
-  }, [screenToGraph]);
+  }, []);
 
-  // Update marquee selection
-  const updateMarqueeSelection = useCallback((event) => {
-    if (!isMarqueeSelecting || !marqueeStart) return;
-    
-    const graphPos = screenToGraph(event.clientX, event.clientY);
-    setMarqueeEnd(graphPos);
-    
-    // Calculate screen rect for overlay
-    const startScreen = graphToScreen(marqueeStart.x, marqueeStart.y);
-    const screenRect = {
-      x: Math.min(startScreen.x, event.clientX),
-      y: Math.min(startScreen.y, event.clientY),
-      width: Math.abs(event.clientX - startScreen.x),
-      height: Math.abs(event.clientY - startScreen.y)
-    };
-    setSelectionRect(screenRect);
-  }, [isMarqueeSelecting, marqueeStart, screenToGraph, graphToScreen]);
+  const updateMarqueeSelection = useCallback((e) => {
+    if (!isMarqueeSelecting) return;
 
-  // End marquee selection
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+
+    setMarqueeEnd({ x: endX, y: endY });
+
+    const minX = Math.min(marqueeStart.x, endX);
+    const minY = Math.min(marqueeStart.y, endY);
+    const width = Math.abs(endX - marqueeStart.x);
+    const height = Math.abs(endY - marqueeStart.y);
+
+    setSelectionRect({ x: minX, y: minY, width, height });
+  }, [isMarqueeSelecting, marqueeStart]);
+
   const endMarqueeSelection = useCallback((event) => {
-    if (!isMarqueeSelecting || !marqueeStart || !marqueeEnd) {
-      setIsMarqueeSelecting(false);
-      setMarqueeStart(null);
-      setMarqueeEnd(null);
-      setSelectionRect(null);
-      return;
-    }
+    if (!isMarqueeSelecting || !marqueeStart || !marqueeEnd) return;
 
-    console.log('Ending marquee selection', { marqueeStart, marqueeEnd });
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
 
-    // Calculate selection bounds in graph space
+    // Convert screen coords to graph coords
     const bounds = {
-      x: Math.min(marqueeStart.x, marqueeEnd.x),
-      y: Math.min(marqueeStart.y, marqueeEnd.y),
-      width: Math.abs(marqueeEnd.x - marqueeStart.x),
-      height: Math.abs(marqueeEnd.y - marqueeStart.y)
+      x: (Math.min(marqueeStart.x, marqueeEnd.x) - pan.x) / zoom,
+      y: (Math.min(marqueeStart.y, marqueeEnd.y) - pan.y) / zoom,
+      width: Math.abs(marqueeEnd.x - marqueeStart.x) / zoom,
+      height: Math.abs(marqueeEnd.y - marqueeStart.y) / zoom
     };
 
-    // Only proceed if selection is large enough
-    if (bounds.width >= 10 / zoom || bounds.height >= 10 / zoom) {
-      // Find nodes within selection bounds
-      const selectedNodes = nodes.filter(node => {
-        const nodeX = node.position.x;
-        const nodeY = node.position.y;
-        const nodeWidth = node.width || 120;
-        const nodeHeight = node.height || 60;
-        
-        // Check if node intersects with selection rectangle
-        return !(
-          nodeX + nodeWidth < bounds.x ||
-          nodeX > bounds.x + bounds.width ||
-          nodeY + nodeHeight < bounds.y ||
-          nodeY > bounds.y + bounds.height
-        );
-      });
+    // Find intersecting nodes
+    const selectedNodes = nodes.filter(node => {
+      const nodeX = node.position.x;
+      const nodeY = node.position.y;
+      const nodeWidth = node.width || 120;
+      const nodeHeight = node.height || 60;
+      
+      // Check if node intersects with selection rectangle
+      return !(
+        nodeX + nodeWidth < bounds.x ||
+        nodeX > bounds.x + bounds.width ||
+        nodeY + nodeHeight < bounds.y ||
+        nodeY > bounds.y + bounds.height
+      );
+    });
 
-      console.log('Selected nodes:', selectedNodes);
+    console.log('Selected nodes:', selectedNodes);
 
-      if (selectedNodes.length > 0 && setSelectedNodeIds) {
-        setSelectedNodeIds(selectedNodes.map(node => node.id));
-        if (setSelectedEdgeIds) setSelectedEdgeIds([]);
-        
-        // Emit event
-        eventBus.emit('nodes-selected', selectedNodes);
-        
-        if (onNodeClick && selectedNodes.length === 1) {
-          onNodeClick(selectedNodes[0].id, event);
-        }
+    if (selectedNodes.length > 0 && setSelectedNodeIds) {
+      setSelectedNodeIds(selectedNodes.map(node => node.id));
+      if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+      
+      // Emit event
+      eventBus.emit('nodes-selected', selectedNodes);
+      
+      if (onNodeClick && selectedNodes.length === 1) {
+        onNodeClick(selectedNodes[0].id, event);
       }
     }
 
@@ -441,8 +464,10 @@ export default function NodeGraph({
         onMarqueeStart={startMarqueeSelection}
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
+        layerRefs={layerRefs}
       >
         <GroupLayer
+          ref={groupRef}
           groups={groups}
           pan={pan}
           zoom={zoom}
@@ -454,6 +479,9 @@ export default function NodeGraph({
         />
         
         <EdgeLayer
+          ref={edgeLayerImperativeRef}
+          draggingInfoRef={draggingInfoRef}
+          canvasRef={edgeCanvasRef}
           edgeList={edges}
           nodeList={nodeList}
           pan={pan}
@@ -476,7 +504,9 @@ export default function NodeGraph({
         />
         
         <HandleLayer
-          canvasRef={canvasRef}
+          ref={handleLayerImperativeRef}
+          draggingInfoRef={draggingInfoRef}
+          canvasRef={handleCanvasRef}
           nodes={nodeList}
           edges={edges}
           pan={pan}
@@ -486,6 +516,8 @@ export default function NodeGraph({
 
         <div style={{ pointerEvents: draggingHandle ? 'none' : 'auto' }}>
           <NodeLayer
+            containerRef={nodeContainerRef}
+            nodeRefs={nodeRefs}
             nodes={nodeList.filter(node => node.visible !== false)}
             pan={pan}
             zoom={zoom}

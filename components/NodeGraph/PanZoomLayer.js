@@ -1,24 +1,51 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 
-const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarqueeStart, children, theme }) => {
+const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarqueeStart, children, theme, layerRefs }) => {
     const dragging = useRef(false);
     const lastPos = useRef({ x: 0, y: 0 });
     const mouseDownPosRef = React.useRef(null);
     const layerRef = useRef(null);
+
+    const tempPanRef = useRef({ x: 0, y: 0 });
+    const rafIdRef = useRef(null);
+
+    const applyTempPan = useCallback(() => {
+        const tx = tempPanRef.current.x;
+        const ty = tempPanRef.current.y;
+        const t = (tx || ty) ? `translate(${tx}px, ${ty}px)` : '';
+        
+        if (layerRefs.edgeCanvas.current) layerRefs.edgeCanvas.current.style.transform = t;
+        if (layerRefs.handleCanvas.current) layerRefs.handleCanvas.current.style.transform = t;
+        if (layerRefs.group.current) layerRefs.group.current.style.transform = t;
+        if (layerRefs.nodeContainer.current) layerRefs.nodeContainer.current.style.transform = t;
+    }, [layerRefs]);
 
     const handleMouseMove = useCallback((e) => {
         if (!dragging.current) return;
         const dx = e.clientX - lastPos.current.x;
         const dy = e.clientY - lastPos.current.y;
         lastPos.current = { x: e.clientX, y: e.clientY };
-        onPanZoom((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
-    }, [onPanZoom]);
+
+        tempPanRef.current.x += dx;
+        tempPanRef.current.y += dy;
+
+        if (!rafIdRef.current) {
+            rafIdRef.current = requestAnimationFrame(() => {
+                applyTempPan();
+                rafIdRef.current = null;
+            });
+        }
+    }, [applyTempPan]);
 
     const handleMouseUp = useCallback((e) => {
         if (e.button !== 0) return;
         dragging.current = false;
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUp);
+
+        onPanZoom((prev) => ({ x: prev.x + tempPanRef.current.x, y: prev.y + tempPanRef.current.y }));
+        tempPanRef.current = { x: 0, y: 0 };
+        applyTempPan();
 
         if (!mouseDownPosRef.current) return;
         const dx = Math.abs(e.clientX - mouseDownPosRef.current.x);
@@ -28,7 +55,7 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarq
             onBackgroundClick(e);
         }
         mouseDownPosRef.current = null;
-    }, [handleMouseMove, onBackgroundClick]);
+    }, [handleMouseMove, onBackgroundClick, applyTempPan, onPanZoom]);
 
     const handleMouseDown = useCallback((e) => {
         if (e.button !== 0) return;
