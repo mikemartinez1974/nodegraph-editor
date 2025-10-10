@@ -1,5 +1,5 @@
 // HandleLayer.js - Canvas-based handles for maximum performance
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
@@ -108,6 +108,7 @@ const HandleLayer = ({
   const hoveredHandleRef = useRef(null);
   const previewLineRef = useRef({ visible: false });
   const animationFrameRef = useRef(null);
+  const [isOverHandle, setIsOverHandle] = useState(false);
 
   // Calculate handles and position map with pure computation
   const { handlePositions, handlePositionMap } = useMemo(() => {
@@ -161,7 +162,7 @@ const HandleLayer = ({
         Math.pow(canvasY - screenY, 2)
       );
       
-      if (distance <= handleRadius + 2) { // Add small padding for easier clicking
+      if (distance <= handleRadius + 2) {
         return handle;
       }
     }
@@ -360,27 +361,6 @@ const HandleLayer = ({
       previewLineRef.current.endY = e.clientY - rect.top;
       
       scheduleRender();
-      
-      // Check for target node hover
-      const graphX = (e.clientX - pan.x) / zoom;
-      const graphY = (e.clientY - pan.y) / zoom;
-      
-      const hoveredNode = nodes.find(node => {
-        if (node.id === draggingHandleRef.current.nodeId) return false;
-        const nodeX = node.position?.x || node.x;
-        const nodeY = node.position?.y || node.y;
-        const nodeWidth = node.width || 60;
-        const nodeHeight = node.height || 60;
-        
-        return (
-          graphX >= nodeX - nodeWidth / 2 &&
-          graphX <= nodeX + nodeWidth / 2 &&
-          graphY >= nodeY - nodeHeight / 2 &&
-          graphY <= nodeY + nodeHeight / 2
-        );
-      });
-      
-      // Could emit node hover events here if needed
       return;
     }
     
@@ -400,70 +380,20 @@ const HandleLayer = ({
       if (handle) {
         eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
         canvasRef.current.style.cursor = 'pointer';
+        setIsOverHandle(true);
       } else {
         canvasRef.current.style.cursor = 'default';
+        setIsOverHandle(false);
       }
       
       scheduleRender();
     }
-  }, [findHandleAt, scheduleRender, nodes, pan, zoom]);
-
-  const handleMouseUp = useCallback((e) => {
-    if (!draggingHandleRef.current) return;
-    
-    const handle = draggingHandleRef.current;
-    const graphX = (e.clientX - pan.x) / zoom;
-    const graphY = (e.clientY - pan.y) / zoom;
-    
-    // Find target node
-    const targetNode = nodes.find(node => {
-      if (node.id === handle.nodeId) return false;
-      const nodeX = node.position?.x || node.x;
-      const nodeY = node.position?.y || node.y;
-      const nodeWidth = node.width || 60;
-      const nodeHeight = node.height || 60;
-      
-      return (
-        graphX >= nodeX - nodeWidth / 2 &&
-        graphX <= nodeX + nodeWidth / 2 &&
-        graphY >= nodeY - nodeHeight / 2 &&
-        graphY <= nodeY + nodeHeight / 2
-      );
-    });
-    
-    // Find associated edge
-    const associatedEdge = edges.find(edge => {
-      if (handle.direction === 'source') {
-        return edge.source === handle.nodeId && edge.type === handle.edgeType;
-      } else {
-        return edge.target === handle.nodeId && edge.type === handle.edgeType;
-      }
-    });
-    
-    // Emit drop event
-    eventBus.emit('handleDrop', {
-      graph: { x: graphX, y: graphY },
-      screen: { x: e.clientX, y: e.clientY },
-      sourceNode: handle.nodeId,
-      targetNode: targetNode?.id || null,
-      edgeType: handle.edgeType,
-      edgeId: associatedEdge?.id || null,
-      direction: handle.direction
-    });
-    
-    // Clean up
-    draggingHandleRef.current = null;
-    previewLineRef.current.visible = false;
-    scheduleRender();
-    
-    eventBus.emit('handleDragEnd', { handle });
-  }, [nodes, edges, pan, zoom, scheduleRender]);
+  }, [findHandleAt, scheduleRender]);
 
   // Canvas setup and resize handling
   useEffect(() => {
     const updateCanvasSize = () => {
       if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect();
         const width = window.innerWidth;
         const height = window.innerHeight;
         
@@ -485,8 +415,6 @@ const HandleLayer = ({
     scheduleRender();
   }, [handlePositions, pan, zoom, scheduleRender]);
 
-  // No longer need the old useEffect for global events - handled in mouseDown now
-
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
       <div 
@@ -506,12 +434,12 @@ const HandleLayer = ({
             position: 'absolute',
             top: 0,
             left: 0,
-            pointerEvents: 'auto',
+            // KEY FIX: Only capture pointer events when over a handle or dragging
+            pointerEvents: (isOverHandle || draggingHandleRef.current) ? 'auto' : 'none',
             cursor: 'default'
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
         />
       </div>
       {children}
