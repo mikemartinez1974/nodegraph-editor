@@ -53,13 +53,6 @@ export default function GraphEditor({ backgroundImage }) {
     edgesRef.current = edges;
   }, [edges]);
 
-  useEffect(() => {
-    // Always load the intro graph on startup
-    import('./introGraph').then(({ introGraph }) => {
-      handleLoadGraph(introGraph.nodes, introGraph.edges);
-    });
-  }, []);
-
   // Compute hovered edge endpoints
   let hoveredEdgeSource = null;
   let hoveredEdgeTarget = null;
@@ -445,6 +438,13 @@ export default function GraphEditor({ backgroundImage }) {
     edgesRef,
     nodesRef
   });
+
+  // Load IntroGraph.json at startup
+  useEffect(() => {
+    import('../data/IntroGraph.json').then((data) => {
+      handleLoadGraph(data.nodes, data.edges);
+    });
+  }, []);
 
   return (
     <div id="graph-editor-background" style={{

@@ -108,7 +108,8 @@ const HandleLayer = ({
   const hoveredHandleRef = useRef(null);
   const previewLineRef = useRef({ visible: false });
   const animationFrameRef = useRef(null);
-  const [isOverHandle, setIsOverHandle] = useState(false);
+  const sensorRef = useRef(null);
+  const [sensorActive, setSensorActive] = useState(false);
 
   // Calculate handles and position map with pure computation
   const { handlePositions, handlePositionMap } = useMemo(() => {
@@ -123,6 +124,67 @@ const HandleLayer = ({
     });
     return { handlePositions: allHandles, handlePositionMap: handleMap };
   }, [nodes, edgeTypes]);
+
+  // Listen for node/edge hover events to activate sensor
+  useEffect(() => {
+    const handleNodeHover = () => {
+      setSensorActive(true);
+    };
+    
+    const handleNodeUnhover = () => {
+      // Don't deactivate immediately if we're dragging
+      if (!draggingHandleRef.current) {
+        setSensorActive(false);
+      }
+    };
+    
+    const handleEdgeHover = () => {
+      setSensorActive(true);
+    };
+    
+    const handleEdgeUnhover = () => {
+      // Don't deactivate immediately if we're dragging
+      if (!draggingHandleRef.current) {
+        setSensorActive(false);
+      }
+    };
+
+    const handleNodeMouseEnter = () => {
+      setSensorActive(true);
+    };
+
+    const handleNodeMouseLeave = () => {
+      if (!draggingHandleRef.current) {
+        setSensorActive(false);
+      }
+    };
+
+    const handleEdgeMouseEnter = () => {
+      setSensorActive(true);
+    };
+
+    const handleEdgeMouseLeave = () => {
+      if (!draggingHandleRef.current) {
+        setSensorActive(false);
+      }
+    };
+    
+    eventBus.on('nodeHover', handleNodeHover);
+    eventBus.on('nodeUnhover', handleNodeUnhover);
+    eventBus.on('nodeMouseEnter', handleNodeMouseEnter);
+    eventBus.on('nodeMouseLeave', handleNodeMouseLeave);
+    eventBus.on('edgeMouseEnter', handleEdgeHover);
+    eventBus.on('edgeMouseLeave', handleEdgeUnhover);
+    
+    return () => {
+      eventBus.off('nodeHover', handleNodeHover);
+      eventBus.off('nodeUnhover', handleNodeUnhover);
+      eventBus.off('nodeMouseEnter', handleNodeMouseEnter);
+      eventBus.off('nodeMouseLeave', handleNodeMouseLeave);
+      eventBus.off('edgeMouseEnter', handleEdgeHover);
+      eventBus.off('edgeMouseLeave', handleEdgeUnhover);
+    };
+  }, []);
 
   // Context functions
   const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
@@ -257,13 +319,28 @@ const HandleLayer = ({
     });
   }, [drawCanvas]);
 
-  // Event handlers
-  const handleMouseDown = useCallback((e) => {
-    const handle = findHandleAt(e.clientX, e.clientY);
-    if (!handle) return;
+  // Event handlers for sensor layer
+  const handleSensorMouseDown = useCallback((e) => {
+    console.log('Sensor mousedown fired, sensorActive:', sensorActive);
+    console.log('Hovered handle ref:', hoveredHandleRef.current);
     
+    // When sensor is active (hovering node/edge), we should check for handles
+    const handle = findHandleAt(e.clientX, e.clientY);
+    
+    console.log('Handle found at mousedown:', handle?.id || 'NONE');
+    
+    if (!handle) {
+      // Not on a handle, but we're near a node/edge
+      // Let the event pass through to potentially select the node/edge
+      console.log('No handle found - letting event through');
+      return;
+    }
+    
+    // We found a handle - stop all event propagation
+    console.log('Handle grabbed:', handle.id);
     e.stopPropagation();
     e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
     
     draggingHandleRef.current = handle;
     previewLineRef.current = {
@@ -271,6 +348,9 @@ const HandleLayer = ({
       endX: handle.position.x * zoom + pan.x,
       endY: handle.position.y * zoom + pan.y
     };
+    
+    // Keep sensor active while dragging
+    setSensorActive(true);
     
     // Add global document listeners immediately
     const handleGlobalMouseMove = (e) => {
@@ -291,8 +371,6 @@ const HandleLayer = ({
       const rect = canvasRef.current.getBoundingClientRect();
       const graphX = (e.clientX - rect.left - pan.x) / zoom;
       const graphY = (e.clientY - rect.top - pan.y) / zoom;
-      
-      console.log('Drop at graph coords:', graphX, graphY);
       
       // Find target node with proper coordinate checking
       const targetNode = nodes.find(node => {
@@ -315,14 +393,8 @@ const HandleLayer = ({
           graphY <= nodeBottom
         );
         
-        if (isInside) {
-          console.log('Target found:', node.id, 'at', nodeX, nodeY);
-        }
-        
         return isInside;
       });
-      
-      console.log('Final target:', targetNode?.id || 'none');
       
       // Emit drop event
       const dropEvent = {
@@ -334,7 +406,6 @@ const HandleLayer = ({
         direction: handle.direction
       };
       
-      console.log('Emitting handleDrop event:', dropEvent);
       eventBus.emit('handleDrop', dropEvent);
       
       // Clean up
@@ -342,6 +413,7 @@ const HandleLayer = ({
       document.removeEventListener('mouseup', handleGlobalMouseUp, true);
       draggingHandleRef.current = null;
       previewLineRef.current.visible = false;
+      setSensorActive(false); // Deactivate after drag ends
       scheduleRender();
       eventBus.emit('handleDragEnd', { handle });
     };
@@ -353,7 +425,7 @@ const HandleLayer = ({
     eventBus.emit('handleDragStart', { handle });
   }, [findHandleAt, scheduleRender, pan, zoom, nodes]);
 
-  const handleMouseMove = useCallback((e) => {
+  const handleSensorMouseMove = useCallback((e) => {
     if (draggingHandleRef.current) {
       // Update preview line
       const rect = canvasRef.current.getBoundingClientRect();
@@ -378,12 +450,20 @@ const HandleLayer = ({
       hoveredHandleRef.current = handle;
       
       if (handle) {
+        // Keep sensor active when over a handle!
+        setSensorActive(true);
         eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
-        canvasRef.current.style.cursor = 'pointer';
-        setIsOverHandle(true);
+        if (sensorRef.current) {
+          sensorRef.current.style.cursor = 'pointer';
+        }
       } else {
-        canvasRef.current.style.cursor = 'default';
-        setIsOverHandle(false);
+        // Only deactivate if we're not dragging
+        if (!draggingHandleRef.current) {
+          setSensorActive(false);
+        }
+        if (sensorRef.current) {
+          sensorRef.current.style.cursor = 'default';
+        }
       }
       
       scheduleRender();
@@ -428,18 +508,33 @@ const HandleLayer = ({
           zIndex: 20 
         }}
       >
+        {/* Visual canvas - no pointer events */}
         <canvas
           ref={canvasRef}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            // KEY FIX: Only capture pointer events when over a handle or dragging
-            pointerEvents: (isOverHandle || draggingHandleRef.current) ? 'auto' : 'none',
+            pointerEvents: 'none',
             cursor: 'default'
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
+        />
+        
+        {/* Context-aware sensor - only active when hovering nodes/edges */}
+        <div
+          ref={sensorRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: sensorActive ? 'auto' : 'none', // KEY: Only active when hovering nodes/edges
+            cursor: 'default',
+            background: 'transparent'
+          }}
+          onMouseDown={handleSensorMouseDown}
+          onMouseMove={handleSensorMouseMove}
         />
       </div>
       {children}

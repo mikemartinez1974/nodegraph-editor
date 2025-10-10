@@ -37,6 +37,126 @@ function isPointNearBezier(x, y, x1, y1, cx1, cy1, cx2, cy2, x2, y2, threshold =
   return false;
 }
 
+// Helper to get label position on edge
+function getEdgeLabelPosition(sourcePos, targetPos, isCurved, curveDirection) {
+  if (isCurved) {
+    // For curved edges, place label at the curve peak
+    const midX = (sourcePos.x + targetPos.x) / 2;
+    const midY = (sourcePos.y + targetPos.y) / 2;
+    
+    if (curveDirection === 'horizontal') {
+      // Bezier curve goes through (midX, sourcePos.y) and (midX, targetPos.y)
+      // Label at t=0.5 of bezier
+      const t = 0.5;
+      const x = Math.pow(1 - t, 3) * sourcePos.x + 
+                3 * Math.pow(1 - t, 2) * t * midX + 
+                3 * (1 - t) * Math.pow(t, 2) * midX + 
+                Math.pow(t, 3) * targetPos.x;
+      const y = Math.pow(1 - t, 3) * sourcePos.y + 
+                3 * Math.pow(1 - t, 2) * t * sourcePos.y + 
+                3 * (1 - t) * Math.pow(t, 2) * targetPos.y + 
+                Math.pow(t, 3) * targetPos.y;
+      return { x, y };
+    } else {
+      // Vertical curve
+      const t = 0.5;
+      const x = Math.pow(1 - t, 3) * sourcePos.x + 
+                3 * Math.pow(1 - t, 2) * t * sourcePos.x + 
+                3 * (1 - t) * Math.pow(t, 2) * targetPos.x + 
+                Math.pow(t, 3) * targetPos.x;
+      const y = Math.pow(1 - t, 3) * sourcePos.y + 
+                3 * Math.pow(1 - t, 2) * t * midY + 
+                3 * (1 - t) * Math.pow(t, 2) * midY + 
+                Math.pow(t, 3) * targetPos.y;
+      return { x, y };
+    }
+  } else {
+    // For straight edges, place label at midpoint
+    return {
+      x: (sourcePos.x + targetPos.x) / 2,
+      y: (sourcePos.y + targetPos.y) / 2
+    };
+  }
+}
+
+// Draw edge label
+function drawEdgeLabel(ctx, label, labelPos, theme, isSelected, isHovered) {
+  if (!label) return;
+  
+  // Style configuration
+  const fontSize = 12;
+  const fontFamily = theme?.typography?.fontFamily || 'Arial, sans-serif';
+  const padding = 6;
+  
+  // Set font for measurement
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  const metrics = ctx.measureText(label);
+  const textWidth = metrics.width;
+  const textHeight = fontSize;
+  
+  // Background and border colors
+  let bgColor = theme?.palette?.background?.paper || '#ffffff';
+  let borderColor = theme?.palette?.divider || '#e0e0e0';
+  let textColor = theme?.palette?.text?.primary || '#000000';
+  
+  if (isSelected) {
+    bgColor = theme?.palette?.secondary?.light || '#f48fb1';
+    borderColor = theme?.palette?.secondary?.main || '#dc004e';
+    textColor = theme?.palette?.secondary?.contrastText || '#000000';
+  } else if (isHovered) {
+    borderColor = theme?.palette?.primary?.main || '#1976d2';
+  }
+  
+  // Draw background
+  ctx.save();
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(
+    labelPos.x - textWidth / 2 - padding,
+    labelPos.y - textHeight / 2 - padding,
+    textWidth + padding * 2,
+    textHeight + padding * 2
+  );
+  
+  // Draw border
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = isSelected ? 2 : 1;
+  ctx.strokeRect(
+    labelPos.x - textWidth / 2 - padding,
+    labelPos.y - textHeight / 2 - padding,
+    textWidth + padding * 2,
+    textHeight + padding * 2
+  );
+  
+  // Draw text
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, labelPos.x, labelPos.y);
+  
+  ctx.restore();
+}
+
+// Check if point is in label bounds (for clicking)
+function isPointInLabel(x, y, labelPos, labelText, ctx) {
+  if (!labelText || !labelPos) return false;
+  
+  ctx.save();
+  ctx.font = '12px Arial, sans-serif';
+  const metrics = ctx.measureText(labelText);
+  const textWidth = metrics.width;
+  const textHeight = 12;
+  const padding = 6;
+  
+  ctx.restore();
+  
+  return (
+    x >= labelPos.x - textWidth / 2 - padding &&
+    x <= labelPos.x + textWidth / 2 + padding &&
+    y >= labelPos.y - textHeight / 2 - padding &&
+    y <= labelPos.y + textHeight / 2 + padding
+  );
+}
+
 function EdgeLayer({ 
   edgeList = [], 
   nodeList = [], 
@@ -54,6 +174,7 @@ function EdgeLayer({
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const { getHandlePositionForEdge } = useContext(HandlePositionContext);
   const prevHoveredEdgeRef = useRef(null);
+  const edgeDataRef = useRef([]); // Store edge rendering data for hit testing
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -78,24 +199,59 @@ function EdgeLayer({
     const mouseX = (e.clientX - rect.left - pan.x) / zoom;
     const mouseY = (e.clientY - rect.top - pan.y) / zoom;
     let found = null;
-    for (const edge of edgeList) {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) continue;
-      let hit = false;
-      const isCurved = edge.style?.curved === true;
-      if (isCurved) {
-        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40;
-        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
-      } else {
-        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
-      }
-      if (hit) {
-        found = edge.id;
-        break;
+    
+    const ctx = canvasRef.current.getContext('2d');
+    
+    // Check labels first (higher priority)
+    for (const edgeData of edgeDataRef.current) {
+      if (edgeData.label && edgeData.labelPos) {
+        if (isPointInLabel(mouseX, mouseY, edgeData.labelPos, edgeData.label, ctx)) {
+          found = edgeData.id;
+          break;
+        }
       }
     }
+    
+    // If not on label, check edge lines
+    if (!found) {
+      for (const edgeData of edgeDataRef.current) {
+        let hit = false;
+        if (edgeData.isCurved) {
+          const midX = (edgeData.sourcePos.x + edgeData.targetPos.x) / 2;
+          const midY = (edgeData.sourcePos.y + edgeData.targetPos.y) / 2;
+          
+          if (edgeData.curveDirection === 'horizontal') {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              midX, edgeData.sourcePos.y,
+              midX, edgeData.targetPos.y,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          } else {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              edgeData.sourcePos.x, midY,
+              edgeData.targetPos.x, midY,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          }
+        } else {
+          hit = isPointNearLine(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        }
+        
+        if (hit) {
+          found = edgeData.id;
+          break;
+        }
+      }
+    }
+    
     if (prevHoveredEdgeRef.current !== found) {
       if (prevHoveredEdgeRef.current) {
         eventBus.emit('edgeMouseLeave', { id: prevHoveredEdgeRef.current });
@@ -129,26 +285,61 @@ function EdgeLayer({
     let found = null;
     let foundEdge = null;
     
+    const ctx = canvasRef.current.getContext('2d');
+    
+    // Check labels first
     for (const edge of edgeList) {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) continue;
-
-      let hit = false;
-      const isCurved = edge.style?.curved === true;
-
-      if (isCurved) {
-        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40;
-        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
-      } else {
-        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
+      const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
+      if (edgeData?.label && edgeData?.labelPos) {
+        if (isPointInLabel(mouseX, mouseY, edgeData.labelPos, edgeData.label, ctx)) {
+          found = edge.id;
+          foundEdge = edge;
+          break;
+        }
       }
-      
-      if (hit) {
-        found = edge.id;
-        foundEdge = edge;
-        break;
+    }
+    
+    // If not on label, check edge lines
+    if (!found) {
+      for (const edge of edgeList) {
+        const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
+        if (!edgeData) continue;
+        
+        let hit = false;
+        if (edgeData.isCurved) {
+          const midX = (edgeData.sourcePos.x + edgeData.targetPos.x) / 2;
+          const midY = (edgeData.sourcePos.y + edgeData.targetPos.y) / 2;
+          
+          if (edgeData.curveDirection === 'horizontal') {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              midX, edgeData.sourcePos.y,
+              midX, edgeData.targetPos.y,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          } else {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              edgeData.sourcePos.x, midY,
+              edgeData.targetPos.x, midY,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          }
+        } else {
+          hit = isPointNearLine(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        }
+        
+        if (hit) {
+          found = edge.id;
+          foundEdge = edge;
+          break;
+        }
       }
     }
     
@@ -168,26 +359,61 @@ function EdgeLayer({
     let found = null;
     let foundEdge = null;
     
+    const ctx = canvasRef.current.getContext('2d');
+    
+    // Check labels first
     for (const edge of edgeList) {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) continue;
-
-      let hit = false;
-      const isCurved = edge.style?.curved === true;
-
-      if (isCurved) {
-        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40;
-        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
-      } else {
-        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
+      const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
+      if (edgeData?.label && edgeData?.labelPos) {
+        if (isPointInLabel(mouseX, mouseY, edgeData.labelPos, edgeData.label, ctx)) {
+          found = edge.id;
+          foundEdge = edge;
+          break;
+        }
       }
-      
-      if (hit) {
-        found = edge.id;
-        foundEdge = edge;
-        break;
+    }
+    
+    // If not on label, check edge lines
+    if (!found) {
+      for (const edge of edgeList) {
+        const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
+        if (!edgeData) continue;
+        
+        let hit = false;
+        if (edgeData.isCurved) {
+          const midX = (edgeData.sourcePos.x + edgeData.targetPos.x) / 2;
+          const midY = (edgeData.sourcePos.y + edgeData.targetPos.y) / 2;
+          
+          if (edgeData.curveDirection === 'horizontal') {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              midX, edgeData.sourcePos.y,
+              midX, edgeData.targetPos.y,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          } else {
+            hit = isPointNearBezier(
+              mouseX, mouseY,
+              edgeData.sourcePos.x, edgeData.sourcePos.y,
+              edgeData.sourcePos.x, midY,
+              edgeData.targetPos.x, midY,
+              edgeData.targetPos.x, edgeData.targetPos.y
+            );
+          }
+        } else {
+          hit = isPointNearLine(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        }
+        
+        if (hit) {
+          found = edge.id;
+          foundEdge = edge;
+          break;
+        }
       }
     }
     
@@ -203,20 +429,49 @@ function EdgeLayer({
     const mouseX = (e.clientX - rect.left - pan.x) / zoom;
     const mouseY = (e.clientY - rect.top - pan.y) / zoom;
     
+    const ctx = canvasRef.current.getContext('2d');
+    
     for (const edge of edgeList) {
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
-      if (!sourceNode || !targetNode) continue;
+      const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
+      if (!edgeData) continue;
       
+      // Check label
+      if (edgeData.label && edgeData.labelPos) {
+        if (isPointInLabel(mouseX, mouseY, edgeData.labelPos, edgeData.label, ctx)) {
+          e.stopPropagation();
+          break;
+        }
+      }
+      
+      // Check edge line
       let hit = false;
-      const isCurved = edge.style?.curved === true;
-      
-      if (isCurved) {
-        const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-        const midY = (sourceNode.position.y + targetNode.position.y) / 2 - 40;
-        hit = isPointNearBezier(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, midX, sourceNode.position.y, midX, targetNode.position.y, targetNode.position.x, targetNode.position.y);
+      if (edgeData.isCurved) {
+        const midX = (edgeData.sourcePos.x + edgeData.targetPos.x) / 2;
+        const midY = (edgeData.sourcePos.y + edgeData.targetPos.y) / 2;
+        
+        if (edgeData.curveDirection === 'horizontal') {
+          hit = isPointNearBezier(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            midX, edgeData.sourcePos.y,
+            midX, edgeData.targetPos.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        } else {
+          hit = isPointNearBezier(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.sourcePos.x, midY,
+            edgeData.targetPos.x, midY,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        }
       } else {
-        hit = isPointNearLine(mouseX, mouseY, sourceNode.position.x, sourceNode.position.y, targetNode.position.x, targetNode.position.y);
+        hit = isPointNearLine(
+          mouseX, mouseY,
+          edgeData.sourcePos.x, edgeData.sourcePos.y,
+          edgeData.targetPos.x, edgeData.targetPos.y
+        );
       }
       
       if (hit) {
@@ -238,6 +493,9 @@ function EdgeLayer({
     
     const devicePixelRatio = setupHiDPICanvas(canvas, ctx, canvasSize.width, canvasSize.height);
     clearCanvas(ctx, canvasSize.width, canvasSize.height);
+
+    // Store edge data for hit testing
+    const newEdgeData = [];
 
     ctx.save();
     ctx.translate(pan.x, pan.y);
@@ -400,9 +658,31 @@ function EdgeLayer({
         ctx.restore();
       }
       
+      // Draw edge label
+      const label = edge.label || edge.data?.label;
+      let labelPos = null;
+      
+      if (label) {
+        labelPos = getEdgeLabelPosition(sourcePos, targetPos, isCurved, curveDirection);
+        drawEdgeLabel(ctx, label, labelPos, theme, isSelected, isHovered);
+      }
+      
+      // Store edge data for hit testing
+      newEdgeData.push({
+        id: edge.id,
+        sourcePos,
+        targetPos,
+        isCurved,
+        curveDirection,
+        label,
+        labelPos
+      });
+      
       ctx.setLineDash([]);
       ctx.restore();
     });
+    
+    edgeDataRef.current = newEdgeData;
     
     ctx.restore();
     
@@ -420,7 +700,7 @@ function EdgeLayer({
       ref={canvasRef}
       width={canvasSize.width}
       height={canvasSize.height}
-      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'auto', zIndex: 5 }}
+      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'auto', zIndex: 10 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
