@@ -105,3 +105,39 @@ export function onNodeDragEnd(setDraggingNodeId, draggingNodeIdRef, onNodeDragMo
   window.removeEventListener('mousemove', onNodeDragMove);
   window.removeEventListener('mouseup', onNodeDragEnd);
 }
+
+export function handleNodeClick({ id, event, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick }) {
+  if (!onNodeClick && setSelectedNodeIds) {
+    setSelectedNodeIds([id]);
+    if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+  }
+}
+
+export function handleEdgeClick({ id, event, setSelectedEdgeIds, setSelectedNodeIds, onEdgeClick }) {
+  if (!onEdgeClick && setSelectedEdgeIds) {
+    setSelectedEdgeIds([id]);
+    if (setSelectedNodeIds) setSelectedNodeIds([]);
+  }
+}
+
+export function handleEdgeHover(id, setHoveredNodeId) {
+  setHoveredNodeId(id);
+}
+
+export function handleNodeMouseEnter({ id, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) {
+  setHoveredNodeId(id);
+  setIsNodeHovered(true);
+}
+
+export function handleNodeMouseLeave({ id, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) {
+  setIsNodeHovered(false);
+  if (hoverTimeoutRef.current[id]) {
+    clearTimeout(hoverTimeoutRef.current[id]);
+  }
+  hoverTimeoutRef.current[id] = setTimeout(() => {
+    if (!isNodeHovered && !isHandleHovered && !draggingHandle) {
+      setHoveredNodeId(prev => (prev === id ? null : prev));
+    }
+    hoverTimeoutRef.current[id] = null;
+  }, 250);
+}

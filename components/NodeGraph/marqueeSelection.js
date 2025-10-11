@@ -101,111 +101,117 @@ export class MarqueeSelector {
 }
 
 // React hook for marquee selection
-export function useMarqueeSelection(nodes = [], onSelectionChange, options = {}) {
-  const {
-    enabled = true,
-    multiSelect = true,
-    minSelectionSize = 5,
-    modifierKey = null // 'ctrl', 'shift', 'alt', or null for always enabled
-  } = options;
-
-  const selectorRef = useRef(new MarqueeSelector());
+export function useMarqueeSelection({ nodes, pan, zoom, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, containerRef }) {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionRect, setSelectionRect] = useState(null);
-  const [selectedNodes, setSelectedNodes] = useState([]);
+  const marqueeStartRef = useRef(null);
+  const marqueeEndRef = useRef(null);
 
-  const startSelection = useCallback((event) => {
-    if (!enabled) return false;
+  const startSelection = useCallback((e) => {
+    if (!e.shiftKey) return false;
 
-    // Check modifier key if specified
-    if (modifierKey) {
-      const hasModifier = (
-        (modifierKey === 'ctrl' && (event.ctrlKey || event.metaKey)) ||
-        (modifierKey === 'shift' && event.shiftKey) ||
-        (modifierKey === 'alt' && event.altKey)
-      );
-      
-      if (!hasModifier) return false;
-    }
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return false;
 
-    const point = getEventPoint(event);
-    selectorRef.current.startSelection(point);
+    const startX = e.clientX - rect.left;
+    const startY = e.clientY - rect.top;
+
+    marqueeStartRef.current = { x: startX, y: startY };
+    marqueeEndRef.current = { x: startX, y: startY };
     setIsSelecting(true);
-    setSelectionRect(selectorRef.current.getSelectionRect());
-    
+
+    console.log('startSelection: Selection started at', { x: startX, y: startY }); // Debug log
+
     return true;
-  }, [enabled, modifierKey]);
+  }, [containerRef]);
 
-  const updateSelection = useCallback((event) => {
+  const updateSelection = useCallback((e) => {
     if (!isSelecting) return;
 
-    const point = getEventPoint(event);
-    selectorRef.current.updateSelection(point);
-    
-    const rect = selectorRef.current.getSelectionRect();
-    setSelectionRect(rect);
+    console.log('updateSelection: Mouse moved, updating selection rectangle'); // Debug log
 
-    // Update selected nodes in real-time if rectangle is large enough
-    if (rect && (rect.width >= minSelectionSize || rect.height >= minSelectionSize)) {
-      const selected = selectorRef.current.getSelectedNodes(nodes);
-      setSelectedNodes(selected);
-    }
-  }, [isSelecting, nodes, minSelectionSize]);
-
-  const endSelection = useCallback((event) => {
-    if (!isSelecting) return [];
-
-    const finalRect = selectorRef.current.endSelection();
-    setIsSelecting(false);
-    setSelectionRect(null);
-
-    let finalSelection = [];
-    
-    // Only commit selection if rectangle meets minimum size
-    if (finalRect && (finalRect.width >= minSelectionSize || finalRect.height >= minSelectionSize)) {
-      finalSelection = selectorRef.current.getSelectedNodes(nodes);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) {
+        console.log('updateSelection: Container rect not found'); // Debug log
+        return;
     }
 
-    setSelectedNodes(finalSelection);
-    
-    if (onSelectionChange) {
-      onSelectionChange(finalSelection, event);
-    }
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
 
-    return finalSelection;
-  }, [isSelecting, nodes, minSelectionSize, onSelectionChange]);
+    marqueeEndRef.current = { x: endX, y: endY };
 
-  const cancelSelection = useCallback(() => {
+    const minX = Math.min(marqueeStartRef.current.x, endX);
+    const minY = Math.min(marqueeStartRef.current.y, endY);
+    const width = Math.abs(endX - marqueeStartRef.current.x);
+    const height = Math.abs(endY - marqueeStartRef.current.y);
+
+    setSelectionRect({ x: minX, y: minY, width, height });
+
+    console.log('updateSelection: Updated selection rectangle to', { x: minX, y: minY, width, height }); // Debug log
+  }, [isSelecting, containerRef]);
+
+  const endSelection = useCallback((e) => {
     if (!isSelecting) return;
 
-    selectorRef.current.cancelSelection();
-    setIsSelecting(false);
-    setSelectionRect(null);
-    setSelectedNodes([]);
-  }, [isSelecting]);
+    console.log('endSelection: Ending selection process'); // Debug log
 
-  // Cancel selection on escape key
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && isSelecting) {
-        event.preventDefault();
-        cancelSelection();
-      }
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) {
+        console.log('endSelection: Container rect not found'); // Debug log
+        return;
+    }
+
+    const bounds = {
+      x: (Math.min(marqueeStartRef.current.x, marqueeEndRef.current.x) - pan.x) / zoom,
+      y: (Math.min(marqueeStartRef.current.y, marqueeEndRef.current.y) - pan.y) / zoom,
+      width: Math.abs(marqueeEndRef.current.x - marqueeStartRef.current.x) / zoom,
+      height: Math.abs(marqueeEndRef.current.y - marqueeStartRef.current.y) / zoom
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isSelecting, cancelSelection]);
+    console.log('endSelection: Calculated bounds', bounds); // Debug log
+
+    const selectedNodes = nodes.filter(node => {
+      const nodeX = node.position.x;
+      const nodeY = node.position.y;
+      const nodeWidth = node.width || 120;
+      const nodeHeight = node.height || 60;
+
+      return !(
+        nodeX + nodeWidth < bounds.x ||
+        nodeX > bounds.x + bounds.width ||
+        nodeY + nodeHeight < bounds.y ||
+        nodeY > bounds.y + bounds.height
+      );
+    });
+
+    if (selectedNodes.length > 0 && setSelectedNodeIds) {
+      setSelectedNodeIds(selectedNodes.map(node => node.id));
+      if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+
+      console.log('endSelection: Selected nodes:', selectedNodes.map(node => node.id)); // Debug log
+
+      if (onNodeClick && selectedNodes.length === 1) {
+        onNodeClick(selectedNodes[0].id, e);
+      }
+    } else {
+      console.log('endSelection: No nodes selected'); // Debug log
+    }
+
+    setIsSelecting(false);
+    marqueeStartRef.current = null;
+    marqueeEndRef.current = null;
+    setSelectionRect(null);
+
+    console.log('endSelection: Selection process completed'); // Debug log
+  }, [isSelecting, pan, nodes, zoom, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, containerRef]);
 
   return {
     isSelecting,
     selectionRect,
-    selectedNodes,
     startSelection,
     updateSelection,
-    endSelection,
-    cancelSelection,
-    selector: selectorRef.current
+    endSelection
   };
 }
 
@@ -223,16 +229,16 @@ export function MarqueeOverlay({ selectionRect, theme, className = "" }) {
   if (!selectionRect) return null;
 
   const style = {
-    position: 'absolute',
+    position: "absolute",
     left: selectionRect.x,
     top: selectionRect.y,
     width: selectionRect.width,
     height: selectionRect.height,
-    border: `2px dashed ${theme?.palette?.primary?.main || '#1976d2'}`,
-    backgroundColor: `${theme?.palette?.primary?.main || '#1976d2'}20`,
-    pointerEvents: 'none',
+    border: `2px dashed ${theme?.palette?.primary?.main || "#1976d2"}`,
+    backgroundColor: `${theme?.palette?.primary?.main || "#1976d2"}20`,
+    pointerEvents: "none",
     zIndex: 1000,
-    boxSizing: 'border-box'
+    boxSizing: "border-box",
   };
 
   return <div className={`marquee-selection ${className}`} style={style} />;
@@ -411,4 +417,15 @@ export function useSelectionManager() {
     clearSelection,
     manager: managerRef.current
   };
+}
+
+// Helper function to handle marquee start
+export function handleMarqueeStart({ e, startSelection }) {
+  if (!e.shiftKey) return false;
+
+  console.log('handleMarqueeStart: Shift key detected, attempting to start marquee selection'); // Debug log
+  const started = startSelection(e);
+  console.log('handleMarqueeStart: Marquee selection started:', started); // Debug log
+
+  return started; // Ensure it returns true when marquee selection starts
 }

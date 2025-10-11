@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 
-const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarqueeStart, children, theme, layerRefs }) => {
+const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarqueeStart, children, theme, layerRefs }, ref) => {
     const dragging = useRef(false);
     const lastPos = useRef({ x: 0, y: 0 });
     const mouseDownPosRef = React.useRef(null);
@@ -59,15 +59,18 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarq
 
     const handleMouseDown = useCallback((e) => {
         if (e.button !== 0) return;
-        
+
         // Check if this should be handled by marquee selection
         if (e.shiftKey && onMarqueeStart) {
-            // Try to start marquee selection
-            if (onMarqueeStart(e)) {
-                return; // Marquee selection started, don't handle pan
+            const marqueeStarted = onMarqueeStart(e);
+            if (marqueeStarted) {
+                e.preventDefault(); // Prevent default panning behavior
+                e.stopPropagation();
+                return; // Marquee selection started, block panning
             }
         }
-        
+
+        // Default to panning behavior
         dragging.current = true;
         lastPos.current = { x: e.clientX, y: e.clientY };
         mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
@@ -94,7 +97,7 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarq
 
     return (
         <div
-            ref={layerRef}
+            ref={ref}
             style={{
                 position: 'absolute',
                 inset: 0,
@@ -108,6 +111,6 @@ const PanZoomLayer = ({ pan, zoom, onPanZoom, setZoom, onBackgroundClick, onMarq
             {children}
         </div>
     );
-};
+});
 
 export default PanZoomLayer;

@@ -10,7 +10,9 @@ import NodeLayer from './NodeLayer';
 import GroupLayer from './GroupLayer';
 import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
-import { MarqueeOverlay } from './marqueeSelection';
+import { handleNodeClick, handleEdgeClick, handleEdgeHover, handleNodeMouseEnter, handleNodeMouseLeave } from './eventHandlers';
+import { onNodeDragMove, onNodeDragStart, handleNodeDragEnd } from './dragHandlers';
+import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
 
 export default function NodeGraph({ 
   nodes = [], 
@@ -52,7 +54,8 @@ export default function NodeGraph({
   const dragOffset = useRef({ x: 0, y: 0 });
   const draggingNodeIdRef = useRef(null);
   const draggingGroupIdRef = useRef(null);
-  const containerRef = useRef(null);
+  const containerRef = useRef(null); // Ensure containerRef is defined
+  const panZoomRef = useRef(null); // Ref for PanZoomLayer
   const hoverTimeoutRef = useRef({});
   const dragRafRef = useRef(null);
   const lastDragPosition = useRef(null);
@@ -90,56 +93,49 @@ export default function NodeGraph({
     visible: node.visible !== undefined ? node.visible : true
   })), [nodes]);
 
+  // Replace inline event handlers with imported functions
   // Define handler functions outside useEffect
-  function handleNodeClick({ id, event }) {
+  function handleNodeClickWrapper({ id, event }) {
     if (!onNodeClick && setSelectedNodeIds) {
       setSelectedNodeIds([id]);
       if (setSelectedEdgeIds) setSelectedEdgeIds([]);
     }
   }
 
-  function handleEdgeClick({ id, event }) {
+  function handleEdgeClickWrapper({ id, event }) {
     if (!onEdgeClick && setSelectedEdgeIds) {
       setSelectedEdgeIds([id]);
       if (setSelectedNodeIds) setSelectedNodeIds([]);
     }
   }
 
-  function handleEdgeHover(id) {
-    setHoveredNodeId(id);
-  }
-
-  function handleNodeMouseEnter({ id }) {
-    setHoveredNodeId(id);
-    setIsNodeHovered(true);
-  }
-
-  function handleNodeMouseLeave({ id }) {
-    setIsNodeHovered(false);
-    if (hoverTimeoutRef.current[id]) {
-      clearTimeout(hoverTimeoutRef.current[id]);
-    }
-    hoverTimeoutRef.current[id] = setTimeout(() => {
-      if (!isNodeHovered && !isHandleHovered && !draggingHandle) {
-        setHoveredNodeId(prev => (prev === id ? null : prev));
-      }
-      hoverTimeoutRef.current[id] = null;
-    }, 250);
-  }
-
   // Event bus handlers for node/edge events
   useEffect(() => {
-    eventBus.on('nodeClick', handleNodeClick);
-    eventBus.on('edgeClick', handleEdgeClick);
-    eventBus.on('nodeMouseEnter', handleNodeMouseEnter);
-    eventBus.on('nodeMouseLeave', handleNodeMouseLeave);
+    eventBus.on('nodeClick', handleNodeClickWrapper);
+    eventBus.on('edgeClick', handleEdgeClickWrapper);
     return () => {
-      eventBus.off('nodeClick', handleNodeClick);
-      eventBus.off('edgeClick', handleEdgeClick);
-      eventBus.off('nodeMouseEnter', handleNodeMouseEnter);
-      eventBus.off('nodeMouseLeave', handleNodeMouseLeave);
+      eventBus.off('nodeClick', handleNodeClickWrapper);
+      eventBus.off('edgeClick', handleEdgeClickWrapper);
     };
   }, [setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, onEdgeClick]);
+
+  // Consolidate event bus handler registration
+  useEffect(() => {
+    const eventHandlers = [
+      { event: 'nodeMouseEnter', handler: (data) => handleNodeMouseEnter({ ...data, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) },
+      { event: 'nodeMouseLeave', handler: (data) => handleNodeMouseLeave({ ...data, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) },
+      { event: 'nodeHover', handler: ({ id }) => setHoveredNodeId(id) },
+      { event: 'nodeUnhover', handler: () => setHoveredNodeId(null) },
+      { event: 'handleHover', handler: ({ nodeId }) => setHoveredNodeId(nodeId) },
+      { event: 'handleUnhover', handler: () => setHoveredNodeId(null) },
+    ];
+
+    eventHandlers.forEach(({ event, handler }) => eventBus.on(event, handler));
+
+    return () => {
+      eventHandlers.forEach(({ event, handler }) => eventBus.off(event, handler));
+    };
+  }, [setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle]);
 
   // Listen for node/handle hover events from the event bus
   useEffect(() => {
@@ -159,6 +155,7 @@ export default function NodeGraph({
     };
   }, []);
 
+  // Replace inline drag handlers with imported functions
   // Node drag logic
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current) {
@@ -206,8 +203,8 @@ export default function NodeGraph({
     };
     lastMousePos.current = { x: e.clientX, y: e.clientY };
     lastDragPosition.current = { x: node.position.x, y: node.position.y }; // Initialize for onNodeDragEnd
-    window.addEventListener('mousemove', onNodeDragMove);
-    window.addEventListener('mouseup', handleNodeDragEnd);
+    containerRef.current.addEventListener('mousemove', onNodeDragMove, { passive: false });
+    containerRef.current.addEventListener('mouseup', handleNodeDragEnd, { passive: false });
   }
 
   function handleNodeDragEnd() {
@@ -241,8 +238,8 @@ export default function NodeGraph({
       cancelAnimationFrame(dragRafRef.current);
       dragRafRef.current = null;
     }
-    window.removeEventListener('mousemove', onNodeDragMove);
-    window.removeEventListener('mouseup', handleNodeDragEnd);
+    containerRef.current.removeEventListener('mousemove', onNodeDragMove);
+    containerRef.current.removeEventListener('mouseup', handleNodeDragEnd);
   }
 
   // Group drag logic
@@ -308,8 +305,8 @@ export default function NodeGraph({
         y: (e.clientY - rect.top - pan.y) / zoom
       };
     }
-    window.addEventListener('mousemove', onGroupDragMove);
-    window.addEventListener('mouseup', handleGroupDragEnd);
+    window.addEventListener('mousemove', onGroupDragMove, { passive: false });
+    window.addEventListener('mouseup', handleGroupDragEnd, { passive: false });
   }
 
   function handleGroupDragEnd() {
@@ -332,118 +329,52 @@ export default function NodeGraph({
     if (setSelectedEdgeIds) setSelectedEdgeIds([]);
   }
 
-  // Marquee selection logic
-  const [isMarqueeSelecting, setIsMarqueeSelecting] = useState(false);
-  const [marqueeStart, setMarqueeStart] = useState(null);
-  const [marqueeEnd, setMarqueeEnd] = useState(null);
-  const [selectionRect, setSelectionRect] = useState(null);
+  const {
+    isSelecting,
+    selectionRect,
+    startSelection,
+    updateSelection,
+    endSelection
+  } = useMarqueeSelection({
+    nodes,
+    pan,
+    zoom,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    onNodeClick,
+    containerRef
+  });
 
-  const startMarqueeSelection = useCallback((e) => {
-    if (!e.shiftKey) return false;
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return false;
-
-    const startX = e.clientX - rect.left;
-    const startY = e.clientY - rect.top;
-
-    setMarqueeStart({ x: startX, y: startY });
-    setMarqueeEnd({ x: startX, y: startY });
-    setIsMarqueeSelecting(true);
-
-    return true;
-  }, []);
-
-  const updateMarqueeSelection = useCallback((e) => {
-    if (!isMarqueeSelecting) return;
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const endX = e.clientX - rect.left;
-    const endY = e.clientY - rect.top;
-
-    setMarqueeEnd({ x: endX, y: endY });
-
-    const minX = Math.min(marqueeStart.x, endX);
-    const minY = Math.min(marqueeStart.y, endY);
-    const width = Math.abs(endX - marqueeStart.x);
-    const height = Math.abs(endY - marqueeStart.y);
-
-    setSelectionRect({ x: minX, y: minY, width, height });
-  }, [isMarqueeSelecting, marqueeStart]);
-
-  const endMarqueeSelection = useCallback((event) => {
-    if (!isMarqueeSelecting || !marqueeStart || !marqueeEnd) return;
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    // Convert screen coords to graph coords
-    const bounds = {
-      x: (Math.min(marqueeStart.x, marqueeEnd.x) - pan.x) / zoom,
-      y: (Math.min(marqueeStart.y, marqueeEnd.y) - pan.y) / zoom,
-      width: Math.abs(marqueeEnd.x - marqueeStart.x) / zoom,
-      height: Math.abs(marqueeEnd.y - marqueeStart.y) / zoom
-    };
-
-    // Find intersecting nodes
-    const selectedNodes = nodes.filter(node => {
-      const nodeX = node.position.x;
-      const nodeY = node.position.y;
-      const nodeWidth = node.width || 120;
-      const nodeHeight = node.height || 60;
-      
-      // Check if node intersects with selection rectangle
-      return !(
-        nodeX + nodeWidth < bounds.x ||
-        nodeX > bounds.x + bounds.width ||
-        nodeY + nodeHeight < bounds.y ||
-        nodeY > bounds.y + bounds.height
-      );
-    });
-
-    console.log('Selected nodes:', selectedNodes);
-
-    if (selectedNodes.length > 0 && setSelectedNodeIds) {
-      setSelectedNodeIds(selectedNodes.map(node => node.id));
-      if (setSelectedEdgeIds) setSelectedEdgeIds([]);
-      
-      // Emit event
-      eventBus.emit('nodes-selected', selectedNodes);
-      
-      if (onNodeClick && selectedNodes.length === 1) {
-        onNodeClick(selectedNodes[0].id, event);
-      }
-    }
-
-    // Clean up
-    setIsMarqueeSelecting(false);
-    setMarqueeStart(null);
-    setMarqueeEnd(null);
-    setSelectionRect(null);
-  }, [isMarqueeSelecting, marqueeStart, marqueeEnd, nodes, zoom, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick]);
-
-  // Global mouse event listeners for marquee selection
+  // Marquee selection event listeners
   useEffect(() => {
-    if (!isMarqueeSelecting) return;
+    if (!isSelecting) return;
+
+    console.log('useEffect: Adding mousemove and mouseup listeners for marquee selection'); // Debug log
 
     const handleMouseMove = (e) => {
-      updateMarqueeSelection(e);
+      console.log('mousemove event detected'); // Debug log
+      updateSelection(e);
     };
 
     const handleMouseUp = (e) => {
-      endMarqueeSelection(e);
+      console.log('mouseup event detected'); // Debug log
+      endSelection(e);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const element = panZoomRef.current;
+    if (element) {
+      element.addEventListener('mousemove', handleMouseMove, { capture: true });
+      element.addEventListener('mouseup', handleMouseUp, { capture: true });
+    }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      console.log('useEffect: Removing mousemove and mouseup listeners for marquee selection'); // Debug log
+      if (element) {
+        element.removeEventListener('mousemove', handleMouseMove, { capture: true });
+        element.removeEventListener('mouseup', handleMouseUp, { capture: true });
+      }
     };
-  }, [isMarqueeSelecting, updateMarqueeSelection, endMarqueeSelection]);
+  }, [isSelecting, updateSelection, endSelection, panZoomRef]);
 
   return (
     <div id="graph-canvas" ref={containerRef} style={{
@@ -451,20 +382,20 @@ export default function NodeGraph({
       inset: 0,
       width: '100vw',
       height: '100vh',
-      pointerEvents: 'none',
       background: "none",
       zIndex: 0
     }}>
       <PanZoomLayer
+        ref={panZoomRef}
         pan={pan}
         zoom={zoom}
         onPanZoom={setPan}
         setZoom={setZoom}
         onBackgroundClick={handleBackgroundClickFromPanZoom}
-        onMarqueeStart={startMarqueeSelection}
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
-        layerRefs={layerRefs}
+        layerRefs={{ ...layerRefs, container: containerRef }} // Pass containerRef to PanZoomLayer
+        onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })} // Pass the actual startSelection function
       >
         <GroupLayer
           ref={groupRef}
@@ -593,13 +524,12 @@ export default function NodeGraph({
             );
           })()
         )}
-      </PanZoomLayer>
 
-      {/* Marquee selection overlay */}
-      <MarqueeOverlay 
-        selectionRect={selectionRect} 
-        theme={theme} 
-      />
+        <MarqueeOverlay 
+          selectionRect={selectionRect} 
+          theme={theme} 
+        />
+      </PanZoomLayer>
     </div>
   );
 }
