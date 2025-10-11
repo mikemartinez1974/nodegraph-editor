@@ -368,7 +368,7 @@ const HandleLayer = forwardRef(({
       draggingHandleRef.current = null;
       previewLineRef.current.visible = false;
       setSensorActive(false);
-      scheduleRender(); // Ensure immediate redraw on drop
+      scheduleRender();
       eventBus.emit('handleDragEnd', { handle });
     };
     

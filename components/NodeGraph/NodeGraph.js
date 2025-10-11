@@ -222,9 +222,11 @@ export default function NodeGraph({
       if (nodeEl) nodeEl.style.transform = '';
       draggingInfoRef.current = null;
 
-      // Final redraw
-      if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
-      if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+      // Force redraws after React state update completes
+      requestAnimationFrame(() => {
+        if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+        if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+      });
 
       // Call onNodeDragEnd if needed
       if (typeof onNodeDragEnd === 'function') {
