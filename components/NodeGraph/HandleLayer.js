@@ -455,7 +455,11 @@ const HandleLayer = forwardRef(({
           width: '100vw', 
           height: '100vh', 
           pointerEvents: 'none', 
-          zIndex: 20 
+          zIndex: 20
+        }}
+        onWheel={(e) => {
+          // Explicitly allow wheel events to pass through
+          // Don't call stopPropagation or preventDefault
         }}
       >
         {/* Visual canvas - no pointer events */}
@@ -470,7 +474,7 @@ const HandleLayer = forwardRef(({
           }}
         />
         
-        {/* Context-aware sensor - only active when hovering nodes/edges */}
+        {/* Context-aware sensor - always present but only captures mouse events, not wheel */}
         <div
           ref={sensorRef}
           style={{
@@ -479,7 +483,7 @@ const HandleLayer = forwardRef(({
             left: 0,
             width: '100%',
             height: '100%',
-            pointerEvents: sensorActive ? 'auto' : 'none',
+            pointerEvents: 'auto', // Always allow handle events
             cursor: 'default',
             background: 'transparent'
           }}

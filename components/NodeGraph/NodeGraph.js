@@ -385,7 +385,8 @@ export default function NodeGraph({
       width: '100vw',
       height: '100vh',
       background: "none",
-      zIndex: 0
+      zIndex: 0,
+      pointerEvents: 'auto'
     }}>
       <PanZoomLayer
         ref={panZoomRef}
@@ -396,8 +397,8 @@ export default function NodeGraph({
         onBackgroundClick={handleBackgroundClickFromPanZoom}
         theme={theme}
         style={{ pointerEvents: 'auto', width: '100vw', height: '100vh' }}
-        layerRefs={{ ...layerRefs, container: containerRef }} // Pass containerRef to PanZoomLayer
-        onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })} // Pass the actual startSelection function
+        layerRefs={{ ...layerRefs, container: containerRef }}
+        onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })}
       >
         <GroupLayer
           ref={groupRef}

@@ -1,66 +1,150 @@
-# Node Graph Modes
-
-Your node graph supports three main modes for positioning nodes: **Manual**, **Nav**, and **Auto**.  
-Each mode defines how node positions are set, updated, and displayed.
-
----
-
-## 1. Manual Mode
-- **Behavior**
-  - Nodes are positioned explicitly by the user.
-  - No automatic repositioning occurs.
-- **Implementation Notes**
-  - Store `x, y` (or `x, y, z` for 3D) per node.
-  - Update coordinates when nodes are dragged or moved.
-  - Disable all auto-layout or physics simulations.
-- **Pros**
-  - Full control.
-- **Cons**
-  - Tedious for large graphs.
-
----
-
-## 2. Nav Mode (Dynamic Auto-Layout)
-- **Behavior**
-  - Nodes move dynamically around a selected node.
-  - Positioning is determined by physics or force-directed layout.
-- **Implementation Notes**
-  - On each frame, calculate forces (spring/repulsion) between nodes.
-  - Selected node can be pinned at center.
-  - Use damping factors to keep movement smooth and stable.
-- **Pros**
-  - Intuitive exploration of relationships.
-- **Cons**
-  - Can feel chaotic with too many nodes.
-
----
-
-## 3. Auto Mode (Algorithmic Layout)
-- **Behavior**
-  - Nodes are positioned by a chosen layout algorithm:
-    - Hierarchical
-    - Radial
-    - Grid
-  - Once laid out, nodes typically stay fixed until re-run.
-- **Implementation Notes**
-  - Provide layout options and spacing parameters.
-  - Compute node positions from scratch using node relationships.
-  - Allow re-running layout when graph changes.
-- **Pros**
-  - Neat and structured layouts.
-- **Cons**
-  - Less flexible than Nav Mode.
-
----
-
-## Implementation Considerations
-- Maintain a **mode state variable**:  
-  let mode = "manual"; // "manual" | "nav" | "auto"
-Only run the positioning logic for the active mode.
-
-When switching from Nav/Auto → Manual, preserve the current node positions.
-
-Smoothly interpolate positions when changing modes to avoid abrupt jumps.
-
-
-Do you want me to also include a **pseudo-code class design** (like `GraphManager`) in this same markdow
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e",
+      "type": "default",
+      "label": "Copy/Paste w/ Me",
+      "position": { "x": 0, "y": 0 },
+      "width": 80,
+      "height": 48,
+      "data": { "memo": "", "link": "", "label": "Copy/Paste w/ Me" }
+    },
+    {
+      "id": "3bfea1a2-5646-4074-b25f-b385b7ab4a59",
+      "type": "default",
+      "label": "Monetization",
+      "position": { "x": -160, "y": -120 },
+      "width": 80,
+      "height": 48,
+      "data": { "memo": "", "link": "", "label": "Monetization" }
+    },
+    {
+      "id": "ca352b0b-9f80-400e-be42-6421b65b1248",
+      "type": "default",
+      "label": "To Do",
+      "position": { "x": -120, "y": 160 },
+      "width": 80,
+      "height": 48,
+      "data": { "memo": "", "link": "", "label": "To Do" }
+    },
+    {
+      "id": "f2c1e1de-c84c-426e-9c46-505280b1ca79",
+      "type": "default",
+      "label": "Documentation",
+      "position": { "x": 120, "y": -160 },
+      "width": 80,
+      "height": 48,
+      "data": { "memo": "", "link": "", "label": "Documentation" }
+    },
+    {
+      "id": "8bd41609-6980-4341-9a6c-078d0ccc9a6a",
+      "type": "default",
+      "label": "Release",
+      "position": { "x": 160, "y": 120 },
+      "width": 80,
+      "height": 48,
+      "data": { "memo": "", "link": "", "label": "Release" }
+    },
+    {
+      "id": "launch_prep",
+      "type": "default",
+      "label": "🚀 Launch Prep",
+      "position": { "x": 0, "y": 300 },
+      "width": 100,
+      "height": 48,
+      "data": {
+        "memo": "# Launch Prep\n\nChecklist for releasing your app to the public.",
+        "link": ""
+      }
+    },
+    {
+      "id": "technical_prep",
+      "type": "default",
+      "label": "🧪 Technical Prep",
+      "position": { "x": -200, "y": 450 },
+      "width": 120,
+      "height": 60,
+      "data": {
+        "memo": "# Technical Prep\n\n- QA testing\n- Security review\n- Performance optimization\n- Analytics setup\n- Backend readiness",
+        "link": ""
+      }
+    },
+    {
+      "id": "aso",
+      "type": "default",
+      "label": "📱 App Store Optimization",
+      "position": { "x": 0, "y": 450 },
+      "width": 160,
+      "height": 60,
+      "data": {
+        "memo": "# ASO\n\n- Title & keywords\n- Screenshots & icon\n- Preview video",
+        "link": ""
+      }
+    },
+    {
+      "id": "marketing",
+      "type": "default",
+      "label": "📣 Marketing",
+      "position": { "x": 200, "y": 450 },
+      "width": 120,
+      "height": 60,
+      "data": {
+        "memo": "# Marketing\n\n- Landing page\n- Press kit\n- Social media\n- Email campaigns\n- Influencer outreach",
+        "link": ""
+      }
+    },
+    {
+      "id": "legal",
+      "type": "default",
+      "label": "🧾 Legal & Compliance",
+      "position": { "x": -100, "y": 600 },
+      "width": 140,
+      "height": 60,
+      "data": {
+        "memo": "# Legal & Compliance\n\n- Privacy policy\n- App store guidelines\n- Licensing",
+        "link": ""
+      }
+    },
+    {
+      "id": "ux_support",
+      "type": "default",
+      "label": "🧑‍💻 UX & Support",
+      "position": { "x": 100, "y": 600 },
+      "width": 130,
+      "height": 60,
+      "data": {
+        "memo": "# UX & Support\n\n- Onboarding\n- Tutorials\n- Support channels",
+        "link": ""
+      }
+    },
+    {
+      "id": "post_launch",
+      "type": "default",
+      "label": "📊 Post-Launch",
+      "position": { "x": 0, "y": 750 },
+      "width": 120,
+      "height": 60,
+      "data": {
+        "memo": "# Post-Launch\n\n- Monitor feedback\n- Bug fixes\n- Retention campaigns",
+        "link": ""
+      }
+    }
+  ],
+  "edges": [
+    { "id": "edge_1", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "3bfea1a2-5646-4074-b25f-b385b7ab4a59", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_2", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "ca352b0b-9f80-400e-be42-6421b65b1248", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_3", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "f2c1e1de-c84c-426e-9c46-505280b1ca79", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_4", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "8bd41609-6980-4341-9a6c-078d0ccc9a6a", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_5", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "launch_prep", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_6", "type": "child", "source": "launch_prep", "target": "technical_prep", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_7", "type": "child", "source": "launch_prep", "target": "aso", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_8", "type": "child", "source": "launch_prep", "target": "marketing", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_9", "type": "child", "source": "launch_prep", "target": "legal", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_10", "type": "child", "source": "launch_prep", "target": "ux_support", "label": "", "style": { "width": 2, "curved": true } },
+    { "id": "edge_11", "type": "child", "source": "launch_prep", "target": "post_launch", "label": "", "style": { "width": 2, "curved": true } }
+  ],
+  "timestamp": "2025-10-11T06:26:00.000Z",
+  "nodeCount": 13,
+  "edgeCount": 11
+}

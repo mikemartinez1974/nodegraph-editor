@@ -79,8 +79,6 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
     }, [handleMouseMove, handleMouseUp, onMarqueeStart]);
 
     useEffect(() => {
-        const el = layerRef.current;
-        if (!el) return;
         function handleWheel(e) {
             e.preventDefault();
             const change = 0.01;
@@ -89,9 +87,9 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
                 setZoom((prev) => Math.max(0.1, Math.min(2, prev + delta)));
             }
         }
-        el.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('wheel', handleWheel, { passive: false });
         return () => {
-            el.removeEventListener('wheel', handleWheel, { passive: false });
+            window.removeEventListener('wheel', handleWheel, { passive: false });
         };
     }, [zoom, setZoom]);
 
@@ -105,6 +103,7 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
                 zIndex: 1,
                 background: 'transparent',
                 transition: 'background 0.2s',
+                pointerEvents: 'auto', // Ensure wheel events are received
             }}
             onMouseDown={handleMouseDown}
         >
