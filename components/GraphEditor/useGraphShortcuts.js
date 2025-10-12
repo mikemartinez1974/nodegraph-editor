@@ -101,11 +101,11 @@ export default function useGraphShortcuts({
           return;
         }
         
-        // Check if it's our data format
-        if (!clipboardData || clipboardData.type !== 'nodegraph-data') {
-          console.log('Clipboard does not contain valid nodegraph data');
-          return;
-        }
+        // // Check if it's our data format
+        // if (!clipboardData || clipboardData.type !== 'nodegraph-data') {
+        //   console.log('Clipboard does not contain valid nodegraph data');
+        //   return;
+        // }
         
         if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
           console.log('Clipboard does not contain valid node array');

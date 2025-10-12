@@ -439,11 +439,30 @@ export default function GraphEditor({ backgroundImage }) {
     nodesRef
   });
 
-  // Load IntroGraph.json at startup
+  // Load IntroGraph.json at startup (use public/data so we can override at runtime)
   useEffect(() => {
-    import('../data/IntroGraph.json').then((data) => {
-      handleLoadGraph(data.nodes, data.edges);
-    });
+    // Prevent double-initialization (hot reloads or duplicate mounts)
+    if (typeof window !== 'undefined') {
+      if (window.__nodegraph_initial_loaded) return;
+      window.__nodegraph_initial_loaded = true;
+    }
+
+    // Fetch the intro graph from the public folder so deployments can override it
+    fetch('/data/IntroGraph.json')
+      .then((resp) => {
+        if (!resp.ok) throw new Error(`Failed to fetch IntroGraph.json: ${resp.status}`);
+        return resp.json();
+      })
+      .then((data) => {
+        if (data && data.nodes && data.edges) {
+          handleLoadGraph(data.nodes, data.edges);
+        } else {
+          console.warn('IntroGraph.json does not contain nodes/edges');
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load IntroGraph from public/data:', err);
+      });
   }, []);
 
   return (

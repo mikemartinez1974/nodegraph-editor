@@ -285,19 +285,14 @@ const HandleLayer = forwardRef(({
 
   // Event handlers for sensor layer
   const handleSensorMouseDown = useCallback((e) => {
-    console.log('Sensor mousedown fired, sensorActive:', sensorActive);
-    console.log('Hovered handle ref:', hoveredHandleRef.current);
     
     const handle = findHandleAt(e.clientX, e.clientY);
     
-    console.log('Handle found at mousedown:', handle?.id || 'NONE');
     
     if (!handle) {
-      console.log('No handle found - letting event through');
       return;
     }
     
-    console.log('Handle grabbed:', handle.id);
     e.stopPropagation();
     e.preventDefault();
     e.nativeEvent.stopImmediatePropagation();

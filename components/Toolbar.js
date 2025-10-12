@@ -65,6 +65,7 @@ const Toolbar = ({
   const [metadataCopied, setMetadataCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pasted, setPasted] = useState(false);
+  const [onboardCopied, setOnboardCopied] = useState(false);
   const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
   const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
@@ -316,7 +317,20 @@ const Toolbar = ({
     }
   };
 
-
+  const handleCopyOnboard = async () => {
+    try {
+      const resp = await fetch('/data/OnboardLLM.md');
+      let text;
+      if (resp.ok) text = await resp.text(); else text = 'OnboardLLM.md not available.';
+      await navigator.clipboard.writeText(text);
+      setOnboardCopied(true);
+      setTimeout(() => setOnboardCopied(false), 2000);
+      console.log('Onboard LLM guide copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy OnboardLLM.md:', err);
+      alert('Unable to copy Onboard LLM guide to clipboard.');
+    }
+  };
 
   return (
     <Paper
@@ -571,13 +585,14 @@ const Toolbar = ({
         {!isCollapsed && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Status indicators */}
-            {(copied || metadataCopied || saved || pasted) && (
+            {(copied || metadataCopied || saved || pasted || onboardCopied) && (
               <Chip
                 label={
                   copied ? "JSON Copied!" :
                   metadataCopied ? "Metadata Copied!" :
                   saved ? "Saved!" :
-                  pasted ? "Pasted!" : ""
+                  pasted ? "Pasted!" :
+                  onboardCopied ? "LLM Guide Copied!" : ""
                 }
                 size="small"
                 color="success"
@@ -598,6 +613,14 @@ const Toolbar = ({
               size="small"
             >
               <ListIcon fontSize="small" />
+            </IconButton>
+            {/* Copy LLM guide to clipboard */}
+            <IconButton
+              onClick={handleCopyOnboard}
+              title="Copy LLM Guide"
+              size="small"
+            >
+              <ManualIcon fontSize="small" />
             </IconButton>
           </Box>
         )}
