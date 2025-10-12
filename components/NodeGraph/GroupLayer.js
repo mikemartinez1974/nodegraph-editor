@@ -26,7 +26,7 @@ const GroupLayer = ({
         width: '100%', 
         height: '100%', 
         pointerEvents: 'none',
-        zIndex: -1 // Render behind nodes
+        zIndex: 1 // Render behind nodes
       }}
     >
       <svg 
