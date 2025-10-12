@@ -43,7 +43,9 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUp);
 
-        onPanZoom((prev) => ({ x: prev.x + tempPanRef.current.x, y: prev.y + tempPanRef.current.y }));
+        // Use latest tempPanRef for pan update, then reset synchronously
+        const panDelta = { ...tempPanRef.current };
+        onPanZoom((prev) => ({ x: prev.x + panDelta.x, y: prev.y + panDelta.y }));
         tempPanRef.current = { x: 0, y: 0 };
         applyTempPan();
 
@@ -92,6 +94,11 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
             window.removeEventListener('wheel', handleWheel, { passive: false });
         };
     }, [zoom, setZoom]);
+
+    // Ensure transforms are cleared after pan changes
+    useEffect(() => {
+        applyTempPan();
+    }, [pan, applyTempPan]);
 
     return (
         <div
