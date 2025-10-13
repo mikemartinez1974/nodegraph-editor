@@ -44,6 +44,9 @@ export default function GraphEditor({ backgroundImage }) {
   const graphAPI = useRef(null);
   const groupManager = useRef(new GroupManager());
 
+  // Track if initial graph has loaded and prevent reload after replace
+  const initialGraphLoadedRef = useRef(false);
+
   // Keep refs in sync with state
   useEffect(() => {
     nodesRef.current = nodes;
@@ -144,6 +147,36 @@ export default function GraphEditor({ backgroundImage }) {
       console.log('  window.graphAPI.readNode() // Get all nodes');
       console.log('  window.graphAPI.getStats() // Get graph statistics');
     }
+  }, []);
+
+  // Load IntroGraph.json at startup (use public/data so we can override at runtime)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.__nodegraph_initial_loaded) return;
+      window.__nodegraph_initial_loaded = true;
+    }
+    if (initialGraphLoadedRef.current) return;
+    initialGraphLoadedRef.current = true;
+    fetch('/data/IntroGraph.json')
+      .then((resp) => {
+        if (!resp.ok) throw new Error(`Failed to fetch IntroGraph.json: ${resp.status}`);
+        return resp.json();
+      })
+      .then((data) => {
+        if (data && data.nodes && data.edges) {
+          setNodes(data.nodes);
+          setEdges(data.edges);
+          setGroups(data.groups || []);
+          nodesRef.current = data.nodes;
+          edgesRef.current = data.edges;
+          saveToHistory(data.nodes, data.edges);
+        } else {
+          console.warn('IntroGraph.json does not contain nodes/edges');
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load IntroGraph from public/data:', err);
+      });
   }, []);
 
   // Load a graph (replace nodes and edges), single implementation only
@@ -439,31 +472,124 @@ export default function GraphEditor({ backgroundImage }) {
     nodesRef
   });
 
-  // Load IntroGraph.json at startup (use public/data so we can override at runtime)
-  useEffect(() => {
-    // Prevent double-initialization (hot reloads or duplicate mounts)
-    if (typeof window !== 'undefined') {
-      if (window.__nodegraph_initial_loaded) return;
-      window.__nodegraph_initial_loaded = true;
+  // Paste/import handler for graph data
+  function handlePasteGraphData(pastedData) {
+    // Support explicit action field
+    let explicitAction = pastedData.action;
+    if (explicitAction) delete pastedData.action;
+
+    // Detect type: full graph, partial graph, or single node/edge/group
+    let nodes = [], edges = [], groups = [];
+    if (Array.isArray(pastedData)) {
+      // Array of nodes/edges/groups
+      if (pastedData[0]?.id && pastedData[0]?.position) {
+        nodes = pastedData;
+      } else if (pastedData[0]?.source && pastedData[0]?.target) {
+        edges = pastedData;
+      } else if (pastedData[0]?.nodeIds) {
+        groups = pastedData;
+      }
+    } else if (pastedData.nodes || pastedData.edges || pastedData.groups) {
+      nodes = pastedData.nodes || [];
+      edges = pastedData.edges || [];
+      groups = pastedData.groups || [];
+    } else if (pastedData.id && pastedData.position) {
+      nodes = [pastedData];
+    } else if (pastedData.id && pastedData.source && pastedData.target) {
+      edges = [pastedData];
+    } else if (pastedData.id && pastedData.nodeIds) {
+      groups = [pastedData];
+    } else {
+      alert('Unrecognized graph data format.');
+      return;
     }
 
-    // Fetch the intro graph from the public folder so deployments can override it
-    fetch('/data/IntroGraph.json')
-      .then((resp) => {
-        if (!resp.ok) throw new Error(`Failed to fetch IntroGraph.json: ${resp.status}`);
-        return resp.json();
-      })
-      .then((data) => {
-        if (data && data.nodes && data.edges) {
-          handleLoadGraph(data.nodes, data.edges);
-        } else {
-          console.warn('IntroGraph.json does not contain nodes/edges');
+    // Use explicit action if present, otherwise prompt user
+    let action = explicitAction || 'add';
+    if (!explicitAction) {
+      if (nodes.length + edges.length + groups.length === 0) {
+        alert('No nodes, edges, or groups found in pasted data.');
+        return;
+      }
+      if ((nodes.length > 0 && nodes.length === (pastedData.nodes?.length || nodes.length)) &&
+          (edges.length > 0 && edges.length === (pastedData.edges?.length || edges.length))) {
+        // Looks like a full graph
+        if (window.confirm('Replace your entire graph with this data? (Cancel to add instead)')) {
+          action = 'replace';
         }
-      })
-      .catch((err) => {
-        console.warn('Could not load IntroGraph from public/data:', err);
+      } else if (nodes.length + edges.length + groups.length === 1) {
+        if (window.confirm('Update existing node/edge/group if ID matches? (Cancel to add as new)')) {
+          action = 'update';
+        }
+      } else {
+        if (window.confirm('Add new items? (Cancel to update existing by ID)')) {
+          action = 'add';
+        } else {
+          action = 'update';
+        }
+      }
+    }
+
+    // Perform action
+    if (action === 'replace') {
+      console.log('REPLACE action triggered. Setting nodes:', nodes, 'edges:', edges, 'groups:', groups);
+      setNodes(nodes);
+      setEdges(edges);
+      setGroups(groups);
+      nodesRef.current = nodes;
+      edgesRef.current = edges;
+      setSelectedNodeIds([]);
+      setSelectedEdgeIds([]);
+      setSelectedGroupIds([]);
+      if (typeof historyIndexRef !== 'undefined') historyIndexRef.current = 0;
+      saveToHistory(nodes, edges);
+      return;
+    }
+
+    if (action === 'add') {
+      // Add new nodes/edges/groups, skip duplicates
+      const existingNodeIds = new Set(nodesRef.current.map(n => n.id));
+      const existingEdgeIds = new Set(edgesRef.current.map(e => e.id));
+      const existingGroupIds = new Set(groups.map(g => g.id));
+      const newNodes = [ ...nodesRef.current, ...nodes.filter(n => !existingNodeIds.has(n.id)) ];
+      const newEdges = [ ...edgesRef.current, ...edges.filter(e => !existingEdgeIds.has(e.id)) ];
+      const newGroups = [ ...groups, ...groups.filter(g => !existingGroupIds.has(g.id)) ];
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setGroups(newGroups);
+      saveToHistory(newNodes, newEdges);
+      return;
+    }
+
+    if (action === 'update') {
+      // Update existing nodes/edges/groups by ID
+      let updatedNodes = [...nodesRef.current];
+      let updatedEdges = [...edgesRef.current];
+      let updatedGroups = [...groups];
+      nodes.forEach(n => {
+        const idx = updatedNodes.findIndex(x => x.id === n.id);
+        if (idx !== -1) updatedNodes[idx] = { ...updatedNodes[idx], ...n };
       });
-  }, []);
+      edges.forEach(e => {
+        const idx = updatedEdges.findIndex(x => x.id === e.id);
+        if (idx !== -1) updatedEdges[idx] = { ...updatedEdges[idx], ...e };
+      });
+      groups.forEach(g => {
+        const idx = updatedGroups.findIndex(x => x.id === g.id);
+        if (idx !== -1) updatedGroups[idx] = { ...updatedGroups[idx], ...g };
+      });
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+      setGroups(updatedGroups);
+      saveToHistory(updatedNodes, updatedEdges);
+      return;
+    }
+  }
+
+  // Expose for testing (replace with UI integration later)
+  if (typeof window !== 'undefined') {
+    window.handlePasteGraphData = handlePasteGraphData;
+  }
 
   return (
     <div id="graph-editor-background" style={{

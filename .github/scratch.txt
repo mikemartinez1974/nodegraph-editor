@@ -1,150 +1,40 @@
 {
-  "type": "nodegraph-data",
+  "action": "add",
   "nodes": [
     {
-      "id": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e",
-      "type": "default",
-      "label": "Copy/Paste w/ Me",
-      "position": { "x": 0, "y": 0 },
-      "width": 80,
-      "height": 48,
-      "data": { "memo": "", "link": "", "label": "Copy/Paste w/ Me" }
-    },
-    {
-      "id": "3bfea1a2-5646-4074-b25f-b385b7ab4a59",
-      "type": "default",
-      "label": "Monetization",
-      "position": { "x": -160, "y": -120 },
-      "width": 80,
-      "height": 48,
-      "data": { "memo": "", "link": "", "label": "Monetization" }
-    },
-    {
-      "id": "ca352b0b-9f80-400e-be42-6421b65b1248",
-      "type": "default",
-      "label": "To Do",
-      "position": { "x": -120, "y": 160 },
-      "width": 80,
-      "height": 48,
-      "data": { "memo": "", "link": "", "label": "To Do" }
-    },
-    {
-      "id": "f2c1e1de-c84c-426e-9c46-505280b1ca79",
-      "type": "default",
-      "label": "Documentation",
-      "position": { "x": 120, "y": -160 },
-      "width": 80,
-      "height": 48,
-      "data": { "memo": "", "link": "", "label": "Documentation" }
-    },
-    {
-      "id": "8bd41609-6980-4341-9a6c-078d0ccc9a6a",
-      "type": "default",
-      "label": "Release",
-      "position": { "x": 160, "y": 120 },
-      "width": 80,
-      "height": 48,
-      "data": { "memo": "", "link": "", "label": "Release" }
-    },
-    {
-      "id": "launch_prep",
-      "type": "default",
-      "label": "🚀 Launch Prep",
-      "position": { "x": 0, "y": 300 },
-      "width": 100,
-      "height": 48,
+      "id": "recipe_french_toast",
+      "label": "French Toast",
+      "position": { "x": -500, "y": 400 },
+      "width": 180,
+      "height": 100,
       "data": {
-        "memo": "# Launch Prep\n\nChecklist for releasing your app to the public.",
-        "link": ""
+        "memo": "# French Toast\n\n**Ingredients:**\n- 2 eggs\n- 1/2 cup milk\n- 4 slices of bread\n- 1 tsp cinnamon\n- Butter for frying\n\n**Instructions:**\n1. Whisk eggs, milk, and cinnamon together.\n2. Dip bread slices into mixture.\n3. Fry on medium heat until golden brown.\n4. Serve with syrup or fruit."
       }
     },
     {
-      "id": "technical_prep",
-      "type": "default",
-      "label": "🧪 Technical Prep",
-      "position": { "x": -200, "y": 450 },
-      "width": 120,
-      "height": 60,
+      "id": "recipe_pancakes",
+      "label": "Pancakes",
+      "position": { "x": -300, "y": 400 },
+      "width": 180,
+      "height": 100,
       "data": {
-        "memo": "# Technical Prep\n\n- QA testing\n- Security review\n- Performance optimization\n- Analytics setup\n- Backend readiness",
-        "link": ""
+        "memo": "# Pancakes\n\n**Ingredients:**\n- 1 cup flour\n- 2 tbsp sugar\n- 2 tsp baking powder\n- 1 cup milk\n- 1 egg\n- Butter for cooking\n\n**Instructions:**\n1. Mix dry ingredients in a bowl.\n2. Whisk in milk and egg.\n3. Pour batter onto a hot griddle.\n4. Cook until bubbles form, flip, and cook other side.\n5. Serve with syrup or fruit."
       }
     },
     {
-      "id": "aso",
-      "type": "default",
-      "label": "📱 App Store Optimization",
-      "position": { "x": 0, "y": 450 },
-      "width": 160,
-      "height": 60,
+      "id": "recipe_omelette",
+      "label": "Omelette",
+      "position": { "x": -100, "y": 400 },
+      "width": 180,
+      "height": 100,
       "data": {
-        "memo": "# ASO\n\n- Title & keywords\n- Screenshots & icon\n- Preview video",
-        "link": ""
-      }
-    },
-    {
-      "id": "marketing",
-      "type": "default",
-      "label": "📣 Marketing",
-      "position": { "x": 200, "y": 450 },
-      "width": 120,
-      "height": 60,
-      "data": {
-        "memo": "# Marketing\n\n- Landing page\n- Press kit\n- Social media\n- Email campaigns\n- Influencer outreach",
-        "link": ""
-      }
-    },
-    {
-      "id": "legal",
-      "type": "default",
-      "label": "🧾 Legal & Compliance",
-      "position": { "x": -100, "y": 600 },
-      "width": 140,
-      "height": 60,
-      "data": {
-        "memo": "# Legal & Compliance\n\n- Privacy policy\n- App store guidelines\n- Licensing",
-        "link": ""
-      }
-    },
-    {
-      "id": "ux_support",
-      "type": "default",
-      "label": "🧑‍💻 UX & Support",
-      "position": { "x": 100, "y": 600 },
-      "width": 130,
-      "height": 60,
-      "data": {
-        "memo": "# UX & Support\n\n- Onboarding\n- Tutorials\n- Support channels",
-        "link": ""
-      }
-    },
-    {
-      "id": "post_launch",
-      "type": "default",
-      "label": "📊 Post-Launch",
-      "position": { "x": 0, "y": 750 },
-      "width": 120,
-      "height": 60,
-      "data": {
-        "memo": "# Post-Launch\n\n- Monitor feedback\n- Bug fixes\n- Retention campaigns",
-        "link": ""
+        "memo": "# Omelette\n\n**Ingredients:**\n- 3 eggs\n- Salt and pepper\n- 1/4 cup cheese (optional)\n- Vegetables of choice\n- Butter for frying\n\n**Instructions:**\n1. Beat eggs with salt and pepper.\n2. Melt butter in a pan.\n3. Pour eggs into pan and cook until set.\n4. Add cheese and vegetables.\n5. Fold omelette and serve."
       }
     }
   ],
   "edges": [
-    { "id": "edge_1", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "3bfea1a2-5646-4074-b25f-b385b7ab4a59", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_2", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "ca352b0b-9f80-400e-be42-6421b65b1248", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_3", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "f2c1e1de-c84c-426e-9c46-505280b1ca79", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_4", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "8bd41609-6980-4341-9a6c-078d0ccc9a6a", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_5", "type": "child", "source": "d69eb3de-a368-4ffe-b51b-c9c1400e1a4e", "target": "launch_prep", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_6", "type": "child", "source": "launch_prep", "target": "technical_prep", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_7", "type": "child", "source": "launch_prep", "target": "aso", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_8", "type": "child", "source": "launch_prep", "target": "marketing", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_9", "type": "child", "source": "launch_prep", "target": "legal", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_10", "type": "child", "source": "launch_prep", "target": "ux_support", "label": "", "style": { "width": 2, "curved": true } },
-    { "id": "edge_11", "type": "child", "source": "launch_prep", "target": "post_launch", "label": "", "style": { "width": 2, "curved": true } }
-  ],
-  "timestamp": "2025-10-11T06:26:00.000Z",
-  "nodeCount": 13,
-  "edgeCount": 11
+    { "id": "edge_french_toast", "source": "node_breakfast", "target": "recipe_french_toast", "type": "straight" },
+    { "id": "edge_pancakes", "source": "node_breakfast", "target": "recipe_pancakes", "type": "straight" },
+    { "id": "edge_omelette", "source": "node_breakfast", "target": "recipe_omelette", "type": "straight" }
+  ]
 }

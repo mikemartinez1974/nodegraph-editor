@@ -85,13 +85,10 @@ export default function useGraphShortcuts({
     async function pasteFromClipboard() {
       try {
         const clipboardText = await navigator.clipboard.readText();
-        
-        // Validate JSON before parsing
         if (!clipboardText || typeof clipboardText !== 'string') {
           console.log('Clipboard is empty or invalid');
           return;
         }
-
         let clipboardData;
         try {
           clipboardData = JSON.parse(clipboardText);
@@ -100,75 +97,58 @@ export default function useGraphShortcuts({
           console.log('First 100 chars of clipboard:', clipboardText.substring(0, 100));
           return;
         }
-        
-        // // Check if it's our data format
-        // if (!clipboardData || clipboardData.type !== 'nodegraph-data') {
-        //   console.log('Clipboard does not contain valid nodegraph data');
-        //   return;
-        // }
-        
-        if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
-          console.log('Clipboard does not contain valid node array');
+        // If action: replace or update, call handlePasteGraphData
+        if ((clipboardData.action === 'replace' || clipboardData.action === 'update') && typeof window.handlePasteGraphData === 'function') {
+          window.handlePasteGraphData(clipboardData);
           return;
         }
-
+        if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
+          console.log('Clipboard does not contain valid node array. Each node should include label, position, width, and height. Defaults will be applied if missing.');
+          return;
+        }
         const currentNodes = nodesRef?.current || [];
         const currentEdges = edgesRef?.current || [];
-        
         // Generate new IDs for pasted nodes to avoid conflicts
         const idMapping = {};
         const timestamp = Date.now();
-        
-        // First pass: create ID mapping for all nodes
         clipboardData.nodes.forEach((node, index) => {
           const newId = `node_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`;
           idMapping[node.id] = newId;
         });
-        
-        // Second pass: create nodes with new IDs and restore escaped characters
-        const pastedNodes = clipboardData.nodes.map(node => ({
+        const pastedNodes = clipboardData.nodes.map((node, index) => ({
           ...node,
           id: idMapping[node.id],
-          position: {
-            x: node.position.x + 50, // Offset position to avoid overlap
-            y: node.position.y + 50
-          },
+          label: node.label || node.id || `Node ${index + 1}`,
+          position: node.position || { x: 100 + index * 120, y: 100 },
+          width: node.width || 160,
+          height: node.height || 80,
           data: {
             ...node.data,
-            // Restore escaped newlines and carriage returns
             memo: typeof node.data?.memo === 'string' ? node.data.memo.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.memo,
             link: typeof node.data?.link === 'string' ? node.data.link.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.link
           }
         }));
-
-        // Update edge source/target IDs using the mapping
-        const pastedEdges = (clipboardData.edges || []).map((edge, index) => ({
-          ...edge,
-          id: `edge_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`,
-          source: idMapping[edge.source],
-          target: idMapping[edge.target]
-        })).filter(edge => edge.source && edge.target); // Only keep edges where both nodes were remapped
-
-        // Add pasted nodes and edges
+        // Update edge source/target IDs using the mapping, but only for edges that reference pasted nodes
+        const pastedEdges = (clipboardData.edges || []).map((edge, index) => {
+          const newSource = idMapping[edge.source] || edge.source;
+          const newTarget = idMapping[edge.target] || edge.target;
+          return {
+            ...edge,
+            id: `edge_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`,
+            source: newSource,
+            target: newTarget
+          };
+        }).filter(edge => pastedNodes.some(n => n.id === edge.source || n.id === edge.target));
         const newNodes = [...currentNodes, ...pastedNodes];
         const newEdges = [...currentEdges, ...pastedEdges];
-
         setNodes(newNodes);
         setEdges(newEdges);
-        
-        // Update refs
         if (nodesRef) nodesRef.current = newNodes;
         if (edgesRef) edgesRef.current = newEdges;
-        
-        // Select the newly pasted nodes
         setSelectedNodeIds(pastedNodes.map(node => node.id));
         setSelectedEdgeIds([]);
-        
-        // Save to history
         if (saveToHistory) saveToHistory(newNodes, newEdges);
-        
         console.log(`Pasted ${pastedNodes.length} nodes and ${pastedEdges.length} edges`);
-        
       } catch (err) {
         console.error('Failed to paste from clipboard:', err);
       }

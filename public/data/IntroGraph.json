@@ -31,12 +31,12 @@
     {
       "id": "node_1760249098717_2_8y56vd",
       "type": "default",
-      "label": "2️⃣ Click to Read",
+      "label": "2️⃣Double-Click to Read",
       "position": {
         "x": 450,
         "y": 250
       },
-      "width": 160,
+      "width": 200,
       "height": 75,
       "data": {
         "memo": "**You're doing it right now!**\n\nEach node has details inside.\n\nYou can edit this text too! ✏️"
@@ -293,6 +293,38 @@
       "data": {
         "memo": "**Experiment freely:**\n\nTry weird connections.\n\nAsk AI odd questions.\n\nBreak things. Learn. Grow! 🌱"
       }
+    },
+    {
+      "id": "node_1760253809945_0_0xiqrx",
+      "type": "default",
+      "label": "Contact Me!",
+      "position": {
+        "x": 697.319516031984,
+        "y": 99.78377663237725
+      },
+      "width": 160,
+      "height": 48,
+      "data": {
+        "memo": "# Contact\n\nmike@cpwith.me\n\n### Comments and suggestions are welcome\n",
+        "link": "",
+        "label": "Contact Me!"
+      }
+    },
+    {
+      "id": "a00e325e-617c-418b-a6d7-79d7d0caded5",
+      "type": "default",
+      "label": "Quick Start",
+      "position": {
+        "x": 204,
+        "y": 98.5
+      },
+      "width": 100,
+      "height": 48,
+      "data": {
+        "memo": "# Quick Start\n\n### Nodes\n\nYou can create a node from the toolbar, or you can drag the handles on another node.  The top and bottom handles are parent/child handles, the the left and right handles are peer handles.  You can drag/drop a handle to create a new node with the corresponding relationship type.  \n\nNodes have a label, a memo, and a link.  The label is displayed on top of the node, and you are reading a memo right now.  The memo supports Markdown, which is useful for formatting text and for structuring data (The LLM likes both the Markdown the the Emojis).  Examine the little buttons above this text box. You can only edit it in edit (pencil) mode, but you want to read it in view (eye) mode.  Emoji's are supported in the labels and the memos.\n\nDouble-clicking a node opens the Node Properites Panel (that's this one), where you can view node all of the node data.\n\n### Selecting Nodes \n\nYou can click a node to select it, ctrl+click to select a group of individual nodes, and you can shift+drag to draw a box for selecting a range of nodes.\n\n### Copy & Paste\n\nStandard copy and paste keyboard controls are in effect for nodes (Ctrl+c/x/v)\n\nWhen you paste node graph data, you paste json data.  This can be pasted into an LLM Chatbot (ChatGPT, Grok, Claude, Gemini, any one you like), which will have no trouble at all interpreting it.  The LLM can give you json data back, and it will even make it easy for you to copy it to your clipboard, which you can then paste into cpwith.me.\n\n---\n### **Important**\n---\n\nIn order for cpwith.me to work with the LLM, it needs to be onboarded.  To do this, click the button on the far right of the toolbar, and then click into the chatbox of your LLM, and then press ctr+v (paste), and then press enter.  This will tell the LLM all about this app so that it can provide meaningful content.\n\n### Other Features\n\nFeatures include the Node Properties panel (that's this one), the Node List (accessible from the tool bar), and pretty decent theme/background support, undo/redo, and some experimental layout modes.  Node Types etc. are on the way.  See the contact node if you have a suggestion.\n\n---\n\n*At some point, this is all going to click for you.  This is powerful!*",
+        "link": "",
+        "label": "Quick Start"
+      }
     }
   ],
   "edges": [
@@ -463,6 +495,30 @@
       "source": "node_1760249098717_16_6iug83",
       "target": "node_1760249098717_20_e79vaj",
       "label": ""
+    },
+    {
+      "id": "26b5e54f-a98c-4506-bb88-69a60114af93",
+      "type": "peer",
+      "source": "node_1760249098717_0_yisxlm",
+      "target": "node_1760253809945_0_0xiqrx",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      }
+    },
+    {
+      "id": "cd17b6cb-30e6-42ac-85c5-75903cecc3ab",
+      "type": "peer",
+      "source": "node_1760249098717_0_yisxlm",
+      "target": "a00e325e-617c-418b-a6d7-79d7d0caded5",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      }
     }
   ]
 }
