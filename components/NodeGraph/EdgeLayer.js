@@ -407,9 +407,36 @@ const EdgeLayer = forwardRef(({
 
   function handleMouseMove(e) {
     if (!canvasRef.current) return;
+    
+    // First check if we're near a node (for handle detection)
     const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left - pan.x) / zoom;
-    const mouseY = (e.clientY - rect.top - pan.y) / zoom;
+    const graphX = (e.clientX - rect.left - pan.x) / zoom;
+    const graphY = (e.clientY - rect.top - pan.y) / zoom;
+    
+    // Check if mouse is over any node
+    const nodeHit = nodeList.find(node => {
+      const nodeX = node.position?.x || node.x;
+      const nodeY = node.position?.y || node.y;
+      const nodeWidth = node.width || 60;
+      const nodeHeight = node.height || 60;
+      const margin = 30; // Extra margin around node for handles
+      
+      return (
+        graphX >= nodeX - nodeWidth / 2 - margin &&
+        graphX <= nodeX + nodeWidth / 2 + margin &&
+        graphY >= nodeY - nodeHeight / 2 - margin &&
+        graphY <= nodeY + nodeHeight / 2 + margin
+      );
+    });
+    
+    // If near a node, let HandleLayer take over
+    if (nodeHit) {
+      eventBus.emit('nodeProximity', { nodeId: nodeHit.id });
+      return;
+    }
+    
+    const mouseX = graphX;
+    const mouseY = graphY;
     let found = null;
     
     const ctx = canvasRef.current.getContext('2d');

@@ -285,17 +285,17 @@ const HandleLayer = forwardRef(({
 
   // Event handlers for sensor layer
   const handleSensorMouseDown = useCallback((e) => {
-    
     const handle = findHandleAt(e.clientX, e.clientY);
     
-    
+    // Only block events if we actually hit a handle
     if (!handle) {
+      // No handle hit - let event fall through to EdgeLayer
       return;
     }
     
+    // We hit a handle - block the event and start drag
     e.stopPropagation();
     e.preventDefault();
-    e.nativeEvent.stopImmediatePropagation();
     
     draggingHandleRef.current = handle;
     previewLineRef.current = {
@@ -375,12 +375,14 @@ const HandleLayer = forwardRef(({
   }, [findHandleAt, scheduleRender, pan, zoom, nodes]);
 
   const handleSensorMouseMove = useCallback((e) => {
+    // If dragging, update preview line and block events
     if (draggingHandleRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       previewLineRef.current.endX = e.clientX - rect.left;
       previewLineRef.current.endY = e.clientY - rect.top;
       
       scheduleRender();
+      e.stopPropagation(); // Block during drag
       return;
     }
     
@@ -397,23 +399,47 @@ const HandleLayer = forwardRef(({
       hoveredHandleRef.current = handle;
       
       if (handle) {
-        setSensorActive(true);
         eventBus.emit('handleHover', { nodeId: handle.nodeId, handleId: handle.id });
         if (sensorRef.current) {
           sensorRef.current.style.cursor = 'pointer';
         }
+        // Block events when hovering a handle
+        e.stopPropagation();
       } else {
-        if (!draggingHandleRef.current) {
-          setSensorActive(false);
-        }
         if (sensorRef.current) {
           sensorRef.current.style.cursor = 'default';
         }
+        // No handle hover - let event fall through
       }
       
       scheduleRender();
+    } else if (handle) {
+      // Still hovering same handle - block events
+      e.stopPropagation();
     }
   }, [findHandleAt, scheduleRender]);
+
+  // Listen for node proximity to activate sensor
+  useEffect(() => {
+    let proximityTimeout;
+    
+    const handleNodeProximity = () => {
+      setSensorActive(true);
+      clearTimeout(proximityTimeout);
+      proximityTimeout = setTimeout(() => {
+        if (!draggingHandleRef.current && !hoveredHandleRef.current) {
+          setSensorActive(false);
+        }
+      }, 100);
+    };
+    
+    eventBus.on('nodeProximity', handleNodeProximity);
+    
+    return () => {
+      eventBus.off('nodeProximity', handleNodeProximity);
+      clearTimeout(proximityTimeout);
+    };
+  }, []);
 
   // Canvas setup and resize handling
   useEffect(() => {
@@ -469,7 +495,7 @@ const HandleLayer = forwardRef(({
           }}
         />
         
-        {/* Context-aware sensor - always present but only captures mouse events, not wheel */}
+        {/* Context-aware sensor - only active when near nodes */}
         <div
           ref={sensorRef}
           style={{
@@ -478,7 +504,7 @@ const HandleLayer = forwardRef(({
             left: 0,
             width: '100%',
             height: '100%',
-            pointerEvents: 'auto', // Always allow handle events
+            pointerEvents: sensorActive ? 'auto' : 'none', // Only block when near nodes
             cursor: 'default',
             background: 'transparent'
           }}
