@@ -334,7 +334,7 @@ export default function GraphEditor({ backgroundImage }) {
     mode,
     autoLayoutType,
     handleModeChange,
-    handleAutoLayoutChange,
+    setAutoLayoutType,
     applyAutoLayout
   } = useGraphModes({
     nodes,
@@ -618,7 +618,7 @@ export default function GraphEditor({ backgroundImage }) {
         mode={mode}
         autoLayoutType={autoLayoutType}
         onModeChange={handleModeChange}
-        onAutoLayoutChange={handleAutoLayoutChange}
+        onAutoLayoutChange={setAutoLayoutType}
         onApplyLayout={applyAutoLayout}
       />
       

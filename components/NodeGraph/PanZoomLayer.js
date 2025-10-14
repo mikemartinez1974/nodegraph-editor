@@ -82,6 +82,14 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
 
     useEffect(() => {
         function handleWheel(e) {
+            // Only zoom if mouse is over the graph canvas, not a scrollable panel or input
+            const tag = e.target.tagName;
+            const isTextInput = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable;
+            const isScrollablePanel = e.target.closest('.MuiDrawer-paper, .scrollable-panel, .MuiPaper-root');
+            if (isTextInput || isScrollablePanel) {
+                // Let the wheel event scroll the panel/input
+                return;
+            }
             e.preventDefault();
             const change = 0.01;
             const delta = e.deltaY < 0 ? change : -change;

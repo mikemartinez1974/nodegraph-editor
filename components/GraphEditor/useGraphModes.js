@@ -261,45 +261,23 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges 
         timeline.to(node.position, {
           x: pos.x,
           y: pos.y,
-          duration: 1.2,
-          ease: "power2.inOut"
+          duration: 1,
+          ease: 'power2.out'
         }, 0);
       }
     });
-
+    
     animationRef.current = timeline;
   }, [nodes, setNodes]);
-
-  // Physics loop for nav mode (30 FPS for snappier response)
-  useEffect(() => {
-    if (mode === 'nav' && nodes.length > 0) {
-      const interval = setInterval(runPhysicsSimulation, 33); // 30 FPS for snappier feel
-      physicsRef.current = interval;
-      
-      return () => {
-        clearInterval(interval);
-      };
-    } else {
-      if (physicsRef.current) {
-        clearInterval(physicsRef.current);
-        physicsRef.current = null;
-      }
-      // Clear velocities when leaving nav mode
-      velocitiesRef.current.clear();
-    }
-  }, [mode, nodes.length, runPhysicsSimulation]);
 
   // Handle mode changes
   const handleModeChange = useCallback((newMode) => {
     if (newMode === mode) return;
-    
     setMode(newMode);
-    
-    if (newMode === 'auto') {
-      // Apply layout immediately when entering auto mode
-      setTimeout(() => applyAutoLayout(autoLayoutType), 100);
-    }
-    
+    // Removed auto-apply when entering auto mode
+    // if (newMode === 'auto') {
+    //   setTimeout(() => applyAutoLayout(autoLayoutType), 100);
+    // }
     if (newMode === 'manual') {
       // Clear any ongoing animations
       if (animationRef.current) {
@@ -309,19 +287,22 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges 
     }
   }, [mode, autoLayoutType, applyAutoLayout]);
 
-  // Handle auto layout type changes
-  const handleAutoLayoutChange = useCallback((layoutType) => {
-    setAutoLayoutType(layoutType);
-    if (mode === 'auto') {
-      applyAutoLayout(layoutType);
-    }
-  }, [mode, applyAutoLayout]);
+  // Effect: Run physics simulation in nav mode
+  useEffect(() => {
+    const interval = setInterval(() => {
+      runPhysicsSimulation();
+    }, 1000 / 30); // 30 FPS
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [runPhysicsSimulation]);
 
   return {
     mode,
     autoLayoutType,
     handleModeChange,
-    handleAutoLayoutChange,
+    setAutoLayoutType, // <-- ensure this is exported
     applyAutoLayout: () => applyAutoLayout(autoLayoutType)
   };
 }

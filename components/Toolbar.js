@@ -30,7 +30,9 @@ import {
   ExpandMore as ExpandMoreIcon,
   MoreHoriz as MoreIcon,
   ChevronLeft as CollapseIcon,
-  ChevronRight as ExpandIcon
+  ChevronRight as ExpandIcon,
+  ContentPasteGo as ContentPasteGoIcon,
+  ThumbDownOffAlt as ThumbDownOffAltIcon
 } from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
@@ -69,8 +71,6 @@ const Toolbar = ({
   const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
   const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -356,128 +356,136 @@ const Toolbar = ({
         p: 1,
         flexWrap: 'nowrap'
       }}>
-        {/* Collapse/Expand toggle */}
-        <IconButton
-          onClick={() => setIsCollapsed(!isCollapsed)}
+        {/* Essential actions */}
+        <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
+          {/* Onboard LLM button - first icon */}
+          <IconButton
+            onClick={handleCopyOnboard}
+            title="Onboard LLM"
+            size="small"
+          >
+            <ContentPasteGoIcon fontSize="small" />
+          </IconButton>
+          
+          <IconButton
+            onClick={onAddNode}
+            title="Add Node (Ctrl+N)"
+            size="small"
+          >
+            <AddIcon />
+          </IconButton>
+          
+          <IconButton
+            onClick={onToggleNodeList}
+            color={showNodeList ? "primary" : "default"}
+            title="Toggle Node List"
+            size="small"
+          >
+            <ListIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={onDeleteSelected}
+            disabled={!selectedNodeId && !selectedEdgeId}
+            color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
+            title="Delete Selected (Delete)"
+            size="small"
+          >
+            <DeleteIcon />
+          </IconButton>
+
+          <IconButton
+            onClick={onClearGraph}
+            title="Clear Graph"
+            size="small"
+            color="error"
+          >
+            <ThumbDownOffAltIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={handleSaveToFile}
+            title="Save Graph to File"
+            size="small"
+          >
+            <SaveIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={handleLoadFile}
+            title="Load Graph from File"
+            size="small"
+          >
+            <LoadIcon fontSize="small" />
+          </IconButton>
+        </ButtonGroup>
+
+        {/* History controls */}
+        <ButtonGroup size="small" sx={{ mr: 1 }}>
+          <IconButton
+            onClick={onUndo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+            size="small"
+          >
+            <UndoIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={onRedo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Y)"
+            size="small"
+          >
+            <RedoIcon fontSize="small" />
+          </IconButton>
+        </ButtonGroup>
+
+        {/* Mode selector */}
+        <ToggleButtonGroup
+          value={mode}
+          exclusive
+          onChange={(event, newMode) => {
+            if (newMode !== null) {
+              onModeChange(newMode);
+            }
+          }}
           size="small"
-          title={isCollapsed ? "Expand Toolbar" : "Collapse Toolbar"}
+          sx={{ mr: 1 }}
         >
-          {isCollapsed ? <ExpandIcon /> : <CollapseIcon />}
-        </IconButton>
+          <ToggleButton value="manual" title="Manual Mode">
+            <ManualIcon fontSize="small" />
+          </ToggleButton>
+          <ToggleButton value="nav" title="Navigation Mode">
+            <NavIcon fontSize="small" />
+          </ToggleButton>
+          <ToggleButton value="auto" title="Auto Layout Mode">
+            <AutoIcon fontSize="small" />
+          </ToggleButton>
+        </ToggleButtonGroup>
 
-        {!isCollapsed ? (
-          <>
-            {/* Essential actions */}
-            <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
-              <IconButton
-                onClick={onAddNode}
-                title="Add Node (Ctrl+N)"
-                size="small"
-              >
-                <AddIcon />
-              </IconButton>
-              <IconButton
-                onClick={onDeleteSelected}
-                disabled={!selectedNodeId && !selectedEdgeId}
-                color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
-                title="Delete Selected (Delete)"
-                size="small"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </ButtonGroup>
-
-            {/* Mode selector */}
-            <ToggleButtonGroup
-              value={mode}
-              exclusive
-              onChange={(event, newMode) => {
-                if (newMode !== null) {
-                  onModeChange(newMode);
-                }
+        {/* Auto layout options - only in auto mode */}
+        {mode === 'auto' && (
+          <ButtonGroup size="small" sx={{ mr: 1 }}>
+            <Button
+              onClick={(event) => {
+                setAutoLayoutMenuAnchor(event.currentTarget);
               }}
+              endIcon={<ExpandMoreIcon fontSize="small" />}
               size="small"
-              sx={{ mr: 1 }}
+              variant="outlined"
             >
-              <ToggleButton value="manual" title="Manual Mode">
-                <ManualIcon fontSize="small" />
-              </ToggleButton>
-              <ToggleButton value="nav" title="Navigation Mode">
-                <NavIcon fontSize="small" />
-              </ToggleButton>
-              <ToggleButton value="auto" title="Auto Layout Mode">
-                <AutoIcon fontSize="small" />
-              </ToggleButton>
-            </ToggleButtonGroup>
-
-            {/* Auto layout options - only in auto mode */}
-            {mode === 'auto' && (
-              <ButtonGroup size="small" sx={{ mr: 1 }}>
-                <Button
-                  onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
-                  endIcon={<ExpandMoreIcon fontSize="small" />}
-                  size="small"
-                  variant="outlined"
-                >
-                  {autoLayoutType}
-                </Button>
-                <Button
-                  onClick={onApplyLayout}
-                  size="small"
-                  variant="contained"
-                  startIcon={<AutoIcon fontSize="small" />}
-                >
-                  Apply
-                </Button>
-              </ButtonGroup>
-            )}
-
-            {/* History controls */}
-            <ButtonGroup size="small" sx={{ mr: 1 }}>
-              <IconButton
-                onClick={onUndo}
-                disabled={!canUndo}
-                title="Undo (Ctrl+Z)"
-                size="small"
-              >
-                <UndoIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                onClick={onRedo}
-                disabled={!canRedo}
-                title="Redo (Ctrl+Y)"
-                size="small"
-              >
-                <RedoIcon fontSize="small" />
-              </IconButton>
-            </ButtonGroup>
-
-            {/* More actions menu */}
-            <IconButton
-              onClick={(event) => setMoreMenuAnchor(event.currentTarget)}
-              title="More Actions"
+              {autoLayoutType}
+            </Button>
+            <Button
+              onClick={onApplyLayout}
               size="small"
+              variant="contained"
+              startIcon={<AutoIcon fontSize="small" />}
             >
-              <MoreIcon />
-            </IconButton>
-          </>
-        ) : (
-          /* Collapsed state */
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              {nodes.length}N • {edges.length}E
-            </Typography>
-            <IconButton
-              onClick={onAddNode}
-              title="Add Node"
-              size="small"
-            >
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+              Apply
+            </Button>
+          </ButtonGroup>
         )}
-
-        {/* Auto Layout Menu */}
         <Menu
           anchorEl={autoLayoutMenuAnchor}
           open={Boolean(autoLayoutMenuAnchor)}
@@ -485,6 +493,7 @@ const Toolbar = ({
         >
           <MenuItem
             onClick={() => {
+              // Only set the layout type, do not apply layout
               onAutoLayoutChange('hierarchical');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -494,6 +503,7 @@ const Toolbar = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
+              // Only set the layout type, do not apply layout
               onAutoLayoutChange('radial');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -503,6 +513,7 @@ const Toolbar = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
+              // Only set the layout type, do not apply layout
               onAutoLayoutChange('grid');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -512,62 +523,21 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
-        {/* Save Menu */}
-        <Menu
-          anchorEl={saveMenuAnchor}
-          open={Boolean(saveMenuAnchor)}
-          onClose={() => setSaveMenuAnchor(null)}
-        >
-          <MenuItem onClick={() => { handleSaveToFile(); setSaveMenuAnchor(null); }}>
-            Save to File
-          </MenuItem>
-          <MenuItem onClick={() => { handleCopyJSON(); setSaveMenuAnchor(null); }}>
-            Copy JSON
-          </MenuItem>
-          <MenuItem onClick={() => { handleCopyMetadata(); setSaveMenuAnchor(null); }}>
-            Copy Metadata
-          </MenuItem>
-        </Menu>
-
-        {/* Load Menu */}
-        <Menu
-          anchorEl={loadMenuAnchor}
-          open={Boolean(loadMenuAnchor)}
-          onClose={() => setLoadMenuAnchor(null)}
-        >
-          <MenuItem onClick={() => { handleLoadFile(); setLoadMenuAnchor(null); }}>
-            Load from File
-          </MenuItem>
-          <MenuItem onClick={() => { handlePasteGraph(); setLoadMenuAnchor(null); }}>
-            Paste Graph
-          </MenuItem>
-        </Menu>
-
-        {/* More Menu */}
-        <Menu
-          anchorEl={moreMenuAnchor}
-          open={Boolean(moreMenuAnchor)}
-          onClose={() => setMoreMenuAnchor(null)}
-        >
-          <MenuItem onClick={() => { handleClear(); setMoreMenuAnchor(null); }}>
-            <ClearIcon sx={{ mr: 1 }} />
-            Clear Graph
-          </MenuItem>
-          <MenuItem onClick={() => { setSaveMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
-            <SaveIcon sx={{ mr: 1 }} />
-            Save Options...
-          </MenuItem>
-          <MenuItem onClick={() => { setLoadMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
-            <LoadIcon sx={{ mr: 1 }} />
-            Load Options...
-          </MenuItem>
-          {mode === 'auto' && (
-            <MenuItem onClick={() => { setAutoLayoutMenuAnchor(moreMenuAnchor); setMoreMenuAnchor(null); }}>
-              <AutoIcon sx={{ mr: 1 }} />
-              Layout Options...
-            </MenuItem>
-          )}
-        </Menu>
+        {/* Status indicators */}
+        {(copied || metadataCopied || saved || pasted || onboardCopied) && (
+          <Chip
+            label={
+              copied ? "JSON Copied!" :
+              metadataCopied ? "Metadata Copied!" :
+              saved ? "Saved!" :
+              pasted ? "Pasted!" :
+              onboardCopied ? "LLM Guide Copied!" : ""
+            }
+            size="small"
+            color="success"
+            sx={{ animation: 'fadeInOut 2s' }}
+          />
+        )}
 
         {/* Hidden file input */}
         <input
@@ -577,53 +547,6 @@ const Toolbar = ({
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
-
-        {/* Spacer - only in expanded mode */}
-        {!isCollapsed && <Box sx={{ flexGrow: 1 }} />}
-
-        {/* Right section - only in expanded mode */}
-        {!isCollapsed && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* Status indicators */}
-            {(copied || metadataCopied || saved || pasted || onboardCopied) && (
-              <Chip
-                label={
-                  copied ? "JSON Copied!" :
-                  metadataCopied ? "Metadata Copied!" :
-                  saved ? "Saved!" :
-                  pasted ? "Pasted!" :
-                  onboardCopied ? "LLM Guide Copied!" : ""
-                }
-                size="small"
-                color="success"
-                sx={{ animation: 'fadeInOut 2s' }}
-              />
-            )}
-
-            {/* Graph stats */}
-            <Typography variant="caption" color="text.secondary">
-              {nodes.length}N • {edges.length}E
-            </Typography>
-
-            {/* Node list toggle */}
-            <IconButton
-              onClick={onToggleNodeList}
-              color={showNodeList ? "primary" : "default"}
-              title="Toggle Node List"
-              size="small"
-            >
-              <ListIcon fontSize="small" />
-            </IconButton>
-            {/* Copy LLM guide to clipboard */}
-            <IconButton
-              onClick={handleCopyOnboard}
-              title="Copy LLM Guide"
-              size="small"
-            >
-              <ManualIcon fontSize="small" />
-            </IconButton>
-          </Box>
-        )}
       </Box>
     </Paper>
   );
