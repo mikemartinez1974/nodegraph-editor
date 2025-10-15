@@ -229,16 +229,19 @@ const EdgeLayer = forwardRef(({
       }
 
       // Apply dragging offset if applicable
-      if (draggingInfoRef.current && draggingInfoRef.current.nodeId === edge.source) {
-        sourcePos = {
-          x: sourcePos.x + draggingInfoRef.current.offset.x,
-          y: sourcePos.y + draggingInfoRef.current.offset.y
-        };
-      } else if (draggingInfoRef.current && draggingInfoRef.current.nodeId === edge.target) {
-        targetPos = {
-          x: targetPos.x + draggingInfoRef.current.offset.x,
-          y: targetPos.y + draggingInfoRef.current.offset.y
-        };
+      if (draggingInfoRef.current && draggingInfoRef.current.nodeIds) {
+        if (draggingInfoRef.current.nodeIds.includes(edge.source)) {
+          sourcePos = {
+            x: sourcePos.x + draggingInfoRef.current.offset.x,
+            y: sourcePos.y + draggingInfoRef.current.offset.y
+          };
+        }
+        if (draggingInfoRef.current.nodeIds.includes(edge.target)) {
+          targetPos = {
+            x: targetPos.x + draggingInfoRef.current.offset.x,
+            y: targetPos.y + draggingInfoRef.current.offset.y
+          };
+        }
       }
       
       ctx.save();

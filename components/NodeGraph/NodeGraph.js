@@ -56,6 +56,8 @@ export default function NodeGraph({
   const draggingNodeIdRef = useRef(null);
   const draggingGroupIdRef = useRef(null);
   const containerRef = useRef(null); // Ensure containerRef is defined
+  const isDragging = useRef(false); // Track if we actually dragged
+  const dragStartTime = useRef(0); // Track when drag started
   const panZoomRef = useRef(null); // Ref for PanZoomLayer
   const hoverTimeoutRef = useRef({});
   const dragRafRef = useRef(null);
@@ -97,6 +99,11 @@ export default function NodeGraph({
   // Replace inline event handlers with imported functions
   // Define handler functions outside useEffect
   function handleNodeClickWrapper({ id, event }) {
+    // Ignore clicks that are actually drag-end events
+    if (isDragging.current || (Date.now() - dragStartTime.current < 200 && draggingNodeIdRef.current)) {
+      return;
+    }
+    
     if (!onNodeClick && setSelectedNodeIds) {
       setSelectedNodeIds([id]);
       if (setSelectedEdgeIds) setSelectedEdgeIds([]);
@@ -159,30 +166,29 @@ export default function NodeGraph({
   // Replace inline drag handlers with imported functions
   // Node drag logic
   function onNodeDragMove(e) {
-    if (draggingNodeIdRef.current) {
+    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current)) {
       const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
       const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
       lastMousePos.current = { x: e.clientX, y: e.clientY };
 
       if (!draggingInfoRef.current) {
-        draggingInfoRef.current = { nodeId: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
+        draggingInfoRef.current = { nodeIds: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
       }
       draggingInfoRef.current.offset.x += graphDx;
       draggingInfoRef.current.offset.y += graphDy;
-
-      // Update lastDragPosition for onNodeDragEnd
-      lastDragPosition.current = {
-        x: lastDragPosition.current.x + graphDx,
-        y: lastDragPosition.current.y + graphDy
-      };
+      
+      // Mark that we've actually dragged (moved the mouse)
+      isDragging.current = true;
 
       if (!dragRafRef.current) {
         dragRafRef.current = requestAnimationFrame(() => {
-          // Move node DOM
-          const nodeEl = nodeRefs.current.get(draggingNodeIdRef.current);
-          if (nodeEl) {
-            nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
-          }
+          // Move all dragging nodes
+          draggingNodeIdRef.current.forEach(nodeId => {
+            const nodeEl = nodeRefs.current.get(nodeId);
+            if (nodeEl) {
+              nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
+            }
+          });
 
           // Redraw canvases
           if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
@@ -196,31 +202,58 @@ export default function NodeGraph({
 
   function onNodeDragStart(e, node) {
     e.preventDefault();
+    
+    // Determine which nodes to drag
+    let nodesToDrag = [node.id];
+    if (selectedNodeIds.includes(node.id) && selectedNodeIds.length > 1) {
+      // Dragging a selected node with multiple selections - drag all selected
+      nodesToDrag = [...selectedNodeIds];
+    }
+    
     setDraggingNodeId(node.id);
-    draggingNodeIdRef.current = node.id;
+    draggingNodeIdRef.current = nodesToDrag; // Now stores array of IDs
+    isDragging.current = false; // Reset drag flag
+    dragStartTime.current = Date.now(); // Track start time
+    
+    // Store initial positions for all nodes being dragged
+    const initialPositions = {};
+    nodesToDrag.forEach(id => {
+      const n = nodes.find(nd => nd.id === id);
+      if (n) {
+        initialPositions[id] = { x: n.position.x, y: n.position.y };
+      }
+    });
+    lastDragPosition.current = initialPositions;
+    
     dragOffset.current = {
       x: e.clientX - (node.position.x * zoom + pan.x),
       y: e.clientY - (node.position.y * zoom + pan.y)
     };
     lastMousePos.current = { x: e.clientX, y: e.clientY };
-    lastDragPosition.current = { x: node.position.x, y: node.position.y }; // Initialize for onNodeDragEnd
     containerRef.current.addEventListener('mousemove', onNodeDragMove, { passive: false });
     containerRef.current.addEventListener('mouseup', handleNodeDragEnd, { passive: false });
   }
 
   function handleNodeDragEnd() {
-    if (draggingNodeIdRef.current && draggingInfoRef.current) {
-      const id = draggingNodeIdRef.current;
+    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current) && draggingInfoRef.current) {
       const offset = draggingInfoRef.current.offset;
-      const node = nodes.find(n => n.id === id);
-      if (node && typeof onNodeMove === 'function') {
-        const newPosition = { x: node.position.x + offset.x, y: node.position.y + offset.y };
-        onNodeMove(id, newPosition);
-      }
+      
+      // Update all dragged nodes
+      draggingNodeIdRef.current.forEach(id => {
+        const node = nodes.find(n => n.id === id);
+        if (node && typeof onNodeMove === 'function') {
+          const newPosition = { 
+            x: node.position.x + offset.x, 
+            y: node.position.y + offset.y 
+          };
+          onNodeMove(id, newPosition);
+        }
 
-      // Reset
-      const nodeEl = nodeRefs.current.get(id);
-      if (nodeEl) nodeEl.style.transform = '';
+        // Reset transform
+        const nodeEl = nodeRefs.current.get(id);
+        if (nodeEl) nodeEl.style.transform = '';
+      });
+
       draggingInfoRef.current = null;
 
       // Force redraws after React state update completes
@@ -230,8 +263,15 @@ export default function NodeGraph({
       });
 
       // Call onNodeDragEnd if needed
-      if (typeof onNodeDragEnd === 'function') {
-        onNodeDragEnd(id, lastDragPosition.current);
+      if (typeof onNodeDragEnd === 'function' && lastDragPosition.current) {
+        // Call once per dragged node with updated positions
+        draggingNodeIdRef.current.forEach(id => {
+          const initial = lastDragPosition.current[id];
+          if (initial) {
+            const finalPos = { x: initial.x + offset.x, y: initial.y + offset.y };
+            onNodeDragEnd(id, finalPos);
+          }
+        });
       }
     }
 
@@ -462,6 +502,12 @@ export default function NodeGraph({
             theme={theme}
             nodeTypes={nodeTypes}
             onNodeEvent={(id, e) => {
+            // Ignore clicks that are actually drag-end events
+            if (isDragging.current || (Date.now() - dragStartTime.current < 200 && draggingNodeIdRef.current)) {
+              isDragging.current = false; // Reset for next interaction
+              return;
+            }
+            
             if (onNodeClick) onNodeClick(id, e);
             const node = nodes.find(n => n.id === id);
             if (node && node.handleProgress === 1) {

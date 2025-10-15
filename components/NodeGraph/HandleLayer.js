@@ -19,7 +19,7 @@ function getHandlePositions(node, edgeTypes, draggingInfoRef) {
   // Apply dragging offset if applicable
   let adjustedX = x;
   let adjustedY = y;
-  if (draggingInfoRef.current && draggingInfoRef.current.nodeId === node.id) {
+  if (draggingInfoRef.current && draggingInfoRef.current.nodeIds && draggingInfoRef.current.nodeIds.includes(node.id)) {
     adjustedX += draggingInfoRef.current.offset.x;
     adjustedY += draggingInfoRef.current.offset.y;
   }
