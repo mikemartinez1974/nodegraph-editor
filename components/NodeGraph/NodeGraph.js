@@ -19,6 +19,7 @@ export default function NodeGraph({
   setNodes,
   edges = [], 
   groups = [], 
+  setGroups,
   nodeTypes = {}, 
   edgeTypes = {}, 
   selectedNodeId, 
@@ -47,6 +48,54 @@ export default function NodeGraph({
   onNodeDragEnd 
 }) {
   const theme = useTheme();
+  
+  // Auto-update group bounds when nodes move
+  useEffect(() => {
+    if (!setGroups || groups.length === 0) return;
+    
+    const updatedGroups = groups.map(group => {
+      if (!group.nodeIds || group.nodeIds.length === 0) return group;
+      
+      const groupNodes = nodes.filter(n => group.nodeIds.includes(n.id));
+      if (groupNodes.length === 0) return group;
+      
+      // Calculate bounding box with padding
+      const padding = 20;
+      const positions = groupNodes.map(n => ({
+        x: n.position?.x || n.x || 0,
+        y: n.position?.y || n.y || 0,
+        width: n.width || 60,
+        height: n.height || 60
+      }));
+      
+      const minX = Math.min(...positions.map(p => p.x - p.width / 2)) - padding;
+      const maxX = Math.max(...positions.map(p => p.x + p.width / 2)) + padding;
+      const minY = Math.min(...positions.map(p => p.y - p.height / 2)) - padding;
+      const maxY = Math.max(...positions.map(p => p.y + p.height / 2)) + padding;
+      
+      const newBounds = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+      };
+      
+      // Only update if bounds changed significantly (avoid unnecessary updates)
+      const boundsChanged = !group.bounds || 
+        Math.abs(group.bounds.x - newBounds.x) > 1 ||
+        Math.abs(group.bounds.y - newBounds.y) > 1 ||
+        Math.abs(group.bounds.width - newBounds.width) > 1 ||
+        Math.abs(group.bounds.height - newBounds.height) > 1;
+      
+      return boundsChanged ? { ...group, bounds: newBounds } : group;
+    });
+    
+    // Check if any group actually changed
+    const hasChanges = updatedGroups.some((g, i) => g !== groups[i]);
+    if (hasChanges) {
+      setGroups(updatedGroups);
+    }
+  }, [nodes, groups, setGroups]);
   
   const canvasRef = useRef(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -286,6 +335,8 @@ export default function NodeGraph({
   }
 
   // Group drag logic
+  const groupDragOffsetRef = useRef({ x: 0, y: 0 });
+  
   function onGroupDragMove(e) {
     if (draggingGroupIdRef.current && dragRafRef.current === null) {
       dragRafRef.current = requestAnimationFrame(() => {
@@ -301,6 +352,10 @@ export default function NodeGraph({
             
             dragOffset.current.x = currentX;
             dragOffset.current.y = currentY;
+            
+            // Track cumulative offset for handles
+            groupDragOffsetRef.current.x += deltaX;
+            groupDragOffsetRef.current.y += deltaY;
             
             // Update node positions in the group
             setNodes(prevNodes => prevNodes.map(node => {
@@ -330,6 +385,10 @@ export default function NodeGraph({
               }
               return g;
             }));
+            
+            // Redraw handles to follow
+            if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+            if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
           }
         }
         dragRafRef.current = null;
@@ -341,6 +400,7 @@ export default function NodeGraph({
     e.preventDefault();
     setDraggingGroupId(group.id);
     draggingGroupIdRef.current = group.id;
+    groupDragOffsetRef.current = { x: 0, y: 0 }; // Reset cumulative offset
     const rect = containerRef.current?.getBoundingClientRect();
     if (rect) {
       dragOffset.current = {
@@ -355,12 +415,17 @@ export default function NodeGraph({
   function handleGroupDragEnd() {
     setDraggingGroupId(null);
     draggingGroupIdRef.current = null;
+    groupDragOffsetRef.current = { x: 0, y: 0 }; // Reset offset
     if (dragRafRef.current) {
       cancelAnimationFrame(dragRafRef.current);
       dragRafRef.current = null;
     }
     window.removeEventListener('mousemove', onGroupDragMove);
     window.removeEventListener('mouseup', handleGroupDragEnd);
+    
+    // Final redraw after drag ends
+    if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+    if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
   }
 
   // Handle background click from PanZoomLayer

@@ -80,6 +80,7 @@ const GroupLayer = ({
                   }}
                   onMouseDown={(e) => {
                     e.stopPropagation();
+                    e.preventDefault(); // Prevent pan from starting
                     onGroupDragStart?.(e, group);
                   }}
                 />

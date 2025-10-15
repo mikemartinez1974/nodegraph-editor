@@ -8,7 +8,7 @@ const handleOffset = 15;
 const handleSpacing = 30;
 const handleRadius = 6;
 
-function getHandlePositions(node, edgeTypes, draggingInfoRef) {
+function getHandlePositions(node, edgeTypes, draggingInfoRef, draggingGroupId, groupDragOffset, groups) {
   const handles = [];
   const visibleEdgeTypes = Object.keys(edgeTypes);
   const x = node.position ? node.position.x : node.x;
@@ -19,9 +19,20 @@ function getHandlePositions(node, edgeTypes, draggingInfoRef) {
   // Apply dragging offset if applicable
   let adjustedX = x;
   let adjustedY = y;
+  
+  // Check for node drag offset
   if (draggingInfoRef.current && draggingInfoRef.current.nodeIds && draggingInfoRef.current.nodeIds.includes(node.id)) {
     adjustedX += draggingInfoRef.current.offset.x;
     adjustedY += draggingInfoRef.current.offset.y;
+  }
+  
+  // Check for group drag offset
+  if (draggingGroupId && groupDragOffset && groups) {
+    const group = groups.find(g => g.id === draggingGroupId);
+    if (group && group.nodeIds && group.nodeIds.includes(node.id)) {
+      adjustedX += groupDragOffset.x;
+      adjustedY += groupDragOffset.y;
+    }
   }
 
   visibleEdgeTypes.forEach((type, i) => {
@@ -112,7 +123,10 @@ const HandleLayer = forwardRef(({
   zoom = 1, 
   edgeTypes = {}, 
   children,
-  draggingInfoRef 
+  draggingInfoRef,
+  draggingGroupId,
+  groupDragOffset,
+  groups
 }, ref) => {
   const draggingHandleRef = useRef(null);
   const hoveredHandleRef = useRef(null);
@@ -171,7 +185,7 @@ const HandleLayer = forwardRef(({
     
     // Compute handle positions dynamically for hit detection
     const handlePositions = nodes.filter(n => n.visible !== false).flatMap(node => 
-      getHandlePositions(node, edgeTypes, draggingInfoRef)
+      getHandlePositions(node, edgeTypes, draggingInfoRef, draggingGroupId, groupDragOffset, groups)
     );
 
     for (const handle of handlePositions) {
@@ -201,7 +215,7 @@ const HandleLayer = forwardRef(({
     
     // Compute handle positions dynamically for drawing
     const handlePositions = nodes.filter(n => n.visible !== false).flatMap(node => 
-      getHandlePositions(node, edgeTypes, draggingInfoRef)
+      getHandlePositions(node, edgeTypes, draggingInfoRef, draggingGroupId, groupDragOffset, groups)
     );
 
     // Draw handles
@@ -271,7 +285,7 @@ const HandleLayer = forwardRef(({
       
       ctx.restore();
     }
-  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef]);
+  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef, draggingGroupId, groupDragOffset, groups]);
 
   // Optimized render loop
   const scheduleRender = useCallback(() => {
@@ -468,7 +482,7 @@ const HandleLayer = forwardRef(({
   // Redraw when nodes, edges, pan, or zoom change
   useEffect(() => {
     scheduleRender();
-  }, [nodes, edges, pan, zoom, scheduleRender]);
+  }, [nodes, edges, pan, zoom, scheduleRender, draggingGroupId, groupDragOffset]);
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
