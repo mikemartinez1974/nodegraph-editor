@@ -145,7 +145,7 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
       <Divider />
 
       {/* Content */}
-      <Box sx={{ p: 2, overflowY: 'auto', flexGrow: 1 }}>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden' }}>
         {/* Node ID (read-only) */}
         <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
           ID: {selectedNode.id}
@@ -163,7 +163,7 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
         />
 
         {/* Memo */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <NoteIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
@@ -204,109 +204,93 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
               />
             </Box>
           )}
-          {memoView === 'edit' ? (
-            <>
-              <TextField
-                fullWidth
-                multiline
-                rows={6}
-                value={memo}
-                onChange={handleMemoChange}
-                variant="outlined"
-                placeholder="Add notes about this node... (Markdown supported)"
-                inputRef={memoInputRef}
-                sx={{ 
-                  '& .MuiOutlinedInput-root': {
-                    fontFamily: 'monospace',
-                    fontSize: 13
-                  }
-                }}
-              />
-              {memo && (
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                  {memo.length} characters
-                </Typography>
-              )}
-            </>
-          ) : (
-            <Box
-              sx={{
-                minHeight: 160,
-                maxHeight: 300,
-                overflowY: 'auto',
-                p: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                backgroundColor: 'background.default',
-                '& h1': { fontSize: 20, fontWeight: 700, mt: 2, mb: 1 },
-                '& h2': { fontSize: 18, fontWeight: 600, mt: 1.5, mb: 1 },
-                '& h3': { fontSize: 16, fontWeight: 600, mt: 1.5, mb: 0.5 },
-                '& p': { mb: 1 },
-                '& ul, & ol': { pl: 3, mb: 1 },
-                '& li': { mb: 0.5 },
-                '& code': { 
-                  backgroundColor: 'action.hover', 
-                  padding: '2px 4px', 
-                  borderRadius: 0.5,
-                  fontFamily: 'monospace',
-                  fontSize: 12
-                },
-                '& pre': { 
-                  backgroundColor: 'action.hover', 
-                  p: 1.5, 
-                  borderRadius: 1,
-                  overflowX: 'auto',
-                  mb: 1
-                },
-                '& pre code': {
-                  backgroundColor: 'transparent',
-                  padding: 0
-                },
-                '& blockquote': {
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main',
-                  pl: 2,
-                  ml: 0,
-                  fontStyle: 'italic',
-                  color: 'text.secondary'
-                },
-                '& a': {
-                  color: 'primary.main',
-                  textDecoration: 'underline'
-                },
-                '& table': {
-                  borderCollapse: 'collapse',
-                  width: '100%',
-                  mb: 1
-                },
-                '& th, & td': {
+          <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+            {memoView === 'edit' ? (
+              <>
+                <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    value={memo}
+                    onChange={handleMemoChange}
+                    variant="outlined"
+                    placeholder="Add notes about this node... (Markdown supported)"
+                    inputRef={memoInputRef}
+                    sx={{
+                      flexGrow: 1,
+                      minHeight: 0,
+                      maxHeight: '100%',
+                      resize: 'none',
+                      '& .MuiOutlinedInput-root': {
+                        fontFamily: 'monospace',
+                        fontSize: 13,
+                        height: '100%',
+                        alignItems: 'flex-start',
+                        '& textarea': {
+                          height: '100%',
+                          minHeight: 0,
+                          resize: 'none',
+                          boxSizing: 'border-box'
+                        }
+                      }
+                    }}
+                  />
+                </Box>
+                {memo && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                    {memo.length} characters
+                  </Typography>
+                )}
+              </>
+            ) : (
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  minHeight: 0,
+                  maxHeight: '100%',
+                  overflowY: 'auto',
+                  p: 2,
                   border: '1px solid',
                   borderColor: 'divider',
-                  padding: '6px 8px',
-                  textAlign: 'left'
-                },
-                '& th': {
-                  backgroundColor: 'action.hover',
-                  fontWeight: 600
-                }
-              }}
-            >
-              {memo ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {memo}
-                </ReactMarkdown>
-              ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                  No content to preview
-                </Typography>
-              )}
-            </Box>
-          )}
+                  borderRadius: 1,
+                  backgroundColor: 'background.default',
+                  '& h1': { fontSize: 20, fontWeight: 700, mt: 2, mb: 1 },
+                  '& h2': { fontSize: 18, fontWeight: 600, mt: 1.5, mb: 1 },
+                  '& h3': { fontSize: 16, fontWeight: 600, mt: 1.5, mb: 0.5 },
+                  '& p': { mb: 1 },
+                  '& ul, & ol': { pl: 3, mb: 1 },
+                  '& li': { mb: 0.5 },
+                  '& code': { backgroundColor: 'action.hover', padding: '2px 4px', borderRadius: 0.5, fontFamily: 'monospace', fontSize: 12 },
+                  '& pre': { backgroundColor: 'action.hover', p: 1.5, borderRadius: 1, overflowX: 'auto', mb: 1 },
+                  '& pre code': { backgroundColor: 'transparent', padding: 0 },
+                  '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 2, ml: 0, fontStyle: 'italic', color: 'text.secondary' },
+                  '& a': { color: 'primary.main', textDecoration: 'underline' },
+                  '& table': { borderCollapse: 'collapse', width: '100%', mb: 1 },
+                  '& th, & td': { border: '1px solid', borderColor: 'divider', padding: '6px 8px', textAlign: 'left' },
+                  '& th': { backgroundColor: 'action.hover', fontWeight: 600 }
+                }}
+              >
+                {memo ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {memo}
+                  </ReactMarkdown>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    No content to preview
+                  </Typography>
+                )}
+              </Box>
+            )}
+            {memoView === 'preview' && memo && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {memo.length} characters
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         {/* Link */}
-        <Box>
+        <Box sx={{ mt: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <LinkIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
             <Typography variant="subtitle2" color="text.secondary">
