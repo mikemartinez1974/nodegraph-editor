@@ -1,49 +1,71 @@
 // GroupLayer.js - Renders group backgrounds and labels
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-const GroupLayer = ({ 
+const GroupLayer = forwardRef(({ 
   groups = [], 
+  nodes = [], 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
+  selectedGroupIds = [], 
   onGroupClick, 
-  onGroupDoubleClick,
-  onGroupDragStart,
-  selectedGroupIds = [],
+  onGroupDoubleClick, 
+  onGroupDragStart, 
   theme: customTheme 
-}) => {
+}, ref) => {
   const muiTheme = useTheme();
   const theme = customTheme || muiTheme;
 
   if (!groups || groups.length === 0) return null;
 
+  // Calculate live bounds based on current node positions (no caching - updates every render)
+  const getLiveBounds = (group) => {
+    if (!group.nodeIds || group.nodeIds.length === 0) return group.bounds;
+    
+    const groupNodes = nodes.filter(n => group.nodeIds.includes(n.id));
+    if (groupNodes.length === 0) return group.bounds;
+    
+    const padding = 20;
+    const positions = groupNodes.map(n => ({
+      x: n.position?.x || n.x || 0,
+      y: n.position?.y || n.y || 0,
+      width: n.width || 60,
+      height: n.height || 60
+    }));
+    
+    const minX = Math.min(...positions.map(p => p.x - p.width / 2)) - padding;
+    const maxX = Math.max(...positions.map(p => p.x + p.width / 2)) + padding;
+    const minY = Math.min(...positions.map(p => p.y - p.height / 2)) - padding;
+    const maxY = Math.max(...positions.map(p => p.y + p.height / 2)) + padding;
+    
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
+  };
+  
   return (
-    <div 
+    <svg 
       style={{ 
-        position: 'absolute', 
-        left: 0, 
-        top: 0, 
-        width: '100%', 
-        height: '100%', 
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: '100vw', 
+        height: '100vh', 
+        overflow: 'visible',
         pointerEvents: 'none',
         zIndex: 1 // Render behind nodes
       }}
     >
-      <svg 
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          overflow: 'visible',
-          pointerEvents: 'none'
-        }}
-      >
-        <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+      <g>
           {groups.map((group) => {
             // Only show if visible is explicitly true
             if (group.visible !== true || group.collapsed) return null;
             
             const isSelected = selectedGroupIds.includes(group.id);
-            const bounds = group.bounds;
+            const bounds = getLiveBounds(group); // Calculate bounds live on every render
             
             // Handle both group.style and direct properties
             const style = group.style || {};
@@ -56,10 +78,10 @@ const GroupLayer = ({
               <g key={group.id}>
                 {/* Group background */}
                 <rect
-                  x={bounds.x}
-                  y={bounds.y}
-                  width={bounds.width}
-                  height={bounds.height}
+                  x={bounds.x * zoom + pan.x}
+                  y={bounds.y * zoom + pan.y}
+                  width={bounds.width * zoom}
+                  height={bounds.height * zoom}
                   fill={backgroundColor}
                   stroke={isSelected ? theme.palette.secondary.main : borderColor}
                   strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
@@ -87,8 +109,8 @@ const GroupLayer = ({
                 
                 {/* Group label */}
                 <text
-                  x={bounds.x + 8}
-                  y={bounds.y + 16}
+                  x={(bounds.x + 8) * zoom + pan.x}
+                  y={(bounds.y + 16) * zoom + pan.y}
                   fill={theme.palette.text.primary}
                   fontSize={12}
                   fontWeight="600"
@@ -105,8 +127,8 @@ const GroupLayer = ({
                 {group.collapsible !== false && (
                   <g>
                     <circle
-                      cx={bounds.x + bounds.width - 16}
-                      cy={bounds.y + 16}
+                      cx={(bounds.x + bounds.width - 16) * zoom + pan.x}
+                      cy={(bounds.y + 16) * zoom + pan.y}
                       r={10}
                       fill={theme.palette.primary.main}
                       stroke={theme.palette.background.paper}
@@ -122,8 +144,8 @@ const GroupLayer = ({
                     />
                     {/* Collapse/expand icon */}
                     <text
-                      x={bounds.x + bounds.width - 16}
-                      y={bounds.y + 20}
+                      x={(bounds.x + bounds.width - 16) * zoom + pan.x}
+                      y={(bounds.y + 20) * zoom + pan.y}
                       fill={theme.palette.primary.contrastText}
                       fontSize={12}
                       fontWeight="bold"
@@ -150,8 +172,8 @@ const GroupLayer = ({
                     ].map((corner, index) => (
                       <circle
                         key={index}
-                        cx={corner.x}
-                        cy={corner.y}
+                        cx={corner.x * zoom + pan.x}
+                        cy={corner.y * zoom + pan.y}
                         r={4}
                         fill={theme.palette.secondary.main}
                         stroke={theme.palette.background.paper}
@@ -169,8 +191,7 @@ const GroupLayer = ({
           })}
         </g>
       </svg>
-    </div>
   );
-};
+});
 
 export default GroupLayer;

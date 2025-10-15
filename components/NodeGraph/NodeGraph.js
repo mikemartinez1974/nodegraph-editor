@@ -509,6 +509,7 @@ export default function NodeGraph({
         <GroupLayer
           ref={groupRef}
           groups={groups}
+          nodes={nodeList}
           pan={pan}
           zoom={zoom}
           selectedGroupIds={selectedGroupIds}
