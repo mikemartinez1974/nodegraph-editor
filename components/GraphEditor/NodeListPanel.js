@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Drawer,
   TextField,
@@ -16,7 +16,8 @@ import {
   Chip,
   Menu,
   MenuItem,
-  Tooltip
+  Tooltip,
+  Paper
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -44,6 +45,9 @@ export default function NodeListPanel({
   const [selectedTypes, setSelectedTypes] = useState(new Set());
   const [showVisible, setShowVisible] = useState(true);
   const [showHidden, setShowHidden] = useState(true);
+  const [pos, setPos] = useState({ x: 16, y: 88 });
+  const dragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
 
   // Get unique node types for filtering
   const nodeTypes = useMemo(() => {
@@ -92,29 +96,50 @@ export default function NodeListPanel({
 
   const activeFiltersCount = selectedTypes.size + (showVisible && showHidden ? 0 : 1);
 
+  const onMouseDown = e => {
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = e => {
+    if (!dragging.current) return;
+    setPos({
+      x: Math.max(0, Math.min(e.clientX - offset.current.x, window.innerWidth - 240)),
+      y: Math.max(0, Math.min(e.clientY - offset.current.y, window.innerHeight - 56)),
+    });
+  };
+
+  const onMouseUp = () => {
+    dragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <Drawer
-      anchor="left"
-      open={isOpen}
-      onClose={onClose}
-      variant="persistent"
+    <Paper
+      elevation={8}
       sx={{
-        width: isOpen ? 320 : 0,
-        flexShrink: 0,
+        position: 'fixed',
+        left: pos.x,
+        top: pos.y,
+        width: 280,
+        maxHeight: 'calc(100vh - 104px)',
+        backgroundColor: theme?.palette?.background?.paper || '#fff',
         zIndex: 1200,
-        '& .MuiDrawer-paper': {
-          width: 320,
-          boxSizing: 'border-box',
-          backgroundColor: theme?.palette?.background?.paper || '#fff',
-          borderRight: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          top: 64, // Start below the AppBar (Material-UI default height)
-          height: 'calc(100vh - 64px)', // Full height minus AppBar
-          position: 'fixed'
-        }
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none',
       }}
+      onMouseDown={onMouseDown}
     >
       {/* Header */}
       <Box sx={{ 
@@ -492,6 +517,6 @@ export default function NodeListPanel({
           <Typography color="error" sx={{ color: theme?.palette?.error?.main || '#f44336' }}>Clear all filters</Typography>
         </MenuItem>
       </Menu>
-    </Drawer>
+    </Paper>
   );
 }

@@ -1,524 +1,119 @@
 {
   "nodes": [
     {
-      "id": "node_1760249098717_0_yisxlm",
-      "type": "default",
-      "label": "👋 Welcome!",
-      "position": {
-        "x": 450,
-        "y": 100
-      },
-      "width": 160,
-      "height": 80,
-      "data": {
-        "memo": "**You're looking at an AI-generated graph!**\n\nBut YOU can edit, add, and shape it too.\n\nFollow the numbered steps below ⬇️"
-      }
-    },
-    {
-      "id": "node_1760249098717_1_5he9qk",
-      "type": "default",
-      "label": "1️⃣ Drag Me Around",
-      "position": {
-        "x": 200,
-        "y": 250
-      },
-      "width": 160,
-      "height": 75,
-      "data": {
-        "memo": "**Try it now!**\n\nClick and hold this node, then move your mouse.\n\nYou can rearrange anything on this canvas."
-      }
-    },
-    {
-      "id": "node_1760249098717_2_8y56vd",
-      "type": "default",
-      "label": "2️⃣Double-Click to Read",
-      "position": {
-        "x": 450,
-        "y": 250
-      },
-      "width": 200,
-      "height": 75,
-      "data": {
-        "memo": "**You're doing it right now!**\n\nEach node has details inside.\n\nYou can edit this text too! ✏️"
-      }
-    },
-    {
-      "id": "node_1760249098717_3_w4t8cc",
-      "type": "default",
-      "label": "3️⃣ Create a Node",
-      "position": {
-        "x": 700,
-        "y": 250
-      },
-      "width": 160,
-      "height": 75,
-      "data": {
-        "memo": "**Add your own ideas!**\n\nLook for the \"Add Node\" button on the toolbar (or drag one of the little handles off of this node).\n\nYour graph, your way. ➕"
-      }
-    },
-    {
-      "id": "node_1760249098717_4_56d9tj",
-      "type": "default",
-      "label": "✋ Manual Control",
-      "position": {
-        "x": 250,
-        "y": 400
-      },
-      "width": 170,
-      "height": 75,
-      "data": {
-        "memo": "**You can do everything:**\n\n- Create nodes\n- Draw connections\n- Edit labels\n- Delete things\n\nFull creative control! 🎨"
-      }
-    },
-    {
-      "id": "node_1760249098717_5_qk3wo2",
-      "type": "default",
-      "label": "🤖 AI Assistance",
-      "position": {
-        "x": 650,
-        "y": 400
-      },
-      "width": 170,
-      "height": 75,
-      "data": {
-        "memo": "**Or let AI help:**\n\n\"Add 5 nodes about X\"\n\"Connect these ideas\"\n\"Organize this section\"\n\nYour AI copilot! 🚀"
-      }
-    },
-    {
-      "id": "node_1760249098717_6_so3sbm",
-      "type": "default",
-      "label": "💡 Best of Both Worlds",
-      "position": {
-        "x": 450,
-        "y": 550
-      },
-      "width": 200,
-      "height": 80,
-      "data": {
-        "memo": "**Mix and match!**\n\n- Start with AI generation\n- Tweak nodes manually\n- Ask AI to expand\n- Fine-tune yourself\n\n**Collaborate with AI!** ✨"
-      }
-    },
-    {
-      "id": "node_1760249098717_7_utv89c",
-      "type": "default",
-      "label": "🎯 Workflow A: Start Manual",
-      "position": {
-        "x": 200,
-        "y": 700
-      },
-      "width": 190,
-      "height": 80,
-      "data": {
-        "memo": "**Human-first approach:**\n\n1. Create a few nodes yourself\n2. Connect your ideas\n3. Ask AI: \"Expand on this\"\n4. AI fills in the gaps\n\nGreat for brainstorming!"
-      }
-    },
-    {
-      "id": "node_1760249098717_8_jbgypk",
-      "type": "default",
-      "label": "🤖 Workflow B: Start with AI",
-      "position": {
-        "x": 450,
-        "y": 700
-      },
-      "width": 190,
-      "height": 80,
-      "data": {
-        "memo": "**AI-first approach:**\n\n1. Tell AI what you want\n2. Paste the JSON\n3. Move/edit nodes manually\n4. Ask AI to refine\n\nGreat for structure!"
-      }
-    },
-    {
-      "id": "node_1760249098717_9_83jatw",
-      "type": "default",
-      "label": "⚡ Workflow C: Dynamic Duo",
-      "position": {
-        "x": 700,
-        "y": 700
-      },
-      "width": 190,
-      "height": 80,
-      "data": {
-        "memo": "**True collaboration:**\n\n1. You add a node\n2. AI suggests connections\n3. You refine the layout\n4. AI adds detail\n\nBounce ideas back and forth!"
-      }
-    },
-    {
-      "id": "node_1760249098717_10_8r2d92",
-      "type": "default",
-      "label": "🔗 Make Connections",
-      "position": {
-        "x": 200,
-        "y": 850
-      },
-      "width": 160,
-      "height": 75,
-      "data": {
-        "memo": "**Draw edges yourself:**\n\nDrag from a node's handle to another node.\n\nOr ask AI: \"Connect X to Y with a curved edge\""
-      }
-    },
-    {
-      "id": "node_1760249098717_11_yr2db1",
-      "type": "default",
-      "label": "✏️ Edit Anything",
-      "position": {
-        "x": 390,
-        "y": 850
-      },
-      "width": 160,
-      "height": 75,
-      "data": {
-        "memo": "**Nothing is locked:**\n\n- Change labels\n- Update descriptions\n- Modify positions\n\nMake it yours!"
-      }
-    },
-    {
-      "id": "node_1760249098717_12_4ho635",
-      "type": "default",
-      "label": "📦 Organize with Groups",
-      "position": {
-        "x": 580,
-        "y": 850
-      },
-      "width": 170,
-      "height": 75,
-      "data": {
-        "memo": "**Group related nodes:**\n\nSelect multiple nodes and group them.\n\nOr ask AI: \"Put these in a group called 'Phase 1'\""
-      }
-    },
-    {
-      "id": "node_1760249098717_13_i9r34y",
-      "type": "default",
-      "label": "🗑️ Remove What You Don't Need",
-      "position": {
-        "x": 780,
-        "y": 850
-      },
-      "width": 180,
-      "height": 75,
-      "data": {
-        "memo": "**Clean up freely:**\n\nSelect and delete nodes or edges.\n\nYour canvas, your rules. No AI permission needed!"
-      }
-    },
-    {
-      "id": "node_1760249098717_14_es3mza",
-      "type": "default",
-      "label": "🎯 TRY IT NOW",
+      "id": "node_1760572800000_welcome",
+      "label": "👋 Welcome to cpwith.me!",
       "position": {
         "x": 300,
-        "y": 1000
+        "y": 100
       },
-      "width": 170,
-      "height": 75,
+      "width": 200,
+      "height": 100,
       "data": {
-        "memo": "**Your first task:**\n\nCreate a new node right now!\n\nAdd your name, a goal, or just \"Hello World!\"\n\n➕ Go ahead!"
+        "memo": "**Create amazing graphs with AI!**\n\nThis is your canvas. Collaborate with an AI (like me!) to explore any topic.\n\nFollow these steps to get started! ⬇️"
       }
     },
     {
-      "id": "node_1760249098717_15_zzny4m",
-      "type": "default",
-      "label": "🚀 Then Try AI",
+      "id": "node_1760572800000_llm",
+      "label": "🤖 Connect to AI",
       "position": {
-        "x": 500,
-        "y": 1000
+        "x": 200,
+        "y": 300
       },
-      "width": 170,
-      "height": 75,
+      "width": 160,
+      "height": 80,
       "data": {
-        "memo": "**After you create a node:**\n\nTell your AI:\n\"Add 3 related nodes connected to [your node name]\"\n\nWatch it expand! ✨"
+        "memo": "**Step 1:**\n\nClick the toolbar’s far-right button to copy onboarding instructions.\nPaste them into your AI chatbot (e.g., Grok, ChatGPT).\n\nThis tells the AI how to generate graphs for you!"
       }
     },
     {
-      "id": "node_1760249098717_16_6iug83",
-      "type": "default",
-      "label": "🔄 Keep Iterating",
+      "id": "node_1760572800000_topic",
+      "label": "💡 Pick a Topic",
       "position": {
-        "x": 700,
-        "y": 1000
+        "x": 449,
+        "y": 300
       },
-      "width": 170,
-      "height": 75,
+      "width": 160,
+      "height": 80,
       "data": {
-        "memo": "**The magic loop:**\n\nYou create → AI expands\n\nAI generates → You refine\n\nBack and forth = amazing graphs! 🎨"
+        "memo": "**Step 2:**\n\nAsk your AI: \"Create a node graph about [your topic]\" (e.g., 'space exploration', 'your favorite hobby').\n\nThe AI will give you JSON to paste here."
       }
     },
     {
-      "id": "node_1760249098717_17_khnzin",
-      "type": "default",
-      "label": "💎 Quick Tip",
+      "id": "node_1760572800000_paste",
+      "label": "📋 Paste & Explore",
       "position": {
-        "x": 150,
-        "y": 1150
+        "x": 257,
+        "y": 446
       },
-      "width": 150,
+      "width": 140,
       "height": 70,
       "data": {
-        "memo": "**Start messy!**\n\nDrop ideas randomly.\n\nOrganize later (manually or with AI)."
-      }
-    },
-    {
-      "id": "node_1760249098717_18_j5yveb",
-      "type": "default",
-      "label": "💎 Quick Tip",
-      "position": {
-        "x": 330,
-        "y": 1150
-      },
-      "width": 150,
-      "height": 70,
-      "data": {
-        "memo": "**Use AI for tedious work:**\n\n\"Create 20 nodes for...\"\n\nThen focus on the creative parts yourself."
-      }
-    },
-    {
-      "id": "node_1760249098717_19_bo2vni",
-      "type": "default",
-      "label": "💎 Quick Tip",
-      "position": {
-        "x": 510,
-        "y": 1150
-      },
-      "width": 150,
-      "height": 70,
-      "data": {
-        "memo": "**Trust your instincts:**\n\nIf AI's suggestion feels wrong, change it!\n\nYou're the director. 🎬"
-      }
-    },
-    {
-      "id": "node_1760249098717_20_e79vaj",
-      "type": "default",
-      "label": "💎 Quick Tip",
-      "position": {
-        "x": 690,
-        "y": 1150
-      },
-      "width": 150,
-      "height": 70,
-      "data": {
-        "memo": "**Experiment freely:**\n\nTry weird connections.\n\nAsk AI odd questions.\n\nBreak things. Learn. Grow! 🌱"
+        "memo": "**Step 3:**\n\nCopy the JSON from your AI.\nPaste it into this editor (Ctrl+V).\n\nDrag, edit, or ask the AI to refine your graph!"
       }
     },
     {
       "id": "node_1760253809945_0_0xiqrx",
-      "type": "default",
-      "label": "Contact Me!",
+      "label": "📬 Contact Me!",
       "position": {
-        "x": 697.319516031984,
-        "y": 99.78377663237725
+        "x": 700,
+        "y": 202
       },
-      "width": 160,
-      "height": 48,
+      "width": 140,
+      "height": 70,
       "data": {
-        "memo": "# Contact\n\nmike@cpwith.me\n\n### Comments and suggestions are welcome\n",
-        "link": "",
-        "label": "Contact Me!"
+        "memo": "# Contact\n\nmike@cpwith.me\n\n### Comments and suggestions are welcome\n"
       }
     },
     {
-      "id": "a00e325e-617c-418b-a6d7-79d7d0caded5",
-      "type": "default",
-      "label": "Quick Start",
+      "id": "node_1760572800000_tips",
+      "label": "⚡ Quick Tips",
       "position": {
-        "x": 204,
-        "y": 98.5
+        "x": 526,
+        "y": 439
       },
-      "width": 100,
-      "height": 48,
+      "width": 160,
+      "height": 80,
       "data": {
-        "memo": "# Quick Start\n\n### Nodes\n\nYou can create a node from the toolbar, or you can drag the handles on another node.  The top and bottom handles are parent/child handles, the the left and right handles are peer handles.  You can drag/drop a handle to create a new node with the corresponding relationship type.  \n\nNodes have a label, a memo, and a link.  The label is displayed on top of the node, and you are reading a memo right now.  The memo supports Markdown, which is useful for formatting text and for structuring data (The LLM likes both the Markdown the the Emojis).  Examine the little buttons above this text box. You can only edit it in edit (pencil) mode, but you want to read it in view (eye) mode.  Emoji's are supported in the labels and the memos.\n\nDouble-clicking a node opens the Node Properites Panel (that's this one), where you can view node all of the node data.\n\n### Selecting Nodes \n\nYou can click a node to select it, ctrl+click to select a group of individual nodes, and you can shift+drag to draw a box for selecting a range of nodes.\n\n### Copy & Paste\n\nStandard copy and paste keyboard controls are in effect for nodes (Ctrl+c/x/v)\n\nWhen you paste node graph data, you paste json data.  This can be pasted into an LLM Chatbot (ChatGPT, Grok, Claude, Gemini, any one you like), which will have no trouble at all interpreting it.  The LLM can give you json data back, and it will even make it easy for you to copy it to your clipboard, which you can then paste into cpwith.me.\n\n---\n### **Important**\n---\n\nIn order for cpwith.me to work with the LLM, it needs to be onboarded.  To do this, click the button on the far right of the toolbar, and then click into the chatbox of your LLM, and then press ctr+v (paste), and then press enter.  This will tell the LLM all about this app so that it can provide meaningful content.\n\n### Other Features\n\nFeatures include the Node Properties panel (that's this one), the Node List (accessible from the tool bar), and pretty decent theme/background support, undo/redo, and some experimental layout modes.  Node Types etc. are on the way.  See the contact node if you have a suggestion.\n\n---\n\n*At some point, this is all going to click for you.  This is powerful!*",
-        "link": "",
-        "label": "Quick Start"
+        "memo": "**Get comfy:**\n- Drag nodes to move them\n- Double-click to read/edit\n- Add nodes via toolbar or handles\n- Ctrl+C/V to copy/paste\n\nStart messy, refine later!"
       }
     }
   ],
   "edges": [
     {
-      "id": "edge_1760249098717_0_ivyyo5",
-      "type": "curved",
-      "source": "node_1760249098717_0_yisxlm",
-      "target": "node_1760249098717_1_5he9qk",
+      "id": "edge_1760572800000_e1",
+      "type": "straight",
+      "source": "node_1760572800000_welcome",
+      "target": "node_1760572800000_llm",
       "label": "start"
     },
     {
-      "id": "edge_1760249098717_1_n0ap72",
+      "id": "edge_1760572800000_e2",
       "type": "straight",
-      "source": "node_1760249098717_0_yisxlm",
-      "target": "node_1760249098717_2_8y56vd",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_2_cqf1s5",
-      "type": "curved",
-      "source": "node_1760249098717_0_yisxlm",
-      "target": "node_1760249098717_3_w4t8cc",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_3_2jk10i",
-      "type": "straight",
-      "source": "node_1760249098717_1_5he9qk",
-      "target": "node_1760249098717_4_56d9tj",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_4_h7gz4z",
-      "type": "straight",
-      "source": "node_1760249098717_3_w4t8cc",
-      "target": "node_1760249098717_5_qk3wo2",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_5_lj7c4j",
-      "type": "curved",
-      "source": "node_1760249098717_4_56d9tj",
-      "target": "node_1760249098717_6_so3sbm",
-      "label": "combine"
-    },
-    {
-      "id": "edge_1760249098717_6_frrqn3",
-      "type": "curved",
-      "source": "node_1760249098717_5_qk3wo2",
-      "target": "node_1760249098717_6_so3sbm",
-      "label": "with"
-    },
-    {
-      "id": "edge_1760249098717_7_hj0d2y",
-      "type": "curved",
-      "source": "node_1760249098717_6_so3sbm",
-      "target": "node_1760249098717_7_utv89c",
-      "label": "approaches"
-    },
-    {
-      "id": "edge_1760249098717_8_shr8j5",
-      "type": "straight",
-      "source": "node_1760249098717_6_so3sbm",
-      "target": "node_1760249098717_8_jbgypk",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_9_jn3pfv",
-      "type": "curved",
-      "source": "node_1760249098717_6_so3sbm",
-      "target": "node_1760249098717_9_83jatw",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_10_0tcprd",
-      "type": "straight",
-      "source": "node_1760249098717_7_utv89c",
-      "target": "node_1760249098717_10_8r2d92",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_11_9ckjj8",
-      "type": "straight",
-      "source": "node_1760249098717_8_jbgypk",
-      "target": "node_1760249098717_11_yr2db1",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_12_1l7lab",
-      "type": "straight",
-      "source": "node_1760249098717_9_83jatw",
-      "target": "node_1760249098717_13_i9r34y",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_13_1hum61",
-      "type": "straight",
-      "source": "node_1760249098717_10_8r2d92",
-      "target": "node_1760249098717_11_yr2db1",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_14_475vkx",
-      "type": "straight",
-      "source": "node_1760249098717_11_yr2db1",
-      "target": "node_1760249098717_12_4ho635",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_15_ni4r5i",
-      "type": "straight",
-      "source": "node_1760249098717_12_4ho635",
-      "target": "node_1760249098717_13_i9r34y",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_16_s0kbjn",
-      "type": "curved",
-      "source": "node_1760249098717_10_8r2d92",
-      "target": "node_1760249098717_14_es3mza",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_17_u959dn",
-      "type": "curved",
-      "source": "node_1760249098717_11_yr2db1",
-      "target": "node_1760249098717_14_es3mza",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_18_8a885u",
-      "type": "straight",
-      "source": "node_1760249098717_14_es3mza",
-      "target": "node_1760249098717_15_zzny4m",
+      "source": "node_1760572800000_llm",
+      "target": "node_1760572800000_topic",
       "label": "next"
     },
     {
-      "id": "edge_1760249098717_19_63rz0c",
+      "id": "edge_1760572800000_e3",
       "type": "straight",
-      "source": "node_1760249098717_15_zzny4m",
-      "target": "node_1760249098717_16_6iug83",
+      "source": "node_1760572800000_topic",
+      "target": "node_1760572800000_paste",
       "label": "then"
     },
     {
-      "id": "edge_1760249098717_20_jl6gi2",
+      "id": "edge_1760572800000_e4",
       "type": "curved",
-      "source": "node_1760249098717_14_es3mza",
-      "target": "node_1760249098717_17_khnzin",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_21_mzpfa8",
-      "type": "curved",
-      "source": "node_1760249098717_15_zzny4m",
-      "target": "node_1760249098717_18_j5yveb",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_22_4jb2bf",
-      "type": "curved",
-      "source": "node_1760249098717_15_zzny4m",
-      "target": "node_1760249098717_19_bo2vni",
-      "label": ""
-    },
-    {
-      "id": "edge_1760249098717_23_by7dt7",
-      "type": "curved",
-      "source": "node_1760249098717_16_6iug83",
-      "target": "node_1760249098717_20_e79vaj",
-      "label": ""
-    },
-    {
-      "id": "26b5e54f-a98c-4506-bb88-69a60114af93",
-      "type": "peer",
-      "source": "node_1760249098717_0_yisxlm",
+      "source": "node_1760572800000_welcome",
       "target": "node_1760253809945_0_0xiqrx",
-      "label": "",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      }
+      "label": "questions?"
     },
     {
-      "id": "cd17b6cb-30e6-42ac-85c5-75903cecc3ab",
-      "type": "peer",
-      "source": "node_1760249098717_0_yisxlm",
-      "target": "a00e325e-617c-418b-a6d7-79d7d0caded5",
-      "label": "",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      }
+      "id": "edge_1760572800000_e5",
+      "type": "curved",
+      "source": "node_1760572800000_paste",
+      "target": "node_1760572800000_tips",
+      "label": "learn more"
     }
   ]
 }

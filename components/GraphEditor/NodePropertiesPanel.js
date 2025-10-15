@@ -1,30 +1,39 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import IconButton from '@mui/material/IconButton';
+import { Paper, Box, Typography, IconButton, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
-import ResizableDrawer from './components/ResizeableDrawer';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 
-export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClose, theme }) {
+
+export default function NodePropertiesPanel({
+  selectedNode,
+  onUpdateNode,
+  onClose,
+  theme
+}) {
   const [memo, setMemo] = useState('');
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [markdownView, setMarkdownView] = useState(true); // true = view mode, false = edit mode
+  const [dockSide, setDockSide] = useState('right');
+  const [width, setWidth] = useState(320);
+  const resizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(width);
   const memoInputRef = useRef();
 
   // Update local state when selected node changes
@@ -96,51 +105,68 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
     setShowEmojiPicker(false);
   };
 
+  const handleDockToggle = () => {
+    setDockSide(dockSide === 'right' ? 'left' : 'right');
+  };
 
+  const onResizeMouseDown = (e) => {
+    resizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = width;
+    document.addEventListener('mousemove', onResizeMouseMove);
+    document.addEventListener('mouseup', onResizeMouseUp);
+  };
+
+  const onResizeMouseMove = (e) => {
+    if (!resizing.current) return;
+    let delta = dockSide === 'right' ? startX.current - e.clientX : e.clientX - startX.current;
+    let newWidth = Math.max(240, Math.min(startWidth.current + delta, 600));
+    setWidth(newWidth);
+  };
+
+  const onResizeMouseUp = () => {
+    resizing.current = false;
+    document.removeEventListener('mousemove', onResizeMouseMove);
+    document.removeEventListener('mouseup', onResizeMouseUp);
+  };
 
   return (
-    <ResizableDrawer
-      open={Boolean(selectedNode)}
-      onClose={onClose}
-      initialWidth={400}
-      minWidth={250}
-      maxWidth={900}
-      PaperProps={{
-        sx: {
-          top: 64, // Start below the AppBar
-          height: 'calc(100vh - 64px)', // Full height minus AppBar
-          position: 'fixed',
-          boxSizing: 'border-box',
-          zIndex: 1100,
-          borderLeft: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-          backgroundColor: theme?.palette?.background?.paper || '#fff',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }
+    <Paper
+      elevation={8}
+      sx={{
+        position: 'fixed',
+        [dockSide]: 0,
+        top: 64,
+        height: 'calc(100vh - 64px)', // AppBar height is 64px
+        width: width,
+        backgroundColor: theme?.palette?.background?.paper || '#fff',
+        zIndex: 1300,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxShadow: 4,
+        borderRadius: 0,
       }}
     >
-      {/* Header */}
       <Box sx={{
         p: 2,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff',
-        borderBottom: `1px solid ${theme?.palette?.primary?.dark || '#1565c0'}`
-      }}
-      >
+        color: theme?.palette?.primary?.contrastText || '#fff'
+      }}>
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Node Properties
         </Typography>
-        <IconButton 
-          size="small" 
-          onClick={onClose}
-          sx={{ color: 'inherit' }}
-        >
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton size="small" onClick={handleDockToggle} sx={{ color: 'inherit' }}>
+            {dockSide === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
+          </IconButton>
+          <IconButton size="small" onClick={onClose} sx={{ color: 'inherit' }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </Box>
       <Divider />
 
@@ -325,6 +351,19 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
         </Box>
       </Box>
 
-    </ResizableDrawer>
+      {/* Resize handle */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          [dockSide === 'right' ? 'left' : 'right']: -6,
+          width: 12,
+          height: '100%',
+          cursor: 'ew-resize',
+          zIndex: 1400,
+        }}
+        onMouseDown={onResizeMouseDown}
+      />
+    </Paper>
   );
 }

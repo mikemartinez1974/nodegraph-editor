@@ -691,6 +691,7 @@ export default function GraphEditor({ backgroundImage }) {
         setNodes={setNodes}
         edges={edges} 
         groups={groups}
+        setGroups={setGroups}
         pan={pan} 
         zoom={zoom} 
         setPan={setPan} 

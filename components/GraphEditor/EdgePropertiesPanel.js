@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -22,10 +22,13 @@ export default function EdgePropertiesPanel({
   onClose, 
   theme 
 }) {
+  const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 88 });
   const [edgeType, setEdgeType] = useState('');
   const [label, setLabel] = useState('');
   const [lineWidth, setLineWidth] = useState(2);
   const [curved, setCurved] = useState(false);
+  const dragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
 
   // Get edge ID - handle both string and object cases
   const edgeId = typeof selectedEdge === 'string' ? selectedEdge : selectedEdge?.id;
@@ -106,21 +109,48 @@ export default function EdgePropertiesPanel({
   const sourceNode = selectedEdge.sourceNode || { label: selectedEdge.source };
   const targetNode = selectedEdge.targetNode || { label: selectedEdge.target };
 
+  const onMouseDown = e => {
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = e => {
+    if (!dragging.current) return;
+    setPos({
+      x: Math.max(0, Math.min(e.clientX - offset.current.x, window.innerWidth - 320)),
+      y: Math.max(0, Math.min(e.clientY - offset.current.y, window.innerHeight - 56)),
+    });
+  };
+
+  const onMouseUp = () => {
+    dragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
   return (
     <Paper
       elevation={8}
       sx={{
         position: 'fixed',
-        right: 16,
-        top: 88,
+        left: pos.x,
+        top: pos.y,
         width: 320,
         maxHeight: 'calc(100vh - 104px)',
         backgroundColor: theme?.palette?.background?.paper || '#fff',
         zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none',
       }}
+      onMouseDown={onMouseDown}
     >
       {/* Header */}
       <Box sx={{ 
