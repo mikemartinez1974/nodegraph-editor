@@ -16,6 +16,7 @@ import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqu
 
 export default function NodeGraph({ 
   nodes = [], 
+  setNodes,
   edges = [], 
   groups = [], 
   nodeTypes = {}, 

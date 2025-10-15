@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Paper,
   List,
@@ -30,6 +30,34 @@ export default function GroupListPanel({
   isOpen = true,
   theme
 }) {
+  const [pos, setPos] = useState({ x: 16, y: 88 });
+  const dragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
+
+  const onMouseDown = e => {
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = e => {
+    if (!dragging.current) return;
+    setPos({
+      x: Math.max(0, Math.min(e.clientX - offset.current.x, window.innerWidth - 240)),
+      y: Math.max(0, Math.min(e.clientY - offset.current.y, window.innerHeight - 56)),
+    });
+  };
+
+  const onMouseUp = () => {
+    dragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -37,16 +65,19 @@ export default function GroupListPanel({
       elevation={8}
       sx={{
         position: 'fixed',
-        left: 16,
-        top: 88,
+        left: pos.x,
+        top: pos.y,
         width: 280,
         maxHeight: 'calc(100vh - 104px)',
         backgroundColor: theme?.palette?.background?.paper || '#fff',
         zIndex: 1200,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none',
       }}
+      onMouseDown={onMouseDown}
     >
       {/* Header */}
       <Box sx={{

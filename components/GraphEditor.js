@@ -688,6 +688,7 @@ export default function GraphEditor({ backgroundImage }) {
       
       <NodeGraph 
         nodes={nodes} 
+        setNodes={setNodes}
         edges={edges} 
         groups={groups}
         pan={pan} 
