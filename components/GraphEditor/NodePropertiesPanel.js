@@ -233,7 +233,7 @@ export default function NodePropertiesPanel({
           <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
             {memoView === 'edit' ? (
               <>
-                <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
                   <TextField
                     fullWidth
                     multiline
@@ -247,6 +247,7 @@ export default function NodePropertiesPanel({
                       minHeight: 0,
                       maxHeight: '100%',
                       resize: 'none',
+                      overflow: 'auto',
                       '& .MuiOutlinedInput-root': {
                         fontFamily: 'monospace',
                         fontSize: 13,
@@ -256,7 +257,8 @@ export default function NodePropertiesPanel({
                           height: '100%',
                           minHeight: 0,
                           resize: 'none',
-                          boxSizing: 'border-box'
+                          boxSizing: 'border-box',
+                          overflow: 'auto',
                         }
                       }
                     }}
