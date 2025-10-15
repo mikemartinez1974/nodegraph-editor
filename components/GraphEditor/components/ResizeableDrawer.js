@@ -8,6 +8,7 @@ export default function ResizableDrawer({
   initialWidth = 800, // increased from 320
   minWidth = 200,
   maxWidth = 1200, // increased from 600
+  PaperProps = {}, // <-- accept PaperProps
 }) {
   const [width, setWidth] = useState(initialWidth);
   const dragging = useRef(false);
@@ -45,10 +46,12 @@ export default function ResizableDrawer({
       onClose={onClose}
       variant="persistent"
       PaperProps={{
+        ...PaperProps,
         sx: {
+          ...PaperProps.sx,
           width,
           display: "flex",
-          flexDirection: "row", // handle on the left edge
+          flexDirection: "row",
           overflow: "hidden",
         },
       }}

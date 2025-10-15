@@ -1,8 +1,5 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import Drawer from '@mui/material/Drawer';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import NoteIcon from '@mui/icons-material/Note';
@@ -17,6 +14,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import ResizableDrawer from './components/ResizeableDrawer';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClose, theme }) {
   const [memo, setMemo] = useState('');
@@ -99,26 +99,24 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
 
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={Boolean(selectedNode)}
       onClose={onClose}
-      variant="persistent"
-      sx={{
-        width: selectedNode ? 400 : 0,
-        flexShrink: 0,
-        zIndex: 1100, // Lower than theme drawer (1500) and toolbar (1300)
-        '& .MuiDrawer-paper': {
-          width: 400,
-          boxSizing: 'border-box',
-          backgroundColor: theme?.palette?.background?.paper || '#fff',
-          borderLeft: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
+      initialWidth={400}
+      minWidth={250}
+      maxWidth={900}
+      PaperProps={{
+        sx: {
           top: 64, // Start below the AppBar
           height: 'calc(100vh - 64px)', // Full height minus AppBar
-          position: 'fixed'
+          position: 'fixed',
+          boxSizing: 'border-box',
+          zIndex: 1100,
+          borderLeft: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
+          backgroundColor: theme?.palette?.background?.paper || '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
         }
       }}
     >
@@ -343,6 +341,6 @@ export default function NodePropertiesPanel({ selectedNode, onUpdateNode, onClos
         </Box>
       </Box>
 
-    </Drawer>
+    </ResizableDrawer>
   );
 }

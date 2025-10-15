@@ -664,7 +664,9 @@ export default function GraphEditor({ backgroundImage }) {
         }}
         onEdgeClick={(edge, event) => {
           const isMultiSelect = event.ctrlKey || event.metaKey;
-          handleEdgeSelection(edge.id, isMultiSelect);
+          const edgeId = typeof edge === 'string' ? edge : edge?.id;
+          console.log('Edge clicked:', edge, 'ID:', edgeId);
+          handleEdgeSelection(edgeId, isMultiSelect);
         }}
         onNodeClick={(nodeId, event) => {
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
