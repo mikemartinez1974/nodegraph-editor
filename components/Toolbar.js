@@ -42,6 +42,7 @@ const getGraphAPI = () => (typeof window !== 'undefined' ? window.graphAPI : nul
 const Toolbar = ({ 
   nodes = [], 
   edges = [], 
+  groups = [], // <-- add this prop
   onLoadGraph, 
   onAddNode, 
   onDeleteSelected, 
@@ -165,7 +166,7 @@ const Toolbar = ({
 
         // Call the callback to update the graph
         if (onLoadGraph) {
-          onLoadGraph(jsonData.nodes, jsonData.edges);
+          onLoadGraph(jsonData.nodes, jsonData.edges, jsonData.groups || []);
           console.log('Graph loaded successfully!');
         }
       } catch (error) {
@@ -197,7 +198,8 @@ const Toolbar = ({
         target: edge.target,
         label: edge.label,
         style: edge.style
-      }))
+      })),
+      groups: groups.map(group => ({ ...group })) // use prop
     };
 
     const jsonString = JSON.stringify(schema, null, 2);

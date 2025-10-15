@@ -182,15 +182,17 @@ export default function GraphEditor({ backgroundImage }) {
   }, []);
 
   // Load a graph (replace nodes and edges), single implementation only
-  function handleLoadGraph(loadedNodes, loadedEdges) {
+  function handleLoadGraph(loadedNodes, loadedEdges, loadedGroups = []) {
     setNodes(loadedNodes);
     setEdges(loadedEdges);
+    setGroups(loadedGroups);
     nodesRef.current = loadedNodes;
     edgesRef.current = loadedEdges;
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
     saveToHistory(loadedNodes, loadedEdges);
-    console.log(`Loaded ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
+    console.log(`Loaded ${loadedNodes.length} nodes, ${loadedEdges.length} edges, ${loadedGroups.length} groups`);
 
     // Center, select, and open properties for the first node
     if (loadedNodes.length > 0) {
@@ -645,6 +647,7 @@ export default function GraphEditor({ backgroundImage }) {
         showGroupList={showGroupList}
         nodes={nodes} 
         edges={edges} 
+        groups={groups}
         onLoadGraph={handleLoadGraph}
         onAddNode={handleAddNode}
         onDeleteSelected={handleDeleteSelected}
