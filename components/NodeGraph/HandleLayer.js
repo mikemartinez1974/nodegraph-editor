@@ -409,13 +409,17 @@ const HandleLayer = forwardRef(({
         if (sensorRef.current) {
           sensorRef.current.style.cursor = 'default';
         }
-        // No handle hover - let event fall through
+        // No handle hover - deactivate sensor and let event fall through
+        setSensorActive(false);
       }
       
       scheduleRender();
     } else if (handle) {
       // Still hovering same handle - block events
       e.stopPropagation();
+    } else {
+      // No handle - make sure sensor is off
+      setSensorActive(false);
     }
   }, [findHandleAt, scheduleRender]);
 
@@ -510,6 +514,13 @@ const HandleLayer = forwardRef(({
           }}
           onMouseDown={handleSensorMouseDown}
           onMouseMove={handleSensorMouseMove}
+          onMouseLeave={() => {
+            // Deactivate sensor when mouse leaves
+            if (!draggingHandleRef.current) {
+              setSensorActive(false);
+              hoveredHandleRef.current = null;
+            }
+          }}
         />
       </div>
       {children}

@@ -24,7 +24,6 @@ export default function EdgePropertiesPanel({
 }) {
   const [edgeType, setEdgeType] = useState('');
   const [label, setLabel] = useState('');
-  const [showLabel, setShowLabel] = useState(false);
   const [lineWidth, setLineWidth] = useState(2);
   const [curved, setCurved] = useState(false);
 
@@ -33,11 +32,10 @@ export default function EdgePropertiesPanel({
     if (selectedEdge) {
       setEdgeType(selectedEdge.type || 'child');
       setLabel(selectedEdge.label || '');
-      setShowLabel(selectedEdge.showLabel || false);
       setLineWidth(selectedEdge.style?.width || 2);
-      setCurved(selectedEdge.style?.curved || false);
+      setCurved(selectedEdge.style?.curved !== undefined ? selectedEdge.style?.curved : false);
     }
-  }, [selectedEdge?.id]);
+  }, [selectedEdge?.id, selectedEdge?.style]);
 
   if (!selectedEdge) return null;
 
@@ -66,24 +64,28 @@ export default function EdgePropertiesPanel({
     onUpdateEdge(selectedEdge.id, { label: newLabel });
   };
 
-  const handleShowLabelChange = (e) => {
-    const newShowLabel = e.target.checked;
-    setShowLabel(newShowLabel);
-    onUpdateEdge(selectedEdge.id, { showLabel: newShowLabel });
-  };
-
   const handleLineWidthChange = (e, newValue) => {
     setLineWidth(newValue);
+    // Merge with existing style, don't replace it
+    const currentStyle = selectedEdge.style || {};
     onUpdateEdge(selectedEdge.id, {
-      style: { ...selectedEdge.style, width: newValue }
+      style: { 
+        ...currentStyle, 
+        width: newValue 
+      }
     });
   };
 
   const handleCurvedChange = (e) => {
     const newCurved = e.target.checked;
     setCurved(newCurved);
+    // Merge with existing style, don't replace it
+    const currentStyle = selectedEdge.style || {};
     onUpdateEdge(selectedEdge.id, {
-      style: { ...selectedEdge.style, curved: newCurved }
+      style: { 
+        ...currentStyle, 
+        curved: newCurved 
+      }
     });
   };
 
@@ -172,20 +174,8 @@ export default function EdgePropertiesPanel({
           onChange={handleLabelChange}
           variant="outlined"
           size="small"
-          sx={{ mb: 1 }}
-        />
-
-        {/* Show Label Toggle */}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showLabel}
-              onChange={handleShowLabelChange}
-              size="small"
-            />
-          }
-          label="Show label"
           sx={{ mb: 2 }}
+          helperText="Leave empty to hide label"
         />
 
         <Divider sx={{ my: 2 }} />

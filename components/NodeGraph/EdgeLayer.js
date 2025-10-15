@@ -240,8 +240,9 @@ const EdgeLayer = forwardRef(({
       const typeDef = edgeTypes[edge.type] || {};
       const styleDef = typeDef.style || {};
       
-      let color = styleDef.color || theme.palette.primary.main;
-      let lineWidth = styleDef.width || 2;
+      // Use edge-specific style first, then fall back to type preset
+      let color = edge.style?.color || styleDef.color || theme.palette.primary.main;
+      let lineWidth = edge.style?.width ?? styleDef.width ?? 2;
       let opacity = 1;
       
       if (isSelected) {
@@ -262,9 +263,10 @@ const EdgeLayer = forwardRef(({
       ctx.strokeStyle = color;
       ctx.lineWidth = lineWidth;
       ctx.globalAlpha = opacity;
-      ctx.setLineDash(styleDef.dash || []);
+      ctx.setLineDash(edge.style?.dash || styleDef.dash || []);
       
-      const isCurved = styleDef.curved === true;
+      // Use edge-specific curved setting first, then fall back to type preset
+      const isCurved = edge.style?.curved ?? styleDef.curved ?? false;
       
       let curveDirection = curveDirectionOverride;
       if (!curveDirection) {
