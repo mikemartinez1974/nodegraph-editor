@@ -38,11 +38,19 @@ const GroupLayer = ({
         }}
       >
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-          {groups.map(group => {
-            if (!group.visible || group.collapsed) return null;
+          {groups.map((group) => {
+            // Only show if visible is explicitly true
+            if (group.visible !== true || group.collapsed) return null;
             
             const isSelected = selectedGroupIds.includes(group.id);
             const bounds = group.bounds;
+            
+            // Handle both group.style and direct properties
+            const style = group.style || {};
+            const backgroundColor = style.backgroundColor || 'rgba(25, 118, 210, 0.1)';
+            const borderColor = style.borderColor || '#1976d2';
+            const borderWidth = style.borderWidth ?? 2;
+            const borderRadius = style.borderRadius ?? 8;
             
             return (
               <g key={group.id}>
@@ -52,12 +60,12 @@ const GroupLayer = ({
                   y={bounds.y}
                   width={bounds.width}
                   height={bounds.height}
-                  fill={group.style.backgroundColor}
-                  stroke={isSelected ? theme.palette.secondary.main : group.style.borderColor}
-                  strokeWidth={isSelected ? group.style.borderWidth + 1 : group.style.borderWidth}
+                  fill={backgroundColor}
+                  stroke={isSelected ? theme.palette.secondary.main : borderColor}
+                  strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
                   strokeDasharray={isSelected ? "4,2" : "none"}
-                  rx={group.style.borderRadius}
-                  ry={group.style.borderRadius}
+                  rx={borderRadius}
+                  ry={borderRadius}
                   style={{ 
                     pointerEvents: 'auto',
                     cursor: 'pointer'

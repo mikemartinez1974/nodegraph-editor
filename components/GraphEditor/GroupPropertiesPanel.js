@@ -1,0 +1,224 @@
+"use client";
+import React, { useState, useEffect } from 'react';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+
+export default function GroupPropertiesPanel({ 
+  selectedGroup, 
+  onUpdateGroup, 
+  onUngroupGroup,
+  onClose, 
+  theme 
+}) {
+  const [label, setLabel] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('');
+  const [borderColor, setBorderColor] = useState('');
+  const [borderWidth, setBorderWidth] = useState(2);
+  const [visible, setVisible] = useState(false);
+
+  // Update local state when selected group changes
+  useEffect(() => {
+    if (selectedGroup) {
+      setLabel(selectedGroup.label || '');
+      setBackgroundColor(selectedGroup.style?.backgroundColor || 'rgba(25, 118, 210, 0.1)');
+      setBorderColor(selectedGroup.style?.borderColor || '#1976d2');
+      setBorderWidth(selectedGroup.style?.borderWidth || 2);
+      setVisible(false); // Always start invisible
+    }
+  }, [selectedGroup?.id]);
+
+  if (!selectedGroup) return null;
+
+  const handleLabelChange = (e) => {
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    onUpdateGroup(selectedGroup.id, { label: newLabel });
+  };
+
+  const handleBackgroundColorChange = (e) => {
+    const newColor = e.target.value;
+    setBackgroundColor(newColor);
+    onUpdateGroup(selectedGroup.id, {
+      style: {
+        ...selectedGroup.style,
+        backgroundColor: newColor
+      }
+    });
+  };
+
+  const handleBorderColorChange = (e) => {
+    const newColor = e.target.value;
+    setBorderColor(newColor);
+    onUpdateGroup(selectedGroup.id, {
+      style: {
+        ...selectedGroup.style,
+        borderColor: newColor
+      }
+    });
+  };
+
+  const handleBorderWidthChange = (e) => {
+    const newWidth = parseInt(e.target.value) || 2;
+    setBorderWidth(newWidth);
+    onUpdateGroup(selectedGroup.id, {
+      style: {
+        ...selectedGroup.style,
+        borderWidth: newWidth
+      }
+    });
+  };
+
+  const handleVisibilityChange = (e) => {
+    const newVisible = e.target.checked;
+    setVisible(newVisible);
+    onUpdateGroup(selectedGroup.id, { visible: newVisible });
+  };
+
+  const handleUngroup = () => {
+    onUngroupGroup(selectedGroup.id);
+    onClose();
+  };
+
+  return (
+    <Paper
+      elevation={8}
+      sx={{
+        position: 'fixed',
+        right: 16,
+        top: 88,
+        width: 320,
+        maxHeight: 'calc(100vh - 104px)',
+        backgroundColor: theme?.palette?.background?.paper || '#fff',
+        zIndex: 1300,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Header */}
+      <Box sx={{ 
+        p: 2, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        backgroundColor: theme?.palette?.primary?.main || '#1976d2',
+        color: theme?.palette?.primary?.contrastText || '#fff'
+      }}>
+        <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
+          Group Properties
+        </Typography>
+        <IconButton 
+          size="small" 
+          onClick={onClose}
+          sx={{ color: 'inherit' }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      <Divider />
+
+      {/* Content */}
+      <Box sx={{ p: 2, overflowY: 'auto', flexGrow: 1 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          ID: {selectedGroup.id}
+        </Typography>
+
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          Contains {selectedGroup.nodeIds?.length || 0} nodes
+        </Typography>
+
+        <TextField
+          fullWidth
+          label="Label"
+          value={label}
+          onChange={handleLabelChange}
+          variant="outlined"
+          size="small"
+          sx={{ mb: 2 }}
+        />
+
+        <Divider sx={{ my: 2 }} />
+
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+          Style
+        </Typography>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary" gutterBottom>
+            Background Color
+          </Typography>
+          <TextField
+            fullWidth
+            type="color"
+            value={backgroundColor}
+            onChange={handleBackgroundColorChange}
+            variant="outlined"
+            size="small"
+          />
+        </Box>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary" gutterBottom>
+            Border Color
+          </Typography>
+          <TextField
+            fullWidth
+            type="color"
+            value={borderColor}
+            onChange={handleBorderColorChange}
+            variant="outlined"
+            size="small"
+          />
+        </Box>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary" gutterBottom>
+            Border Width: {borderWidth}px
+          </Typography>
+          <TextField
+            fullWidth
+            type="number"
+            value={borderWidth}
+            onChange={handleBorderWidthChange}
+            variant="outlined"
+            size="small"
+            inputProps={{ min: 1, max: 10 }}
+          />
+        </Box>
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={visible}
+              onChange={handleVisibilityChange}
+              size="small"
+            />
+          }
+          label="Visible"
+          sx={{ mb: 2 }}
+        />
+
+        <Divider sx={{ my: 2 }} />
+
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          onClick={handleUngroup}
+          sx={{ mt: 1 }}
+        >
+          Ungroup
+        </Button>
+      </Box>
+    </Paper>
+  );
+}

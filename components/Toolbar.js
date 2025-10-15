@@ -32,7 +32,8 @@ import {
   ChevronLeft as CollapseIcon,
   ChevronRight as ExpandIcon,
   ContentPasteGo as ContentPasteGoIcon,
-  ThumbDownOffAlt as ThumbDownOffAltIcon
+  ThumbDownOffAlt as ThumbDownOffAltIcon,
+  FolderSpecial as GroupIcon
 } from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
@@ -53,6 +54,8 @@ const Toolbar = ({
   canRedo = false,
   onToggleNodeList,
   showNodeList = true,
+  onToggleGroupList,
+  showGroupList = true,
   mode,
   autoLayoutType,
   onModeChange,
@@ -382,6 +385,15 @@ const Toolbar = ({
             size="small"
           >
             <ListIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={onToggleGroupList}
+            color={showGroupList ? "primary" : "default"}
+            title="Toggle Group List"
+            size="small"
+          >
+            <GroupIcon fontSize="small" />
           </IconButton>
 
           <IconButton

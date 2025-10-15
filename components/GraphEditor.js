@@ -10,6 +10,7 @@ import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
+import GroupListPanel from './GraphEditor/GroupListPanel';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
@@ -32,6 +33,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [selectedGroupIds, setSelectedGroupIds] = useState([]);
   const [groups, setGroups] = useState([]);
   const [showNodeList, setShowNodeList] = useState(true);
+  const [showGroupList, setShowGroupList] = useState(true);
   const [showNodeProperties, setShowNodeProperties] = useState(false);
   const [showEdgeProperties, setShowEdgeProperties] = useState(false);
 
@@ -390,6 +392,42 @@ export default function GraphEditor({ backgroundImage }) {
     setShowEdgeProperties(true);
   };
 
+  // Group List Panel handlers
+  const handleGroupListSelect = (groupId, isMultiSelect = false) => {
+    handleGroupSelection(groupId, isMultiSelect);
+  };
+
+  const handleGroupFocus = (groupId) => {
+    const group = groups.find(g => g.id === groupId);
+    if (group && group.bounds) {
+      setPan({
+        x: window.innerWidth / 2 - (group.bounds.x + group.bounds.width / 2) * zoom,
+        y: window.innerHeight / 2 - (group.bounds.y + group.bounds.height / 2) * zoom
+      });
+      setSelectedGroupIds([groupId]);
+      setSelectedNodeIds([]);
+      setSelectedEdgeIds([]);
+    }
+  };
+
+  const handleGroupToggleVisibility = (groupId) => {
+    const updatedGroups = groups.map(g =>
+      g.id === groupId ? { ...g, visible: g.visible === true ? false : true } : g
+    );
+    setGroups(updatedGroups);
+    saveToHistory(nodes, edges);
+  };
+
+  const handleGroupDelete = (groupId) => {
+    const result = groupManager.current.removeGroup(groupId);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
+      saveToHistory(nodes, edges);
+      console.log('Deleted group:', groupId);
+    }
+  };
+
   // Node update from properties panel - using GraphCRUD API
   const handleUpdateNodeData = (nodeId, newData, isLabelUpdate = false) => {
     const updateData = isLabelUpdate 
@@ -603,6 +641,8 @@ export default function GraphEditor({ backgroundImage }) {
       <Toolbar 
         onToggleNodeList={() => setShowNodeList(!showNodeList)}
         showNodeList={showNodeList}
+        onToggleGroupList={() => setShowGroupList(!showGroupList)}
+        showGroupList={showGroupList}
         nodes={nodes} 
         edges={edges} 
         onLoadGraph={handleLoadGraph}
@@ -630,6 +670,19 @@ export default function GraphEditor({ backgroundImage }) {
         onNodeFocus={handleNodeFocus}
         onClose={() => setShowNodeList(false)}
         isOpen={showNodeList}
+        theme={theme}
+      />
+
+      <GroupListPanel
+        groups={groups}
+        selectedGroupId={selectedGroupIds[0] || null}
+        selectedGroupIds={selectedGroupIds}
+        onGroupSelect={handleGroupListSelect}
+        onGroupFocus={handleGroupFocus}
+        onGroupToggleVisibility={handleGroupToggleVisibility}
+        onGroupDelete={handleGroupDelete}
+        onClose={() => setShowGroupList(false)}
+        isOpen={showGroupList}
         theme={theme}
       />
       
