@@ -421,6 +421,8 @@ const Toolbar = ({
   return (
     <Paper
       elevation={3}
+      role="toolbar"
+      aria-label="Graph editor toolbar"
       sx={{
         position: 'fixed',
         top: pos.y,
@@ -448,6 +450,7 @@ const Toolbar = ({
           <IconButton
             onClick={handleCopyOnboard}
             title="Onboard LLM"
+            aria-label="Copy LLM onboarding guide to clipboard"
             size="small"
           >
             <ContentPasteGoIcon fontSize="small" />
@@ -457,6 +460,7 @@ const Toolbar = ({
           <IconButton
             onClick={handlePasteSelected}
             title="Paste from Clipboard"
+            aria-label="Paste graph data from clipboard (Ctrl+V)"
             size="small"
           >
             <ContentPasteIcon fontSize="small" />
@@ -467,6 +471,7 @@ const Toolbar = ({
             onClick={handleCopySelected}
             disabled={selectedNodeIds.length === 0}
             title="Copy Selected Nodes + Edges"
+            aria-label={`Copy ${selectedNodeIds.length} selected nodes to clipboard`}
             size="small"
             color={selectedNodeIds.length > 0 ? "primary" : "default"}
           >

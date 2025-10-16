@@ -726,15 +726,70 @@ export default function GraphEditor({ backgroundImage }) {
     window.handlePasteGraphData = handlePasteGraphData;
   }
 
+  // Keyboard navigation for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Tab navigation for nodes
+      if (e.key === 'Tab' && selectedNodeIds.length > 0) {
+        e.preventDefault();
+        const currentIndex = nodesRef.current.findIndex(n => n.id === selectedNodeIds[0]);
+        const nextIndex = e.shiftKey 
+          ? (currentIndex - 1 + nodesRef.current.length) % nodesRef.current.length
+          : (currentIndex + 1) % nodesRef.current.length;
+        
+        if (nodesRef.current[nextIndex]) {
+          setSelectedNodeIds([nodesRef.current[nextIndex].id]);
+          setSelectedEdgeIds([]);
+        }
+      }
+      
+      // Arrow keys to move selected nodes (with Ctrl modifier)
+      if (e.ctrlKey && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const moveAmount = e.shiftKey ? 10 : 1;
+        const dx = e.key === 'ArrowLeft' ? -moveAmount : e.key === 'ArrowRight' ? moveAmount : 0;
+        const dy = e.key === 'ArrowUp' ? -moveAmount : e.key === 'ArrowDown' ? moveAmount : 0;
+        
+        setNodes(prev => {
+          const next = prev.map(node => {
+            if (selectedNodeIds.includes(node.id)) {
+              return {
+                ...node,
+                position: {
+                  x: node.position.x + dx,
+                  y: node.position.y + dy
+                }
+              };
+            }
+            return node;
+          });
+          nodesRef.current = next;
+          return next;
+        });
+        
+        // Save to history after keyboard move
+        saveToHistory(nodesRef.current, edgesRef.current);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedNodeIds, setSelectedNodeIds, setSelectedEdgeIds, setNodes, saveToHistory]);
+
   return (
-    <div id="graph-editor-background" style={{
-      minHeight: '100vh',
-      minWidth: '100vw',
-      backgroundImage: backgroundImage ? `url('/background art/${backgroundImage}')` : undefined,
-      backgroundSize: 'auto',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-    }}>
+    <div 
+      id="graph-editor-background" 
+      role="application"
+      aria-label="Node graph editor"
+      style={{
+        minHeight: '100vh',
+        minWidth: '100vw',
+        backgroundImage: backgroundImage ? `url('/background art/${backgroundImage}')` : undefined,
+        backgroundSize: 'auto',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       <Toolbar 
         onToggleNodeList={() => setShowNodeList(!showNodeList)}
         showNodeList={showNodeList}
