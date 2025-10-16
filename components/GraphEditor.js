@@ -9,6 +9,7 @@ import GroupManager from './GraphEditor/GroupManager';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
+import ResizableNode from '../components/GraphEditor/Nodes/ResizableNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
 import GroupListPanel from './GraphEditor/GroupListPanel';
 import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
@@ -100,10 +101,22 @@ export default function GraphEditor({ backgroundImage }) {
       } else {
         // Drop on empty space - create new node and edge
         console.log('Creating new node and edge');
+        
+        // Find the source node to copy its type and size (use nodesRef for current state)
+        const sourceNode = nodesRef.current.find(n => n.id === data.sourceNode);
+        const nodeType = sourceNode?.type || 'default';
+        const nodeWidth = sourceNode?.width || 80;
+        const nodeHeight = sourceNode?.height || 48;
+        
+        console.log('Source node:', sourceNode, 'Type:', nodeType, 'Size:', nodeWidth, 'x', nodeHeight);
+        
         const nodeResult = graphAPI.current.createNode({
           label: data.label || `Node-${Date.now()}`,
           position: data.graph,
-          data: data.nodeData || {}
+          data: data.nodeData || {},
+          type: nodeType,
+          width: nodeWidth,
+          height: nodeHeight
         });
         
         if (nodeResult.success) {
@@ -117,10 +130,31 @@ export default function GraphEditor({ backgroundImage }) {
         }
       }
     };
+
+    const handleNodeResize = (data) => {
+      const { id, width, height } = data;
+      setNodes(prev => {
+        const next = prev.map(n => 
+          n.id === id ? { ...n, width, height } : n
+        );
+        nodesRef.current = next;
+        return next;
+      });
+    };
+
+    const handleNodeResizeEnd = () => {
+      // Save to history when resize completes
+      saveToHistory(nodesRef.current, edgesRef.current);
+    };
     
     eventBus.on('handleDrop', handleDrop);
+    eventBus.on('nodeResize', handleNodeResize);
+    eventBus.on('nodeResizeEnd', handleNodeResizeEnd);
+    
     return () => {
       eventBus.off('handleDrop', handleDrop);
+      eventBus.off('nodeResize', handleNodeResize);
+      eventBus.off('nodeResizeEnd', handleNodeResizeEnd);
     };
   }, []);
 
@@ -321,7 +355,8 @@ export default function GraphEditor({ backgroundImage }) {
   const nodeTypes = {
     default: DefaultNode,
     display: DisplayNode,
-    list: ListNode
+    list: ListNode,
+    resizable: ResizableNode
   };
 
   // Use selection hook
