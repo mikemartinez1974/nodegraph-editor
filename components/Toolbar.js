@@ -33,7 +33,9 @@ import {
   ChevronRight as ExpandIcon,
   ContentPasteGo as ContentPasteGoIcon,
   ThumbDownOffAlt as ThumbDownOffAltIcon,
-  FolderSpecial as GroupIcon
+  FolderSpecial as GroupIcon,
+  ContentPaste as ContentPasteIcon,
+  ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
@@ -51,6 +53,7 @@ const Toolbar = ({
   onRedo,
   selectedNodeId,
   selectedEdgeId,
+  selectedNodeIds = [], // <-- add this prop
   canUndo = false,
   canRedo = false,
   onToggleNodeList,
@@ -71,6 +74,7 @@ const Toolbar = ({
   const [metadataCopied, setMetadataCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pasted, setPasted] = useState(false);
+  const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
   const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
   const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
@@ -337,6 +341,79 @@ const Toolbar = ({
     }
   };
 
+  const handleCopySelected = async () => {
+    if (selectedNodeIds.length === 0) {
+      alert('No nodes selected. Please select one or more nodes to copy.');
+      return;
+    }
+
+    // Get selected nodes
+    const selectedNodes = nodes.filter(n => selectedNodeIds.includes(n.id));
+    
+    // Get all edges that connect selected nodes (both source and target must be selected)
+    const selectedEdges = edges.filter(e => 
+      selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
+    );
+
+    const data = {
+      nodes: selectedNodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        data: node.data
+      })),
+      edges: selectedEdges.map(edge => ({
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target,
+        label: edge.label,
+        style: edge.style
+      }))
+    };
+
+    const jsonString = JSON.stringify(data, null, 2);
+
+    try {
+      await navigator.clipboard.writeText(jsonString);
+      setSelectedCopied(true);
+      setTimeout(() => setSelectedCopied(false), 2000);
+      console.log(`Copied ${selectedNodes.length} nodes and ${selectedEdges.length} edges to clipboard!`);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy selected nodes to clipboard.');
+    }
+  };
+
+  const handlePasteSelected = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const jsonData = JSON.parse(clipboardText);
+
+      // Validate structure
+      if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
+        alert('Invalid clipboard data. Must contain nodes array.');
+        return;
+      }
+
+      // Call the global paste handler if available
+      if (typeof window !== 'undefined' && window.handlePasteGraphData) {
+        window.handlePasteGraphData(jsonData);
+        setPasted(true);
+        setTimeout(() => setPasted(false), 2000);
+        console.log('Pasted data from clipboard!');
+      } else {
+        alert('Paste handler not available.');
+      }
+    } catch (error) {
+      console.error('Error pasting from clipboard:', error);
+      alert('Error pasting from clipboard. Please ensure you have valid JSON copied.');
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -363,13 +440,33 @@ const Toolbar = ({
       }}>
         {/* Essential actions */}
         <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
-          {/* Onboard LLM button - first icon */}
+          {/* Onboard LLM button - position #1 */}
           <IconButton
             onClick={handleCopyOnboard}
             title="Onboard LLM"
             size="small"
           >
             <ContentPasteGoIcon fontSize="small" />
+          </IconButton>
+          
+          {/* Paste button - position #2 */}
+          <IconButton
+            onClick={handlePasteSelected}
+            title="Paste from Clipboard"
+            size="small"
+          >
+            <ContentPasteIcon fontSize="small" />
+          </IconButton>
+
+          {/* Copy Selected button - position #3 */}
+          <IconButton
+            onClick={handleCopySelected}
+            disabled={selectedNodeIds.length === 0}
+            title="Copy Selected Nodes + Edges"
+            size="small"
+            color={selectedNodeIds.length > 0 ? "primary" : "default"}
+          >
+            <ContentCopyIcon fontSize="small" />
           </IconButton>
           
           <IconButton
@@ -538,13 +635,14 @@ const Toolbar = ({
         </Menu>
 
         {/* Status indicators */}
-        {(copied || metadataCopied || saved || pasted || onboardCopied) && (
+        {(copied || metadataCopied || saved || pasted || selectedCopied || onboardCopied) && (
           <Chip
             label={
               copied ? "JSON Copied!" :
               metadataCopied ? "Metadata Copied!" :
               saved ? "Saved!" :
               pasted ? "Pasted!" :
+              selectedCopied ? "Selected Copied!" :
               onboardCopied ? "LLM Guide Copied!" : ""
             }
             size="small"

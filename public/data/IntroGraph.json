@@ -4,8 +4,8 @@
       "id": "node_1760572800000_welcome",
       "label": "👋 Welcome to cpwith.me!",
       "position": {
-        "x": 300,
-        "y": 100
+        "x": 258.97435897435895,
+        "y": 60.256410256410255
       },
       "width": 200,
       "height": 100,
@@ -14,68 +14,81 @@
       }
     },
     {
-      "id": "node_1760572800000_llm",
-      "label": "🤖 Connect to AI",
+      "id": "node_1760572800000_split",
+      "label": "🖥️ Split Your Screen",
       "position": {
-        "x": 200,
-        "y": 300
+        "x": 644.198717948718,
+        "y": 201.4743589743589
       },
       "width": 160,
       "height": 80,
       "data": {
-        "memo": "**Step 1:**\n\nClick the toolbar’s far-right button to copy onboarding instructions.\nPaste them into your AI chatbot (e.g., Grok, ChatGPT).\n\nThis tells the AI how to generate graphs for you!"
+        "memo": "**Step 1:**\n\nSplit your screen to show the chatbot on one side and the graph editor on the other.\n\nIn a browser, drag tabs to resize windows side by side.\nThis makes it easier to copy and paste JSON!"
+      }
+    },
+    {
+      "id": "node_1760572800000_llm",
+      "label": "🤖 Connect to AI",
+      "position": {
+        "x": 380.3846153846154,
+        "y": 246.2500000000001
+      },
+      "width": 160,
+      "height": 80,
+      "data": {
+        "memo": "**Step 2:**\n\nClick the toolbar’s far-left button to copy onboarding instructions.\nPaste them into your AI chatbot (e.g., Grok, ChatGPT).\n\nThis tells the AI how to generate graphs for you!"
       }
     },
     {
       "id": "node_1760572800000_topic",
       "label": "💡 Pick a Topic",
       "position": {
-        "x": 449,
-        "y": 300
+        "x": 639.5993589743591,
+        "y": 336.71474358974365
       },
       "width": 160,
       "height": 80,
       "data": {
-        "memo": "**Step 2:**\n\nAsk your AI: \"Create a node graph about [your topic]\" (e.g., 'space exploration', 'your favorite hobby').\n\nThe AI will give you JSON to paste here."
+        "memo": "**Step 3:**\n\nAsk your AI: \"Create a node graph about [your topic]\" (e.g., 'space exploration', 'your favorite hobby').\n\nThe AI will give you JSON to paste here."
       }
     },
     {
       "id": "node_1760572800000_paste",
       "label": "📋 Paste & Explore",
       "position": {
-        "x": 257,
-        "y": 446
+        "x": 373.97435897435884,
+        "y": 423.1730769230769
       },
       "width": 140,
       "height": 70,
       "data": {
-        "memo": "**Step 3:**\n\nCopy the JSON from your AI.\nPaste it into this editor (Ctrl+V).\n\nDrag, edit, or ask the AI to refine your graph!"
-      }
-    },
-    {
-      "id": "node_1760253809945_0_0xiqrx",
-      "label": "📬 Contact Me!",
-      "position": {
-        "x": 700,
-        "y": 202
-      },
-      "width": 140,
-      "height": 70,
-      "data": {
-        "memo": "# Contact\n\nmike@cpwith.me\n\n### Comments and suggestions are welcome\n"
+        "memo": "**Step 4:**\n\nCopy the JSON from your AI.\nPaste it into this editor (Ctrl+V).\n\nDrag, edit, or ask the AI to refine your graph!"
       }
     },
     {
       "id": "node_1760572800000_tips",
       "label": "⚡ Quick Tips",
       "position": {
-        "x": 526,
-        "y": 439
+        "x": 631.0338918507234,
+        "y": 555.9802614876872
       },
       "width": 160,
       "height": 80,
       "data": {
-        "memo": "**Get comfy:**\n- Drag nodes to move them\n- Double-click to read/edit\n- Add nodes via toolbar or handles\n- Ctrl+C/V to copy/paste\n\nStart messy, refine later!"
+        "memo": "**Get comfy:**\n- Drag nodes to move them\n- Double-click to read/edit\n- Add nodes via toolbar or handles\n- Ctrl+C/V to copy/paste\n\nStart messy, refine later!\n\nThere's so much more you can do with this tool.  If it makes sense to you, it will make sense  to the AI"
+      }
+    },
+    {
+      "id": "node_1760253809945_0_0xiqrx",
+      "label": "📬 Contact Me!",
+      "position": {
+        "x": 625.8814102564103,
+        "y": 62.78846153846166
+      },
+      "width": 140,
+      "height": 70,
+      "data": {
+        "memo": "# Contact\n\nmike@cpwith.me\n\n### Comments and suggestions are welcome\n"
       }
     }
   ],
@@ -84,18 +97,25 @@
       "id": "edge_1760572800000_e1",
       "type": "straight",
       "source": "node_1760572800000_welcome",
-      "target": "node_1760572800000_llm",
-      "label": "start"
+      "target": "node_1760572800000_split",
+      "label": "first"
     },
     {
       "id": "edge_1760572800000_e2",
       "type": "straight",
-      "source": "node_1760572800000_llm",
-      "target": "node_1760572800000_topic",
+      "source": "node_1760572800000_split",
+      "target": "node_1760572800000_llm",
       "label": "next"
     },
     {
       "id": "edge_1760572800000_e3",
+      "type": "straight",
+      "source": "node_1760572800000_llm",
+      "target": "node_1760572800000_topic",
+      "label": "then"
+    },
+    {
+      "id": "edge_1760572800000_e6",
       "type": "straight",
       "source": "node_1760572800000_topic",
       "target": "node_1760572800000_paste",
@@ -114,6 +134,26 @@
       "source": "node_1760572800000_paste",
       "target": "node_1760572800000_tips",
       "label": "learn more"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group_steps",
+      "label": "Onboarding Steps 📋",
+      "nodeIds": [
+        "node_1760572800000_split",
+        "node_1760572800000_llm",
+        "node_1760572800000_topic",
+        "node_1760572800000_paste",
+        "node_1760572800000_tips"
+      ],
+      "bounds": {
+        "x": 280.3846153846154,
+        "y": 141.4743589743589,
+        "width": 463.8141025641026,
+        "height": 474.50590251332835
+      },
+      "visible": false
     }
   ]
 }

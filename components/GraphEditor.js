@@ -32,8 +32,8 @@ export default function GraphEditor({ backgroundImage }) {
   const [selectedEdgeIds, setSelectedEdgeIds] = useState([]);
   const [selectedGroupIds, setSelectedGroupIds] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [showNodeList, setShowNodeList] = useState(true);
-  const [showGroupList, setShowGroupList] = useState(true);
+  const [showNodeList, setShowNodeList] = useState(false);
+  const [showGroupList, setShowGroupList] = useState(false);
   const [showNodeProperties, setShowNodeProperties] = useState(false);
   const [showEdgeProperties, setShowEdgeProperties] = useState(false);
 
@@ -172,6 +172,18 @@ export default function GraphEditor({ backgroundImage }) {
           nodesRef.current = data.nodes;
           edgesRef.current = data.edges;
           saveToHistory(data.nodes, data.edges);
+
+          // Center the first node on screen after loading
+          if (data.nodes.length > 0) {
+            const firstNode = data.nodes[0];
+            setPan({
+              x: window.innerWidth / 2 - (firstNode.position?.x || 0) * zoom,
+              y: window.innerHeight / 2 - (firstNode.position?.y || 0) * zoom
+            });
+            // Highlight the first node to hint the user
+            setSelectedNodeIds([firstNode.id]);
+            setSelectedEdgeIds([]);
+          }
         } else {
           console.warn('IntroGraph.json does not contain nodes/edges');
         }
@@ -655,6 +667,7 @@ export default function GraphEditor({ backgroundImage }) {
         onUndo={handleUndo}
         onRedo={handleRedo}
         selectedNodeId={selectedNodeIds[0] || null}
+        selectedNodeIds={selectedNodeIds}
         selectedEdgeId={selectedEdgeIds[0] || null}
         canUndo={canUndo}
         canRedo={canRedo}
@@ -728,7 +741,12 @@ export default function GraphEditor({ backgroundImage }) {
         }}
         onNodeClick={(nodeId, event) => {
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
+          const wasSelected = selectedNodeIds.length === 1 && selectedNodeIds[0] === nodeId;
           handleNodeSelection(nodeId, isMultiSelect);
+          // If the node was already selected (single selection) and this is a simple click, toggle the properties drawer
+          if (!isMultiSelect && wasSelected) {
+            setShowNodeProperties(prev => !prev);
+          }
         }}
         onNodeDoubleClick={handleNodeDoubleClick}
         onEdgeDoubleClick={handleEdgeDoubleClick}
