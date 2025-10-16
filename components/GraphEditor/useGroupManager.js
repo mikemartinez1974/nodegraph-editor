@@ -4,13 +4,15 @@ export default function useGroupManager({
   groups,
   setGroups,
   nodes,
+  setNodes,
+  edges,
+  setEdges,
   setSelectedNodeIds,
   setSelectedGroupIds,
   selectedNodeIds,
   selectedGroupIds,
   groupManager,
-  saveToHistory,
-  edges
+  saveToHistory
 }) {
   // Create group
   const handleCreateGroup = useCallback(() => {
@@ -60,12 +62,47 @@ export default function useGroupManager({
     const result = groupManager.current.toggleGroupCollapse(groupId);
     if (result.success) {
       const group = result.data;
-      // Update nodes visibility
-      // This should be handled in the parent if needed
-      setGroups(groupManager.current.getAllGroups());
-      console.log(`Group ${groupId} ${group.collapsed ? 'collapsed' : 'expanded'}`);
+      
+      // Update node visibility based on collapse state
+      const updatedNodes = nodes.map(node => {
+        if (group.nodeIds.includes(node.id)) {
+          return {
+            ...node,
+            visible: group.collapsed ? false : true // collapsed = true means hide nodes
+          };
+        }
+        return node;
+      });
+      
+      // Also hide edges connected to collapsed nodes
+      const updatedEdges = edges.map(edge => {
+        const sourceHidden = group.nodeIds.includes(edge.source) && group.collapsed;
+        const targetHidden = group.nodeIds.includes(edge.target) && group.collapsed;
+        if (sourceHidden || targetHidden) {
+          return {
+            ...edge,
+            visible: false
+          };
+        } else if (group.nodeIds.includes(edge.source) || group.nodeIds.includes(edge.target)) {
+          // Re-show edges when expanding
+          return {
+            ...edge,
+            visible: true
+          };
+        }
+        return edge;
+      });
+      
+      // Update groups state without changing visibility
+      const updatedGroups = groups.map(g => 
+        g.id === groupId ? { ...g, collapsed: group.collapsed } : g
+      );
+      
+      setNodes(updatedNodes);
+      setGroups(updatedGroups);
+      saveToHistory(updatedNodes, updatedEdges);
     }
-  }, [groupManager, setGroups]);
+  }, [groupManager, nodes, edges, groups, setNodes, setGroups, saveToHistory]);
 
   // Update group bounds when nodes move
   const updateGroupBounds = useCallback(() => {

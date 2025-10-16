@@ -11,6 +11,7 @@ import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
 import GroupListPanel from './GraphEditor/GroupListPanel';
+import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
@@ -34,6 +35,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [groups, setGroups] = useState([]);
   const [showNodeList, setShowNodeList] = useState(false);
   const [showGroupList, setShowGroupList] = useState(false);
+  const [showGroupProperties, setShowGroupProperties] = useState(false);
   const [showNodeProperties, setShowNodeProperties] = useState(false);
   const [showEdgeProperties, setShowEdgeProperties] = useState(false);
 
@@ -168,7 +170,17 @@ export default function GraphEditor({ backgroundImage }) {
         if (data && data.nodes && data.edges) {
           setNodes(data.nodes);
           setEdges(data.edges);
-          setGroups(data.groups || []);
+          const loadedGroups = data.groups || [];
+          setGroups(loadedGroups);
+          
+          // Initialize GroupManager with loaded groups
+          loadedGroups.forEach(group => {
+            groupManager.current.groups.set(group.id, group);
+            (group.nodeIds || []).forEach(nodeId => {
+              groupManager.current.nodeToGroup.set(nodeId, group.id);
+            });
+          });
+          
           nodesRef.current = data.nodes;
           edgesRef.current = data.edges;
           saveToHistory(data.nodes, data.edges);
@@ -330,13 +342,15 @@ export default function GraphEditor({ backgroundImage }) {
     groups,
     setGroups,
     nodes,
+    setNodes,
+    edges,
+    setEdges,
     setSelectedNodeIds,
     setSelectedGroupIds,
     selectedNodeIds,
     selectedGroupIds,
     groupManager,
-    saveToHistory,
-    edges
+    saveToHistory
   });
   const {
     handleCreateGroup,
@@ -424,6 +438,10 @@ export default function GraphEditor({ backgroundImage }) {
     }
   };
 
+  const handleGroupDoubleClickFromList = (groupId) => {
+    setShowGroupProperties(true);
+  };
+
   const handleGroupToggleVisibility = (groupId) => {
     const updatedGroups = groups.map(g =>
       g.id === groupId ? { ...g, visible: g.visible === true ? false : true } : g
@@ -439,6 +457,33 @@ export default function GraphEditor({ backgroundImage }) {
       setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
       saveToHistory(nodes, edges);
       console.log('Deleted group:', groupId);
+    }
+  };
+
+  // Group Properties Panel handlers
+  const handleUpdateGroup = (groupId, updates) => {
+    const updatedGroups = groups.map(g =>
+      g.id === groupId ? { ...g, ...updates } : g
+    );
+    setGroups(updatedGroups);
+    saveToHistory(nodes, edges);
+  };
+
+  const handleAddNodesToGroup = (groupId, nodeIds) => {
+    const result = groupManager.current.addNodesToGroup(groupId, nodeIds);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      saveToHistory(nodes, edges);
+      console.log(`Added ${nodeIds.length} nodes to group ${groupId}`);
+    }
+  };
+
+  const handleRemoveNodesFromGroup = (groupId, nodeIds) => {
+    const result = groupManager.current.removeNodesFromGroup(groupId, nodeIds);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      saveToHistory(nodes, edges);
+      console.log(`Removed ${nodeIds.length} nodes from group ${groupId}`);
     }
   };
 
@@ -695,6 +740,7 @@ export default function GraphEditor({ backgroundImage }) {
         selectedGroupIds={selectedGroupIds}
         onGroupSelect={handleGroupListSelect}
         onGroupFocus={handleGroupFocus}
+        onGroupDoubleClick={handleGroupDoubleClickFromList}
         onGroupToggleVisibility={handleGroupToggleVisibility}
         onGroupDelete={handleGroupDelete}
         onClose={() => setShowGroupList(false)}
@@ -795,6 +841,19 @@ export default function GraphEditor({ backgroundImage }) {
           edgeTypes={EdgeTypes}
           onUpdateEdge={handleUpdateEdge}
           onClose={() => setShowEdgeProperties(false)}
+          theme={theme}
+        />
+      )}
+
+      {showGroupProperties && selectedGroupIds.length === 1 && (
+        <GroupPropertiesPanel
+          selectedGroup={groups.find(g => g.id === selectedGroupIds[0])}
+          nodes={nodes}
+          onUpdateGroup={handleUpdateGroup}
+          onUngroupGroup={handleUngroupSelectedWrapper}
+          onAddNodes={handleAddNodesToGroup}
+          onRemoveNodes={handleRemoveNodesFromGroup}
+          onClose={() => setShowGroupProperties(false)}
           theme={theme}
         />
       )}

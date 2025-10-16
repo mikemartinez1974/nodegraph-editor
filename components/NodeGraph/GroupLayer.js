@@ -61,8 +61,8 @@ const GroupLayer = forwardRef(({
     >
       <g>
           {groups.map((group) => {
-            // Only show if visible is explicitly true
-            if (group.visible !== true || group.collapsed) return null;
+            // Only hide if visible is explicitly false (don't hide collapsed groups)
+            if (group.visible === false) return null;
             
             const isSelected = selectedGroupIds.includes(group.id);
             const bounds = getLiveBounds(group); // Calculate bounds live on every render
@@ -73,6 +73,102 @@ const GroupLayer = forwardRef(({
             const borderColor = style.borderColor || '#1976d2';
             const borderWidth = style.borderWidth ?? 2;
             const borderRadius = style.borderRadius ?? 8;
+            
+            // If collapsed, show a small collapsed representation
+            if (group.collapsed) {
+              const collapsedWidth = 120;
+              const collapsedHeight = 40;
+              const collapsedX = bounds.x + bounds.width / 2 - collapsedWidth / 2;
+              const collapsedY = bounds.y + bounds.height / 2 - collapsedHeight / 2;
+              
+              return (
+                <g key={group.id}>
+                  {/* Collapsed group box */}
+                  <rect
+                    x={collapsedX * zoom + pan.x}
+                    y={collapsedY * zoom + pan.y}
+                    width={collapsedWidth * zoom}
+                    height={collapsedHeight * zoom}
+                    fill={backgroundColor}
+                    stroke={isSelected ? theme.palette.secondary.main : borderColor}
+                    strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
+                    strokeDasharray={isSelected ? "4,2" : "none"}
+                    rx={borderRadius}
+                    ry={borderRadius}
+                    style={{ 
+                      pointerEvents: 'auto',
+                      cursor: 'pointer'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onGroupClick?.(group.id, e);
+                    }}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      onGroupDoubleClick?.(group.id, e);
+                    }}
+                  />
+                  
+                  {/* Collapsed group label */}
+                  <text
+                    x={(collapsedX + collapsedWidth / 2) * zoom + pan.x}
+                    y={(collapsedY + collapsedHeight / 2 + 5) * zoom + pan.y}
+                    fill={theme.palette.text.primary}
+                    fontSize={12}
+                    fontWeight="600"
+                    fontFamily={theme.typography.fontFamily}
+                    textAnchor="middle"
+                    style={{ 
+                      pointerEvents: 'none',
+                      userSelect: 'none'
+                    }}
+                  >
+                    {group.label} ({group.nodeIds.length})
+                  </text>
+                  
+                  {/* Expand button */}
+                  <g>
+                    <circle
+                      cx={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
+                      cy={(collapsedY + 16) * zoom + pan.y}
+                      r={10}
+                      fill={theme.palette.primary.main}
+                      stroke={theme.palette.background.paper}
+                      strokeWidth={2}
+                      style={{ 
+                        pointerEvents: 'auto',
+                        cursor: 'pointer'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (onGroupClick) {
+                          onGroupClick(group.id, e, 'toggle-collapse');
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                    />
+                    <text
+                      x={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
+                      y={(collapsedY + 20) * zoom + pan.y}
+                      fill={theme.palette.primary.contrastText}
+                      fontSize={12}
+                      fontWeight="bold"
+                      textAnchor="middle"
+                      style={{ 
+                        pointerEvents: 'none',
+                        userSelect: 'none'
+                      }}
+                    >
+                      +
+                    </text>
+                  </g>
+                </g>
+              );
+            }
             
             return (
               <g key={group.id}>
@@ -139,11 +235,20 @@ const GroupLayer = forwardRef(({
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onGroupDoubleClick?.(group.id, e, 'toggle-collapse');
+                        e.preventDefault();
+                        if (onGroupClick) {
+                          onGroupClick(group.id, e, 'toggle-collapse');
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
                       }}
                     />
                     {/* Collapse/expand icon */}
                     <text
+                      cx={(bounds.x + bounds.width - 16) * zoom + pan.x}
+                      cy={(bounds.y + 16) * zoom + pan.y}
                       x={(bounds.x + bounds.width - 16) * zoom + pan.x}
                       y={(bounds.y + 20) * zoom + pan.y}
                       fill={theme.palette.primary.contrastText}

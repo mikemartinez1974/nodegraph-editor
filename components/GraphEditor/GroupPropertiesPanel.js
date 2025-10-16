@@ -10,11 +10,21 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import Chip from '@mui/material/Chip';
 
 export default function GroupPropertiesPanel({ 
-  selectedGroup, 
+  selectedGroup,
+  nodes = [],
   onUpdateGroup, 
   onUngroupGroup,
+  onAddNodes,
+  onRemoveNodes,
   onClose, 
   theme 
 }) {
@@ -206,6 +216,68 @@ export default function GroupPropertiesPanel({
           label="Visible"
           sx={{ mb: 2 }}
         />
+
+        <Divider sx={{ my: 2 }} />
+
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Nodes in Group ({selectedGroup.nodeIds?.length || 0})
+        </Typography>
+
+        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+          {(selectedGroup.nodeIds || []).map((nodeId) => {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return null;
+            return (
+              <ListItem key={nodeId}>
+                <ListItemText
+                  primary={node.label || `Node ${nodeId.slice(0, 8)}`}
+                  secondary={`ID: ${nodeId.slice(0, 8)}...`}
+                  primaryTypographyProps={{ variant: 'body2' }}
+                  secondaryTypographyProps={{ variant: 'caption' }}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => onRemoveNodes(selectedGroup.id, [nodeId])}
+                    title="Remove from group"
+                  >
+                    <RemoveIcon fontSize="small" />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Available Nodes
+        </Typography>
+
+        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+          {nodes
+            .filter(node => !(selectedGroup.nodeIds || []).includes(node.id))
+            .map((node) => (
+              <ListItem key={node.id}>
+                <ListItemText
+                  primary={node.label || `Node ${node.id.slice(0, 8)}`}
+                  secondary={`ID: ${node.id.slice(0, 8)}...`}
+                  primaryTypographyProps={{ variant: 'body2' }}
+                  secondaryTypographyProps={{ variant: 'caption' }}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => onAddNodes(selectedGroup.id, [node.id])}
+                    title="Add to group"
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+        </List>
 
         <Divider sx={{ my: 2 }} />
 

@@ -24,6 +24,7 @@ export default function GroupListPanel({
   selectedGroupIds = [],
   onGroupSelect,
   onGroupFocus,
+  onGroupDoubleClick,
   onGroupToggleVisibility,
   onGroupDelete,
   onClose,
@@ -129,7 +130,11 @@ export default function GroupListPanel({
                     const isMultiSelect = e.ctrlKey || e.metaKey;
                     onGroupSelect(group.id, isMultiSelect);
                   }}
-                  onDoubleClick={() => onGroupFocus(group.id)}
+                  onDoubleClick={() => {
+                    if (onGroupDoubleClick) {
+                      onGroupDoubleClick(group.id);
+                    }
+                  }}
                   sx={{ py: 1.5 }}
                 >
                   <ListItemText

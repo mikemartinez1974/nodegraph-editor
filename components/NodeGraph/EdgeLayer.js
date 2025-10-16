@@ -193,7 +193,17 @@ const EdgeLayer = forwardRef(({
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
     
-    edgeList.forEach(edge => {
+    // Filter edges: hide if either endpoint is invisible or if edge itself is invisible
+    const visibleEdges = edgeList.filter(edge => {
+      if (edge.visible === false) return false;
+      const sourceNode = nodeList.find(n => n.id === edge.source);
+      const targetNode = nodeList.find(n => n.id === edge.target);
+      // Hide edge if either endpoint is invisible
+      if (sourceNode?.visible === false || targetNode?.visible === false) return false;
+      return true;
+    });
+    
+    visibleEdges.forEach(edge => {
       const isSelected = selectedEdgeIds.includes(edge.id) || selectedEdgeId === edge.id;
       const isHovered = hoveredEdge === edge.id;
       
