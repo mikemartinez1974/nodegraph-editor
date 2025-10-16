@@ -29,7 +29,10 @@ import {
   VisibilityOff as VisibilityOffIcon,
   LocationOn as LocationIcon
 } from '@mui/icons-material';
+import * as ReactWindow from 'react-window';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+
+const { FixedSizeList } = ReactWindow;
 
 export default function NodeListPanel({ 
   nodes = [], 
@@ -123,6 +126,48 @@ export default function NodeListPanel({
 
   if (!isOpen) return null;
 
+  // Virtualized row renderer
+  const VirtualRow = ({ index, style }) => {
+    const node = nodes[index];
+    const isSelected = selectedNodeIds?.includes(node.id);
+    
+    return (
+      <ListItem
+        style={style}
+        key={node.id}
+        disablePadding
+        secondaryAction={
+          <IconButton
+            edge="end"
+            aria-label="focus on node"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onNodeFocus) onNodeFocus(node.id);
+            }}
+          >
+            <CenterFocusStrongIcon />
+          </IconButton>
+        }
+      >
+        <ListItemButton
+          selected={isSelected}
+          onClick={(e) => {
+            const isMultiSelect = e.ctrlKey || e.metaKey;
+            if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
+          }}
+        >
+          <ListItemText
+            primary={node.label || node.id}
+            secondary={`Type: ${node.type || 'default'}`}
+          />
+        </ListItemButton>
+      </ListItem>
+    );
+  };
+
+  // Use virtualization when list is large (>100 items)
+  const useVirtualization = nodes.length > 100;
+
   return (
     <Drawer
       anchor="right"
@@ -153,42 +198,56 @@ export default function NodeListPanel({
         )}
       </Box>
       
-      <List>
-        {nodes.map((node) => {
-          const isSelected = selectedNodeIds?.includes(node.id);
-          return (
-            <ListItem
-              key={node.id}
-              disablePadding
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="focus on node"
+      {useVirtualization ? (
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <FixedSizeList
+            height={window.innerHeight - 200}
+            itemCount={nodes.length}
+            itemSize={72}
+            width="100%"
+            overscanCount={5}
+          >
+            {VirtualRow}
+          </FixedSizeList>
+        </Box>
+      ) : (
+        <List>
+          {nodes.map((node) => {
+            const isSelected = selectedNodeIds?.includes(node.id);
+            return (
+              <ListItem
+                key={node.id}
+                disablePadding
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="focus on node"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onNodeFocus) onNodeFocus(node.id);
+                    }}
+                  >
+                    <CenterFocusStrongIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemButton
+                  selected={isSelected}
                   onClick={(e) => {
-                    e.stopPropagation();
-                    if (onNodeFocus) onNodeFocus(node.id);
+                    const isMultiSelect = e.ctrlKey || e.metaKey;
+                    if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
                   }}
                 >
-                  <CenterFocusStrongIcon />
-                </IconButton>
-              }
-            >
-              <ListItemButton
-                selected={isSelected}
-                onClick={(e) => {
-                  const isMultiSelect = e.ctrlKey || e.metaKey;
-                  if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
-                }}
-              >
-                <ListItemText
-                  primary={node.label || node.id}
-                  secondary={`Type: ${node.type || 'default'}`}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
+                  <ListItemText
+                    primary={node.label || node.id}
+                    secondary={`Type: ${node.type || 'default'}`}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
     </Drawer>
   );
 }
