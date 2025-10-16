@@ -64,7 +64,8 @@ const Toolbar = ({
   autoLayoutType,
   onModeChange,
   onAutoLayoutChange,
-  onApplyLayout
+  onApplyLayout,
+  onShowMessage // Add this new prop
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -121,7 +122,7 @@ const Toolbar = ({
       // Validate the structure
       if (!jsonData.nodes || !jsonData.edges) {
         console.error('Invalid graph format in clipboard');
-        alert('Invalid graph format. Clipboard must contain a graph with nodes and edges.');
+        if (onShowMessage) onShowMessage('Invalid graph format. Clipboard must contain nodes and edges.', 'error');
         return;
       }
 
@@ -134,7 +135,7 @@ const Toolbar = ({
       }
     } catch (error) {
       console.error('Error reading from clipboard:', error);
-      alert('Error reading from clipboard. Please ensure you have a valid JSON graph copied.');
+      if (onShowMessage) onShowMessage('Error reading from clipboard. Please ensure you have valid JSON copied.', 'error');
     }
   };
 
@@ -164,7 +165,7 @@ const Toolbar = ({
         // Validate the structure
         if (!jsonData.nodes || !jsonData.edges) {
           console.error('Invalid graph file format');
-          alert('Invalid graph file format. Missing nodes or edges.');
+          if (onShowMessage) onShowMessage('Invalid graph file format. Missing nodes or edges.', 'error');
           return;
         }
 
@@ -175,7 +176,7 @@ const Toolbar = ({
         }
       } catch (error) {
         console.error('Error parsing JSON:', error);
-        alert('Error loading file. Please ensure it\'s a valid JSON graph file.');
+        if (onShowMessage) onShowMessage('Error loading file. Please ensure it\'s valid JSON.', 'error');
       }
     };
 
@@ -305,6 +306,7 @@ const Toolbar = ({
       await navigator.clipboard.writeText(jsonString);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
       console.log('Graph schema copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -319,8 +321,10 @@ const Toolbar = ({
         document.execCommand('copy');
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
       } catch (err2) {
         console.error('Fallback copy failed:', err2);
+        if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
       }
       document.body.removeChild(textArea);
     }
@@ -337,13 +341,13 @@ const Toolbar = ({
       console.log('Onboard LLM guide copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy OnboardLLM.md:', err);
-      alert('Unable to copy Onboard LLM guide to clipboard.');
+      if (onShowMessage) onShowMessage('Unable to copy onboard guide to clipboard.', 'error');
     }
   };
 
   const handleCopySelected = async () => {
     if (selectedNodeIds.length === 0) {
-      alert('No nodes selected. Please select one or more nodes to copy.');
+      if (onShowMessage) onShowMessage('No nodes selected. Please select nodes to copy.', 'warning');
       return;
     }
 
@@ -384,7 +388,7 @@ const Toolbar = ({
       console.log(`Copied ${selectedNodes.length} nodes and ${selectedEdges.length} edges to clipboard!`);
     } catch (err) {
       console.error('Failed to copy:', err);
-      alert('Failed to copy selected nodes to clipboard.');
+      if (onShowMessage) onShowMessage('Failed to copy to clipboard. Try using Ctrl+C.', 'error');
     }
   };
 
@@ -395,7 +399,7 @@ const Toolbar = ({
 
       // Validate structure
       if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
-        alert('Invalid clipboard data. Must contain nodes array.');
+        if (onShowMessage) onShowMessage('Invalid clipboard data. Must contain nodes array.', 'error');
         return;
       }
 
@@ -406,11 +410,11 @@ const Toolbar = ({
         setTimeout(() => setPasted(false), 2000);
         console.log('Pasted data from clipboard!');
       } else {
-        alert('Paste handler not available.');
+        if (onShowMessage) onShowMessage('Paste handler not available.', 'error');
       }
     } catch (error) {
       console.error('Error pasting from clipboard:', error);
-      alert('Error pasting from clipboard. Please ensure you have valid JSON copied.');
+      if (onShowMessage) onShowMessage('Error pasting. Ensure you have valid JSON copied.', 'error');
     }
   };
 

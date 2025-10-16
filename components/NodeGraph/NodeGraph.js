@@ -176,7 +176,7 @@ export default function NodeGraph({
     };
   }, [setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, onEdgeClick]);
 
-  // Consolidate event bus handler registration
+  // Consolidate all event bus handler registration (removed duplicate listeners)
   useEffect(() => {
     const eventHandlers = [
       { event: 'nodeMouseEnter', handler: (data) => handleNodeMouseEnter({ ...data, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) },
@@ -193,24 +193,6 @@ export default function NodeGraph({
       eventHandlers.forEach(({ event, handler }) => eventBus.off(event, handler));
     };
   }, [setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle]);
-
-  // Listen for node/handle hover events from the event bus
-  useEffect(() => {
-    const handleNodeHover = ({ id }) => setHoveredNodeId(id);
-    const handleNodeUnhover = () => setHoveredNodeId(null);
-    const handleHandleHover = ({ nodeId }) => setHoveredNodeId(nodeId);
-    const handleHandleUnhover = () => setHoveredNodeId(null);
-    eventBus.on('nodeHover', handleNodeHover);
-    eventBus.on('nodeUnhover', handleNodeUnhover);
-    eventBus.on('handleHover', handleHandleHover);
-    eventBus.on('handleUnhover', handleHandleUnhover);
-    return () => {
-      eventBus.off('nodeHover', handleNodeHover);
-      eventBus.off('nodeUnhover', handleNodeUnhover);
-      eventBus.off('handleHover', handleHandleHover);
-      eventBus.off('handleUnhover', handleHandleUnhover);
-    };
-  }, []);
 
   // Replace inline drag handlers with imported functions
   // Node drag logic
@@ -457,15 +439,11 @@ export default function NodeGraph({
   useEffect(() => {
     if (!isSelecting) return;
 
-    console.log('useEffect: Adding mousemove and mouseup listeners for marquee selection'); // Debug log
-
     const handleMouseMove = (e) => {
-      console.log('mousemove event detected'); // Debug log
       updateSelection(e);
     };
 
     const handleMouseUp = (e) => {
-      console.log('mouseup event detected'); // Debug log
       endSelection(e);
     };
 
@@ -476,7 +454,6 @@ export default function NodeGraph({
     }
 
     return () => {
-      console.log('useEffect: Removing mousemove and mouseup listeners for marquee selection'); // Debug log
       if (element) {
         element.removeEventListener('mousemove', handleMouseMove, { capture: true });
         element.removeEventListener('mouseup', handleMouseUp, { capture: true });
