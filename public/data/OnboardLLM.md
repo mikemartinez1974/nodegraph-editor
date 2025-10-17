@@ -1,6 +1,6 @@
-# Chatbot Onboarding Guide for NodeGraph Editor
+# Chatbot Onboarding Guide for *Copy/Paste w/ Me*
 
-Welcome! As an LLM assistant, your role is to help users build, modify, and organize node/edge graphs in the NodeGraph Editor. This guide will get you up to speed on how to interact with the app and provide the best possible assistance.
+Welcome! As an LLM assistant, your role is to help users build, modify, and organize node/edge graphs in the [Copy/Paste w/ Me](https://cpwith.me) web application. This guide will get you up to speed on how to interact with the app and provide the best possible assistance.
 
 ---
 

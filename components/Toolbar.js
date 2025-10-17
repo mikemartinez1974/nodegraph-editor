@@ -35,7 +35,9 @@ import {
   ThumbDownOffAlt as ThumbDownOffAltIcon,
   FolderSpecial as GroupIcon,
   ContentPaste as ContentPasteIcon,
-  ContentCopy as ContentCopyIcon
+  ContentCopy as ContentCopyIcon,
+  FileCopy as FileCopyIcon,
+  MenuBook as MenuBookIcon
 } from '@mui/icons-material';
 
 // Helper to get GraphCRUD API
@@ -418,6 +420,19 @@ const Toolbar = ({
     }
   };
 
+  const handleCopyUserManual = async () => {
+    try {
+      const res = await fetch('/data/UserManual.md');
+      if (!res.ok) throw new Error('Manual not found');
+      const text = await res.text();
+      await navigator.clipboard.writeText(text);
+      if (onShowMessage) onShowMessage('User manual copied to clipboard!', 'success');
+    } catch (err) {
+      console.error('Failed to copy manual:', err);
+      if (onShowMessage) onShowMessage('Failed to copy manual. Try again or check network.', 'error');
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -476,6 +491,17 @@ const Toolbar = ({
             color={selectedNodeIds.length > 0 ? "primary" : "default"}
           >
             <ContentCopyIcon fontSize="small" />
+          </IconButton>
+
+          {/* New: Copy Entire Graph immediately after Copy Selected */}
+          <IconButton
+            onClick={handleCopyJSON}
+            title="Copy Entire Graph"
+            aria-label="Copy entire graph JSON"
+            size="small"
+            disabled={!nodes || nodes.length === 0}
+          >
+            <FileCopyIcon fontSize="small" />
           </IconButton>
           
           <IconButton
@@ -537,6 +563,27 @@ const Toolbar = ({
             size="small"
           >
             <LoadIcon fontSize="small" />
+          </IconButton>
+
+          {/* New: Copy Graph' button */}
+          <IconButton
+            onClick={handleCopyJSON}
+            title="Copy Entire Graph"
+            aria-label="Copy entire graph JSON"
+            size="small"
+            disabled={!nodes || nodes.length === 0}
+          >
+            <FileCopyIcon fontSize="small" />
+          </IconButton>
+
+          {/* New: Copy User Manual button */}
+          <IconButton
+            onClick={handleCopyUserManual}
+            title="Copy User Manual"
+            aria-label="Copy the User Manual to clipboard"
+            size="small"
+          >
+            <MenuBookIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
 

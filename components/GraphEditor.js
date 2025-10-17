@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import NodeGraph from './NodeGraph';
 import Toolbar from './Toolbar';
 import eventBus from './NodeGraph/eventBus';
@@ -775,6 +775,73 @@ export default function GraphEditor({ backgroundImage }) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedNodeIds, setSelectedNodeIds, setSelectedEdgeIds, setNodes, saveToHistory]);
+
+  // Handle paste from clipboard
+  const handlePaste = useCallback(async (e) => {
+    try {
+      let text;
+      
+      // Get clipboard text
+      if (e?.clipboardData) {
+        text = e.clipboardData.getData('text');
+      } else {
+        text = await navigator.clipboard.readText();
+      }
+      
+      if (!text || !text.trim()) {
+        return;
+      }
+
+      // Try to parse as JSON first
+      let parsedData;
+      try {
+        parsedData = JSON.parse(text);
+      } catch (jsonError) {
+        // Not JSON - treat as plain text and create a node
+        const lines = text.trim().split('\n');
+        const label = lines[0].substring(0, 50); // First line, max 50 chars
+        const memo = text.trim();
+        
+        const newNode = {
+          id: `node_${Date.now()}`,
+          label: label,
+          type: 'default',
+          position: { x: 0, y: 0 },
+          width: 200,
+          height: 100,
+          data: {
+            memo: memo
+          }
+        };
+        
+        setNodes(prev => {
+          const next = [...prev, newNode];
+          nodesRef.current = next;
+          return next;
+        });
+        
+        saveToHistory(nodesRef.current, edgesRef.current);
+        showMessage('Created node from pasted text', 'success');
+        return;
+      }
+
+      // JSON parsed successfully - continue with existing logic
+      // ...existing JSON handling code...
+    } catch (error) {
+      console.error('Error handling paste:', error);
+    }
+  }, [nodesRef, setNodes, saveToHistory]);
+
+  // Register paste handler on mount
+  useEffect(() => {
+    const handlePasteEvent = (e) => {
+      e.preventDefault();
+      handlePaste(e);
+    };
+
+    window.addEventListener('paste', handlePasteEvent);
+    return () => window.removeEventListener('paste', handlePasteEvent);
+  }, [handlePaste]);
 
   return (
     <div 

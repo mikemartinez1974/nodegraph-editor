@@ -15,6 +15,7 @@ import remarkGfm from 'remark-gfm';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
+import Drawer from '@mui/material/Drawer';
 
 
 export default function NodePropertiesPanel({
@@ -23,6 +24,24 @@ export default function NodePropertiesPanel({
   onClose,
   theme
 }) {
+  const drawerWidth = 400;
+  
+  // Remember drawer position in localStorage
+  const [anchor, setAnchor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nodePropertiesPanelAnchor') || 'right';
+    }
+    return 'right';
+  });
+
+  const toggleAnchor = () => {
+    const newAnchor = anchor === 'right' ? 'left' : 'right';
+    setAnchor(newAnchor);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nodePropertiesPanelAnchor', newAnchor);
+    }
+  };
+
   const [memo, setMemo] = useState('');
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
@@ -131,39 +150,29 @@ export default function NodePropertiesPanel({
   };
 
   return (
-    <Paper
-      elevation={8}
+    <Drawer
+      anchor={anchor}
+      open={true}
+      onClose={onClose}
+      variant="persistent"
       sx={{
-        position: 'fixed',
-        [dockSide]: 0,
-        top: 64,
-        height: 'calc(100vh - 64px)', // AppBar height is 64px
-        width: width,
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
-        zIndex: 1300,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        boxShadow: 4,
-        borderRadius: 0,
+        width: drawerWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          top: 64,
+          height: 'calc(100% - 64px)'
+        }
       }}
     >
-      <Box sx={{
-        p: 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff'
-      }}>
-        <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-          Node Properties
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton size="small" onClick={handleDockToggle} sx={{ color: 'inherit' }}>
-            {dockSide === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
+        <Typography variant="h6">Node Properties</Typography>
+        <Box>
+          <IconButton onClick={toggleAnchor} size="small" title="Switch sides" aria-label="Toggle panel side">
+            {anchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
-          <IconButton size="small" onClick={onClose} sx={{ color: 'inherit' }}>
+          <IconButton onClick={onClose} size="small" aria-label="close properties panel">
             <CloseIcon />
           </IconButton>
         </Box>
@@ -352,20 +361,6 @@ export default function NodePropertiesPanel({
           )}
         </Box>
       </Box>
-
-      {/* Resize handle */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          [dockSide === 'right' ? 'left' : 'right']: -6,
-          width: 12,
-          height: '100%',
-          cursor: 'ew-resize',
-          zIndex: 1400,
-        }}
-        onMouseDown={onResizeMouseDown}
-      />
-    </Paper>
+    </Drawer>
   );
 }
