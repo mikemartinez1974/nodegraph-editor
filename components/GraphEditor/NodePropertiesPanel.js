@@ -244,31 +244,28 @@ export default function NodePropertiesPanel({
               <>
                 <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
                   <TextField
-                    fullWidth
+                    label="Memo"
                     multiline
+                    rows={12}
                     value={memo}
                     onChange={handleMemoChange}
-                    variant="outlined"
-                    placeholder="Add notes about this node... (Markdown supported)"
-                    inputRef={memoInputRef}
-                    sx={{
-                      flexGrow: 1,
-                      minHeight: 0,
-                      maxHeight: '100%',
-                      resize: 'none',
-                      overflow: 'auto',
-                      '& .MuiOutlinedInput-root': {
-                        fontFamily: 'monospace',
-                        fontSize: 13,
-                        height: '100%',
+                    onBlur={handleMemoChange}
+                    fullWidth
+                    sx={{ 
+                      mb: 2,
+                      '& .MuiInputBase-root': {
+                        overflow: 'hidden',
                         alignItems: 'flex-start',
-                        '& textarea': {
-                          height: '100%',
-                          minHeight: 0,
-                          resize: 'none',
-                          boxSizing: 'border-box',
-                          overflow: 'auto',
-                        }
+                      },
+                      '& .MuiInputBase-input': {
+                        overflow: 'auto !important',
+                        '&::-webkit-scrollbar': {
+                          width: '8px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          backgroundColor: theme.palette.divider,
+                          borderRadius: '4px',
+                        },
                       }
                     }}
                   />

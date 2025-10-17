@@ -433,6 +433,39 @@ const Toolbar = ({
     }
   };
 
+  // Universal paste handler: JSON -> use existing handler; Plain text -> create a node
+  const handlePasteUniversal = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()) return;
+
+      // If JSON, defer to the existing paste handler
+      try {
+        JSON.parse(text);
+        return handlePasteSelected();
+      } catch {
+        // Not JSON: create a node from the text via graphAPI
+        const lines = text.trim().split('\n');
+        const label = (lines[0] || 'Pasted Note').slice(0, 80);
+        const memo = text.trim();
+
+        if (window.graphAPI && typeof window.graphAPI.createNode === 'function') {
+          await window.graphAPI.createNode({
+            label,
+            position: { x: 0, y: 0 },
+            data: { memo }
+          });
+          if (onShowMessage) onShowMessage('Created node from pasted text', 'success');
+        } else {
+          if (onShowMessage) onShowMessage('Could not create node (graph API unavailable)', 'error');
+        }
+      }
+    } catch (err) {
+      console.error('Error handling paste:', err);
+      if (onShowMessage) onShowMessage('Error reading clipboard. Grant permission and try again.', 'error');
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -473,9 +506,9 @@ const Toolbar = ({
           
           {/* Paste button - position #2 */}
           <IconButton
-            onClick={handlePasteSelected}
-            title="Paste from Clipboard"
-            aria-label="Paste graph data from clipboard (Ctrl+V)"
+            onClick={handlePasteUniversal}
+            title="Paste (JSON or Text)"
+            aria-label="Paste graph JSON or create node from text"
             size="small"
           >
             <ContentPasteIcon fontSize="small" />
@@ -502,6 +535,16 @@ const Toolbar = ({
             disabled={!nodes || nodes.length === 0}
           >
             <FileCopyIcon fontSize="small" />
+          </IconButton>
+          
+          {/* New: Copy User Manual button */}
+          <IconButton
+            onClick={handleCopyUserManual}
+            title="Copy User Manual"
+            aria-label="Copy the User Manual to clipboard"
+            size="small"
+          >
+            <MenuBookIcon fontSize="small" />
           </IconButton>
           
           <IconButton
@@ -563,27 +606,6 @@ const Toolbar = ({
             size="small"
           >
             <LoadIcon fontSize="small" />
-          </IconButton>
-
-          {/* New: Copy Graph' button */}
-          <IconButton
-            onClick={handleCopyJSON}
-            title="Copy Entire Graph"
-            aria-label="Copy entire graph JSON"
-            size="small"
-            disabled={!nodes || nodes.length === 0}
-          >
-            <FileCopyIcon fontSize="small" />
-          </IconButton>
-
-          {/* New: Copy User Manual button */}
-          <IconButton
-            onClick={handleCopyUserManual}
-            title="Copy User Manual"
-            aria-label="Copy the User Manual to clipboard"
-            size="small"
-          >
-            <MenuBookIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
 
