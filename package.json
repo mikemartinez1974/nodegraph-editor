@@ -2,6 +2,7 @@
   "name": "copy_paste_with_me",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev --turbopack",
     "debug": "next dev --turbopack",
