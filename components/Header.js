@@ -11,12 +11,9 @@ import { useTheme } from '@mui/material/styles';
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const muiTheme = useTheme();
-  // Dark mode = light logo (white on dark), Light mode = dark logo (dark on light)
-  const logoSrc = muiTheme?.palette?.mode === 'dark' ? '/logo-light.png' : '/logo-dark.png';
+  // Dark mode = dark logo, Light mode = light logo
+  const logoSrc = muiTheme?.palette?.mode === 'dark' ? '/logo_dark.png' : '/logo_light.png';
   const [imgError, setImgError] = useState(false);
-  
-  // Debug: log the logo path and any errors
-  console.log('Logo path:', logoSrc, 'Theme mode:', muiTheme?.palette?.mode);
 
   return (
     <div>

@@ -434,6 +434,7 @@ const Toolbar = ({
   };
 
   // Universal paste handler: JSON -> use existing handler; Plain text -> create a node
+  // Only triggered by toolbar button click, not keyboard shortcuts
   const handlePasteUniversal = async () => {
     try {
       const text = await navigator.clipboard.readText();

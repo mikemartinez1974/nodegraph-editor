@@ -271,16 +271,16 @@ export default function GraphEditor({ backgroundImage }) {
   const handleAddNode = () => {
     // Use GraphCRUD API - the single source of truth for node creation
     const result = graphAPI.current.createNode({
-      type: 'default',
+      type: 'default',  // Now creates resizable nodes by default
       label: `Node ${nodesRef.current.length + 1}`,
       data: { memo: '', link: '' },
       position: {
         x: 100 + (nodesRef.current.length * 20),
         y: 100 + (nodesRef.current.length * 20)
       },
-      width: 80,
-      height: 48,
-      resizable: false,
+      width: 200,
+      height: 100,
+      resizable: true,
       handlePosition: 'center',
       showLabel: true
     });
@@ -353,12 +353,13 @@ export default function GraphEditor({ backgroundImage }) {
     console.log('Graph cleared');
   };
 
-  // Node types mapping
+  // Node types mapping - default is now resizable
   const nodeTypes = {
-    default: DefaultNode,
+    default: ResizableNode,
     display: DisplayNode,
     list: ListNode,
-    resizable: ResizableNode
+    resizable: ResizableNode,
+    legacy: DefaultNode  // Keep old default as 'legacy' if needed
   };
 
   // Use selection hook
@@ -778,6 +779,20 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Handle paste from clipboard
   const handlePaste = useCallback(async (e) => {
+    // Check if user is typing in a text field - if so, allow default paste behavior
+    const activeElement = document.activeElement;
+    const isTextInput = activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.isContentEditable ||
+      activeElement.getAttribute('contenteditable') === 'true'
+    );
+    
+    if (isTextInput) {
+      // User is in a text field, let browser handle paste normally
+      return;
+    }
+
     try {
       let text;
       
@@ -805,10 +820,11 @@ export default function GraphEditor({ backgroundImage }) {
         const newNode = {
           id: `node_${Date.now()}`,
           label: label,
-          type: 'default',
+          type: 'default',  // Now creates resizable nodes
           position: { x: 0, y: 0 },
           width: 200,
           height: 100,
+          resizable: true,
           data: {
             memo: memo
           }
@@ -821,7 +837,7 @@ export default function GraphEditor({ backgroundImage }) {
         });
         
         saveToHistory(nodesRef.current, edgesRef.current);
-        showMessage('Created node from pasted text', 'success');
+        setSnackbar({ open: true, message: 'Created node from pasted text', severity: 'success' });
         return;
       }
 
@@ -830,11 +846,25 @@ export default function GraphEditor({ backgroundImage }) {
     } catch (error) {
       console.error('Error handling paste:', error);
     }
-  }, [nodesRef, setNodes, saveToHistory]);
+  }, [nodesRef, setNodes, saveToHistory, setSnackbar]);
 
   // Register paste handler on mount
   useEffect(() => {
     const handlePasteEvent = (e) => {
+      // Check if user is in a text field first
+      const activeElement = document.activeElement;
+      const isTextInput = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable ||
+        activeElement.getAttribute('contenteditable') === 'true'
+      );
+      
+      if (isTextInput) {
+        // Let browser handle paste in text fields normally
+        return;
+      }
+      
       e.preventDefault();
       handlePaste(e);
     };

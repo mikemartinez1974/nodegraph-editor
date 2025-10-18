@@ -2,6 +2,7 @@
   "nodes": [
     {
       "id": "node_welcome",
+      "type": "default",
       "label": "👋 Welcome!",
       "position": {
         "x": 200,
@@ -9,12 +10,14 @@
       },
       "width": 200,
       "height": 100,
+      "resizable": true,
       "data": {
         "memo": "**Build graphs with AI!**\n\nThis is your canvas. Work with an AI chatbot to visualize any topic.\n\nLet's get you started! ⬇️"
       }
     },
     {
       "id": "node_split",
+      "type": "default",
       "label": "🖥️ Split Your Screen",
       "position": {
         "x": 200,
@@ -22,12 +25,14 @@
       },
       "width": 200,
       "height": 100,
+      "resizable": true,
       "data": {
         "memo": "**Step 1: Set Up Side-by-Side**\n\nOpen your AI chatbot (ChatGPT, Claude, Grok) in another window or tab.\n\nDrag to resize so you see both:\n- This graph editor on one side\n- Your chatbot on the other\n\nMakes copy/paste super easy!"
       }
     },
     {
       "id": "node_onboard",
+      "type": "default",
       "label": "🤖 Onboard Your AI",
       "position": {
         "x": 200,
@@ -35,12 +40,14 @@
       },
       "width": 200,
       "height": 100,
+      "resizable": true,
       "data": {
         "memo": "**Step 2: Quick Setup**\n\n1. Click the 📋 button (top-left toolbar)\n2. Paste into your AI chat\n\nThis teaches the AI how to make graphs for you!"
       }
     },
     {
       "id": "node_ask",
+      "type": "default",
       "label": "💬 Ask for a Graph",
       "position": {
         "x": 200,
@@ -48,12 +55,14 @@
       },
       "width": 200,
       "height": 100,
+      "resizable": true,
       "data": {
         "memo": "**Step 3: Get Creative**\n\nAsk your AI:\n*\"Create a graph about [YOUR TOPIC]\"*\n\nExamples:\n- \"My morning routine\"\n- \"Solar system planets\"\n- \"How pizza is made\"\n\nThe AI replies with JSON!"
       }
     },
     {
       "id": "node_paste",
+      "type": "default",
       "label": "📋 Paste & Enjoy",
       "position": {
         "x": 200,
@@ -61,12 +70,14 @@
       },
       "width": 200,
       "height": 100,
+      "resizable": true,
       "data": {
         "memo": "**Step 4: See It Come Alive**\n\n1. Copy JSON from your AI\n2. Paste here (Ctrl+V)\n3. Watch your graph appear!\n\nDrag, edit, refine—repeat!"
       }
     },
     {
       "id": "node_contact",
+      "type": "default",
       "label": "📬 Questions?",
       "position": {
         "x": 500,
@@ -74,12 +85,14 @@
       },
       "width": 160,
       "height": 80,
+      "resizable": true,
       "data": {
         "memo": "**Get in touch:**\n\nmike@cpwith.me\n\nFeedback & ideas welcome!"
       }
     },
     {
       "id": "node_tips",
+      "type": "default",
       "label": "💡 Pro Tips",
       "position": {
         "x": 500,
@@ -87,6 +100,7 @@
       },
       "width": 160,
       "height": 80,
+      "resizable": true,
       "data": {
         "memo": "**Quick tricks:**\n\n- Drag nodes to arrange\n- Double-click to edit\n- Use handles to connect\n- Select + copy/paste\n- Collapse groups (−/+)\n\nHave fun exploring!"
       }
