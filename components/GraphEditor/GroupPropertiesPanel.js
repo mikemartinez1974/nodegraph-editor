@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -34,15 +34,55 @@ export default function GroupPropertiesPanel({
   const [borderWidth, setBorderWidth] = useState(2);
   const [visible, setVisible] = useState(false);
 
+  // Debounce helpers
+  const pendingRef = useRef({});
+  const timerRef = useRef(null);
+  const DEBOUNCE_MS = 400;
+
+  const scheduleUpdate = (fields) => {
+    pendingRef.current = {
+      ...pendingRef.current,
+      ...fields
+    };
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      const payload = { ...pendingRef.current };
+      pendingRef.current = {};
+      timerRef.current = null;
+      if (!selectedGroup) return;
+      onUpdateGroup(selectedGroup.id, payload);
+    }, DEBOUNCE_MS);
+  };
+
+  const flushPending = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (pendingRef.current && Object.keys(pendingRef.current).length > 0) {
+      const payload = { ...pendingRef.current };
+      pendingRef.current = {};
+      if (selectedGroup) onUpdateGroup(selectedGroup.id, payload);
+    }
+  };
+
   // Update local state when selected group changes
   useEffect(() => {
+    // Flush any pending changes for previous group
+    flushPending();
     if (selectedGroup) {
       setLabel(selectedGroup.label || '');
       setBackgroundColor(selectedGroup.style?.backgroundColor || 'rgba(25, 118, 210, 0.1)');
       setBorderColor(selectedGroup.style?.borderColor || '#1976d2');
       setBorderWidth(selectedGroup.style?.borderWidth || 2);
-      setVisible(false); // Always start invisible
+      // Preserve group's visibility state (default: visible unless explicitly false)
+      setVisible(selectedGroup.visible !== false);
     }
+    // Cleanup when component unmounts or selectedGroup changes
+    return () => {
+      flushPending();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGroup?.id]);
 
   if (!selectedGroup) return null;
@@ -50,49 +90,35 @@ export default function GroupPropertiesPanel({
   const handleLabelChange = (e) => {
     const newLabel = e.target.value;
     setLabel(newLabel);
-    onUpdateGroup(selectedGroup.id, { label: newLabel });
+    scheduleUpdate({ label: newLabel });
   };
 
   const handleBackgroundColorChange = (e) => {
     const newColor = e.target.value;
     setBackgroundColor(newColor);
-    onUpdateGroup(selectedGroup.id, {
-      style: {
-        ...selectedGroup.style,
-        backgroundColor: newColor
-      }
-    });
+    scheduleUpdate({ style: { ...(selectedGroup.style || {}), backgroundColor: newColor } });
   };
 
   const handleBorderColorChange = (e) => {
     const newColor = e.target.value;
     setBorderColor(newColor);
-    onUpdateGroup(selectedGroup.id, {
-      style: {
-        ...selectedGroup.style,
-        borderColor: newColor
-      }
-    });
+    scheduleUpdate({ style: { ...(selectedGroup.style || {}), borderColor: newColor } });
   };
 
   const handleBorderWidthChange = (e) => {
-    const newWidth = parseInt(e.target.value) || 2;
+    const newWidth = parseInt(e.target.value, 10) || 2;
     setBorderWidth(newWidth);
-    onUpdateGroup(selectedGroup.id, {
-      style: {
-        ...selectedGroup.style,
-        borderWidth: newWidth
-      }
-    });
+    scheduleUpdate({ style: { ...(selectedGroup.style || {}), borderWidth: newWidth } });
   };
 
   const handleVisibilityChange = (e) => {
     const newVisible = e.target.checked;
     setVisible(newVisible);
-    onUpdateGroup(selectedGroup.id, { visible: newVisible });
+    scheduleUpdate({ visible: newVisible });
   };
 
   const handleUngroup = () => {
+    flushPending();
     onUngroupGroup(selectedGroup.id);
     onClose();
   };
