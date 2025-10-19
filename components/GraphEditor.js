@@ -7,10 +7,8 @@ import GraphCRUD from './GraphEditor/GraphCrud.js';
 import EdgeTypes from './GraphEditor/edgeTypes';
 import GroupManager from './GraphEditor/GroupManager';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
-import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
-import ListNode from '../components/GraphEditor/Nodes/ListNode';
-import ResizableNode from '../components/GraphEditor/Nodes/ResizableNode';
-import MarkdownNode from '../components/GraphEditor/Nodes/MarkdownNode';
+import FixedNode from './GraphEditor/Nodes/FixedNode';
+import MarkdownNode from './GraphEditor/Nodes/MarkdownNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
 import GroupListPanel from './GraphEditor/GroupListPanel';
 import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
@@ -39,14 +37,13 @@ export default function GraphEditor({ backgroundImage }) {
   const [showNodeList, setShowNodeList] = useState(false);
   const [showGroupList, setShowGroupList] = useState(false);
   const [showGroupProperties, setShowGroupProperties] = useState(false);
-  const [showNodeProperties, setShowNodeProperties] = useState(false);
-  const [showEdgeProperties, setShowEdgeProperties] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
   const historyIndexRef = useRef(0);
   const lastHandleDropTime = useRef(0);
+  const lastNodeClickTime = useRef(0);
 
   const theme = useTheme();
   const graphAPI = useRef(null);
@@ -232,6 +229,8 @@ export default function GraphEditor({ backgroundImage }) {
             // Highlight the first node to hint the user
             setSelectedNodeIds([firstNode.id]);
             setSelectedEdgeIds([]);
+            // Open properties panel for first node
+            setTimeout(() => eventBus.emit('openNodeProperties'), 100);
           }
         } else {
           console.warn('IntroGraph.json does not contain nodes/edges');
@@ -264,7 +263,7 @@ export default function GraphEditor({ backgroundImage }) {
       });
       setSelectedNodeIds([firstNode.id]);
       setSelectedEdgeIds([]);
-      setShowNodeProperties(true);
+      eventBus.emit('openNodeProperties');
     }
   }
 
@@ -354,14 +353,14 @@ export default function GraphEditor({ backgroundImage }) {
     console.log('Graph cleared');
   };
 
-  // Node types mapping - default is now resizable
+  // Node types mapping
+  // - default: ResizableNode (the resizable, interactive default)
+  // - fixed: DefaultNode (non-resizable, fixed-size)
+  // - markdown: MarkdownNode (displays memo as formatted markdown)
   const nodeTypes = {
-    default: ResizableNode,
-    display: DisplayNode,
-    list: ListNode,
-    resizable: ResizableNode,
+    default: DefaultNode,
+    fixed: FixedNode,
     markdown: MarkdownNode,
-    legacy: DefaultNode  // Keep old default as 'legacy' if needed
   };
 
   // Use selection hook
@@ -373,9 +372,7 @@ export default function GraphEditor({ backgroundImage }) {
   } = useSelection({
     setSelectedNodeIds,
     setSelectedEdgeIds,
-    setSelectedGroupIds,
-    setShowNodeProperties,
-    setShowEdgeProperties
+    setSelectedGroupIds
   });
 
   const groupManagerHook = useGroupManager({
@@ -453,11 +450,11 @@ export default function GraphEditor({ backgroundImage }) {
   };
 
   const handleNodeDoubleClick = (nodeId) => {
-    setShowNodeProperties(true);
+    eventBus.emit('openNodeProperties');
   };
 
   const handleEdgeDoubleClick = (edgeId) => {
-    setShowEdgeProperties(true);
+    eventBus.emit('openEdgeProperties');
   };
 
   // Group List Panel handlers
@@ -881,21 +878,29 @@ export default function GraphEditor({ backgroundImage }) {
   // Pass anchor change to NodePropertiesPanel
   const handleNodePanelAnchorChange = (newAnchor) => {
     setNodePanelAnchor(newAnchor);
-    // If node list is open, move it to the opposite side
-    if (showNodeList) {
-      setNodeListAnchor(newAnchor === 'right' ? 'left' : 'right');
-    }
   };
 
   // Track which side Node List Panel is docked to
   const [nodeListAnchor, setNodeListAnchor] = useState('left');
 
-  // When Node Properties Panel opens, always open Node List Panel on opposite side
+  // When Node Properties Panel opens OR changes sides, always position Node List Panel on opposite side
   useEffect(() => {
-    if (showNodeProperties) {
-      setNodeListAnchor(nodePanelAnchor === 'right' ? 'left' : 'right');
+    const handlePropertiesOpen = () => {
+      const oppositeAnchor = nodePanelAnchor === 'right' ? 'left' : 'right';
+      setNodeListAnchor(oppositeAnchor);
+    };
+    
+    eventBus.on('openNodeProperties', handlePropertiesOpen);
+    
+    if (showNodeList) {
+      const oppositeAnchor = nodePanelAnchor === 'right' ? 'left' : 'right';
+      setNodeListAnchor(oppositeAnchor);
     }
-  }, [showNodeProperties, nodePanelAnchor]);
+    
+    return () => {
+      eventBus.off('openNodeProperties', handlePropertiesOpen);
+    };
+  }, [showNodeList, nodePanelAnchor]);
 
   return (
     <div 
@@ -938,16 +943,13 @@ export default function GraphEditor({ backgroundImage }) {
         onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
       />
       
-      {showNodeProperties && selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
-        <NodePropertiesPanel
-          selectedNode={nodes.find(n => n.id === selectedNodeIds[0])}
-          onUpdateNode={handleUpdateNodeData}
-          onClose={() => setShowNodeProperties(false)}
-          theme={theme}
-          anchor={nodePanelAnchor}
-          onAnchorChange={handleNodePanelAnchorChange}
-        />
-      )}
+      <NodePropertiesPanel
+        selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
+        onUpdateNode={handleUpdateNodeData}
+        theme={theme}
+        anchor={nodePanelAnchor}
+        onAnchorChange={handleNodePanelAnchorChange}
+      />
       <NodeListPanel
         nodes={nodes}
         selectedNodeId={selectedNodeIds[0] || null}
@@ -1012,12 +1014,23 @@ export default function GraphEditor({ backgroundImage }) {
           handleEdgeSelection(edgeId, isMultiSelect);
         }}
         onNodeClick={(nodeId, event) => {
+          // Only handle actual click events, ignore mouseup (which doesn't pass event)
+          if (!event || event.type !== 'click') {
+            return;
+          }
+          
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-          const wasSelected = selectedNodeIds.length === 1 && selectedNodeIds[0] === nodeId;
-          handleNodeSelection(nodeId, isMultiSelect);
-          // If the node was already selected (single selection) and this is a simple click, toggle the properties drawer
-          if (!isMultiSelect && wasSelected) {
-            setShowNodeProperties(prev => !prev);
+          const isSelected = selectedNodeIds.includes(nodeId);
+          
+          if (isMultiSelect) {
+            handleNodeSelection(nodeId, true);
+          } else if (isSelected) {
+            // Click on already selected node - toggle drawer
+            eventBus.emit('selectedNodeClick', { nodeId });
+          } else {
+            // Click on unselected node - just select it
+            setSelectedNodeIds([nodeId]);
+            setSelectedEdgeIds([]);
           }
         }}
         onNodeDoubleClick={handleNodeDoubleClick}
@@ -1030,7 +1043,10 @@ export default function GraphEditor({ backgroundImage }) {
             handleGroupSelection(groupId, isMultiSelect);
           }
         }}
-        onBackgroundClick={clearSelection}
+        onBackgroundClick={() => {
+          clearSelection();
+          eventBus.emit('backgroundClick');
+        }}
         onEdgeHover={id => setHoveredEdgeId(id)}
         onNodeHover={id => setHoveredNodeId(id)}
         hoveredEdgeId={hoveredEdgeId}
@@ -1048,19 +1064,16 @@ export default function GraphEditor({ backgroundImage }) {
         }}
       />
       
-      {showEdgeProperties && selectedEdgeIds.length === 1 && selectedNodeIds.length === 0 && (
-        <EdgePropertiesPanel
-          selectedEdge={{
-            ...edges.find(e => e.id === selectedEdgeIds[0]),
-            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
-            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
-          }}
-          edgeTypes={EdgeTypes}
-          onUpdateEdge={handleUpdateEdge}
-          onClose={() => setShowEdgeProperties(false)}
-          theme={theme}
-        />
-      )}
+      <EdgePropertiesPanel
+        selectedEdge={selectedEdgeIds.length === 1 ? {
+          ...edges.find(e => e.id === selectedEdgeIds[0]),
+          sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
+          targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
+        } : null}
+        edgeTypes={EdgeTypes}
+        onUpdateEdge={handleUpdateEdge}
+        theme={theme}
+      />
 
       {showGroupProperties && selectedGroupIds.length === 1 && (
         <GroupPropertiesPanel

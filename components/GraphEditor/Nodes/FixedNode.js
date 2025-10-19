@@ -1,13 +1,12 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
+import ReactMarkdown from 'react-markdown';
 import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
-const DefaultNode = ({ 
+const FixedNode = ({ 
   node, 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
@@ -24,9 +23,6 @@ const DefaultNode = ({
   const width = (node?.width || 60) * zoom;
   const height = (node?.height || 60) * zoom;
   const nodeRef = useRef(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const resizeStartPos = useRef({ x: 0, y: 0 });
-  const resizeStartSize = useRef({ width: 0, height: 0 });
 
   // Register node in nodeRefs
   useEffect(() => {
@@ -60,40 +56,6 @@ const DefaultNode = ({
   // Base position for non-dragging state
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
   const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
-
-  // Resize handlers
-  const handleResizeStart = (e) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    resizeStartPos.current = { x: e.clientX, y: e.clientY };
-    resizeStartSize.current = { width: node.width || 60, height: node.height || 60 };
-  };
-
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const handleResizeMove = (e) => {
-      const dx = (e.clientX - resizeStartPos.current.x) / zoom;
-      const dy = (e.clientY - resizeStartPos.current.y) / zoom;
-      const newWidth = Math.max(60, resizeStartSize.current.width + dx);
-      const newHeight = Math.max(40, resizeStartSize.current.height + dy);
-      
-      eventBus.emit('nodeResize', { id: node.id, width: newWidth, height: newHeight });
-    };
-
-    const handleResizeEnd = () => {
-      setIsResizing(false);
-      eventBus.emit('nodeResizeEnd', { id: node.id });
-    };
-
-    document.addEventListener('mousemove', handleResizeMove);
-    document.addEventListener('mouseup', handleResizeEnd);
-
-    return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
-    };
-  }, [isResizing, node.id, zoom]);
 
   return (
     <div
@@ -141,28 +103,38 @@ const DefaultNode = ({
         eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
       }}
     >
-      {/* Render node label if present */}
+      {/* Render node label/markdown if present */}
       {node?.label && (
         <div style={{ 
           textAlign: 'center', 
           fontWeight: 500, 
           fontSize: Math.max(12, 14 * zoom), 
           marginTop: 4,
-          padding: '0 8px',
-          overflow: 'auto',
-          maxWidth: '100%',
-          maxHeight: '80%',
-          '& p': { margin: 0 },
-          '& code': { 
-            backgroundColor: 'rgba(0,0,0,0.1)', 
-            padding: '2px 4px', 
-            borderRadius: 2,
-            fontSize: '0.9em'
-          }
+          padding: '0 4px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '100%'
         }}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {node.label}
-          </ReactMarkdown>
+          {node.label.includes('**') || node.label.includes('*') || node.label.includes('#') ? (
+            <div style={{
+              fontSize: 'inherit',
+              '& p': { margin: 0 },
+              '& strong': { fontWeight: 'bold' },
+              '& em': { fontStyle: 'italic' }
+            }}>
+              <ReactMarkdown
+                components={{
+                  p: ({node, ...props}) => <span style={{ margin: 0 }} {...props} />,
+                  strong: ({node, ...props}) => <strong {...props} />,
+                  em: ({node, ...props}) => <em {...props} />
+                }}
+              >
+                {node.label}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            node.label
+          )}
         </div>
       )}
       {/* Data indicators */}
@@ -205,36 +177,9 @@ const DefaultNode = ({
           )}
         </div>
       )}
-      
-      {/* Resize handle */}
-      <div
-        onMouseDown={handleResizeStart}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          width: 16,
-          height: 16,
-          cursor: 'nwse-resize',
-          opacity: isSelected ? 0.7 : 0.3,
-          '&:hover': {
-            opacity: 1
-          }
-        }}
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16">
-          <path
-            d="M 16,0 L 16,16 L 0,16"
-            fill="none"
-            stroke={theme.palette.text.secondary}
-            strokeWidth="2"
-          />
-        </svg>
-      </div>
-      
       {children}  
     </div>
   );
 };
 
-export default DefaultNode;
+export default FixedNode;

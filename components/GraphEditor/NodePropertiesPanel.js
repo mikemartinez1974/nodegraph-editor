@@ -16,7 +16,7 @@ import remarkGfm from 'remark-gfm';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
-
+import eventBus from '../NodeGraph/eventBus';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -26,11 +26,6 @@ export default function NodePropertiesPanel({
   anchor = 'right',
   onAnchorChange
 }) {
-  // Guard: if no node selected, don't render
-  if (!selectedNode) {
-    return null;
-  }
-
   const drawerWidth = 400;
   
   // Use prop anchor, but remember preference in localStorage
@@ -55,6 +50,7 @@ export default function NodePropertiesPanel({
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [width, setWidth] = useState(400);
+  const [isOpen, setIsOpen] = useState(false);
   const resizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(width);
@@ -155,12 +151,31 @@ export default function NodePropertiesPanel({
     document.removeEventListener('mouseup', onResizeMouseUp);
   };
 
+  // Listen for selectedNodeClick event to toggle panel
+  useEffect(() => {
+    const handleSelectedNodeClick = () => {
+      setIsOpen(prev => !prev);
+    };
+
+    const handleBackgroundClick = () => {
+      setIsOpen(false);
+    };
+
+    eventBus.on('selectedNodeClick', handleSelectedNodeClick);
+    eventBus.on('backgroundClick', handleBackgroundClick);
+    
+    return () => {
+      eventBus.off('selectedNodeClick', handleSelectedNodeClick);
+      eventBus.off('backgroundClick', handleBackgroundClick);
+    };
+  }, [isOpen]);
+
   return createPortal(
     <Box
       sx={{
         position: 'fixed',
         top: 64,
-        [currentAnchor === 'right' ? 'right' : 'left']: 0,
+        [currentAnchor === 'right' ? 'right' : 'left']: isOpen ? 0 : -width - 50,
         width: width,
         height: 'calc(100vh - 64px)',
         backgroundColor: 'background.paper',
@@ -170,6 +185,8 @@ export default function NodePropertiesPanel({
         display: 'flex',
         flexDirection: 'column',
         zIndex: 1200,
+        transition: 'right 0.3s ease, left 0.3s ease',
+        pointerEvents: isOpen ? 'auto' : 'none',
       }}
     >
       {/* Resize handle */}
@@ -207,7 +224,7 @@ export default function NodePropertiesPanel({
           <IconButton onClick={toggleAnchor} size="small" title="Switch sides" aria-label="Toggle panel side">
             {anchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
-          <IconButton onClick={onClose} size="small" aria-label="close properties panel">
+          <IconButton onClick={() => setIsOpen(false)} size="small" aria-label="close properties panel">
             <CloseIcon />
           </IconButton>
         </Box>
@@ -215,11 +232,12 @@ export default function NodePropertiesPanel({
       <Divider />
 
       {/* Content */}
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden' }}>
-        {/* Node ID (read-only) */}
-        <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
-          ID: {selectedNode.id}
-        </Typography>
+      {selectedNode && (
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden' }}>
+          {/* Node ID (read-only) */}
+          <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+            ID: {selectedNode.id}
+          </Typography>
 
         {/* Label */}
         <TextField
@@ -359,7 +377,6 @@ export default function NodePropertiesPanel({
         </Box>
 
         {/* Link */}
-        <Box sx={{ mt: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <LinkIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
             <Typography variant="subtitle2" color="text.secondary">
@@ -392,7 +409,7 @@ export default function NodePropertiesPanel({
             </Box>
           )}
         </Box>
-      </Box>
+      )}
     </Box>,
     document.body
   );
