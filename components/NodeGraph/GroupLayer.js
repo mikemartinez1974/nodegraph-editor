@@ -11,6 +11,7 @@ const GroupLayer = forwardRef(({
   onGroupClick, 
   onGroupDoubleClick, 
   onGroupDragStart, 
+  onBackgroundClick, // Add this prop
   theme: customTheme 
 }, ref) => {
   const muiTheme = useTheme();
@@ -47,255 +48,165 @@ const GroupLayer = forwardRef(({
   };
   
   return (
-    <svg 
-      style={{ 
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        width: '100vw', 
-        height: '100vh', 
-        overflow: 'visible',
-        pointerEvents: 'none',
-        zIndex: 1 // Render behind nodes
-      }}
-    >
-      <g>
-          {groups.map((group) => {
-            // Only hide if visible is explicitly false (don't hide collapsed groups)
-            if (group.visible === false) return null;
-            
-            const isSelected = selectedGroupIds.includes(group.id);
-            const bounds = getLiveBounds(group); // Calculate bounds live on every render
-            
-            // Handle both group.style and direct properties
-            const style = group.style || {};
-            const backgroundColor = style.backgroundColor || 'rgba(25, 118, 210, 0.1)';
-            const borderColor = style.borderColor || '#1976d2';
-            const borderWidth = style.borderWidth ?? 2;
-            const borderRadius = style.borderRadius ?? 8;
-            
-            // If collapsed, show a small collapsed representation
-            if (group.collapsed) {
-              const collapsedWidth = 120;
-              const collapsedHeight = 40;
-              const collapsedX = bounds.x + bounds.width / 2 - collapsedWidth / 2;
-              const collapsedY = bounds.y + bounds.height / 2 - collapsedHeight / 2;
+    <div ref={ref} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      {groups.map((group) => {
+        // Only hide if visible is explicitly false (don't hide collapsed groups)
+        if (group.visible === false) return null;
+        
+        const isSelected = selectedGroupIds.includes(group.id);
+        const bounds = getLiveBounds(group); // Calculate bounds live on every render
+        
+        // Handle both group.style and direct properties
+        const style = group.style || {};
+        const backgroundColor = style.backgroundColor || 'rgba(25, 118, 210, 0.1)';
+        const borderColor = style.borderColor || '#1976d2';
+        const borderWidth = style.borderWidth ?? 2;
+        const borderRadius = style.borderRadius ?? 8;
+        
+        // If collapsed, show a small collapsed representation
+        if (group.collapsed) {
+          const collapsedWidth = 120;
+          const collapsedHeight = 40;
+          const collapsedX = bounds.x + bounds.width / 2 - collapsedWidth / 2;
+          const collapsedY = bounds.y + bounds.height / 2 - collapsedHeight / 2;
+          
+          return (
+            <g key={group.id}>
+              {/* Collapsed group box */}
+              <rect
+                x={collapsedX * zoom + pan.x}
+                y={collapsedY * zoom + pan.y}
+                width={collapsedWidth * zoom}
+                height={collapsedHeight * zoom}
+                fill={backgroundColor}
+                stroke={isSelected ? theme.palette.secondary.main : borderColor}
+                strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
+                strokeDasharray={isSelected ? "4,2" : "none"}
+                rx={borderRadius}
+                ry={borderRadius}
+                style={{ 
+                  pointerEvents: 'auto',
+                  cursor: 'pointer'
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGroupClick?.(group.id, e);
+                }}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  onGroupDoubleClick?.(group.id, e);
+                }}
+              />
               
-              return (
-                <g key={group.id}>
-                  {/* Collapsed group box */}
-                  <rect
-                    x={collapsedX * zoom + pan.x}
-                    y={collapsedY * zoom + pan.y}
-                    width={collapsedWidth * zoom}
-                    height={collapsedHeight * zoom}
-                    fill={backgroundColor}
-                    stroke={isSelected ? theme.palette.secondary.main : borderColor}
-                    strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
-                    strokeDasharray={isSelected ? "4,2" : "none"}
-                    rx={borderRadius}
-                    ry={borderRadius}
-                    style={{ 
-                      pointerEvents: 'auto',
-                      cursor: 'pointer'
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onGroupClick?.(group.id, e);
-                    }}
-                    onDoubleClick={(e) => {
-                      e.stopPropagation();
-                      onGroupDoubleClick?.(group.id, e);
-                    }}
-                  />
-                  
-                  {/* Collapsed group label */}
-                  <text
-                    x={(collapsedX + collapsedWidth / 2) * zoom + pan.x}
-                    y={(collapsedY + collapsedHeight / 2 + 5) * zoom + pan.y}
-                    fill={theme.palette.text.primary}
-                    fontSize={12}
-                    fontWeight="600"
-                    fontFamily={theme.typography.fontFamily}
-                    textAnchor="middle"
-                    style={{ 
-                      pointerEvents: 'none',
-                      userSelect: 'none'
-                    }}
-                  >
-                    {group.label} ({group.nodeIds.length})
-                  </text>
-                  
-                  {/* Expand button */}
-                  <g>
-                    <circle
-                      cx={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
-                      cy={(collapsedY + 16) * zoom + pan.y}
-                      r={10}
-                      fill={theme.palette.primary.main}
-                      stroke={theme.palette.background.paper}
-                      strokeWidth={2}
-                      style={{ 
-                        pointerEvents: 'auto',
-                        cursor: 'pointer'
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        if (onGroupClick) {
-                          onGroupClick(group.id, e, 'toggle-collapse');
-                        }
-                      }}
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                    />
-                    <text
-                      x={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
-                      y={(collapsedY + 20) * zoom + pan.y}
-                      fill={theme.palette.primary.contrastText}
-                      fontSize={12}
-                      fontWeight="bold"
-                      textAnchor="middle"
-                      style={{ 
-                        pointerEvents: 'none',
-                        userSelect: 'none'
-                      }}
-                    >
-                      +
-                    </text>
-                  </g>
-                </g>
-              );
-            }
-            
-            return (
-              <g key={group.id}>
-                {/* Group background */}
-                <rect
-                  x={bounds.x * zoom + pan.x}
-                  y={bounds.y * zoom + pan.y}
-                  width={bounds.width * zoom}
-                  height={bounds.height * zoom}
-                  fill={backgroundColor}
-                  stroke={isSelected ? theme.palette.secondary.main : borderColor}
-                  strokeWidth={isSelected ? borderWidth + 1 : borderWidth}
-                  strokeDasharray={isSelected ? "4,2" : "none"}
-                  rx={borderRadius}
-                  ry={borderRadius}
+              {/* Collapsed group label */}
+              <text
+                x={(collapsedX + collapsedWidth / 2) * zoom + pan.x}
+                y={(collapsedY + collapsedHeight / 2 + 5) * zoom + pan.y}
+                fill={theme.palette.text.primary}
+                fontSize={12}
+                fontWeight="600"
+                fontFamily={theme.typography.fontFamily}
+                textAnchor="middle"
+                style={{ 
+                  pointerEvents: 'none',
+                  userSelect: 'none'
+                }}
+              >
+                {group.label} ({group.nodeIds.length})
+              </text>
+              
+              {/* Expand button */}
+              <g>
+                <circle
+                  cx={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
+                  cy={(collapsedY + 16) * zoom + pan.y}
+                  r={10}
+                  fill={theme.palette.primary.main}
+                  stroke={theme.palette.background.paper}
+                  strokeWidth={2}
                   style={{ 
                     pointerEvents: 'auto',
                     cursor: 'pointer'
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onGroupClick?.(group.id, e);
-                  }}
-                  onDoubleClick={(e) => {
-                    e.stopPropagation();
-                    onGroupDoubleClick?.(group.id, e);
+                    e.preventDefault();
+                    if (onGroupClick) {
+                      onGroupClick(group.id, e, 'toggle-collapse');
+                    }
                   }}
                   onMouseDown={(e) => {
                     e.stopPropagation();
-                    e.preventDefault(); // Prevent pan from starting
-                    onGroupDragStart?.(e, group);
+                    e.preventDefault();
                   }}
                 />
-                
-                {/* Group label */}
                 <text
-                  x={(bounds.x + 8) * zoom + pan.x}
-                  y={(bounds.y + 16) * zoom + pan.y}
-                  fill={theme.palette.text.primary}
+                  x={(collapsedX + collapsedWidth - 16) * zoom + pan.x}
+                  y={(collapsedY + 20) * zoom + pan.y}
+                  fill={theme.palette.primary.contrastText}
                   fontSize={12}
-                  fontWeight="600"
-                  fontFamily={theme.typography.fontFamily}
+                  fontWeight="bold"
+                  textAnchor="middle"
                   style={{ 
                     pointerEvents: 'none',
                     userSelect: 'none'
                   }}
                 >
-                  {group.label} ({group.nodeIds.length})
+                  +
                 </text>
-                
-                {/* Collapse/expand button */}
-                {group.collapsible !== false && (
-                  <g>
-                    <circle
-                      cx={(bounds.x + bounds.width - 16) * zoom + pan.x}
-                      cy={(bounds.y + 16) * zoom + pan.y}
-                      r={10}
-                      fill={theme.palette.primary.main}
-                      stroke={theme.palette.background.paper}
-                      strokeWidth={2}
-                      style={{ 
-                        pointerEvents: 'auto',
-                        cursor: 'pointer'
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        if (onGroupClick) {
-                          onGroupClick(group.id, e, 'toggle-collapse');
-                        }
-                      }}
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                    />
-                    {/* Collapse/expand icon */}
-                    <text
-                      cx={(bounds.x + bounds.width - 16) * zoom + pan.x}
-                      cy={(bounds.y + 16) * zoom + pan.y}
-                      x={(bounds.x + bounds.width - 16) * zoom + pan.x}
-                      y={(bounds.y + 20) * zoom + pan.y}
-                      fill={theme.palette.primary.contrastText}
-                      fontSize={12}
-                      fontWeight="bold"
-                      textAnchor="middle"
-                      style={{ 
-                        pointerEvents: 'none',
-                        userSelect: 'none'
-                      }}
-                    >
-                      {group.collapsed ? '+' : '−'}
-                    </text>
-                  </g>
-                )}
-                
-                {/* Selection handles if selected */}
-                {isSelected && (
-                  <g>
-                    {/* Corner resize handles */}
-                    {[
-                      { x: bounds.x, y: bounds.y }, // top-left
-                      { x: bounds.x + bounds.width, y: bounds.y }, // top-right
-                      { x: bounds.x, y: bounds.y + bounds.height }, // bottom-left
-                      { x: bounds.x + bounds.width, y: bounds.y + bounds.height }, // bottom-right
-                    ].map((corner, index) => (
-                      <circle
-                        key={index}
-                        cx={corner.x * zoom + pan.x}
-                        cy={corner.y * zoom + pan.y}
-                        r={4}
-                        fill={theme.palette.secondary.main}
-                        stroke={theme.palette.background.paper}
-                        strokeWidth={2}
-                        style={{ 
-                          pointerEvents: 'auto',
-                          cursor: index % 2 === 0 ? 'nw-resize' : 'ne-resize'
-                        }}
-                      />
-                    ))}
-                  </g>
-                )}
               </g>
-            );
-          })}
-        </g>
-      </svg>
+            </g>
+          );
+        }
+        
+        return (
+          <div
+            key={group.id}
+            style={{
+              position: 'absolute',
+              left: bounds.x * zoom + pan.x,
+              top: bounds.y * zoom + pan.y,
+              width: bounds.width * zoom,
+              height: bounds.height * zoom,
+              border: `2px solid ${borderColor}`,
+              borderRadius: '8px',
+              backgroundColor: backgroundColor,
+              cursor: 'move',
+              zIndex: 10,
+              pointerEvents: 'none', // Let clicks pass through
+            }}
+          >
+            {/* Label - restore pointer events only here */}
+            <div 
+              className="group-label"
+              style={{
+                position: 'absolute',
+                top: -32,
+                left: 0,
+                padding: '4px 8px',
+                backgroundColor: borderColor,
+                color: theme.palette.getContrastText(borderColor),
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                pointerEvents: 'auto', // Enable events only on label
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onGroupClick) onGroupClick(group.id, e);
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                onGroupDragStart(e, group);
+              }}
+            >
+              {group.label || `Group ${group.id}`}
+              {/* Collapse button - also needs pointer-events: auto */}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 });
 

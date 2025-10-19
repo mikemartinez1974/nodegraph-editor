@@ -522,6 +522,7 @@ export default function NodeGraph({
           onGroupClick={onGroupClick}
           onGroupDoubleClick={onGroupClick}
           onGroupDragStart={onGroupDragStart}
+          onBackgroundClick={handleBackgroundClickFromPanZoom}
           theme={theme}
         />
         

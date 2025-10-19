@@ -496,10 +496,13 @@ export default function GraphEditor({ backgroundImage }) {
   const handleGroupDelete = (groupId) => {
     const result = groupManager.current.removeGroup(groupId);
     if (result.success) {
-      setGroups(groupManager.current.getAllGroups());
+      const updatedGroups = groupManager.current.getAllGroups();
+      setGroups(updatedGroups);
       setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
-      saveToHistory(nodes, edges);
+      saveToHistory(nodes, edges, updatedGroups);
       console.log('Deleted group:', groupId);
+    } else {
+      console.error('Failed to delete group:', result.error);
     }
   };
 
@@ -679,11 +682,21 @@ export default function GraphEditor({ backgroundImage }) {
       setGroups(pastedGroups);
       nodesRef.current = pastedNodes;
       edgesRef.current = pastedEdges;
+      
+      // Clear and reinitialize GroupManager with new groups
+      groupManager.current = new GroupManager();
+      pastedGroups.forEach(group => {
+        groupManager.current.groups.set(group.id, group);
+        (group.nodeIds || []).forEach(nodeId => {
+          groupManager.current.nodeToGroup.set(nodeId, group.id);
+        });
+      });
+      
       setSelectedNodeIds([]);
       setSelectedEdgeIds([]);
       setSelectedGroupIds([]);
       if (typeof historyIndexRef !== 'undefined') historyIndexRef.current = 0;
-      saveToHistory(pastedNodes, pastedEdges);
+      saveToHistory(pastedNodes, pastedEdges, pastedGroups);
       return;
     }
 
@@ -695,10 +708,19 @@ export default function GraphEditor({ backgroundImage }) {
       const newNodes = [ ...nodesRef.current, ...pastedNodes.filter(n => !existingNodeIds.has(n.id)) ];
       const newEdges = [ ...edgesRef.current, ...pastedEdges.filter(e => !existingEdgeIds.has(e.id)) ];
       const newGroups = [ ...groups, ...pastedGroups.filter(g => !existingGroupIds.has(g.id)) ];
+      
+      // Update groupManager with new groups
+      pastedGroups.filter(g => !existingGroupIds.has(g.id)).forEach(group => {
+        groupManager.current.groups.set(group.id, group);
+        (group.nodeIds || []).forEach(nodeId => {
+          groupManager.current.nodeToGroup.set(nodeId, group.id);
+        });
+      });
+      
       setNodes(newNodes);
       setEdges(newEdges);
       setGroups(newGroups);
-      saveToHistory(newNodes, newEdges);
+      saveToHistory(newNodes, newEdges, newGroups);
       return;
     }
 
