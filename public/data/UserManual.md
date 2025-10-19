@@ -83,12 +83,23 @@ Your AI generates graphs in JSON format. You don't need to write this yourself, 
 - **position** (required): `{ x: number, y: number }` coordinates
 - **width**: Node width in pixels (default: 200)
 - **height**: Node height in pixels (default: 100)
+- **color**: Node background color (supports hex colors, rgb, rgba, and CSS gradients)
+  - Hex: `"#2e7d32"` or `"rgb(46, 125, 50)"`
+  - Gradient: `"linear-gradient(135deg, #667eea 0%, #764ba2 100%)"`
+  - If omitted, uses your default color preference
 - **data.memo**: Markdown-formatted notes (renders as formatted text in markdown nodes, appears in properties panel for all nodes)
 - **data.link**: Optional URL
 
 ### Edge Types
 - **child/parent**: Vertical hierarchy (top/bottom handles)
 - **peer**: Horizontal relationships (left/right handles)
+
+### Edge Properties
+- **color**: Edge line color (supports hex colors, rgb, and CSS gradients)
+  - Hex: `"#ff5722"` or `"rgb(255, 87, 34)"`
+  - Gradient: `"linear-gradient(90deg, #667eea 0%, #764ba2 100%)"`
+  - If omitted, uses your default edge color preference
+- Use colors to differentiate relationship types or importance
 
 ### When Asking Your AI
 - **"Space them out more"** - If nodes overlap
@@ -97,6 +108,8 @@ Your AI generates graphs in JSON format. You don't need to write this yourself, 
 - **"Use curved edges"** - Make graphs prettier
 - **"Add a documentation node"** - Create a markdown-type node for instructions or reference
 - **"Put the description in a markdown node"** - Display rich formatted text directly on the canvas
+- **"Color the important nodes red"** - Add visual emphasis with colors
+- **"Use a gradient for the title node"** - Make key nodes stand out with gradients
 
 ---
 

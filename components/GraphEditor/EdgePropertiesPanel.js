@@ -14,19 +14,22 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Slider from '@mui/material/Slider';
+import ColorPickerInput from './ColorPickerInput';
 
 export default function EdgePropertiesPanel({ 
   selectedEdge, 
   edgeTypes = {},
   onUpdateEdge, 
   onClose, 
-  theme 
+  theme,
+  defaultEdgeColor = '#666666'
 }) {
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 88 });
   const [edgeType, setEdgeType] = useState('');
   const [label, setLabel] = useState('');
   const [lineWidth, setLineWidth] = useState(2);
   const [curved, setCurved] = useState(false);
+  const [edgeColor, setEdgeColor] = useState(selectedEdge?.color || defaultEdgeColor);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
 
@@ -41,8 +44,9 @@ export default function EdgePropertiesPanel({
       setLabel(edge.label || '');
       setLineWidth(edge.style?.width || 2);
       setCurved(edge.style?.curved !== undefined ? edge.style?.curved : false);
+      setEdgeColor(edge.color || defaultEdgeColor);
     }
-  }, [edgeId]);
+  }, [edgeId, defaultEdgeColor]);
 
   if (!selectedEdge) return null;
 
@@ -104,6 +108,17 @@ export default function EdgePropertiesPanel({
         curved: newCurved 
       }
     });
+  };
+
+  const handleColorChange = (color) => {
+    setEdgeColor(color);
+    onUpdateEdge(selectedEdge.id, { color });
+  };
+
+  const handleSetAsDefault = () => {
+    if (edgeColor && typeof window !== 'undefined' && window.setDefaultEdgeColor) {
+      window.setDefaultEdgeColor(edgeColor);
+    }
   };
 
   const sourceNode = selectedEdge.sourceNode || { label: selectedEdge.source };
@@ -256,6 +271,31 @@ export default function EdgePropertiesPanel({
           }
           label="Curved line"
         />
+
+        {/* Color Picker Section */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+            Edge Color
+          </Typography>
+          <ColorPickerInput
+            value={edgeColor}
+            onChange={handleColorChange}
+            sx={{ mb: 1 }}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={curved}
+                onChange={handleCurvedChange}
+                size="small"
+              />
+            }
+            label="Set as default color for new edges"
+          />
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            Supports hex colors and CSS gradients
+          </Typography>
+        </Box>
       </Box>
     </Paper>
   );

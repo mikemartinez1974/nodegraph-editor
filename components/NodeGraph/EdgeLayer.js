@@ -259,8 +259,8 @@ const EdgeLayer = forwardRef(({
       const typeDef = edgeTypes[edge.type] || {};
       const styleDef = typeDef.style || {};
       
-      // Use edge-specific style first, then fall back to type preset
-      let color = edge.style?.color || styleDef.color || theme.palette.primary.main;
+      // Use edge.color first (new feature), then edge.style.color, then type preset, then theme default
+      let color = edge.color || edge.style?.color || styleDef.color || theme.palette.text.secondary;
       let lineWidth = edge.style?.width ?? styleDef.width ?? 2;
       let opacity = 1;
       let dash = edge.style?.dash ?? styleDef.dash ?? [];

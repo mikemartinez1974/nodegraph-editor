@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, IconButton, Divider } from '@mui/material';
+import { Box, Typography, IconButton, Divider, Stack, Tooltip } from '@mui/material';
 import { createPortal } from 'react-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,6 +17,8 @@ import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
 import eventBus from '../NodeGraph/eventBus';
+import ColorPickerInput from './ColorPickerInput';
+import SaveIcon from '@mui/icons-material/Save';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -24,7 +26,8 @@ export default function NodePropertiesPanel({
   onClose,
   theme,
   anchor = 'right',
-  onAnchorChange
+  onAnchorChange,
+  defaultNodeColor = '#1976d2'
 }) {
   const drawerWidth = 400;
   
@@ -51,6 +54,7 @@ export default function NodePropertiesPanel({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [width, setWidth] = useState(400);
   const [isOpen, setIsOpen] = useState(true); // Start open by default
+  const [nodeColor, setNodeColor] = useState(selectedNode?.color || defaultNodeColor);
   const resizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(width);
@@ -62,8 +66,9 @@ export default function NodePropertiesPanel({
       setMemo(selectedNode.data?.memo || '');
       setLink(selectedNode.data?.link || '');
       setLabel(selectedNode.label || '');
+      setNodeColor(selectedNode.color || defaultNodeColor);
     }
-  }, [selectedNode?.id]);
+  }, [selectedNode?.id, defaultNodeColor]);
 
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
@@ -169,6 +174,17 @@ export default function NodePropertiesPanel({
       eventBus.off('backgroundClick', handleBackgroundClick);
     };
   }, [isOpen]);
+
+  const handleColorChange = (color) => {
+    setNodeColor(color);
+    onUpdateNode(selectedNode.id, { color });
+  };
+  
+  const handleSetAsDefault = () => {
+    if (nodeColor && typeof window !== 'undefined' && window.setDefaultNodeColor) {
+      window.setDefaultNodeColor(nodeColor);
+    }
+  };
 
   return createPortal(
     <Box

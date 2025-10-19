@@ -1,10 +1,15 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
 import eventBus from '../../NodeGraph/eventBus';
 import LinkIcon from '@mui/icons-material/Link';
+
+// Helper to check if a color is a gradient
+const isGradientColor = (color) => {
+  return color && (color.includes('gradient') || color.includes('linear-') || color.includes('radial-'));
+};
 
 const MarkdownNode = ({ 
   node, 
@@ -141,6 +146,21 @@ const MarkdownNode = ({
     });
   };
 
+  // Use node color with fallback
+  const nodeColor = node.color || theme.palette.primary.main;
+  const isGradient = isGradientColor(nodeColor);
+  
+  // Only use alpha for solid colors, use reduced opacity or the color directly for gradients
+  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.05);
+  const nodeBorderColor = isGradient ? nodeColor : alpha(nodeColor, 0.3);
+    
+  // Calculate text color for readability
+  const computedTextColor = theme.palette.getContrastText(
+    typeof backgroundColor === 'string' && backgroundColor.startsWith('linear-gradient')
+      ? theme.palette.primary.main
+      : backgroundColor
+  );
+
   return (
     <div
       ref={nodeRef}
@@ -152,13 +172,13 @@ const MarkdownNode = ({
         width,
         height,
         cursor: isResizing ? 'nwse-resize' : (draggingHandle ? 'grabbing' : 'grab'),
-        border: isSelected ? `4px solid ${borderColor}` : `3px solid ${borderColor}`,
-        background: boardBackground,
+        border: isSelected ? `4px solid ${nodeBorderColor}` : `3px solid ${nodeBorderColor}`,
+        background: backgroundColor,
         borderRadius: 4,
         boxShadow: isSelected 
           ? `0 0 12px ${theme.palette.secondary.main}, inset 0 2px 8px rgba(0,0,0,0.3)` 
           : 'inset 0 2px 8px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.3)',
-        color: textColor,
+        color: computedTextColor,
         zIndex: 100,
         pointerEvents: 'auto',
         display: 'flex',
@@ -205,19 +225,19 @@ const MarkdownNode = ({
           remarkPlugins={[remarkGfm]}
           components={{
             // Style markdown elements to fit the board theme
-            p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0', color: textColor }} {...props} />,
-            h1: ({node, ...props}) => <h1 style={{ margin: '0 0 10px 0', fontSize: '1.5em', color: textColor, fontWeight: 'bold', borderBottom: isDark ? '2px solid #4a6b4a' : '2px solid #8b7355' }} {...props} />,
-            h2: ({node, ...props}) => <h2 style={{ margin: '0 0 8px 0', fontSize: '1.3em', color: textColor, fontWeight: 'bold' }} {...props} />,
-            h3: ({node, ...props}) => <h3 style={{ margin: '0 0 6px 0', fontSize: '1.15em', color: textColor, fontWeight: 'bold' }} {...props} />,
-            ul: ({node, ...props}) => <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: textColor }} {...props} />,
-            ol: ({node, ...props}) => <ol style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: textColor }} {...props} />,
-            li: ({node, ...props}) => <li style={{ margin: '3px 0', color: textColor }} {...props} />,
+            p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0', color: computedTextColor }} {...props} />,
+            h1: ({node, ...props}) => <h1 style={{ margin: '0 0 10px 0', fontSize: '1.5em', color: computedTextColor, fontWeight: 'bold', borderBottom: isDark ? '2px solid #4a6b4a' : '2px solid #8b7355' }} {...props} />,
+            h2: ({node, ...props}) => <h2 style={{ margin: '0 0 8px 0', fontSize: '1.3em', color: computedTextColor, fontWeight: 'bold' }} {...props} />,
+            h3: ({node, ...props}) => <h3 style={{ margin: '0 0 6px 0', fontSize: '1.15em', color: computedTextColor, fontWeight: 'bold' }} {...props} />,
+            ul: ({node, ...props}) => <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: computedTextColor }} {...props} />,
+            ol: ({node, ...props}) => <ol style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: computedTextColor }} {...props} />,
+            li: ({node, ...props}) => <li style={{ margin: '3px 0', color: computedTextColor }} {...props} />,
             code: ({node, inline, ...props}) => 
               inline 
-                ? <code style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', padding: '2px 5px', borderRadius: 3, color: textColor, fontFamily: 'monospace' }} {...props} />
-                : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', color: textColor, fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
-            strong: ({node, ...props}) => <strong style={{ color: textColor, fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
-            em: ({node, ...props}) => <em style={{ color: textColor, fontStyle: 'italic' }} {...props} />,
+                ? <code style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', padding: '2px 5px', borderRadius: 3, color: computedTextColor, fontFamily: 'monospace' }} {...props} />
+                : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', color: computedTextColor, fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
+            strong: ({node, ...props}) => <strong style={{ color: computedTextColor, fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
+            em: ({node, ...props}) => <em style={{ color: computedTextColor, fontStyle: 'italic' }} {...props} />,
             a: ({node, ...props}) => <a style={{ color: isDark ? '#81c784' : '#1976d2', textDecoration: 'underline', pointerEvents: 'auto' }} {...props} target="_blank" rel="noopener noreferrer" />
           }}
         >
@@ -256,7 +276,7 @@ const MarkdownNode = ({
             width: 24,
             height: 24,
             cursor: 'nwse-resize',
-            background: borderColor,
+            background: nodeBorderColor,
             borderTopLeftRadius: 4,
             borderBottomRightRadius: 2,
             display: 'flex',
@@ -270,8 +290,8 @@ const MarkdownNode = ({
           <div style={{
             width: 12,
             height: 12,
-            borderRight: `2px solid ${textColor}`,
-            borderBottom: `2px solid ${textColor}`,
+            borderRight: `2px solid ${computedTextColor}`,
+            borderBottom: `2px solid ${computedTextColor}`,
             opacity: 0.8
           }} />
         </div>

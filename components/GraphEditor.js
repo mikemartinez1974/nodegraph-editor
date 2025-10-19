@@ -52,6 +52,37 @@ export default function GraphEditor({ backgroundImage }) {
   // Track if initial graph has loaded and prevent reload after replace
   const initialGraphLoadedRef = useRef(false);
 
+  // Default node color with localStorage persistence
+  const [defaultNodeColor, setDefaultNodeColor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nodegraph_default_color') || '#1976d2';
+    }
+    return '#1976d2';
+  });
+
+  // Default edge color with localStorage persistence
+  const [defaultEdgeColor, setDefaultEdgeColor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nodegraph_default_edge_color') || '#666666';
+    }
+    return '#666666';
+  });
+
+  // Save color preferences when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nodegraph_default_color', defaultNodeColor);
+    }
+    eventBus.emit('defaultNodeColorChanged', { color: defaultNodeColor });
+  }, [defaultNodeColor]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nodegraph_default_edge_color', defaultEdgeColor);
+    }
+    eventBus.emit('defaultEdgeColorChanged', { color: defaultEdgeColor });
+  }, [defaultEdgeColor]);
+
   // Keep refs in sync with state
   useEffect(() => {
     nodesRef.current = nodes;
@@ -176,16 +207,38 @@ export default function GraphEditor({ backgroundImage }) {
       setEdges,
       saveToHistory
     );
+    
+    // Extend GraphAPI to use default color when creating nodes
+    const originalCreateNode = graphAPI.current.createNode;
+    graphAPI.current.createNode = (nodeData) => {
+      return originalCreateNode({
+        ...nodeData,
+        color: nodeData.color || defaultNodeColor
+      });
+    };
+    
+    // Extend GraphAPI to use default color when creating edges
+    const originalCreateEdge = graphAPI.current.createEdge;
+    graphAPI.current.createEdge = (edgeData) => {
+      return originalCreateEdge({
+        ...edgeData,
+        color: edgeData.color || defaultEdgeColor
+      });
+    };
 
     if (typeof window !== 'undefined') {
       window.graphAPI = graphAPI.current;
+      window.setDefaultNodeColor = (color) => setDefaultNodeColor(color);
+      window.setDefaultEdgeColor = (color) => setDefaultEdgeColor(color);
       console.log('Graph CRUD API available at window.graphAPI');
       console.log('Examples:');
       console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
       console.log('  window.graphAPI.readNode() // Get all nodes');
       console.log('  window.graphAPI.getStats() // Get graph statistics');
+      console.log('  window.setDefaultNodeColor("#ff5722") // Change default color');
+      console.log('  window.setDefaultEdgeColor("#00ff00") // Change default edge color');
     }
-  }, []);
+  }, [defaultNodeColor, defaultEdgeColor]);
 
   // Load IntroGraph.json at startup (use public/data so we can override at runtime)
   useEffect(() => {
@@ -978,6 +1031,7 @@ export default function GraphEditor({ backgroundImage }) {
         anchor={nodePanelAnchor}
         onAnchorChange={handleNodePanelAnchorChange}
         onClose={() => {}}
+        defaultNodeColor={defaultNodeColor}
       />
       <NodeListPanel
         nodes={nodes}
@@ -1103,6 +1157,7 @@ export default function GraphEditor({ backgroundImage }) {
         edgeTypes={EdgeTypes}
         onUpdateEdge={handleUpdateEdge}
         theme={theme}
+        defaultEdgeColor={defaultEdgeColor}
       />
 
       {showGroupProperties && selectedGroupIds.length === 1 && (

@@ -1,11 +1,16 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
+// Helper to check if a color is a gradient
+const isGradientColor = (color) => {
+  return color && (color.includes('gradient') || color.includes('linear-') || color.includes('radial-'));
+};
 
 const DefaultNode = ({ 
   node, 
@@ -95,6 +100,21 @@ const DefaultNode = ({
     };
   }, [isResizing, node.id, zoom]);
 
+  // Use node color or theme default
+  const nodeColor = node.color || theme.palette.primary.main;
+  const isGradient = isGradientColor(nodeColor);
+  
+  // Only use alpha for solid colors
+  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.1);
+  const borderColor = isGradient ? nodeColor : nodeColor;
+  
+  // Get text color that contrasts with background
+  const textColor = theme.palette.getContrastText(
+    typeof backgroundColor === 'string' && backgroundColor.startsWith('linear-gradient')
+      ? theme.palette.primary.main // Fallback for gradients
+      : backgroundColor
+  );
+
   return (
     <div
       ref={nodeRef}
@@ -106,11 +126,13 @@ const DefaultNode = ({
         width,
         height,
         cursor: draggingHandle ? 'grabbing' : 'grab',
-        border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
-        background: isSelected ? selected_gradient : unselected_gradient,
-        borderRadius: 8,
-        boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
-        color: isSelected ? `${theme.textColors.dark}` : `${theme.textColors.light}`,
+        border: `${isSelected ? 3 : 2}px solid ${borderColor}`,
+        background: backgroundColor,
+        borderRadius: 6,
+        boxSizing: 'border-box',
+        padding: 8,
+        color: textColor,
+        transition: 'border 0.2s ease',
         zIndex: 100,
         pointerEvents: 'auto',
         display: 'flex',

@@ -5,6 +5,12 @@ import ReactMarkdown from 'react-markdown';
 import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
+import { alpha } from '@mui/material';
+
+// Helper to check if a color is a gradient
+const isGradientColor = (color) => {
+  return color && (color.includes('gradient') || color.includes('linear-') || color.includes('radial-'));
+};
 
 const FixedNode = ({ 
   node, 
@@ -56,6 +62,14 @@ const FixedNode = ({
   // Base position for non-dragging state
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
   const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
+
+  // Use node.color if available, otherwise fall back to theme primary
+  const nodeColor = node.color || theme.palette.primary.main;
+  const isGradient = isGradientColor(nodeColor);
+  
+  // Only use alpha for solid colors
+  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.1);
+  const borderColor = isGradient ? nodeColor : nodeColor;
 
   return (
     <div

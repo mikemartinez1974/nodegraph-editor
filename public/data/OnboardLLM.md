@@ -30,9 +30,15 @@ Welcome! As an LLM assistant, your role is to help users build, modify, and orga
   - Secondary: `{ "width": 140, "height": 70 }`
   - Markdown nodes: `{ "width": 250, "height": 200 }` (for rich content)
   - Avoid squares (80x80) – they look cramped
+- **Node Colors:**
+  - Each node can have a `color` property with hex colors or CSS gradients
+  - Solid: `"color": "#2e7d32"` (hex), `"color": "rgb(46, 125, 50)"` (rgb)
+  - Gradients: `"color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"`
+  - If omitted, nodes use the user's default color preference
+  - Use colors to categorize or highlight important nodes
 - **Node Types:**
   - `default`: Standard nodes with labels (resizable by user)
-  - `fixed`: Stadard node with labels (not resizable by user)
+  - `fixed`: Standard node with labels (not resizable by user)
   - `markdown`: Display-only nodes showing formatted memo content as text on a blackboard/whiteboard (theme-sensitive)
   - Use markdown nodes for documentation, explanations, or reference material
   - Use default nodes for structural elements and action items
@@ -40,17 +46,25 @@ Welcome! As an LLM assistant, your role is to help users build, modify, and orga
   - `child`: Hierarchies
   - `peer`: Lateral relationships
   - Mix types for interest; label edges when relationships need clarification
+- **Edge Colors:**
+  - Each edge can have a `color` property with hex colors or CSS gradients
+  - Solid: `"color": "#ff5722"` (hex)
+  - Gradients: `"color": "linear-gradient(90deg, #667eea 0%, #764ba2 100%)"`
+  - If omitted, edges use the user's default edge color
+  - Use different colors for different relationship types
 - **Layout:**
   - Space nodes 200-250px apart
   - Align to grid (multiples of 50)
   - Vary node sizes for hierarchy
   - Use groups for organization
+  - Use colors to create visual categories or emphasis
 - **Emoji:** Use in labels for organization (e.g., "Planning 📋")
 - **Markdown:** Use in `data.memo` or `data.label` for rich descriptions (rendered in markdown nodes, shown in properties panel for others)
 
 ## JSON Patterns
 - **Always include an `action` field**: `add`, `update`, or `replace`
 - **Node Example:**
+
 ```json
 {
   "action": "add",
@@ -60,14 +74,33 @@ Welcome! As an LLM assistant, your role is to help users build, modify, and orga
     "label": "New Node",
     "position": { "x": 250, "y": 150 },
     "width": 160,
-    "height": 80
+    "height": 80,
+    "color": "#2e7d32"
   }],
   "edges": [{
     "id": "edge_1704067200000_e1",
     "source": "existing_node_id",
     "target": "node_1704067200000_abc1",
     "type": "straight",
-    "label": "depends on"
+    "label": "depends on",
+    "color": "#ff5722"
+  }]
+}
+```
+
+- **Gradient Node Example:**
+
+```json
+{
+  "action": "add",
+  "nodes": [{
+    "id": "node_gradient_1",
+    "type": "default",
+    "label": "Featured Node ⭐",
+    "position": { "x": 400, "y": 200 },
+    "width": 200,
+    "height": 100,
+    "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
   }]
 }
 ```
