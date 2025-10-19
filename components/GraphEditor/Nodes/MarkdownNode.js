@@ -166,14 +166,18 @@ const MarkdownNode = ({
       }}
     >
       {/* Markdown content */}
-      <div style={{ 
-        flex: 1,
-        padding: '12px',
-        overflow: 'auto',
-        fontSize: Math.max(10, 12 * zoom),
-        lineHeight: 1.5,
-        fontFamily: isDark ? '"Courier New", Courier, monospace' : '"Comic Sans MS", "Trebuchet MS", sans-serif'
-      }}>
+      <div 
+        style={{ 
+          flex: 1,
+          padding: '12px',
+          overflow: 'auto',
+          fontSize: Math.max(10, 12 * zoom),
+          lineHeight: 1.5,
+          fontFamily: isDark ? '"Courier New", Courier, monospace' : '"Comic Sans MS", "Trebuchet MS", sans-serif',
+          cursor: 'pointer',
+          pointerEvents: 'none'
+        }}
+      >
         <ReactMarkdown
           components={{
             // Style markdown elements to fit the board theme
@@ -190,7 +194,7 @@ const MarkdownNode = ({
                 : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', color: textColor, fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
             strong: ({node, ...props}) => <strong style={{ color: textColor, fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
             em: ({node, ...props}) => <em style={{ color: textColor, fontStyle: 'italic' }} {...props} />,
-            a: ({node, ...props}) => <a style={{ color: isDark ? '#81c784' : '#1976d2', textDecoration: 'underline' }} {...props} target="_blank" rel="noopener noreferrer" />
+            a: ({node, ...props}) => <a style={{ color: isDark ? '#81c784' : '#1976d2', textDecoration: 'underline', pointerEvents: 'auto' }} {...props} target="_blank" rel="noopener noreferrer" />
           }}
         >
           {memo}
