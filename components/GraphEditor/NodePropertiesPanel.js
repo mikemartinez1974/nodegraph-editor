@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Paper, Box, Typography, IconButton, Divider } from '@mui/material';
+import { Box, Typography, IconButton, Divider } from '@mui/material';
+import { createPortal } from 'react-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -15,31 +16,37 @@ import remarkGfm from 'remark-gfm';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
-import Drawer from '@mui/material/Drawer';
 
 
 export default function NodePropertiesPanel({
   selectedNode,
   onUpdateNode,
   onClose,
-  theme
+  theme,
+  anchor = 'right',
+  onAnchorChange
 }) {
+  // Guard: if no node selected, don't render
+  if (!selectedNode) {
+    return null;
+  }
+
   const drawerWidth = 400;
   
-  // Remember drawer position in localStorage
-  const [anchor, setAnchor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('nodePropertiesPanelAnchor') || 'right';
-    }
-    return 'right';
-  });
+  // Use prop anchor, but remember preference in localStorage
+  const [currentAnchor, setCurrentAnchor] = useState(anchor);
+
+  useEffect(() => {
+    setCurrentAnchor(anchor);
+  }, [anchor]);
 
   const toggleAnchor = () => {
-    const newAnchor = anchor === 'right' ? 'left' : 'right';
-    setAnchor(newAnchor);
+    const newAnchor = currentAnchor === 'right' ? 'left' : 'right';
+    setCurrentAnchor(newAnchor);
     if (typeof window !== 'undefined') {
       localStorage.setItem('nodePropertiesPanelAnchor', newAnchor);
     }
+    if (onAnchorChange) onAnchorChange(newAnchor);
   };
 
   const [memo, setMemo] = useState('');
@@ -47,9 +54,7 @@ export default function NodePropertiesPanel({
   const [label, setLabel] = useState('');
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [markdownView, setMarkdownView] = useState(true); // true = view mode, false = edit mode
-  const [dockSide, setDockSide] = useState('right');
-  const [width, setWidth] = useState(320);
+  const [width, setWidth] = useState(400);
   const resizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(width);
@@ -138,8 +143,9 @@ export default function NodePropertiesPanel({
 
   const onResizeMouseMove = (e) => {
     if (!resizing.current) return;
-    let delta = dockSide === 'right' ? startX.current - e.clientX : e.clientX - startX.current;
-    let newWidth = Math.max(240, Math.min(startWidth.current + delta, 600));
+    // When on the right side, dragging left decreases width; when on the left, dragging right decreases width
+    let delta = currentAnchor === 'right' ? startX.current - e.clientX : e.clientX - startX.current;
+    let newWidth = Math.max(240, Math.min(startWidth.current + delta, 700));
     setWidth(newWidth);
   };
 
@@ -149,23 +155,52 @@ export default function NodePropertiesPanel({
     document.removeEventListener('mouseup', onResizeMouseUp);
   };
 
-  return (
-    <Drawer
-      anchor={anchor}
-      open={true}
-      onClose={onClose}
-      variant="persistent"
+  return createPortal(
+    <Box
       sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          top: 64,
-          height: 'calc(100% - 64px)'
-        }
+        position: 'fixed',
+        top: 64,
+        [currentAnchor === 'right' ? 'right' : 'left']: 0,
+        width: width,
+        height: 'calc(100vh - 64px)',
+        backgroundColor: 'background.paper',
+        borderLeft: currentAnchor === 'right' ? `1px solid ${theme.palette.divider}` : 'none',
+        borderRight: currentAnchor === 'left' ? `1px solid ${theme.palette.divider}` : 'none',
+        boxShadow: currentAnchor === 'right' ? '-2px 0 8px rgba(0,0,0,0.1)' : '2px 0 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 1200,
       }}
     >
+      {/* Resize handle */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          [currentAnchor === 'right' ? 'left' : 'right']: -6,
+          width: 12,
+          height: '100%',
+          cursor: 'ew-resize',
+          zIndex: 2000,
+          background: 'transparent',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onMouseDown={onResizeMouseDown}
+        title="Resize panel"
+        aria-label="Resize properties panel"
+      >
+        <div style={{
+          width: 6,
+          height: 48,
+          borderRadius: 3,
+          background: theme.palette.divider,
+          opacity: 0.7,
+          boxShadow: '0 0 4px rgba(0,0,0,0.15)'
+        }} />
+      </div>
+
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
         <Typography variant="h6">Node Properties</Typography>
         <Box>
@@ -358,6 +393,7 @@ export default function NodePropertiesPanel({
           )}
         </Box>
       </Box>
-    </Drawer>
+    </Box>,
+    document.body
   );
 }

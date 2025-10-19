@@ -107,6 +107,8 @@ export default function NodeGraph({
   const containerRef = useRef(null); // Ensure containerRef is defined
   const isDragging = useRef(false); // Track if we actually dragged
   const dragStartTime = useRef(0); // Track when drag started
+  const dragStartPos = useRef({ x: 0, y: 0 }); // Track drag start position
+  const dragThreshold = 5; // pixels - minimum drag distance to count as a drag
   const panZoomRef = useRef(null); // Ref for PanZoomLayer
   const hoverTimeoutRef = useRef({});
   const dragRafRef = useRef(null);
@@ -198,6 +200,17 @@ export default function NodeGraph({
   // Node drag logic
   function onNodeDragMove(e) {
     if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current)) {
+      // Check if we've exceeded the drag threshold
+      const dragDistance = Math.hypot(
+        e.clientX - dragStartPos.current.x,
+        e.clientY - dragStartPos.current.y
+      );
+      
+      // Only start actual dragging if threshold is exceeded
+      if (dragDistance < dragThreshold) {
+        return; // Don't drag yet, mouse hasn't moved far enough
+      }
+
       const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
       const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
       lastMousePos.current = { x: e.clientX, y: e.clientY };
@@ -208,7 +221,7 @@ export default function NodeGraph({
       draggingInfoRef.current.offset.x += graphDx;
       draggingInfoRef.current.offset.y += graphDy;
       
-      // Mark that we've actually dragged (moved the mouse)
+      // Mark that we've actually dragged (moved the mouse past threshold)
       isDragging.current = true;
 
       if (!dragRafRef.current) {
@@ -245,6 +258,7 @@ export default function NodeGraph({
     draggingNodeIdRef.current = nodesToDrag; // Now stores array of IDs
     isDragging.current = false; // Reset drag flag
     dragStartTime.current = Date.now(); // Track start time
+    dragStartPos.current = { x: e.clientX, y: e.clientY }; // Track start position
     
     // Store initial positions for all nodes being dragged
     const initialPositions = {};
@@ -266,43 +280,58 @@ export default function NodeGraph({
   }
 
   function handleNodeDragEnd() {
-    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current) && draggingInfoRef.current) {
-      const offset = draggingInfoRef.current.offset;
+    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current)) {
+      // Check if this was actually a drag or just a click
+      const dragDistance = Math.hypot(
+        lastMousePos.current.x - dragStartPos.current.x,
+        lastMousePos.current.y - dragStartPos.current.y
+      );
       
-      // Update all dragged nodes
-      draggingNodeIdRef.current.forEach(id => {
-        const node = nodes.find(n => n.id === id);
-        if (node && typeof onNodeMove === 'function') {
-          const newPosition = { 
-            x: node.position.x + offset.x, 
-            y: node.position.y + offset.y 
-          };
-          onNodeMove(id, newPosition);
+      if (dragDistance < dragThreshold) {
+        // Very small movement - treat as a click
+        const node = nodes.find(n => n.id === draggingNodeIdRef.current[0]);
+        if (node && typeof onNodeClick === 'function') {
+          onNodeClick(node.id, {});
         }
-
-        // Reset transform
-        const nodeEl = nodeRefs.current.get(id);
-        if (nodeEl) nodeEl.style.transform = '';
-      });
-
-      draggingInfoRef.current = null;
-
-      // Force redraws after React state update completes
-      requestAnimationFrame(() => {
-        if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
-        if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
-      });
-
-      // Call onNodeDragEnd if needed
-      if (typeof onNodeDragEnd === 'function' && lastDragPosition.current) {
-        // Call once per dragged node with updated positions
+      } else if (draggingInfoRef.current) {
+        // This was an actual drag
+        const offset = draggingInfoRef.current.offset;
+        
+        // Update all dragged nodes
         draggingNodeIdRef.current.forEach(id => {
-          const initial = lastDragPosition.current[id];
-          if (initial) {
-            const finalPos = { x: initial.x + offset.x, y: initial.y + offset.y };
-            onNodeDragEnd(id, finalPos);
+          const node = nodes.find(n => n.id === id);
+          if (node && typeof onNodeMove === 'function') {
+            const newPosition = { 
+              x: node.position.x + offset.x, 
+              y: node.position.y + offset.y 
+            };
+            onNodeMove(id, newPosition);
           }
+
+          // Reset transform
+          const nodeEl = nodeRefs.current.get(id);
+          if (nodeEl) nodeEl.style.transform = '';
         });
+
+        draggingInfoRef.current = null;
+
+        // Force redraws after React state update completes
+        requestAnimationFrame(() => {
+          if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+          if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+        });
+
+        // Call onNodeDragEnd if needed
+        if (typeof onNodeDragEnd === 'function' && lastDragPosition.current) {
+          // Call once per dragged node with updated positions
+          draggingNodeIdRef.current.forEach(id => {
+            const initial = lastDragPosition.current[id];
+            if (initial) {
+              const finalPos = { x: initial.x + offset.x, y: initial.y + offset.y };
+              onNodeDragEnd(id, finalPos);
+            }
+          });
+        }
       }
     }
 

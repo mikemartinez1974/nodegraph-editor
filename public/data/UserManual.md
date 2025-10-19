@@ -75,12 +75,16 @@ Your AI generates graphs in JSON format. You don't need to write this yourself, 
 
 ### Node Properties
 - **id** (required): Unique string identifier
-- **label** (required): Short display name
+- **label** (required): Short display name (shown on default nodes, not on markdown nodes)
+- **type**: "default" | "markdown" | "resizable" | "legacy"
+  - `default`: Standard resizable node showing label (most common)
+  - `markdown`: Display node rendering memo content as formatted text on a blackboard/whiteboard
+  - `legacy`: Old-style fixed-size node
 - **position** (required): `{ x: number, y: number }` coordinates
 - **width**: Node width in pixels (default: 200)
 - **height**: Node height in pixels (default: 100)
-- **type**: "default" | "resizable" | "custom"
-- **data.memo**: Markdown-formatted notes (supports **bold**, *italic*, lists, etc.)
+- **data.memo**: Markdown-formatted notes (renders as formatted text in markdown nodes, appears in properties panel for all nodes)
+- **data.link**: Optional URL
 
 ### Edge Types
 - **child/parent**: Vertical hierarchy (top/bottom handles)
@@ -91,6 +95,8 @@ Your AI generates graphs in JSON format. You don't need to write this yourself, 
 - **"Make it horizontal/vertical"** - Control layout direction
 - **"Add markdown notes"** - Include formatted text in nodes
 - **"Use curved edges"** - Make graphs prettier
+- **"Add a documentation node"** - Create a markdown-type node for instructions or reference
+- **"Put the description in a markdown node"** - Display rich formatted text directly on the canvas
 
 ---
 
@@ -184,9 +190,9 @@ Users can group related nodes:
 ```
 
 ### Node Types
-- **default**: Fixed size, simple
-- **resizable**: User can drag corners to resize
-- **custom**: Advanced custom rendering
+- **default**: Resizable node with label displayed at top
+- **markdown**: Display node showing formatted memo content (looks like a blackboard in dark mode, whiteboard in light mode)
+- **legacy**: Old fixed-size nodes (not recommended for new graphs)
 
 ### Edge Routing
 - **straight**: Best for simple connections
@@ -257,6 +263,11 @@ Users can group related nodes:
 
 ### Making Beautiful Graphs
 
+**Use the Right Node Type**
+- Default nodes for tasks, items, concepts
+- Markdown nodes for instructions, documentation, or reference material
+- Say "Put that in a markdown node" for formatted content
+
 **Good Spacing**
 - If nodes overlap, ask AI to "spread them out more"
 - Breathing room makes graphs easier to read
@@ -271,7 +282,8 @@ Users can group related nodes:
 
 **Add Descriptions**
 - "Include details in the node notes"
-- Hover over nodes to see the full markdown content
+- Markdown nodes show the content directly
+- Other nodes show content in the properties panel when selected
 
 ---
 
@@ -288,9 +300,9 @@ Users can group related nodes:
 **What you'll get:** A horizontal flow showing phases of a project. Perfect for planning anything with steps!
 
 ### Example 3: Learning Concepts
-**Say to AI:** "Create a graph explaining how photosynthesis works"
+**Say to AI:** "Create a graph explaining how photosynthesis works, with a markdown node containing the detailed explanation"
 
-**What you'll get:** An educational diagram breaking down complex topics into connected concepts.
+**What you'll get:** An educational diagram breaking down complex topics into connected concepts, with a formatted reference card showing the full explanation.
 
 ---
 

@@ -28,6 +28,7 @@ const backgroundImages = [
   '8.png',
   '9.png',
   '10.png',
+  'greenfelt.png',
   'background1.jpg',
   'background2.jpg',
   'background3.jpg',
@@ -38,7 +39,9 @@ const backgroundImages = [
   'background8.jpg',
   'background9.jpg',
   'background10.jpg',
-  'background11.jpg'
+  'background11.jpg',
+  'background12.jpg',
+  'background13.jpg',
 ];
 
 export default function ThemeDrawer(props) {

@@ -10,6 +10,7 @@ import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import DisplayNode from '../components/GraphEditor/Nodes/DisplayNode';
 import ListNode from '../components/GraphEditor/Nodes/ListNode';
 import ResizableNode from '../components/GraphEditor/Nodes/ResizableNode';
+import MarkdownNode from '../components/GraphEditor/Nodes/MarkdownNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
 import GroupListPanel from './GraphEditor/GroupListPanel';
 import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
@@ -359,6 +360,7 @@ export default function GraphEditor({ backgroundImage }) {
     display: DisplayNode,
     list: ListNode,
     resizable: ResizableNode,
+    markdown: MarkdownNode,
     legacy: DefaultNode  // Keep old default as 'legacy' if needed
   };
 
@@ -873,6 +875,28 @@ export default function GraphEditor({ backgroundImage }) {
     return () => window.removeEventListener('paste', handlePasteEvent);
   }, [handlePaste]);
 
+  // Track which side Node Properties Panel is docked to
+  const [nodePanelAnchor, setNodePanelAnchor] = useState('right');
+
+  // Pass anchor change to NodePropertiesPanel
+  const handleNodePanelAnchorChange = (newAnchor) => {
+    setNodePanelAnchor(newAnchor);
+    // If node list is open, move it to the opposite side
+    if (showNodeList) {
+      setNodeListAnchor(newAnchor === 'right' ? 'left' : 'right');
+    }
+  };
+
+  // Track which side Node List Panel is docked to
+  const [nodeListAnchor, setNodeListAnchor] = useState('left');
+
+  // When Node Properties Panel opens, always open Node List Panel on opposite side
+  useEffect(() => {
+    if (showNodeProperties) {
+      setNodeListAnchor(nodePanelAnchor === 'right' ? 'left' : 'right');
+    }
+  }, [showNodeProperties, nodePanelAnchor]);
+
   return (
     <div 
       id="graph-editor-background" 
@@ -914,6 +938,16 @@ export default function GraphEditor({ backgroundImage }) {
         onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
       />
       
+      {showNodeProperties && selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
+        <NodePropertiesPanel
+          selectedNode={nodes.find(n => n.id === selectedNodeIds[0])}
+          onUpdateNode={handleUpdateNodeData}
+          onClose={() => setShowNodeProperties(false)}
+          theme={theme}
+          anchor={nodePanelAnchor}
+          onAnchorChange={handleNodePanelAnchorChange}
+        />
+      )}
       <NodeListPanel
         nodes={nodes}
         selectedNodeId={selectedNodeIds[0] || null}
@@ -923,6 +957,7 @@ export default function GraphEditor({ backgroundImage }) {
         onClose={() => setShowNodeList(false)}
         isOpen={showNodeList}
         theme={theme}
+        anchor={nodeListAnchor}
       />
 
       <GroupListPanel
@@ -1013,15 +1048,6 @@ export default function GraphEditor({ backgroundImage }) {
         }}
       />
       
-      {showNodeProperties && selectedNodeIds.length === 1 && selectedEdgeIds.length === 0 && (
-        <NodePropertiesPanel
-          selectedNode={nodes.find(n => n.id === selectedNodeIds[0])}
-          onUpdateNode={handleUpdateNodeData}
-          onClose={() => setShowNodeProperties(false)}
-          theme={theme}
-        />
-      )}
-            
       {showEdgeProperties && selectedEdgeIds.length === 1 && selectedNodeIds.length === 0 && (
         <EdgePropertiesPanel
           selectedEdge={{
