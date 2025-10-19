@@ -229,11 +229,17 @@ export default function GraphEditor({ backgroundImage }) {
             // Highlight the first node to hint the user
             setSelectedNodeIds([firstNode.id]);
             setSelectedEdgeIds([]);
-            // Open properties panel for first node
-            setTimeout(() => eventBus.emit('openNodeProperties'), 100);
+            // Open properties panel after a short delay to ensure UI is ready
+            setTimeout(() => {
+              eventBus.emit('openNodeProperties');
+            }, 300);
           }
         } else {
           console.warn('IntroGraph.json does not contain nodes/edges');
+          // Even if no graph loads, try to open the properties panel
+          setTimeout(() => {
+            eventBus.emit('openNodeProperties');
+          }, 300);
         }
       })
       .catch((err) => {
@@ -872,16 +878,16 @@ export default function GraphEditor({ backgroundImage }) {
     return () => window.removeEventListener('paste', handlePasteEvent);
   }, [handlePaste]);
 
-  // Track which side Node Properties Panel is docked to
-  const [nodePanelAnchor, setNodePanelAnchor] = useState('right');
+  // Track which side Node Properties Panel is docked to (initialized to left)
+  const [nodePanelAnchor, setNodePanelAnchor] = useState('left');
+
+  // Track which side Node List Panel is docked to (initialized to right, opposite of properties panel)
+  const [nodeListAnchor, setNodeListAnchor] = useState('right');
 
   // Pass anchor change to NodePropertiesPanel
   const handleNodePanelAnchorChange = (newAnchor) => {
     setNodePanelAnchor(newAnchor);
   };
-
-  // Track which side Node List Panel is docked to
-  const [nodeListAnchor, setNodeListAnchor] = useState('left');
 
   // When Node Properties Panel opens OR changes sides, always position Node List Panel on opposite side
   useEffect(() => {
@@ -949,6 +955,7 @@ export default function GraphEditor({ backgroundImage }) {
         theme={theme}
         anchor={nodePanelAnchor}
         onAnchorChange={handleNodePanelAnchorChange}
+        onClose={() => {}}
       />
       <NodeListPanel
         nodes={nodes}

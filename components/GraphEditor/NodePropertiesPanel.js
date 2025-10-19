@@ -50,7 +50,7 @@ export default function NodePropertiesPanel({
   const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [width, setWidth] = useState(400);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Start open by default
   const resizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(width);
