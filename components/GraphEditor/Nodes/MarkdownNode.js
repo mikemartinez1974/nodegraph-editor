@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
 import eventBus from '../../NodeGraph/eventBus';
 import LinkIcon from '@mui/icons-material/Link';
 
@@ -36,13 +37,35 @@ const MarkdownNode = ({
     }
   }, [node.id, nodeRefs]);
 
-  // Prevent default wheel behavior
+  // Prevent default wheel behavior - allow scrolling content, prevent zoom
   useEffect(() => {
     const nodeDiv = nodeRef.current;
     if (!nodeDiv) return;
+    
     function handleWheel(e) {
+      const contentDiv = nodeDiv.querySelector('div[style*="overflow: auto"]');
+      if (!contentDiv) {
+        e.preventDefault();
+        return;
+      }
+
+      const { scrollTop, scrollHeight, clientHeight } = contentDiv;
+      const isScrollingDown = e.deltaY > 0;
+      const isScrollingUp = e.deltaY < 0;
+      
+      // Allow scroll if content can scroll in that direction
+      const canScrollDown = scrollTop < scrollHeight - clientHeight;
+      const canScrollUp = scrollTop > 0;
+      
+      if ((isScrollingDown && canScrollDown) || (isScrollingUp && canScrollUp)) {
+        // Allow default scroll behavior
+        return;
+      }
+      
+      // Prevent zoom if can't scroll
       e.preventDefault();
     }
+    
     nodeDiv.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
       nodeDiv.removeEventListener('wheel', handleWheel, { passive: false });
@@ -179,6 +202,7 @@ const MarkdownNode = ({
         }}
       >
         <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
           components={{
             // Style markdown elements to fit the board theme
             p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0', color: textColor }} {...props} />,

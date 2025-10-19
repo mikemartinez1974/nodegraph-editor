@@ -960,6 +960,7 @@ export default function GraphEditor({ backgroundImage }) {
         isOpen={showNodeList}
         theme={theme}
         anchor={nodeListAnchor}
+        propertiesPanelAnchor={nodePanelAnchor} // Pass the propertiesPanelAnchor state
       />
 
       <GroupListPanel

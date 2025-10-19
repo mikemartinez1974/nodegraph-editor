@@ -31,18 +31,20 @@ import {
 } from '@mui/icons-material';
 import * as ReactWindow from 'react-window';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import { createPortal } from 'react-dom';
 
 const { FixedSizeList } = ReactWindow;
 
 export default function NodeListPanel({ 
   nodes = [], 
-  selectedNodeId, 
+  selectedNodeId = null,
   selectedNodeIds = [],
   onNodeSelect, 
   onNodeFocus, 
-  onClose, 
-  theme, 
-  isOpen = true 
+  onClose,
+  isOpen = false,
+  theme,
+  propertiesPanelAnchor = 'right'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
@@ -124,7 +126,7 @@ export default function NodeListPanel({
     document.removeEventListener('mouseup', onMouseUp);
   };
 
-  if (!isOpen) return null;
+  const anchor = propertiesPanelAnchor === 'right' ? 'left' : 'right';
 
   // Virtualized row renderer
   const VirtualRow = ({ index, style }) => {
@@ -168,21 +170,25 @@ export default function NodeListPanel({
   // Use virtualization when list is large (>100 items)
   const useVirtualization = nodes.length > 100;
 
-  return (
-    <Drawer
-      anchor="right"
-      open={isOpen}
-      onClose={onClose}
-      variant="persistent"
+  return createPortal(
+    <Box
       sx={{
-        width: 300,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: 300,
-          boxSizing: 'border-box',
-          top: 64,
-          height: 'calc(100% - 64px)'
-        }
+        position: 'fixed',
+        top: 64,
+        [anchor]: isOpen ? 0 : -300,
+        // Explicitly unset the opposite side
+        [anchor === 'right' ? 'left' : 'right']: 'auto',
+        width: 280,
+        height: 'calc(100vh - 64px)',
+        backgroundColor: 'background.paper',
+        borderRight: anchor === 'left' ? `1px solid ${theme.palette.divider}` : 'none',
+        borderLeft: anchor === 'right' ? `1px solid ${theme.palette.divider}` : 'none',
+        boxShadow: anchor === 'left' ? '2px 0 8px rgba(0,0,0,0.1)' : '-2px 0 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 1100,
+        transition: `${anchor} 0.3s ease`,
+        pointerEvents: isOpen ? 'auto' : 'none',
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
@@ -248,6 +254,7 @@ export default function NodeListPanel({
           })}
         </List>
       )}
-    </Drawer>
+    </Box>,
+    document.body
   );
 }
