@@ -26,7 +26,6 @@
       "width": 378,
       "height": 372,
       "color": "#2e7d32",
-      "color": "#2e7d32",
       "data": {
         "memo": "# Step 1: Open Your Chatbot\n\n![Your workspace](/data/TutorialScreenshot1.png)\n\n**Set the stage:**\n- Open a new browser window.\n- Load your chatbot (e.g., Grok, ChatGPT).\n- Drag windows side-by-side, like the image above."
       }
