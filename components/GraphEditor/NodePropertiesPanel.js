@@ -130,10 +130,6 @@ export default function NodePropertiesPanel({
     setShowEmojiPicker(false);
   };
 
-  const handleDockToggle = () => {
-    setDockSide(dockSide === 'right' ? 'left' : 'right');
-  };
-
   const onResizeMouseDown = (e) => {
     resizing.current = true;
     startX.current = e.clientX;
@@ -266,36 +262,36 @@ export default function NodePropertiesPanel({
           sx={{ mb: 2 }}
         />
 
-        {/* Memo */}
-        <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <NoteIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-              <Typography variant="subtitle2" color="text.secondary">
-                Memo (Markdown)
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <IconButton size="small" onClick={handleEmojiClick} sx={{ p: 0.5 }}>
-                <InsertEmoticonIcon fontSize="small" />
-              </IconButton>
-              <ToggleButtonGroup
-                value={memoView}
-                exclusive
-                onChange={(e, newView) => newView && setMemoView(newView)}
-                size="small"
-              >
-                <ToggleButton value="edit" sx={{ py: 0.5, px: 1 }}>
-                  <EditIcon sx={{ fontSize: 16 }} />
-                </ToggleButton>
-                <ToggleButton value="preview" sx={{ py: 0.5, px: 1 }}>
-                  <VisibilityIcon sx={{ fontSize: 16 }} />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
+        {/* Memo header moved outside the scrollable container so controls are always visible */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, mt: '6px' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <NoteIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+            <Typography variant="subtitle2" color="text.secondary" sx={{ pt: '3px', ml: 0.5 }}>
+              Memo (Markdown)
+            </Typography>
           </Box>
-          {showEmojiPicker && (
-            <Box sx={{ position: 'absolute', zIndex: 1500, right: 40, top: 80 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton size="small" onClick={handleEmojiClick} sx={{ p: 0.5 }} aria-label="Insert emoji">
+              <InsertEmoticonIcon fontSize="small" />
+            </IconButton>
+            <ToggleButtonGroup
+              value={memoView}
+              exclusive
+              onChange={(e, newView) => newView && setMemoView(newView)}
+              size="small"
+            >
+              <ToggleButton value="edit" sx={{ py: 0.5, px: 1 }} aria-label="Edit memo">
+                <EditIcon sx={{ fontSize: 16 }} />
+              </ToggleButton>
+              <ToggleButton value="preview" sx={{ py: 0.5, px: 1 }} aria-label="Preview memo">
+                <VisibilityIcon sx={{ fontSize: 16 }} />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </Box>
+        {showEmojiPicker && (
+            // Use fixed positioning so it's not clipped by parent containers
+            <Box sx={{ position: 'fixed', zIndex: 1500, right: 40, top: 120 }}>
               <EmojiPicker 
                 onEmojiClick={handleEmojiSelect}
                 height={350}
@@ -308,92 +304,88 @@ export default function NodePropertiesPanel({
               />
             </Box>
           )}
-          <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-            {memoView === 'edit' ? (
-              <>
-                <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-                  <TextField
-                    label="Memo"
-                    multiline
-                    rows={12}
-                    value={memo}
-                    onChange={handleMemoChange}
-                    onBlur={handleMemoChange}
-                    fullWidth
-                    sx={{ 
-                      mb: 2,
-                      '& .MuiInputBase-root': {
-                        overflow: 'hidden',
-                        alignItems: 'flex-start',
-                      },
-                      '& .MuiInputBase-input': {
-                        overflow: 'auto !important',
-                        '&::-webkit-scrollbar': {
-                          width: '8px',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                          backgroundColor: theme.palette.divider,
-                          borderRadius: '4px',
-                        },
-                      }
-                    }}
-                  />
-                </Box>
-                {memo && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {memo.length} characters
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  minHeight: 0,
-                  maxHeight: '100%',
-                  overflowY: 'auto',
-                  p: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  backgroundColor: 'background.default',
-                  '& h1': { fontSize: 20, fontWeight: 700, mt: 2, mb: 1 },
-                  '& h2': { fontSize: 18, fontWeight: 600, mt: 1.5, mb: 1 },
-                  '& h3': { fontSize: 16, fontWeight: 600, mt: 1.5, mb: 0.5 },
-                  '& p': { mb: 1 },
-                  '& ul, & ol': { pl: 3, mb: 1 },
-                  '& li': { mb: 0.5 },
-                  '& code': { backgroundColor: 'action.hover', padding: '2px 4px', borderRadius: 0.5, fontFamily: 'monospace', fontSize: 12 },
-                  '& pre': { backgroundColor: 'action.hover', p: 1.5, borderRadius: 1, overflowX: 'auto', mb: 1 },
-                  '& pre code': { backgroundColor: 'transparent', padding: 0 },
-                  '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 2, ml: 0, fontStyle: 'italic', color: 'text.secondary' },
-                  '& a': { color: 'primary.main', textDecoration: 'underline' },
-                  '& table': { borderCollapse: 'collapse', width: '100%', mb: 1 },
-                  '& th, & td': { border: '1px solid', borderColor: 'divider', padding: '6px 8px', textAlign: 'left' },
-                  '& th': { backgroundColor: 'action.hover', fontWeight: 600 }
-                }}
-              >
-                {memo ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {memo}
-                  </ReactMarkdown>
-                ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                    No content to preview
-                  </Typography>
-                )}
-              </Box>
-            )}
-            {memoView === 'preview' && memo && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {memo.length} characters
-              </Typography>
-            )}
-          </Box>
-        </Box>
 
-        {/* Link */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        {/* Memo container (scrolling area) */}
+        <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', pt: 1, pb: 3, mb: 1, overflow: memoView === 'edit' ? 'visible' : 'auto' }}>
+          {memoView === 'edit' ? (
+            <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: memoView === 'edit' ? 'visible' : 'auto' }}>
+              <TextField
+                  inputRef={memoInputRef}
+                  label="Memo"
+                  multiline
+                  rows={10}
+                  value={memo}
+                  onChange={handleMemoChange}
+                  onBlur={handleMemoChange}
+                  fullWidth
+                  sx={{ 
+                    mb: 1,
+                    '& .MuiInputBase-root': {
+                      overflow: 'visible',
+                      alignItems: 'flex-start',
+                    },
+                    '& .MuiInputBase-input': {
+                      overflow: 'auto !important',
+                      '&::-webkit-scrollbar': {
+                        width: '8px',
+                        cursor: 'pointer'
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: theme.palette.divider,
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      },
+                    }
+                  }}
+                />
+            </Box>
+          ) : (
+            <>
+            <Box
+              sx={{
+                flexGrow: 1,
+                minHeight: 0,
+                maxHeight: '100%',
+                overflowY: 'auto',
+                p: 0,
+                border: 'none',
+                borderColor: 'transparent',
+                borderRadius: 0,
+                backgroundColor: 'transparent',
+                '& h1': { fontSize: 20, fontWeight: 700, mt: 2, mb: 1 },
+                '& h2': { fontSize: 18, fontWeight: 600, mt: 1.5, mb: 1 },
+                '& h3': { fontSize: 16, fontWeight: 600, mt: 1.5, mb: 0.5 },
+                '& p': { mb: 1 },
+                '& ul, & ol': { pl: 3, mb: 1 },
+                '& li': { mb: 0.5 },
+                '& code': { backgroundColor: 'action.hover', padding: '2px 4px', borderRadius: 0.5, fontFamily: 'monospace', fontSize: 12 },
+                '& pre': { backgroundColor: 'action.hover', p: 1.5, borderRadius: 1, overflowX: 'auto', mb: 1 },
+                '& pre code': { backgroundColor: 'transparent', padding: 0 },
+                '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 2, ml: 0, fontStyle: 'italic', color: 'text.secondary' },
+                '& a': { color: 'primary.main', textDecoration: 'underline' },
+                '& table': { borderCollapse: 'collapse', width: '100%', mb: 1 },
+                '& th, & td': { border: '1px solid', borderColor: 'divider', padding: '6px 8px', textAlign: 'left' },
+                '& th': { backgroundColor: 'action.hover', fontWeight: 600 }
+              }}
+            >
+              {memo ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {memo}
+                </ReactMarkdown>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                  No content to preview
+                </Typography>
+              )}
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              {memo.length} characters
+            </Typography>
+            </>
+          )}
+
+          {/* Link */}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, mt: 1 }}>
             <LinkIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
             <Typography variant="subtitle2" color="text.secondary">
               Link
@@ -424,6 +416,7 @@ export default function NodePropertiesPanel({
               </Typography>
             </Box>
           )}
+        </Box>
         </Box>
       )}
     </Box>,
