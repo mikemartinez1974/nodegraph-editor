@@ -45,7 +45,7 @@ export default class GraphCRUD {
           memo: data.memo || '',
           link: data.link || ''
         },
-        resizable: false,
+        resizable: true,
         handlePosition: 'center',
         showLabel: true
       };

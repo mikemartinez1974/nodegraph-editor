@@ -211,7 +211,7 @@ export default function GraphEditor({ backgroundImage }) {
     // Extend GraphAPI to use default color when creating nodes
     const originalCreateNode = graphAPI.current.createNode;
     graphAPI.current.createNode = (nodeData) => {
-      return originalCreateNode({
+      return originalCreateNode.call(graphAPI.current, {
         ...nodeData,
         color: nodeData.color || defaultNodeColor
       });
@@ -220,7 +220,7 @@ export default function GraphEditor({ backgroundImage }) {
     // Extend GraphAPI to use default color when creating edges
     const originalCreateEdge = graphAPI.current.createEdge;
     graphAPI.current.createEdge = (edgeData) => {
-      return originalCreateEdge({
+      return originalCreateEdge.call(graphAPI.current, {
         ...edgeData,
         color: edgeData.color || defaultEdgeColor
       });
@@ -334,15 +334,16 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Add node handler (keeps refs & history consistent)
   const handleAddNode = () => {
+    // Calculate position at center of current view
+    const centerX = (window.innerWidth / 2 - pan.x) / zoom;
+    const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+    
     // Use GraphCRUD API - the single source of truth for node creation
     const result = graphAPI.current.createNode({
       type: 'default',  // Now creates resizable nodes by default
       label: `Node ${nodesRef.current.length + 1}`,
       data: { memo: '', link: '' },
-      position: {
-        x: 100 + (nodesRef.current.length * 20),
-        y: 100 + (nodesRef.current.length * 20)
-      },
+      position: { x: centerX, y: centerY },
       width: 200,
       height: 100,
       resizable: true,
@@ -912,18 +913,26 @@ export default function GraphEditor({ backgroundImage }) {
       try {
         parsedData = JSON.parse(text);
       } catch (jsonError) {
-        // Not JSON - treat as plain text and create a node
+        // Not JSON - treat as plain text and create a resizable node
         const lines = text.trim().split('\n');
         const label = lines[0].substring(0, 50); // First line, max 50 chars
         const memo = text.trim();
         
+        // Calculate size based on text content
+        const width = Math.max(200, Math.min(600, label.length * 8 + 100));
+        const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
+        
+        // Position at center of current view
+        const centerX = (window.innerWidth / 2 - pan.x) / zoom;
+        const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+        
         const newNode = {
           id: `node_${Date.now()}`,
           label: label,
-          type: 'default',  // Now creates resizable nodes
-          position: { x: 0, y: 0 },
-          width: 200,
-          height: 100,
+          type: 'default',  // Resizable node type
+          position: { x: centerX, y: centerY },
+          width: width,
+          height: height,
           resizable: true,
           data: {
             memo: memo
@@ -937,7 +946,7 @@ export default function GraphEditor({ backgroundImage }) {
         });
         
         saveToHistory(nodesRef.current, edgesRef.current);
-        setSnackbar({ open: true, message: 'Created node from pasted text', severity: 'success' });
+        setSnackbar({ open: true, message: 'Created resizable node from pasted text', severity: 'success' });
         return;
       }
 
@@ -946,7 +955,7 @@ export default function GraphEditor({ backgroundImage }) {
     } catch (error) {
       console.error('Error handling paste:', error);
     }
-  }, [nodesRef, setNodes, saveToHistory, setSnackbar]);
+  }, [nodesRef, setNodes, saveToHistory, setSnackbar, pan, zoom]);
 
   // Register paste handler on mount
   useEffect(() => {
@@ -1042,6 +1051,12 @@ export default function GraphEditor({ backgroundImage }) {
         onAutoLayoutChange={setAutoLayoutType}
         onApplyLayout={applyAutoLayout}
         onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
+        pan={pan}
+        zoom={zoom}
+        setNodes={setNodes}
+        nodesRef={nodesRef}
+        saveToHistory={saveToHistory}
+        edgesRef={edgesRef}
       />
       
       <NodePropertiesPanel

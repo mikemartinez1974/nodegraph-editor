@@ -67,7 +67,13 @@ const Toolbar = ({
   onModeChange,
   onAutoLayoutChange,
   onApplyLayout,
-  onShowMessage // Add this new prop
+  onShowMessage, // Add this new prop
+  pan,
+  zoom,
+  setNodes,
+  nodesRef,
+  saveToHistory,
+  edgesRef
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -294,6 +300,7 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
+        color: node.color, // <-- include color
         data: node.data
       })),
       edges: edges.map(edge => ({
@@ -302,6 +309,7 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label,
+        color: edge.color, // <-- include color
         style: edge.style
       }))
     };
@@ -373,6 +381,7 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
+        color: node.color, // <-- include color
         data: node.data
       })),
       edges: selectedEdges.map(edge => ({
@@ -381,6 +390,7 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label,
+        color: edge.color, // <-- include color
         style: edge.style
       }))
     };
@@ -449,21 +459,40 @@ const Toolbar = ({
         JSON.parse(text);
         return handlePasteSelected();
       } catch {
-        // Not JSON: create a node from the text via graphAPI
+        // Not JSON: create a resizable node directly
         const lines = text.trim().split('\n');
-        const label = (lines[0] || 'Pasted Note').slice(0, 80);
+        const label = lines[0].substring(0, 50); // First line, max 50 chars
         const memo = text.trim();
-
-        if (window.graphAPI && typeof window.graphAPI.createNode === 'function') {
-          await window.graphAPI.createNode({
-            label,
-            position: { x: 0, y: 0 },
-            data: { memo }
-          });
-          if (onShowMessage) onShowMessage('Created node from pasted text', 'success');
-        } else {
-          if (onShowMessage) onShowMessage('Could not create node (graph API unavailable)', 'error');
-        }
+        
+        // Calculate size based on text content
+        const width = Math.max(200, Math.min(600, label.length * 8 + 100));
+        const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
+        
+        // Position at center of current view
+        const centerX = (window.innerWidth / 2 - pan.x) / zoom;
+        const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+        
+        const newNode = {
+          id: `node_${Date.now()}`,
+          label: label,
+          type: 'default',  // Regular resizable node
+          position: { x: centerX, y: centerY },
+          width: width,
+          height: height,
+          resizable: true,
+          data: {
+            memo: memo
+          }
+        };
+        
+        setNodes(prev => {
+          const next = [...prev, newNode];
+          nodesRef.current = next;
+          return next;
+        });
+        
+        saveToHistory(nodesRef.current, edgesRef.current);
+        if (onShowMessage) onShowMessage('Created resizable node from pasted text', 'success');
       }
     } catch (err) {
       console.error('Error handling paste:', err);
