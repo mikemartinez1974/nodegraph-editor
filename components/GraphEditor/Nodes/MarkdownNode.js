@@ -43,7 +43,22 @@ const MarkdownNode = ({
           lineHeight: 1.5,
           fontFamily: isDark ? '"Courier New", Courier, monospace' : '"Comic Sans MS", "Trebuchet MS", sans-serif',
           cursor: 'pointer',
-          pointerEvents: 'none'
+          pointerEvents: 'auto'
+        }}
+        onWheel={(e) => {
+          // Scroll the node content and prevent the event from bubbling up to the PanZoomLayer
+          try {
+            const delta = e.deltaY;
+            const el = e.currentTarget;
+            if (el && Math.abs(delta) > 0) {
+              el.scrollTop += delta;
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          } catch (err) {
+            // swallow errors to avoid breaking the app
+            console.warn('Error handling node wheel:', err);
+          }
         }}
       >
         <ReactMarkdown

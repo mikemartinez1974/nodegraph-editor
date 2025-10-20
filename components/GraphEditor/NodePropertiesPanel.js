@@ -67,6 +67,8 @@ export default function NodePropertiesPanel({
       setLink(selectedNode.data?.link || '');
       setLabel(selectedNode.label || '');
       setNodeColor(selectedNode.color || defaultNodeColor);
+      // When opening panel for a node, default to preview mode
+      setMemoView('preview');
     }
   }, [selectedNode?.id, defaultNodeColor]);
 

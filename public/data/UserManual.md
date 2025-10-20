@@ -23,7 +23,7 @@ Welcome! This guide will help you master the graph editor and work efficiently w
 - This lets you copy/paste back and forth easily
 
 ### Step 2: Onboard Your AI
-1. Click the **📋 Onboard LLM** button (top-left toolbar)
+1. Click the **📋 Onboard LLM** button (first button on the left in the toolbar)
 2. Paste that text into your AI chat
 3. The AI now knows how to create graphs for you!
 
@@ -36,8 +36,57 @@ Tell your AI what you want:
 ### Step 4: Paste & Watch Magic Happen
 1. Copy the AI's JSON response
 2. Click anywhere in this app
-3. Press **Ctrl+V** (or click 📄 Paste button)
+3. Press **Ctrl+V** (or click the **📋 Paste** button, second from left in toolbar)
 4. Your graph appears instantly!
+
+---
+
+## Your Toolbar (All the Buttons Explained!)
+
+The main toolbar appears at the top of your screen and can be dragged around. Here are all the buttons from **left to right**:
+
+### Core Actions (First Group, Left Side)
+- **📋 Onboard LLM** (1st button): Copy the AI setup guide to clipboard - do this first to teach your AI how to make graphs!
+- **📋 Paste** (2nd button): Paste AI's JSON or create a node from plain text (same as Ctrl+V)
+- **📋 Copy Selected** (3rd button): Copy just the nodes you've selected (with their connecting edges)
+- **📋 Copy Graph** (4th button): Copy the entire graph to clipboard as JSON
+- **📖 Copy Manual** (5th button): Copy this entire user manual to clipboard
+- **➕ Add Node** (6th button): Create a blank node manually at the center of your view
+- **📑 Node List** (7th button): Toggle the node list panel on/off
+- **📁 Group List** (8th button): Toggle the group list panel on/off
+- **🗑️ Delete** (9th button): Remove selected items (nodes, edges, or groups)
+- **👎 Clear Graph** (10th button): Delete everything - clears the entire graph (asks for confirmation)
+- **💾 Save** (11th button): Download your graph as a .json file to your computer
+- **📂 Load** (12th button): Open a saved graph from your computer
+
+### History Controls (Second Group)
+- **↩️ Undo**: Go back to previous state (Ctrl+Z)
+- **↪️ Redo**: Go forward to next state (Ctrl+Y)
+
+### Mode Selector (Third Group)
+- **✏️ Manual Mode**: Default mode - manually edit and arrange nodes
+- **🧭 Nav Mode**: Navigation only - can't edit, just explore (good for presentations!)
+- **🔧 Auto-Layout**: Enable automatic graph layout (then select type and click Apply)
+
+### Keyboard Shortcuts
+- **Ctrl+X**: Cut selected nodes/edges
+- **Ctrl+C**: Copy selected nodes/edges
+- **Ctrl+V**: Paste graph JSON
+- **Ctrl+Z**: Undo
+- **Ctrl+Y**: Redo
+- **Delete**: Remove selected items
+- **Tab/Shift+Tab**: Navigate between nodes (accessibility)
+- **Ctrl+Arrows**: Move selected nodes (1px)
+- **Ctrl+Shift+Arrows**: Move selected nodes (10px)
+
+### Using Your Mouse
+- **Click a node**: Select it (turns blue)
+- **Ctrl+Click**: Select multiple nodes
+- **Drag a node**: Move it around
+- **Drag empty space**: Pan the whole canvas
+- **Scroll wheel**: Zoom in and out
+- **Click a line**: Select an edge (connection)
+- **Drag from dots**: Create new connections between nodes
 
 ---
 
@@ -141,49 +190,6 @@ Your AI generates graphs in JSON format. You don't need to write this yourself, 
 
 ---
 
-## Your Toolbar (All the Buttons Explained!)
-
-### Main Toolbar (Top-Left, You Can Drag It!)
-- **📋 Onboard LLM**: Copy setup guide for your AI (do this first!)
-- **📄 Paste**: Paste AI's JSON (or just press Ctrl+V)
-- **📋 Copy Selected**: Copy just the nodes you've selected
-- **📋 Copy Graph**: Copy the entire graph JSON to share or save
-- **➕ Add Node**: Create a blank node manually
-- **📑 Node List**: Browse all your nodes in a side panel
-- **📁 Group List**: See all your groups
-- **🗑️ Delete**: Remove selected items
-- **🗑️ Clear Graph**: Delete everything
-- **💾 Save**: Download your graph as a .json file
-- **📥 Load File**: Open a saved graph from your computer
-- **↩️ Undo / ↪️ Redo**: Made a mistake? Go back in time!
-
-### Mode Buttons (Control How You Interact)
-- **✏️ Manual Mode**: Default mode - manually edit and arrange nodes
-- **🧭 Nav Mode**: Navigation only - can't edit, just explore (good for presentations!)
-- **🔧 Auto-Layout**: Automatically arrange your graph (experimental)
-
-### Keyboard Shortcuts
-- **Ctrl+X**: Cut selected nodes/edges
-- **Ctrl+C**: Copy selected nodes/edges
-- **Ctrl+V**: Paste graph JSON
-- **Ctrl+Z**: Undo
-- **Ctrl+Y**: Redo
-- **Delete**: Remove selected items
-- **Tab/Shift+Tab**: Navigate between nodes (accessibility)
-- **Ctrl+Arrows**: Move selected nodes (1px)
-- **Ctrl+Shift+Arrows**: Move selected nodes (10px)
-
-### Using Your Mouse
-- **Click a node**: Select it (turns blue)
-- **Ctrl+Click**: Select multiple nodes
-- **Drag a node**: Move it around
-- **Drag empty space**: Pan the whole canvas
-- **Scroll wheel**: Zoom in and out
-- **Click a line**: Select an edge (connection)
-- **Drag from dots**: Create new connections between nodes
-
----
-
 ## Advanced Features
 
 ### Groups
@@ -248,7 +254,7 @@ Users can group related nodes:
 **Fix it:**
 - Make sure you copied the full JSON block
 - Click in the app first, then Ctrl+V
-- Try the 📄 Paste button instead
+- Try the **📋 Paste** button (2nd button from left) instead
 
 ---
 
@@ -270,7 +276,7 @@ Users can group related nodes:
 - Use Undo (Ctrl+Z) fearlessly
 
 **Save Your Work**
-- Click 💾 Save often
+- Click **💾 Save** (11th button from left) often
 - Your browser won't auto-save
 - Download .json files to keep your graphs
 
@@ -322,16 +328,16 @@ Users can group related nodes:
 ## Frequently Asked Questions
 
 **Q: Will my graphs be saved automatically?**  
-A: No! Click 💾 Save to download .json files. Save often!
+A: No! Click **💾 Save** (11th button from left) to download .json files. Save often!
 
 **Q: Can I edit nodes manually?**  
 A: Yes! Click a node, then click the properties panel to edit labels and notes.
 
 **Q: What if I make a mistake?**  
-A: Press Ctrl+Z to undo! The app remembers your history.
+A: Press Ctrl+Z to undo, or use the **↩️ Undo** button! The app remembers your history.
 
 **Q: Can I share my graphs?**  
-A: Yes! Save as .json and share the file. Others can load it with 📥 Load File.
+A: Yes! Save as .json using **💾 Save** button and share the file. Others can load it with **📂 Load**.
 
 **Q: Do I need to know JSON?**  
 A: Nope! Your AI handles all the technical stuff. Just describe what you want.
@@ -358,7 +364,7 @@ A: The app handles 1000+ nodes smoothly! But start small and grow your graph.
 - **Scroll**: Zoom in/out
 
 **First Time Setup:**
-1. Click 📋 Onboard LLM
+1. Click **📋 Onboard LLM** (1st button, far left)
 2. Paste into AI chat
 3. Ask AI to create a graph
 4. Copy & paste result
@@ -368,7 +374,7 @@ A: The app handles 1000+ nodes smoothly! But start small and grow your graph.
 - **Add stuff**: "Add more nodes about X"
 - **Change stuff**: "Update node Y to say Z"
 - **Fix layout**: "Spread them out more"
-- **Save your work**: Click 💾 Save
+- **Save your work**: Click **💾 Save** (11th button)
 
 ---
 
@@ -387,4 +393,4 @@ The best way to learn is by doing. Don't be afraid to try things - Undo is your 
 
 **Happy graphing!** 🎨📊✨
 
-*Need the onboarding guide for your AI? Click 📋 Onboard LLM in the toolbar!*
+*Need the onboarding guide for your AI? Click **📋 Onboard LLM** (first button on the left) in the toolbar!*

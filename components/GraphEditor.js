@@ -16,7 +16,7 @@ import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
 import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
 import { v4 as uuidv4 } from 'uuid';
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import useSelection from './GraphEditor/useSelection';
 import useGraphHistory from './GraphEditor/useGraphHistory';
 import useGraphShortcuts from './GraphEditor/useGraphShortcuts';
@@ -38,6 +38,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [showGroupList, setShowGroupList] = useState(false);
   const [showGroupProperties, setShowGroupProperties] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [loading, setLoading] = useState(false);
 
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
@@ -248,18 +249,21 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Load IntroGraph.json at startup (use public/data so we can override at runtime)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (window.__nodegraph_initial_loaded) return;
-      window.__nodegraph_initial_loaded = true;
-    }
-    if (initialGraphLoadedRef.current) return;
-    initialGraphLoadedRef.current = true;
-    fetch('/data/IntroGraph.json')
-      .then((resp) => {
+    // Manage initial graph loading indicator
+    (async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          if (window.__nodegraph_initial_loaded) return;
+          window.__nodegraph_initial_loaded = true;
+        }
+        if (initialGraphLoadedRef.current) return;
+        initialGraphLoadedRef.current = true;
+
+        setLoading(true);
+        const resp = await fetch('/data/IntroGraph.json');
         if (!resp.ok) throw new Error(`Failed to fetch IntroGraph.json: ${resp.status}`);
-        return resp.json();
-      })
-      .then((data) => {
+        const data = await resp.json();
+
         if (data && data.nodes && data.edges) {
           setNodes(data.nodes);
           setEdges(data.edges);
@@ -295,15 +299,14 @@ export default function GraphEditor({ backgroundImage }) {
           }
         } else {
           console.warn('IntroGraph.json does not contain nodes/edges');
-          // Even if no graph loads, try to open the properties panel
-          setTimeout(() => {
-            eventBus.emit('openNodeProperties');
-          }, 300);
+          setTimeout(() => eventBus.emit('openNodeProperties'), 300);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.warn('Could not load IntroGraph from public/data:', err);
-      });
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   // Load a graph (replace nodes and edges), single implementation only
@@ -405,17 +408,32 @@ export default function GraphEditor({ backgroundImage }) {
     }
   };
 
-  // Clear graph
+  // Clear graph (toolbar)
   const handleClearGraph = () => {
+    // Replace/ensure clearing groups as well
     const newNodes = [];
     const newEdges = [];
+    const newGroups = [];
+
     setNodes(newNodes);
     setEdges(newEdges);
-    nodesRef.current = newNodes;
-    edgesRef.current = newEdges;
+    setGroups(newGroups);
+
+    if (nodesRef) nodesRef.current = newNodes;
+    if (edgesRef) edgesRef.current = newEdges;
+
+    // Clear selections
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
-    saveToHistory(newNodes, newEdges);
+    if (typeof setSelectedGroupIds === 'function') setSelectedGroupIds([]);
+
+    // Clear GroupManager internal maps if present
+    if (groupManager && groupManager.current && typeof groupManager.current.clear === 'function') {
+      groupManager.current.clear();
+    }
+
+    // Save cleared state to history
+    if (typeof saveToHistory === 'function') saveToHistory(newNodes, newEdges, newGroups);
     console.log('Graph cleared');
   };
 
@@ -675,153 +693,169 @@ export default function GraphEditor({ backgroundImage }) {
     nodesRef
   });
 
-  // Paste/import handler for graph data
-  function handlePasteGraphData(pastedData) {
-    console.log('📋 PASTE HANDLER - Raw pastedData:', pastedData);
-    console.log('📋 pastedData.nodes:', pastedData.nodes);
-    console.log('📋 First node:', pastedData.nodes?.[0]);
-    console.log('📋 First node color:', pastedData.nodes?.[0]?.color);
-    
-    // Support explicit action field
-    let explicitAction = pastedData.action;
-    if (explicitAction) delete pastedData.action;
+  // Paste/import graph data handler
+  async function handlePasteGraphData(pastedData) {
+    setLoading(true);
+    // yield to the browser so the Backdrop/CircularProgress can render before heavy work
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-    // Detect type: full graph, partial graph, or single node/edge/group
-    // Use distinct names to avoid shadowing state variables
-    let pastedNodes = [], pastedEdges = [], pastedGroups = [];
-    if (Array.isArray(pastedData)) {
-      // Array of nodes/edges/groups
-      if (pastedData[0]?.id && pastedData[0]?.position) {
-        pastedNodes = pastedData;
-      } else if (pastedData[0]?.source && pastedData[0]?.target) {
-        pastedEdges = pastedData;
-      } else if (pastedData[0]?.nodeIds) {
-        pastedGroups = pastedData;
-      }
-    } else if (pastedData.nodes || pastedData.edges || pastedData.groups) {
-      pastedNodes = pastedData.nodes || [];
-      pastedEdges = pastedData.edges || [];
-      pastedGroups = pastedData.groups || [];
-    } else if (pastedData.id && pastedData.position) {
-      pastedNodes = [pastedData];
-    } else if (pastedData.id && pastedData.source && pastedData.target) {
-      pastedEdges = [pastedData];
-    } else if (pastedData.id && pastedData.nodeIds) {
-      pastedGroups = [pastedData];
-    } else {
-      setSnackbar({ open: true, message: 'Unrecognized graph data format.', severity: 'error' });
-      return;
-    }
+    try {
+      // Normalize pasted payload to nodes/edges/groups arrays
+      let pastedNodes = [];
+      let pastedEdges = [];
+      let pastedGroups = [];
 
-    // Use explicit action if present, otherwise prompt user
-    let action = explicitAction || 'add';
-    if (!explicitAction) {
-      if (pastedNodes.length + pastedEdges.length + pastedGroups.length === 0) {
-        setSnackbar({ open: true, message: 'No nodes, edges, or groups found in pasted data.', severity: 'warning' });
+      if (!pastedData) {
+        console.warn('handlePasteGraphData called with empty data');
         return;
       }
-      if ((pastedNodes.length > 0 && pastedNodes.length === (pastedData.nodes?.length || pastedNodes.length)) &&
-          (pastedEdges.length > 0 && pastedEdges.length === (pastedData.edges?.length || pastedEdges.length))) {
-        // Looks like a full graph
-        if (window.confirm('Replace your entire graph with this data? (Cancel to add instead)')) {
-          action = 'replace';
-        }
-      } else if (pastedNodes.length + pastedEdges.length + pastedGroups.length === 1) {
-        if (window.confirm('Update existing node/edge/group if ID matches? (Cancel to add as new)')) {
-          action = 'update';
-        }
-      } else {
-        if (window.confirm('Add new items? (Cancel to update existing by ID)')) {
-          action = 'add';
-        } else {
-          action = 'update';
-        }
+
+      if (Array.isArray(pastedData)) {
+        // try to detect type
+        if (pastedData[0]?.position && pastedData[0]?.id) pastedNodes = pastedData;
+        else if (pastedData[0]?.source && pastedData[0]?.target) pastedEdges = pastedData;
+        else if (pastedData[0]?.nodeIds) pastedGroups = pastedData;
+      } else if (pastedData.nodes || pastedData.edges || pastedData.groups) {
+        pastedNodes = pastedData.nodes || [];
+        pastedEdges = pastedData.edges || [];
+        pastedGroups = pastedData.groups || [];
+      } else if (pastedData.id && pastedData.position) {
+        pastedNodes = [pastedData];
+      } else if (pastedData.id && pastedData.source && pastedData.target) {
+        pastedEdges = [pastedData];
+      } else if (pastedData.id && pastedData.nodeIds) {
+        pastedGroups = [pastedData];
       }
-    }
 
-    // Perform action
-    if (action === 'replace') {
-      console.log('REPLACE action triggered. Setting nodes:', pastedNodes, 'edges:', pastedEdges, 'groups:', pastedGroups);
-      
-      // Ensure all properties including color are preserved with deep spread
-      const nodesWithAllProps = pastedNodes.map(node => ({ ...node }));
-      const edgesWithAllProps = pastedEdges.map(edge => ({ ...edge }));
-      const groupsWithAllProps = pastedGroups.map(group => ({ ...group }));
-      
-      console.log('📦 After spread - nodes with color:', nodesWithAllProps.filter(n => n.color).length);
-      console.log('📦 After spread - edges with color:', edgesWithAllProps.filter(e => e.color).length);
-      
-      setNodes(nodesWithAllProps);
-      setEdges(edgesWithAllProps);
-      setGroups(groupsWithAllProps);
-      nodesRef.current = nodesWithAllProps;
-      edgesRef.current = edgesWithAllProps;
-      
-      // Clear and reinitialize GroupManager with new groups
-      groupManager.current = new GroupManager();
-      pastedGroups.forEach(group => {
-        groupManager.current.groups.set(group.id, group);
-        (group.nodeIds || []).forEach(nodeId => {
-          groupManager.current.nodeToGroup.set(nodeId, group.id);
+      // Helper to sanitize groups so nodeIds only reference nodes that will exist
+      const sanitizeGroups = (groupsArray, availableNodeIdSet) => {
+        return groupsArray.map(g => {
+          const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => availableNodeIdSet.has(id)) : [];
+          return { ...g, nodeIds };
+        }).filter(g => (g.nodeIds && g.nodeIds.length >= 2));
+      };
+
+      // Decide action: replace/add/update. If full graph object with nodes+edges+groups, ask to replace
+      let action = pastedData.action || null;
+      if (!action) {
+        if (pastedNodes.length && pastedEdges.length) action = 'replace';
+        else action = 'add';
+      }
+
+      if (action === 'replace') {
+        const nodesWithProps = pastedNodes.map(n => ({ ...n }));
+        const edgesWithProps = pastedEdges.map(e => ({ ...e }));
+        const nodeIdSet = new Set(nodesWithProps.map(n => n.id));
+        const groupsSanitized = sanitizeGroups(pastedGroups.map(g => ({ ...g })), nodeIdSet);
+
+        // Replace nodes/edges
+        setNodes(nodesWithProps);
+        setEdges(edgesWithProps);
+
+        if (nodesRef) nodesRef.current = nodesWithProps;
+        if (edgesRef) edgesRef.current = edgesWithProps;
+
+        // Explicitly clear previous groups first, then set new groups
+        setGroups([]);
+        if (groupManager && groupManager.current) {
+          groupManager.current.clear();
+        }
+
+        setGroups(groupsSanitized);
+
+        // Initialize GroupManager with the new groups
+        if (groupManager && groupManager.current) {
+          groupsSanitized.forEach(g => {
+            groupManager.current.groups.set(g.id, g);
+            (g.nodeIds || []).forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
+          });
+        }
+
+        // Clear selections
+        setSelectedNodeIds([]);
+        setSelectedEdgeIds([]);
+        if (typeof setSelectedGroupIds === 'function') setSelectedGroupIds([]);
+
+        if (typeof saveToHistory === 'function') saveToHistory(nodesWithProps, edgesWithProps, groupsSanitized);
+        return;
+      }
+
+      if (action === 'add') {
+        // Add only items that don't already exist
+        const existingNodeIds = new Set(nodesRef.current.map(n => n.id));
+        const existingEdgeIds = new Set(edgesRef.current.map(e => e.id));
+        const existingGroupIds = new Set(groups.map(g => g.id));
+
+        const nodesToAdd = pastedNodes.filter(n => !existingNodeIds.has(n.id)).map(n => ({ ...n }));
+        const edgesToAdd = pastedEdges.filter(e => !existingEdgeIds.has(e.id)).map(e => ({ ...e }));
+
+        const combinedNodeIds = new Set([...nodesRef.current.map(n => n.id), ...nodesToAdd.map(n => n.id)]);
+        const groupsToAddRaw = pastedGroups.filter(g => !existingGroupIds.has(g.id)).map(g => ({ ...g }));
+        const groupsToAdd = sanitizeGroups(groupsToAddRaw, combinedNodeIds);
+
+        const newNodes = [ ...nodesRef.current, ...nodesToAdd ];
+        const newEdges = [ ...edgesRef.current, ...edgesToAdd ];
+        const newGroups = [ ...groups, ...groupsToAdd ];
+
+        setNodes(newNodes);
+        setEdges(newEdges);
+        setGroups(newGroups);
+
+        // Update GroupManager
+        if (groupManager && groupManager.current) {
+          groupsToAdd.forEach(g => {
+            groupManager.current.groups.set(g.id, g);
+            (g.nodeIds || []).forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
+          });
+        }
+
+        if (typeof saveToHistory === 'function') saveToHistory(newNodes, newEdges, newGroups);
+        return;
+      }
+
+      if (action === 'update') {
+        // Update existing items by id
+        const updatedNodes = [...nodesRef.current];
+        const updatedEdges = [...edgesRef.current];
+        const updatedGroups = [...groups];
+
+        pastedNodes.forEach(n => {
+          const idx = updatedNodes.findIndex(x => x.id === n.id);
+          if (idx !== -1) updatedNodes[idx] = { ...updatedNodes[idx], ...n };
         });
-      });
-      
-      setSelectedNodeIds([]);
-      setSelectedEdgeIds([]);
-      setSelectedGroupIds([]);
-      if (typeof historyIndexRef !== 'undefined') historyIndexRef.current = 0;
-      saveToHistory(pastedNodes, pastedEdges, pastedGroups);
-      return;
-    }
-
-    if (action === 'add') {
-      // Add new nodes/edges/groups, skip duplicates (compare against CURRENT state, not pasted data)
-      const existingNodeIds = new Set(nodesRef.current.map(n => n.id));
-      const existingEdgeIds = new Set(edgesRef.current.map(e => e.id));
-      const existingGroupIds = new Set(groups.map(g => g.id)); // groups is current state
-      const newNodes = [ ...nodesRef.current, ...pastedNodes.filter(n => !existingNodeIds.has(n.id)) ];
-      const newEdges = [ ...edgesRef.current, ...pastedEdges.filter(e => !existingEdgeIds.has(e.id)) ];
-      const newGroups = [ ...groups, ...pastedGroups.filter(g => !existingGroupIds.has(g.id)) ];
-      
-      // Update groupManager with new groups
-      pastedGroups.filter(g => !existingGroupIds.has(g.id)).forEach(group => {
-        groupManager.current.groups.set(group.id, group);
-        (group.nodeIds || []).forEach(nodeId => {
-          groupManager.current.nodeToGroup.set(nodeId, group.id);
+        pastedEdges.forEach(e => {
+          const idx = updatedEdges.findIndex(x => x.id === e.id);
+          if (idx !== -1) updatedEdges[idx] = { ...updatedEdges[idx], ...e };
         });
-      });
-      
-      setNodes(newNodes);
-      setEdges(newEdges);
-      setGroups(newGroups);
-      saveToHistory(newNodes, newEdges, newGroups);
-      return;
-    }
 
-    if (action === 'update') {
-      // Update existing nodes/edges/groups by ID
-      let updatedNodes = [...nodesRef.current];
-      let updatedEdges = [...edgesRef.current];
-      let updatedGroups = [...groups]; // groups is current state
-      pastedNodes.forEach(n => {
-        const idx = updatedNodes.findIndex(x => x.id === n.id);
-        if (idx !== -1) updatedNodes[idx] = { ...updatedNodes[idx], ...n };
-      });
-      pastedEdges.forEach(e => {
-        const idx = updatedEdges.findIndex(x => x.id === e.id);
-        if (idx !== -1) updatedEdges[idx] = { ...updatedEdges[idx], ...e };
-      });
-      pastedGroups.forEach(g => {
-        const idx = updatedGroups.findIndex(x => x.id === g.id);
-        if (idx !== -1) updatedGroups[idx] = { ...updatedGroups[idx], ...g };
-      });
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-      setGroups(updatedGroups);
-      saveToHistory(updatedNodes, updatedEdges);
-      return;
+        // Sanitize group updates against updated node set
+        const currentNodeSet = new Set(updatedNodes.map(n => n.id));
+        pastedGroups.forEach(g => {
+          const idx = updatedGroups.findIndex(x => x.id === g.id);
+          const sanitized = sanitizeGroups([g], currentNodeSet)[0];
+          if (idx !== -1 && sanitized) updatedGroups[idx] = { ...updatedGroups[idx], ...sanitized };
+        });
+
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+        setGroups(updatedGroups);
+
+        if (typeof saveToHistory === 'function') saveToHistory(updatedNodes, updatedEdges, updatedGroups);
+        return;
+      }
+    } catch (err) {
+      console.error('Error in handlePasteGraphData:', err);
+      setSnackbar({ open: true, message: 'Error importing graph', severity: 'error' });
+    } finally {
+      setLoading(false);
     }
   }
+
+  // Connect eventBus to paste handler
+  useEffect(() => {
+    eventBus.on('pasteGraphData', handlePasteGraphData);
+    return () => eventBus.off('pasteGraphData', handlePasteGraphData);
+  }, []);
 
   // Expose for testing (replace with UI integration later)
   if (typeof window !== 'undefined') {
@@ -1222,6 +1256,10 @@ export default function GraphEditor({ backgroundImage }) {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <Backdrop open={loading} sx={{ zIndex: 1900, color: '#fff' }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }
