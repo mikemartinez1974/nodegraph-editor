@@ -118,26 +118,28 @@ const Toolbar = ({
 
   const handlePasteGraph = async () => {
     try {
-      const clipboardText = await navigator.clipboard.readText();
-      const jsonData = JSON.parse(clipboardText);
-
-      // Validate the structure
-      if (!jsonData.nodes || !jsonData.edges) {
-        console.error('Invalid graph format in clipboard');
-        if (onShowMessage) onShowMessage('Invalid graph format. Clipboard must contain nodes and edges.', 'error');
-        return;
-      }
-
-      // Call the callback to update the graph
-      if (onLoadGraph) {
-        onLoadGraph(jsonData.nodes, jsonData.edges);
-        setPasted(true);
-        setTimeout(() => setPasted(false), 2000);
-        console.log('Graph pasted from clipboard!');
-      }
+      const text = await navigator.clipboard.readText();
+      const data = JSON.parse(text);
+      
+      console.log('📋 TOOLBAR PASTE - Immediately after JSON.parse:', {
+        hasNodes: !!data.nodes,
+        firstNode: data.nodes?.[0],
+        firstNodeColor: data.nodes?.[0]?.color
+      });
+      
+      // DEBUG: Log what we're about to paste
+      console.log('📋 PASTE DEBUG - From clipboard:', {
+        nodeCount: data.nodes?.length,
+        edgeCount: data.edges?.length,
+        sampleNode: data.nodes?.[0],
+        nodesWithColor: data.nodes?.filter(n => n.color).length,
+        edgesWithColor: data.edges?.filter(e => e.color).length
+      });
+      
+      eventBus.emit('pasteGraphData', data);
+      // ...existing success code...
     } catch (error) {
-      console.error('Error reading from clipboard:', error);
-      if (onShowMessage) onShowMessage('Error reading from clipboard. Please ensure you have valid JSON copied.', 'error');
+      console.error('Failed to paste:', error);
     }
   };
 
@@ -196,6 +198,7 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
+        color: node.color, // <-- include color
         data: node.data
       })),
       edges: edges.map(edge => ({
@@ -204,6 +207,7 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label,
+        color: edge.color, // <-- include color
         style: edge.style
       })),
       groups: groups.map(group => ({ ...group })) // use prop
@@ -467,6 +471,114 @@ const Toolbar = ({
     }
   };
 
+  const handleCopyGraph = () => {
+    // DEBUG: Log nodes state BEFORE creating graphData
+    console.log('📋 COPY - nodes array:', nodes);
+    console.log('📋 COPY - first node:', nodes[0]);
+    console.log('📋 COPY - first node color:', nodes[0]?.color);
+    
+    const graphData = {
+      nodes: nodes,
+      edges: edges,
+      groups: groups || []
+    };
+    
+    // DEBUG: Log graphData AFTER creation
+    console.log('📋 COPY - graphData.nodes[0]:', graphData.nodes[0]);
+    console.log('📋 COPY - graphData.nodes[0].color:', graphData.nodes[0]?.color);
+    
+    // DEBUG: Log what we're copying
+    console.log('📋 COPY DEBUG - Copying to clipboard:', {
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      sampleNode: nodes[0],
+      nodesWithColor: nodes.filter(n => n.color).length,
+      edgesWithColor: edges.filter(e => e.color).length
+    });
+    
+    const jsonString = JSON.stringify(graphData, null, 2);
+    
+    // DEBUG: Log the actual JSON string
+    console.log('📋 COPY - JSON string preview:', jsonString.substring(0, 500));
+    
+    navigator.clipboard.writeText(jsonString)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
+        console.log('Graph schema copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy:', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = jsonString;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
+        } catch (err2) {
+          console.error('Fallback copy failed:', err2);
+          if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
+        }
+        document.body.removeChild(textArea);
+      });
+  };
+
+  // Add debug logging to the save handler to verify color properties
+  const handleSaveGraph = () => {
+    // Log nodes and edges before saving
+    console.log('📝 SAVE - nodes array:', nodes);
+    console.log('📝 SAVE - first node:', nodes[0]);
+    console.log('📝 SAVE - first node color:', nodes[0]?.color);
+    console.log('📝 SAVE - edges array:', edges);
+    console.log('📝 SAVE - first edge:', edges[0]);
+    console.log('📝 SAVE - first edge color:', edges[0]?.color);
+
+    const graphData = {
+      nodes: nodes,
+      edges: edges,
+      groups: groups || []
+    };
+    
+    // Log the actual JSON string preview
+    const jsonString = JSON.stringify(graphData, null, 2);
+    console.log('📝 SAVE - JSON string preview:', jsonString.substring(0, 500));
+    
+    navigator.clipboard.writeText(jsonString)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
+        console.log('Graph schema copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy:', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = jsonString;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
+        } catch (err2) {
+          console.error('Fallback copy failed:', err2);
+          if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
+        }
+        document.body.removeChild(textArea);
+      });
+  };
+
   return (
     <Paper
       elevation={3}
@@ -529,7 +641,7 @@ const Toolbar = ({
 
           {/* New: Copy Entire Graph immediately after Copy Selected */}
           <IconButton
-            onClick={handleCopyJSON}
+            onClick={handleCopyGraph}
             title="Copy Entire Graph"
             aria-label="Copy entire graph JSON"
             size="small"

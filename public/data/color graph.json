@@ -5,11 +5,12 @@
       "type": "default",
       "label": "**Welcome to Copy/Paste w/ Me!** 👋",
       "position": {
-        "x": 300,
-        "y": 50
+        "x": 450,
+        "y": 93
       },
       "width": 200,
       "height": 100,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       "data": {
         "memo": "**Your Creative Hub!**\n\nTeam up with your AI to build stunning graphs. Start with a quick setup below! ⬇️"
       }
@@ -19,11 +20,12 @@
       "type": "markdown",
       "label": "**Set Up Side-by-Side** 🖥️",
       "position": {
-        "x": 150,
-        "y": 300
+        "x": -40,
+        "y": 254
       },
-      "width": 250,
-      "height": 200,
+      "width": 378,
+      "height": 372,
+      "color": "#2e7d32",
       "data": {
         "memo": "# Step 1: Open Your Chatbot\n\n![Your workspace](/data/TutorialScreenshot1.png)\n\n**Set the stage:**\n- Open a new browser window.\n- Load your chatbot (e.g., Grok, ChatGPT).\n- Drag windows side-by-side, like the image above."
       }
@@ -33,11 +35,12 @@
       "type": "default",
       "label": "**Onboard Your AI** 🤖",
       "position": {
-        "x": 450,
-        "y": 300
+        "x": 457,
+        "y": 236
       },
       "width": 160,
       "height": 80,
+      "color": "#0288d1",
       "data": {
         "memo": "**Step 2:**\n\nClick the toolbar’s far-right button (📋). Copy the text. Paste it into your chatbot and hit enter. This syncs your AI with the app!"
       }
@@ -47,11 +50,12 @@
       "type": "default",
       "label": "**Create Your Graph** 📈",
       "position": {
-        "x": 300,
-        "y": 550
+        "x": 728,
+        "y": 466
       },
       "width": 160,
       "height": 80,
+      "color": "#0288d1",
       "data": {
         "memo": "**Step 3:**\n\nAsk your AI: 'Create a node graph about [your topic]' (e.g., 'coding', 'space'). Copy the JSON, paste it here (Ctrl+V), and see your graph come alive!"
       }
@@ -61,11 +65,12 @@
       "type": "markdown",
       "label": "**See the Magic!** ✨",
       "position": {
-        "x": 600,
-        "y": 300
+        "x": 768,
+        "y": 236
       },
-      "width": 250,
-      "height": 200,
+      "width": 263,
+      "height": 245,
+      "color": "linear-gradient(135deg, #ff5722 0%, #f06292 100%)",
       "data": {
         "memo": "# Sample Graph\n\n**Idea: Your Passion**\n\n- **Dream**: What excites you?\n- **Explore**: Learn its roots\n- **Build**: Make it real\n\nDrag these or ask your AI to expand!"
       }
@@ -77,28 +82,32 @@
       "type": "child",
       "source": "node_1760572800000_welcome",
       "target": "node_1760572800000_setup",
-      "label": "start here"
+      "label": "start here",
+      "color": "#ff5722"
     },
     {
       "id": "edge_1760572800000_e2",
       "type": "peer",
       "source": "node_1760572800000_setup",
       "target": "node_1760572800000_onboard",
-      "label": "then"
+      "label": "then",
+      "color": "#ff5722"
     },
     {
       "id": "edge_1760572800000_e3",
       "type": "child",
       "source": "node_1760572800000_onboard",
       "target": "node_1760572800000_create",
-      "label": "next"
+      "label": "next",
+      "color": "#ff5722"
     },
     {
       "id": "edge_1760572800000_e4",
       "type": "peer",
       "source": "node_1760572800000_welcome",
       "target": "node_1760572800000_demo",
-      "label": "get inspired"
+      "label": "get inspired",
+      "color": "linear-gradient(90deg, #667eea 0%, #764ba2 100%)"
     }
   ],
   "groups": [
@@ -113,10 +122,10 @@
         "node_1760572800000_demo"
       ],
       "bounds": {
-        "x": 5,
-        "y": -20,
-        "width": 740,
-        "height": 630
+        "x": -249,
+        "y": 23,
+        "width": 1168.5,
+        "height": 503
       }
     }
   ]

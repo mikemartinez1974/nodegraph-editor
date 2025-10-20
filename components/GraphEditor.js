@@ -226,8 +226,14 @@ export default function GraphEditor({ backgroundImage }) {
       });
     };
 
+    // Expose GraphCRUD API to window for console access
     if (typeof window !== 'undefined') {
       window.graphAPI = graphAPI.current;
+      
+      // Add direct state accessors for debugging
+      window.graphAPI.getNodes = () => nodesRef.current;
+      window.graphAPI.getEdges = () => edgesRef.current;
+      
       window.setDefaultNodeColor = (color) => setDefaultNodeColor(color);
       window.setDefaultEdgeColor = (color) => setDefaultEdgeColor(color);
       console.log('Graph CRUD API available at window.graphAPI');
@@ -670,6 +676,11 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Paste/import handler for graph data
   function handlePasteGraphData(pastedData) {
+    console.log('📋 PASTE HANDLER - Raw pastedData:', pastedData);
+    console.log('📋 pastedData.nodes:', pastedData.nodes);
+    console.log('📋 First node:', pastedData.nodes?.[0]);
+    console.log('📋 First node color:', pastedData.nodes?.[0]?.color);
+    
     // Support explicit action field
     let explicitAction = pastedData.action;
     if (explicitAction) delete pastedData.action;
@@ -730,11 +741,20 @@ export default function GraphEditor({ backgroundImage }) {
     // Perform action
     if (action === 'replace') {
       console.log('REPLACE action triggered. Setting nodes:', pastedNodes, 'edges:', pastedEdges, 'groups:', pastedGroups);
-      setNodes(pastedNodes);
-      setEdges(pastedEdges);
-      setGroups(pastedGroups);
-      nodesRef.current = pastedNodes;
-      edgesRef.current = pastedEdges;
+      
+      // Ensure all properties including color are preserved with deep spread
+      const nodesWithAllProps = pastedNodes.map(node => ({ ...node }));
+      const edgesWithAllProps = pastedEdges.map(edge => ({ ...edge }));
+      const groupsWithAllProps = pastedGroups.map(group => ({ ...group }));
+      
+      console.log('📦 After spread - nodes with color:', nodesWithAllProps.filter(n => n.color).length);
+      console.log('📦 After spread - edges with color:', edgesWithAllProps.filter(e => e.color).length);
+      
+      setNodes(nodesWithAllProps);
+      setEdges(edgesWithAllProps);
+      setGroups(groupsWithAllProps);
+      nodesRef.current = nodesWithAllProps;
+      edgesRef.current = edgesWithAllProps;
       
       // Clear and reinitialize GroupManager with new groups
       groupManager.current = new GroupManager();
