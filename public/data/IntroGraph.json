@@ -1,150 +1,123 @@
 {
   "nodes": [
     {
-      "id": "node_welcome",
+      "id": "node_1760572800000_welcome",
       "type": "default",
-      "label": "👋 Welcome!",
+      "label": "**Welcome to Copy/Paste w/ Me!** 👋",
       "position": {
-        "x": 200,
-        "y": 80
+        "x": 226.87179487179492,
+        "y": 133.81623931623915
       },
       "width": 200,
       "height": 100,
-      "resizable": true,
       "data": {
-        "memo": "**Build graphs with AI!**\n\nThis is your canvas. Work with an AI chatbot to visualize any topic.\n\nLet's get you started! ⬇️"
+        "memo": "**Your Creative Hub!**\n\nTeam up with your AI to build stunning graphs. Start with a quick setup below! ⬇️"
       }
     },
     {
-      "id": "node_split",
-      "type": "default",
-      "label": "🖥️ Split Your Screen",
+      "id": "node_1760572800000_setup",
+      "type": "markdown",
+      "label": "**Set Up Side-by-Side** 🖥️",
       "position": {
-        "x": 200,
-        "y": 240
+        "x": -258.59450990575,
+        "y": 386.1947947540503
       },
-      "width": 200,
-      "height": 100,
-      "resizable": true,
+      "width": 335.62886597938143,
+      "height": 393.74226804123714,
       "data": {
-        "memo": "**Step 1: Set Up Side-by-Side**\n\nOpen your AI chatbot (ChatGPT, Claude, Grok) in another window or tab.\n\nDrag to resize so you see both:\n- This graph editor on one side\n- Your chatbot on the other\n\nMakes copy/paste super easy!"
+        "memo": "# Step 1: Open Your Chatbot\n\n![Your workspace](/data/TutorialScreenshot1.png)\n\n**Set the stage:**\n- Open a new browser window.\n- Load your chatbot (e.g., Grok, ChatGPT).\n- Drag windows side-by-side, like the image above."
       }
     },
     {
-      "id": "node_onboard",
+      "id": "node_1760572800000_onboard",
       "type": "default",
-      "label": "🤖 Onboard Your AI",
+      "label": "**Onboard Your AI** 🤖",
       "position": {
-        "x": 200,
-        "y": 400
-      },
-      "width": 200,
-      "height": 100,
-      "resizable": true,
-      "data": {
-        "memo": "**Step 2: Quick Setup**\n\n1. Click the 📋 button (top-left toolbar)\n2. Paste into your AI chat\n\nThis teaches the AI how to make graphs for you!"
-      }
-    },
-    {
-      "id": "node_ask",
-      "type": "default",
-      "label": "💬 Ask for a Graph",
-      "position": {
-        "x": 200,
-        "y": 560
-      },
-      "width": 200,
-      "height": 100,
-      "resizable": true,
-      "data": {
-        "memo": "**Step 3: Get Creative**\n\nAsk your AI:\n*\"Create a graph about [YOUR TOPIC]\"*\n\nExamples:\n- \"My morning routine\"\n- \"Solar system planets\"\n- \"How pizza is made\"\n\nThe AI replies with JSON!"
-      }
-    },
-    {
-      "id": "node_paste",
-      "type": "default",
-      "label": "📋 Paste & Enjoy",
-      "position": {
-        "x": 200,
-        "y": 720
-      },
-      "width": 200,
-      "height": 100,
-      "resizable": true,
-      "data": {
-        "memo": "**Step 4: See It Come Alive**\n\n1. Copy JSON from your AI\n2. Paste here (Ctrl+V)\n3. Watch your graph appear!\n\nDrag, edit, refine—repeat!"
-      }
-    },
-    {
-      "id": "node_contact",
-      "type": "default",
-      "label": "📬 Questions?",
-      "position": {
-        "x": 500,
-        "y": 80
+        "x": 151.25649836990053,
+        "y": 328.45603136840225
       },
       "width": 160,
       "height": 80,
-      "resizable": true,
       "data": {
-        "memo": "**Get in touch:**\n\nmike@cpwith.me\n\nFeedback & ideas welcome!"
+        "memo": "**Step 2:**\n\nClick the toolbar’s far-right button (📋). Copy the text. Paste it into your chatbot and hit enter. This syncs your AI with the app!"
       }
     },
     {
-      "id": "node_tips",
+      "id": "node_1760572800000_create",
       "type": "default",
-      "label": "💡 Pro Tips",
+      "label": "**Create Your Graph** 📈",
       "position": {
-        "x": 500,
-        "y": 240
+        "x": 248.22649572649573,
+        "y": 511.3247863247861
       },
       "width": 160,
       "height": 80,
-      "resizable": true,
       "data": {
-        "memo": "**Quick tricks:**\n\n- Drag nodes to arrange\n- Double-click to edit\n- Use handles to connect\n- Select + copy/paste\n- Collapse groups (−/+)\n\nHave fun exploring!"
+        "memo": "**Step 3:**\n\nAsk your AI: 'Create a node graph about [your topic]' (e.g., 'coding', 'space'). Copy the JSON, paste it here (Ctrl+V), and see your graph come alive!"
+      }
+    },
+    {
+      "id": "node_1760572800000_demo",
+      "type": "markdown",
+      "label": "**See the Magic!** ✨",
+      "position": {
+        "x": 549.3234529505519,
+        "y": 460.4579973288549
+      },
+      "width": 255.15463917525773,
+      "height": 235.0515463917526,
+      "data": {
+        "memo": "# Sample Graph\n\n**Idea: Your Passion**\n\n- **Dream**: What excites you?\n- **Explore**: Learn its roots\n- **Build**: Make it real\n\nDrag these or ask your AI to expand!"
       }
     }
   ],
   "edges": [
     {
-      "id": "edge_1",
-      "type": "straight",
-      "source": "node_welcome",
-      "target": "node_split"
+      "id": "edge_1760572800000_e1",
+      "type": "child",
+      "source": "node_1760572800000_welcome",
+      "target": "node_1760572800000_setup",
+      "label": "start here"
     },
     {
-      "id": "edge_2",
-      "type": "straight",
-      "source": "node_split",
-      "target": "node_onboard"
+      "id": "edge_1760572800000_e2",
+      "type": "peer",
+      "source": "node_1760572800000_setup",
+      "target": "node_1760572800000_onboard",
+      "label": "then"
     },
     {
-      "id": "edge_3",
-      "type": "straight",
-      "source": "node_onboard",
-      "target": "node_ask"
+      "id": "edge_1760572800000_e3",
+      "type": "child",
+      "source": "node_1760572800000_onboard",
+      "target": "node_1760572800000_create",
+      "label": "next"
     },
     {
-      "id": "edge_4",
-      "type": "straight",
-      "source": "node_ask",
-      "target": "node_paste"
-    },
-    {
-      "id": "edge_5",
-      "type": "curved",
-      "source": "node_welcome",
-      "target": "node_contact",
-      "label": "need help?"
-    },
-    {
-      "id": "edge_6",
-      "type": "curved",
-      "source": "node_paste",
-      "target": "node_tips",
-      "label": "explore"
+      "id": "edge_1760572800000_e4",
+      "type": "peer",
+      "source": "node_1760572800000_welcome",
+      "target": "node_1760572800000_demo",
+      "label": "get inspired"
     }
   ],
-  "groups": []
+  "groups": [
+    {
+      "id": "group_start",
+      "label": "Your First Steps 🌟",
+      "nodeIds": [
+        "node_1760572800000_welcome",
+        "node_1760572800000_setup",
+        "node_1760572800000_onboard",
+        "node_1760572800000_create",
+        "node_1760572800000_demo"
+      ],
+      "bounds": {
+        "x": -446.4089428954407,
+        "y": 63.81623931623915,
+        "width": 1143.3097154336215,
+        "height": 539.2496894584298
+      }
+    }
+  ]
 }

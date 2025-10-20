@@ -100,13 +100,17 @@ const DefaultNode = ({
     };
   }, [isResizing, node.id, zoom]);
 
-  // Use node color or theme default
-  const nodeColor = node.color || theme.palette.primary.main;
-  const isGradient = isGradientColor(nodeColor);
+  // Use node.color if available and non-empty, otherwise use theme colors
+  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
+  const isGradient = nodeColor && isGradientColor(nodeColor);
   
-  // Only use alpha for solid colors
-  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.1);
-  const borderColor = isGradient ? nodeColor : nodeColor;
+  // Use custom color if provided, otherwise use theme
+  const backgroundColor = nodeColor 
+    ? nodeColor
+    : theme.palette.background.paper;
+  const borderColor = nodeColor
+    ? nodeColor
+    : theme.palette.primary.main;
   
   // Get text color that contrasts with background
   const textColor = theme.palette.getContrastText(

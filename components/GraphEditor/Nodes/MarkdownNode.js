@@ -1,15 +1,11 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
-import { useTheme, alpha } from '@mui/material/styles';
+import React from 'react';
+import { useTheme } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
 import eventBus from '../../NodeGraph/eventBus';
 import LinkIcon from '@mui/icons-material/Link';
-
-// Helper to check if a color is a gradient
-const isGradientColor = (color) => {
-  return color && (color.includes('gradient') || color.includes('linear-') || color.includes('radial-'));
-};
+import DefaultNode from './DefaultNode';
 
 const MarkdownNode = ({ 
   node, 
@@ -26,187 +22,16 @@ const MarkdownNode = ({
   onResize
 }) => {
   const theme = useTheme();
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const width = (node?.width || 200) * zoom;
-  const height = (node?.height || 150) * zoom;
-  const nodeRef = useRef(null);
-
-  // Register node in nodeRefs
-  useEffect(() => {
-    if (nodeRef.current && nodeRefs) {
-      nodeRefs.current.set(node.id, nodeRef.current);
-      return () => {
-        nodeRefs.current.delete(node.id);
-      };
-    }
-  }, [node.id, nodeRefs]);
-
-  // Prevent default wheel behavior - allow scrolling content, prevent zoom
-  useEffect(() => {
-    const nodeDiv = nodeRef.current;
-    if (!nodeDiv) return;
-    
-    function handleWheel(e) {
-      const contentDiv = nodeDiv.querySelector('div[style*="overflow: auto"]');
-      if (!contentDiv) {
-        e.preventDefault();
-        return;
-      }
-
-      const { scrollTop, scrollHeight, clientHeight } = contentDiv;
-      const isScrollingDown = e.deltaY > 0;
-      const isScrollingUp = e.deltaY < 0;
-      
-      // Allow scroll if content can scroll in that direction
-      const canScrollDown = scrollTop < scrollHeight - clientHeight;
-      const canScrollUp = scrollTop > 0;
-      
-      if ((isScrollingDown && canScrollDown) || (isScrollingUp && canScrollUp)) {
-        // Allow default scroll behavior
-        return;
-      }
-      
-      // Prevent zoom if can't scroll
-      e.preventDefault();
-    }
-    
-    nodeDiv.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      nodeDiv.removeEventListener('wheel', handleWheel, { passive: false });
-    };
-  }, []);
-
-  // Handle resize drag
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const handleMouseMove = (e) => {
-      const deltaX = (e.clientX - resizeStart.x) / zoom;
-      const deltaY = (e.clientY - resizeStart.y) / zoom;
-      
-      const newWidth = Math.max(100, resizeStart.width + deltaX);
-      const newHeight = Math.max(80, resizeStart.height + deltaY);
-      
-      // Emit resize event
-      eventBus.emit('nodeResize', { 
-        id: node.id, 
-        width: newWidth, 
-        height: newHeight 
-      });
-      
-      if (onResize) {
-        onResize(node.id, newWidth, newHeight);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      // Save to history on resize end
-      eventBus.emit('nodeResizeEnd', { id: node.id });
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing, resizeStart, zoom, node.id, onResize]);
-
   const memo = node?.data?.memo || '';
   const hasLink = node?.data?.link && node.data.link.trim().length > 0;
 
-  // Theme-sensitive board colors
+  // Theme-sensitive markdown styling
   const isDark = theme.palette.mode === 'dark';
-  const boardBackground = isDark 
-    ? '#1a2b1a'  // Dark green blackboard
-    : '#f8f9fa';  // Off-white whiteboard
-  const textColor = isDark 
-    ? '#c8e6c9'  // Chalk green
-    : '#2c3e50';  // Dark gray/blue
-  const borderColor = isDark
-    ? '#4a6b4a'  // Wood frame for blackboard
-    : '#8b7355';  // Wood frame for whiteboard
 
-  // Base position for non-dragging state
-  const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
-  const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
-
-  const handleResizeStart = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setIsResizing(true);
-    setResizeStart({
-      x: e.clientX,
-      y: e.clientY,
-      width: node.width || 200,
-      height: node.height || 150
-    });
-  };
-
-  // Use node color with fallback
-  const nodeColor = node.color || theme.palette.primary.main;
-  const isGradient = isGradientColor(nodeColor);
-  
-  // Only use alpha for solid colors, use reduced opacity or the color directly for gradients
-  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.05);
-  const nodeBorderColor = isGradient ? nodeColor : alpha(nodeColor, 0.3);
-    
-  // Calculate text color for readability
-  const computedTextColor = theme.palette.getContrastText(
-    typeof backgroundColor === 'string' && backgroundColor.startsWith('linear-gradient')
-      ? theme.palette.primary.main
-      : backgroundColor
-  );
-
+  // Render using DefaultNode as base, with custom markdown content
   return (
-    <div
-      ref={nodeRef}
-      className="node-or-handle"
-      style={{
-        position: 'absolute',
-        left: baseLeft,
-        top: baseTop,
-        width,
-        height,
-        cursor: isResizing ? 'nwse-resize' : (draggingHandle ? 'grabbing' : 'grab'),
-        border: isSelected ? `4px solid ${nodeBorderColor}` : `3px solid ${nodeBorderColor}`,
-        background: backgroundColor,
-        borderRadius: 4,
-        boxShadow: isSelected 
-          ? `0 0 12px ${theme.palette.secondary.main}, inset 0 2px 8px rgba(0,0,0,0.3)` 
-          : 'inset 0 2px 8px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.3)',
-        color: computedTextColor,
-        zIndex: 100,
-        pointerEvents: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        ...style
-      }}
-      tabIndex={0}
-      onMouseDown={e => {
-        e.stopPropagation();
-        if (onMouseDown) onMouseDown(e);
-        eventBus.emit('nodeMouseDown', { id: node.id, event: e });
-      }}
-      onClick={e => {
-        e.stopPropagation();
-        if (typeof onClick === 'function') onClick(e);
-        eventBus.emit('nodeClick', { id: node.id, event: e });
-      }}
-      onDoubleClick={e => {
-        e.stopPropagation();
-        if (typeof onDoubleClick === 'function') onDoubleClick(e);
-      }}
-      onMouseEnter={e => {
-        eventBus.emit('nodeMouseEnter', { id: node.id, event: e });
-      }}
-      onMouseLeave={e => {
-        eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
-      }}
+    <DefaultNode
+      {...{ node, pan, zoom, style, isSelected, onMouseDown, onClick, onDoubleClick, draggingHandle, nodeRefs, onResize }}
     >
       {/* Markdown content */}
       <div 
@@ -225,19 +50,19 @@ const MarkdownNode = ({
           remarkPlugins={[remarkGfm]}
           components={{
             // Style markdown elements to fit the board theme
-            p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0', color: computedTextColor }} {...props} />,
-            h1: ({node, ...props}) => <h1 style={{ margin: '0 0 10px 0', fontSize: '1.5em', color: computedTextColor, fontWeight: 'bold', borderBottom: isDark ? '2px solid #4a6b4a' : '2px solid #8b7355' }} {...props} />,
-            h2: ({node, ...props}) => <h2 style={{ margin: '0 0 8px 0', fontSize: '1.3em', color: computedTextColor, fontWeight: 'bold' }} {...props} />,
-            h3: ({node, ...props}) => <h3 style={{ margin: '0 0 6px 0', fontSize: '1.15em', color: computedTextColor, fontWeight: 'bold' }} {...props} />,
-            ul: ({node, ...props}) => <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: computedTextColor }} {...props} />,
-            ol: ({node, ...props}) => <ol style={{ margin: '0 0 8px 0', paddingLeft: '20px', color: computedTextColor }} {...props} />,
-            li: ({node, ...props}) => <li style={{ margin: '3px 0', color: computedTextColor }} {...props} />,
+            p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0' }} {...props} />,
+            h1: ({node, ...props}) => <h1 style={{ margin: '0 0 10px 0', fontSize: '1.5em', fontWeight: 'bold', borderBottom: isDark ? '2px solid #4a6b4a' : '2px solid #8b7355' }} {...props} />,
+            h2: ({node, ...props}) => <h2 style={{ margin: '0 0 8px 0', fontSize: '1.3em', fontWeight: 'bold' }} {...props} />,
+            h3: ({node, ...props}) => <h3 style={{ margin: '0 0 6px 0', fontSize: '1.15em', fontWeight: 'bold' }} {...props} />,
+            ul: ({node, ...props}) => <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px' }} {...props} />,
+            ol: ({node, ...props}) => <ol style={{ margin: '0 0 8px 0', paddingLeft: '20px' }} {...props} />,
+            li: ({node, ...props}) => <li style={{ margin: '3px 0' }} {...props} />,
             code: ({node, inline, ...props}) => 
               inline 
-                ? <code style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', padding: '2px 5px', borderRadius: 3, color: computedTextColor, fontFamily: 'monospace' }} {...props} />
-                : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', color: computedTextColor, fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
-            strong: ({node, ...props}) => <strong style={{ color: computedTextColor, fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
-            em: ({node, ...props}) => <em style={{ color: computedTextColor, fontStyle: 'italic' }} {...props} />,
+                ? <code style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', padding: '2px 5px', borderRadius: 3, fontFamily: 'monospace' }} {...props} />
+                : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
+            strong: ({node, ...props}) => <strong style={{ fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
+            em: ({node, ...props}) => <em style={{ fontStyle: 'italic' }} {...props} />,
             a: ({node, ...props}) => <a style={{ color: isDark ? '#81c784' : '#1976d2', textDecoration: 'underline', pointerEvents: 'auto' }} {...props} target="_blank" rel="noopener noreferrer" />
           }}
         >
@@ -265,40 +90,7 @@ const MarkdownNode = ({
         </div>
       )}
       
-      {/* Resize handle - bottom right corner */}
-      {isSelected && (
-        <div
-          onMouseDown={handleResizeStart}
-          style={{
-            position: 'absolute',
-            bottom: -2,
-            right: -2,
-            width: 24,
-            height: 24,
-            cursor: 'nwse-resize',
-            background: nodeBorderColor,
-            borderTopLeftRadius: 4,
-            borderBottomRightRadius: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
-            zIndex: 102,
-            pointerEvents: 'auto'
-          }}
-        >
-          <div style={{
-            width: 12,
-            height: 12,
-            borderRight: `2px solid ${computedTextColor}`,
-            borderBottom: `2px solid ${computedTextColor}`,
-            opacity: 0.8
-          }} />
-        </div>
-      )}
-      
-      {children}  
-    </div>
+    </DefaultNode>
   );
 };
 

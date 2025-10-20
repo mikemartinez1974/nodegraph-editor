@@ -63,13 +63,17 @@ const FixedNode = ({
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
   const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
 
-  // Use node.color if available, otherwise fall back to theme primary
-  const nodeColor = node.color || theme.palette.primary.main;
-  const isGradient = isGradientColor(nodeColor);
+  // Use node.color if available and non-empty, otherwise use theme colors
+  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
+  const isGradient = nodeColor && isGradientColor(nodeColor);
   
-  // Only use alpha for solid colors
-  const backgroundColor = isGradient ? nodeColor : alpha(nodeColor, 0.1);
-  const borderColor = isGradient ? nodeColor : nodeColor;
+  // Use custom color if provided, otherwise use theme
+  const backgroundColor = nodeColor 
+    ? nodeColor
+    : theme.palette.background.paper;
+  const borderColor = nodeColor
+    ? nodeColor
+    : theme.palette.primary.main;
 
   return (
     <div
