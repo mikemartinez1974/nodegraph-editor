@@ -311,7 +311,7 @@ export default function NodePropertiesPanel({
             <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: memoView === 'edit' ? 'visible' : 'auto' }}>
               <TextField
                   inputRef={memoInputRef}
-                  label="Memo"
+                  label="Edit Mode"
                   multiline
                   rows={10}
                   value={memo}
