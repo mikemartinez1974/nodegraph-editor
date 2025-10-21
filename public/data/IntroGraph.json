@@ -225,8 +225,8 @@
       "type": "default",
       "label": "📋 Toolbar is at the Top",
       "position": {
-        "x": -700,
-        "y": 0
+        "x": -555,
+        "y": 1
       },
       "width": 200,
       "height": 100,
@@ -240,7 +240,7 @@
       "type": "default",
       "label": "📖 Need Help? Copy Manual",
       "position": {
-        "x": 700,
+        "x": 504,
         "y": 0
       },
       "width": 200,
@@ -412,9 +412,9 @@
       ],
       "bounds": {
         "x": -410,
-        "y": 443,
+        "y": 442.5,
         "width": 820,
-        "height": 1002
+        "height": 1002.5
       },
       "collapsed": false,
       "visible": true

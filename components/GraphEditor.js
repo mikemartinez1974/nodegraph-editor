@@ -237,13 +237,18 @@ export default function GraphEditor({ backgroundImage }) {
       
       window.setDefaultNodeColor = (color) => setDefaultNodeColor(color);
       window.setDefaultEdgeColor = (color) => setDefaultEdgeColor(color);
-      console.log('Graph CRUD API available at window.graphAPI');
-      console.log('Examples:');
-      console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
-      console.log('  window.graphAPI.readNode() // Get all nodes');
-      console.log('  window.graphAPI.getStats() // Get graph statistics');
-      console.log('  window.setDefaultNodeColor("#ff5722") // Change default color');
-      console.log('  window.setDefaultEdgeColor("#00ff00") // Change default edge color');
+      
+      // Avoid logging multiple times during Fast Refresh/hot reload
+      if (!window.__graphAPILogged) {
+        window.__graphAPILogged = true;
+        console.log('Graph CRUD API available at window.graphAPI');
+        console.log('Examples:');
+        console.log('  window.graphAPI.createNode({ label: "Test", position: { x: 200, y: 200 } })');
+        console.log('  window.graphAPI.readNode() // Get all nodes');
+        console.log('  window.graphAPI.getStats() // Get graph statistics');
+        console.log('  window.setDefaultNodeColor("#ff5722") // Change default color');
+        console.log('  window.setDefaultEdgeColor("#00ff00") // Change default edge color');
+      }
     }
   }, [defaultNodeColor, defaultEdgeColor]);
 
@@ -1191,10 +1196,26 @@ export default function GraphEditor({ backgroundImage }) {
         onGroupClick={(groupId, event, action) => {
           if (action === 'toggle-collapse') {
             handleToggleGroupCollapse(groupId);
-          } else {
-            const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-            handleGroupSelection(groupId, isMultiSelect);
+            return;
           }
+
+          if (action === 'select-members') {
+            const group = groups.find(g => g.id === groupId);
+            if (group) {
+              // Select the group and all member nodes for group-drag operations
+              setSelectedGroupIds([groupId]);
+              setSelectedNodeIds(group.nodeIds ? [...group.nodeIds] : []);
+              setSelectedEdgeIds([]);
+            } else {
+              const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
+              handleGroupSelection(groupId, isMultiSelect);
+            }
+            return;
+          }
+
+          // default behavior: select group
+          const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
+          handleGroupSelection(groupId, isMultiSelect);
         }}
         onBackgroundClick={() => {
           clearSelection();

@@ -36,7 +36,7 @@ const NodeLayer = ({
                 const NodeComponent = nodeTypes[node.type] || DefaultNode;
                 const isSelected = selectedNodeIds.includes(node.id);
                 const isMultiSelect = selectedNodeIds.length > 1;
-                
+
                 return (
                     <NodeComponent
                         key={node.id}
@@ -58,7 +58,7 @@ const NodeLayer = ({
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                         nodeRefs={nodeRefs}  // Pass nodeRefs to each node component
                     />
-                );
+                 );
             })}
         </div>
     );

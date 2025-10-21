@@ -147,6 +147,9 @@ export default function NodeGraph({
     visible: node.visible !== undefined ? node.visible : true
   })), [nodes]);
 
+  // Only expose nodes that are visible to layers which should not render handles for hidden nodes
+  const visibleNodeList = useMemo(() => nodeList.filter(n => n.visible !== false), [nodeList]);
+
   // Replace inline event handlers with imported functions
   // Define handler functions outside useEffect
   function handleNodeClickWrapper({ id, event }) {
@@ -490,6 +493,23 @@ export default function NodeGraph({
     };
   }, [isSelecting, updateSelection, endSelection, panZoomRef]);
 
+  // Add effect to redraw canvases when nodes or groups change (ensures handles update immediately)
+  useEffect(() => {
+    // schedule redraw on next frame
+    requestAnimationFrame(() => {
+      try {
+        if (handleLayerImperativeRef.current && typeof handleLayerImperativeRef.current.redraw === 'function') {
+          handleLayerImperativeRef.current.redraw();
+        }
+        if (edgeLayerImperativeRef.current && typeof edgeLayerImperativeRef.current.redraw === 'function') {
+          edgeLayerImperativeRef.current.redraw();
+        }
+      } catch (err) {
+        console.warn('Error redrawing layers:', err);
+      }
+    });
+  }, [nodes, groups]);
+
   return (
     <div id="graph-canvas" ref={containerRef} style={{
       position: 'fixed',
@@ -555,7 +575,7 @@ export default function NodeGraph({
           ref={handleLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={handleCanvasRef}
-          nodes={nodeList}
+          nodes={visibleNodeList}
           edges={edges}
           pan={pan}
           zoom={zoom}
@@ -566,7 +586,7 @@ export default function NodeGraph({
           <NodeLayer
             containerRef={nodeContainerRef}
             nodeRefs={nodeRefs}
-            nodes={nodeList.filter(node => node.visible !== false)}
+            nodes={visibleNodeList}
             pan={pan}
             zoom={zoom}
             selectedNodeId={selectedNodeId}
