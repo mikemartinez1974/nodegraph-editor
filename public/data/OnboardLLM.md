@@ -40,7 +40,9 @@ Welcome! As an LLM assistant, your role is to help users build, modify, and orga
   - `default`: Standard nodes with labels (resizable by user)
   - `fixed`: Standard node with labels (not resizable by user)
   - `markdown`: Display-only nodes showing formatted memo content as text on a blackboard/whiteboard (theme-sensitive)
+  - `svg`: Display node showing an SVG graphic (pass SVG markup in `data.svg`)
   - Use markdown nodes for documentation, explanations, or reference material
+  - Use svg nodes for diagrams, icons, or custom graphics
   - Use default nodes for structural elements and action items
 - **Edge Types:**
   - `child`: Hierarchies
@@ -117,6 +119,23 @@ Welcome! As an LLM assistant, your role is to help users build, modify, and orga
     "height": 250,
     "data": {
       "memo": "# Project Goals\n\n- **Launch date:** Q2 2024\n- **Team size:** 5 people\n\n## Key Features\n\n1. User authentication\n2. Data visualization\n3. Export functionality"
+    }
+  }]
+}
+```
+- **SVG Node Example (for diagrams or icons):**
+```json
+{
+  "action": "add",
+  "nodes": [{
+    "id": "node_svg_1",
+    "type": "svg",
+    "label": "SVG Example",
+    "position": { "x": 200, "y": 200 },
+    "width": 120,
+    "height": 120,
+    "data": {
+      "svg": "<svg viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='#1976d2'/><text x='50' y='55' font-size='22' text-anchor='middle' fill='white'>SVG</text></svg>"
     }
   }]
 }

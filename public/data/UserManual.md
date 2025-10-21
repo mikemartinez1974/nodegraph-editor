@@ -211,7 +211,25 @@ Users can group related nodes:
 ### Node Types
 - **default**: Resizable node with label displayed at top
 - **markdown**: Display node showing formatted memo content (looks like a blackboard in dark mode, whiteboard in light mode)
+- **svg**: Display node showing an SVG graphic (pass SVG markup in `data.svg`)
 - **legacy**: Old fixed-size nodes (not recommended for new graphs)
+
+SVG nodes let you display custom graphics, diagrams, or icons directly on the graph. To use, set `type: "svg"` and provide SVG markup in `data.svg`.
+
+#### Example SVG Node
+```json
+{
+  "id": "node_svg_1",
+  "type": "svg",
+  "label": "SVG Example",
+  "position": { "x": 200, "y": 200 },
+  "width": 120,
+  "height": 120,
+  "data": {
+    "svg": "<svg viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='#1976d2'/><text x='50' y='55' font-size='22' text-anchor='middle' fill='white'>SVG</text></svg>"
+  }
+}
+```
 
 ### Edge Routing
 - **straight**: Best for simple connections

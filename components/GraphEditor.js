@@ -9,6 +9,7 @@ import GroupManager from './GraphEditor/GroupManager';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
 import FixedNode from './GraphEditor/Nodes/FixedNode';
 import MarkdownNode from './GraphEditor/Nodes/MarkdownNode';
+import SvgNode from './GraphEditor/Nodes/SvgNode';
 import NodeListPanel from './GraphEditor/NodeListPanel';
 import GroupListPanel from './GraphEditor/GroupListPanel';
 import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
@@ -446,10 +447,12 @@ export default function GraphEditor({ backgroundImage }) {
   // - default: ResizableNode (the resizable, interactive default)
   // - fixed: DefaultNode (non-resizable, fixed-size)
   // - markdown: MarkdownNode (displays memo as formatted markdown)
+  // - svg: SvgNode (renders SVG graphics from node.data.svg)
   const nodeTypes = {
     default: DefaultNode,
     fixed: FixedNode,
     markdown: MarkdownNode,
+    svg: SvgNode,
   };
 
   // Use selection hook
