@@ -33,6 +33,9 @@ export default function GroupPropertiesPanel({
   const [borderColor, setBorderColor] = useState('');
   const [borderWidth, setBorderWidth] = useState(2);
   const [visible, setVisible] = useState(false);
+  const [pos, setPos] = useState({ x: 16, y: 88 });
+  const dragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
 
   // Debounce helpers
   const pendingRef = useRef({});
