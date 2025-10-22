@@ -7,6 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
  * All functions return { success: boolean, data?: any, error?: string }
  */
 
+function deduplicateNodes(nodes) {
+  const seen = new Set();
+  return nodes.filter(node => {
+    if (seen.has(node.id)) return false;
+    seen.add(node.id);
+    return true;
+  });
+}
+
 export default class GraphCRUD {
   constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory) {
     this.getNodes = getNodes;
@@ -32,8 +41,11 @@ export default class GraphCRUD {
    */
   createNode({ id, type = 'default', label = '', position = { x: 100, y: 100 }, data = {}, width, height } = {}) {
     try {
-      const nodeId = id || this._generateId();
-      
+      const currentNodes = this.getNodes();
+      let nodeId;
+      do {
+        nodeId = id || this._generateId();
+      } while (currentNodes.some(n => n.id === nodeId));
       const newNode = {
         id: nodeId,
         type,
@@ -49,12 +61,9 @@ export default class GraphCRUD {
         handlePosition: 'center',
         showLabel: true
       };
-
-      const currentNodes = this.getNodes();
-      const updatedNodes = [...currentNodes, newNode];
+      const updatedNodes = deduplicateNodes([...currentNodes, newNode]);
       this.setNodes(updatedNodes);
       this.saveToHistory(updatedNodes, this.getEdges());
-
       return { success: true, data: newNode };
     } catch (error) {
       return { success: false, error: error.message };
@@ -290,11 +299,15 @@ export default class GraphCRUD {
       const results = nodesArray.map(opts => this.createNode(opts));
       const successful = results.filter(r => r.success);
       const failed = results.filter(r => !r.success);
-
+      // Deduplicate after batch creation
+      const allCreated = successful.map(r => r.data);
+      const updatedNodes = deduplicateNodes([...this.getNodes(), ...allCreated]);
+      this.setNodes(updatedNodes);
+      this.saveToHistory(updatedNodes, this.getEdges());
       return {
         success: failed.length === 0,
         data: {
-          created: successful.map(r => r.data),
+          created: allCreated,
           failed: failed.map(r => r.error)
         }
       };
@@ -424,11 +437,10 @@ export default class GraphCRUD {
   // ==================== HELPER METHODS ====================
 
   _generateId() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return uuidv4();
   }
 }
 

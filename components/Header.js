@@ -7,17 +7,24 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ThemeDrawer from './Header/ThemeDrawer';
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
+import themeMap from './Header/themes';
 
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const muiTheme = useTheme();
+  let muiTheme = useTheme();
+  if (!muiTheme || !('palette' in muiTheme)) {
+    muiTheme = themeMap.default;
+  }
   // Dark mode = dark logo, Light mode = light logo
   const logoSrc = muiTheme?.palette?.mode === 'dark' ? '/logo_dark.png' : '/logo_light.png';
   const [imgError, setImgError] = useState(false);
 
   return (
     <div>
-      <AppBar position="fixed" color="primary">
+      <AppBar position="fixed" color="primary" sx={{
+        background: `linear-gradient(135deg, ${muiTheme.palette.primary.light} 0%, ${muiTheme.palette.primary.dark} 100%)`,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+      }}>
         <Toolbar>
           {/* Theme-aware logo with fallback */}
           {!imgError ? (

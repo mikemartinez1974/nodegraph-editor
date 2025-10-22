@@ -28,6 +28,7 @@ const NodeLayer = ({
     });
     if (duplicates.length > 0) {
         console.warn('Duplicate node ids detected in NodeLayer:', duplicates);
+        console.log('Full nodes array with duplicates:', nodes);
     }
 
     return (

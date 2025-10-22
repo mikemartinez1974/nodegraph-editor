@@ -57,7 +57,7 @@ const FixedNode = ({
   const hasLink = node?.data?.link && node.data.link.trim().length > 0;
 
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
-  const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
+  const unselected_gradient = nodeColor ? nodeColor : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
   // Base position for non-dragging state
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;

@@ -171,16 +171,15 @@ export default function NodeListPanel({
   const useVirtualization = nodes.length > 100;
 
   return createPortal(
-    <Box
+    <Paper
+      elevation={8}
       sx={{
         position: 'fixed',
-        top: 64,
         [anchor]: isOpen ? 0 : -300,
-        // Explicitly unset the opposite side
-        [anchor === 'right' ? 'left' : 'right']: 'auto',
+        top: 64,
         width: 280,
         height: 'calc(100vh - 64px)',
-        backgroundColor: 'background.paper',
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
         borderRight: anchor === 'left' ? `1px solid ${theme.palette.divider}` : 'none',
         borderLeft: anchor === 'right' ? `1px solid ${theme.palette.divider}` : 'none',
         boxShadow: anchor === 'left' ? '2px 0 8px rgba(0,0,0,0.1)' : '-2px 0 8px rgba(0,0,0,0.1)',
@@ -189,11 +188,12 @@ export default function NodeListPanel({
         zIndex: 1100,
         transition: `${anchor} 0.3s ease`,
         pointerEvents: isOpen ? 'auto' : 'none',
+        overflow: 'hidden',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
         <Typography variant="h6">Nodes</Typography>
-        <IconButton onClick={onClose} aria-label="close node list">
+        <IconButton onClick={onClose} aria-label="close node list" sx={{ color: 'inherit' }}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -224,6 +224,7 @@ export default function NodeListPanel({
               <ListItem
                 key={node.id}
                 disablePadding
+                sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
                 secondaryAction={
                   <IconButton
                     edge="end"
@@ -243,6 +244,16 @@ export default function NodeListPanel({
                     const isMultiSelect = e.ctrlKey || e.metaKey;
                     if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
                   }}
+                  sx={{
+                    backgroundColor: isSelected ? theme.palette.secondary.main : theme.palette.background.paper,
+                    color: isSelected ? theme.palette.secondary.contrastText : theme.palette.text.primary,
+                    boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
+                    borderRadius: 1,
+                    fontWeight: isSelected ? 600 : 400,
+                    '&:hover': {
+                      backgroundColor: isSelected ? theme.palette.secondary.dark : theme.palette.action.hover
+                    }
+                  }}
                 >
                   <ListItemText
                     primary={node.label || node.id}
@@ -254,7 +265,7 @@ export default function NodeListPanel({
           })}
         </List>
       )}
-    </Box>,
+    </Paper>,
     document.body
   );
 }

@@ -690,7 +690,10 @@ const Toolbar = ({
           </IconButton>
           
           <IconButton
-            onClick={onAddNode}
+            onClick={e => {
+              console.log('Toolbar Add Node button clicked');
+              onAddNode(e);
+            }}
             title="Add Node (Ctrl+N)"
             size="small"
           >

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, IconButton, Divider, Stack, Tooltip } from '@mui/material';
+import { Box, Typography, IconButton, Divider, Stack, Tooltip, Paper } from '@mui/material';
 import { createPortal } from 'react-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -185,14 +185,15 @@ export default function NodePropertiesPanel({
   };
 
   return createPortal(
-    <Box
+    <Paper
+      elevation={8}
       sx={{
         position: 'fixed',
         top: 64,
         [currentAnchor === 'right' ? 'right' : 'left']: isOpen ? 0 : -width - 50,
         width: width,
         height: 'calc(100vh - 64px)',
-        backgroundColor: 'background.paper',
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
         borderLeft: currentAnchor === 'right' ? `1px solid ${theme.palette.divider}` : 'none',
         borderRight: currentAnchor === 'left' ? `1px solid ${theme.palette.divider}` : 'none',
         boxShadow: currentAnchor === 'right' ? '-2px 0 8px rgba(0,0,0,0.1)' : '2px 0 8px rgba(0,0,0,0.1)',
@@ -201,6 +202,7 @@ export default function NodePropertiesPanel({
         zIndex: 1200,
         transition: 'right 0.3s ease, left 0.3s ease',
         pointerEvents: isOpen ? 'auto' : 'none',
+        overflow: 'hidden',
       }}
     >
       {/* Resize handle */}
@@ -232,13 +234,13 @@ export default function NodePropertiesPanel({
         }} />
       </div>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
         <Typography variant="h6">Node Properties</Typography>
         <Box>
-          <IconButton onClick={toggleAnchor} size="small" title="Switch sides" aria-label="Toggle panel side">
+          <IconButton onClick={toggleAnchor} size="small" title="Switch sides" aria-label="Toggle panel side" sx={{ color: 'inherit' }}>
             {anchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
-          <IconButton onClick={() => setIsOpen(false)} size="small" aria-label="close properties panel">
+          <IconButton onClick={() => setIsOpen(false)} size="small" aria-label="close properties panel" sx={{ color: 'inherit' }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -259,9 +261,9 @@ export default function NodePropertiesPanel({
           label="Label"
           value={label}
           onChange={handleLabelChange}
-          variant="outlined"
+          variant="filled"
           size="small"
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, backgroundColor: theme.palette.background.paper }}
         />
 
         {/* Memo header and controls */}
@@ -318,7 +320,9 @@ export default function NodePropertiesPanel({
               onChange={handleMemoChange}
               onBlur={handleMemoChange}
               fullWidth
+              variant="filled"
               sx={{
+                backgroundColor: theme.palette.background.paper,
                 '& .MuiInputBase-root': { alignItems: 'flex-start' },
                 '& .MuiInputBase-input': {
                   overflow: 'auto !important',
@@ -329,7 +333,7 @@ export default function NodePropertiesPanel({
             />
           </Box>
         ) : (
-          <Box sx={{ mb: 1, maxHeight: 240, overflowY: 'auto', p: 1, backgroundColor: 'transparent' }}>
+          <Box sx={{ mb: 1, height: 240, overflowY: 'auto', p: 1, backgroundColor: theme.palette.background.paper, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
             {memo ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {memo}
@@ -358,10 +362,10 @@ export default function NodePropertiesPanel({
           fullWidth
           value={link}
           onChange={handleLinkChange}
-          variant="outlined"
+          variant="filled"
           size="small"
           placeholder="https://example.com"
-          sx={{ mb: 1 }}
+          sx={{ mb: 1, backgroundColor: theme.palette.background.paper }}
         />
         {link && (
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -381,7 +385,7 @@ export default function NodePropertiesPanel({
         )}
         </Box>
       )}
-    </Box>,
+    </Paper>,
     document.body
   );
 }

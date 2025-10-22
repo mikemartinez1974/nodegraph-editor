@@ -157,7 +157,7 @@ export default function EdgePropertiesPanel({
         top: pos.y,
         width: 320,
         maxHeight: 'calc(100vh - 104px)',
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
+        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
         zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
@@ -231,9 +231,9 @@ export default function EdgePropertiesPanel({
           label="Label"
           value={label}
           onChange={handleLabelChange}
-          variant="outlined"
+          variant="filled"
           size="small"
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, backgroundColor: theme.palette.background.paper }}
           helperText="Leave empty to hide label"
         />
 

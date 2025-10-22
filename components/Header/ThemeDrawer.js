@@ -180,6 +180,26 @@ export default function ThemeDrawer(props) {
                 label="Centered"
               />
               <ImageList cols={3} gap={8} sx={{ width: '100%' }}>
+                <ImageListItem key="none" onClick={() => {
+                  document.getElementById('graph-editor-background').style.backgroundImage = 'none';
+                  localStorage.removeItem('backgroundImage');
+                }}>
+                  <Box sx={{
+                    width: '100%',
+                    height: 80,
+                    borderRadius: 8,
+                    bgcolor: 'background.paper',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    border: '1px dashed',
+                    color: 'text.secondary',
+                    fontSize: 16
+                  }}>
+                    No Background
+                  </Box>
+                </ImageListItem>
                 {backgroundImages.map((file) => {
                   const imgSrc = `/background art/${file}`;
                   return (

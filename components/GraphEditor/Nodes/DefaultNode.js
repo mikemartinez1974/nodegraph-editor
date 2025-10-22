@@ -59,8 +59,9 @@ const DefaultNode = ({
   const hasMemo = node?.data?.memo && node.data.memo.trim().length > 0;
   const hasLink = node?.data?.link && node.data.link.trim().length > 0;
 
+  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
-  const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
+  const unselected_gradient = nodeColor ? nodeColor : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
   // Base position for non-dragging state
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
@@ -101,16 +102,8 @@ const DefaultNode = ({
   }, [isResizing, node.id, zoom]);
 
   // Use node.color if available and non-empty, otherwise use theme colors
-  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
-  const isGradient = nodeColor && isGradientColor(nodeColor);
-  
-  // Use custom color if provided, otherwise use theme
-  const backgroundColor = nodeColor 
-    ? nodeColor
-    : theme.palette.background.paper;
-  const borderColor = nodeColor
-    ? nodeColor
-    : theme.palette.primary.main;
+  const backgroundColor = nodeColor ? nodeColor : theme.palette.background.paper;
+  const borderColor = nodeColor ? nodeColor : theme.palette.primary.main;
   
   // Get text color that contrasts with background
   const textColor = theme.palette.getContrastText(
@@ -130,8 +123,8 @@ const DefaultNode = ({
         width,
         height,
         cursor: draggingHandle ? 'grabbing' : 'grab',
-        border: `${isSelected ? 3 : 2}px solid ${borderColor}`,
-        background: backgroundColor,
+        border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
+        background: isSelected ? selected_gradient : unselected_gradient,
         borderRadius: 6,
         boxSizing: 'border-box',
         padding: 8,

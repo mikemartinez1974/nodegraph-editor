@@ -132,7 +132,7 @@ export default function GroupPropertiesPanel({
         top: 88,
         width: 320,
         maxHeight: 'calc(100vh - 104px)',
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
+        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
         zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
@@ -177,9 +177,9 @@ export default function GroupPropertiesPanel({
           label="Label"
           value={label}
           onChange={handleLabelChange}
-          variant="outlined"
+          variant="filled"
           size="small"
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, backgroundColor: theme.palette.background.paper }}
         />
 
         <Divider sx={{ my: 2 }} />
@@ -197,8 +197,9 @@ export default function GroupPropertiesPanel({
             type="color"
             value={backgroundColor}
             onChange={handleBackgroundColorChange}
-            variant="outlined"
+            variant="filled"
             size="small"
+            sx={{ backgroundColor: theme.palette.background.paper }}
           />
         </Box>
 
@@ -211,8 +212,9 @@ export default function GroupPropertiesPanel({
             type="color"
             value={borderColor}
             onChange={handleBorderColorChange}
-            variant="outlined"
+            variant="filled"
             size="small"
+            sx={{ backgroundColor: theme.palette.background.paper }}
           />
         </Box>
 
@@ -225,9 +227,10 @@ export default function GroupPropertiesPanel({
             type="number"
             value={borderWidth}
             onChange={handleBorderWidthChange}
-            variant="outlined"
+            variant="filled"
             size="small"
             inputProps={{ min: 1, max: 10 }}
+            sx={{ backgroundColor: theme.palette.background.paper }}
           />
         </Box>
 

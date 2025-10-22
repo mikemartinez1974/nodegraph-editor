@@ -147,7 +147,7 @@ export default function GroupListPanel({
         top: pos.y,
         width: 280,
         maxHeight: 'calc(100vh - 104px)',
-        backgroundColor: theme?.palette?.background?.paper || '#fff',
+        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
         zIndex: 1200,
         display: 'flex',
         flexDirection: 'column',

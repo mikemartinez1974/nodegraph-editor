@@ -1,0 +1,474 @@
+// ============================================
+// 2. GraphEditor/graphEditorHandlers.js
+// All handler functions consolidated
+// ============================================
+import eventBus from '../NodeGraph/eventBus';
+
+export function createGraphEditorHandlers({
+  graphAPI,
+  state,
+  historyHook,
+  groupManagerHook,
+  selectionHook,
+  modesHook
+}) {
+  const {
+    nodes, setNodes, nodesRef,
+    edges, setEdges, edgesRef,
+    groups, setGroups,
+    pan, zoom,
+    selectedNodeIds, setSelectedNodeIds,
+    selectedEdgeIds, setSelectedEdgeIds,
+    selectedGroupIds, setSelectedGroupIds,
+    groupManager,
+    setSnackbar, setLoading
+  } = state;
+  
+  const { saveToHistory } = historyHook;
+  
+  // ===== NODE HANDLERS =====
+  const handleAddNode = () => {
+    const centerX = (window.innerWidth / 2 - pan.x) / zoom;
+    const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+    let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
+    if (!api || typeof api.createNode !== 'function') {
+      console.error('graphAPI is not available or createNode is not a function');
+      return;
+    }
+    const result = api.createNode({
+      type: 'default',
+      label: 'New Node',
+      data: { memo: '', link: '' },
+      position: { x: centerX, y: centerY },
+      width: 200,
+      height: 100,
+      resizable: true,
+      handlePosition: 'center',
+      showLabel: true
+    });
+
+    if (result.success) {
+      setNodes(prevNodes => {
+        const next = [...prevNodes, result.data];
+        console.log('setNodes (handleAddNode):', next);
+        return next;
+      });
+    } else {
+      console.error('Failed to create node:', result.error);
+    }
+  };
+  
+  const handleUpdateNodeData = (nodeId, newData, isLabelUpdate = false) => {
+    const updateData = isLabelUpdate 
+      ? { label: newData.label, data: newData }
+      : { data: newData };
+    
+    const result = graphAPI.current.updateNode(nodeId, updateData);
+    if (!result.success) {
+      console.error('Failed to update node:', result.error);
+    }
+  };
+  
+  const handleNodeListSelect = (nodeId, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      selectionHook.handleNodeSelection(nodeId, true);
+    } else {
+      setSelectedNodeIds([nodeId]);
+      setSelectedEdgeIds([]);
+    }
+  };
+
+  const handleNodeFocus = (nodeId) => {
+    const node = nodesRef.current.find(n => n.id === nodeId);
+    if (node) {
+      state.setPan({
+        x: window.innerWidth / 2 - node.position.x * zoom,
+        y: window.innerHeight / 2 - node.position.y * zoom
+      });
+      setSelectedNodeIds([nodeId]);
+      setSelectedEdgeIds([]);
+    }
+  };
+
+  const handleNodeDoubleClick = (nodeId) => {
+    eventBus.emit('openNodeProperties');
+  };
+  
+  // ===== EDGE HANDLERS =====
+  const handleUpdateEdge = (edgeId, updates) => {
+    let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
+    if (!api || typeof api.updateEdge !== 'function') {
+      console.error('graphAPI is not available or updateEdge is not a function');
+      return;
+    }
+    const result = api.updateEdge(edgeId, updates);
+    if (!result.success) {
+      console.error('Failed to update edge:', result.error);
+    }
+  };
+  
+  const handleEdgeDoubleClick = (edgeId) => {
+    eventBus.emit('openEdgeProperties');
+  };
+  
+  // ===== DELETE HANDLERS =====
+  const handleDeleteSelected = () => {
+    if (selectedNodeIds.length > 0) {
+      const newNodes = nodes.filter(n => !selectedNodeIds.includes(n.id));
+      const newEdges = edges.filter(e => 
+        !selectedNodeIds.includes(e.source) && !selectedNodeIds.includes(e.target)
+      );
+      
+      setNodes(newNodes);
+      setEdges(newEdges);
+      nodesRef.current = newNodes;
+      edgesRef.current = newEdges;
+      setSelectedNodeIds([]);
+      saveToHistory(newNodes, newEdges);
+    } else if (selectedEdgeIds.length > 0) {
+      const newEdges = edges.filter(e => !selectedEdgeIds.includes(e.id));
+      setEdges(newEdges);
+      edgesRef.current = newEdges;
+      setSelectedEdgeIds([]);
+      saveToHistory(nodesRef.current, newEdges);
+    } else if (selectedGroupIds.length > 0) {
+      selectedGroupIds.forEach(groupId => {
+        groupManager.current.removeGroup(groupId);
+      });
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds([]);
+      saveToHistory(nodes, edges);
+    }
+  };
+  
+  const handleClearGraph = () => {
+    const newNodes = [], newEdges = [], newGroups = [];
+    setNodes(newNodes);
+    setEdges(newEdges);
+    setGroups(newGroups);
+    nodesRef.current = newNodes;
+    edgesRef.current = newEdges;
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
+    groupManager.current?.clear?.();
+    saveToHistory(newNodes, newEdges, newGroups);
+  };
+  
+  // ===== LOAD/SAVE HANDLERS =====
+  const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = []) => {
+    setNodes(loadedNodes);
+    setEdges(loadedEdges);
+    setGroups(loadedGroups);
+    nodesRef.current = loadedNodes;
+    edgesRef.current = loadedEdges;
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
+    saveToHistory(loadedNodes, loadedEdges);
+
+    if (loadedNodes.length > 0) {
+      const firstNode = loadedNodes[0];
+      state.setPan({
+        x: window.innerWidth / 2 - firstNode.position.x * zoom,
+        y: window.innerHeight / 2 - firstNode.position.y * zoom
+      });
+      setSelectedNodeIds([firstNode.id]);
+      eventBus.emit('openNodeProperties');
+    }
+  };
+  
+  // ===== GROUP HANDLERS =====
+  const handleGroupListSelect = (groupId, isMultiSelect = false) => {
+    selectionHook.handleGroupSelection(groupId, isMultiSelect);
+  };
+
+  const handleGroupFocus = (groupId) => {
+    const group = groups.find(g => g.id === groupId);
+    if (group?.bounds) {
+      state.setPan({
+        x: window.innerWidth / 2 - (group.bounds.x + group.bounds.width / 2) * zoom,
+        y: window.innerHeight / 2 - (group.bounds.y + group.bounds.height / 2) * zoom
+      });
+      setSelectedGroupIds([groupId]);
+      setSelectedNodeIds([]);
+      setSelectedEdgeIds([]);
+    }
+  };
+
+  const handleGroupDoubleClickFromList = (groupId) => {
+    state.setShowGroupProperties(true);
+  };
+
+  const handleGroupToggleVisibility = (groupId) => {
+    const updatedGroups = groups.map(g =>
+      g.id === groupId ? { ...g, visible: g.visible !== true } : g
+    );
+    setGroups(updatedGroups);
+    saveToHistory(nodes, edges);
+  };
+
+  const handleGroupDelete = (groupId) => {
+    const result = groupManager.current.removeGroup(groupId);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
+      saveToHistory(nodes, edges);
+    }
+  };
+
+  const handleUpdateGroup = (groupId, updates) => {
+    const updatedGroups = groups.map(g =>
+      g.id === groupId ? { ...g, ...updates } : g
+    );
+    setGroups(updatedGroups);
+    saveToHistory(nodes, edges);
+  };
+
+  const handleAddNodesToGroup = (groupId, nodeIds) => {
+    const result = groupManager.current.addNodesToGroup(groupId, nodeIds);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      saveToHistory(nodes, edges);
+    }
+  };
+
+  const handleRemoveNodesFromGroup = (groupId, nodeIds) => {
+    const result = groupManager.current.removeNodesFromGroup(groupId, nodeIds);
+    if (result.success) {
+      setGroups(groupManager.current.getAllGroups());
+      saveToHistory(nodes, edges);
+    }
+  };
+  
+  const handleCreateGroupWrapper = () => {
+    if (selectedNodeIds.length < 2) return;
+    const result = groupManager.current.createGroup(selectedNodeIds, {
+      nodes: nodes,
+      label: `Group ${groups.length + 1}`
+    });
+    if (result.success) {
+      setGroups([...groups, result.data]);
+      setSelectedNodeIds([]);
+      setSelectedGroupIds([result.data.id]);
+      saveToHistory(nodes, edges);
+    }
+  };
+
+  const handleUngroupSelectedWrapper = () => {
+    if (selectedGroupIds.length === 0) return;
+    let updated = false;
+    selectedGroupIds.forEach(groupId => {
+      if (groupManager.current.removeGroup(groupId).success) updated = true;
+    });
+    if (updated) {
+      setGroups(groupManager.current.getAllGroups());
+      setSelectedGroupIds([]);
+      saveToHistory(nodes, edges);
+    }
+  };
+  
+  // ===== PASTE HANDLER =====
+  const handlePasteGraphData = async (pastedData) => {
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    try {
+      let pastedNodes = [], pastedEdges = [], pastedGroups = [];
+
+      if (!pastedData) return;
+
+      // Parse input format
+      if (Array.isArray(pastedData)) {
+        if (pastedData[0]?.position && pastedData[0]?.id) pastedNodes = pastedData;
+        else if (pastedData[0]?.source && pastedData[0]?.target) pastedEdges = pastedData;
+        else if (pastedData[0]?.nodeIds) pastedGroups = pastedData;
+      } else if (pastedData.nodes || pastedData.edges || pastedData.groups) {
+        pastedNodes = pastedData.nodes || [];
+        pastedEdges = pastedData.edges || [];
+        pastedGroups = pastedData.groups || [];
+      } else if (pastedData.id && pastedData.position) {
+        pastedNodes = [pastedData];
+      } else if (pastedData.id && pastedData.source && pastedData.target) {
+        pastedEdges = [pastedData];
+      } else if (pastedData.id && pastedData.nodeIds) {
+        pastedGroups = [pastedData];
+      }
+
+      const sanitizeGroups = (groupsArray, availableNodeIdSet) => {
+        return groupsArray.map(g => {
+          const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => availableNodeIdSet.has(id)) : [];
+          return { ...g, nodeIds };
+        }).filter(g => g.nodeIds?.length >= 2);
+      };
+
+      let action = pastedData.action || (pastedNodes.length && pastedEdges.length ? 'replace' : 'add');
+
+      if (action === 'replace') {
+        const nodeIdSet = new Set(pastedNodes.map(n => n.id));
+        const groupsSanitized = sanitizeGroups(pastedGroups, nodeIdSet);
+        
+        setNodes(pastedNodes);
+        setEdges(pastedEdges);
+        setGroups([]);
+        groupManager.current?.clear?.();
+        setGroups(groupsSanitized);
+        
+        groupsSanitized.forEach(g => {
+          groupManager.current.groups.set(g.id, g);
+          g.nodeIds?.forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
+        });
+        
+        setSelectedNodeIds([]);
+        setSelectedEdgeIds([]);
+        setSelectedGroupIds([]);
+        saveToHistory(pastedNodes, pastedEdges, groupsSanitized);
+      } else if (action === 'add') {
+        const existingNodeIds = new Set(nodesRef.current.map(n => n.id));
+        const existingEdgeIds = new Set(edgesRef.current.map(e => e.id));
+        const existingGroupIds = new Set(groups.map(g => g.id));
+
+        const nodesToAdd = pastedNodes.filter(n => !existingNodeIds.has(n.id));
+        const edgesToAdd = pastedEdges.filter(e => !existingEdgeIds.has(e.id));
+        const combinedNodeIds = new Set([...nodesRef.current.map(n => n.id), ...nodesToAdd.map(n => n.id)]);
+        const groupsToAdd = sanitizeGroups(
+          pastedGroups.filter(g => !existingGroupIds.has(g.id)),
+          combinedNodeIds
+        );
+
+        const newNodes = [...nodesRef.current, ...nodesToAdd];
+        const newEdges = [...edgesRef.current, ...edgesToAdd];
+        const newGroups = [...groups, ...groupsToAdd];
+
+        setNodes(newNodes);
+        setEdges(newEdges);
+        setGroups(newGroups);
+
+        groupsToAdd.forEach(g => {
+          groupManager.current.groups.set(g.id, g);
+          g.nodeIds?.forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
+        });
+
+        saveToHistory(newNodes, newEdges, newGroups);
+      }
+    } catch (err) {
+      console.error('Error in handlePasteGraphData:', err);
+      setSnackbar({ open: true, message: 'Error importing graph', severity: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return {
+    // Node
+    handleAddNode,
+    handleUpdateNodeData,
+    handleNodeListSelect,
+    handleNodeFocus,
+    handleNodeDoubleClick,
+    
+    // Edge
+    handleUpdateEdge,
+    handleEdgeDoubleClick,
+    
+    // Delete
+    handleDeleteSelected,
+    handleClearGraph,
+    
+    // Load/Save
+    handleLoadGraph,
+    handlePasteGraphData,
+    
+    // Group
+    handleGroupListSelect,
+    handleGroupFocus,
+    handleGroupDoubleClickFromList,
+    handleGroupToggleVisibility,
+    handleGroupDelete,
+    handleUpdateGroup,
+    handleAddNodesToGroup,
+    handleRemoveNodesFromGroup,
+    handleCreateGroupWrapper,
+    handleUngroupSelectedWrapper
+  };
+}
+
+function generateUUID(nodes) {
+  let id;
+  do {
+    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+  } while (nodes.some(n => n.id === id));
+  return id;
+}
+
+function ensureUniqueNodeIds(nodes, existingNodes) {
+  const existingIds = new Set(existingNodes.map(n => n.id));
+  return nodes.map(node => {
+    let id;
+    do {
+      id = generateUUID();
+    } while (existingIds.has(id));
+    existingIds.add(id);
+    return { ...node, id };
+  });
+}
+
+function deduplicateNodes(nodes) {
+  const seen = new Set();
+  const ids = nodes.map(n => n.id);
+  const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
+  if (duplicates.length > 0) {
+    console.warn('deduplicateNodes: duplicate IDs found:', duplicates);
+    console.log('deduplicateNodes: all IDs:', ids);
+  }
+  return nodes.filter(node => {
+    if (seen.has(node.id)) return false;
+    seen.add(node.id);
+    return true;
+  });
+}
+
+function handleAddNode({ nodes, setNodes, pan, zoom, defaultNodeColor }) {
+  console.log('handleAddNode called');
+  let id;
+  do {
+    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+  } while (nodes.some(n => n.id === id));
+  const newNode = {
+    id,
+    type: 'default',
+    label: 'New Node',
+    position: { x: (window.innerWidth / 2 - pan.x) / zoom, y: (window.innerHeight / 2 - pan.y) / zoom },
+    width: 120,
+    height: 60,
+    color: defaultNodeColor,
+    data: {}
+  };
+  setNodes(prev => {
+    const next = deduplicateNodes([...prev, newNode]);
+    console.log('setNodes (handleAddNode):', next.map(n => n.id));
+    return next;
+  });
+}
+
+function handleImportNodes({ nodes, setNodes, importedNodes }) {
+  const uniqueNodes = ensureUniqueNodeIds(importedNodes, nodes);
+  setNodes(prev => {
+    const next = deduplicateNodes([...prev, ...uniqueNodes]);
+    console.log('setNodes (handleImportNodes):', next.map(n => n.id));
+    return next;
+  });
+}
+
+function handlePasteGraph({ nodes, setNodes, pastedNodes }) {
+  const uniqueNodes = ensureUniqueNodeIds(pastedNodes, nodes);
+  setNodes(prev => {
+    const next = deduplicateNodes([...prev, ...uniqueNodes]);
+    console.log('setNodes (handlePasteGraph):', next.map(n => n.id));
+    return next;
+  });
+}

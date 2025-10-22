@@ -220,6 +220,11 @@ export default function useGraphShortcuts({
         e.preventDefault();
         handleUngroupSelected();
       }
+      // Example shortcut registration (add this near your node add shortcut logic)
+      function handleShortcutAddNode() {
+        console.log('Shortcut: Add Node triggered');
+        // ...existing code to add node...
+      }
     }
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
