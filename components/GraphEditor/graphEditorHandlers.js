@@ -48,11 +48,8 @@ export function createGraphEditorHandlers({
     });
 
     if (result.success) {
-      setNodes(prevNodes => {
-        const next = [...prevNodes, result.data];
-        console.log('setNodes (handleAddNode):', next);
-        return next;
-      });
+      // Remove direct setNodes calls from handleAddNode
+      // Only use GraphCRUD API for node addition
     } else {
       console.error('Failed to create node:', result.error);
     }
@@ -430,26 +427,33 @@ function deduplicateNodes(nodes) {
   });
 }
 
+let addNodeGuard = false;
+
 function handleAddNode({ nodes, setNodes, pan, zoom, defaultNodeColor }) {
+  if (addNodeGuard) return;
+  addNodeGuard = true;
+  setTimeout(() => { addNodeGuard = false; }, 100);
   console.log('handleAddNode called');
-  let id;
-  do {
-    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-  } while (nodes.some(n => n.id === id));
-  const newNode = {
-    id,
-    type: 'default',
-    label: 'New Node',
-    position: { x: (window.innerWidth / 2 - pan.x) / zoom, y: (window.innerHeight / 2 - pan.y) / zoom },
-    width: 120,
-    height: 60,
-    color: defaultNodeColor,
-    data: {}
-  };
   setNodes(prev => {
-    const next = deduplicateNodes([...prev, newNode]);
+    let id;
+    do {
+      id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+    } while (prev.some(n => n.id === id));
+    const newNode = {
+      id,
+      type: 'default',
+      label: 'New Node',
+      position: { x: (window.innerWidth / 2 - pan.x) / zoom, y: (window.innerHeight / 2 - pan.y) / zoom },
+      width: 120,
+      height: 60,
+      color: defaultNodeColor,
+      data: {}
+    };
+    // Remove any node with the same ID before adding
+    const filtered = prev.filter(n => n.id !== id);
+    const next = deduplicateNodes([...filtered, newNode]);
     console.log('setNodes (handleAddNode):', next.map(n => n.id));
     return next;
   });
