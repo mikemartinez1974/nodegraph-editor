@@ -111,7 +111,8 @@ export default function GroupPropertiesPanel({
   const handleBorderWidthChange = (e) => {
     const newWidth = parseInt(e.target.value, 10) || 2;
     setBorderWidth(newWidth);
-    scheduleUpdate({ style: { ...(selectedGroup.style || {}), borderWidth: newWidth } });
+    // Always merge with previous style and trigger update
+    scheduleUpdate({ style: { ...((selectedGroup && selectedGroup.style) || {}), borderWidth: newWidth } });
   };
 
   const handleVisibilityChange = (e) => {
@@ -126,21 +127,48 @@ export default function GroupPropertiesPanel({
     onClose();
   };
 
+  const onMouseDown = e => {
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = e => {
+    if (!dragging.current) return;
+    setPos({
+      x: Math.max(0, Math.min(e.clientX - offset.current.x, window.innerWidth - 340)),
+      y: Math.max(0, Math.min(e.clientY - offset.current.y, window.innerHeight - 104)),
+    });
+  };
+
+  const onMouseUp = () => {
+    dragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
   return (
     <Paper
       elevation={8}
       sx={{
         position: 'fixed',
-        right: 16,
-        top: 88,
+        left: pos.x,
+        top: pos.y,
         width: 320,
         maxHeight: 'calc(100vh - 104px)',
         background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
         zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none',
       }}
+      onMouseDown={onMouseDown}
     >
       {/* Header */}
       <Box sx={{ 
@@ -255,7 +283,7 @@ export default function GroupPropertiesPanel({
           Nodes in Group ({selectedGroup.nodeIds?.length || 0})
         </Typography>
 
-        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1, backgroundColor: theme.palette.background.paper }}>
           {(selectedGroup.nodeIds || []).map((nodeId) => {
             const node = nodes.find(n => n.id === nodeId);
             if (!node) return null;
@@ -286,7 +314,7 @@ export default function GroupPropertiesPanel({
           Available Nodes
         </Typography>
 
-        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+        <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1, backgroundColor: theme.palette.background.paper }}>
           {nodes
             .filter(node => !(selectedGroup.nodeIds || []).includes(node.id))
             .map((node) => (
