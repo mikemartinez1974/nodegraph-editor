@@ -217,7 +217,7 @@ export default function NodeListPanel({
           </FixedSizeList>
         </Box>
       ) : (
-        <List>
+        <List sx={{ height: 'calc(100vh - 180px)', overflowY: 'auto' }}>
           {nodes.map((node) => {
             const isSelected = selectedNodeIds?.includes(node.id);
             return (

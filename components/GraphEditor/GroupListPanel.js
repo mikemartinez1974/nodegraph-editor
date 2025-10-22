@@ -210,10 +210,12 @@ export default function GroupListPanel({
                 return (
                   <ListItem
                     key={group.id}
-                    disablePadding
+                    selected={isSelected}
                     sx={{
+                      backgroundColor: isSelected
+                        ? theme.palette.action.selected
+                        : theme.palette.background.paper,
                       borderBottom: `1px solid ${theme?.palette?.divider || '#e0e0e0'}`,
-                      backgroundColor: isSelected ? theme?.palette?.action?.selected : 'transparent'
                     }}
                   >
                     <ListItemButton
