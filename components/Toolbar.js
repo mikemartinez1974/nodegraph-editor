@@ -39,14 +39,52 @@ import {
   FileCopy as FileCopyIcon,
   MenuBook as MenuBookIcon
 } from '@mui/icons-material';
+import eventBus from '../components/NodeGraph/eventBus';
 
-// Helper to get GraphCRUD API
-const getGraphAPI = () => (typeof window !== 'undefined' ? window.graphAPI : null);
+// Helper to detect theme name from colors
+const detectThemeNameFromPalette = (theme) => {
+  if (!theme?.palette?.primary?.main) return 'light';
+  
+  const primaryColor = theme.palette.primary.main;
+  
+  // Map primary colors to theme names (from your themes.js)
+  const colorToThemeMap = {
+    '#1976d2': 'light',
+    '#90caf9': 'dark',
+    '#2e7d32': 'forest',
+    '#0288d1': 'ocean',
+    '#d84315': 'desert',
+    '#ec407a': 'sakura',
+    '#0097a7': 'arctic',
+    '#ff6f00': 'sunset',
+    '#00e676': 'neon',
+    '#ff0266': 'cyberpunk',
+    '#00bfa5': 'tropical',
+    '#3949ab': 'midnight',
+    '#512da8': 'royal',
+    '#546e7a': 'charcoal',
+    '#9c7a3c': 'champagne',
+    '#607d8b': 'slate',
+    '#bf360c': 'autumn',
+    '#6d4c41': 'cafe',
+    '#ff8f00': 'amber',
+    '#d84315': 'terracotta',
+    '#00897b': 'mint',
+    '#7e57c2': 'lavender',
+    '#90a4ae': 'mist',
+    '#d32f2f': 'volcano',
+    '#5e35b1': 'deepSpace',
+    '#00695c': 'emerald',
+    '#c62828': 'crimson',
+  };
+  
+  return colorToThemeMap[primaryColor] || theme.palette.mode || 'light';
+};
 
 const Toolbar = ({ 
   nodes = [], 
   edges = [], 
-  groups = [], // <-- add this prop
+  groups = [],
   onLoadGraph, 
   onAddNode, 
   onDeleteSelected, 
@@ -55,7 +93,7 @@ const Toolbar = ({
   onRedo,
   selectedNodeId,
   selectedEdgeId,
-  selectedNodeIds = [], // <-- add this prop
+  selectedNodeIds = [],
   canUndo = false,
   canRedo = false,
   onToggleNodeList,
@@ -67,13 +105,18 @@ const Toolbar = ({
   onModeChange,
   onAutoLayoutChange,
   onApplyLayout,
-  onShowMessage, // Add this new prop
+  onShowMessage,
   pan,
   zoom,
   setNodes,
   nodesRef,
   saveToHistory,
-  edgesRef
+  edgesRef,
+  // New props for capturing settings
+  currentTheme = 'light',
+  backgroundImage = null,
+  defaultNodeColor = '#1976d2',
+  defaultEdgeColor = '#666666'
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -122,33 +165,6 @@ const Toolbar = ({
     document.removeEventListener('mouseup', onMouseUp);
   };
 
-  const handlePasteGraph = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      const data = JSON.parse(text);
-      
-      console.log('📋 TOOLBAR PASTE - Immediately after JSON.parse:', {
-        hasNodes: !!data.nodes,
-        firstNode: data.nodes?.[0],
-        firstNodeColor: data.nodes?.[0]?.color
-      });
-      
-      // DEBUG: Log what we're about to paste
-      console.log('📋 PASTE DEBUG - From clipboard:', {
-        nodeCount: data.nodes?.length,
-        edgeCount: data.edges?.length,
-        sampleNode: data.nodes?.[0],
-        nodesWithColor: data.nodes?.filter(n => n.color).length,
-        edgesWithColor: data.edges?.filter(e => e.color).length
-      });
-      
-      eventBus.emit('pasteGraphData', data);
-      // ...existing success code...
-    } catch (error) {
-      console.error('Failed to paste:', error);
-    }
-  };
-
   const handleClear = () => {
     if (onClearGraph) {
       const confirmed = window.confirm('Are you sure you want to clear the entire graph? This cannot be undone.');
@@ -172,8 +188,23 @@ const Toolbar = ({
       try {
         const jsonData = JSON.parse(event.target.result);
         
-        // Validate the structure
-        if (!jsonData.nodes || !jsonData.edges) {
+        // Support both old format and new NodeGraphSaveFormat
+        let nodesToLoad, edgesToLoad, groupsToLoad;
+        
+        if (jsonData.fileVersion && jsonData.nodes) {
+          // New format - extract from NodeGraphSaveFormat
+          nodesToLoad = jsonData.nodes;
+          edgesToLoad = jsonData.edges;
+          groupsToLoad = jsonData.groups || [];
+          
+          // TODO: Apply settings from the file (theme, viewport, etc.)
+          console.log('Loaded NodeGraphSaveFormat v' + jsonData.fileVersion);
+        } else if (jsonData.nodes && jsonData.edges) {
+          // Legacy format - direct nodes/edges
+          nodesToLoad = jsonData.nodes;
+          edgesToLoad = jsonData.edges;
+          groupsToLoad = jsonData.groups || [];
+        } else {
           console.error('Invalid graph file format');
           if (onShowMessage) onShowMessage('Invalid graph file format. Missing nodes or edges.', 'error');
           return;
@@ -181,8 +212,16 @@ const Toolbar = ({
 
         // Call the callback to update the graph
         if (onLoadGraph) {
-          onLoadGraph(jsonData.nodes, jsonData.edges, jsonData.groups || []);
+          onLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
           console.log('Graph loaded successfully!');
+          if (onShowMessage) onShowMessage('Graph loaded successfully!', 'success');
+
+          // Emit optional settings/viewport for the editor to apply (settings are optional)
+          try {
+            eventBus.emit('loadSaveFile', { settings: jsonData.settings || {}, viewport: jsonData.viewport || {} });
+          } catch (err) {
+            console.warn('Failed to emit loadSaveFile event:', err);
+          }
         }
       } catch (error) {
         console.error('Error parsing JSON:', error);
@@ -191,12 +230,49 @@ const Toolbar = ({
     };
 
     reader.readAsText(file);
-    // Reset the input so the same file can be loaded again
     e.target.value = '';
   };
 
   const handleSaveToFile = () => {
-    const schema = {
+    const now = new Date().toISOString();
+    
+    // Extract theme object from current theme
+    const themeObject = theme?.palette ? {
+      primary: theme.palette.primary?.main || '#1976d2',
+      primaryContrast: theme.palette.primary?.contrastText || '#ffffff',
+      secondary: theme.palette.secondary?.main || '#dc004e',
+      secondaryContrast: theme.palette.secondary?.contrastText || '#ffffff',
+      background: theme.palette.background?.default || '#f5f5f5',
+      paper: theme.palette.background?.paper || '#ffffff',
+      textPrimary: theme.palette.text?.primary || '#000000',
+      textSecondary: theme.palette.text?.secondary || '#666666',
+      divider: theme.palette.divider || '#e0e0e0'
+    } : null;
+
+    // Build NodeGraphSaveFormat compliant file
+    const saveData = {
+      fileVersion: "1.0",
+      metadata: {
+        title: "Untitled Graph",
+        description: "",
+        created: now,
+        modified: now,
+        author: "",
+        tags: []
+      },
+      settings: {
+        theme: themeObject,
+        backgroundImage: backgroundImage || null,
+        defaultNodeColor: defaultNodeColor || '#1976d2',
+        defaultEdgeColor: defaultEdgeColor || '#666666',
+        snapToGrid: false,
+        gridSize: 20,
+        autoSave: false
+      },
+      viewport: {
+        pan: pan || { x: 0, y: 0 },
+        zoom: zoom || 1
+      },
       nodes: nodes.map(node => ({
         id: node.id,
         type: node.type,
@@ -204,28 +280,36 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
-        color: node.color, // <-- include color
-        data: node.data
+        color: node.color,
+        visible: node.visible !== false,
+        showLabel: node.showLabel !== false,
+        data: node.data || {}
       })),
       edges: edges.map(edge => ({
         id: edge.id,
         type: edge.type,
         source: edge.source,
         target: edge.target,
-        label: edge.label,
-        color: edge.color, // <-- include color
-        style: edge.style
+        label: edge.label || "",
+        style: edge.style || {}
       })),
-      groups: groups.map(group => ({ ...group })) // use prop
+      groups: groups.map(group => ({
+        id: group.id,
+        label: group.label || "",
+        nodeIds: group.nodeIds || [],
+        bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
+        visible: group.visible !== false,
+        style: group.style || {}
+      }))
     };
 
-    const jsonString = JSON.stringify(schema, null, 2);
+    const jsonString = JSON.stringify(saveData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.nodegraph`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -233,11 +317,11 @@ const Toolbar = ({
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    console.log('Graph saved to file!');
+    if (onShowMessage) onShowMessage('Graph saved to .nodegraph file!', 'success');
+    console.log('Graph saved to file in NodeGraphSaveFormat!');
   };
 
   const handleCopyMetadata = async () => {
-    // Extract only metadata - node/edge types and data structure
     const edgeTypesUsed = [...new Set(edges.map(e => e.type))];
     const edgeMetadata = {};
     
@@ -273,7 +357,6 @@ const Toolbar = ({
       console.log('Graph metadata copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy:', err);
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = jsonString;
       textArea.style.position = 'fixed';
@@ -300,7 +383,7 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
-        color: node.color, // <-- include color
+        color: node.color,
         data: node.data
       })),
       edges: edges.map(edge => ({
@@ -309,7 +392,7 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label,
-        color: edge.color, // <-- include color
+        color: edge.color,
         style: edge.style
       }))
     };
@@ -324,7 +407,6 @@ const Toolbar = ({
       console.log('Graph schema copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy:', err);
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = jsonString;
       textArea.style.position = 'fixed';
@@ -365,10 +447,7 @@ const Toolbar = ({
       return;
     }
 
-    // Get selected nodes
     const selectedNodes = nodes.filter(n => selectedNodeIds.includes(n.id));
-    
-    // Get all edges that connect selected nodes (both source and target must be selected)
     const selectedEdges = edges.filter(e => 
       selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
     );
@@ -381,7 +460,7 @@ const Toolbar = ({
         position: node.position,
         width: node.width,
         height: node.height,
-        color: node.color, // <-- include color
+        color: node.color,
         data: node.data
       })),
       edges: selectedEdges.map(edge => ({
@@ -390,7 +469,7 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label,
-        color: edge.color, // <-- include color
+        color: edge.color,
         style: edge.style
       }))
     };
@@ -413,13 +492,11 @@ const Toolbar = ({
       const clipboardText = await navigator.clipboard.readText();
       const jsonData = JSON.parse(clipboardText);
 
-      // Validate structure
       if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
         if (onShowMessage) onShowMessage('Invalid clipboard data. Must contain nodes array.', 'error');
         return;
       }
 
-      // Call the global paste handler if available
       if (typeof window !== 'undefined' && window.handlePasteGraphData) {
         window.handlePasteGraphData(jsonData);
         setPasted(true);
@@ -447,42 +524,34 @@ const Toolbar = ({
     }
   };
 
-  // Universal paste handler: JSON -> use existing handler; Plain text -> create a node
-  // Only triggered by toolbar button click, not keyboard shortcuts
   const handlePasteUniversal = async () => {
     try {
       const text = await navigator.clipboard.readText();
       if (!text || !text.trim()) return;
 
-      // If JSON, defer to the existing paste handler
       try {
         JSON.parse(text);
         return handlePasteSelected();
       } catch {
-        // Not JSON: create a resizable node directly
         const lines = text.trim().split('\n');
-        const label = lines[0].substring(0, 50); // First line, max 50 chars
+        const label = lines[0].substring(0, 50);
         const memo = text.trim();
         
-        // Calculate size based on text content
         const width = Math.max(200, Math.min(600, label.length * 8 + 100));
         const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
         
-        // Position at center of current view
         const centerX = (window.innerWidth / 2 - pan.x) / zoom;
         const centerY = (window.innerHeight / 2 - pan.y) / zoom;
         
         const newNode = {
           id: `node_${Date.now()}`,
           label: label,
-          type: 'default',  // Regular resizable node
+          type: 'default',
           position: { x: centerX, y: centerY },
           width: width,
           height: height,
           resizable: true,
-          data: {
-            memo: memo
-          }
+          data: { memo: memo }
         };
         
         setNodes(prev => {
@@ -501,34 +570,13 @@ const Toolbar = ({
   };
 
   const handleCopyGraph = () => {
-    // DEBUG: Log nodes state BEFORE creating graphData
-    console.log('📋 COPY - nodes array:', nodes);
-    console.log('📋 COPY - first node:', nodes[0]);
-    console.log('📋 COPY - first node color:', nodes[0]?.color);
-    
     const graphData = {
       nodes: nodes,
       edges: edges,
       groups: groups || []
     };
     
-    // DEBUG: Log graphData AFTER creation
-    console.log('📋 COPY - graphData.nodes[0]:', graphData.nodes[0]);
-    console.log('📋 COPY - graphData.nodes[0].color:', graphData.nodes[0]?.color);
-    
-    // DEBUG: Log what we're copying
-    console.log('📋 COPY DEBUG - Copying to clipboard:', {
-      nodeCount: nodes.length,
-      edgeCount: edges.length,
-      sampleNode: nodes[0],
-      nodesWithColor: nodes.filter(n => n.color).length,
-      edgesWithColor: edges.filter(e => e.color).length
-    });
-    
     const jsonString = JSON.stringify(graphData, null, 2);
-    
-    // DEBUG: Log the actual JSON string
-    console.log('📋 COPY - JSON string preview:', jsonString.substring(0, 500));
     
     navigator.clipboard.writeText(jsonString)
       .then(() => {
@@ -539,7 +587,6 @@ const Toolbar = ({
       })
       .catch(err => {
         console.error('Failed to copy:', err);
-        // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = jsonString;
         textArea.style.position = 'fixed';
@@ -559,53 +606,103 @@ const Toolbar = ({
       });
   };
 
-  // Add debug logging to the save handler to verify color properties
-  const handleSaveGraph = () => {
-    // Log nodes and edges before saving
-    console.log('📝 SAVE - nodes array:', nodes);
-    console.log('📝 SAVE - first node:', nodes[0]);
-    console.log('📝 SAVE - first node color:', nodes[0]?.color);
-    console.log('📝 SAVE - edges array:', edges);
-    console.log('📝 SAVE - first edge:', edges[0]);
-    console.log('📝 SAVE - first edge color:', edges[0]?.color);
+  // Build a compact theme object to persist in save file
+  const exportThemeObject = (theme) => ({
+    primary: theme.palette?.primary?.main || null,
+    primaryContrast: theme.palette?.primary?.contrastText || null,
+    secondary: theme.palette?.secondary?.main || null,
+    secondaryContrast: theme.palette?.secondary?.contrastText || null,
+    background: theme.palette?.background?.default || null,
+    paper: theme.palette?.background?.paper || null,
+    textPrimary: theme.palette?.text?.primary || null,
+    textSecondary: theme.palette?.text?.secondary || null,
+    divider: theme.palette?.divider || null,
+    success: theme.palette?.success?.main || null,
+    error: theme.palette?.error?.main || null,
+    warning: theme.palette?.warning?.main || null,
+    info: theme.palette?.info?.main || null
+  });
 
-    const graphData = {
-      nodes: nodes,
-      edges: edges,
-      groups: groups || []
+  const handleExport = () => {
+    const payload = {
+      fileVersion: "1.0",
+      metadata: {
+        title: "Untitled Graph",
+        description: "",
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        author: "",
+        tags: []
+      },
+      settings: {
+        theme: null,
+        backgroundImage: backgroundImage || null,
+        defaultNodeColor: defaultNodeColor || '#1976d2',
+        defaultEdgeColor: defaultEdgeColor || '#666666',
+        snapToGrid: false,
+        gridSize: 20,
+        autoSave: false
+      },
+      viewport: {
+        pan: pan || { x: 0, y: 0 },
+        zoom: zoom || 1
+      },
+      nodes: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        color: node.color,
+        visible: node.visible !== false,
+        showLabel: node.showLabel !== false,
+        data: node.data || {}
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target,
+        label: edge.label || "",
+        style: edge.style || {}
+      })),
+      groups: groups.map(group => ({
+        id: group.id,
+        label: group.label || "",
+        nodeIds: group.nodeIds || [],
+        bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
+        visible: group.visible !== false,
+        style: group.style || {}
+      }))
     };
+
+    // Ensure settings.theme is a theme object, not a string
+    try {
+      payload.settings = payload.settings || {};
+      payload.settings.theme = exportThemeObject(theme);
+      // remove any legacy themeName or mode fields
+      if (payload.settings.themeName) delete payload.settings.themeName;
+      if (payload.settings.theme && payload.settings.theme.mode) delete payload.settings.theme.mode;
+    } catch (err) {
+      // Fallback: leave existing value if theme not available
+      console.warn('Could not include theme object in export:', err);
+    }
+
+    const jsonString = JSON.stringify(payload, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     
-    // Log the actual JSON string preview
-    const jsonString = JSON.stringify(graphData, null, 2);
-    console.log('📝 SAVE - JSON string preview:', jsonString.substring(0, 500));
-    
-    navigator.clipboard.writeText(jsonString)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-        console.log('Graph schema copied to clipboard!');
-      })
-      .catch(err => {
-        console.error('Failed to copy:', err);
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = jsonString;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-        } catch (err2) {
-          console.error('Fallback copy failed:', err2);
-          if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
-        }
-        document.body.removeChild(textArea);
-      });
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.nodegraph`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    if (onShowMessage) onShowMessage('Graph exported to .nodegraph file!', 'success');
+    console.log('Graph exported to file in NodeGraphSaveFormat!');
   };
 
   return (
@@ -634,9 +731,7 @@ const Toolbar = ({
         p: 1,
         flexWrap: 'nowrap'
       }}>
-        {/* Essential actions */}
         <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
-          {/* Onboard LLM button - position #1 */}
           <IconButton
             onClick={handleCopyOnboard}
             title="Onboard LLM"
@@ -646,7 +741,6 @@ const Toolbar = ({
             <ContentPasteGoIcon fontSize="small" />
           </IconButton>
           
-          {/* Paste button - position #2 */}
           <IconButton
             onClick={handlePasteUniversal}
             title="Paste (JSON or Text)"
@@ -656,7 +750,6 @@ const Toolbar = ({
             <ContentPasteIcon fontSize="small" />
           </IconButton>
 
-          {/* Copy Selected button - position #3 */}
           <IconButton
             onClick={handleCopySelected}
             disabled={selectedNodeIds.length === 0}
@@ -668,7 +761,6 @@ const Toolbar = ({
             <ContentCopyIcon fontSize="small" />
           </IconButton>
 
-          {/* New: Copy Entire Graph immediately after Copy Selected */}
           <IconButton
             onClick={handleCopyGraph}
             title="Copy Entire Graph"
@@ -679,7 +771,6 @@ const Toolbar = ({
             <FileCopyIcon fontSize="small" />
           </IconButton>
           
-          {/* New: Copy User Manual button */}
           <IconButton
             onClick={handleCopyUserManual}
             title="Copy User Manual"
@@ -729,7 +820,7 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
-            onClick={onClearGraph}
+            onClick={handleClear}
             title="Clear Graph"
             size="small"
             color="error"
@@ -739,7 +830,7 @@ const Toolbar = ({
 
           <IconButton
             onClick={handleSaveToFile}
-            title="Save Graph to File"
+            title="Save Graph to File (.nodegraph)"
             size="small"
           >
             <SaveIcon fontSize="small" />
@@ -754,7 +845,6 @@ const Toolbar = ({
           </IconButton>
         </ButtonGroup>
 
-        {/* History controls */}
         <ButtonGroup size="small" sx={{ mr: 1 }}>
           <IconButton
             onClick={onUndo}
@@ -774,7 +864,6 @@ const Toolbar = ({
           </IconButton>
         </ButtonGroup>
 
-        {/* Mode selector */}
         <ToggleButtonGroup
           value={mode}
           exclusive
@@ -797,7 +886,6 @@ const Toolbar = ({
           </ToggleButton>
         </ToggleButtonGroup>
 
-        {/* Auto layout options - only in auto mode */}
         {mode === 'auto' && (
           <ButtonGroup size="small" sx={{ mr: 1 }}>
             <Button
@@ -827,7 +915,6 @@ const Toolbar = ({
         >
           <MenuItem
             onClick={() => {
-              // Only set the layout type, do not apply layout
               onAutoLayoutChange('hierarchical');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -837,7 +924,6 @@ const Toolbar = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
-              // Only set the layout type, do not apply layout
               onAutoLayoutChange('radial');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -847,7 +933,6 @@ const Toolbar = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
-              // Only set the layout type, do not apply layout
               onAutoLayoutChange('grid');
               setAutoLayoutMenuAnchor(null);
             }}
@@ -857,7 +942,6 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
-        {/* Status indicators */}
         {(copied || metadataCopied || saved || pasted || selectedCopied || onboardCopied) && (
           <Chip
             label={
@@ -874,11 +958,10 @@ const Toolbar = ({
           />
         )}
 
-        {/* Hidden file input */}
         <input
           ref={fileInputRef}
           type="file"
-          accept=".json"
+          accept=".json,.nodegraph"
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />

@@ -30,3 +30,34 @@
     }
   ]
 }
+
+
+
+
+{
+  "version": "1.0",
+  "metadata": {
+    "title": "My Project",
+    "description": "",
+    "created": "2025-10-22T10:30:00Z",
+    "modified": "2025-10-22T14:45:00Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": "ocean",
+    "backgroundImage": "grid-01.png",
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": true
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1.0
+  },
+  "nodes": [...],
+  "edges": [...],
+  "groups": [...]
+}

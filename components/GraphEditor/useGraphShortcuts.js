@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import eventBus from '../NodeGraph/eventBus';
 
 export default function useGraphShortcuts({
   setNodes,
@@ -170,6 +171,29 @@ export default function useGraphShortcuts({
     function handleKeyboardShortcuts(e) {
       // Only trigger graph shortcuts if not editing text
       if (isTextInputActive()) return;
+      const mod = e.ctrlKey || e.metaKey;
+
+      // Save (Ctrl/Cmd+S)
+      if (mod && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        eventBus.emit('saveGraph');
+        return;
+      }
+
+      // Undo (Ctrl/Cmd+Z)
+      if (mod && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        eventBus.emit('undo');
+        return;
+      }
+
+      // Redo (Ctrl/Cmd+Y)
+      if (mod && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault();
+        eventBus.emit('redo');
+        return;
+      }
+
       // Copy selected nodes on Ctrl+C
       if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
         e.preventDefault();

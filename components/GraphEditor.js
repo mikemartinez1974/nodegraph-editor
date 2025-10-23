@@ -144,6 +144,27 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, [graphAPI]);
   
+  // Listen for 'loadSaveFile' event and apply optional settings/viewport: setPan, setZoom, defaultNodeColor/defaultEdgeColor, and apply theme if theme object present in settings.
+  useEffect(() => {
+    function handleLoadSaveFile({ settings = {}, viewport = {} }) {
+      try {
+        if (viewport.pan) setPan(viewport.pan);
+        if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
+        if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
+        if (settings.defaultEdgeColor) state.defaultEdgeColor = settings.defaultEdgeColor;
+        // Optionally apply theme colors if provided (emit event for UI-level theming)
+        if (settings.theme) {
+          eventBus.emit('applyThemeFromSave', settings.theme);
+        }
+      } catch (err) {
+        console.warn('Failed to apply loaded save settings:', err);
+      }
+    }
+
+    eventBus.on('loadSaveFile', handleLoadSaveFile);
+    return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
+  }, [setPan, setZoom, state]);
+  
   return (
     <div 
       id="graph-editor-background" 
