@@ -27,6 +27,7 @@ const NodeLayer = ({
 }) => {
     // Deduplicate nodes before rendering
     const uniqueNodes = deduplicateNodes(nodes);
+    
     // Runtime check for duplicate node ids
     const idSet = new Set();
     const duplicates = [];
@@ -56,30 +57,24 @@ const NodeLayer = ({
                         pan={pan}
                         zoom={zoom}
                         isSelected={isSelected}
-                        selected={selectedNodeId === node.id} // Backward compatibility
+                        selected={selectedNodeId === node.id}
                         isMultiSelect={isMultiSelect}
                         selectedCount={selectedNodeIds.length}
                         draggingHandle={draggingNodeId === node.id}
                         onMouseDown={e => {
-                            // Allow text selection inside markdown nodes
                             const target = e.target;
                             if (target && target.closest && target.closest('.markdown-content')) {
-                                // Don't initiate drag; let the browser handle text selection
                                 return;
                             }
                             onNodeDragStart && onNodeDragStart(e, node);
                         }}
                         onClick={onNodeEvent ? (e) => {
-                            // If user selected text inside a markdown-content, don't treat this as a click
                             try {
                               const sel = window.getSelection && window.getSelection();
                               if (sel && sel.toString && sel.toString().length > 0) {
-                                // User made a text selection — do not fire node click or clear selection
                                 return;
                               }
-                            } catch (err) {
-                              // ignore selection errors
-                            }
+                            } catch (err) {}
                             onNodeEvent(node.id, e);
                         } : undefined}
                         onDoubleClick={onNodeDoubleClick ? (e) => {
@@ -88,7 +83,7 @@ const NodeLayer = ({
                         } : undefined}
                         onMouseEnter={() => eventBus.emit('nodeHover', { id: node.id })}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
-                        nodeRefs={nodeRefs}  // Pass nodeRefs to each node component
+                        nodeRefs={nodeRefs}
                     />
                  );
             })}

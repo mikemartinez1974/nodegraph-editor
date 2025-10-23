@@ -14,10 +14,10 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
         const ty = tempPanRef.current.y;
         const t = (tx || ty) ? `translate(${tx}px, ${ty}px)` : '';
         
-        if (layerRefs.edgeCanvas.current) layerRefs.edgeCanvas.current.style.transform = t;
-        if (layerRefs.handleCanvas.current) layerRefs.handleCanvas.current.style.transform = t;
-        if (layerRefs.group.current) layerRefs.group.current.style.transform = t;
-        if (layerRefs.nodeContainer.current) layerRefs.nodeContainer.current.style.transform = t;
+        if (layerRefs?.edgeCanvas?.current) layerRefs.edgeCanvas.current.style.transform = t;
+        if (layerRefs?.handleCanvas?.current) layerRefs.handleCanvas.current.style.transform = t;
+        if (layerRefs?.group?.current) layerRefs.group.current.style.transform = t;
+        if (layerRefs?.nodeContainer?.current) layerRefs.nodeContainer.current.style.transform = t;
     }, [layerRefs]);
 
     const handleMouseMove = useCallback((e) => {
@@ -66,9 +66,9 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
         if (e.shiftKey && onMarqueeStart) {
             const marqueeStarted = onMarqueeStart(e);
             if (marqueeStarted) {
-                e.preventDefault(); // Prevent default panning behavior
+                e.preventDefault();
                 e.stopPropagation();
-                return; // Marquee selection started, block panning
+                return;
             }
         }
 
@@ -81,27 +81,57 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
     }, [handleMouseMove, handleMouseUp, onMarqueeStart]);
 
     useEffect(() => {
+        const wheelTimeoutRef = { current: null };
+        
         function handleWheel(e) {
             // Only zoom if mouse is over the graph canvas, not a scrollable panel or input
             const tag = e.target.tagName;
             const isTextInput = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable;
             const isScrollablePanel = e.target.closest('.MuiDrawer-paper, .scrollable-panel, .MuiPaper-root');
             if (isTextInput || isScrollablePanel) {
-                // Let the wheel event scroll the panel/input
                 return;
             }
             e.preventDefault();
-            const change = 0.01;
-            const delta = e.deltaY < 0 ? change : -change;
-            if (typeof setZoom === 'function') {
-                setZoom((prev) => Math.max(0.1, Math.min(2, prev + delta)));
+            
+            // Clear any pending zoom timeout
+            if (wheelTimeoutRef.current) {
+                clearTimeout(wheelTimeoutRef.current);
             }
+            
+            // Multiplicative zoom for smooth, natural feel
+            const zoomSpeed = 0.002;
+            const delta = -e.deltaY * zoomSpeed;
+            
+            setZoom((prevZoom) => {
+                const newZoom = Math.max(0.1, Math.min(3, prevZoom * (1 + delta)));
+                
+                // Calculate cursor position in graph coordinates
+                const cursorX = e.clientX;
+                const cursorY = e.clientY;
+                
+                // Zoom towards cursor
+                onPanZoom((prevPan) => {
+                    const graphX = (cursorX - prevPan.x) / prevZoom;
+                    const graphY = (cursorY - prevPan.y) / prevZoom;
+                    
+                    return {
+                        x: cursorX - graphX * newZoom,
+                        y: cursorY - graphY * newZoom
+                    };
+                });
+                
+                return newZoom;
+            });
         }
+        
         window.addEventListener('wheel', handleWheel, { passive: false });
         return () => {
             window.removeEventListener('wheel', handleWheel, { passive: false });
+            if (wheelTimeoutRef.current) {
+                clearTimeout(wheelTimeoutRef.current);
+            }
         };
-    }, [zoom, setZoom]);
+    }, [setZoom, onPanZoom]);
 
     // Ensure transforms are cleared after pan changes
     useEffect(() => {
@@ -118,7 +148,7 @@ const PanZoomLayer = React.forwardRef(({ pan, zoom, onPanZoom, setZoom, onBackgr
                 zIndex: 1,
                 background: 'transparent',
                 transition: 'background 0.2s',
-                pointerEvents: 'auto', // Ensure wheel events are received
+                pointerEvents: 'auto',
             }}
             onMouseDown={handleMouseDown}
         >
