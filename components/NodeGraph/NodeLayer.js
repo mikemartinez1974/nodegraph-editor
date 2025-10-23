@@ -60,8 +60,28 @@ const NodeLayer = ({
                         isMultiSelect={isMultiSelect}
                         selectedCount={selectedNodeIds.length}
                         draggingHandle={draggingNodeId === node.id}
-                        onMouseDown={e => onNodeDragStart && onNodeDragStart(e, node)}
-                        onClick={onNodeEvent ? (e) => onNodeEvent(node.id, e) : undefined}
+                        onMouseDown={e => {
+                            // Allow text selection inside markdown nodes
+                            const target = e.target;
+                            if (target && target.closest && target.closest('.markdown-content')) {
+                                // Don't initiate drag; let the browser handle text selection
+                                return;
+                            }
+                            onNodeDragStart && onNodeDragStart(e, node);
+                        }}
+                        onClick={onNodeEvent ? (e) => {
+                            // If user selected text inside a markdown-content, don't treat this as a click
+                            try {
+                              const sel = window.getSelection && window.getSelection();
+                              if (sel && sel.toString && sel.toString().length > 0) {
+                                // User made a text selection — do not fire node click or clear selection
+                                return;
+                              }
+                            } catch (err) {
+                              // ignore selection errors
+                            }
+                            onNodeEvent(node.id, e);
+                        } : undefined}
                         onDoubleClick={onNodeDoubleClick ? (e) => {
                             e.stopPropagation();
                             onNodeDoubleClick(node.id);

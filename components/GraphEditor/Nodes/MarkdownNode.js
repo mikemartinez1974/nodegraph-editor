@@ -61,6 +61,7 @@ const MarkdownNode = ({
       {/* Markdown content */}
       <div 
         ref={nodeRef}
+        className="markdown-content"
         style={{ 
           flex: 1,
           padding: '12px',
@@ -69,7 +70,8 @@ const MarkdownNode = ({
           lineHeight: 1.5,
           fontFamily: isDark ? '"Courier New", Courier, monospace' : '"Comic Sans MS", "Trebuchet MS", sans-serif',
           cursor: 'pointer',
-          pointerEvents: 'auto'
+          pointerEvents: 'auto',
+          userSelect: 'text'
         }}
       >
         <ReactMarkdown
