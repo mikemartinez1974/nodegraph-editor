@@ -37,9 +37,11 @@ import {
   ContentPaste as ContentPasteIcon,
   ContentCopy as ContentCopyIcon,
   FileCopy as FileCopyIcon,
-  MenuBook as MenuBookIcon
+  MenuBook as MenuBookIcon,
+  Settings as SettingsIcon
 } from '@mui/icons-material';
 import eventBus from '../components/NodeGraph/eventBus';
+import PreferencesDialog from './GraphEditor/PreferencesDialog';
 
 // Helper to detect theme name from colors
 const detectThemeNameFromPalette = (theme) => {
@@ -131,6 +133,7 @@ const Toolbar = ({
   const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
   const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -843,6 +846,15 @@ const Toolbar = ({
           >
             <LoadIcon fontSize="small" />
           </IconButton>
+
+          <IconButton
+            onClick={() => setPreferencesOpen(true)}
+            title="Preferences"
+            aria-label="Open Preferences"
+            size="small"
+          >
+            <SettingsIcon fontSize="small" />
+          </IconButton>
         </ButtonGroup>
 
         <ButtonGroup size="small" sx={{ mr: 1 }}>
@@ -964,6 +976,11 @@ const Toolbar = ({
           accept=".json,.nodegraph"
           onChange={handleFileChange}
           style={{ display: 'none' }}
+        />
+
+        <PreferencesDialog
+          open={preferencesOpen}
+          onClose={() => setPreferencesOpen(false)}
         />
       </Box>
     </Paper>
