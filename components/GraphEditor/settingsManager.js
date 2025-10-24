@@ -2,6 +2,38 @@
 
 const SETTINGS_KEY = 'nodegraph-editor-settings';
 
+const introGraph = {
+  nodes: [
+    {
+      id: 'intro-1',
+      label: 'Welcome to NodeGraph Editor!',
+      position: { x: 200, y: 150 },
+      type: 'default',
+      width: 250,
+      height: 100,
+      data: { memo: 'This is an introductory graph. Use the AI to create and edit graphs!' }
+    },
+    {
+      id: 'intro-2',
+      label: 'Start Here',
+      position: { x: 500, y: 150 },
+      type: 'default',
+      width: 150,
+      height: 80,
+      data: { memo: 'Drag nodes, add edges, and explore the features.' }
+    }
+  ],
+  edges: [
+    {
+      id: 'intro-edge-1',
+      source: 'intro-1',
+      target: 'intro-2',
+      label: 'Next Step'
+    }
+  ],
+  groups: []
+};
+
 const defaultSettings = {
   themeName: 'light',
   backgroundImage: null,
@@ -37,17 +69,20 @@ const defaultSettings = {
 
 export const loadSettings = () => {
   try {
-    const savedSettings = localStorage.getItem(SETTINGS_KEY);
-    return savedSettings ? JSON.parse(savedSettings) : defaultSettings;
+    console.log('loadSettings called, returning defaultSettings');
+    return { ...defaultSettings, nodes: [], edges: [], groups: [] };
   } catch (error) {
     console.error('Failed to load settings:', error);
-    return defaultSettings;
+    return { ...defaultSettings, nodes: [], edges: [], groups: [] };
   }
 };
 
 export const saveSettings = (settings) => {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
+    if (!isFreeUser) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    }
   } catch (error) {
     console.error('Failed to save settings:', error);
   }

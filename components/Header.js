@@ -5,12 +5,17 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ThemeDrawer from './Header/ThemeDrawer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import themeMap from './Header/themes';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
+import eventBus from './NodeGraph/eventBus';
 
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [address, setAddress] = useState('');
   let muiTheme = useTheme();
   if (!muiTheme || !('palette' in muiTheme)) {
     muiTheme = themeMap.default;
@@ -18,6 +23,14 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   // Dark mode = dark logo, Light mode = light logo
   const logoSrc = muiTheme?.palette?.mode === 'dark' ? '/logo_dark.png' : '/logo_light.png';
   const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    const handleSetAddress = ({ url }) => {
+      setAddress(url);
+    };
+    eventBus.on('setAddress', handleSetAddress);
+    return () => eventBus.off('setAddress', handleSetAddress);
+  }, []);
 
   return (
     <div>
@@ -48,6 +61,35 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
               🎨 🖌️ 🖼️ 🧶 🧷
             </span>
           </Typography>
+
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Enter URL or search..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                eventBus.emit('fetchUrl', { url: address });
+                // Removed setAddress(''); to keep the URL in the bar
+              }
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              width: 300,
+              mr: 2,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: muiTheme.palette.background.paper,
+                borderRadius: 1,
+              },
+            }}
+          />
 
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon />

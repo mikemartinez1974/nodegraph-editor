@@ -118,7 +118,8 @@ const Toolbar = ({
   currentTheme = 'light',
   backgroundImage = null,
   defaultNodeColor = '#1976d2',
-  defaultEdgeColor = '#666666'
+  defaultEdgeColor = '#666666',
+  isFreeUser = false // New prop for free user check
 }) => {
   const theme = useTheme();
   const palette = theme?.palette || {};
@@ -793,24 +794,6 @@ const Toolbar = ({
           >
             <AddIcon />
           </IconButton>
-          
-          <IconButton
-            onClick={onToggleNodeList}
-            color={showNodeList ? "primary" : "default"}
-            title="Toggle Node List"
-            size="small"
-          >
-            <ListIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={onToggleGroupList}
-            color={showGroupList ? "primary" : "default"}
-            title="Toggle Group List"
-            size="small"
-          >
-            <GroupIcon fontSize="small" />
-          </IconButton>
 
           <IconButton
             onClick={onDeleteSelected}
@@ -827,14 +810,55 @@ const Toolbar = ({
             title="Clear Graph"
             size="small"
             color="error"
+            disabled={isFreeUser}
           >
             <ThumbDownOffAltIcon fontSize="small" />
+          </IconButton>
+
+          <ButtonGroup size="small" sx={{ mr: 1 }}>
+            <IconButton
+              onClick={onUndo}
+              disabled={!canUndo}
+              title="Undo (Ctrl+Z)"
+              size="small"
+            >
+              <UndoIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              onClick={onRedo}
+              disabled={!canRedo}
+              title="Redo (Ctrl+Y)"
+              size="small"
+            >
+              <RedoIcon fontSize="small" />
+            </IconButton>
+          </ButtonGroup>
+          
+          <IconButton
+            onClick={onToggleNodeList}
+            color={showNodeList ? "primary" : "default"}
+            title="Toggle Node List"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <ListIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={onToggleGroupList}
+            color={showGroupList ? "primary" : "default"}
+            title="Toggle Group List"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <GroupIcon fontSize="small" />
           </IconButton>
 
           <IconButton
             onClick={handleSaveToFile}
             title="Save Graph to File (.nodegraph)"
             size="small"
+            disabled={isFreeUser}
           >
             <SaveIcon fontSize="small" />
           </IconButton>
@@ -843,6 +867,7 @@ const Toolbar = ({
             onClick={handleLoadFile}
             title="Load Graph from File"
             size="small"
+            disabled={isFreeUser}
           >
             <LoadIcon fontSize="small" />
           </IconButton>
@@ -852,29 +877,13 @@ const Toolbar = ({
             title="Preferences"
             aria-label="Open Preferences"
             size="small"
+            disabled={isFreeUser}
           >
             <SettingsIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
 
-        <ButtonGroup size="small" sx={{ mr: 1 }}>
-          <IconButton
-            onClick={onUndo}
-            disabled={!canUndo}
-            title="Undo (Ctrl+Z)"
-            size="small"
-          >
-            <UndoIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            onClick={onRedo}
-            disabled={!canRedo}
-            title="Redo (Ctrl+Y)"
-            size="small"
-          >
-            <RedoIcon fontSize="small" />
-          </IconButton>
-        </ButtonGroup>
+
 
         <ToggleButtonGroup
           value={mode}
@@ -886,6 +895,7 @@ const Toolbar = ({
           }}
           size="small"
           sx={{ mr: 1 }}
+          disabled={isFreeUser}
         >
           <ToggleButton value="manual" title="Manual Mode">
             <ManualIcon fontSize="small" />
@@ -907,6 +917,7 @@ const Toolbar = ({
               endIcon={<ExpandMoreIcon fontSize="small" />}
               size="small"
               variant="outlined"
+              disabled={isFreeUser}
             >
               {autoLayoutType}
             </Button>
@@ -915,6 +926,7 @@ const Toolbar = ({
               size="small"
               variant="contained"
               startIcon={<AutoIcon fontSize="small" />}
+              disabled={isFreeUser}
             >
               Apply
             </Button>

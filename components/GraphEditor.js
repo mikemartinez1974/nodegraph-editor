@@ -61,6 +61,9 @@ export default function GraphEditor({ backgroundImage }) {
     groupManager
   } = state;
   
+  // Determine if user is free (replace with real logic)
+  const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
+  
   const selectionHook = useSelection({
     setSelectedNodeIds,
     setSelectedEdgeIds,
@@ -165,6 +168,93 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
   }, [setPan, setZoom, state]);
   
+  // Listen for 'fetchUrl' event from address bar
+  useEffect(() => {
+    const handleFetchUrl = async ({ url }) => {
+      try {
+        let fullUrl = url;
+        if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+          fullUrl = 'https://' + fullUrl;
+        }
+        console.log('Fetching URL:', fullUrl);
+        const response = await fetch(fullUrl);
+        if (!response.ok) throw new Error('Failed to fetch');
+        const text = await response.text();
+        
+        // Try to parse as JSON (graph data)
+        try {
+          const jsonData = JSON.parse(text);
+          // Check if it's graph data (has nodes or edges)
+          if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
+            // Load as graph
+            const nodesToLoad = jsonData.nodes;
+            const edgesToLoad = jsonData.edges || [];
+            const groupsToLoad = jsonData.groups || [];
+            handlers.handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+            setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
+            eventBus.emit('setAddress', fullUrl); // Update address bar
+            return;
+          }
+        } catch {
+          // Not JSON, treat as text
+        }
+        
+        // Create text node
+        const lines = text.trim().split('\n');
+        const label = lines[0].substring(0, 50);
+        const memo = text.trim();
+        
+        const width = Math.max(200, Math.min(600, label.length * 8 + 100));
+        const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
+        
+        const centerX = (window.innerWidth / 2 - pan.x) / zoom;
+        const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+        
+        const newNode = {
+          id: `node_${Date.now()}`,
+          label: label,
+          type: 'default',
+          position: { x: centerX, y: centerY },
+          width: width,
+          height: height,
+          resizable: true,
+          data: { memo: memo }
+        };
+        
+        setNodes(prev => {
+          const next = [...prev, newNode];
+          nodesRef.current = next;
+          return next;
+        });
+        
+        historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+        setSnackbar({ open: true, message: 'Fetched and created node from URL', severity: 'success' });
+        eventBus.emit('setAddress', fullUrl); // Update address bar
+      } catch (error) {
+        console.error('Error fetching URL:', error);
+        setSnackbar({ open: true, message: 'Failed to fetch URL. Check the address and try again.', severity: 'error' });
+      }
+    };
+
+    eventBus.on('fetchUrl', handleFetchUrl);
+    return () => eventBus.off('fetchUrl', handleFetchUrl);
+  }, [pan, zoom, setNodes, nodesRef, historyHook, setSnackbar, handlers]);
+  
+  // Suppress specific error message about asynchronous responses
+  useEffect(() => {
+    const handleError = (event) => {
+      if (event.message.includes("A listener indicated an asynchronous response")) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("error", handleError);
+
+    return () => {
+      window.removeEventListener("error", handleError);
+    };
+  }, []);
+  
   return (
     <div 
       id="graph-editor-background" 
@@ -214,6 +304,7 @@ export default function GraphEditor({ backgroundImage }) {
         nodesRef={nodesRef}
         saveToHistory={historyHook.saveToHistory}
         edgesRef={edgesRef}
+        isFreeUser={isFreeUser}
       />
       
       <NodePropertiesPanel
