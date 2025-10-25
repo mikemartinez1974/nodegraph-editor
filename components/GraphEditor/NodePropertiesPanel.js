@@ -19,6 +19,10 @@ import TextField from '@mui/material/TextField';
 import eventBus from '../NodeGraph/eventBus';
 import ColorPickerInput from './ColorPickerInput';
 import SaveIcon from '@mui/icons-material/Save';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -55,6 +59,7 @@ export default function NodePropertiesPanel({
   const [width, setWidth] = useState(400);
   const [isOpen, setIsOpen] = useState(true); // Start open by default
   const [nodeColor, setNodeColor] = useState(selectedNode?.color || defaultNodeColor);
+  const [nodeType, setNodeType] = useState('');
   const resizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(width);
@@ -67,6 +72,7 @@ export default function NodePropertiesPanel({
       setLink(selectedNode.data?.link || '');
       setLabel(selectedNode.label || '');
       setNodeColor(selectedNode.color || defaultNodeColor);
+      setNodeType(selectedNode.type || 'default');
       // When opening panel for a node, default to preview mode
       setMemoView('preview');
     }
@@ -97,6 +103,12 @@ export default function NodePropertiesPanel({
       ...selectedNode.data,
       label: newLabel
     }, true); // true flag indicates label update
+  };
+
+  const handleNodeTypeChange = (e) => {
+    const newType = e.target.value;
+    setNodeType(newType);
+    onUpdateNode(selectedNode.id, { type: newType });
   };
 
   const handleLinkClick = () => {
@@ -265,6 +277,21 @@ export default function NodePropertiesPanel({
           size="small"
           sx={{ mb: 2, backgroundColor: theme.palette.background.paper }}
         />
+
+        {/* Node Type */}
+        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+          <InputLabel>Node Type</InputLabel>
+          <Select
+            value={nodeType}
+            label="Node Type"
+            onChange={handleNodeTypeChange}
+          >
+            <MenuItem value="default">Default Node</MenuItem>
+            <MenuItem value="fixed">Fixed Node</MenuItem>
+            <MenuItem value="markdown">Markdown Node</MenuItem>
+            <MenuItem value="svg">SVG Node</MenuItem>
+          </Select>
+        </FormControl>
 
         {/* Memo header and controls */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, mt: '6px' }}>

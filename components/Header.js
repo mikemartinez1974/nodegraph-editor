@@ -12,10 +12,24 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import eventBus from './NodeGraph/eventBus';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import HomeIcon from '@mui/icons-material/Home';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import Box from '@mui/material/Box';
 
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [browserHistory, setBrowserHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   let muiTheme = useTheme();
   if (!muiTheme || !('palette' in muiTheme)) {
     muiTheme = themeMap.default;
@@ -23,6 +37,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   // Dark mode = dark logo, Light mode = light logo
   const logoSrc = muiTheme?.palette?.mode === 'dark' ? '/logo_dark.png' : '/logo_light.png';
   const [imgError, setImgError] = useState(false);
+  const currentUrl = browserHistory[historyIndex] || '';
 
   useEffect(() => {
     const handleSetAddress = ({ url }) => {
@@ -31,6 +46,35 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
     eventBus.on('setAddress', handleSetAddress);
     return () => eventBus.off('setAddress', handleSetAddress);
   }, []);
+
+  useEffect(() => {
+    setIsBookmarked(bookmarks.includes(currentUrl));
+  }, [bookmarks, currentUrl]);
+
+  const handleBrowserBack = () => {
+    window.history.back();
+  };
+
+  const handleBrowserForward = () => {
+    window.history.forward();
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  const handleHome = () => {
+    eventBus.emit('clearGraph');
+    setAddress('');
+  };
+
+  const handleToggleBookmark = () => {
+    if (isBookmarked) {
+      setBookmarks(bookmarks.filter((url) => url !== currentUrl));
+    } else {
+      setBookmarks([...bookmarks, currentUrl]);
+    }
+  };
 
   return (
     <div>
@@ -62,6 +106,45 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
             </span>
           </Typography>
 
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ButtonGroup variant="outlined" size="small" sx={{ borderColor: muiTheme.palette.divider }}>
+              <IconButton
+                onClick={handleBrowserBack}
+                disabled={historyIndex <= 0}
+                title="Back"
+                aria-label="Navigate back"
+                size="small"
+              >
+                <ArrowBackIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={handleBrowserForward}
+                disabled={historyIndex >= browserHistory.length - 1}
+                title="Forward"
+                aria-label="Navigate forward"
+                size="small"
+              >
+                <ArrowForwardIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={handleRefresh}
+                disabled={!currentUrl || isLoading}
+                title="Refresh"
+                aria-label="Refresh current URL"
+                size="small"
+              >
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={handleHome}
+                title="Home (Clear Graph)"
+                aria-label="Return to home"
+                size="small"
+              >
+                <HomeIcon fontSize="small" />
+              </IconButton>
+            </ButtonGroup>
+          </Box>
           <TextField
             variant="outlined"
             size="small"
@@ -71,7 +154,6 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 eventBus.emit('fetchUrl', { url: address });
-                // Removed setAddress(''); to keep the URL in the bar
               }
             }}
             InputProps={{
@@ -79,18 +161,42 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
                 <InputAdornment position="start">
                   <SearchIcon />
                 </InputAdornment>
-              ),
+              )
             }}
             sx={{
-              width: 300,
-              mr: 2,
+              width: 525, // Increased width by 75%
               '& .MuiOutlinedInput-root': {
                 backgroundColor: muiTheme.palette.background.paper,
                 borderRadius: 1,
               },
             }}
           />
-
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton
+              onClick={handleToggleBookmark}
+              disabled={!currentUrl}
+              title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+              aria-label="Toggle bookmark"
+              size="small"
+              color={isBookmarked ? "primary" : "default"}
+            >
+              {isBookmarked ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
+            </IconButton>
+            <IconButton
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              disabled={bookmarks.length === 0}
+              title="View bookmarks"
+              aria-label="Open bookmarks menu"
+              size="small"
+            >
+              <BookmarkIcon fontSize="small" />
+              {bookmarks.length > 0 && (
+                <Typography variant="caption" sx={{ ml: 0.5, fontSize: '0.65rem' }}>
+                  {bookmarks.length}
+                </Typography>
+              )}
+            </IconButton>
+          </Box>
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon />
           </IconButton>

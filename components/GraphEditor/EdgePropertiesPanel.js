@@ -1,11 +1,11 @@
+// In EdgePropertiesPanel.js, replace the entire component with this fixed version:
+
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -15,6 +15,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Slider from '@mui/material/Slider';
 import ColorPickerInput from './ColorPickerInput';
+import FormLabel from '@mui/material/FormLabel';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 export default function EdgePropertiesPanel({ 
   selectedEdge, 
@@ -43,12 +46,19 @@ export default function EdgePropertiesPanel({
       setEdgeType(edge.type || 'child');
       setLabel(edge.label || '');
       setLineWidth(edge.style?.width || 2);
-      setCurved(edge.style?.curved !== undefined ? edge.style?.curved : false);
+      
+      // Check curved from style first, then fall back to type preset
+      let isCurved = false;
+      if (edge.style?.curved !== undefined) {
+        isCurved = edge.style.curved;
+      } else if (edge.type && edgeTypes[edge.type]?.style?.curved !== undefined) {
+        isCurved = edgeTypes[edge.type].style.curved;
+      }
+      setCurved(isCurved);
+      
       setEdgeColor(edge.color || defaultEdgeColor);
     }
-  }, [edgeId, defaultEdgeColor]);
-
-  if (!selectedEdge) return null;
+  }, [edgeId, defaultEdgeColor, edgeTypes]);
 
   const handleEdgeTypeChange = (e) => {
     if (!edgeId) return;
@@ -79,14 +89,9 @@ export default function EdgePropertiesPanel({
 
   const handleLineWidthChange = (e, newValue) => {
     setLineWidth(newValue);
-    if (!edgeId) {
-      console.log('No edgeId, cannot update');
-      return;
-    }
-    // Merge with existing style, don't replace it
+    if (!edgeId) return;
     const edge = typeof selectedEdge === 'string' ? {} : selectedEdge;
     const currentStyle = edge.style || {};
-    console.log('Updating edge width:', edgeId, 'to', newValue);
     onUpdateEdge(edgeId, {
       style: { 
         ...currentStyle, 
@@ -99,7 +104,6 @@ export default function EdgePropertiesPanel({
     if (!edgeId) return;
     const newCurved = e.target.checked;
     setCurved(newCurved);
-    // Merge with existing style, don't replace it
     const edge = typeof selectedEdge === 'string' ? {} : selectedEdge;
     const currentStyle = edge.style || {};
     onUpdateEdge(edgeId, {
@@ -115,14 +119,8 @@ export default function EdgePropertiesPanel({
     onUpdateEdge(selectedEdge.id, { color });
   };
 
-  const handleSetAsDefault = () => {
-    if (edgeColor && typeof window !== 'undefined' && window.setDefaultEdgeColor) {
-      window.setDefaultEdgeColor(edgeColor);
-    }
-  };
-
-  const sourceNode = selectedEdge.sourceNode || { label: selectedEdge.source };
-  const targetNode = selectedEdge.targetNode || { label: selectedEdge.target };
+  const sourceNode = selectedEdge?.sourceNode || { label: selectedEdge?.source };
+  const targetNode = selectedEdge?.targetNode || { label: selectedEdge?.target };
 
   const onMouseDown = e => {
     dragging.current = true;
@@ -203,9 +201,9 @@ export default function EdgePropertiesPanel({
             Connection
           </Typography>
           <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 12 }}>
-            {sourceNode.label || selectedEdge.source}
+            {sourceNode.label || selectedEdge?.source}
             <br />
-            → {targetNode.label || selectedEdge.target}
+            → {targetNode.label || selectedEdge?.target}
           </Typography>
         </Box>
 
@@ -257,20 +255,40 @@ export default function EdgePropertiesPanel({
             step={1}
             marks
             valueLabelDisplay="auto"
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
           />
         </Box>
 
-        {/* Curved Toggle */}
-        <FormControlLabel
-          control={
+        {/* Curved Toggle - FIXED with white styling */}
+        <FormControl component="fieldset" sx={{ mb: 3 }}>
+          <FormLabel component="legend">Edge Shape</FormLabel>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">Straight</Typography>
             <Switch
               checked={curved}
               onChange={handleCurvedChange}
-              size="small"
+              inputProps={{ 'aria-label': 'Edge shape switch' }}
+              sx={{
+                '& .MuiSwitch-switchBase': {
+                  color: '#fff',
+                  '&.Mui-checked': {
+                    color: '#fff',
+                  },
+                  '&.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: '#4caf50',
+                    opacity: 1,
+                  },
+                },
+                '& .MuiSwitch-track': {
+                  backgroundColor: '#999',
+                  opacity: 1,
+                },
+              }}
             />
-          }
-          label="Curved line"
-        />
+            <Typography variant="body2">Curved</Typography>
+          </Box>
+        </FormControl>
 
         {/* Color Picker Section */}
         <Box sx={{ mb: 2 }}>
@@ -281,16 +299,6 @@ export default function EdgePropertiesPanel({
             value={edgeColor}
             onChange={handleColorChange}
             sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={curved}
-                onChange={handleCurvedChange}
-                size="small"
-              />
-            }
-            label="Set as default color for new edges"
           />
           <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
             Supports hex colors and CSS gradients

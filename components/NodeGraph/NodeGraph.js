@@ -575,6 +575,9 @@ export default function NodeGraph({
           pan={pan}
           zoom={zoom}
           edgeTypes={edgeTypes}
+          draggingGroupId={draggingGroupId}
+          groupDragOffset={groupDragOffsetRef.current}
+          groups={groups}
         />
 
         <div style={{ pointerEvents: draggingHandle ? 'none' : 'auto' }}>

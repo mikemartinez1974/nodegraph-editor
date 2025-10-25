@@ -40,42 +40,6 @@ export default function PreferencesDialog({ open, onClose }) {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Preferences</DialogTitle>
       <DialogContent>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={settings.showNodeList}
-              onChange={(e) => handleChange('showNodeList', e.target.checked)}
-            />
-          }
-          label="Show Node List"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={settings.showGroupList}
-              onChange={(e) => handleChange('showGroupList', e.target.checked)}
-            />
-          }
-          label="Show Group List"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={settings.showGroupProperties}
-              onChange={(e) => handleChange('showGroupProperties', e.target.checked)}
-            />
-          }
-          label="Show Group Properties"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={settings.showNodeProperties}
-              onChange={(e) => handleChange('showNodeProperties', e.target.checked)}
-            />
-          }
-          label="Show Node Properties"
-        />
         <TextField
           label="Default Node Color"
           type="color"
@@ -92,16 +56,14 @@ export default function PreferencesDialog({ open, onClose }) {
           fullWidth
           margin="normal"
         />
-        <Select
-          value={settings.autoLayoutType}
-          onChange={(e) => handleChange('autoLayoutType', e.target.value)}
+        <TextField
+          label="Background Image URL"
+          type="url"
+          value={settings.backgroundImage || ''}
+          onChange={(e) => handleChange('backgroundImage', e.target.value)}
           fullWidth
           margin="normal"
-        >
-          <MenuItem value="grid">Grid</MenuItem>
-          <MenuItem value="hierarchical">Hierarchical</MenuItem>
-          <MenuItem value="radial">Radial</MenuItem>
-        </Select>
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleReset} color="secondary">

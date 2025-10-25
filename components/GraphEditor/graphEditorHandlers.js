@@ -27,7 +27,7 @@ export function createGraphEditorHandlers({
   const { saveToHistory } = historyHook;
   
   // ===== NODE HANDLERS =====
-  const handleAddNode = () => {
+  const handleAddNode = (type = 'default') => {
     const centerX = (window.innerWidth / 2 - pan.x) / zoom;
     const centerY = (window.innerHeight / 2 - pan.y) / zoom;
     let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
@@ -36,7 +36,7 @@ export function createGraphEditorHandlers({
       return;
     }
     const result = api.createNode({
-      type: 'default',
+      type: type, // Use the passed type
       label: 'New Node',
       data: { memo: '', link: '' },
       position: { x: centerX, y: centerY },
@@ -442,9 +442,9 @@ function handleAddNode({ nodes, setNodes, pan, zoom, defaultNodeColor }) {
         : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
     } while (prev.some(n => n.id === id));
     const newNode = {
-      id,
-      type: 'default',
+      id: `node_${Date.now()}`,
       label: 'New Node',
+      type: type, // Use the passed type
       position: { x: (window.innerWidth / 2 - pan.x) / zoom, y: (window.innerHeight / 2 - pan.y) / zoom },
       width: 120,
       height: 60,

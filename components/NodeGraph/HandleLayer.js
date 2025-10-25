@@ -21,7 +21,7 @@ function getHandlePositions(node, edgeTypes, draggingInfoRef, draggingGroupId, g
   let adjustedY = y;
   
   // Check for node drag offset
-  if (draggingInfoRef.current && draggingInfoRef.current.nodeIds && draggingInfoRef.current.nodeIds.includes(node.id)) {
+  if (draggingInfoRef && draggingInfoRef.current && draggingInfoRef.current.nodeIds && draggingInfoRef.current.nodeIds.includes(node.id)) {
     adjustedX += draggingInfoRef.current.offset.x;
     adjustedY += draggingInfoRef.current.offset.y;
   }
@@ -146,7 +146,7 @@ const HandleLayer = forwardRef(({
   const handlePositionMap = useMemo(() => {
     const handleMap = {};
     nodes.filter(n => n.visible !== false).forEach(node => {
-      const handles = getHandlePositions(node, edgeTypes, { current: null }); // Static positions for context
+      const handles = getHandlePositions(node, edgeTypes, { current: null }, null, null, null); // Static positions for context
       handles.forEach(h => {
         handleMap[h.id] = h.position;
       });
@@ -203,7 +203,7 @@ const HandleLayer = forwardRef(({
     }
     
     return null;
-  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef]);
+  }, [nodes, edgeTypes, pan, zoom, draggingInfoRef, draggingGroupId, groupDragOffset, groups]);
 
   // Canvas drawing function
   const drawCanvas = useCallback(() => {
@@ -479,10 +479,22 @@ const HandleLayer = forwardRef(({
     return () => window.removeEventListener('resize', updateCanvasSize);
   }, [scheduleRender]);
 
-  // Redraw when nodes, edges, pan, or zoom change
+  // CRITICAL FIX: Force immediate redraw when pan or zoom changes
+  useEffect(() => {
+    // Cancel any pending animation frame to avoid stale renders
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    
+    // Draw immediately (not on next frame) for smooth zoom/pan
+    drawCanvas();
+  }, [pan.x, pan.y, zoom, drawCanvas]);
+
+  // Redraw when nodes, edges change
   useEffect(() => {
     scheduleRender();
-  }, [nodes, edges, pan, zoom, scheduleRender, draggingGroupId, groupDragOffset]);
+  }, [nodes, edges, scheduleRender, draggingGroupId, groupDragOffset]);
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>

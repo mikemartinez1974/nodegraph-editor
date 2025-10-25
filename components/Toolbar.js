@@ -28,9 +28,6 @@ import {
   Navigation as NavIcon,
   GridOn as AutoIcon,
   ExpandMore as ExpandMoreIcon,
-  MoreHoriz as MoreIcon,
-  ChevronLeft as CollapseIcon,
-  ChevronRight as ExpandIcon,
   ContentPasteGo as ContentPasteGoIcon,
   ThumbDownOffAlt as ThumbDownOffAltIcon,
   FolderSpecial as GroupIcon,
@@ -38,50 +35,16 @@ import {
   ContentCopy as ContentCopyIcon,
   FileCopy as FileCopyIcon,
   MenuBook as MenuBookIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+  Refresh as RefreshIcon,
+  Home as HomeIcon,
+  Bookmark as BookmarkIcon,
+  BookmarkBorder as BookmarkBorderIcon
 } from '@mui/icons-material';
 import eventBus from '../components/NodeGraph/eventBus';
 import PreferencesDialog from './GraphEditor/PreferencesDialog';
-
-// Helper to detect theme name from colors
-const detectThemeNameFromPalette = (theme) => {
-  if (!theme?.palette?.primary?.main) return 'light';
-  
-  const primaryColor = theme.palette.primary.main;
-  
-  // Map primary colors to theme names (from your themes.js)
-  const colorToThemeMap = {
-    '#1976d2': 'light',
-    '#90caf9': 'dark',
-    '#2e7d32': 'forest',
-    '#0288d1': 'ocean',
-    '#d84315': 'desert',
-    '#ec407a': 'sakura',
-    '#0097a7': 'arctic',
-    '#ff6f00': 'sunset',
-    '#00e676': 'neon',
-    '#ff0266': 'cyberpunk',
-    '#00bfa5': 'tropical',
-    '#3949ab': 'midnight',
-    '#512da8': 'royal',
-    '#546e7a': 'charcoal',
-    '#9c7a3c': 'champagne',
-    '#607d8b': 'slate',
-    '#bf360c': 'autumn',
-    '#6d4c41': 'cafe',
-    '#ff8f00': 'amber',
-    '#d84315': 'terracotta',
-    '#00897b': 'mint',
-    '#7e57c2': 'lavender',
-    '#90a4ae': 'mist',
-    '#d32f2f': 'volcano',
-    '#5e35b1': 'deepSpace',
-    '#00695c': 'emerald',
-    '#c62828': 'crimson',
-  };
-  
-  return colorToThemeMap[primaryColor] || theme.palette.mode || 'light';
-};
 
 const Toolbar = ({ 
   nodes = [], 
@@ -114,36 +77,61 @@ const Toolbar = ({
   nodesRef,
   saveToHistory,
   edgesRef,
-  // New props for capturing settings
   currentTheme = 'light',
   backgroundImage = null,
   defaultNodeColor = '#1976d2',
   defaultEdgeColor = '#666666',
-  isFreeUser = false // New prop for free user check
+  isFreeUser = false
 }) => {
   const theme = useTheme();
-  const palette = theme?.palette || {};
-  const primary = palette.primary || {};
   const [pos, setPos] = useState({ x: 0, y: 88 });
   const [copied, setCopied] = useState(false);
-  const [metadataCopied, setMetadataCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pasted, setPasted] = useState(false);
   const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
-  const [saveMenuAnchor, setSaveMenuAnchor] = useState(null);
-  const [loadMenuAnchor, setLoadMenuAnchor] = useState(null);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
+  
+  // Browser navigation state
+  const [browserHistory, setBrowserHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState(() => {
+    try {
+      const saved = localStorage.getItem('graphBrowserBookmarks');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
+  const currentUrl = browserHistory[historyIndex] || '';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPos({ x: window.innerWidth - 600, y: 88 });
     }
-  }, []);
+    
+    // Listen for address changes to update history
+    const handleAddressSet = (data) => {
+      const url = typeof data === 'string' ? data : data?.url;
+      if (url && url !== currentUrl) {
+        setBrowserHistory(prev => {
+          const newHistory = prev.slice(0, historyIndex + 1);
+          return [...newHistory, url];
+        });
+        setHistoryIndex(prev => prev + 1);
+      }
+    };
+    
+    eventBus.on('setAddress', handleAddressSet);
+    return () => eventBus.off('setAddress', handleAddressSet);
+  }, [historyIndex, currentUrl]);
 
   const onMouseDown = e => {
     dragging.current = true;
@@ -174,7 +162,6 @@ const Toolbar = ({
       const confirmed = window.confirm('Are you sure you want to clear the entire graph? This cannot be undone.');
       if (confirmed) {
         onClearGraph();
-        console.log('Graph cleared');
       }
     }
   };
@@ -192,35 +179,25 @@ const Toolbar = ({
       try {
         const jsonData = JSON.parse(event.target.result);
         
-        // Support both old format and new NodeGraphSaveFormat
         let nodesToLoad, edgesToLoad, groupsToLoad;
         
         if (jsonData.fileVersion && jsonData.nodes) {
-          // New format - extract from NodeGraphSaveFormat
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
           groupsToLoad = jsonData.groups || [];
-          
-          // TODO: Apply settings from the file (theme, viewport, etc.)
-          console.log('Loaded NodeGraphSaveFormat v' + jsonData.fileVersion);
         } else if (jsonData.nodes && jsonData.edges) {
-          // Legacy format - direct nodes/edges
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
           groupsToLoad = jsonData.groups || [];
         } else {
-          console.error('Invalid graph file format');
           if (onShowMessage) onShowMessage('Invalid graph file format. Missing nodes or edges.', 'error');
           return;
         }
 
-        // Call the callback to update the graph
         if (onLoadGraph) {
           onLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
-          console.log('Graph loaded successfully!');
           if (onShowMessage) onShowMessage('Graph loaded successfully!', 'success');
 
-          // Emit optional settings/viewport for the editor to apply (settings are optional)
           try {
             eventBus.emit('loadSaveFile', { settings: jsonData.settings || {}, viewport: jsonData.viewport || {} });
           } catch (err) {
@@ -240,7 +217,6 @@ const Toolbar = ({
   const handleSaveToFile = () => {
     const now = new Date().toISOString();
     
-    // Extract theme object from current theme
     const themeObject = theme?.palette ? {
       primary: theme.palette.primary?.main || '#1976d2',
       primaryContrast: theme.palette.primary?.contrastText || '#ffffff',
@@ -253,7 +229,6 @@ const Toolbar = ({
       divider: theme.palette.divider || '#e0e0e0'
     } : null;
 
-    // Build NodeGraphSaveFormat compliant file
     const saveData = {
       fileVersion: "1.0",
       metadata: {
@@ -322,112 +297,6 @@ const Toolbar = ({
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     if (onShowMessage) onShowMessage('Graph saved to .nodegraph file!', 'success');
-    console.log('Graph saved to file in NodeGraphSaveFormat!');
-  };
-
-  const handleCopyMetadata = async () => {
-    const edgeTypesUsed = [...new Set(edges.map(e => e.type))];
-    const edgeMetadata = {};
-    
-    edgeTypesUsed.forEach(type => {
-      const edgesOfType = edges.filter(e => e.type === type);
-      const sampleEdge = edgesOfType[0];
-      edgeMetadata[type] = {
-        count: edgesOfType.length,
-        style: sampleEdge?.style || {},
-        label: sampleEdge?.label || '',
-        showLabel: sampleEdge?.showLabel || false
-      };
-    });
-
-    const metadata = {
-      nodeTypes: [...new Set(nodes.map(n => n.type))],
-      nodeCount: nodes.length,
-      edgeTypes: edgeTypesUsed,
-      edgeCount: edges.length,
-      edgeMetadata: edgeMetadata,
-      dataFields: {
-        memo: nodes.some(n => n.data?.memo),
-        link: nodes.some(n => n.data?.link)
-      }
-    };
-
-    const jsonString = JSON.stringify(metadata, null, 2);
-
-    try {
-      await navigator.clipboard.writeText(jsonString);
-      setMetadataCopied(true);
-      setTimeout(() => setMetadataCopied(false), 2000);
-      console.log('Graph metadata copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      const textArea = document.createElement('textarea');
-      textArea.value = jsonString;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        setMetadataCopied(true);
-        setTimeout(() => setMetadataCopied(false), 2000);
-      } catch (err2) {
-        console.error('Fallback copy failed:', err2);
-      }
-      document.body.removeChild(textArea);
-    }
-  };
-
-  const handleCopyJSON = async () => {
-    const schema = {
-      nodes: nodes.map(node => ({
-        id: node.id,
-        type: node.type,
-        label: node.label,
-        position: node.position,
-        width: node.width,
-        height: node.height,
-        color: node.color,
-        data: node.data
-      })),
-      edges: edges.map(edge => ({
-        id: edge.id,
-        type: edge.type,
-        source: edge.source,
-        target: edge.target,
-        label: edge.label,
-        color: edge.color,
-        style: edge.style
-      }))
-    };
-
-    const jsonString = JSON.stringify(schema, null, 2);
-
-    try {
-      await navigator.clipboard.writeText(jsonString);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-      console.log('Graph schema copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      const textArea = document.createElement('textarea');
-      textArea.value = jsonString;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-      } catch (err2) {
-        console.error('Fallback copy failed:', err2);
-        if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
-      }
-      document.body.removeChild(textArea);
-    }
   };
 
   const handleCopyOnboard = async () => {
@@ -438,7 +307,6 @@ const Toolbar = ({
       await navigator.clipboard.writeText(text);
       setOnboardCopied(true);
       setTimeout(() => setOnboardCopied(false), 2000);
-      console.log('Onboard LLM guide copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy OnboardLLM.md:', err);
       if (onShowMessage) onShowMessage('Unable to copy onboard guide to clipboard.', 'error');
@@ -484,7 +352,6 @@ const Toolbar = ({
       await navigator.clipboard.writeText(jsonString);
       setSelectedCopied(true);
       setTimeout(() => setSelectedCopied(false), 2000);
-      console.log(`Copied ${selectedNodes.length} nodes and ${selectedEdges.length} edges to clipboard!`);
     } catch (err) {
       console.error('Failed to copy:', err);
       if (onShowMessage) onShowMessage('Failed to copy to clipboard. Try using Ctrl+C.', 'error');
@@ -505,7 +372,6 @@ const Toolbar = ({
         window.handlePasteGraphData(jsonData);
         setPasted(true);
         setTimeout(() => setPasted(false), 2000);
-        console.log('Pasted data from clipboard!');
       } else {
         if (onShowMessage) onShowMessage('Paste handler not available.', 'error');
       }
@@ -587,127 +453,50 @@ const Toolbar = ({
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-        console.log('Graph schema copied to clipboard!');
       })
       .catch(err => {
         console.error('Failed to copy:', err);
-        const textArea = document.createElement('textarea');
-        textArea.value = jsonString;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          if (onShowMessage) onShowMessage('Graph copied to clipboard!', 'success');
-        } catch (err2) {
-          console.error('Fallback copy failed:', err2);
-          if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
-        }
-        document.body.removeChild(textArea);
+        if (onShowMessage) onShowMessage('Failed to copy to clipboard.', 'error');
       });
   };
 
-  // Build a compact theme object to persist in save file
-  const exportThemeObject = (theme) => ({
-    primary: theme.palette?.primary?.main || null,
-    primaryContrast: theme.palette?.primary?.contrastText || null,
-    secondary: theme.palette?.secondary?.main || null,
-    secondaryContrast: theme.palette?.secondary?.contrastText || null,
-    background: theme.palette?.background?.default || null,
-    paper: theme.palette?.background?.paper || null,
-    textPrimary: theme.palette?.text?.primary || null,
-    textSecondary: theme.palette?.text?.secondary || null,
-    divider: theme.palette?.divider || null,
-    success: theme.palette?.success?.main || null,
-    error: theme.palette?.error?.main || null,
-    warning: theme.palette?.warning?.main || null,
-    info: theme.palette?.info?.main || null
-  });
-
-  const handleExport = () => {
-    const payload = {
-      fileVersion: "1.0",
-      metadata: {
-        title: "Untitled Graph",
-        description: "",
-        created: new Date().toISOString(),
-        modified: new Date().toISOString(),
-        author: "",
-        tags: []
-      },
-      settings: {
-        theme: null,
-        backgroundImage: backgroundImage || null,
-        defaultNodeColor: defaultNodeColor || '#1976d2',
-        defaultEdgeColor: defaultEdgeColor || '#666666',
-        snapToGrid: false,
-        gridSize: 20,
-        autoSave: false
-      },
-      viewport: {
-        pan: pan || { x: 0, y: 0 },
-        zoom: zoom || 1
-      },
-      nodes: nodes.map(node => ({
-        id: node.id,
-        type: node.type,
-        label: node.label,
-        position: node.position,
-        width: node.width,
-        height: node.height,
-        color: node.color,
-        visible: node.visible !== false,
-        showLabel: node.showLabel !== false,
-        data: node.data || {}
-      })),
-      edges: edges.map(edge => ({
-        id: edge.id,
-        type: edge.type,
-        source: edge.source,
-        target: edge.target,
-        label: edge.label || "",
-        style: edge.style || {}
-      })),
-      groups: groups.map(group => ({
-        id: group.id,
-        label: group.label || "",
-        nodeIds: group.nodeIds || [],
-        bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
-        visible: group.visible !== false,
-        style: group.style || {}
-      }))
-    };
-
-    // Ensure settings.theme is a theme object, not a string
-    try {
-      payload.settings = payload.settings || {};
-      payload.settings.theme = exportThemeObject(theme);
-      // remove any legacy themeName or mode fields
-      if (payload.settings.themeName) delete payload.settings.themeName;
-      if (payload.settings.theme && payload.settings.theme.mode) delete payload.settings.theme.mode;
-    } catch (err) {
-      // Fallback: leave existing value if theme not available
-      console.warn('Could not include theme object in export:', err);
+  const handleHome = () => {
+    if (onClearGraph) {
+      const confirmed = window.confirm('Navigate to home? This will clear the current graph.');
+      if (confirmed) {
+        onClearGraph();
+        setBrowserHistory(['']);
+        setHistoryIndex(0);
+        eventBus.emit('setAddress', { url: '' });
+      }
     }
-
-    const jsonString = JSON.stringify(payload, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.nodegraph`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    if (onShowMessage) onShowMessage('Graph exported to .nodegraph file!', 'success');
-    console.log('Graph exported to file in NodeGraphSaveFormat!');
   };
+
+  const handleToggleBookmark = () => {
+    if (!currentUrl) return;
+    
+    const existingIndex = bookmarks.findIndex(b => b.url === currentUrl);
+    let newBookmarks;
+    
+    if (existingIndex >= 0) {
+      newBookmarks = bookmarks.filter((_, i) => i !== existingIndex);
+      if (onShowMessage) onShowMessage('Bookmark removed', 'success');
+    } else {
+      const title = currentUrl.length > 40 ? currentUrl.substring(0, 37) + '...' : currentUrl;
+      newBookmarks = [...bookmarks, { url: currentUrl, title, date: new Date().toISOString() }];
+      if (onShowMessage) onShowMessage('Bookmark added', 'success');
+    }
+    
+    setBookmarks(newBookmarks);
+    localStorage.setItem('graphBrowserBookmarks', JSON.stringify(newBookmarks));
+  };
+
+  const handleBookmarkClick = (url) => {
+    eventBus.emit('fetchUrl', { url });
+    setBookmarkMenuAnchor(null);
+  };
+
+  const isBookmarked = currentUrl && bookmarks.some(b => b.url === currentUrl);
 
   return (
     <Paper
@@ -735,6 +524,7 @@ const Toolbar = ({
         p: 1,
         flexWrap: 'nowrap'
       }}>
+        {/* Main Toolbar Controls */}
         <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
           <IconButton
             onClick={handleCopyOnboard}
@@ -785,10 +575,7 @@ const Toolbar = ({
           </IconButton>
           
           <IconButton
-            onClick={e => {
-              console.log('Toolbar Add Node button clicked');
-              onAddNode(e);
-            }}
+            onClick={(e) => setAddNodeMenuAnchor(e.currentTarget)}
             title="Add Node (Ctrl+N)"
             size="small"
           >
@@ -883,8 +670,6 @@ const Toolbar = ({
           </IconButton>
         </ButtonGroup>
 
-
-
         <ToggleButtonGroup
           value={mode}
           exclusive
@@ -966,11 +751,49 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
-        {(copied || metadataCopied || saved || pasted || selectedCopied || onboardCopied) && (
+        <Menu
+          anchorEl={addNodeMenuAnchor}
+          open={Boolean(addNodeMenuAnchor)}
+          onClose={() => setAddNodeMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              onAddNode('default');
+              setAddNodeMenuAnchor(null);
+            }}
+          >
+            Default Node
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onAddNode('fixed');
+              setAddNodeMenuAnchor(null);
+            }}
+          >
+            Fixed Node
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onAddNode('markdown');
+              setAddNodeMenuAnchor(null);
+            }}
+          >
+            Markdown Node
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onAddNode('svg');
+              setAddNodeMenuAnchor(null);
+            }}
+          >
+            SVG Node
+          </MenuItem>
+        </Menu>
+
+        {(copied || saved || pasted || selectedCopied || onboardCopied) && (
           <Chip
             label={
               copied ? "JSON Copied!" :
-              metadataCopied ? "Metadata Copied!" :
               saved ? "Saved!" :
               pasted ? "Pasted!" :
               selectedCopied ? "Selected Copied!" :
@@ -994,6 +817,61 @@ const Toolbar = ({
           open={preferencesOpen}
           onClose={() => setPreferencesOpen(false)}
         />
+        
+        {/* Bookmarks Menu */}
+        <Menu
+          anchorEl={bookmarkMenuAnchor}
+          open={Boolean(bookmarkMenuAnchor)}
+          onClose={() => setBookmarkMenuAnchor(null)}
+          PaperProps={{
+            style: {
+              maxHeight: 400,
+              minWidth: 300,
+            },
+          }}
+        >
+          {bookmarks.length === 0 ? (
+            <MenuItem disabled>
+              <Typography variant="body2" color="text.secondary">
+                No bookmarks yet
+              </Typography>
+            </MenuItem>
+          ) : (
+            bookmarks.map((bookmark, index) => (
+              <MenuItem
+                key={index}
+                onClick={() => handleBookmarkClick(bookmark.url)}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  py: 1,
+                  pr: 6
+                }}
+              >
+                <Typography variant="body2" noWrap sx={{ maxWidth: 280, fontWeight: 500 }}>
+                  {bookmark.title || bookmark.url}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 280 }}>
+                  {bookmark.url}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newBookmarks = bookmarks.filter((_, i) => i !== index);
+                    setBookmarks(newBookmarks);
+                    localStorage.setItem('graphBrowserBookmarks', JSON.stringify(newBookmarks));
+                    if (onShowMessage) onShowMessage('Bookmark removed', 'success');
+                  }}
+                  sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)' }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </MenuItem>
+            ))
+          )}
+        </Menu>
       </Box>
     </Paper>
   );

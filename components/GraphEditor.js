@@ -255,6 +255,13 @@ export default function GraphEditor({ backgroundImage }) {
     };
   }, []);
   
+  // Close NodePropertiesPanel if selection is not exactly one node
+  useEffect(() => {
+    if (selectedNodeIds.length !== 1 && showNodeList) {
+      setNodePanelAnchor(null);
+    }
+  }, [selectedNodeIds, showNodeList]);
+  
   return (
     <div 
       id="graph-editor-background" 
@@ -279,9 +286,9 @@ export default function GraphEditor({ backgroundImage }) {
         edges={edges} 
         groups={groups}
         onLoadGraph={handlers.handleLoadGraph}
-        onAddNode={e => {
-          console.log('GraphEditor.js: onAddNode called from Toolbar');
-          handlers.handleAddNode(e);
+        onAddNode={(type) => {
+          console.log('GraphEditor.js: onAddNode called from Toolbar with type:', type);
+          handlers.handleAddNode(type);
         }}
         onDeleteSelected={handlers.handleDeleteSelected}
         onClearGraph={handlers.handleClearGraph}
@@ -307,15 +314,17 @@ export default function GraphEditor({ backgroundImage }) {
         isFreeUser={isFreeUser}
       />
       
-      <NodePropertiesPanel
-        selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
-        onUpdateNode={handlers.handleUpdateNodeData}
-        theme={theme}
-        anchor={nodePanelAnchor}
-        onAnchorChange={setNodePanelAnchor}
-        onClose={() => {}}
-        defaultNodeColor={defaultNodeColor}
-      />
+      {selectedNodeIds.length === 1 && (
+        <NodePropertiesPanel
+          selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
+          onUpdateNode={handlers.handleUpdateNodeData}
+          theme={theme}
+          anchor={nodePanelAnchor}
+          onAnchorChange={setNodePanelAnchor}
+          onClose={() => {}}
+          defaultNodeColor={defaultNodeColor}
+        />
+      )}
       
       <NodeListPanel
         nodes={nodes}
@@ -438,17 +447,19 @@ export default function GraphEditor({ backgroundImage }) {
         }}
       />
       
-      <EdgePropertiesPanel
-        selectedEdge={selectedEdgeIds.length === 1 ? {
-          ...edges.find(e => e.id === selectedEdgeIds[0]),
-          sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
-          targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
-        } : null}
-        edgeTypes={EdgeTypes}
-        onUpdateEdge={handlers.handleUpdateEdge}
-        theme={theme}
-        defaultEdgeColor={defaultEdgeColor}
-      />
+      {selectedEdgeIds.length === 1 && edges.find(e => e.id === selectedEdgeIds[0]) && (
+        <EdgePropertiesPanel
+          selectedEdge={{
+            ...edges.find(e => e.id === selectedEdgeIds[0]),
+            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
+            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
+          }}
+          edgeTypes={EdgeTypes}
+          onUpdateEdge={handlers.handleUpdateEdge}
+          theme={theme}
+          defaultEdgeColor={defaultEdgeColor}
+        />
+      )}
 
       {showGroupProperties && selectedGroupIds.length === 1 && (
         <GroupPropertiesPanel
