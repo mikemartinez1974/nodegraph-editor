@@ -20,7 +20,7 @@ import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from './NodeGraph/eventBus';
 
 import { useGraphEditorState } from './GraphEditor/useGraphEditorState';
-import { createGraphEditorHandlers } from './GraphEditor/graphEditorHandlers';
+import { createGraphEditorHandlers, processQueuedUpdates } from './GraphEditor/graphEditorHandlers';
 import { useGraphEditorSetup } from './GraphEditor/useGraphEditorSetup';
 import useSelection from './GraphEditor/useSelection';
 import useGraphHistory from './GraphEditor/useGraphHistory';
@@ -147,6 +147,22 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, [graphAPI]);
   
+  // Log Graph API initialization
+  useEffect(() => {
+    if (graphAPI && graphAPI.current) {
+      console.log("Graph API initialized:", graphAPI.current);
+
+      // Process any queued updates
+      try {
+        processQueuedUpdates();
+      } catch (err) {
+        console.warn('processQueuedUpdates failed:', err);
+      }
+    } else {
+      console.warn("Graph API is not yet initialized.");
+    }
+  }, [graphAPI]);
+  
   // Listen for 'loadSaveFile' event and apply optional settings/viewport: setPan, setZoom, defaultNodeColor/defaultEdgeColor, and apply theme if theme object present in settings.
   useEffect(() => {
     function handleLoadSaveFile({ settings = {}, viewport = {} }) {
@@ -188,9 +204,9 @@ export default function GraphEditor({ backgroundImage }) {
           if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
             // Load as graph
             const nodesToLoad = jsonData.nodes;
-            const edgesToLoad = jsonData.edges || [];
-            const groupsToLoad = jsonData.groups || [];
-            handlers.handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+            const edgesToLoadFromJson = jsonData.edges || [];
+            const groupsToLoadFromJson = jsonData.groups || [];
+            handlers.handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             eventBus.emit('setAddress', fullUrl); // Update address bar
             return;
@@ -317,7 +333,38 @@ export default function GraphEditor({ backgroundImage }) {
       {selectedNodeIds.length === 1 && (
         <NodePropertiesPanel
           selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
-          onUpdateNode={handlers.handleUpdateNodeData}
+          onUpdateNode={(id, updates, options) => {
+            // Immediate local update to keep UI responsive
+            setNodes(prev => {
+              const next = prev.map(n => {
+                if (n.id === id) {
+                  return {
+                    ...n,
+                    ...updates,
+                    data: updates && updates.data ? { ...n.data, ...updates.data } : n.data,
+                    position: updates && updates.position ? { ...n.position, ...updates.position } : n.position
+                  };
+                }
+                return n;
+              });
+              nodesRef.current = next;
+              try {
+                historyHook.saveToHistory(next, edgesRef.current);
+              } catch (err) {
+                console.warn('Failed to save history after node update:', err);
+              }
+              return next;
+            });
+
+            // Also call existing handler if available (will queue/process appropriately)
+            try {
+              if (handlers && typeof handlers.handleUpdateNodeData === 'function') {
+                handlers.handleUpdateNodeData(id, updates, options);
+              }
+            } catch (err) {
+              console.warn('handlers.handleUpdateNodeData failed:', err);
+            }
+          }}
           theme={theme}
           anchor={nodePanelAnchor}
           onAnchorChange={setNodePanelAnchor}
@@ -378,10 +425,10 @@ export default function GraphEditor({ backgroundImage }) {
           setNodes(prev => {
             const next = prev.map(n => n.id === id ? { ...n, position } : n);
             nodesRef.current = next;
+            setTimeout(() => groupManagerHook.updateGroupBounds(), 0);
+            eventBus.emit('nodeDrag', { nodeId: id, position });
             return next;
           });
-          setTimeout(() => groupManagerHook.updateGroupBounds(), 0);
-          eventBus.emit('nodeDrag', { nodeId: id, position });
         }}
         onEdgeClick={(edge, event) => {
           const isMultiSelect = event.ctrlKey || event.metaKey;

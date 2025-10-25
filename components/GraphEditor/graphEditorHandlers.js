@@ -55,16 +55,40 @@ export function createGraphEditorHandlers({
     }
   };
   
+  let updateQueue = [];
+
   const handleUpdateNodeData = (nodeId, newData, isLabelUpdate = false) => {
-    const updateData = isLabelUpdate 
-      ? { label: newData.label, data: newData }
-      : { data: newData };
-    
-    const result = graphAPI.current.updateNode(nodeId, updateData);
-    if (!result.success) {
-      console.error('Failed to update node:', result.error);
+    if (!graphAPI || !graphAPI.current) {
+      console.warn("Graph API is not initialized. Queuing update.");
+      updateQueue.push({ nodeId, newData });
+      return;
     }
+
+    // Process any queued updates
+    while (updateQueue.length > 0) {
+      const { nodeId: queuedNodeId, newData: queuedNewData } = updateQueue.shift();
+      processNodeUpdate(queuedNodeId, queuedNewData);
+    }
+
+    // Process the current update
+    processNodeUpdate(nodeId, newData);
   };
+  
+  function processNodeUpdate(nodeId, newData) {
+    const node = graphAPI.current.getNodeById(nodeId);
+    if (!node) {
+      console.error(`Node with ID ${nodeId} not found.`);
+      return;
+    }
+
+    const updatedNode = {
+      ...node,
+      ...newData,
+      data: newData.data ? { ...node.data, ...newData.data } : node.data,
+    };
+
+    graphAPI.current.updateNode(nodeId, updatedNode);
+  }
   
   const handleNodeListSelect = (nodeId, isMultiSelect = false) => {
     if (isMultiSelect) {
@@ -475,4 +499,17 @@ function handlePasteGraph({ nodes, setNodes, pastedNodes }) {
     console.log('setNodes (handlePasteGraph):', next.map(n => n.id));
     return next;
   });
+}
+
+export function processQueuedUpdates() {
+  if (!graphAPI || !graphAPI.current) {
+    console.warn("Graph API is not initialized. Cannot process queued updates.");
+    return;
+  }
+
+  console.log("Processing queued updates...");
+  while (updateQueue.length > 0) {
+    const { nodeId, updates } = updateQueue.shift();
+    processNodeUpdate(nodeId, updates);
+  }
 }
