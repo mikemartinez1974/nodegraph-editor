@@ -2,7 +2,7 @@
 // 5. GraphEditor.js (MAIN - significantly reduced)
 // ============================================
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import NodeGraph from './NodeGraph';
 import Toolbar from './Toolbar';
 import DefaultNode from './GraphEditor/Nodes/DefaultNode';
@@ -20,7 +20,7 @@ import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from './NodeGraph/eventBus';
 
 import { useGraphEditorState } from './GraphEditor/useGraphEditorState';
-import { createGraphEditorHandlers, processQueuedUpdates } from './GraphEditor/graphEditorHandlers';
+import { createGraphEditorHandlers, handleUpdateNodeData } from './GraphEditor/graphEditorHandlers';
 import { useGraphEditorSetup } from './GraphEditor/useGraphEditorSetup';
 import useSelection from './GraphEditor/useSelection';
 import useGraphHistory from './GraphEditor/useGraphHistory';
@@ -37,6 +37,7 @@ const nodeTypes = {
 
 export default function GraphEditor({ backgroundImage }) {
   const theme = useTheme();
+  const [showEdgePanel, setShowEdgePanel] = useState(false);
   const state = useGraphEditorState();
   
   const {
@@ -147,22 +148,6 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, [graphAPI]);
   
-  // Log Graph API initialization
-  useEffect(() => {
-    if (graphAPI && graphAPI.current) {
-      console.log("Graph API initialized:", graphAPI.current);
-
-      // Process any queued updates
-      try {
-        processQueuedUpdates();
-      } catch (err) {
-        console.warn('processQueuedUpdates failed:', err);
-      }
-    } else {
-      console.warn("Graph API is not yet initialized.");
-    }
-  }, [graphAPI]);
-  
   // Listen for 'loadSaveFile' event and apply optional settings/viewport: setPan, setZoom, defaultNodeColor/defaultEdgeColor, and apply theme if theme object present in settings.
   useEffect(() => {
     function handleLoadSaveFile({ settings = {}, viewport = {} }) {
@@ -192,11 +177,10 @@ export default function GraphEditor({ backgroundImage }) {
         if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
           fullUrl = 'https://' + fullUrl;
         }
-        console.log('Fetching URL:', fullUrl);
         const response = await fetch(fullUrl);
         if (!response.ok) throw new Error('Failed to fetch');
         const text = await response.text();
-        
+
         // Try to parse as JSON (graph data)
         try {
           const jsonData = JSON.parse(text);
@@ -433,7 +417,25 @@ export default function GraphEditor({ backgroundImage }) {
         onEdgeClick={(edge, event) => {
           const isMultiSelect = event.ctrlKey || event.metaKey;
           const edgeId = typeof edge === 'string' ? edge : edge?.id;
-          selectionHook.handleEdgeSelection(edgeId, isMultiSelect);
+
+          if (isMultiSelect) {
+            selectionHook.handleEdgeSelection(edgeId, true);
+            return;
+          }
+
+          // Use functional updater to avoid stale state and reliably toggle panel
+          setSelectedEdgeIds(prev => {
+            const already = prev.includes(edgeId);
+            if (already) {
+              // Toggle the edge panel when clicking the already-selected edge
+              setShowEdgePanel(s => !s);
+              return prev; // keep selection
+            } else {
+              // Select the new edge and open the panel
+              setShowEdgePanel(true);
+              return [edgeId];
+            }
+          });
         }}
         onNodeClick={(nodeId, event) => {
           if (!event || event.type !== 'click') return;
@@ -494,19 +496,21 @@ export default function GraphEditor({ backgroundImage }) {
         }}
       />
       
-      {selectedEdgeIds.length === 1 && edges.find(e => e.id === selectedEdgeIds[0]) && (
+      {selectedEdgeIds.length === 1 && edges.find(e => e.id === selectedEdgeIds[0]) && showEdgePanel && (
         <EdgePropertiesPanel
-          selectedEdge={{
-            ...edges.find(e => e.id === selectedEdgeIds[0]),
-            sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
-            targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
-          }}
-          edgeTypes={EdgeTypes}
-          onUpdateEdge={handlers.handleUpdateEdge}
-          theme={theme}
-          defaultEdgeColor={defaultEdgeColor}
-        />
-      )}
+           selectedEdge={{
+             ...edges.find(e => e.id === selectedEdgeIds[0]),
+             sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
+             targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
+           }}
+           edgeTypes={EdgeTypes}
+           onUpdateEdge={handlers.handleUpdateEdge}
+           theme={theme}
+           defaultEdgeColor={defaultEdgeColor}
+           isOpen={showEdgePanel}
+           onClose={() => setShowEdgePanel(false)}
+         />
+       )}
 
       {showGroupProperties && selectedGroupIds.length === 1 && (
         <GroupPropertiesPanel

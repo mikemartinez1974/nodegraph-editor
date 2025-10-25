@@ -133,17 +133,25 @@ function drawEdgeLabel(ctx, label, labelPos, theme, isSelected, isHovered, sourc
 
 // Check if point is in label bounds (for clicking)
 function isPointInLabel(x, y, labelPos, labelText, ctx) {
-  if (!labelText || !labelPos) return false;
-  
+  if (!labelText || !labelPos || !ctx) return false;
+
+  // Measure text using the canvas context (which may be scaled for HiDPI)
   ctx.save();
   ctx.font = '12px Arial, sans-serif';
   const metrics = ctx.measureText(labelText);
-  const textWidth = metrics.width;
-  const textHeight = 12;
-  const padding = 6;
-  
   ctx.restore();
-  
+
+  // Determine the canvas scale factor (device pixels per CSS pixel)
+  const canvas = ctx.canvas;
+  const cssWidth = canvas.clientWidth || canvas.width;
+  const pixelWidth = canvas.width || cssWidth;
+  const scale = pixelWidth / cssWidth || 1;
+
+  // Adjust measured widths back to graph/CSS coordinate space
+  const textWidth = (metrics.width || 0) / scale;
+  const textHeight = 12 / scale; // font size in CSS pixels adjusted
+  const padding = 6 / scale;
+
   return (
     x >= labelPos.x - textWidth / 2 - padding &&
     x <= labelPos.x + textWidth / 2 + padding &&

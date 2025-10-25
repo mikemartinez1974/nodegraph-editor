@@ -174,8 +174,6 @@ export default class GraphCRUD {
 
       // Get fresh node state to ensure we have the latest nodes
       const nodes = this.getNodes();
-      console.log('Available nodes for edge creation:', nodes.map(n => n.id));
-      console.log('Looking for source:', source, 'target:', target);
       const sourceExists = nodes.some(n => n.id === source);
       const targetExists = nodes.some(n => n.id === target);
 

@@ -58,7 +58,7 @@ export default function EdgePropertiesPanel({
       
       setEdgeColor(edge.color || defaultEdgeColor);
     }
-  }, [edgeId, defaultEdgeColor, edgeTypes]);
+  }, [edgeId, defaultEdgeColor, edgeTypes, selectedEdge]);
 
   const handleEdgeTypeChange = (e) => {
     if (!edgeId) return;
@@ -116,13 +116,14 @@ export default function EdgePropertiesPanel({
 
   const handleColorChange = (color) => {
     setEdgeColor(color);
-    onUpdateEdge(selectedEdge.id, { color });
+    if (edgeId) onUpdateEdge(edgeId, { color });
   };
 
   const sourceNode = selectedEdge?.sourceNode || { label: selectedEdge?.source };
   const targetNode = selectedEdge?.targetNode || { label: selectedEdge?.target };
 
   const onMouseDown = e => {
+    // start dragging only when clicking the header; this handler will be set on header
     dragging.current = true;
     offset.current = {
       x: e.clientX - pos.x,
@@ -160,10 +161,7 @@ export default function EdgePropertiesPanel({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        cursor: dragging.current ? 'grabbing' : 'grab',
-        userSelect: 'none',
       }}
-      onMouseDown={onMouseDown}
     >
       {/* Header */}
       <Box sx={{ 
@@ -172,14 +170,18 @@ export default function EdgePropertiesPanel({
         alignItems: 'center', 
         justifyContent: 'space-between',
         backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff'
-      }}>
+        color: theme?.palette?.primary?.contrastText || '#fff',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none'
+      }}
+      onMouseDown={onMouseDown}
+      >
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Edge Properties
         </Typography>
         <IconButton 
           size="small" 
-          onClick={onClose}
+          onClick={() => onClose && onClose()}
           sx={{ color: 'inherit' }}
         >
           <CloseIcon />
@@ -260,7 +262,7 @@ export default function EdgePropertiesPanel({
           />
         </Box>
 
-        {/* Curved Toggle - FIXED with white styling */}
+        {/* Curved Toggle */}
         <FormControl component="fieldset" sx={{ mb: 3 }}>
           <FormLabel component="legend">Edge Shape</FormLabel>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

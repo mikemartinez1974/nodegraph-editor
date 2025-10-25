@@ -165,10 +165,9 @@ export default function GroupPropertiesPanel({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        cursor: dragging.current ? 'grabbing' : 'grab',
-        userSelect: 'none',
+        // cursor and userSelect moved to header to avoid intercepting internal control clicks
       }}
-      onMouseDown={onMouseDown}
+      // removed onMouseDown here to avoid capturing clicks on buttons inside the panel
     >
       {/* Header */}
       <Box sx={{ 
@@ -177,8 +176,12 @@ export default function GroupPropertiesPanel({
         alignItems: 'center', 
         justifyContent: 'space-between',
         backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff'
-      }}>
+        color: theme?.palette?.primary?.contrastText || '#fff',
+        cursor: dragging.current ? 'grabbing' : 'grab',
+        userSelect: 'none'
+      }}
+      onMouseDown={onMouseDown}
+      >
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Group Properties
         </Typography>

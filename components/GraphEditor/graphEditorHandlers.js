@@ -55,39 +55,21 @@ export function createGraphEditorHandlers({
     }
   };
   
-  let updateQueue = [];
-
-  const handleUpdateNodeData = (nodeId, newData, isLabelUpdate = false) => {
+  // Simplified update handler: directly call graphAPI when available, otherwise fail fast.
+  function handleUpdateNodeData(nodeId, updates) {
     if (!graphAPI || !graphAPI.current) {
-      console.warn("Graph API is not initialized. Queuing update.");
-      updateQueue.push({ nodeId, newData });
-      return;
+      // graphAPI not ready; return failure without noisy logging
+      return { success: false, error: 'graphAPI unavailable' };
     }
 
-    // Process any queued updates
-    while (updateQueue.length > 0) {
-      const { nodeId: queuedNodeId, newData: queuedNewData } = updateQueue.shift();
-      processNodeUpdate(queuedNodeId, queuedNewData);
+    try {
+      const result = graphAPI.current.updateNode(nodeId, updates);
+      return result;
+    } catch (err) {
+      // Log real errors
+      console.error('Failed to update node via graphAPI:', err);
+      return { success: false, error: err.message };
     }
-
-    // Process the current update
-    processNodeUpdate(nodeId, newData);
-  };
-  
-  function processNodeUpdate(nodeId, newData) {
-    const node = graphAPI.current.getNodeById(nodeId);
-    if (!node) {
-      console.error(`Node with ID ${nodeId} not found.`);
-      return;
-    }
-
-    const updatedNode = {
-      ...node,
-      ...newData,
-      data: newData.data ? { ...node.data, ...newData.data } : node.data,
-    };
-
-    graphAPI.current.updateNode(nodeId, updatedNode);
   }
   
   const handleNodeListSelect = (nodeId, isMultiSelect = false) => {
@@ -501,15 +483,4 @@ function handlePasteGraph({ nodes, setNodes, pastedNodes }) {
   });
 }
 
-export function processQueuedUpdates() {
-  if (!graphAPI || !graphAPI.current) {
-    console.warn("Graph API is not initialized. Cannot process queued updates.");
-    return;
-  }
-
-  console.log("Processing queued updates...");
-  while (updateQueue.length > 0) {
-    const { nodeId, updates } = updateQueue.shift();
-    processNodeUpdate(nodeId, updates);
-  }
-}
+export { handleUpdateNodeData };

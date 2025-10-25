@@ -6,7 +6,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NoteIcon from '@mui/icons-material/Note';
-import LinkIcon from '@mui/icons-material/Link';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -52,9 +51,8 @@ export default function NodePropertiesPanel({
   };
 
   const [memo, setMemo] = useState('');
-  const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
-  const [memoView, setMemoView] = useState('edit'); // 'edit' or 'preview'
+  const [memoView, setMemoView] = useState('edit'); // default to edit mode
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [width, setWidth] = useState(400);
   const [isOpen, setIsOpen] = useState(true); // Start open by default
@@ -69,53 +67,31 @@ export default function NodePropertiesPanel({
   useEffect(() => {
     if (selectedNode) {
       setMemo(selectedNode.data?.memo || '');
-      setLink(selectedNode.data?.link || '');
       setLabel(selectedNode.label || '');
       setNodeColor(selectedNode.color || defaultNodeColor);
       setNodeType(selectedNode.type || 'default');
-      // When opening panel for a node, default to preview mode
-      setMemoView('preview');
+      // Keep memoView as-is (default to edit) instead of forcing preview
     }
   }, [selectedNode?.id, defaultNodeColor]);
 
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
     setMemo(newMemo);
-    onUpdateNode(selectedNode.id, { 
-      ...selectedNode.data, 
-      memo: newMemo 
-    });
-  };
-
-  const handleLinkChange = (e) => {
-    const newLink = e.target.value;
-    setLink(newLink);
-    onUpdateNode(selectedNode.id, { 
-      ...selectedNode.data, 
-      link: newLink 
-    });
+    // send structured update: data.memo
+    if (onUpdateNode) onUpdateNode(selectedNode.id, { data: { memo: newMemo } });
   };
 
   const handleLabelChange = (e) => {
     const newLabel = e.target.value;
     setLabel(newLabel);
-    onUpdateNode(selectedNode.id, { 
-      ...selectedNode.data,
-      label: newLabel
-    }, true); // true flag indicates label update
+    // label is a top-level node property
+    if (onUpdateNode) onUpdateNode(selectedNode.id, { label: newLabel }, true); // true flag indicates label update
   };
 
   const handleNodeTypeChange = (e) => {
     const newType = e.target.value;
     setNodeType(newType);
-    onUpdateNode(selectedNode.id, { type: newType });
-  };
-
-  const handleLinkClick = () => {
-    if (link) {
-      const url = link.startsWith('http') ? link : `https://${link}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+    if (onUpdateNode) onUpdateNode(selectedNode.id, { type: newType });
   };
 
   const handleEmojiClick = () => {
@@ -131,15 +107,16 @@ export default function NodePropertiesPanel({
       const end = input.selectionEnd;
       const newMemo = memo.slice(0, start) + emoji + memo.slice(end);
       setMemo(newMemo);
-      onUpdateNode(selectedNode.id, { ...selectedNode.data, memo: newMemo });
+      if (onUpdateNode) onUpdateNode(selectedNode.id, { data: { memo: newMemo } });
       // Move cursor after emoji
       setTimeout(() => {
         input.focus();
         input.setSelectionRange(start + emoji.length, start + emoji.length);
       }, 0);
     } else {
-      setMemo(memo + emoji);
-      onUpdateNode(selectedNode.id, { ...selectedNode.data, memo: memo + emoji });
+      const newMemo = memo + emoji;
+      setMemo(newMemo);
+      if (onUpdateNode) onUpdateNode(selectedNode.id, { data: { memo: newMemo } });
     }
     setShowEmojiPicker(false);
   };
@@ -187,7 +164,7 @@ export default function NodePropertiesPanel({
 
   const handleColorChange = (color) => {
     setNodeColor(color);
-    onUpdateNode(selectedNode.id, { color });
+    if (onUpdateNode) onUpdateNode(selectedNode.id, { color });
   };
   
   const handleSetAsDefault = () => {
@@ -378,38 +355,15 @@ export default function NodePropertiesPanel({
           {memo.length} characters
         </Typography>
 
-        {/* Link controls (normal flow) */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <LinkIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-          <Typography variant="subtitle2" color="text.secondary">
-            Link
-          </Typography>
+        {/* Color picker and other controls */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+          <ColorPickerInput value={nodeColor} onChange={handleColorChange} />
+          <Tooltip title="Set as default color">
+            <IconButton size="small" onClick={handleSetAsDefault}>
+              <SaveIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
-        <TextField
-          fullWidth
-          value={link}
-          onChange={handleLinkChange}
-          variant="filled"
-          size="small"
-          placeholder="https://example.com"
-          sx={{ mb: 1, backgroundColor: theme.palette.background.paper }}
-        />
-        {link && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'primary.main',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                '&:hover': { color: 'primary.dark' }
-              }}
-              onClick={handleLinkClick}
-            >
-              Open link ↗
-            </Typography>
-          </Box>
-        )}
         </Box>
       )}
     </Paper>,
