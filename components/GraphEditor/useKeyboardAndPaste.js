@@ -4,6 +4,7 @@
 // ============================================
 import { useEffect, useCallback } from 'react';
 import eventBus from '../NodeGraph/eventBus';
+import { pasteFromClipboardUnified } from './pasteHandler';
 
 export function useKeyboardAndPaste(state, handlers, historyHook) {
   const {
@@ -76,12 +77,8 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
     if (isTextInput) return;
 
     try {
-      let text;
-      if (e?.clipboardData) {
-        text = e.clipboardData.getData('text');
-      } else {
-        text = await navigator.clipboard.readText();
-      }
+      // Read clipboard via navigator.clipboard for parity with toolbar paste
+      const text = await navigator.clipboard.readText();
       
       if (!text?.trim()) return;
 
@@ -89,8 +86,9 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
       let parsedData;
       try {
         parsedData = JSON.parse(text);
-        handlers.handlePasteGraphData(parsedData);
-      } catch (jsonError) {
+        // Delegate to unified handler so behavior matches toolbar
+        await pasteFromClipboardUnified({ handlers, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook, onShowMessage: state.setSnackbar ? (msg, sev='info') => state.setSnackbar({ open: true, message: msg, severity: sev }) : null });
+       } catch (jsonError) {
         // Not JSON - create a resizable node from text
         const lines = text.trim().split('\n');
         const label = lines[0].substring(0, 50);
@@ -121,7 +119,7 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
         
         saveToHistory(nodesRef.current, edgesRef.current);
         state.setSnackbar({ open: true, message: 'Created resizable node from pasted text', severity: 'success' });
-      }
+       }
     } catch (error) {
       console.error('Error handling paste:', error);
     }
@@ -140,8 +138,9 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
       
       if (isTextInput) return;
       
+      // Prevent default and invoke the unified clipboard reader (navigator.clipboard)
       e.preventDefault();
-      handlePaste(e);
+      handlePaste();
     };
 
     window.addEventListener('paste', handlePasteEvent);

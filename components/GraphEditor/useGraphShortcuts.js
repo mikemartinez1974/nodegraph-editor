@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import eventBus from '../NodeGraph/eventBus';
+import { pasteFromClipboardUnified } from './pasteHandler';
 
 export default function useGraphShortcuts({
   setNodes,
@@ -85,71 +86,11 @@ export default function useGraphShortcuts({
     // Helper function to paste nodes and edges from clipboard
     async function pasteFromClipboard() {
       try {
-        const clipboardText = await navigator.clipboard.readText();
-        if (!clipboardText || typeof clipboardText !== 'string') {
-          console.log('Clipboard is empty or invalid');
-          return;
+        const result = await pasteFromClipboardUnified({ handlers: null, state: { setNodes, nodesRef, setEdges, edgesRef, setGroups: null, pan: null, zoom: null }, historyHook: { saveToHistory }, onShowMessage: (msg) => console.log(msg) });
+        if (result) {
+          console.log(`Pasted ${result.nodes || 0} nodes and ${result.edges || 0} edges`);
         }
-        let clipboardData;
-        try {
-          clipboardData = JSON.parse(clipboardText);
-        } catch (parseErr) {
-          console.error('Invalid JSON in clipboard:', parseErr.message);
-          console.log('First 100 chars of clipboard:', clipboardText.substring(0, 100));
-          return;
-        }
-        // If action: replace or update, call handlePasteGraphData
-        if ((clipboardData.action === 'replace' || clipboardData.action === 'update') && typeof window.handlePasteGraphData === 'function') {
-          window.handlePasteGraphData(clipboardData);
-          return;
-        }
-        if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
-          console.log('Clipboard does not contain valid node array. Each node should include label, position, width, and height. Defaults will be applied if missing.');
-          return;
-        }
-        const currentNodes = nodesRef?.current || [];
-        const currentEdges = edgesRef?.current || [];
-        // Generate new IDs for pasted nodes to avoid conflicts
-        const idMapping = {};
-        const timestamp = Date.now();
-        clipboardData.nodes.forEach((node, index) => {
-          const newId = `node_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`;
-          idMapping[node.id] = newId;
-        });
-        const pastedNodes = clipboardData.nodes.map((node, index) => ({
-          ...node,
-          id: idMapping[node.id],
-          label: node.label || node.id || `Node ${index + 1}`,
-          position: node.position || { x: 100 + index * 120, y: 100 },
-          width: node.width || 160,
-          height: node.height || 80,
-          data: {
-            ...node.data,
-            memo: typeof node.data?.memo === 'string' ? node.data.memo.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.memo,
-            link: typeof node.data?.link === 'string' ? node.data.link.replace(/\\n/g, '\n').replace(/\\r/g, '\r') : node.data?.link
-          }
-        }));
-        // Update edge source/target IDs using the mapping, but only for edges that reference pasted nodes
-        const pastedEdges = (clipboardData.edges || []).map((edge, index) => {
-          const newSource = idMapping[edge.source] || edge.source;
-          const newTarget = idMapping[edge.target] || edge.target;
-          return {
-            ...edge,
-            id: `edge_${timestamp}_${index}_${Math.random().toString(36).substr(2, 6)}`,
-            source: newSource,
-            target: newTarget
-          };
-        }).filter(edge => pastedNodes.some(n => n.id === edge.source || n.id === edge.target));
-        const newNodes = [...currentNodes, ...pastedNodes];
-        const newEdges = [...currentEdges, ...pastedEdges];
-        setNodes(newNodes);
-        setEdges(newEdges);
-        if (nodesRef) nodesRef.current = newNodes;
-        if (edgesRef) edgesRef.current = newEdges;
-        setSelectedNodeIds(pastedNodes.map(node => node.id));
-        setSelectedEdgeIds([]);
-        if (saveToHistory) saveToHistory(newNodes, newEdges);
-        console.log(`Pasted ${pastedNodes.length} nodes and ${pastedEdges.length} edges`);
+        return;
       } catch (err) {
         console.error('Failed to paste from clipboard:', err);
       }

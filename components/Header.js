@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ThemeDrawer from './Header/ThemeDrawer';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import themeMap from './Header/themes';
 import TextField from '@mui/material/TextField';
@@ -25,6 +25,8 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const historyIndexRef = useRef(historyIndex);
+  useEffect(() => { historyIndexRef.current = historyIndex; }, [historyIndex]);
   const [browserHistory, setBrowserHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
@@ -41,7 +43,23 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
 
   useEffect(() => {
     const handleSetAddress = ({ url }) => {
+      if (!url) return;
       setAddress(url);
+
+      setBrowserHistory(prev => {
+        // Use the ref to get the current index (handles updates outside this closure)
+        const idx = historyIndexRef.current;
+        const truncated = prev.slice(0, Math.max(0, idx + 1));
+        // Avoid duplicate consecutive entries
+        if (truncated[truncated.length - 1] === url) {
+          const newIndex = truncated.length - 1;
+          setHistoryIndex(newIndex);
+          return truncated;
+        }
+        const next = [...truncated, url];
+        setHistoryIndex(next.length - 1);
+        return next;
+      });
     };
     eventBus.on('setAddress', handleSetAddress);
     return () => eventBus.off('setAddress', handleSetAddress);
@@ -52,15 +70,34 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   }, [bookmarks, currentUrl]);
 
   const handleBrowserBack = () => {
-    window.history.back();
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      const url = browserHistory[newIndex];
+      if (url) {
+        setAddress(url);
+        eventBus.emit('fetchUrl', { url });
+      }
+    }
   };
 
   const handleBrowserForward = () => {
-    window.history.forward();
+    if (historyIndex < browserHistory.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      const url = browserHistory[newIndex];
+      if (url) {
+        setAddress(url);
+        eventBus.emit('fetchUrl', { url });
+      }
+    }
   };
 
   const handleRefresh = () => {
-    window.location.reload();
+    const url = currentUrl || address;
+    if (url) {
+      eventBus.emit('fetchUrl', { url });
+    }
   };
 
   const handleHome = () => {
@@ -83,28 +120,6 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
       }}>
         <Toolbar>
-          {/* Theme-aware logo with fallback */}
-          {!imgError ? (
-            <img
-              src={logoSrc}
-              alt="Copy/Paste w/Me logo"
-              width={36}
-              height={36}
-              onError={() => setImgError(true)}
-              style={{ marginRight: 12, display: 'inline-block', objectFit: 'contain' }}
-            />
-          ) : (
-            <Typography variant="h6" component="div" sx={{ mr: 2, fontWeight: 700 }}>
-              CPwM
-            </Typography>
-          )}
-
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-            Copy/Paste w/ Me&nbsp;
-            <span style={{ marginLeft: 50 }}>
-              🎨 🖌️ 🖼️ 🧶 🧷
-            </span>
-          </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ButtonGroup variant="outlined" size="small" sx={{ borderColor: muiTheme.palette.divider }}>
@@ -128,7 +143,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
               </IconButton>
               <IconButton
                 onClick={handleRefresh}
-                disabled={!currentUrl || isLoading}
+                disabled={!currentUrl && !address}
                 title="Refresh"
                 aria-label="Refresh current URL"
                 size="small"
@@ -153,6 +168,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
+                // Emit fetch event - GraphEditor will handle loading and then emit setAddress back
                 eventBus.emit('fetchUrl', { url: address });
               }
             }}
@@ -197,6 +213,10 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
               )}
             </IconButton>
           </Box>
+
+          {/* Spacer to push drawer button to far right */}
+          <Box sx={{ flexGrow: 1 }} />
+
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon />
           </IconButton>

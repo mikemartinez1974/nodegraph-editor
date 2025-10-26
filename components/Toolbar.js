@@ -45,6 +45,7 @@ import {
 } from '@mui/icons-material';
 import eventBus from '../components/NodeGraph/eventBus';
 import PreferencesDialog from './GraphEditor/PreferencesDialog';
+import { pasteFromClipboardUnified } from './GraphEditor/pasteHandler';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -395,48 +396,8 @@ const Toolbar = ({
   };
 
   const handlePasteUniversal = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (!text || !text.trim()) return;
-
-      try {
-        JSON.parse(text);
-        return handlePasteSelected();
-      } catch {
-        const lines = text.trim().split('\n');
-        const label = lines[0].substring(0, 50);
-        const memo = text.trim();
-        
-        const width = Math.max(200, Math.min(600, label.length * 8 + 100));
-        const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
-        
-        const centerX = (window.innerWidth / 2 - pan.x) / zoom;
-        const centerY = (window.innerHeight / 2 - pan.y) / zoom;
-        
-        const newNode = {
-          id: `node_${Date.now()}`,
-          label: label,
-          type: 'default',
-          position: { x: centerX, y: centerY },
-          width: width,
-          height: height,
-          resizable: true,
-          data: { memo: memo }
-        };
-        
-        setNodes(prev => {
-          const next = [...prev, newNode];
-          nodesRef.current = next;
-          return next;
-        });
-        
-        saveToHistory(nodesRef.current, edgesRef.current);
-        if (onShowMessage) onShowMessage('Created resizable node from pasted text', 'success');
-      }
-    } catch (err) {
-      console.error('Error handling paste:', err);
-      if (onShowMessage) onShowMessage('Error reading clipboard. Grant permission and try again.', 'error');
-    }
+    // Delegate to shared paste handler for consistent behavior
+    await pasteFromClipboardUnified({ handlers: null, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook: { saveToHistory }, onShowMessage });
   };
 
   const handleCopyGraph = () => {

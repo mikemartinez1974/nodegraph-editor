@@ -243,15 +243,28 @@ export default function GraphEditor({ backgroundImage }) {
   // Suppress specific error message about asynchronous responses
   useEffect(() => {
     const handleError = (event) => {
-      if (event.message.includes("A listener indicated an asynchronous response")) {
+      if (event.message && event.message.includes("A listener indicated an asynchronous response")) {
         event.preventDefault();
       }
     };
 
     window.addEventListener("error", handleError);
 
+    // Also handle unhandled promise rejections that contain the same message
+    const handleUnhandledRejection = (event) => {
+      const reason = event && (event.reason || event.detail);
+      const message = typeof reason === 'string' ? reason : (reason && reason.message) ? reason.message : '';
+      if (message && message.includes("A listener indicated an asynchronous response")) {
+        // prevent the default logging of unhandledrejection
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
     return () => {
       window.removeEventListener("error", handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }, []);
   
@@ -261,6 +274,58 @@ export default function GraphEditor({ backgroundImage }) {
       setNodePanelAnchor(null);
     }
   }, [selectedNodeIds, showNodeList]);
+  
+  // Handle pasted graph data emitted by paste handler fallback
+  useEffect(() => {
+    const handlePastedData = (data) => {
+      if (!data) return;
+      try {
+        // If full graph data present, use existing load handler
+        if (data.nodes && Array.isArray(data.nodes)) {
+          const nodesToLoad = data.nodes;
+          const edgesToLoad = data.edges || [];
+          const groupsToLoad = data.groups || [];
+          if (handlers && typeof handlers.handleLoadGraph === 'function') {
+            handlers.handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+          } else {
+            // Fallback: merge into current state
+            setNodes(prev => {
+              const next = [...prev, ...nodesToLoad];
+              nodesRef.current = next;
+              return next;
+            });
+            setEdges(prev => {
+              const next = [...prev, ...(data.edges || [])];
+              edgesRef.current = next;
+              return next;
+            });
+            if (groupsToLoad && groupsToLoad.length && setGroups) {
+              setGroups(prev => {
+                const next = [...prev, ...groupsToLoad];
+                return next;
+              });
+            }
+          }
+          setSnackbar({ open: true, message: 'Pasted graph data', severity: 'success' });
+          return;
+        }
+
+        // If only groups present
+        if (data.groups && Array.isArray(data.groups) && setGroups) {
+          setGroups(prev => {
+            const next = [...prev, ...data.groups];
+            return next;
+          });
+          setSnackbar({ open: true, message: 'Pasted groups', severity: 'success' });
+        }
+      } catch (err) {
+        console.warn('Failed to apply pasted data:', err);
+      }
+    };
+
+    eventBus.on('pasteGraphData', handlePastedData);
+    return () => eventBus.off('pasteGraphData', handlePastedData);
+  }, [handlers, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
   
   return (
     <div 
