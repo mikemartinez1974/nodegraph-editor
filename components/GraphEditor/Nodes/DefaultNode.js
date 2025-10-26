@@ -6,6 +6,9 @@ import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { TlzLink } from '../components/TlzLink';
 
 // Helper to check if a color is a gradient
 const isGradientColor = (color) => {
@@ -112,6 +115,15 @@ const DefaultNode = ({
       : backgroundColor
   );
 
+  // Extend sanitize schema to allow 'tlz' protocol
+  const sanitizeSchema = {
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
+    }
+  };
+
   return (
     <div
       ref={nodeRef}
@@ -179,7 +191,7 @@ const DefaultNode = ({
             fontSize: '0.9em'
           }
         }}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]} urlTransform={(url) => url} components={{ a: TlzLink }}>
             {node.label}
           </ReactMarkdown>
         </div>

@@ -2,6 +2,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { TlzLink } from '../components/TlzLink';
 import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
@@ -57,16 +61,13 @@ const FixedNode = ({
   const hasLink = node?.data?.link && node.data.link.trim().length > 0;
 
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
+  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
   const unselected_gradient = nodeColor ? nodeColor : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
   // Base position for non-dragging state
   const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
   const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
 
-  // Use node.color if available and non-empty, otherwise use theme colors
-  const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
-  const isGradient = nodeColor && isGradientColor(nodeColor);
-  
   // Use custom color if provided, otherwise use theme
   const backgroundColor = nodeColor 
     ? nodeColor
@@ -75,6 +76,15 @@ const FixedNode = ({
     ? nodeColor
     : theme.palette.primary.main;
 
+  // Extend sanitize schema to allow 'tlz' protocol
+  const sanitizeSchema = {
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
+    }
+  };
+  
   return (
     <div
       ref={nodeRef}
@@ -90,7 +100,7 @@ const FixedNode = ({
         background: isSelected ? selected_gradient : unselected_gradient,
         borderRadius: 8,
         boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
-        color: isSelected ? `${theme.textColors.dark}` : `${theme.textColors.light}`,
+        color: isSelected ? `${theme.textColors?.dark || '#000'}` : `${theme.textColors?.light || '#fff'}`,
         zIndex: 100,
         pointerEvents: 'auto',
         display: 'flex',
@@ -141,10 +151,14 @@ const FixedNode = ({
               '& em': { fontStyle: 'italic' }
             }}>
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+                urlTransform={(url) => url}
                 components={{
                   p: ({node, ...props}) => <span style={{ margin: 0 }} {...props} />,
                   strong: ({node, ...props}) => <strong {...props} />,
-                  em: ({node, ...props}) => <em {...props} />
+                  em: ({node, ...props}) => <em {...props} />,
+                  a: TlzLink
                 }}
               >
                 {node.label}

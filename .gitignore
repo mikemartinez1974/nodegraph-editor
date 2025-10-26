@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/public/tlz
 
 # debug
 npm-debug.log*
@@ -43,4 +44,4 @@ package-lock.json
 package.json
 .vscode/launch.json
 .gitignore
-public/tlz/twilightzone_concept.json
+

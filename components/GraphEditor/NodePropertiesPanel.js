@@ -12,6 +12,8 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
@@ -22,6 +24,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import { TlzLink } from './components/TlzLink';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -170,6 +173,15 @@ export default function NodePropertiesPanel({
   const handleSetAsDefault = () => {
     if (nodeColor && typeof window !== 'undefined' && window.setDefaultNodeColor) {
       window.setDefaultNodeColor(nodeColor);
+    }
+  };
+
+  // Extend sanitize schema to allow 'tlz' protocol in preview
+  const sanitizeSchema = {
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
     }
   };
 
@@ -339,7 +351,7 @@ export default function NodePropertiesPanel({
         ) : (
           <Box sx={{ mb: 1, height: 240, overflowY: 'auto', p: 1, backgroundColor: theme.palette.background.paper, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
             {memo ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]} urlTransform={(url) => url} components={{ a: TlzLink }}>
                 {memo}
               </ReactMarkdown>
             ) : (

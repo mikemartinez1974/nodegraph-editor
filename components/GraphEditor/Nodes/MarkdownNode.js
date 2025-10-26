@@ -3,6 +3,9 @@ import React, { useRef, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { TlzLink } from '../components/TlzLink';
 import eventBus from '../../NodeGraph/eventBus';
 import LinkIcon from '@mui/icons-material/Link';
 import DefaultNode from './DefaultNode';
@@ -53,6 +56,15 @@ const MarkdownNode = ({
     return () => node.removeEventListener('wheel', handleWheel);
   }, []);
 
+  // Extend the default rehype-sanitize schema to allow the custom 'tlz' protocol for hrefs
+  const sanitizeSchema = {
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
+    }
+  };
+
   // Render using DefaultNode as base, with custom markdown content
   return (
     <DefaultNode
@@ -76,6 +88,8 @@ const MarkdownNode = ({
       >
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+          urlTransform={(url) => url}
           components={{
             // Style markdown elements to fit the board theme
             p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0' }} {...props} />,
@@ -91,7 +105,7 @@ const MarkdownNode = ({
                 : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
             strong: ({node, ...props}) => <strong style={{ fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
             em: ({node, ...props}) => <em style={{ fontStyle: 'italic' }} {...props} />,
-            a: ({node, ...props}) => <a style={{ color: isDark ? '#81c784' : '#1976d2', textDecoration: 'underline', pointerEvents: 'auto' }} {...props} target="_blank" rel="noopener noreferrer" />
+            a: TlzLink  // Use TlzLink instead of inline component
           }}
         >
           {memo}

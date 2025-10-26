@@ -57,59 +57,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       }
     }
   }, [defaultNodeColor, defaultEdgeColor]);
-  
-  // Load initial graph
-  useEffect(() => {
-    (async () => {
-      try {
-        if (typeof window !== 'undefined') {
-          if (window.__nodegraph_initial_loaded) return;
-          window.__nodegraph_initial_loaded = true;
-        }
-        if (initialGraphLoadedRef.current) return;
-        initialGraphLoadedRef.current = true;
-
-        setLoading(true);
-        const resp = await fetch('/data/IntroGraph.json');
-        if (!resp.ok) throw new Error(`Failed to fetch: ${resp.status}`);
-        const data = await resp.json();
-
-        if (data?.nodes && data?.edges) {
-          setNodes(data.nodes);
-          setEdges(data.edges);
-          const loadedGroups = data.groups || [];
-          setGroups(loadedGroups);
-          
-          loadedGroups.forEach(group => {
-            groupManager.current.groups.set(group.id, group);
-            group.nodeIds?.forEach(nodeId => {
-              groupManager.current.nodeToGroup.set(nodeId, group.id);
-            });
-          });
-          
-          nodesRef.current = data.nodes;
-          edgesRef.current = data.edges;
-          saveToHistory(data.nodes, data.edges);
-
-          if (data.nodes.length > 0) {
-            const firstNode = data.nodes[0];
-            state.setPan({
-              x: window.innerWidth / 2 - (firstNode.position?.x || 0) * zoom,
-              y: window.innerHeight / 2 - (firstNode.position?.y || 0) * zoom
-            });
-            setSelectedNodeIds([firstNode.id]);
-            setSelectedEdgeIds([]);
-            setTimeout(() => eventBus.emit('openNodeProperties'), 300);
-          }
-        }
-      } catch (err) {
-        console.warn('Could not load IntroGraph:', err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-  
+    
   // Handle drop events
   useEffect(() => {
     const handleDrop = (data) => {
@@ -184,6 +132,38 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
   if (typeof window !== 'undefined') {
     window.handlePasteGraphData = handlePasteGraphData;
   }
-  
+
+  // On first client mount, if no document is loaded, navigate to configured home URL
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      // Only run once
+      if (!initialGraphLoadedRef || initialGraphLoadedRef.current) return;
+
+      const hasNodes = Array.isArray(nodesRef.current) && nodesRef.current.length > 0;
+      const hasEdges = Array.isArray(edgesRef.current) && edgesRef.current.length > 0;
+
+      if (!hasNodes && !hasEdges) {
+        const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.json';
+        let home = DEFAULT_HOME;
+        try {
+          const stored = localStorage.getItem('homeUrl');
+          if (stored) home = stored;
+        } catch (err) {
+          // ignore
+        }
+
+        if (home) {
+          eventBus.emit('fetchUrl', { url: home });
+        }
+      }
+
+      initialGraphLoadedRef.current = true;
+    } catch (err) {
+      console.warn('Startup home navigation failed:', err);
+      if (initialGraphLoadedRef) initialGraphLoadedRef.current = true;
+    }
+  }, []);
+
   return graphAPI;
 }

@@ -20,6 +20,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Box from '@mui/material/Box';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -41,8 +43,24 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const [imgError, setImgError] = useState(false);
   const currentUrl = browserHistory[historyIndex] || '';
 
+  // Home URL management
+  const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.json';
+  const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
+  const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
+
   useEffect(() => {
-    const handleSetAddress = ({ url }) => {
+    try {
+      const stored = localStorage.getItem('homeUrl');
+      if (stored) setHomeUrl(stored); else setHomeUrl(DEFAULT_HOME);
+    } catch (err) {
+      setHomeUrl(DEFAULT_HOME);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleSetAddress = (data) => {
+      // Accept either a string or an object { url }
+      const url = typeof data === 'string' ? data : data?.url;
       if (!url) return;
       setAddress(url);
 
@@ -101,8 +119,50 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   };
 
   const handleHome = () => {
-    eventBus.emit('clearGraph');
-    setAddress('');
+    // Navigate to the configured home URL
+    if (!homeUrl) {
+      alert('Home URL not set');
+      return;
+    }
+    setAddress(homeUrl);
+    eventBus.emit('fetchUrl', { url: homeUrl });
+  };
+
+  const handleHomeContext = (e) => {
+    e.preventDefault();
+    setHomeMenuAnchor(e.currentTarget);
+  };
+
+  const handleCloseHomeMenu = () => setHomeMenuAnchor(null);
+
+  const handleSetCurrentAsHome = () => {
+    const candidate = currentUrl || address;
+    if (!candidate) {
+      alert('No current document to set as home. Navigate to a document first.');
+      setHomeMenuAnchor(null);
+      return;
+    }
+    try {
+      localStorage.setItem('homeUrl', candidate);
+      setHomeUrl(candidate);
+      alert('Home set to: ' + candidate);
+    } catch (err) {
+      console.warn('Failed to set home URL:', err);
+      alert('Failed to set home URL');
+    }
+    setHomeMenuAnchor(null);
+  };
+
+  const handleResetHome = () => {
+    try {
+      localStorage.removeItem('homeUrl');
+      setHomeUrl(DEFAULT_HOME);
+      alert('Home reset to default');
+    } catch (err) {
+      console.warn('Failed to reset home URL:', err);
+      alert('Failed to reset home URL');
+    }
+    setHomeMenuAnchor(null);
   };
 
   const handleToggleBookmark = () => {
@@ -152,8 +212,9 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
               </IconButton>
               <IconButton
                 onClick={handleHome}
-                title="Home (Clear Graph)"
-                aria-label="Return to home"
+                onContextMenu={handleHomeContext}
+                title="Home"
+                aria-label="Home"
                 size="small"
               >
                 <HomeIcon fontSize="small" />
@@ -222,6 +283,12 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      <Menu anchorEl={homeMenuAnchor} open={Boolean(homeMenuAnchor)} onClose={handleCloseHomeMenu}>
+        <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>
+        <MenuItem onClick={handleResetHome}>Reset Home to default</MenuItem>
+      </Menu>
+
       <ThemeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} themeName={themeName} setThemeName={setThemeName} theme={theme} />
     </div>
   );
