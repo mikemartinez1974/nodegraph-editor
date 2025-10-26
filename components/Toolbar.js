@@ -289,7 +289,7 @@ const Toolbar = ({
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.nodegraph`;
+    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -297,7 +297,7 @@ const Toolbar = ({
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    if (onShowMessage) onShowMessage('Graph saved to .nodegraph file!', 'success');
+    if (onShowMessage) onShowMessage('Graph saved to .json file!', 'success');
   };
 
   const handleCopyOnboard = async () => {
