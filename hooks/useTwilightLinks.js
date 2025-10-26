@@ -16,7 +16,7 @@ export function useTwilightLinks() {
           const path = href.replace("tlz://cpwith.me", "");
 
           // Route internally or trigger custom logic
-          if (path.endsWith(".nodegraph")) {
+          if (path.endsWith(".node")) {
             // Handle .nodegraph files
             router.push(`/twilight${path}`);
           } else {

@@ -284,12 +284,12 @@ const Toolbar = ({
     };
 
     const jsonString = JSON.stringify(saveData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
+    const blob = new Blob([jsonString], { type: 'application/node' });
     const url = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.node`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -297,7 +297,7 @@ const Toolbar = ({
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    if (onShowMessage) onShowMessage('Graph saved to .json file!', 'success');
+    if (onShowMessage) onShowMessage('Graph saved to .node file!', 'success');
   };
 
   const handleCopyOnboard = async () => {
@@ -769,12 +769,12 @@ const Toolbar = ({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".json,.nodegraph"
+          accept=".json,.node"
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
 
-        <PreferencesDialog
+        <PreferencesDialog  
           open={preferencesOpen}
           onClose={() => setPreferencesOpen(false)}
         />
