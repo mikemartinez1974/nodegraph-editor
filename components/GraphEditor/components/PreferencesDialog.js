@@ -11,8 +11,8 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { loadSettings, saveSettings, resetSettings } from './settingsManager';
-import eventBus from '../NodeGraph/eventBus';
+import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
+import eventBus from '../../NodeGraph/eventBus';
 
 export default function PreferencesDialog({ open, onClose }) {
   const [settings, setSettings] = useState(loadSettings());

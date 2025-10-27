@@ -3,8 +3,8 @@
 // Initialization, event listeners, and effects
 // ============================================
 import { useEffect, useRef } from 'react';
-import eventBus from '../NodeGraph/eventBus';
-import GraphCRUD from './GraphCrud';
+import eventBus from '../../NodeGraph/eventBus';
+import GraphCRUD from '../GraphCrud';
 
 export function useGraphEditorSetup(state, handlers, historyHook) {
   const graphAPI = useRef(null);

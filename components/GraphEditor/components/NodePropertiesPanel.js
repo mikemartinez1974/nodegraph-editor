@@ -17,14 +17,14 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import EmojiPicker from 'emoji-picker-react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import TextField from '@mui/material/TextField';
-import eventBus from '../NodeGraph/eventBus';
-import ColorPickerInput from './components/ColorPickerInput';
+import eventBus from '../../NodeGraph/eventBus';
+import ColorPickerInput from './ColorPickerInput';
 import SaveIcon from '@mui/icons-material/Save';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import { TlzLink } from './components/TlzLink';
+import { TlzLink } from './TlzLink';
 
 export default function NodePropertiesPanel({
   selectedNode,

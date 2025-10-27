@@ -1,4 +1,4 @@
-import eventBus from '../NodeGraph/eventBus';
+import eventBus from '../../NodeGraph/eventBus';
 
 export async function pasteFromClipboardUnified({ handlers, state, historyHook, onShowMessage }) {
   const { setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom } = state;

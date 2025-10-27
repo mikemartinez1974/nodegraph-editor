@@ -4,29 +4,29 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import NodeGraph from '../NodeGraph';
-import Toolbar from './Toolbar';
+import Toolbar from './components/Toolbar';
 import DefaultNode from './Nodes/DefaultNode';
 import FixedNode from './Nodes/FixedNode';
 import MarkdownNode from './Nodes/MarkdownNode';
 import SvgNode from './Nodes/SvgNode';
-import NodeListPanel from './NodeListPanel';
-import GroupListPanel from './GroupListPanel';
-import GroupPropertiesPanel from './GroupPropertiesPanel';
+import NodeListPanel from './components/NodeListPanel';
+import GroupListPanel from './components/GroupListPanel';
+import GroupPropertiesPanel from './components/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
-import NodePropertiesPanel from './NodePropertiesPanel';
-import EdgePropertiesPanel from './EdgePropertiesPanel';
+import NodePropertiesPanel from './components/NodePropertiesPanel';
+import EdgePropertiesPanel from './components/EdgePropertiesPanel';
 import EdgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
 
-import { useGraphEditorState } from './useGraphEditorState';
-import { createGraphEditorHandlers, handleUpdateNodeData } from './graphEditorHandlers';
-import { useGraphEditorSetup } from './useGraphEditorSetup';
-import useSelection from './useSelection';
-import useGraphHistory from './useGraphHistory';
-import useGraphShortcuts from './useGraphShortcuts';
-import useGroupManager from './useGroupManager';
-import useGraphModes from './useGraphModes';
+import { useGraphEditorState } from './hooks/useGraphEditorState';
+import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
+import { useGraphEditorSetup } from './hooks/useGraphEditorSetup';
+import useSelection from './hooks/useSelection';
+import useGraphHistory from './hooks/useGraphHistory';
+import useGraphShortcuts from './hooks/useGraphShortcuts';
+import useGroupManager from './hooks/useGroupManager';
+import useGraphModes from './hooks/useGraphModes';
 
 const nodeTypes = {
   default: DefaultNode,

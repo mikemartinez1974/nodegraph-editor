@@ -2,7 +2,7 @@
 // 2. GraphEditor/graphEditorHandlers.js
 // All handler functions consolidated
 // ============================================
-import eventBus from '../NodeGraph/eventBus';
+import eventBus from '../../NodeGraph/eventBus';
 
 export function createGraphEditorHandlers({
   graphAPI,

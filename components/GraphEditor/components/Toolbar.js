@@ -44,9 +44,9 @@ import {
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon
 } from '@mui/icons-material';
-import eventBus from '../NodeGraph/eventBus';
+import eventBus from '../../NodeGraph/eventBus';
 import PreferencesDialog from './PreferencesDialog';
-import { pasteFromClipboardUnified } from './pasteHandler';
+import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 
 const Toolbar = ({ 
   nodes = [], 

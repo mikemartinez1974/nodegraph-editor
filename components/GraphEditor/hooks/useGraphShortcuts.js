@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import eventBus from '../NodeGraph/eventBus';
-import { pasteFromClipboardUnified } from './pasteHandler';
+import eventBus from '../../NodeGraph/eventBus';
+import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 
 export default function useGraphShortcuts({
   setNodes,

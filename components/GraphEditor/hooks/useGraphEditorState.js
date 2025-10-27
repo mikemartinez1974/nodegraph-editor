@@ -4,8 +4,8 @@
 // All state management in one hook
 // ============================================
 import { useState, useRef, useEffect } from 'react';
-import eventBus from '../NodeGraph/eventBus';
-import GroupManager from './GroupManager';
+import eventBus from '../../NodeGraph/eventBus';
+import GroupManager from '../GroupManager';
 
 export function useGraphEditorState() {
   // Graph data
