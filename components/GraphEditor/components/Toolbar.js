@@ -47,6 +47,7 @@ import {
 import eventBus from '../../NodeGraph/eventBus';
 import PreferencesDialog from './PreferencesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
+import AddNodeMenu from './AddNodeMenu';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -736,44 +737,12 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
-        <Menu
+        <AddNodeMenu
           anchorEl={addNodeMenuAnchor}
           open={Boolean(addNodeMenuAnchor)}
           onClose={() => setAddNodeMenuAnchor(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              onAddNode('default');
-              setAddNodeMenuAnchor(null);
-            }}
-          >
-            Default Node
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onAddNode('fixed');
-              setAddNodeMenuAnchor(null);
-            }}
-          >
-            Fixed Node
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onAddNode('markdown');
-              setAddNodeMenuAnchor(null);
-            }}
-          >
-            Markdown Node
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onAddNode('svg');
-              setAddNodeMenuAnchor(null);
-            }}
-          >
-            SVG Node
-          </MenuItem>
-        </Menu>
+          onAddNode={onAddNode}
+        />
 
         <input
           ref={fileInputRef}

@@ -5,10 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import NodeGraph from '../NodeGraph';
 import Toolbar from './components/Toolbar';
-import DefaultNode from './Nodes/DefaultNode';
-import FixedNode from './Nodes/FixedNode';
-import MarkdownNode from './Nodes/MarkdownNode';
-import SvgNode from './Nodes/SvgNode';
+import { getNodeTypes } from './nodeTypeRegistry';
 import NodeListPanel from './components/NodeListPanel';
 import GroupListPanel from './components/GroupListPanel';
 import GroupPropertiesPanel from './components/GroupPropertiesPanel';
@@ -28,12 +25,7 @@ import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
 
-const nodeTypes = {
-  default: DefaultNode,
-  fixed: FixedNode,
-  markdown: MarkdownNode,
-  svg: SvgNode,
-};
+const nodeTypes = getNodeTypes();
 
 export default function GraphEditor({ backgroundImage }) {
   const theme = useTheme();
