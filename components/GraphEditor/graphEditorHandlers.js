@@ -176,8 +176,7 @@ export function createGraphEditorHandlers({
         x: window.innerWidth / 2 - firstNode.position.x * zoom,
         y: window.innerHeight / 2 - firstNode.position.y * zoom
       });
-      setSelectedNodeIds([firstNode.id]);
-      eventBus.emit('openNodeProperties');
+      // Do not auto-select or open the properties panel after loading a file
     }
   };
   

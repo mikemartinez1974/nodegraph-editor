@@ -22,6 +22,9 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import DeleteIcon from '@mui/icons-material/Delete';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Icon from '@mui/material/Icon';
 
 export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -33,7 +36,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const [browserHistory, setBrowserHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null); // bookmark menu anchor
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
   const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
@@ -48,7 +51,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const currentUrl = browserHistory[historyIndex] || '';
 
   // Home URL management
-  const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.json';
+  const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
 
@@ -60,6 +63,32 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
       setHomeUrl(DEFAULT_HOME);
     }
   }, []);
+
+  // Load persisted bookmarks on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('bookmarks');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setBookmarks(parsed);
+      }
+    } catch (err) {
+      console.warn('Failed to load bookmarks:', err);
+    }
+  }, []);
+
+  // Persist bookmarks whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    } catch (err) {
+      console.warn('Failed to save bookmarks:', err);
+    }
+  }, [bookmarks]);
+
+  useEffect(() => {
+    setIsBookmarked(bookmarks.includes(currentUrl));
+  }, [bookmarks, currentUrl]);
 
   // Helper to convert tlz to https fetchable URL
   const convertTlzToFetchUrl = (url) => {
@@ -107,46 +136,29 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
     const handleSetAddress = (data) => {
       const url = typeof data === 'string' ? data : data?.url;
       if (!url) return;
-      
-      console.log('🔵 setAddress received:', url);
-      console.log('   navigatingToUrlRef.current:', navigatingToUrlRef.current);
-      console.log('   setAddressCountRef.current:', setAddressCountRef.current);
-      console.log('   historyIndexRef.current:', historyIndexRef.current);
-      console.log('   browserHistoryRef.current:', browserHistoryRef.current);
-      
+
       // Skip history updates if this is the URL we're navigating to via back/forward
       if (navigatingToUrlRef.current === url) {
-        console.log('   ✅ Skipping history push (navigation event)');
-        setAddress(url);  // Still update the address bar
-        
-        // Increment counter
+        // Update address bar but do not push history
+        setAddress(url);
+        // Increment counter for duplicate navigation signals
         setAddressCountRef.current++;
-        console.log('   📊 setAddress count:', setAddressCountRef.current);
-        
-        // Clear the flag after we've seen it twice (GraphEditor emits at start and end)
+        // Clear the flag after we've seen it twice (GraphEditor emits start/end)
         if (setAddressCountRef.current >= 2) {
-          console.log('   🧹 Clearing navigation flag (received 2+ events)');
           navigatingToUrlRef.current = null;
           setAddressCountRef.current = 0;
         }
         return;
       }
-      
-      console.log('   📝 Pushing to history');
+
       // Show canonical url in address bar (no tlz)
       setAddress(url);
       // Push into our ref-backed history
       pushHistory(url);
-      console.log('   After push - historyIndexRef.current:', historyIndexRef.current);
-      console.log('   After push - browserHistoryRef.current:', browserHistoryRef.current);
     };
     eventBus.on('setAddress', handleSetAddress);
     return () => eventBus.off('setAddress', handleSetAddress);
   }, []);
-
-  useEffect(() => {
-    setIsBookmarked(bookmarks.includes(currentUrl));
-  }, [bookmarks, currentUrl]);
 
   const handleBrowserBack = () => {
     console.log('⬅️ BACK clicked');
@@ -247,12 +259,36 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
     setHomeMenuAnchor(null);
   };
 
+  // Bookmark actions
   const handleToggleBookmark = () => {
-    if (isBookmarked) {
-      setBookmarks(bookmarks.filter((url) => url !== currentUrl));
+    if (!currentUrl) return;
+    if (bookmarks.includes(currentUrl)) {
+      const next = bookmarks.filter((url) => url !== currentUrl);
+      setBookmarks(next);
     } else {
-      setBookmarks([...bookmarks, currentUrl]);
+      const next = [...bookmarks, currentUrl];
+      setBookmarks(next);
     }
+  };
+
+  const handleOpenBookmarksMenu = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleCloseBookmarksMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenBookmark = (url) => {
+    if (!url) return;
+    setAddress(url);
+    handleCloseBookmarksMenu();
+    eventBus.emit('fetchUrl', { url });
+  };
+
+  const handleRemoveBookmark = (url) => {
+    const next = bookmarks.filter(u => u !== url);
+    setBookmarks(next);
   };
 
   return (
@@ -354,7 +390,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
               {isBookmarked ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
             </IconButton>
             <IconButton
-              onClick={(e) => setAnchorEl(e.currentTarget)}
+              onClick={handleOpenBookmarksMenu}
               disabled={bookmarks.length === 0}
               title="View bookmarks"
               aria-label="Open bookmarks menu"
@@ -377,6 +413,25 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      {/* Bookmarks menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseBookmarksMenu}>
+        {bookmarks.length === 0 ? (
+          <MenuItem disabled>No bookmarks</MenuItem>
+        ) : (
+          bookmarks.map((url) => (
+            <MenuItem key={url} onClick={() => handleOpenBookmark(url)} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <OpenInNewIcon fontSize="small" />
+                <Typography variant="body2" sx={{ maxWidth: 420, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</Typography>
+              </Box>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRemoveBookmark(url); }} aria-label="Remove bookmark">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </MenuItem>
+          ))
+        )}
+      </Menu>
 
       <Menu anchorEl={homeMenuAnchor} open={Boolean(homeMenuAnchor)} onClose={handleCloseHomeMenu}>
         <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>

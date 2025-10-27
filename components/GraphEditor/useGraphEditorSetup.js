@@ -121,46 +121,115 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
   
   // Load background
   useEffect(() => {
-    const savedBg = localStorage.getItem('backgroundImage');
-    if (savedBg) {
-      const el = document.getElementById('graph-editor-background');
-      if (el) el.style.backgroundImage = `url('/background art/${savedBg}')`;
+    const applyBackground = (bg) => {
+      try {
+        const el = document.getElementById('graph-editor-background');
+        if (!el) return;
+        if (!bg) {
+          el.style.backgroundImage = '';
+          return;
+        }
+
+        let url = null;
+
+        // If bg is an absolute URL
+        if (/^https?:\/\//i.test(bg)) {
+          url = bg;
+        } else if (bg.startsWith('/')) {
+          // Leading slash path under site root
+          url = bg;
+        } else if (bg.includes('/')) {
+          // Relative path with folders - resolve against site origin
+          try {
+            url = new URL(bg, window.location.origin).href;
+          } catch (err) {
+            url = `/${bg}`;
+          }
+        } else {
+          // Plain filename (no slashes) — interpret as file relative to last loaded document's directory
+          const lastLoaded = typeof window !== 'undefined' ? localStorage.getItem('lastLoadedUrl') : null;
+          if (lastLoaded) {
+            try {
+              const base = lastLoaded.substring(0, lastLoaded.lastIndexOf('/') + 1);
+              url = new URL(bg, base).href;
+            } catch (err) {
+              // fallback to public/background art
+              url = `/background art/${bg}`;
+            }
+          } else {
+            // No lastLoadedUrl available — fall back to public/background art
+            url = `/background art/${bg}`;
+          }
+        }
+
+        // Normalize to absolute URL if possible
+        try {
+          url = new URL(url, window.location.origin).href;
+        } catch (err) {
+          // keep as-is
+        }
+
+        el.style.backgroundImage = `url('${url}')`;
+      } catch (err) {
+        console.warn('Failed to apply background image:', err);
+      }
+    };
+
+    try {
+      const savedBg = localStorage.getItem('backgroundImage');
+      if (savedBg) {
+        applyBackground(savedBg);
+      }
+    } catch (err) {
+      // ignore
     }
+
+    const handler = ({ backgroundImage }) => {
+      applyBackground(backgroundImage || null);
+    };
+    eventBus.on('backgroundChanged', handler);
+    return () => eventBus.off('backgroundChanged', handler);
   }, []);
-  
+
   // Expose for testing
   if (typeof window !== 'undefined') {
     window.handlePasteGraphData = handlePasteGraphData;
   }
 
-  // On first client mount, if no document is loaded, navigate to configured home URL
+  // One-time startup: if no nodes/edges are loaded, fetch the configured home URL
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
-      if (typeof window === 'undefined') return;
-      // Only run once
       if (!initialGraphLoadedRef || initialGraphLoadedRef.current) return;
 
-      const hasNodes = Array.isArray(nodesRef.current) && nodesRef.current.length > 0;
-      const hasEdges = Array.isArray(edgesRef.current) && edgesRef.current.length > 0;
-
-      if (!hasNodes && !hasEdges) {
-        const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.json';
-        let home = DEFAULT_HOME;
+      // Give the app a moment to fully initialize UI and other listeners
+      const t = setTimeout(() => {
         try {
-          const stored = localStorage.getItem('homeUrl');
-          if (stored) home = stored;
+          const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.node';
+          let home = DEFAULT_HOME;
+          try {
+            const stored = localStorage.getItem('homeUrl');
+            if (stored) home = stored;
+          } catch (err) {
+            // ignore localStorage errors
+          }
+
+          const hasNodes = Array.isArray(nodesRef.current) && nodesRef.current.length > 0;
+          const hasEdges = Array.isArray(edgesRef.current) && edgesRef.current.length > 0;
+
+          if (!hasNodes && !hasEdges && home) {
+            // Emit fetchUrl so GraphEditor will load the home document
+            eventBus.emit('fetchUrl', { url: home });
+          }
         } catch (err) {
-          // ignore
+          console.warn('Startup home navigation failed:', err);
+        } finally {
+          if (initialGraphLoadedRef) initialGraphLoadedRef.current = true;
         }
+      }, 50);
 
-        if (home) {
-          eventBus.emit('fetchUrl', { url: home });
-        }
-      }
-
-      initialGraphLoadedRef.current = true;
+      return () => clearTimeout(t);
     } catch (err) {
-      console.warn('Startup home navigation failed:', err);
       if (initialGraphLoadedRef) initialGraphLoadedRef.current = true;
     }
   }, []);
@@ -184,9 +253,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         const origin = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host;
         const fetchable = origin + path;
 
-        // Update address/history with the canonical fetchable URL (do not show tlz://)
-        eventBus.emit('setAddress', fetchable);
-        // Emit fetchUrl to load the resource
+        // Emit fetchUrl to load the resource; the central fetch handler will emit setAddress
         eventBus.emit('fetchUrl', { url: fetchable });
       } catch (err) {
         console.warn('Failed to handle tlzClick:', err);

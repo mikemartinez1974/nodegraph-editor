@@ -121,7 +121,7 @@ export default function GraphEditor({ backgroundImage }) {
     edgesRef,
     nodesRef
   });
-  
+
   // Panel anchor synchronization
   useEffect(() => {
     const handlePropertiesOpen = () => {
@@ -442,7 +442,7 @@ export default function GraphEditor({ backgroundImage }) {
         isFreeUser={isFreeUser}
       />
       
-      {selectedNodeIds.length === 1 && (
+      {selectedNodeIds.length === 1 && nodePanelAnchor && (
         <NodePropertiesPanel
           selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
           onUpdateNode={(id, updates, options) => {
@@ -567,21 +567,46 @@ export default function GraphEditor({ backgroundImage }) {
         }}
         onNodeClick={(nodeId, event) => {
           if (!event || event.type !== 'click') return;
-          
+
           const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-          const isSelected = selectedNodeIds.includes(nodeId);
-          
+
           if (isMultiSelect) {
             selectionHook.handleNodeSelection(nodeId, true);
-          } else if (isSelected) {
-            eventBus.emit('selectedNodeClick', { nodeId });
           } else {
+            // Always select the clicked node. Do not toggle properties on single click.
             setSelectedNodeIds([nodeId]);
             setSelectedEdgeIds([]);
           }
         }}
-        onNodeDoubleClick={handlers.handleNodeDoubleClick}
-        onEdgeDoubleClick={handlers.handleEdgeDoubleClick}
+        onNodeDoubleClick={(nodeId, event) => {
+          // Toggle/open node properties on double-click instead of single click
+          const isSelected = selectedNodeIds.includes(nodeId);
+          if (isSelected && selectedNodeIds.length === 1) {
+            setNodePanelAnchor(prev => prev ? null : 'right');
+          } else {
+            setSelectedNodeIds([nodeId]);
+            setSelectedEdgeIds([]);
+            setNodePanelAnchor('right');
+          }
+
+          // preserve existing handler behavior if present
+          try {
+            if (handlers && typeof handlers.handleNodeDoubleClick === 'function') {
+              handlers.handleNodeDoubleClick(nodeId, event);
+            }
+          } catch (err) {
+            console.warn('handlers.handleNodeDoubleClick failed:', err);
+          }
+        }}
+        onNodeDragEnd={(id, position) => {
+          setNodes(prev => {
+            const next = prev.map(n => n.id === id ? { ...n, position } : n);
+            nodesRef.current = next;
+            eventBus.emit('nodeDragEnd', { nodeId: id, position });
+            historyHook.saveToHistory(next, edgesRef.current);
+            return next;
+          });
+        }}
         onGroupClick={(groupId, event, action) => {
           if (action === 'toggle-collapse') {
             groupManagerHook.handleToggleGroupCollapse(groupId);
@@ -613,15 +638,6 @@ export default function GraphEditor({ backgroundImage }) {
         hoveredEdgeId={hoveredEdgeId}
         hoveredEdgeSource={hoveredEdgeSource}
         hoveredEdgeTarget={hoveredEdgeTarget}
-        onNodeDragEnd={(id, position) => {
-          setNodes(prev => {
-            const next = prev.map(n => n.id === id ? { ...n, position } : n);
-            nodesRef.current = next;
-            eventBus.emit('nodeDragEnd', { nodeId: id, position });
-            historyHook.saveToHistory(next, edgesRef.current);
-            return next;
-          });
-        }}
       />
       
       {selectedEdgeIds.length === 1 && edges.find(e => e.id === selectedEdgeIds[0]) && showEdgePanel && (

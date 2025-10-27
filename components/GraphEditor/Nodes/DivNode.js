@@ -3,23 +3,22 @@ import React, { useRef, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 
-const SvgNode = ({ 
-  node, 
-  pan = { x: 0, y: 0 }, 
-  zoom = 1, 
-  style = {}, 
-  isSelected, 
-  onMouseDown, 
-  onClick, 
-  onDoubleClick, 
-  children, 
+const DivNode = ({
+  node,
+  pan = { x: 0, y: 0 },
+  zoom = 1,
+  style = {},
+  isSelected,
+  onMouseDown,
+  onClick,
+  onDoubleClick,
+  children,
   draggingHandle,
-  nodeRefs 
+  nodeRefs
 }) => {
   const theme = useTheme();
   const nodeRef = useRef(null);
 
-  // Register node in nodeRefs
   useEffect(() => {
     if (nodeRef.current && nodeRefs) {
       nodeRefs.current.set(node.id, nodeRef.current);
@@ -36,10 +35,18 @@ const SvgNode = ({
 
   const borderColor = isSelected ? theme.palette.secondary.main : theme.palette.primary.main;
 
+  const contentStyle = {
+    width: '100%',
+    height: '100%',
+    pointerEvents: 'auto',
+    backgroundColor: 'transparent',
+    overflow: 'hidden'
+  };
+
   return (
     <div
       ref={nodeRef}
-      className="svg-node"
+      className="div-node"
       style={{
         position: 'absolute',
         left: baseLeft,
@@ -73,19 +80,17 @@ const SvgNode = ({
         if (onDoubleClick) onDoubleClick(e);
       }}
     >
-      {node?.data?.svg && (
-        <div
-          dangerouslySetInnerHTML={{ __html: node.data.svg }}
-          style={{
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none' // Prevent interaction with the SVG
-          }}
-        />
+      {node?.memo ? (
+        <div style={contentStyle}>{node.memo}</div>
+      ) : node?.data?.html ? (
+        <div dangerouslySetInnerHTML={{ __html: node.data.html }} style={contentStyle} />
+      ) : (
+        <div style={contentStyle}>
+          {node?.data?.text || children}
+        </div>
       )}
-      {children}
     </div>
   );
 };
 
-export default SvgNode;
+export default DivNode;

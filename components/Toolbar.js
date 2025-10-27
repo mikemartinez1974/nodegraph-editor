@@ -13,7 +13,8 @@ import {
   ToggleButtonGroup,
   Menu,
   MenuItem,
-  Chip
+  Snackbar,
+  Alert
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -113,6 +114,9 @@ const Toolbar = ({
   const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
   const currentUrl = browserHistory[historyIndex] || '';
 
+  // Snackbar state (replaces transient Chips)
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPos({ x: window.innerWidth - 600, y: 88 });
@@ -133,6 +137,26 @@ const Toolbar = ({
     eventBus.on('setAddress', handleAddressSet);
     return () => eventBus.off('setAddress', handleAddressSet);
   }, [historyIndex, currentUrl]);
+
+  // Watch transient flags and show snackbar when they become true
+  useEffect(() => {
+    if (copied) {
+      setSnackbar({ open: true, message: 'JSON copied to clipboard', severity: 'success' });
+    } else if (saved) {
+      setSnackbar({ open: true, message: 'Graph saved to .node file', severity: 'success' });
+    } else if (pasted) {
+      setSnackbar({ open: true, message: 'Pasted content applied', severity: 'success' });
+    } else if (selectedCopied) {
+      setSnackbar({ open: true, message: 'Selected nodes copied', severity: 'success' });
+    } else if (onboardCopied) {
+      setSnackbar({ open: true, message: 'LLM onboarding guide copied', severity: 'success' });
+    }
+  }, [copied, saved, pasted, selectedCopied, onboardCopied]);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
 
   const onMouseDown = e => {
     dragging.current = true;
@@ -751,21 +775,6 @@ const Toolbar = ({
           </MenuItem>
         </Menu>
 
-        {(copied || saved || pasted || selectedCopied || onboardCopied) && (
-          <Chip
-            label={
-              copied ? "JSON Copied!" :
-              saved ? "Saved!" :
-              pasted ? "Pasted!" :
-              selectedCopied ? "Selected Copied!" :
-              onboardCopied ? "LLM Guide Copied!" : ""
-            }
-            size="small"
-            color="success"
-            sx={{ animation: 'fadeInOut 2s' }}
-          />
-        )}
-
         <input
           ref={fileInputRef}
           type="file"
@@ -833,6 +842,18 @@ const Toolbar = ({
             ))
           )}
         </Menu>
+
+        {/* Snackbar for transient messages */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </Paper>
   );

@@ -13,6 +13,7 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import eventBus from '../NodeGraph/eventBus';
 
 const fallbackTheme = themeMap.default;
 
@@ -52,7 +53,7 @@ export default function ThemeDrawer(props) {
     ? (file) => { 
       //console.log('ThemeDrawer safeSetBackgroundImage called with:', file); 
       setBackgroundImage(file); }
-    : () => {};
+    : null;
   const activeTheme = theme || fallbackTheme;
   const [cooldown, setCooldown] = useState(false);
   // Preview theme on hover by setting themeName
@@ -107,6 +108,13 @@ export default function ThemeDrawer(props) {
     setStretched(getBgOption('backgroundStretched', false));
     setCentered(getBgOption('backgroundCentered', true));
     updateBackgroundStyle();
+    // listen to external background changes so the preview UI stays in sync
+    const handler = ({ backgroundImage }) => {
+      // no-op for now; style controls remain independent
+      updateBackgroundStyle();
+    };
+    eventBus.on('backgroundChanged', handler);
+    return () => eventBus.off('backgroundChanged', handler);
     // eslint-disable-next-line
   }, []);
 
@@ -114,6 +122,23 @@ export default function ThemeDrawer(props) {
     // Only update background style when checkboxes change
     updateBackgroundStyle();
   }, [tiled, stretched, centered]);
+
+  const applyBackgroundSelection = (file) => {
+    try {
+      // For selections from this drawer, store and emit the full public path
+      const path = file ? `/background art/${file}` : null;
+      if (safeSetBackgroundImage) safeSetBackgroundImage(path);
+      if (path) {
+        localStorage.setItem('backgroundImage', path);
+        eventBus.emit('backgroundChanged', { backgroundImage: path });
+      } else {
+        localStorage.removeItem('backgroundImage');
+        eventBus.emit('backgroundChanged', { backgroundImage: null });
+      }
+    } catch (err) {
+      console.warn('Failed to apply background selection:', err);
+    }
+  };
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ BackdropProps: { invisible: true } }}
@@ -180,10 +205,7 @@ export default function ThemeDrawer(props) {
                 label="Centered"
               />
               <ImageList cols={3} gap={8} sx={{ width: '100%' }}>
-                <ImageListItem key="none" onClick={() => {
-                  document.getElementById('graph-editor-background').style.backgroundImage = 'none';
-                  localStorage.removeItem('backgroundImage');
-                }}>
+                <ImageListItem key="none" onClick={() => applyBackgroundSelection(null)}>
                   <Box sx={{
                     width: '100%',
                     height: 80,
@@ -203,11 +225,7 @@ export default function ThemeDrawer(props) {
                 {backgroundImages.map((file) => {
                   const imgSrc = `/background art/${file}`;
                   return (
-                    <ImageListItem key={file} onClick={() => {
-                      document.getElementById('graph-editor-background').style.backgroundImage = `url('/background art/${file}')`;
-                      localStorage.setItem('backgroundImage', file);
-                      //console.log('ImageListItem clicked:', file);
-                    }}>
+                    <ImageListItem key={file} onClick={() => applyBackgroundSelection(file)}>
                       <img src={imgSrc} alt={file} style={{ width: '100%', borderRadius: 8, cursor: 'pointer' }} />
                     </ImageListItem>
                   );

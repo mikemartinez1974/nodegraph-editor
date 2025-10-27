@@ -69,7 +69,7 @@ const defaultSettings = {
 
 export const loadSettings = () => {
   try {
-    console.log('loadSettings called, returning defaultSettings');
+    // Return defaults (quiet)
     return { ...defaultSettings, nodes: [], edges: [], groups: [] };
   } catch (error) {
     console.error('Failed to load settings:', error);

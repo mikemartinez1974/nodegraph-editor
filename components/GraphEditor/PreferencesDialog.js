@@ -12,6 +12,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { loadSettings, saveSettings, resetSettings } from './settingsManager';
+import eventBus from '../NodeGraph/eventBus';
 
 export default function PreferencesDialog({ open, onClose }) {
   const [settings, setSettings] = useState(loadSettings());
@@ -24,6 +25,20 @@ export default function PreferencesDialog({ open, onClose }) {
 
   const handleSave = () => {
     saveSettings(settings);
+    try {
+      if (typeof window !== 'undefined') {
+        // Persist top-level backgroundImage key for compatibility with the editor loader
+        if (settings.backgroundImage) {
+          localStorage.setItem('backgroundImage', settings.backgroundImage);
+        } else {
+          localStorage.removeItem('backgroundImage');
+        }
+      }
+      // Notify other components to update background immediately
+      eventBus.emit('backgroundChanged', { backgroundImage: settings.backgroundImage || null });
+    } catch (err) {
+      console.warn('Failed to persist background image preference:', err);
+    }
     onClose();
   };
 

@@ -516,6 +516,20 @@ export default function NodeGraph({
       zIndex: 0,
       pointerEvents: 'auto'
     }}>
+      {/* Background element updated by PreferencesDialog / useGraphEditorSetup */}
+      <div
+        id="graph-editor-background"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: -1,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          pointerEvents: 'none'
+        }}
+      />
+
       <PanZoomLayer
         ref={panZoomRef}
         pan={pan}
