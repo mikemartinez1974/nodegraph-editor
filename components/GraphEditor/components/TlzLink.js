@@ -32,9 +32,7 @@ export const TlzLink = ({ href, children, ...props }) => {
       e.preventDefault();
       e.stopPropagation();
       try {
-        // Update address/history immediately so header reflects navigation
-        try { eventBus.emit('setAddress', { url: fullUrl }); } catch (err) { /* ignore */ }
-        // Let the app handle fetching/loading the resource
+       // Let the app handle fetching/loading the resource using the fetchable https URL
         eventBus.emit('fetchUrl', { url: fullUrl });
       } catch (err) {
         console.warn('TLZ fetch emit failed, falling back to full navigation', err);

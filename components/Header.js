@@ -27,13 +27,17 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
-  const historyIndexRef = useRef(historyIndex);
-  useEffect(() => { historyIndexRef.current = historyIndex; }, [historyIndex]);
+  // Use refs as the authoritative source for history and index to avoid stale closures
+  const historyIndexRef = useRef(-1);
+  const browserHistoryRef = useRef([]);
   const [browserHistory, setBrowserHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
+  const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
+  
   let muiTheme = useTheme();
   if (!muiTheme || !('palette' in muiTheme)) {
     muiTheme = themeMap.default;
@@ -57,27 +61,84 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
     }
   }, []);
 
+  // Helper to convert tlz to https fetchable URL
+  const convertTlzToFetchUrl = (url) => {
+    try {
+      if (typeof url !== 'string') return url;
+      if (!url.startsWith('tlz://')) return url;
+      const rest = url.slice('tlz://'.length);
+      const firstSlash = rest.indexOf('/');
+      let host = '';
+      let path = '';
+      if (firstSlash !== -1) {
+        host = rest.slice(0, firstSlash);
+        path = rest.slice(firstSlash);
+      } else {
+        path = '/' + rest;
+      }
+      const origin = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host;
+      return origin + path;
+    } catch (err) {
+      return url;
+    }
+  };
+
+  // Push a canonical url into the history (keeps refs and state in sync)
+  const pushHistory = (url) => {
+    if (!url) return;
+    const idx = historyIndexRef.current;
+    const truncated = browserHistoryRef.current.slice(0, Math.max(0, idx + 1));
+    // Avoid duplicate consecutive entries
+    if (truncated[truncated.length - 1] === url) {
+      historyIndexRef.current = truncated.length - 1;
+      setHistoryIndex(historyIndexRef.current);
+      browserHistoryRef.current = truncated;
+      setBrowserHistory([...browserHistoryRef.current]);
+      return;
+    }
+    browserHistoryRef.current = [...truncated, url];
+    historyIndexRef.current = browserHistoryRef.current.length - 1;
+    setBrowserHistory([...browserHistoryRef.current]);
+    setHistoryIndex(historyIndexRef.current);
+  };
+
   useEffect(() => {
+    // Handle setAddress events: accept string or object { url }
     const handleSetAddress = (data) => {
-      // Accept either a string or an object { url }
       const url = typeof data === 'string' ? data : data?.url;
       if (!url) return;
-      setAddress(url);
-
-      setBrowserHistory(prev => {
-        // Use the ref to get the current index (handles updates outside this closure)
-        const idx = historyIndexRef.current;
-        const truncated = prev.slice(0, Math.max(0, idx + 1));
-        // Avoid duplicate consecutive entries
-        if (truncated[truncated.length - 1] === url) {
-          const newIndex = truncated.length - 1;
-          setHistoryIndex(newIndex);
-          return truncated;
+      
+      console.log('🔵 setAddress received:', url);
+      console.log('   navigatingToUrlRef.current:', navigatingToUrlRef.current);
+      console.log('   setAddressCountRef.current:', setAddressCountRef.current);
+      console.log('   historyIndexRef.current:', historyIndexRef.current);
+      console.log('   browserHistoryRef.current:', browserHistoryRef.current);
+      
+      // Skip history updates if this is the URL we're navigating to via back/forward
+      if (navigatingToUrlRef.current === url) {
+        console.log('   ✅ Skipping history push (navigation event)');
+        setAddress(url);  // Still update the address bar
+        
+        // Increment counter
+        setAddressCountRef.current++;
+        console.log('   📊 setAddress count:', setAddressCountRef.current);
+        
+        // Clear the flag after we've seen it twice (GraphEditor emits at start and end)
+        if (setAddressCountRef.current >= 2) {
+          console.log('   🧹 Clearing navigation flag (received 2+ events)');
+          navigatingToUrlRef.current = null;
+          setAddressCountRef.current = 0;
         }
-        const next = [...truncated, url];
-        setHistoryIndex(next.length - 1);
-        return next;
-      });
+        return;
+      }
+      
+      console.log('   📝 Pushing to history');
+      // Show canonical url in address bar (no tlz)
+      setAddress(url);
+      // Push into our ref-backed history
+      pushHistory(url);
+      console.log('   After push - historyIndexRef.current:', historyIndexRef.current);
+      console.log('   After push - browserHistoryRef.current:', browserHistoryRef.current);
     };
     eventBus.on('setAddress', handleSetAddress);
     return () => eventBus.off('setAddress', handleSetAddress);
@@ -88,25 +149,42 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   }, [bookmarks, currentUrl]);
 
   const handleBrowserBack = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      const url = browserHistory[newIndex];
+    console.log('⬅️ BACK clicked');
+    console.log('   Before: historyIndexRef.current =', historyIndexRef.current);
+    console.log('   History:', browserHistoryRef.current);
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current = historyIndexRef.current - 1;
+      setHistoryIndex(historyIndexRef.current);
+      const url = browserHistoryRef.current[historyIndexRef.current];
+      console.log('   After: historyIndexRef.current =', historyIndexRef.current);
+      console.log('   Navigating to:', url);
       if (url) {
+        navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
+        setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        eventBus.emit('fetchUrl', { url });
+        const fetchable = convertTlzToFetchUrl(url);
+        eventBus.emit('fetchUrl', { url: fetchable });
       }
     }
   };
 
   const handleBrowserForward = () => {
-    if (historyIndex < browserHistory.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      const url = browserHistory[newIndex];
+    console.log('➡️ FORWARD clicked');
+    console.log('   Before: historyIndexRef.current =', historyIndexRef.current);
+    console.log('   History length:', browserHistoryRef.current.length);
+    console.log('   History:', browserHistoryRef.current);
+    if (historyIndexRef.current < browserHistoryRef.current.length - 1) {
+      historyIndexRef.current = historyIndexRef.current + 1;
+      setHistoryIndex(historyIndexRef.current);
+      const url = browserHistoryRef.current[historyIndexRef.current];
+      console.log('   After: historyIndexRef.current =', historyIndexRef.current);
+      console.log('   Navigating to:', url);
       if (url) {
+        navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
+        setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        eventBus.emit('fetchUrl', { url });
+        const fetchable = convertTlzToFetchUrl(url);
+        eventBus.emit('fetchUrl', { url: fetchable });
       }
     }
   };
@@ -114,18 +192,21 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
   const handleRefresh = () => {
     const url = currentUrl || address;
     if (url) {
-      eventBus.emit('fetchUrl', { url });
+      const fetchable = convertTlzToFetchUrl(url);
+      eventBus.emit('fetchUrl', { url: fetchable });
     }
   };
 
   const handleHome = () => {
-    // Navigate to the configured home URL
+    // Navigate to the configured home URL (display canonical URL)
     if (!homeUrl) {
       alert('Home URL not set');
       return;
     }
     setAddress(homeUrl);
-    eventBus.emit('fetchUrl', { url: homeUrl });
+    // Do not push history here; GraphEditor will emit setAddress when it starts fetching
+    const fetchable = convertTlzToFetchUrl(homeUrl);
+    eventBus.emit('fetchUrl', { url: fetchable });
   };
 
   const handleHomeContext = (e) => {
@@ -143,9 +224,10 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
       return;
     }
     try {
-      localStorage.setItem('homeUrl', candidate);
-      setHomeUrl(candidate);
-      alert('Home set to: ' + candidate);
+      const fetchable = convertTlzToFetchUrl(candidate);
+      localStorage.setItem('homeUrl', fetchable);
+      setHomeUrl(fetchable);
+      alert('Home set to: ' + fetchable);
     } catch (err) {
       console.warn('Failed to set home URL:', err);
       alert('Failed to set home URL');
@@ -229,8 +311,20 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
-                // Emit fetch event - GraphEditor will handle loading and then emit setAddress back
-                eventBus.emit('fetchUrl', { url: address });
+                const fetchUrl = (function(input) {
+                  const trimmed = (input || '').trim();
+                  if (!trimmed) return '';
+                  if (trimmed.startsWith('tlz://')) return convertTlzToFetchUrl(trimmed);
+                  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+                  if (/[.]/.test(trimmed.split('/')[0])) return 'https://' + trimmed;
+                  return trimmed;
+                })(address);
+                if (fetchUrl) {
+                  // Do not push history here; GraphEditor will emit setAddress when it starts fetching
+                  eventBus.emit('fetchUrl', { url: fetchUrl });
+                } else {
+                  eventBus.emit('fetchUrl', { url: address });
+                }
               }
             }}
             InputProps={{

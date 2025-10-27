@@ -173,43 +173,104 @@ export default function GraphEditor({ backgroundImage }) {
   useEffect(() => {
     const handleFetchUrl = async ({ url }) => {
       try {
+        if (!url) return;
         let fullUrl = url;
+
+        // Normalize tlz:// to fetchable https://
+        if (fullUrl.startsWith('tlz://')) {
+          const rest = fullUrl.slice('tlz://'.length);
+          const firstSlash = rest.indexOf('/');
+          let host = '';
+          let path = '';
+
+          if (firstSlash !== -1) {
+            host = rest.slice(0, firstSlash);
+            path = rest.slice(firstSlash); // includes leading '/'
+          } else {
+            path = '/' + rest;
+          }
+
+          fullUrl = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host + path;
+        }
+
+        // Prepend https if missing
         if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
           fullUrl = 'https://' + fullUrl;
         }
-        const response = await fetch(fullUrl);
-        if (!response.ok) throw new Error('Failed to fetch');
+
+        // Update address/history immediately so header/back works
+        try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+
+        const triedUrls = [];
+
+        const tryFetch = async (u) => {
+          triedUrls.push(u);
+          const resp = await fetch(u);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          return resp;
+        };
+
+        let response = null;
+
+        try {
+          response = await tryFetch(fullUrl);
+        } catch (err) {
+          // generate alternates to try
+          const alternates = [];
+          if (fullUrl.match(/\.json($|[?#])/)) {
+            alternates.push(fullUrl.replace(/\.json($|[?#])/, '.node$1'));
+          }
+          if (!fullUrl.endsWith('.node')) {
+            alternates.push(fullUrl + '.node');
+          }
+          if (fullUrl.endsWith('/')) {
+            alternates.push(fullUrl + 'index.node');
+          }
+
+          for (const alt of alternates) {
+            if (triedUrls.includes(alt)) continue;
+            try {
+              response = await tryFetch(alt);
+              fullUrl = alt; // switch canonical to the working one
+              try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+              break;
+            } catch (e) {
+              // continue to next
+            }
+          }
+        }
+
+        if (!response) throw new Error('Failed to fetch any candidate URLs: ' + triedUrls.join(', '));
+
         const text = await response.text();
 
         // Try to parse as JSON (graph data)
         try {
           const jsonData = JSON.parse(text);
-          // Check if it's graph data (has nodes or edges)
           if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
-            // Load as graph
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
             const groupsToLoadFromJson = jsonData.groups || [];
             handlers.handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
-            eventBus.emit('setAddress', fullUrl); // Update address bar
+            eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
             return;
           }
-        } catch {
-          // Not JSON, treat as text
+        } catch (e) {
+          // Not JSON, fall through to create text node
         }
-        
+
         // Create text node
         const lines = text.trim().split('\n');
-        const label = lines[0].substring(0, 50);
+        const label = lines[0] ? lines[0].substring(0, 50) : 'Fetched Text';
         const memo = text.trim();
-        
-        const width = Math.max(200, Math.min(600, label.length * 8 + 100));
+
+        const width = Math.max(200, Math.min(600, (label.length || 10) * 8 + 100));
         const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
-        
+
         const centerX = (window.innerWidth / 2 - pan.x) / zoom;
         const centerY = (window.innerHeight / 2 - pan.y) / zoom;
-        
+
         const newNode = {
           id: `node_${Date.now()}`,
           label: label,
@@ -220,19 +281,21 @@ export default function GraphEditor({ backgroundImage }) {
           resizable: true,
           data: { memo: memo }
         };
-        
+
         setNodes(prev => {
           const next = [...prev, newNode];
           nodesRef.current = next;
           return next;
         });
-        
+
         historyHook.saveToHistory(nodesRef.current, edgesRef.current);
         setSnackbar({ open: true, message: 'Fetched and created node from URL', severity: 'success' });
-        eventBus.emit('setAddress', fullUrl); // Update address bar
+        eventBus.emit('setAddress', fullUrl);
       } catch (error) {
         console.error('Error fetching URL:', error);
-        setSnackbar({ open: true, message: 'Failed to fetch URL. Check the address and try again.', severity: 'error' });
+        // Provide clearer snackbar with attempted info
+        const msg = error && error.message ? error.message : 'Unknown error';
+        setSnackbar({ open: true, message: `Failed to fetch URL: ${msg}`, severity: 'error' });
       }
     };
 

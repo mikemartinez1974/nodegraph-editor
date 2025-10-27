@@ -165,5 +165,37 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     }
   }, []);
 
+  // Handle tlzClick emitted by TlzLink: show tlz in address/history and fetch converted URL
+  useEffect(() => {
+    const handler = ({ href }) => {
+      if (!href) return;
+      try {
+        // Convert tlz to a fetchable URL
+        const rest = href.slice('tlz://'.length);
+        const firstSlash = rest.indexOf('/');
+        let host = '';
+        let path = '';
+        if (firstSlash !== -1) {
+          host = rest.slice(0, firstSlash);
+          path = rest.slice(firstSlash);
+        } else {
+          path = '/' + rest;
+        }
+        const origin = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host;
+        const fetchable = origin + path;
+
+        // Update address/history with the canonical fetchable URL (do not show tlz://)
+        eventBus.emit('setAddress', fetchable);
+        // Emit fetchUrl to load the resource
+        eventBus.emit('fetchUrl', { url: fetchable });
+      } catch (err) {
+        console.warn('Failed to handle tlzClick:', err);
+      }
+    };
+
+    eventBus.on('tlzClick', handler);
+    return () => eventBus.off('tlzClick', handler);
+  }, []);
+
   return graphAPI;
 }
