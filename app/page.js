@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Header from '../components/Header';
+import Header from '../components/Header/Header';
 import { ThemeProvider } from '@mui/material/styles';
 import themeMap from '@/components/Header/themes';
-import GraphEditor from "@/components/GraphEditor";
+import GraphEditor from "@/components/GraphEditor/GraphEditor";
 
 export default function Home() {
   const getSystemTheme = () => {

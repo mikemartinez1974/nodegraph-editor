@@ -3,30 +3,30 @@
 // ============================================
 "use client";
 import React, { useEffect, useState } from 'react';
-import NodeGraph from './NodeGraph';
+import NodeGraph from '../NodeGraph';
 import Toolbar from './Toolbar';
-import DefaultNode from './GraphEditor/Nodes/DefaultNode';
-import FixedNode from './GraphEditor/Nodes/FixedNode';
-import MarkdownNode from './GraphEditor/Nodes/MarkdownNode';
-import SvgNode from './GraphEditor/Nodes/SvgNode';
-import NodeListPanel from './GraphEditor/NodeListPanel';
-import GroupListPanel from './GraphEditor/GroupListPanel';
-import GroupPropertiesPanel from './GraphEditor/GroupPropertiesPanel';
+import DefaultNode from './Nodes/DefaultNode';
+import FixedNode from './Nodes/FixedNode';
+import MarkdownNode from './Nodes/MarkdownNode';
+import SvgNode from './Nodes/SvgNode';
+import NodeListPanel from './NodeListPanel';
+import GroupListPanel from './GroupListPanel';
+import GroupPropertiesPanel from './GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
-import NodePropertiesPanel from './GraphEditor/NodePropertiesPanel';
-import EdgePropertiesPanel from './GraphEditor/EdgePropertiesPanel';
-import EdgeTypes from './GraphEditor/edgeTypes';
+import NodePropertiesPanel from './NodePropertiesPanel';
+import EdgePropertiesPanel from './EdgePropertiesPanel';
+import EdgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
-import eventBus from './NodeGraph/eventBus';
+import eventBus from '../NodeGraph/eventBus';
 
-import { useGraphEditorState } from './GraphEditor/useGraphEditorState';
-import { createGraphEditorHandlers, handleUpdateNodeData } from './GraphEditor/graphEditorHandlers';
-import { useGraphEditorSetup } from './GraphEditor/useGraphEditorSetup';
-import useSelection from './GraphEditor/useSelection';
-import useGraphHistory from './GraphEditor/useGraphHistory';
-import useGraphShortcuts from './GraphEditor/useGraphShortcuts';
-import useGroupManager from './GraphEditor/useGroupManager';
-import useGraphModes from './GraphEditor/useGraphModes';
+import { useGraphEditorState } from './useGraphEditorState';
+import { createGraphEditorHandlers, handleUpdateNodeData } from './graphEditorHandlers';
+import { useGraphEditorSetup } from './useGraphEditorSetup';
+import useSelection from './useSelection';
+import useGraphHistory from './useGraphHistory';
+import useGraphShortcuts from './useGraphShortcuts';
+import useGroupManager from './useGroupManager';
+import useGraphModes from './useGraphModes';
 
 const nodeTypes = {
   default: DefaultNode,
