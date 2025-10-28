@@ -45,7 +45,10 @@ export default function NodeGraph({
   hoveredEdgeId, 
   hoveredEdgeSource, 
   hoveredEdgeTarget, 
-  onNodeDragEnd 
+  onNodeDragEnd,
+  backgroundUrl, // NEW: URL to load in iframe background
+  backgroundInteractive, // NEW: whether iframe should receive pointer events
+  setSnackbar // NEW: optional snackbar setter for errors
 }) {
   const theme = useTheme();
   
@@ -506,6 +509,23 @@ export default function NodeGraph({
     });
   }, [nodes, groups]);
 
+  const [iframeError, setIframeError] = useState(false);
+
+  // When iframe load fails, notify host via eventBus so GraphEditor can clear or notify user
+  const handleIframeError = (e) => {
+    console.warn('Background iframe error', e);
+    setIframeError(true);
+    try { eventBus.emit('backgroundLoadFailed', { url: backgroundUrl }); } catch (err) { /* ignore */ }
+    if (setSnackbar) {
+      setSnackbar({ open: true, message: 'Background page failed to load or blocked by X-Frame-Options/CSP.', severity: 'warning' });
+    }
+  };
+
+  const handleIframeLoad = () => {
+    // clear any previous error
+    if (iframeError) setIframeError(false);
+  };
+
   return (
     <div id="graph-canvas" ref={containerRef} style={{
       position: 'fixed',
@@ -516,13 +536,48 @@ export default function NodeGraph({
       zIndex: 0,
       pointerEvents: 'auto'
     }}>
+      {/* NEW: Web page background iframe */}
+      {backgroundUrl && (
+        <iframe
+          src={backgroundUrl}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            zIndex: -3,
+            pointerEvents: backgroundInteractive ? 'auto' : 'none',
+            opacity: backgroundInteractive ? 1 : 0.85,
+          }}
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          title="Background Web Page"
+        />
+      )}
+
+      {/* If iframe reported an error, show an unobtrusive overlay explaining the issue */}
+      {iframeError && (
+        <div style={{ position: 'absolute', inset: 20, zIndex: -1, pointerEvents: 'none', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+          <div style={{ background: 'rgba(0,0,0,0.6)', color: 'white', padding: 12, borderRadius: 6, maxWidth: 520, pointerEvents: 'auto' }}>
+            <div style={{ fontWeight: 600, marginBottom: 6 }}>Background page blocked</div>
+            <div style={{ fontSize: 13, opacity: 0.95, marginBottom: 8 }}>The page at the specified URL refused to load in an iframe (X-Frame-Options/CSP) or network error occurred.</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => eventBus.emit('clearBackgroundUrl')} style={{ padding: '6px 10px' }}>Clear background</button>
+              <button onClick={() => setIframeError(false)} style={{ padding: '6px 10px' }}>Dismiss</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Background element updated by PreferencesDialog / useGraphEditorSetup */}
       <div
         id="graph-editor-background"
         style={{
           position: 'absolute',
           inset: 0,
-          zIndex: -1,
+          zIndex: -2,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

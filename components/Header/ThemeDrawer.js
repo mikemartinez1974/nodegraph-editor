@@ -14,6 +14,7 @@ import ImageListItem from '@mui/material/ImageListItem';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import eventBus from '../NodeGraph/eventBus';
+import BackgroundControls from '../GraphEditor/components/BackgroundControls';
 
 const fallbackTheme = themeMap.default;
 
@@ -232,6 +233,15 @@ export default function ThemeDrawer(props) {
                 })}
               </ImageList>
             </Box>
+          </AccordionDetails>
+        </Accordion>
+        {/* Background Web Page Accordion */}
+        <Accordion sx={{ width: '100%' }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Background Web Page</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
+            <BackgroundControls />
           </AccordionDetails>
         </Accordion>
       </Box>

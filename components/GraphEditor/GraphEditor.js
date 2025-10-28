@@ -31,7 +31,8 @@ export default function GraphEditor({ backgroundImage }) {
   const theme = useTheme();
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const state = useGraphEditorState();
-  
+
+  // Destructure editor state immediately so variables like `pan` are available for subsequent effects
   const {
     nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
@@ -52,8 +53,92 @@ export default function GraphEditor({ backgroundImage }) {
     nodeListAnchor, setNodeListAnchor,
     defaultNodeColor, defaultEdgeColor,
     groupManager
-  } = state;
-  
+  } = state || {};
+
+  // NEW: background web page state (persisted)
+  const [backgroundUrl, setBackgroundUrl] = useState(
+    typeof window !== 'undefined' ? (localStorage.getItem('backgroundWebPage') || '') : ''
+  );
+  const [backgroundInteractive, setBackgroundInteractive] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (backgroundUrl) {
+        localStorage.setItem('backgroundWebPage', backgroundUrl);
+      } else {
+        localStorage.removeItem('backgroundWebPage');
+      }
+    } catch (err) { }
+  }, [backgroundUrl]);
+
+  // Respond to events emitted from NodeGraph (iframe error) or BackgroundControls
+  useEffect(() => {
+    const handleBackgroundLoadFailed = ({ url } = {}) => {
+      // Keep the URL in storage but notify the user and offer to clear
+      setSnackbar({ open: true, message: `Background failed to load: ${url || ''}`, severity: 'warning' });
+    };
+
+    const handleClearBackground = () => {
+      setBackgroundUrl('');
+      setBackgroundInteractive(false);
+      setSnackbar({ open: true, message: 'Background cleared', severity: 'info' });
+    };
+
+    const handleSetBackgroundUrl = ({ url }) => {
+      setBackgroundUrl(url || '');
+    };
+
+    const handleSetBackgroundInteractive = ({ interactive }) => {
+      setBackgroundInteractive(Boolean(interactive));
+    };
+
+    const handleExportGraph = async () => {
+      try {
+        const data = {
+          nodes: nodesRef.current || nodes,
+          edges: edgesRef.current || edges,
+          groups: groups || [],
+          settings: {
+            defaultNodeColor,
+            defaultEdgeColor,
+            backgroundWebPage: backgroundUrl || '',
+            theme: null
+          },
+          viewport: { pan, zoom }
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `graph_${Date.now()}.node`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setSnackbar({ open: true, message: 'Graph exported', severity: 'success' });
+      } catch (err) {
+        console.error('Failed to export graph', err);
+        setSnackbar({ open: true, message: 'Failed to export graph', severity: 'error' });
+      }
+    };
+
+    eventBus.on('backgroundLoadFailed', handleBackgroundLoadFailed);
+    eventBus.on('clearBackgroundUrl', handleClearBackground);
+    eventBus.on('setBackgroundUrl', handleSetBackgroundUrl);
+    eventBus.on('setBackgroundInteractive', handleSetBackgroundInteractive);
+    eventBus.on('exportGraph', handleExportGraph);
+
+    return () => {
+      eventBus.off('backgroundLoadFailed', handleBackgroundLoadFailed);
+      eventBus.off('clearBackgroundUrl', handleClearBackground);
+      eventBus.off('setBackgroundUrl', handleSetBackgroundUrl);
+      eventBus.off('setBackgroundInteractive', handleSetBackgroundInteractive);
+      eventBus.off('exportGraph', handleExportGraph);
+    };
+  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
+
   // Determine if user is free (replace with real logic)
   const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
   
@@ -148,6 +233,7 @@ export default function GraphEditor({ backgroundImage }) {
         if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
         if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
         if (settings.defaultEdgeColor) state.defaultEdgeColor = settings.defaultEdgeColor;
+        if (settings.backgroundWebPage) setBackgroundUrl(settings.backgroundWebPage); // NEW
         // Optionally apply theme colors if provided (emit event for UI-level theming)
         if (settings.theme) {
           eventBus.emit('applyThemeFromSave', settings.theme);
@@ -159,7 +245,7 @@ export default function GraphEditor({ backgroundImage }) {
 
     eventBus.on('loadSaveFile', handleLoadSaveFile);
     return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
-  }, [setPan, setZoom, state]);
+  }, [setPan, setZoom, state, setBackgroundUrl]); // include setBackgroundUrl
   
   // Listen for 'fetchUrl' event from address bar
   useEffect(() => {
@@ -382,6 +468,25 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('pasteGraphData', handlePastedData);
   }, [handlers, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
   
+  // Keyboard shortcut: toggle background interactivity (Ctrl/Cmd + B)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b' && backgroundUrl) {
+        e.preventDefault();
+        setBackgroundInteractive(prev => {
+          const next = !prev;
+          if (setSnackbar) {
+            setSnackbar({ open: true, message: `Background ${next ? 'interactive' : 'locked'}`, severity: 'info' });
+          }
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [backgroundUrl, backgroundInteractive, setSnackbar]);
+  
   return (
     <div 
       id="graph-editor-background" 
@@ -525,6 +630,9 @@ export default function GraphEditor({ backgroundImage }) {
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
         mode={modesHook.mode}
+        backgroundUrl={backgroundUrl} // NEW
+        backgroundInteractive={backgroundInteractive} // NEW
+        setSnackbar={setSnackbar} // NEW
         onNodeMove={(id, position) => {
           setNodes(prev => {
             const next = prev.map(n => n.id === id ? { ...n, position } : n);
@@ -682,3 +790,4 @@ export default function GraphEditor({ backgroundImage }) {
     </div>
   );
 }
+// Duplicate destructuring removed — state is destructured earlier to ensure variables like `pan` are available.
