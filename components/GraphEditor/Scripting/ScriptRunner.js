@@ -6,12 +6,14 @@ const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></hea
 (function(){
   const pending = new Map();
   let seq = 1;
+  // current run meta (set by host when runScript is posted)
+  window.__runMeta = null;
 
   function hostCall(method, args) {
     return new Promise((resolve, reject) => {
       const id = String(seq++);
       pending.set(id, { resolve, reject });
-      parent.postMessage({ type: 'rpcRequest', id, method, args }, '*');
+      parent.postMessage({ type: 'rpcRequest', id, method, args, meta: window.__runMeta }, '*');
     });
   }
 
@@ -29,6 +31,8 @@ const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></hea
 
       if (msg.type === 'runScript') {
         (async () => {
+          // store meta for hostCall to include
+          window.__runMeta = msg.meta || null;
           const scriptText = msg.script || '';
           const api = {
             getNodes: (...a)=>hostCall('getNodes', a),
@@ -48,6 +52,9 @@ const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></hea
             parent.postMessage({ type: 'scriptResult', success: true, result }, '*');
           } catch (err) {
             parent.postMessage({ type: 'scriptResult', success: false, error: String(err && err.stack ? err.stack : err) }, '*');
+          } finally {
+            // clear run meta after script completes
+            window.__runMeta = null;
           }
         })();
       }
@@ -78,8 +85,8 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
       }
 
       if (msg.type === 'rpcRequest' && typeof onRequest === 'function') {
-        const { id, method, args } = msg;
-        Promise.resolve().then(() => onRequest(method, args)).then(result => {
+        const { id, method, args, meta } = msg;
+        Promise.resolve().then(() => onRequest(method, args, meta)).then(result => {
           iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result }, '*');
         }).catch(err => {
           iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result: null, error: String(err) }, '*');
@@ -102,10 +109,10 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
     return new Promise(resolve => waitersRef.current.push(resolve));
   };
 
-  async function runScript(scriptText = '') {
-    // Ensure the iframe element is mounted
+  async function runScript(scriptText = '', meta = {}) {
+    // ensure iframe mounted
     if (!iframeRef.current) {
-      // Wait a tick so React can mount it
+      // wait for React to mount iframe
       await new Promise(r => setTimeout(r, 0));
     }
 
@@ -122,7 +129,7 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
       };
 
       window.addEventListener('scriptRunnerResult', onResult);
-      iframeRef.current?.contentWindow?.postMessage({ type: 'runScript', script: scriptText }, '*');
+      iframeRef.current?.contentWindow?.postMessage({ type: 'runScript', script: scriptText, meta }, '*');
 
       setTimeout(() => {
         if (!finished) {

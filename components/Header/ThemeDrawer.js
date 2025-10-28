@@ -244,6 +244,7 @@ export default function ThemeDrawer(props) {
           </AccordionSummary>
           <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
             <BackgroundControls />
+            <Button size="small" onClick={() => eventBus.emit('toggleScriptPanel')}>Toggle Script Panel</Button>
           </AccordionDetails>
         </Accordion>
       </Box>

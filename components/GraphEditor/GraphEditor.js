@@ -499,8 +499,11 @@ export default function GraphEditor({ backgroundImage }) {
   }, [backgroundUrl, backgroundInteractive, setSnackbar]);
   
   // Host RPC handler used by ScriptRunner iframe
-  const handleScriptRequest = async (method, args = []) => {
+  const handleScriptRequest = async (method, args = [], meta = {}) => {
     try {
+      const isDry = meta && meta.dry === true;
+      const allowMutations = meta && meta.allowMutations === true;
+
       switch (method) {
         case 'getNodes':
           return nodesRef.current || nodes;
@@ -513,35 +516,53 @@ export default function GraphEditor({ backgroundImage }) {
         case 'createNode': {
           const [nodeData] = args || [{}];
           const newNode = { id: nodeData.id || `node_${Date.now()}`, type: nodeData.type || 'default', label: nodeData.label || 'New Node', position: nodeData.position || { x: 0, y: 0 }, width: nodeData.width || 200, height: nodeData.height || 120, data: nodeData.data || {} };
+
+          if (!allowMutations || isDry) {
+            // Return proposed mutation instead of applying
+            return { proposed: { action: 'createNode', node: newNode }, applied: false };
+          }
+
           // emit event for existing handlers to pick up
           try { eventBus.emit('nodeAdded', { node: newNode }); } catch (err) {}
           // optimistic local update
           setNodes(prev => { const next = [...prev, newNode]; nodesRef.current = next; return next; });
-          return newNode;
+          return { applied: true, node: newNode };
         }
         case 'updateNode': {
           const [id, patch] = args;
+          if (!allowMutations || isDry) {
+            return { proposed: { action: 'updateNode', id, patch }, applied: false };
+          }
           try { eventBus.emit('nodeUpdated', { id, patch, source: 'script' }); } catch (err) {}
           setNodes(prev => { const next = prev.map(n => n.id === id ? { ...n, ...patch, data: patch && patch.data ? { ...n.data, ...patch.data } : n.data } : n); nodesRef.current = next; return next; });
-          return { id, patch };
+          return { applied: true, id, patch };
         }
         case 'deleteNode': {
           const [id] = args;
+          if (!allowMutations || isDry) {
+            return { proposed: { action: 'deleteNode', id }, applied: false };
+          }
           try { eventBus.emit('nodeDeleted', { id, source: 'script' }); } catch (err) {}
           setNodes(prev => { const next = prev.filter(n => n.id !== id); nodesRef.current = next; return next; });
-          return { id };
+          return { applied: true, id };
         }
         case 'createEdge': {
           const [edgeData] = args || [{}];
+          if (!allowMutations || isDry) {
+            return { proposed: { action: 'createEdge', edge: edgeData }, applied: false };
+          }
           try { eventBus.emit('edgeAdded', { edge: edgeData }); } catch (err) {}
           setEdges(prev => { const next = [...prev, edgeData]; edgesRef.current = next; return next; });
-          return edgeData;
+          return { applied: true, edge: edgeData };
         }
         case 'deleteEdge': {
           const [id] = args;
+          if (!allowMutations || isDry) {
+            return { proposed: { action: 'deleteEdge', id }, applied: false };
+          }
           try { eventBus.emit('edgeDeleted', { id, source: 'script' }); } catch (err) {}
           setEdges(prev => { const next = prev.filter(e => e.id !== id); edgesRef.current = next; return next; });
-          return { id };
+          return { applied: true, id };
         }
         case 'log': {
           const [level, message] = args;
@@ -556,6 +577,74 @@ export default function GraphEditor({ backgroundImage }) {
       throw err;
     }
   };
+
+  // Listen for external apply proposals from ScriptPanel
+  useEffect(() => {
+    const handleApplyProposals = ({ proposals = [], sourceId } = {}) => {
+      if (!proposals || !proposals.length) return;
+      try {
+        // Apply proposals sequentially
+        proposals.forEach(p => {
+          try {
+            const action = p.action || (p.proposal && p.proposal.action) || (p.type) || null;
+            if (!action) return;
+            switch (action) {
+              case 'createNode': {
+                const node = p.node || p.payload || p.proposal?.node;
+                if (!node) break;
+                setNodes(prev => { const next = [...prev, node]; nodesRef.current = next; return next; });
+                try { eventBus.emit('nodeAdded', { node }); } catch (e) {}
+                break;
+              }
+              case 'updateNode': {
+                const id = p.id || p.nodeId || p.proposal?.id;
+                const patch = p.patch || p.changes || p.proposal?.patch;
+                if (!id || !patch) break;
+                setNodes(prev => { const next = prev.map(n => n.id === id ? { ...n, ...patch, data: patch && patch.data ? { ...n.data, ...patch.data } : n.data } : n); nodesRef.current = next; return next; });
+                try { eventBus.emit('nodeUpdated', { id, patch, source: 'script-apply' }); } catch (e) {}
+                break;
+              }
+              case 'deleteNode': {
+                const id = p.id || p.nodeId || p.proposal?.id;
+                if (!id) break;
+                setNodes(prev => { const next = prev.filter(n => n.id !== id); nodesRef.current = next; return next; });
+                try { eventBus.emit('nodeDeleted', { id, source: 'script-apply' }); } catch (e) {}
+                break;
+              }
+              case 'createEdge': {
+                const edge = p.edge || p.payload || p.proposal?.edge;
+                if (!edge) break;
+                setEdges(prev => { const next = [...prev, edge]; edgesRef.current = next; return next; });
+                try { eventBus.emit('edgeAdded', { edge }); } catch (e) {}
+                break;
+              }
+              case 'deleteEdge': {
+                const id = p.id || p.edgeId || p.proposal?.id;
+                if (!id) break;
+                setEdges(prev => { const next = prev.filter(e => e.id !== id); edgesRef.current = next; return next; });
+                try { eventBus.emit('edgeDeleted', { id, source: 'script-apply' }); } catch (e) {}
+                break;
+              }
+              default:
+                console.warn('Unknown proposal action:', action);
+            }
+          } catch (err) {
+            console.warn('Failed to apply proposal item', err);
+          }
+        });
+
+        // Save history after applying all proposals
+        try { historyHook.saveToHistory(nodesRef.current, edgesRef.current); } catch (e) {}
+        setSnackbar({ open: true, message: 'Script changes applied', severity: 'success' });
+      } catch (err) {
+        console.error('Failed to apply script proposals', err);
+        setSnackbar({ open: true, message: 'Failed to apply script proposals', severity: 'error' });
+      }
+    };
+
+    eventBus.on('applyScriptProposals', handleApplyProposals);
+    return () => eventBus.off('applyScriptProposals', handleApplyProposals);
+  }, [historyHook, setSnackbar]);
 
   return (
     <div 
