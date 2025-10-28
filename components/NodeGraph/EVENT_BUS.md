@@ -87,15 +87,120 @@ A lightweight pub/sub used across the editor for decoupled communication between
 
 # Event Bus Schema
 
-This document lists the canonical events used across the editor, who typically emits them, and the expected payload shapes. Use these types as the source of truth when integrating components or writing handlers.
+This file documents the canonical events emitted and listened on the project's eventBus.
 
-Format: each entry contains:
+Notes
+- All payloads are JSON-serializable plain objects.
+- Use the eventBus for cross-component communication only — do not expose internal instances or DOM nodes.
 
-- `name` — string event name
-- `emittedBy` — typical emitter(s)
-- `when` — short description of when it is emitted
-- `payload` — JSON schema / example
-- `notes` — additional context
+Events
+
+1) Node lifecycle
+- nodeAdded
+  - emitter: GraphEditor / node creation UI
+  - payload: { node: Node }
+
+- nodeUpdated
+  - emitter: GraphCrud / GraphEditor
+  - payload: { id: string, patch: Partial<Node>, source?: string }
+
+- nodeDeleted
+  - emitter: GraphEditor / Node remove UI
+  - payload: { id: string }
+
+2) Edge lifecycle
+- edgeAdded
+  - emitter: GraphEditor
+  - payload: { edge: Edge }
+
+- edgeUpdated
+  - emitter: GraphCrud / GraphEditor
+  - payload: { id: string, patch: Partial<Edge> }
+
+- edgeDeleted
+  - emitter: GraphEditor
+  - payload: { id: string }
+
+3) Selection & UI
+- selectionChanged
+  - emitter: NodeGraph / UI panels
+  - payload: { nodeIds: string[], edgeIds: string[], groupIds?: string[] }
+
+- nodeClick
+  - emitter: Node components
+  - payload: { id: string, eventType?: 'click'|'double'|'context', meta?: any }
+
+4) Resize / layout
+- nodeResize
+  - emitter: DefaultNode resizing logic
+  - payload: { id: string, width: number, height: number, interim?: boolean }
+
+- nodeResizeEnd
+  - emitter: DefaultNode resizing logic
+  - payload: { id: string, width: number, height: number }
+
+5) Viewport / document
+- loadSaveFile
+  - emitter: File load handlers
+  - payload: { settings?: object, viewport?: { pan, zoom }, nodes?: [], edges?: [] }
+
+- applyThemeFromSave
+  - emitter: GraphEditor load handler
+  - payload: { theme: object }
+
+- setDocument
+  - emitter: ThemeDrawer / BackgroundControls
+  - payload: { document: { type: 'url'|'html', url?: string, html?: string, interactive?: boolean } }
+
+- clearDocument
+  - emitter: ThemeDrawer / BackgroundControls
+  - payload: {}
+
+- backgroundLoadFailed
+  - emitter: NodeGraph iframe handler
+  - payload: { url?: string, reason?: string }
+
+6) Export / persistence
+- exportGraph
+  - emitter: UI (Toolbar/Commands)
+  - payload: { format?: 'node'|'json' }
+
+- graphSaved
+  - emitter: Toolbar / save handler
+  - payload: { filename: string, sizeBytes?: number }
+
+7) Scripting (runtime)
+- scriptStarted
+  - emitter: ScriptRunner (host)
+  - payload: { id: string, scriptName?: string }
+
+- scriptEnded
+  - emitter: ScriptRunner (host)
+  - payload: { id: string, success: boolean, result?: any, error?: string }
+
+- rpcRequest (iframe -> host)
+  - emitter: ScriptRunner (iframe)
+  - payload: { id: string, method: string, args: any[] }
+
+- rpcResponse (host -> iframe)
+  - emitter: ScriptRunner host
+  - payload: { id: string, result?: any, error?: string }
+
+8) Misc
+- fetchUrl
+  - emitter: Toolbar / header controls
+  - payload: { url: string }
+
+- notification
+  - emitter: any
+  - payload: { message: string, severity?: 'info'|'warning'|'error'|'success' }
+
+Examples
+- Emit a node update:
+  eventBus.emit('nodeUpdated', { id: 'node_1', patch: { label: 'New' } });
+
+- Listen for document load failures:
+  eventBus.on('backgroundLoadFailed', ({ url, reason }) => { ... });
 
 ---
 
@@ -380,3 +485,12 @@ Format: each entry contains:
 
 If you want, I can generate TypeScript types for these events or add an events registry file that re-exports event name constants for use across the codebase.
 
+
+
+feat(background): add configurable webpage background and controls
+
+Add BackgroundControls UI and integrate into ThemeDrawer
+Render iframe background in NodeGraph with load/error handling and overlay
+Persist background URL in GraphEditor, toggle interactivity, and include in export (.node)
+Wire eventBus handlers for set/clear background and export
+Update package files (lock/metadata)

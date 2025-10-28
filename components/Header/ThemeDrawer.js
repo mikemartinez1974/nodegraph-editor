@@ -238,7 +238,9 @@ export default function ThemeDrawer(props) {
         {/* Background Web Page Accordion */}
         <Accordion sx={{ width: '100%' }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Background Web Page</Typography>
+            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>
+              Document
+            </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
             <BackgroundControls />

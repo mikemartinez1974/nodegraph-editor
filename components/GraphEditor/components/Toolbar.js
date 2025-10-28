@@ -225,7 +225,7 @@ const Toolbar = ({
           if (onShowMessage) onShowMessage('Graph loaded successfully!', 'success');
 
           try {
-            eventBus.emit('loadSaveFile', { settings: jsonData.settings || {}, viewport: jsonData.viewport || {} });
+            eventBus.emit('loadSaveFile', { settings: jsonData.settings || {}, viewport: jsonData.viewport || {}, scripts: jsonData.scripts || null });
           } catch (err) {
             console.warn('Failed to emit loadSaveFile event:', err);
           }
@@ -278,6 +278,10 @@ const Toolbar = ({
         pan: pan || { x: 0, y: 0 },
         zoom: zoom || 1
       },
+      // NEW: include document/top-level document URL from localStorage if present
+      document: (typeof window !== 'undefined') ? (localStorage.getItem('document') ? { url: localStorage.getItem('document') } : null) : null,
+      // NEW: include user scripts stored in localStorage
+      scripts: (function(){ try { if (typeof window === 'undefined') return []; const raw = localStorage.getItem('scripts'); return raw ? JSON.parse(raw) : []; } catch { return []; } })(),
       nodes: nodes.map(node => ({
         id: node.id,
         type: node.type,

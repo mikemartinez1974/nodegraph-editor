@@ -19,12 +19,15 @@ export default function BackgroundControls({ initialUrl = '', initialInteractive
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: 360, p: 1 }}>
-      <TextField size="small" label="Background page URL" value={url} onChange={(e) => setUrl(e.target.value)} fullWidth />
+      <TextField size="small" label="Document URL" value={url} onChange={(e) => setUrl(e.target.value)} fullWidth />
       <FormControlLabel control={<Checkbox checked={interactive} onChange={(e) => setInteractive(e.target.checked)} />} label="Make interactive (captures pointer)" />
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button variant="contained" size="small" onClick={apply}>Apply</Button>
         <Button variant="outlined" size="small" onClick={clear}>Clear</Button>
       </Box>
+      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+        This URL will be saved as the "document" field in saved .node files. The target server must allow embedding (CORS / X-Frame-Options).
+      </div>
     </Box>
   );
 }

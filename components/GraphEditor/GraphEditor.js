@@ -15,6 +15,8 @@ import EdgePropertiesPanel from './components/EdgePropertiesPanel';
 import EdgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
+import ScriptRunner from './Scripting/ScriptRunner';
+import ScriptPanel from './Scripting/ScriptPanel';
 
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
@@ -55,18 +57,18 @@ export default function GraphEditor({ backgroundImage }) {
     groupManager
   } = state || {};
 
-  // NEW: background web page state (persisted)
+  // NEW: document (background page) state (persisted under 'document')
   const [backgroundUrl, setBackgroundUrl] = useState(
-    typeof window !== 'undefined' ? (localStorage.getItem('backgroundWebPage') || '') : ''
+    typeof window !== 'undefined' ? (localStorage.getItem('document') || '') : ''
   );
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
 
   useEffect(() => {
     try {
       if (backgroundUrl) {
-        localStorage.setItem('backgroundWebPage', backgroundUrl);
+        localStorage.setItem('document', backgroundUrl);
       } else {
-        localStorage.removeItem('backgroundWebPage');
+        localStorage.removeItem('document');
       }
     } catch (err) { }
   }, [backgroundUrl]);
@@ -74,14 +76,13 @@ export default function GraphEditor({ backgroundImage }) {
   // Respond to events emitted from NodeGraph (iframe error) or BackgroundControls
   useEffect(() => {
     const handleBackgroundLoadFailed = ({ url } = {}) => {
-      // Keep the URL in storage but notify the user and offer to clear
-      setSnackbar({ open: true, message: `Background failed to load: ${url || ''}`, severity: 'warning' });
+      setSnackbar({ open: true, message: `Document failed to load: ${url || ''}`, severity: 'warning' });
     };
 
     const handleClearBackground = () => {
       setBackgroundUrl('');
       setBackgroundInteractive(false);
-      setSnackbar({ open: true, message: 'Background cleared', severity: 'info' });
+      setSnackbar({ open: true, message: 'Document cleared', severity: 'info' });
     };
 
     const handleSetBackgroundUrl = ({ url }) => {
@@ -98,12 +99,15 @@ export default function GraphEditor({ backgroundImage }) {
           nodes: nodesRef.current || nodes,
           edges: edgesRef.current || edges,
           groups: groups || [],
+          // include settings with document
           settings: {
             defaultNodeColor,
             defaultEdgeColor,
-            backgroundWebPage: backgroundUrl || '',
+            document: backgroundUrl ? { url: backgroundUrl } : null,
             theme: null
           },
+          // save scripts at top-level
+          scripts: (function(){ try { const raw = localStorage.getItem('scripts'); return raw ? JSON.parse(raw) : []; } catch { return []; } })(),
           viewport: { pan, zoom }
         };
 
@@ -139,6 +143,35 @@ export default function GraphEditor({ backgroundImage }) {
     };
   }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
 
+  // Load saved document from settings when loading a file
+  useEffect(() => {
+    function handleLoadSaveFile(payload = {}) {
+      const { settings = {}, viewport = {}, scripts: topLevelScripts } = payload || {};
+      try {
+        if (viewport.pan) setPan(viewport.pan);
+        if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
+        if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
+        if (settings.defaultEdgeColor) state.defaultEdgeColor = settings.defaultEdgeColor;
+        if (settings.document && settings.document.url) setBackgroundUrl(settings.document.url);
+        // Prefer top-level scripts, fallback to settings.scripts
+        try {
+          const scriptsToLoad = Array.isArray(topLevelScripts) ? topLevelScripts : (Array.isArray(settings.scripts) ? settings.scripts : null);
+          if (scriptsToLoad) {
+            localStorage.setItem('scripts', JSON.stringify(scriptsToLoad));
+          }
+        } catch (err) { }
+        if (settings.theme) {
+          eventBus.emit('applyThemeFromSave', settings.theme);
+        }
+      } catch (err) {
+        console.warn('Failed to apply loaded save settings:', err);
+      }
+    }
+
+    eventBus.on('loadSaveFile', handleLoadSaveFile);
+    return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
+  }, [setPan, setZoom, state, setBackgroundUrl]);
+  
   // Determine if user is free (replace with real logic)
   const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
   
@@ -224,28 +257,6 @@ export default function GraphEditor({ backgroundImage }) {
       window.graphAPI = graphAPI.current;
     }
   }, [graphAPI]);
-  
-  // Listen for 'loadSaveFile' event and apply optional settings/viewport: setPan, setZoom, defaultNodeColor/defaultEdgeColor, and apply theme if theme object present in settings.
-  useEffect(() => {
-    function handleLoadSaveFile({ settings = {}, viewport = {} }) {
-      try {
-        if (viewport.pan) setPan(viewport.pan);
-        if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
-        if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
-        if (settings.defaultEdgeColor) state.defaultEdgeColor = settings.defaultEdgeColor;
-        if (settings.backgroundWebPage) setBackgroundUrl(settings.backgroundWebPage); // NEW
-        // Optionally apply theme colors if provided (emit event for UI-level theming)
-        if (settings.theme) {
-          eventBus.emit('applyThemeFromSave', settings.theme);
-        }
-      } catch (err) {
-        console.warn('Failed to apply loaded save settings:', err);
-      }
-    }
-
-    eventBus.on('loadSaveFile', handleLoadSaveFile);
-    return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
-  }, [setPan, setZoom, state, setBackgroundUrl]); // include setBackgroundUrl
   
   // Listen for 'fetchUrl' event from address bar
   useEffect(() => {
@@ -487,6 +498,65 @@ export default function GraphEditor({ backgroundImage }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [backgroundUrl, backgroundInteractive, setSnackbar]);
   
+  // Host RPC handler used by ScriptRunner iframe
+  const handleScriptRequest = async (method, args = []) => {
+    try {
+      switch (method) {
+        case 'getNodes':
+          return nodesRef.current || nodes;
+        case 'getNode': {
+          const [id] = args;
+          return (nodesRef.current || nodes).find(n => n.id === id) || null;
+        }
+        case 'getEdges':
+          return edgesRef.current || edges;
+        case 'createNode': {
+          const [nodeData] = args || [{}];
+          const newNode = { id: nodeData.id || `node_${Date.now()}`, type: nodeData.type || 'default', label: nodeData.label || 'New Node', position: nodeData.position || { x: 0, y: 0 }, width: nodeData.width || 200, height: nodeData.height || 120, data: nodeData.data || {} };
+          // emit event for existing handlers to pick up
+          try { eventBus.emit('nodeAdded', { node: newNode }); } catch (err) {}
+          // optimistic local update
+          setNodes(prev => { const next = [...prev, newNode]; nodesRef.current = next; return next; });
+          return newNode;
+        }
+        case 'updateNode': {
+          const [id, patch] = args;
+          try { eventBus.emit('nodeUpdated', { id, patch, source: 'script' }); } catch (err) {}
+          setNodes(prev => { const next = prev.map(n => n.id === id ? { ...n, ...patch, data: patch && patch.data ? { ...n.data, ...patch.data } : n.data } : n); nodesRef.current = next; return next; });
+          return { id, patch };
+        }
+        case 'deleteNode': {
+          const [id] = args;
+          try { eventBus.emit('nodeDeleted', { id, source: 'script' }); } catch (err) {}
+          setNodes(prev => { const next = prev.filter(n => n.id !== id); nodesRef.current = next; return next; });
+          return { id };
+        }
+        case 'createEdge': {
+          const [edgeData] = args || [{}];
+          try { eventBus.emit('edgeAdded', { edge: edgeData }); } catch (err) {}
+          setEdges(prev => { const next = [...prev, edgeData]; edgesRef.current = next; return next; });
+          return edgeData;
+        }
+        case 'deleteEdge': {
+          const [id] = args;
+          try { eventBus.emit('edgeDeleted', { id, source: 'script' }); } catch (err) {}
+          setEdges(prev => { const next = prev.filter(e => e.id !== id); edgesRef.current = next; return next; });
+          return { id };
+        }
+        case 'log': {
+          const [level, message] = args;
+          console.log('[script]', level || 'info', message);
+          return true;
+        }
+        default:
+          throw new Error('Unknown method: ' + method);
+      }
+    } catch (err) {
+      console.error('Script RPC error', method, err);
+      throw err;
+    }
+  };
+
   return (
     <div 
       id="graph-editor-background" 
@@ -787,6 +857,12 @@ export default function GraphEditor({ backgroundImage }) {
       <Backdrop open={loading} sx={{ zIndex: 1900, color: '#fff' }}>
         <CircularProgress color="inherit" />
       </Backdrop>
+
+      {/* ScriptRunner (invisible) — provides sandboxed script runtime */}
+      <ScriptRunner onRequest={handleScriptRequest} timeoutMs={10000} />
+
+      {/* Script panel (floating) */}
+      <ScriptPanel />
     </div>
   );
 }
