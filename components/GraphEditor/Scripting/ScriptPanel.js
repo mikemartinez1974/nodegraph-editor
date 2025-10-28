@@ -104,6 +104,26 @@ export default function ScriptPanel() {
     document.removeEventListener('touchend', onResizerUp);
   };
 
+  // Keyboard support for resizer: arrow keys resize, shift+arrow for bigger steps
+  const onResizerKeyDown = (ev) => {
+    const step = ev.shiftKey ? 32 : 8;
+    let w = size.width;
+    let h = size.height;
+    let handled = true;
+    switch (ev.key) {
+      case 'ArrowLeft': w = Math.max(320, Math.round(size.width - step)); break;
+      case 'ArrowRight': w = Math.max(320, Math.round(size.width + step)); break;
+      case 'ArrowUp': h = Math.max(200, Math.round(size.height - step)); break;
+      case 'ArrowDown': h = Math.max(200, Math.round(size.height + step)); break;
+      default: handled = false;
+    }
+    if (handled) {
+      ev.preventDefault();
+      setSize({ width: w, height: h });
+      try { localStorage.setItem('scriptPanelSize', JSON.stringify({ width: w, height: h })); } catch {}
+    }
+  };
+
   // Scripts persistence helper
   const persist = (next) => { setScripts(next); try { localStorage.setItem('scripts', JSON.stringify(next)); } catch {} };
 
@@ -188,7 +208,17 @@ export default function ScriptPanel() {
       </Box>
 
       {/* Bottom-right resizer */}
-      <div onMouseDown={onResizerDown} onTouchStart={onResizerDown} style={{ position: 'absolute', right: 8, bottom: 8, width: 28, height: 28, cursor: 'nwse-resize', zIndex: 1600, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }} aria-hidden>
+      <div
+        onMouseDown={onResizerDown}
+        onTouchStart={onResizerDown}
+        onKeyDown={onResizerKeyDown}
+        role="separator"
+        aria-label="Resize script panel"
+        aria-orientation="both"
+        tabIndex={0}
+        title="Resize panel — drag or use arrow keys (shift for larger step)"
+        style={{ position: 'absolute', right: 8, bottom: 8, width: 28, height: 28, cursor: 'nwse-resize', zIndex: 1600, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}
+      >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.6 }}>
           <path d="M0 12L12 0M6 12L12 6M12 12V12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
