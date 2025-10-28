@@ -1,7 +1,13 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import DefaultNode from './DefaultNode';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { TlzLink } from '../components/TlzLink';
 
 const DivNode = ({
   node,
@@ -17,79 +23,59 @@ const DivNode = ({
   nodeRefs
 }) => {
   const theme = useTheme();
-  const nodeRef = useRef(null);
-
-  useEffect(() => {
-    if (nodeRef.current && nodeRefs) {
-      nodeRefs.current.set(node.id, nodeRef.current);
-      return () => {
-        nodeRefs.current.delete(node.id);
-      };
-    }
-  }, [node.id, nodeRefs]);
-
-  const width = (node?.width || 100) * zoom;
-  const height = (node?.height || 100) * zoom;
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
-
-  const borderColor = isSelected ? theme.palette.secondary.main : theme.palette.primary.main;
 
   const contentStyle = {
     width: '100%',
     height: '100%',
     pointerEvents: 'auto',
     backgroundColor: 'transparent',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    color: theme.palette.text?.primary || '#000',
+    whiteSpace: 'pre-wrap',
+    padding: 8,
+    boxSizing: 'border-box'
+  };
+
+  const memoContent = node?.memo ?? node?.data?.memo;
+  const htmlContent = node?.data?.html;
+
+  const sanitizeSchema = {
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
+    }
   };
 
   return (
-    <div
-      ref={nodeRef}
-      className="div-node"
-      style={{
-        position: 'absolute',
-        left: baseLeft,
-        top: baseTop,
-        width,
-        height,
-        border: `2px solid ${borderColor}`,
-        borderRadius: 8,
-        backgroundColor: 'transparent',
-        boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px rgba(0, 0, 0, 0.2)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        cursor: draggingHandle ? 'grabbing' : 'grab',
-        pointerEvents: 'auto',
-        ...style
-      }}
-      onMouseDown={e => {
-        e.stopPropagation();
-        if (onMouseDown) onMouseDown(e);
-        eventBus.emit('nodeMouseDown', { id: node.id, event: e });
-      }}
-      onClick={e => {
-        e.stopPropagation();
-        if (onClick) onClick(e);
-        eventBus.emit('nodeClick', { id: node.id, event: e });
-      }}
-      onDoubleClick={e => {
-        e.stopPropagation();
-        if (onDoubleClick) onDoubleClick(e);
-      }}
+    <DefaultNode
+      node={node}
+      pan={pan}
+      zoom={zoom}
+      style={style}
+      isSelected={isSelected}
+      onMouseDown={onMouseDown}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      draggingHandle={draggingHandle}
+      nodeRefs={nodeRefs}
     >
-      {node?.memo ? (
-        <div style={contentStyle}>{node.memo}</div>
-      ) : node?.data?.html ? (
-        <div dangerouslySetInnerHTML={{ __html: node.data.html }} style={contentStyle} />
-      ) : (
+      {memoContent ? (
         <div style={contentStyle}>
-          {node?.data?.text || children}
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]} components={{ a: TlzLink }}>
+            {memoContent}
+          </ReactMarkdown>
         </div>
+      ) : htmlContent ? (
+        <div style={contentStyle}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]} components={{ a: TlzLink }}>
+            {htmlContent}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        <div style={contentStyle}>{node?.data?.text || children}</div>
       )}
-    </div>
+    </DefaultNode>
   );
 };
 

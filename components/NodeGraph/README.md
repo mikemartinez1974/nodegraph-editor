@@ -223,16 +223,54 @@ NodeGraph inherits MUI theme via `useTheme()`:
 5. **Theme-aware colors** - Use `theme.palette` instead of hardcoded hex values
 6. **Refs for real-time updates** - Use refs for drag offsets that change 60fps, React state for final positions
 
+# NodeGraph Overview
+
+This folder contains the core rendering and interaction logic for the node/edge graph: pan/zoom, layered rendering (canvas/SVG/DOM), selection, handle/edge dragging, marquee selection, and event dispatching.
+
+## Primary responsibilities
+
+- Render nodes and edges efficiently using separate layers (NodeLayer, EdgeLayer, HandleLayer, PanZoomLayer).
+- Manage user interactions: dragging nodes, creating/dragging edges, resizing nodes, marquee multi-select, and keyboard shortcuts.
+- Provide a stable, testable event bus and helper hooks for other components to subscribe to editor events.
+
+## Key files
+
+- `NodeGraph.js` — Main orchestrator: composes layers and wires hooks and event handlers.
+- `NodeLayer.js` — Renders node components and manages node DOM refs for measurement and hit-testing.
+- `EdgeLayer.js` — Canvas/SVG drawing for edges with performance-oriented utilities.
+- `HandleLayer.js` — Renders handles and manages drag interactions for connections.
+- `PanZoomLayer.js` — Provides pan/zoom transforms and pointer handling.
+- `eventBus.js` — Pub/sub used for decoupled communication between nodes, UI panels, and other systems.
+- `utils/coords.js`, `edgeUtils.js`, `dragUtils.js` — Geometry and interaction utilities used across the graph.
+
+## Hooks
+
+- `usePanZoom` — Manage viewport pan/zoom state and provides helper transforms to convert coordinates between graph space and screen space.
+- `useCanvasSize` — High-DPI aware canvas sizing helpers.
+- `useNodeHover`, `useEdgeHover`, `useHandleProgress` — Encapsulate hover/animation logic.
+- `useNodeGraphEvents`, `useEventBusHandlers` — Register and handle higher-level editor events.
+
+## Extension points
+
+- Register new node types in the nodeType registry (`components/GraphEditor/nodeTypeRegistry.js`).
+- Add custom edge styles by extending `edgeStyleUtils` and passing types into the `EdgeLayer`.
+- Subscribe to events via `eventBus` to implement custom tooling (pan-to-node, selection sync, telemetry).
+
+## Performance considerations
+
+- Use canvas for large numbers of edges; keep node DOMs lightweight.
+- Avoid heavyweight parsing (markdown/html) in render loop — do it on save or memoize results.
+- Use `requestAnimationFrame` for animations and batch DOM reads/writes.
+
+## Security & sanitization
+
+- Node content that renders HTML/Markdown is sanitized (rehype/remark). Do not allow raw scripts in node content.
+
 ## Troubleshooting
 
-**Handles not appearing**: Check that `edgeTypes` is defined and nodes are visible (`visible !== false`)
+- If hit-testing seems off, check nodeRefs registration and pan/zoom transforms.
+- If edges look clipped or blurry, verify canvas scaling via `useHiDPICanvas`.
 
-**Lag during drag**: Ensure you're using transient transforms (`nodeEl.style.transform`) during drag, not React state updates
+## Contributing
 
-**Canvas blurry**: Verify `setupHiDPICanvas()` is called and canvas `width`/`height` match `devicePixelRatio`
-
-**Edges not connecting**: Verify handle IDs match the format `${nodeId}-${edgeType}-${direction}` (e.g., `node1-child-source`)
-
----
-
-For more details, see the [copilot-instructions.md](../../.github/copilot-instructions.md) and inline code comments.
+Follow existing hooks and utilities; register new functionality through the event bus and nodeType registry for minimal coupling.

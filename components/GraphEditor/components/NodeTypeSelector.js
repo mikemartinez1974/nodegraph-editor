@@ -9,22 +9,35 @@ const NodeTypeSelector = ({ value, onChange, fullWidth = true, size = 'small', s
 
   const getIcon = (iconName) => {
     const IconComponent = Icons[iconName];
-    return IconComponent ? <IconComponent fontSize="small" /> : <Icons.Circle fontSize="small" />;
+    return IconComponent ? <IconComponent fontSize="small" /> : null;
+  };
+
+  const displayLabel = (typeKey) => {
+    const item = nodeTypes.find(n => n.type === typeKey);
+    return item ? item.label : (typeKey ? (typeKey.charAt(0).toUpperCase() + typeKey.slice(1)) : '');
   };
 
   return (
     <FormControl fullWidth={fullWidth} size={size} sx={sx}>
-      <InputLabel>Node Type</InputLabel>
+      <InputLabel shrink>Node Type</InputLabel>
       <Select
-        value={value}
+        value={value || ''}
         label="Node Type"
-        onChange={onChange}
+        onChange={(e) => { if (typeof onChange === 'function') onChange(e.target.value); }}
+        displayEmpty
+        inputProps={{ 'aria-label': 'Node Type' }}
+        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+        renderValue={(v) => (
+          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {displayLabel(v)}
+          </div>
+        )}
       >
         {nodeTypes.map(({ type, label, icon }) => (
-          <MenuItem key={type} value={type}>
-            <ListItemIcon sx={{ minWidth: 36 }}>
-              {getIcon(icon)}
-            </ListItemIcon>
+          <MenuItem key={type} value={type} sx={{ whiteSpace: 'nowrap' }}>
+            {icon ? (
+              <ListItemIcon sx={{ minWidth: 36 }}>{getIcon(icon)}</ListItemIcon>
+            ) : null}
             <ListItemText primary={label} />
           </MenuItem>
         ))}

@@ -26,6 +26,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import { TlzLink } from './TlzLink';
 import AddNodeMenu from './AddNodeMenu';
+import NodeTypeSelector from './NodeTypeSelector';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -34,7 +35,8 @@ export default function NodePropertiesPanel({
   theme,
   anchor = 'right',
   onAnchorChange,
-  defaultNodeColor = '#1976d2'
+  defaultNodeColor = '#1976d2',
+  nodeTypes = {}
 }) {
   const drawerWidth = 400;
   
@@ -92,8 +94,7 @@ export default function NodePropertiesPanel({
     if (onUpdateNode) onUpdateNode(selectedNode.id, { label: newLabel }, true); // true flag indicates label update
   };
 
-  const handleNodeTypeChange = (e) => {
-    const newType = e.target.value;
+  const handleNodeTypeChangeInternal = (newType) => {
     setNodeType(newType);
     if (onUpdateNode) onUpdateNode(selectedNode.id, { type: newType });
   };
@@ -269,19 +270,12 @@ export default function NodePropertiesPanel({
         />
 
         {/* Node Type */}
-        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-          <InputLabel>Node Type</InputLabel>
-          <Select
-            value={nodeType}
-            label="Node Type"
-            onChange={handleNodeTypeChange}
-          >
-            <MenuItem value="default">Default Node</MenuItem>
-            <MenuItem value="fixed">Fixed Node</MenuItem>
-            <MenuItem value="markdown">Markdown Node</MenuItem>
-            <MenuItem value="svg">SVG Node</MenuItem>
-          </Select>
-        </FormControl>
+        <NodeTypeSelector
+          value={nodeType}
+          nodeTypes={nodeTypes}
+          onChange={(val) => handleNodeTypeChangeInternal(val)}
+          sx={{ mb: 2 }}
+        />
 
         {/* Memo header and controls */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, mt: '6px' }}>
