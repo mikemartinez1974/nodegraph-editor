@@ -27,6 +27,10 @@ import FormControl from '@mui/material/FormControl';
 import { TlzLink } from './TlzLink';
 import AddNodeMenu from './AddNodeMenu';
 import NodeTypeSelector from './NodeTypeSelector';
+import {
+  Lock as LockIcon,
+  LockOpen as LockOpenIcon,
+} from '@mui/icons-material';
 
 export default function NodePropertiesPanel({
   selectedNode,
@@ -36,7 +40,9 @@ export default function NodePropertiesPanel({
   anchor = 'right',
   onAnchorChange,
   defaultNodeColor = '#1976d2',
-  nodeTypes = {}
+  nodeTypes = {},
+  lockedNodes = new Set(),
+  onToggleNodeLock
 }) {
   const drawerWidth = 400;
   
@@ -178,6 +184,14 @@ export default function NodePropertiesPanel({
     }
   };
 
+  const handleToggleLock = () => {
+    if (onToggleNodeLock) {
+      onToggleNodeLock(selectedNode.id);
+    }
+  };
+
+  const isLocked = lockedNodes.has(selectedNode.id);
+
   // Extend sanitize schema to allow 'tlz' protocol in preview
   const sanitizeSchema = {
     ...defaultSchema,
@@ -246,15 +260,23 @@ export default function NodePropertiesPanel({
           <IconButton onClick={() => setIsOpen(false)} size="small" aria-label="close properties panel" sx={{ color: 'inherit' }}>
             <CloseIcon />
           </IconButton>
+          <IconButton
+            onClick={() => onToggleNodeLock(selectedNode.id)}
+            title={lockedNodes.has(selectedNode.id) ? "Unlock Node" : "Lock Node"}
+            size="small"
+          >
+            {lockedNodes.has(selectedNode.id) ? <LockIcon /> : <LockOpenIcon />}
+          </IconButton>
         </Box>
       </Box>
       <Divider />
 
       {/* Content */}
+      <Box sx={{ p: 2, pt: 0, display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden' }}>
       {selectedNode && (
         <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden' }}>
           {/* Node ID (read-only) */}
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
             ID: {selectedNode.id}
           </Typography>
 
@@ -370,9 +392,56 @@ export default function NodePropertiesPanel({
               <SaveIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          {/* Lock toggle */}
+          <Tooltip title={lockedNodes.has(selectedNode.id) ? "Unlock node" : "Lock node"}>
+            <IconButton
+              size="small"
+              onClick={handleToggleLock}
+              color={lockedNodes.has(selectedNode.id) ? "error" : "default"}
+            >
+              {lockedNodes.has(selectedNode.id) ? <LockOpenIcon fontSize="small" /> : <LockIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        {/* Position inputs (X, Y) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+          <TextField
+            label="X Position"
+            type="number"
+            value={selectedNode.position?.x || 0}
+            onChange={(e) => onUpdateNode(selectedNode.id, { position: { ...selectedNode.position, x: parseFloat(e.target.value) || 0 } })}
+            size="small"
+            disabled={isLocked}
+          />
+          <TextField
+            label="Y Position"
+            type="number"
+            value={selectedNode.position?.y || 0}
+            onChange={(e) => onUpdateNode(selectedNode.id, { position: { ...selectedNode.position, y: parseFloat(e.target.value) || 0 } })}
+            size="small"
+            disabled={isLocked}
+          />
+          <TextField
+            label="Width"
+            type="number"
+            value={selectedNode.width || 200}
+            onChange={(e) => onUpdateNode(selectedNode.id, { width: parseFloat(e.target.value) || 200 })}
+            size="small"
+            disabled={isLocked}
+          />
+          <TextField
+            label="Height"
+            type="number"
+            value={selectedNode.height || 120}
+            onChange={(e) => onUpdateNode(selectedNode.id, { height: parseFloat(e.target.value) || 120 })}
+            size="small"
+            disabled={isLocked}
+          />
         </Box>
         </Box>
       )}
+      </Box>
     </Paper>,
     document.body
   );

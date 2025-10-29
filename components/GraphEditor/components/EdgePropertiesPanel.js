@@ -1,5 +1,3 @@
-// In EdgePropertiesPanel.js, replace the entire component with this fixed version:
-
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Paper from '@mui/material/Paper';
@@ -18,6 +16,10 @@ import ColorPickerInput from './ColorPickerInput';
 import FormLabel from '@mui/material/FormLabel';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import {
+  Lock as LockIcon,
+  LockOpen as LockOpenIcon,
+} from '@mui/icons-material';
 
 export default function EdgePropertiesPanel({ 
   selectedEdge, 
@@ -25,7 +27,9 @@ export default function EdgePropertiesPanel({
   onUpdateEdge, 
   onClose, 
   theme,
-  defaultEdgeColor = '#666666'
+  defaultEdgeColor = '#666666',
+  lockedEdges = new Set(),
+  onToggleEdgeLock
 }) {
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 88 });
   const [edgeType, setEdgeType] = useState('');
@@ -38,6 +42,9 @@ export default function EdgePropertiesPanel({
 
   // Get edge ID - handle both string and object cases
   const edgeId = typeof selectedEdge === 'string' ? selectedEdge : selectedEdge?.id;
+
+  // Check if the selected edge is locked
+  const isLocked = lockedEdges.has(selectedEdge.id);
 
   // Update local state when selected edge changes
   useEffect(() => {
@@ -179,13 +186,23 @@ export default function EdgePropertiesPanel({
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
           Edge Properties
         </Typography>
-        <IconButton 
-          size="small" 
-          onClick={() => onClose && onClose()}
-          sx={{ color: 'inherit' }}
-        >
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton
+            onClick={() => onToggleEdgeLock(selectedEdge.id)}
+            title={lockedEdges.has(selectedEdge.id) ? "Unlock Edge" : "Lock Edge"}
+            size="small"
+            sx={{ color: 'inherit' }}
+          >
+            {lockedEdges.has(selectedEdge.id) ? <LockIcon /> : <LockOpenIcon />}
+          </IconButton>
+          <IconButton 
+            size="small" 
+            onClick={() => onClose && onClose()}
+            sx={{ color: 'inherit' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </Box>
 
       <Divider />
@@ -210,20 +227,26 @@ export default function EdgePropertiesPanel({
         </Box>
 
         {/* Edge Type */}
-        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+        <FormControl size="small" disabled={isLocked}>
           <InputLabel>Edge Type</InputLabel>
           <Select
-            value={edgeType}
+            value={selectedEdge.type || 'straight'}
+            onChange={(e) => onUpdateEdge(selectedEdge.id, { type: e.target.value })}
             label="Edge Type"
-            onChange={handleEdgeTypeChange}
           >
             {Object.keys(edgeTypes).map(type => (
-              <MenuItem key={type} value={type}>
-                {edgeTypes[type].label || type}
-              </MenuItem>
+              <MenuItem key={type} value={type}>{type}</MenuItem>
             ))}
           </Select>
         </FormControl>
+        <TextField
+          label="Color"
+          type="color"
+          value={selectedEdge.color || defaultEdgeColor}
+          onChange={(e) => onUpdateEdge(selectedEdge.id, { color: e.target.value })}
+          size="small"
+          disabled={isLocked}
+        />
 
         {/* Label */}
         <TextField
@@ -306,6 +329,19 @@ export default function EdgePropertiesPanel({
             Supports hex colors and CSS gradients
           </Typography>
         </Box>
+
+        {/* Lock Toggle - new section */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={lockedEdges.has(edgeId)}
+              onChange={() => onToggleEdgeLock(edgeId)}
+              color="primary"
+            />
+          }
+          label="Lock Edge Properties"
+          sx={{ mb: 2 }}
+        />
       </Box>
     </Paper>
   );

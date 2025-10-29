@@ -42,7 +42,9 @@ import {
   Refresh as RefreshIcon,
   Home as HomeIcon,
   Bookmark as BookmarkIcon,
-  BookmarkBorder as BookmarkBorderIcon
+  BookmarkBorder as BookmarkBorderIcon,
+  Map as MapIcon,  // NEW: Import minimap icon
+  GridOn as GridOnIcon  // NEW: Import grid icon
 } from '@mui/icons-material';
 import eventBus from '../../NodeGraph/eventBus';
 import PreferencesDialog from './PreferencesDialog';
@@ -84,7 +86,11 @@ const Toolbar = ({
   backgroundImage = null,
   defaultNodeColor = '#1976d2',
   defaultEdgeColor = '#666666',
-  isFreeUser = false
+  isFreeUser = false,
+  showMinimap = true,  // NEW: Add prop
+  onToggleMinimap,  // NEW: Add prop
+  snapToGrid = false,  // NEW: Add prop
+  onToggleSnapToGrid  // NEW: Add prop
 }) => {
   const theme = useTheme();
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -647,6 +653,30 @@ const Toolbar = ({
             disabled={isFreeUser}
           >
             <LoadIcon fontSize="small" />
+          </IconButton>
+
+          {/* NEW: Minimap toggle button */}
+          <IconButton
+            onClick={onToggleMinimap}
+            color={showMinimap ? "primary" : "default"}
+            title="Toggle Minimap"
+            aria-label="Toggle minimap visibility"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <MapIcon fontSize="small" />
+          </IconButton>
+
+          {/* NEW: Snap to grid toggle button */}
+          <IconButton
+            onClick={onToggleSnapToGrid}
+            color={snapToGrid ? "primary" : "default"}
+            title="Toggle Snap to Grid"
+            aria-label="Toggle snap to grid"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <GridOnIcon fontSize="small" />
           </IconButton>
 
           <IconButton

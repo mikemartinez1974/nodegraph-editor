@@ -32,6 +32,11 @@ const nodeTypes = getNodeTypes();
 export default function GraphEditor({ backgroundImage }) {
   const theme = useTheme();
   const [showEdgePanel, setShowEdgePanel] = useState(false);
+  const [showMinimap, setShowMinimap] = useState(true);
+  const [snapToGrid, setSnapToGrid] = useState(false);
+  const [gridSize, setGridSize] = useState(20);
+  const [lockedNodes, setLockedNodes] = useState(new Set());
+  const [lockedEdges, setLockedEdges] = useState(new Set());
   const state = useGraphEditorState();
 
   // Destructure editor state immediately so variables like `pan` are available for subsequent effects
@@ -646,6 +651,15 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('applyScriptProposals', handleApplyProposals);
   }, [historyHook, setSnackbar]);
 
+  // NEW: Listen for toggleMinimap event to sync minimap visibility with toolbar button
+  useEffect(() => {
+    const handleToggleMinimap = () => {
+      setShowMinimap(prev => !prev);
+    };
+    eventBus.on('toggleMinimap', handleToggleMinimap);
+    return () => eventBus.off('toggleMinimap', handleToggleMinimap);
+  }, []);
+
   return (
     <div 
       id="graph-editor-background" 
@@ -695,7 +709,15 @@ export default function GraphEditor({ backgroundImage }) {
         nodesRef={nodesRef}
         saveToHistory={historyHook.saveToHistory}
         edgesRef={edgesRef}
+        currentTheme={theme.palette.mode}
+        backgroundImage={backgroundImage}
+        defaultNodeColor={defaultNodeColor}
+        defaultEdgeColor={defaultEdgeColor}
         isFreeUser={isFreeUser}
+        showMinimap={showMinimap}
+        onToggleMinimap={() => eventBus.emit('toggleMinimap')}
+        snapToGrid={snapToGrid}
+        onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
       />
       
       {selectedNodeIds.length === 1 && nodePanelAnchor && (
@@ -738,6 +760,18 @@ export default function GraphEditor({ backgroundImage }) {
           onAnchorChange={setNodePanelAnchor}
           onClose={() => {}}
           defaultNodeColor={defaultNodeColor}
+          lockedNodes={lockedNodes}
+          onToggleNodeLock={(nodeId) => {
+            setLockedNodes(prev => {
+              const newSet = new Set(prev);
+              if (newSet.has(nodeId)) {
+                newSet.delete(nodeId);
+              } else {
+                newSet.add(nodeId);
+              }
+              return newSet;
+            });
+          }}
         />
       )}
       
@@ -792,6 +826,11 @@ export default function GraphEditor({ backgroundImage }) {
         backgroundUrl={backgroundUrl} // NEW
         backgroundInteractive={backgroundInteractive} // NEW
         setSnackbar={setSnackbar} // NEW
+        showMinimap={showMinimap}
+        snapToGrid={snapToGrid}
+        gridSize={gridSize}
+        lockedNodes={lockedNodes}
+        lockedEdges={lockedEdges}
         onNodeMove={(id, position) => {
           setNodes(prev => {
             const next = prev.map(n => n.id === id ? { ...n, position } : n);
@@ -912,6 +951,18 @@ export default function GraphEditor({ backgroundImage }) {
            defaultEdgeColor={defaultEdgeColor}
            isOpen={showEdgePanel}
            onClose={() => setShowEdgePanel(false)}
+           lockedEdges={lockedEdges}
+           onToggleEdgeLock={(edgeId) => {
+             setLockedEdges(prev => {
+               const newSet = new Set(prev);
+               if (newSet.has(edgeId)) {
+                 newSet.delete(edgeId);
+               } else {
+                 newSet.add(edgeId);
+               }
+               return newSet;
+             });
+           }}
          />
        )}
 

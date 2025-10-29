@@ -13,6 +13,8 @@ import eventBus from './eventBus';
 import { handleNodeClick, handleEdgeClick, handleEdgeHover, handleNodeMouseEnter, handleNodeMouseLeave } from './eventHandlers';
 import { onNodeDragMove, onNodeDragStart, handleNodeDragEnd } from './dragHandlers';
 import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
+import Minimap from './Minimap';
+import GridLayer from './GridLayer';
 
 export default function NodeGraph({ 
   nodes = [], 
@@ -48,7 +50,12 @@ export default function NodeGraph({
   onNodeDragEnd,
   backgroundUrl, // NEW: URL to load in iframe background
   backgroundInteractive, // NEW: whether iframe should receive pointer events
-  setSnackbar // NEW: optional snackbar setter for errors
+  setSnackbar, // NEW: optional snackbar setter for errors
+  showMinimap = true,
+  snapToGrid = false,
+  gridSize = 20,
+  lockedNodes = new Set(),
+  lockedEdges = new Set(),
 }) {
   const theme = useTheme();
   
@@ -226,6 +233,12 @@ export default function NodeGraph({
       draggingInfoRef.current.offset.x += graphDx;
       draggingInfoRef.current.offset.y += graphDy;
       
+      // Snap to grid if enabled
+      if (snapToGrid) {
+        draggingInfoRef.current.offset.x = Math.round(draggingInfoRef.current.offset.x / gridSize) * gridSize;
+        draggingInfoRef.current.offset.y = Math.round(draggingInfoRef.current.offset.y / gridSize) * gridSize;
+      }
+      
       // Mark that we've actually dragged
       isDragging.current = true;
 
@@ -253,11 +266,21 @@ export default function NodeGraph({
   function onNodeDragStart(e, node) {
     e.preventDefault();
     
+    // Check if node is locked
+    if (lockedNodes.has(node.id)) {
+      return; // Prevent dragging locked nodes
+    }
+    
     // Determine which nodes to drag
     let nodesToDrag = [node.id];
     if (selectedNodeIds.includes(node.id) && selectedNodeIds.length > 1) {
       nodesToDrag = [...selectedNodeIds];
     }
+    
+    // Filter out locked nodes
+    nodesToDrag = nodesToDrag.filter(id => !lockedNodes.has(id));
+    
+    if (nodesToDrag.length === 0) return; // No draggable nodes
     
     setDraggingNodeId(node.id);
     draggingNodeIdRef.current = nodesToDrag;
@@ -596,6 +619,10 @@ export default function NodeGraph({
         onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })}
         layerRefs={layerRefs}
       >
+        {snapToGrid && (
+          <GridLayer pan={pan} zoom={zoom} gridSize={gridSize} theme={theme} />
+        )}
+
         <GroupLayer
           ref={groupRef}
           groups={groups}
@@ -661,6 +688,7 @@ export default function NodeGraph({
             draggingNodeId={draggingNodeId}
             theme={theme}
             nodeTypes={nodeTypes}
+            lockedNodes={lockedNodes}
             onNodeEvent={(id, e) => {
               if (isDragging.current || (Date.now() - dragStartTime.current < 200 && draggingNodeIdRef.current)) {
                 isDragging.current = false;
@@ -739,6 +767,23 @@ export default function NodeGraph({
           theme={theme} 
         />
       </PanZoomLayer>
+
+    {/* Add Minimap at the end */}
+    {typeof showMinimap !== 'undefined' && showMinimap && (
+      <Minimap
+        nodes={nodeList}
+        groups={groups}
+        pan={pan}
+        zoom={zoom}
+        setPan={setPan}
+        containerWidth={window.innerWidth}
+        containerHeight={window.innerHeight}
+        width={220}
+        height={165}
+        position="bottom-right"
+      />
+    )}
+
     </div>
   );
 }
