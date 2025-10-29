@@ -7,6 +7,12 @@ import MarkdownNode from './Nodes/MarkdownNode';
 import SvgNode from './Nodes/SvgNode';
 import DivNode from './Nodes/DivNode';
 import TimerNode from './Nodes/TimerNode';
+import ToggleNode from './Nodes/ToggleNode';
+import CounterNode from './Nodes/CounterNode';
+import GateNode from './Nodes/GateNode';
+import DelayNode from './Nodes/DelayNode';
+import APINode from './Nodes/APINode';
+import ScriptNode from './Nodes/ScriptNode';
 
 
 // Registry structure: each entry has the component and display metadata
@@ -52,6 +58,48 @@ const nodeTypeRegistry = {
     description: 'Node that functions as a countdown or stopwatch timer',
     icon: 'Timer',
     category: 'utility'
+  },
+  toggle: {
+    component: ToggleNode,
+    label: 'Toggle Node',
+    description: 'Node that toggles between two states',
+    icon: 'ToggleOn',
+    category: 'utility'
+  },
+  counter: {
+    component: CounterNode,
+    label: 'Counter Node',
+    description: 'Node that counts up or down',
+    icon: 'AddCircleOutline',
+    category: 'utility'
+  }, 
+  gate: {
+    component: GateNode,
+    label: 'Gate',
+    description: 'Logical gate node (AND/OR/NOT/XOR/NAND/NOR)',
+    icon: 'CallSplit',
+    category: 'logic'
+  },
+  delay: {
+    component: DelayNode,
+    label: 'Delay Node',
+    description: 'Schedules a delayed trigger; supports queueing and cancel',
+    icon: 'Timer',
+    category: 'utility'
+  },
+  api: {
+    component: APINode,
+    label: 'API Node',
+    description: 'Fetch data from a URL on trigger; supports method, headers, body, cancel',
+    icon: 'CloudDownload',
+    category: 'integration'
+  },
+  script: {
+    component: ScriptNode,
+    label: 'Script Node',
+    description: 'Runs a saved session script on trigger; emits result',
+    icon: 'Code',
+    category: 'logic'
   }
 };
 

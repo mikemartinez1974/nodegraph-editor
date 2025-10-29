@@ -141,6 +141,43 @@ export default function ThemeDrawer(props) {
     }
   };
 
+  // Safe toggle for script panel to avoid silent failures and stop event propagation
+  const safeToggleScriptPanel = (e) => {
+    if (e && typeof e.stopPropagation === 'function') {
+      try { e.stopPropagation(); } catch (err) { /* ignore */ }
+    }
+
+    console.log('ThemeDrawer: safeToggleScriptPanel invoked');
+
+    try {
+      if (eventBus && typeof eventBus.emit === 'function') {
+        eventBus.emit('toggleScriptPanel');
+        console.log('ThemeDrawer: emitted toggleScriptPanel via eventBus');
+      } else {
+        console.warn('eventBus.emit not available');
+      }
+    } catch (err) {
+      console.warn('Failed to emit toggleScriptPanel via eventBus:', err);
+    }
+
+    // Also dispatch a window-level CustomEvent as a fallback for listeners
+    try {
+      const ev = new CustomEvent('toggleScriptPanel');
+      window.dispatchEvent(ev);
+      console.log('ThemeDrawer: dispatched window CustomEvent toggleScriptPanel');
+    } catch (err) {
+      console.warn('Failed to dispatch window CustomEvent toggleScriptPanel:', err);
+    }
+
+    // Always post a window message as a last-resort broadcast
+    try {
+      window.postMessage({ type: 'toggleScriptPanel' }, '*');
+      console.log('ThemeDrawer: posted window message toggleScriptPanel');
+    } catch (err) {
+      console.warn('Failed to postMessage toggleScriptPanel:', err);
+    }
+  };
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ BackdropProps: { invisible: true } }}
       sx={{ zIndex: 1500 }} // Ensure it is drawn on top of everything else
@@ -244,7 +281,7 @@ export default function ThemeDrawer(props) {
           </AccordionSummary>
           <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
             <BackgroundControls />
-            <Button size="small" onClick={() => eventBus.emit('toggleScriptPanel')}>Toggle Script Panel</Button>
+            <Button size="small" onClick={safeToggleScriptPanel}>Toggle Script Panel</Button>
           </AccordionDetails>
         </Accordion>
       </Box>

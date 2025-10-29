@@ -932,6 +932,11 @@ export default function GraphEditor({ backgroundImage }) {
         onEdgeHover={undefined}
         hoveredEdgeId={hoveredEdgeId}
       />
+
+      {/* Mount script runner and panel so scripts can run and panel can toggle */}
+      <ScriptRunner onRequest={handleScriptRequest} />
+      <ScriptPanel />
+
     </div>
   );
 }

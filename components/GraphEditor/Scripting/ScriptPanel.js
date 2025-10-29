@@ -314,6 +314,51 @@ export default function ScriptPanel() {
 
   if (!visible) return null;
 
+  // Prepare list content to avoid complex inline JSX ternary
+  const renderScriptList = () => {
+    if (!scripts || scripts.length === 0) {
+      return (
+        <Box sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="caption" color="text.secondary">
+            No scripts yet
+          </Typography>
+        </Box>
+      );
+    }
+
+    return scripts.map((script) => (
+      <ListItemButton
+        key={script.id}
+        selected={script.id === selectedId}
+        onClick={() => setSelectedId(script.id)}
+        sx={{
+          borderLeft: script.id === selectedId ? 3 : 0,
+          borderColor: 'primary.main',
+          '&.Mui-selected': {
+            bgcolor: 'action.selected',
+            '&:hover': {
+              bgcolor: 'action.selected'
+            }
+          }
+        }}
+      >
+        <ListItemText
+          primary={script.name}
+          primaryTypographyProps={{
+            variant: 'body2',
+            noWrap: true,
+            fontWeight: script.id === selectedId ? 600 : 400
+          }}
+          secondary={script.tags ? script.tags.split(',')[0].trim() : null}
+          secondaryTypographyProps={{
+            variant: 'caption',
+            noWrap: true
+          }}
+        />
+      </ListItemButton>
+    ));
+  };
+
   return (
     <>
       <Paper
@@ -417,45 +462,7 @@ export default function ScriptPanel() {
                 }
               }}
             >
-              {scripts.length === 0 ? (
-                <Box sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    No scripts yet
-                  </Typography>
-                </Box>
-              ) : (
-                scripts.map((script) => (
-                  <ListItemButton
-                    key={script.id}
-                    selected={script.id === selectedId}
-                    onClick={() => setSelectedId(script.id)}
-                    sx={{
-                      borderLeft: script.id === selectedId ? 3 : 0,
-                      borderColor: 'primary.main',
-                      '&.Mui-selected': {
-                        bgcolor: 'action.selected',
-                        '&:hover': {
-                          bgcolor: 'action.selected'
-                        }
-                      }
-                    }}
-                  >
-                    <ListItemText
-                      primary={script.name}
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        noWrap: true,
-                        fontWeight: script.id === selectedId ? 600 : 400
-                      }}
-                      secondary={script.tags ? script.tags.split(',')[0].trim() : null}
-                      secondaryTypographyProps={{
-                        variant: 'caption',
-                        noWrap: true
-                      }}
-                    />
-                  </ListItemButton>
-                ))
-              )}
+              {renderScriptList()}
             </List>
           </Box>
 
