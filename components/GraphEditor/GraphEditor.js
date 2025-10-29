@@ -660,6 +660,103 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('toggleMinimap', handleToggleMinimap);
   }, []);
 
+  // Listen for node update events from custom components
+  useEffect(() => {
+    const handleNodeUpdate = ({ id, updates }) => {
+      // Use the existing update function
+      const node = nodes.find(n => n.id === id);
+      if (node) {
+        setNodes(prev => prev.map(n => 
+          n.id === id ? { ...n, ...updates, data: { ...n.data, ...updates.data } } : n
+        ));
+      }
+    };
+
+    eventBus.on('nodeUpdate', handleNodeUpdate);
+    return () => eventBus.off('nodeUpdate', handleNodeUpdate);
+  }, [nodes, setNodes]);
+
+  // Listen for node move events
+  useEffect(() => {
+    const handleNodeMove = ({ id, position }) => {
+      setNodes(prev => prev.map(node => 
+        node.id === id ? { ...node, position } : node
+      ));
+    };
+
+    eventBus.on('nodeMove', handleNodeMove);
+    return () => eventBus.off('nodeMove', handleNodeMove);
+  }, [setNodes]);
+
+  // Listen for edge click events
+  useEffect(() => {
+    const handleEdgeClick = ({ id, event }) => {
+      const isMultiSelect = event?.ctrlKey || event?.metaKey;
+      const edgeId = id;
+
+      if (isMultiSelect) {
+        // Handle multi-select
+        setSelectedEdgeIds(prev => {
+          if (prev.includes(edgeId)) {
+            return prev.filter(eid => eid !== edgeId);
+          } else {
+            return [...prev, edgeId];
+          }
+        });
+        return;
+      }
+
+      // Handle single selection
+      setSelectedEdgeIds(prev => {
+        const already = prev.includes(edgeId);
+        if (already) {
+          // Toggle the edge panel when clicking the already-selected edge
+          setShowEdgePanel(s => !s);
+          return prev; // keep selection
+        } else {
+          // Select the new edge and open the panel
+          setShowEdgePanel(true);
+          return [edgeId];
+        }
+      });
+      setSelectedNodeIds([]); // Clear node selection
+    };
+
+    eventBus.on('edgeClick', handleEdgeClick);
+    return () => eventBus.off('edgeClick', handleEdgeClick);
+  }, [setSelectedEdgeIds, setSelectedNodeIds, setShowEdgePanel, selectionHook]);
+
+  // Listen for edge hover events
+  useEffect(() => {
+    const handleEdgeHover = ({ edgeId }) => {
+      setHoveredEdgeId(edgeId);
+    };
+
+    eventBus.on('edgeHover', handleEdgeHover);
+    return () => eventBus.off('edgeHover', handleEdgeHover);
+  }, [setHoveredEdgeId]);
+
+  // Listen for node hover events
+  useEffect(() => {
+    const handleNodeHover = ({ id }) => {
+      setHoveredNodeId(id);
+    };
+
+    eventBus.on('nodeHover', handleNodeHover);
+    return () => eventBus.off('nodeHover', handleNodeHover);
+  }, [setHoveredNodeId]);
+
+  // Listen for node drag end events
+  useEffect(() => {
+    const handleNodeDragEnd = ({ nodeIds }) => {
+      // Handle node drag end - could trigger any post-drag logic
+      console.log('Node drag ended for nodes:', nodeIds);
+    };
+
+    eventBus.on('nodeDragEnd', handleNodeDragEnd);
+    return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
+  }, []);
+
   return (
     <div 
       id="graph-editor-background" 
@@ -823,187 +920,18 @@ export default function GraphEditor({ backgroundImage }) {
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
         mode={modesHook.mode}
-        backgroundUrl={backgroundUrl} // NEW
-        backgroundInteractive={backgroundInteractive} // NEW
-        setSnackbar={setSnackbar} // NEW
+        backgroundUrl={backgroundUrl}
+        backgroundInteractive={backgroundInteractive}
+        setSnackbar={setSnackbar}
         showMinimap={showMinimap}
         snapToGrid={snapToGrid}
         gridSize={gridSize}
         lockedNodes={lockedNodes}
         lockedEdges={lockedEdges}
-        onNodeMove={(id, position) => {
-          setNodes(prev => {
-            const next = prev.map(n => n.id === id ? { ...n, position } : n);
-            nodesRef.current = next;
-            setTimeout(() => groupManagerHook.updateGroupBounds(), 0);
-            eventBus.emit('nodeDrag', { nodeId: id, position });
-            return next;
-          });
-        }}
-        onEdgeClick={(edge, event) => {
-          const isMultiSelect = event.ctrlKey || event.metaKey;
-          const edgeId = typeof edge === 'string' ? edge : edge?.id;
-
-          if (isMultiSelect) {
-            selectionHook.handleEdgeSelection(edgeId, true);
-            return;
-          }
-
-          // Use functional updater to avoid stale state and reliably toggle panel
-          setSelectedEdgeIds(prev => {
-            const already = prev.includes(edgeId);
-            if (already) {
-              // Toggle the edge panel when clicking the already-selected edge
-              setShowEdgePanel(s => !s);
-              return prev; // keep selection
-            } else {
-              // Select the new edge and open the panel
-              setShowEdgePanel(true);
-              return [edgeId];
-            }
-          });
-        }}
-        onNodeClick={(nodeId, event) => {
-          if (!event || event.type !== 'click') return;
-
-          const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-
-          if (isMultiSelect) {
-            selectionHook.handleNodeSelection(nodeId, true);
-          } else {
-            // Always select the clicked node. Do not toggle properties on single click.
-            setSelectedNodeIds([nodeId]);
-            setSelectedEdgeIds([]);
-          }
-        }}
-        onNodeDoubleClick={(nodeId, event) => {
-          // Toggle/open node properties on double-click instead of single click
-          const isSelected = selectedNodeIds.includes(nodeId);
-          if (isSelected && selectedNodeIds.length === 1) {
-            setNodePanelAnchor(prev => prev ? null : 'right');
-          } else {
-            setSelectedNodeIds([nodeId]);
-            setSelectedEdgeIds([]);
-            setNodePanelAnchor('right');
-          }
-
-          // preserve existing handler behavior if present
-          try {
-            if (handlers && typeof handlers.handleNodeDoubleClick === 'function') {
-              handlers.handleNodeDoubleClick(nodeId, event);
-            }
-          } catch (err) {
-            console.warn('handlers.handleNodeDoubleClick failed:', err);
-          }
-        }}
-        onNodeDragEnd={(id, position) => {
-          setNodes(prev => {
-            const next = prev.map(n => n.id === id ? { ...n, position } : n);
-            nodesRef.current = next;
-            eventBus.emit('nodeDragEnd', { nodeId: id, position });
-            historyHook.saveToHistory(next, edgesRef.current);
-            return next;
-          });
-        }}
-        onGroupClick={(groupId, event, action) => {
-          if (action === 'toggle-collapse') {
-            groupManagerHook.handleToggleGroupCollapse(groupId);
-            return;
-          }
-
-          if (action === 'select-members') {
-            const group = groups.find(g => g.id === groupId);
-            if (group) {
-              setSelectedGroupIds([groupId]);
-              setSelectedNodeIds(group.nodeIds ? [...group.nodeIds] : []);
-              setSelectedEdgeIds([]);
-            } else {
-              const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-              selectionHook.handleGroupSelection(groupId, isMultiSelect);
-            }
-            return;
-          }
-
-          const isMultiSelect = event?.ctrlKey || event?.metaKey || false;
-          selectionHook.handleGroupSelection(groupId, isMultiSelect);
-        }}
-        onBackgroundClick={() => {
-          selectionHook.clearSelection();
-          eventBus.emit('backgroundClick');
-        }}
-        onEdgeHover={id => setHoveredEdgeId(id)}
-        onNodeHover={id => setHoveredNodeId(id)}
+        onEdgeClick={undefined}
+        onEdgeHover={undefined}
         hoveredEdgeId={hoveredEdgeId}
-        hoveredEdgeSource={hoveredEdgeSource}
-        hoveredEdgeTarget={hoveredEdgeTarget}
       />
-      
-      {selectedEdgeIds.length === 1 && edges.find(e => e.id === selectedEdgeIds[0]) && showEdgePanel && (
-        <EdgePropertiesPanel
-           selectedEdge={{
-             ...edges.find(e => e.id === selectedEdgeIds[0]),
-             sourceNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.source),
-             targetNode: nodes.find(n => n.id === edges.find(e => e.id === selectedEdgeIds[0])?.target)
-           }}
-           edgeTypes={EdgeTypes}
-           onUpdateEdge={handlers.handleUpdateEdge}
-           theme={theme}
-           defaultEdgeColor={defaultEdgeColor}
-           isOpen={showEdgePanel}
-           onClose={() => setShowEdgePanel(false)}
-           lockedEdges={lockedEdges}
-           onToggleEdgeLock={(edgeId) => {
-             setLockedEdges(prev => {
-               const newSet = new Set(prev);
-               if (newSet.has(edgeId)) {
-                 newSet.delete(edgeId);
-               } else {
-                 newSet.add(edgeId);
-               }
-               return newSet;
-             });
-           }}
-         />
-       )}
-
-      {showGroupProperties && selectedGroupIds.length === 1 && (
-        <GroupPropertiesPanel
-          selectedGroup={groups.find(g => g.id === selectedGroupIds[0])}
-          nodes={nodes}
-          onUpdateGroup={handlers.handleUpdateGroup}
-          onUngroupGroup={handlers.handleUngroupSelectedWrapper}
-          onAddNodes={handlers.handleAddNodesToGroup}
-          onRemoveNodes={handlers.handleRemoveNodesFromGroup}
-          onClose={() => setShowGroupProperties(false)}
-          theme={theme}
-        />
-      )}
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-
-      <Backdrop open={loading} sx={{ zIndex: 1900, color: '#fff' }}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      {/* ScriptRunner (invisible) — provides sandboxed script runtime */}
-      <ScriptRunner onRequest={handleScriptRequest} timeoutMs={10000} />
-
-      {/* Script panel (floating) */}
-      <ScriptPanel />
     </div>
   );
 }
-// Duplicate destructuring removed — state is destructured earlier to ensure variables like `pan` are available.

@@ -42,12 +42,9 @@ export default function NodeGraph({
   setZoom, 
   onNodeMove, 
   onEdgeClick, 
-  onEdgeHover, 
-  onNodeHover, 
   hoveredEdgeId, 
   hoveredEdgeSource, 
   hoveredEdgeTarget, 
-  onNodeDragEnd,
   backgroundUrl, // NEW: URL to load in iframe background
   backgroundInteractive, // NEW: whether iframe should receive pointer events
   setSnackbar, // NEW: optional snackbar setter for errors
@@ -80,7 +77,7 @@ export default function NodeGraph({
       
       const minX = Math.min(...positions.map(p => p.x - p.width / 2)) - padding;
       const maxX = Math.max(...positions.map(p => p.x + p.width / 2)) + padding;
-      const minY = Math.min(...positions.map(p => p.y - p.height / 2)) - padding;
+      const minY = Math.min(...positions.map((p) => p.y - p.height / 2)) - padding;
       const maxY = Math.max(...positions.map(p => p.y + p.height / 2)) + padding;
       
       const newBounds = {
@@ -106,7 +103,7 @@ export default function NodeGraph({
       setGroups(updatedGroups);
     }
   }, [nodes, groups, setGroups]);
-  
+
   const canvasRef = useRef(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [draggingGroupId, setDraggingGroupId] = useState(null);
@@ -175,10 +172,7 @@ export default function NodeGraph({
   }
 
   function handleEdgeClickWrapper({ id, event }) {
-    if (!onEdgeClick && setSelectedEdgeIds) {
-      setSelectedEdgeIds([id]);
-      if (setSelectedNodeIds) setSelectedNodeIds([]);
-    }
+    eventBus.emit('edgeClick', { id, event });
   }
 
   // Event bus handlers for node/edge events
@@ -189,7 +183,7 @@ export default function NodeGraph({
       eventBus.off('nodeClick', handleNodeClickWrapper);
       eventBus.off('edgeClick', handleEdgeClickWrapper);
     };
-  }, [setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, onEdgeClick]);
+  }, [setSelectedNodeIds, setSelectedEdgeIds, onNodeClick]);
 
   // Consolidate all event bus handler registration
   useEffect(() => {
@@ -325,15 +319,15 @@ export default function NodeGraph({
         // This was an actual drag
         const offset = draggingInfoRef.current.offset;
         
-        // Update all dragged nodes
+        // Update all dragged nodes and emit events
         draggingNodeIdRef.current.forEach(id => {
           const node = nodes.find(n => n.id === id);
-          if (node && typeof onNodeMove === 'function') {
+          if (node) {
             const newPosition = { 
               x: node.position.x + offset.x, 
               y: node.position.y + offset.y 
             };
-            onNodeMove(id, newPosition);
+            eventBus.emit('nodeMove', { id, position: newPosition });
           }
 
           // Reset transform
@@ -349,13 +343,13 @@ export default function NodeGraph({
           if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
         });
 
-        // Call onNodeDragEnd if needed
-        if (typeof onNodeDragEnd === 'function' && lastDragPosition.current) {
+        // Emit nodeMove event
+        if (lastDragPosition.current) {
           draggingNodeIdRef.current.forEach(id => {
             const initial = lastDragPosition.current[id];
             if (initial) {
               const finalPos = { x: initial.x + offset.x, y: initial.y + offset.y };
-              onNodeDragEnd(id, finalPos);
+              eventBus.emit('nodeMove', { id, position: finalPos });
             }
           });
         }
@@ -370,6 +364,9 @@ export default function NodeGraph({
     }
     containerRef.current.removeEventListener('mousemove', onNodeDragMove);
     containerRef.current.removeEventListener('mouseup', handleNodeDragEnd);
+
+    // Emit nodeDragEnd event
+    eventBus.emit('nodeDragEnd', { nodeIds: draggingNodeIdRef.current });
   }
 
   // Group drag logic
@@ -651,15 +648,14 @@ export default function NodeGraph({
           hoveredNodeId={hoveredNodeId}
           handlePositions={handlePositions}
           onEdgeClick={(edge, event) => {
-            eventBus.emit('edgeClick', { id: edge?.id });
-            if (typeof onEdgeClick === 'function') onEdgeClick(edge, event);
+            eventBus.emit('edgeClick', { id: edge?.id, event });
           }}
           onEdgeDoubleClick={(edge, event) => {
             if (typeof onEdgeDoubleClick === 'function') {
               onEdgeDoubleClick(edge.id);
             }
           }}
-          onEdgeHover={onEdgeHover}
+          onEdgeHover={undefined}
         />
         
         <HandleLayer

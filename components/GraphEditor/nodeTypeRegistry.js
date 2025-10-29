@@ -6,6 +6,8 @@ import FixedNode from './Nodes/FixedNode';
 import MarkdownNode from './Nodes/MarkdownNode';
 import SvgNode from './Nodes/SvgNode';
 import DivNode from './Nodes/DivNode';
+import TimerNode from './Nodes/TimerNode';
+
 
 // Registry structure: each entry has the component and display metadata
 const nodeTypeRegistry = {
@@ -43,6 +45,13 @@ const nodeTypeRegistry = {
     description: 'Custom HTML div container',
     icon: 'Code',
     category: 'advanced'
+  },
+  timer: {
+    component: TimerNode,
+    label: 'Timer Node',
+    description: 'Node that functions as a countdown or stopwatch timer',
+    icon: 'Timer',
+    category: 'utility'
   }
 };
 

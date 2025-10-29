@@ -23,6 +23,7 @@ const NodeLayer = ({
     onNodeEvent, 
     onNodeDoubleClick,
     onNodeDragStart, 
+    onNodeHover,
     nodeTypes = { default: DefaultNode } 
 }) => {
     // Deduplicate nodes before rendering
@@ -81,7 +82,10 @@ const NodeLayer = ({
                             e.stopPropagation();
                             onNodeDoubleClick(node.id);
                         } : undefined}
-                        onMouseEnter={() => eventBus.emit('nodeHover', { id: node.id })}
+                        onMouseEnter={() => {
+                            const nodeId = node.id;
+                            eventBus.emit('nodeHover', { id: nodeId });
+                        }}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                         nodeRefs={nodeRefs}
                     />
