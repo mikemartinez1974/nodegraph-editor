@@ -6,6 +6,7 @@ import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 import edgeTypes from '../GraphEditor/edgeTypes';
 import { setupHiDPICanvas, getCanvasContext, clearCanvas } from './canvasUtils';
+import { drawEdgeLabel } from './edgeLabelUtils';
 
 // Hit testing helpers
 function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
@@ -81,7 +82,8 @@ const EdgeLayer = forwardRef(({
   theme, 
   onEdgeClick, 
   onEdgeDoubleClick, 
-  draggingInfoRef 
+  draggingInfoRef,
+  showAllEdgeLabels = false // <-- Add prop
 }, ref) => {
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
@@ -376,6 +378,12 @@ const EdgeLayer = forwardRef(({
         }
         ctx.stroke();
         ctx.restore();
+      }
+      
+      // Draw edge label if showAllEdgeLabels or edge.label is non-empty
+      if (showAllEdgeLabels || (edge.label && edge.label.trim() !== '')) {
+        // Pass sourcePos and targetPos to drawEdgeLabel
+        drawEdgeLabel(ctx, { ...edge, sourcePos, targetPos }, theme);
       }
       
       // Store edge data for hit testing

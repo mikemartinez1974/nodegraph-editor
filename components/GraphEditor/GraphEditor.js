@@ -19,6 +19,7 @@ import eventBus from '../NodeGraph/eventBus';
 import ScriptRunner from './Scripting/ScriptRunner';
 import ScriptPanel from './Scripting/ScriptPanel';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
@@ -28,6 +29,7 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
+import PropertiesPanel from './components/PropertiesPanel';
 
 const nodeTypes = getNodeTypes();
 
@@ -39,6 +41,8 @@ export default function GraphEditor({ backgroundImage }) {
   const [gridSize, setGridSize] = useState(20);
   const [lockedNodes, setLockedNodes] = useState(new Set());
   const [lockedEdges, setLockedEdges] = useState(new Set());
+  const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
+  const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
   const state = useGraphEditorState();
 
   // Destructure editor state immediately so variables like `pan` are available for subsequent effects
@@ -236,7 +240,8 @@ export default function GraphEditor({ backgroundImage }) {
     handleUngroupSelected: handlers.handleUngroupSelectedWrapper,
     saveToHistory: historyHook.saveToHistory,
     edgesRef,
-    nodesRef
+    nodesRef,
+    setShowAllEdgeLabels
   });
 
   // Panel anchor synchronization
@@ -578,7 +583,7 @@ export default function GraphEditor({ backgroundImage }) {
         }
         default:
           throw new Error('Unknown method: ' + method);
-      }
+    }
     } catch (err) {
       console.error('Script RPC error', method, err);
       throw err;
@@ -685,17 +690,18 @@ export default function GraphEditor({ backgroundImage }) {
         } 
         // If dropped in empty space, create a new node and edge
         else {
-          const newNodeId = `node_${Date.now()}`;
+          // Only create one node with UUID and correct type
+          const parentNode = nodes.find(n => n.id === sourceNode);
+          const newNodeId = uuidv4();
           const newNode = {
             id: newNodeId,
             label: 'New Node',
-            type: 'default',
+            type: parentNode?.type || 'default',
             position: { x: graph.x, y: graph.y },
-            width: 200,
-            height: 120,
+            width: parentNode?.width || 200,
+            height: parentNode?.height || 120,
             data: {}
           };
-          
           const newEdge = {
             id: `edge_${Date.now()}`,
             source: direction === 'source' ? sourceNode : newNodeId,
@@ -703,20 +709,17 @@ export default function GraphEditor({ backgroundImage }) {
             type: edgeType,
             style: EdgeTypes[edgeType]?.style || {}
           };
-          
           setNodes(prev => {
             const next = [...prev, newNode];
             nodesRef.current = next;
             return next;
           });
-          
           setEdges(prev => {
             const next = [...prev, newEdge];
             edgesRef.current = next;
             historyHook.saveToHistory(nodesRef.current, next);
             return next;
           });
-          
           setSnackbar({ 
             open: true, 
             message: 'Node and edge created', 
@@ -735,7 +738,7 @@ export default function GraphEditor({ backgroundImage }) {
   
     eventBus.on('handleDrop', handleHandleDrop);
     return () => eventBus.off('handleDrop', handleHandleDrop);
-  }, [setNodes, setEdges, nodesRef, edgesRef, historyHook, setSnackbar]);
+  }, [setNodes, setEdges, nodes, nodesRef, edgesRef, historyHook, setSnackbar]);
 
   // NEW: Listen for toggleMinimap event to sync minimap visibility with toolbar button
   useEffect(() => {
@@ -866,7 +869,25 @@ export default function GraphEditor({ backgroundImage }) {
     // Your handleClick logic here
     // Example: console.log('Single handleClick event:', payload);
   });
-  console.log(`[GraphEditor.js] useHandleClickHandler registered (handlerId: ${handleClickHandlerId})`);
+
+  // Toggle properties panel via event
+  useEffect(() => {
+    const handleTogglePropertiesPanel = () => {
+      setShowPropertiesPanel(prev => !prev);
+    };
+    eventBus.on('togglePropertiesPanel', handleTogglePropertiesPanel);
+    return () => eventBus.off('togglePropertiesPanel', handleTogglePropertiesPanel);
+  }, []);
+
+  // Listen for node click events and select the node
+  useEffect(() => {
+    const handleNodeClick = ({ id }) => {
+      setSelectedNodeIds([id]);
+      setSelectedEdgeIds([]);
+    };
+    eventBus.on('nodeClick', handleNodeClick);
+    return () => eventBus.off('nodeClick', handleNodeClick);
+  }, [setSelectedNodeIds, setSelectedEdgeIds]);
 
   return (
     <div 
@@ -928,58 +949,56 @@ export default function GraphEditor({ backgroundImage }) {
         onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
       />
       
-      {selectedNodeIds.length === 1 && nodePanelAnchor && (
-        <NodePropertiesPanel
+      {showPropertiesPanel && (
+        <PropertiesPanel
           selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
+          selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
+          selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
           onUpdateNode={(id, updates, options) => {
-            // Immediate local update to keep UI responsive
             setNodes(prev => {
-              const next = prev.map(n => {
-                if (n.id === id) {
-                  return {
-                    ...n,
-                    ...updates,
-                    data: updates && updates.data ? { ...n.data, ...updates.data } : n.data,
-                    position: updates && updates.position ? { ...n.position, ...updates.position } : n.position
-                  };
-                }
-                return n;
-              });
+              const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates && updates.data ? { ...n.data, ...updates.data } : n.data } : n);
               nodesRef.current = next;
-              try {
-                historyHook.saveToHistory(next, edgesRef.current);
-              } catch (err) {
-                console.warn('Failed to save history after node update:', err);
-              }
+              try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
               return next;
             });
-
-            // Also call existing handler if available (will queue/process appropriately)
-            try {
-              if (handlers && typeof handlers.handleUpdateNodeData === 'function') {
-                handlers.handleUpdateNodeData(id, updates, options);
-              }
-            } catch (err) {
-              console.warn('handlers.handleUpdateNodeData failed:', err);
-            }
+            try { if (handlers && typeof handlers.handleUpdateNodeData === 'function') { handlers.handleUpdateNodeData(id, updates, options); } } catch (err) {}
+          }}
+          onUpdateEdge={(id, updates) => {
+            setEdges(prev => {
+              const next = prev.map(e => e.id === id ? { ...e, ...updates } : e);
+              edgesRef.current = next;
+              try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
+              return next;
+            });
+          }}
+          onUpdateGroup={(id, updates) => {
+            setGroups(prev => {
+              const next = prev.map(g => g.id === id ? { ...g, ...updates } : g);
+              return next;
+            });
           }}
           theme={theme}
-          anchor={nodePanelAnchor}
-          onAnchorChange={setNodePanelAnchor}
-          onClose={() => {}}
           defaultNodeColor={defaultNodeColor}
+          defaultEdgeColor={defaultEdgeColor}
           lockedNodes={lockedNodes}
+          lockedEdges={lockedEdges}
+          lockedGroups={groupManager?.lockedGroups}
           onToggleNodeLock={(nodeId) => {
             setLockedNodes(prev => {
               const newSet = new Set(prev);
-              if (newSet.has(nodeId)) {
-                newSet.delete(nodeId);
-              } else {
-                newSet.add(nodeId);
-              }
+              if (newSet.has(nodeId)) { newSet.delete(nodeId); } else { newSet.add(nodeId); }
               return newSet;
             });
           }}
+          onToggleEdgeLock={(edgeId) => {
+            setLockedEdges(prev => {
+              const newSet = new Set(prev);
+              if (newSet.has(edgeId)) { newSet.delete(edgeId); } else { newSet.add(edgeId); }
+              return newSet;
+            });
+          }}
+          onToggleGroupLock={groupManager?.toggleGroupLock}
+          onClose={() => setShowPropertiesPanel(false)}
         />
       )}
       
@@ -1013,6 +1032,7 @@ export default function GraphEditor({ backgroundImage }) {
       <NodeGraph 
         nodes={memoizedNodes}
         setNodes={memoizedSetNodes}
+        setEdges={memoizedSetEdges}
         edges={memoizedEdges}
         groups={memoizedGroups}
         setGroups={memoizedSetGroups}
@@ -1042,6 +1062,7 @@ export default function GraphEditor({ backgroundImage }) {
         onEdgeClick={undefined}
         onEdgeHover={undefined}
         hoveredEdgeId={hoveredEdgeId}
+        showAllEdgeLabels={showAllEdgeLabels}
       />
 
       {/* Mount script runner and panel so scripts can run and panel can toggle */}

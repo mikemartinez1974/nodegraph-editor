@@ -60,38 +60,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     
   // Handle drop events
   useEffect(() => {
-    const handleDrop = (data) => {
-      if (!data?.sourceNode) return;
-      
-      if (data.targetNode) {
-        graphAPI.current.createEdge({
-          source: data.sourceNode,
-          target: data.targetNode,
-          type: data.edgeType
-        });
-      } else {
-        const sourceNode = nodesRef.current.find(n => n.id === data.sourceNode);
-        const nodeResult = graphAPI.current.createNode({
-          label: data.label || `Node-${Date.now()}`,
-          position: data.graph,
-          data: data.nodeData || {},
-          type: sourceNode?.type || 'default',
-          width: sourceNode?.width || 80,
-          height: sourceNode?.height || 48
-        });
-        
-        if (nodeResult.success) {
-          setTimeout(() => {
-            graphAPI.current.createEdge({
-              source: data.sourceNode,
-              target: nodeResult.data.id,
-              type: data.edgeType
-            });
-          }, 50);
-        }
-      }
-    };
-
+    // Removed handleDrop handler to prevent duplicate node creation
     const handleNodeResize = (data) => {
       setNodes(prev => {
         const next = prev.map(n => 
@@ -106,13 +75,11 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       saveToHistory(nodesRef.current, edgesRef.current);
     };
     
-    eventBus.on('handleDrop', handleDrop);
     eventBus.on('nodeResize', handleNodeResize);
     eventBus.on('nodeResizeEnd', handleNodeResizeEnd);
     eventBus.on('pasteGraphData', handlePasteGraphData);
     
     return () => {
-      eventBus.off('handleDrop', handleDrop);
       eventBus.off('nodeResize', handleNodeResize);
       eventBus.off('nodeResizeEnd', handleNodeResizeEnd);
       eventBus.off('pasteGraphData', handlePasteGraphData);

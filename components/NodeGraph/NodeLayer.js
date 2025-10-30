@@ -69,15 +69,15 @@ const NodeLayer = ({
                             }
                             onNodeDragStart && onNodeDragStart(e, node);
                         }}
-                        onClick={onNodeEvent ? (e) => {
+                        onClick={e => {
                             try {
                               const sel = window.getSelection && window.getSelection();
                               if (sel && sel.toString && sel.toString().length > 0) {
                                 return;
                               }
                             } catch (err) {}
-                            onNodeEvent(node.id, e);
-                        } : undefined}
+                            eventBus.emit('nodeClick', { id: node.id, event: e });
+                        }}
                         onDoubleClick={onNodeDoubleClick ? (e) => {
                             e.stopPropagation();
                             onNodeDoubleClick(node.id);

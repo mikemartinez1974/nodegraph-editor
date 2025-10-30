@@ -40,6 +40,7 @@ export default function NodeGraph({
   setZoom, 
   onNodeMove, 
   onEdgeClick, 
+  hoveredNodeId,
   hoveredEdgeId, 
   backgroundUrl,
   backgroundInteractive,
@@ -49,6 +50,7 @@ export default function NodeGraph({
   gridSize = 20,
   lockedNodes = new Set(),
   lockedEdges = new Set(),
+  showAllEdgeLabels = false, // <-- Add prop
 }) {
   const theme = useTheme();
   
@@ -112,7 +114,7 @@ export default function NodeGraph({
   // State
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [draggingGroupId, setDraggingGroupId] = useState(null);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  //const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [iframeError, setIframeError] = useState(false);
   const [handlePreviewLine, setHandlePreviewLine] = useState(null);
 
@@ -628,6 +630,30 @@ export default function NodeGraph({
   // Render
   // ============================================
 
+  const nodePositionMap = useMemo(() => {
+    const map = {};
+    nodes.forEach(node => {
+      map[node.id] = {
+        x: node.position.x * zoom + pan.x,
+        y: node.position.y * zoom + pan.y,
+        width: node.width,
+        height: node.height
+      };
+    });
+    return map;
+  }, [nodes, pan, zoom]);
+
+  // Live refs for nodes, edges, pan, zoom
+  const nodesRef = useRef(nodes);
+  const edgesRef = useRef(edges);
+  const panRef = useRef(pan);
+  const zoomRef = useRef(zoom);
+
+  useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+  useEffect(() => { edgesRef.current = edges; }, [edges]);
+  useEffect(() => { panRef.current = pan; }, [pan]);
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+
   return (
     <div id="graph-canvas" ref={containerRef} style={{
       position: 'fixed',
@@ -705,7 +731,7 @@ export default function NodeGraph({
         <GroupLayer
           ref={groupRef}
           groups={groups}
-          nodes={nodeList}
+          nodes={nodesRef.current}
           pan={pan}
           zoom={zoom}
           selectedGroupIds={selectedGroupIds}
@@ -720,8 +746,8 @@ export default function NodeGraph({
           ref={edgeLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={edgeCanvasRef}
-          edgeList={edges}
-          nodeList={nodeList}
+          edgeList={edgesRef.current}
+          nodeList={nodesRef.current}
           pan={pan}
           zoom={zoom}
           selectedEdgeId={selectedEdgeId}
@@ -737,14 +763,17 @@ export default function NodeGraph({
             }
           }}
           onEdgeHover={undefined}
+          showAllEdgeLabels={showAllEdgeLabels}
+          edges={edges}
+          nodePositionMap={nodePositionMap}
         />
         
         <HandleLayer
           ref={handleLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={handleCanvasRef}
-          nodes={visibleNodeList}
-          edges={edges}
+          nodes={nodesRef.current}
+          edges={edgesRef.current}
           pan={pan}
           zoom={zoom}
           edgeTypes={edgeTypes} 
@@ -755,7 +784,7 @@ export default function NodeGraph({
       <NodeLayer
         containerRef={nodeContainerRef}
         nodeRefs={nodeRefs}
-        nodes={visibleNodeList}
+        nodes={nodesRef.current}
         pan={pan}
         zoom={zoom}
         selectedNodeId={selectedNodeId}

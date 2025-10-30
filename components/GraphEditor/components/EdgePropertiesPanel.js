@@ -170,6 +170,10 @@ export default function EdgePropertiesPanel({
     document.removeEventListener('mouseup', onMouseUp);
   };
 
+  // Example fix for Select value
+  const validTypes = ["", "parent", "child", "sibling"];
+  const edgeTypeValue = validTypes.includes(selectedEdge?.type) ? selectedEdge?.type : "";
+
   return (
     <Paper
       elevation={8}
@@ -246,22 +250,14 @@ export default function EdgePropertiesPanel({
         <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
           <InputLabel>Edge Type</InputLabel>
           <Select
-            value={edgeType}
-            onChange={handleEdgeTypeChange}
             label="Edge Type"
+            value={edgeTypeValue}
+            onChange={e => onUpdateEdge(selectedEdge.id, { type: e.target.value })}
           >
-            {Object.entries(edgeTypes).map(([type, config]) => (
-              <MenuItem key={type} value={type}>
-                <Box>
-                  <Typography variant="body2">{config.label || type}</Typography>
-                  {config.description && (
-                    <Typography variant="caption" color="text.secondary">
-                      {config.description}
-                    </Typography>
-                  )}
-                </Box>
-              </MenuItem>
-            ))}
+            <MenuItem value="">None</MenuItem>
+            <MenuItem value="parent">Parent</MenuItem>
+            <MenuItem value="child">Child</MenuItem>
+            <MenuItem value="sibling">Sibling</MenuItem>
           </Select>
         </FormControl>
 

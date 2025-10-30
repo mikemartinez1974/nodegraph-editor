@@ -618,6 +618,16 @@ const Toolbar = ({
           </ButtonGroup>
           
           <IconButton
+            onClick={() => eventBus.emit('togglePropertiesPanel')}
+            title="Toggle Properties Panel"
+            aria-label="Toggle properties panel"
+            size="small"
+            color="primary"
+          >
+            <SettingsIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
             onClick={onToggleNodeList}
             color={showNodeList ? "primary" : "default"}
             title="Toggle Node List"

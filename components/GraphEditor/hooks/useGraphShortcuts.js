@@ -15,7 +15,8 @@ export default function useGraphShortcuts({
   handleUngroupSelected,
   saveToHistory,
   edgesRef,
-  nodesRef
+  nodesRef,
+  setShowAllEdgeLabels // <-- Add this prop
 }) {
   useEffect(() => {
     // Helper function to copy selected nodes and edges to clipboard as JSON
@@ -185,6 +186,14 @@ export default function useGraphShortcuts({
         e.preventDefault();
         handleUngroupSelected();
       }
+      // Show all edge labels on Alt+L
+      if (e.altKey && (e.key === 'l' || e.key === 'L')) {
+        if (setShowAllEdgeLabels) setShowAllEdgeLabels(true);
+      }
+      // Hide all edge labels when Alt or L is released
+      if (!e.altKey || (e.key === 'l' || e.key === 'L')) {
+        if (setShowAllEdgeLabels) setShowAllEdgeLabels(false);
+      }
       // Example shortcut registration (add this near your node add shortcut logic)
       function handleShortcutAddNode() {
         console.log('Shortcut: Add Node triggered');
@@ -192,6 +201,10 @@ export default function useGraphShortcuts({
       }
     }
     window.addEventListener('keydown', handleKeyboardShortcuts);
-    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef]);
+    window.addEventListener('keyup', handleKeyboardShortcuts);
+    return () => {
+      window.removeEventListener('keydown', handleKeyboardShortcuts);
+      window.removeEventListener('keyup', handleKeyboardShortcuts);
+    };
+  }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef, setShowAllEdgeLabels]);
 }

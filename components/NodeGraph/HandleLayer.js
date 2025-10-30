@@ -5,55 +5,24 @@ import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 
 const handleRadius = 8;
-const handleExtension = 20;
 
-function getHandlePositions(node, edgeTypes) {
-  const handles = [];
-  const visibleEdgeTypes = Object.keys(edgeTypes);
+function getHandlePositions(node) {
   const x = node.position?.x ?? node.x ?? 0;
   const y = node.position?.y ?? node.y ?? 0;
   const width = node.width || 60;
   const height = node.height || 60;
-
-  visibleEdgeTypes.forEach((type) => {
-    if (type === 'child' || type === 'parent') {
-      handles.push({
-        id: `${node.id}-${type}-target`,
-        nodeId: node.id,
-        edgeType: type,
-        direction: 'target',
-        position: { x: x, y: y - height / 2 - handleExtension },
-        color: edgeTypes[type].style?.color || '#1976d2'
-      });
-      handles.push({
-        id: `${node.id}-${type}-source`,
-        nodeId: node.id,
-        edgeType: type,
-        direction: 'source',
-        position: { x: x, y: y + height / 2 + handleExtension },
-        color: edgeTypes[type].style?.color || '#1976d2'
-      });
-    } else if (type === 'peer') {
-      handles.push({
-        id: `${node.id}-${type}-target`,
-        nodeId: node.id,
-        edgeType: type,
-        direction: 'target',
-        position: { x: x - width / 2 - handleExtension, y: y },
-        color: edgeTypes[type].style?.color || '#1976d2'
-      });
-      handles.push({
-        id: `${node.id}-${type}-source`,
-        nodeId: node.id,
-        edgeType: type,
-        direction: 'source',
-        position: { x: x + width / 2 + handleExtension, y: y },
-        color: edgeTypes[type].style?.color || '#1976d2'
-      });
-    }
-  });
-  
-  return handles;
+  const handleExtension = 20;
+  // Position handle at lower right
+  return [{
+    id: `${node.id}-new-link`,
+    nodeId: node.id,
+    type: 'new-link',
+    position: {
+      x: x + width / 2 + handleExtension,
+      y: y + height / 2 + handleExtension
+    },
+    color: '#1976d2'
+  }];
 }
 
 const HandleLayer = forwardRef(({ 
@@ -83,13 +52,13 @@ const HandleLayer = forwardRef(({
   const handlePositionMap = React.useMemo(() => {
     const map = {};
     nodes.filter(n => n.visible !== false).forEach(node => {
-      const handles = getHandlePositions(node, edgeTypes);
+      const handles = getHandlePositions(node);
       handles.forEach(h => {
         map[h.id] = h.position;
       });
     });
     return map;
-  }, [nodes, edgeTypes]);
+  }, [nodes]);
 
   const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
 
@@ -114,7 +83,7 @@ const HandleLayer = forwardRef(({
     const allHandles = [];
     
     nodes.filter(n => n.visible !== false).forEach(node => {
-      const handles = getHandlePositions(node, edgeTypes);
+      const handles = getHandlePositions(node);
       
       if (draggingInfoRef?.current?.nodeIds?.includes(node.id)) {
         const offset = draggingInfoRef.current.offset;
@@ -128,7 +97,7 @@ const HandleLayer = forwardRef(({
     });
     
     return allHandles;
-  }, [nodes, edgeTypes, draggingInfoRef]);
+  }, [nodes, draggingInfoRef]);
 
   const findHandleAt = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
