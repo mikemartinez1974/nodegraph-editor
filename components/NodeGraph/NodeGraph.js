@@ -2,16 +2,13 @@
 // NodeGraph.js
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { getEdgeHandlePosition } from './utils';
 import EdgeLayer from './EdgeLayer';
 import HandleLayer from './HandleLayer';
 import PanZoomLayer from './PanZoomLayer';
 import NodeLayer from './NodeLayer';
 import GroupLayer from './GroupLayer';
-import { useCanvasSize } from './hooks/useCanvasSize';
 import eventBus from './eventBus';
-import { handleNodeClick, handleEdgeClick, handleEdgeHover, handleNodeMouseEnter, handleNodeMouseLeave } from './eventHandlers';
-import { onNodeDragMove, onNodeDragStart, handleNodeDragEnd } from './dragHandlers';
+import UnifiedEventHandler from './eventHandlers';
 import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
 import Minimap from './Minimap';
 import GridLayer from './GridLayer';
@@ -20,6 +17,7 @@ export default function NodeGraph({
   nodes = [], 
   setNodes,
   edges = [], 
+  setEdges,
   groups = [], 
   setGroups,
   nodeTypes = {}, 
@@ -43,11 +41,9 @@ export default function NodeGraph({
   onNodeMove, 
   onEdgeClick, 
   hoveredEdgeId, 
-  hoveredEdgeSource, 
-  hoveredEdgeTarget, 
-  backgroundUrl, // NEW: URL to load in iframe background
-  backgroundInteractive, // NEW: whether iframe should receive pointer events
-  setSnackbar, // NEW: optional snackbar setter for errors
+  backgroundUrl,
+  backgroundInteractive,
+  setSnackbar,
   showMinimap = true,
   snapToGrid = false,
   gridSize = 20,
@@ -66,7 +62,6 @@ export default function NodeGraph({
       const groupNodes = nodes.filter(n => group.nodeIds.includes(n.id));
       if (groupNodes.length === 0) return group;
       
-      // Calculate bounding box with padding
       const padding = 20;
       const positions = groupNodes.map(n => ({
         x: n.position?.x || n.x || 0,
@@ -87,7 +82,6 @@ export default function NodeGraph({
         height: maxY - minY
       };
       
-      // Only update if bounds changed significantly (avoid unnecessary updates)
       const boundsChanged = !group.bounds || 
         Math.abs(group.bounds.x - newBounds.x) > 1 ||
         Math.abs(group.bounds.y - newBounds.y) > 1 ||
@@ -97,40 +91,44 @@ export default function NodeGraph({
       return boundsChanged ? { ...group, bounds: newBounds } : group;
     });
     
-    // Check if any group actually changed
     const hasChanges = updatedGroups.some((g, i) => g !== groups[i]);
     if (hasChanges) {
       setGroups(updatedGroups);
     }
   }, [nodes, groups, setGroups]);
 
-  const canvasRef = useRef(null);
-  const [draggingNodeId, setDraggingNodeId] = useState(null);
-  const [draggingGroupId, setDraggingGroupId] = useState(null);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const draggingNodeIdRef = useRef(null);
-  const draggingGroupIdRef = useRef(null);
+  // Refs
   const containerRef = useRef(null);
-  const isDragging = useRef(false);
-  const dragStartTime = useRef(0);
-  const dragStartPos = useRef({ x: 0, y: 0 });
-  const dragThreshold = 5;
   const panZoomRef = useRef(null);
-  const hoverTimeoutRef = useRef({});
-  const dragRafRef = useRef(null);
-  const lastDragPosition = useRef(null);
-  const [draggingHandle, setDraggingHandle] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
-  const [draggingHandlePos, setDraggingHandlePos] = useState(null);
-  const [isNodeHovered, setIsNodeHovered] = useState(false);
-  const [handlePositions, setHandlePositions] = useState({});
-
-  // Add refs for layers
   const edgeCanvasRef = useRef(null);
   const handleCanvasRef = useRef(null);
   const groupRef = useRef(null);
   const nodeContainerRef = useRef(null);
+  const nodeRefs = useRef(new Map());
+  const edgeLayerImperativeRef = useRef(null);
+  const handleLayerImperativeRef = useRef(null);
+  const unifiedEventHandlerRef = useRef(null);
+
+  // State
+  const [draggingNodeId, setDraggingNodeId] = useState(null);
+  const [draggingGroupId, setDraggingGroupId] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [iframeError, setIframeError] = useState(false);
+  const [handlePreviewLine, setHandlePreviewLine] = useState(null);
+
+  // Drag state
+  const draggingNodeIdRef = useRef(null);
+  const draggingGroupIdRef = useRef(null);
+  const draggingInfoRef = useRef(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const dragStartTime = useRef(0);
+  const dragStartPos = useRef({ x: 0, y: 0 });
+  const lastMousePos = useRef(null);
+  const lastDragPosition = useRef(null);
+  const dragRafRef = useRef(null);
+  const groupDragOffsetRef = useRef({ x: 0, y: 0 });
+  const dragThreshold = 5;
 
   // Create layerRefs object
   const layerRefs = useMemo(() => ({
@@ -140,220 +138,285 @@ export default function NodeGraph({
     nodeContainer: nodeContainerRef
   }), []);
 
-  // New for transient dragging
-  const nodeRefs = useRef(new Map());
-  const draggingInfoRef = useRef(null);
-  const edgeLayerImperativeRef = useRef(null);
-  const handleLayerImperativeRef = useRef(null);
-  const lastMousePos = useRef(null);
-
   // Process nodes with defaults
   const nodeList = useMemo(() => nodes.map(node => ({
     ...node,
-    handleProgress: node.handleProgress !== undefined ? node.handleProgress : 0,
-    showHandlesOnHover: node.showHandlesOnHover !== undefined ? node.showHandlesOnHover : true,
     visible: node.visible !== undefined ? node.visible : true
   })), [nodes]);
 
-  // Only expose nodes that are visible to layers which should not render handles for hidden nodes
   const visibleNodeList = useMemo(() => nodeList.filter(n => n.visible !== false), [nodeList]);
 
-  // Define handler functions outside useEffect
-  function handleNodeClickWrapper({ id, event }) {
-    // Ignore clicks that are actually drag-end events
-    if (isDragging.current || (Date.now() - dragStartTime.current < 200 && draggingNodeIdRef.current)) {
-      return;
-    }
-    
-    if (!onNodeClick && setSelectedNodeIds) {
-      setSelectedNodeIds([id]);
-      if (setSelectedEdgeIds) setSelectedEdgeIds([]);
-    }
-  }
+  // ============================================
+  // Unified Event Handler Setup
+  // ============================================
+  
+  // useEffect(() => {
+  //   if (!containerRef.current) return;
 
-  function handleEdgeClickWrapper({ id, event }) {
-    eventBus.emit('edgeClick', { id, event });
-  }
+  //   // Create unified event handler
+  //   const handler = new UnifiedEventHandler({
+  //     containerRef,
+  //     handleLayerRef: handleLayerImperativeRef,
+  //     nodeRefs,
+  //     nodes: nodeList,
+  //     edges,
+  //     groups,
+  //     pan,
+  //     zoom,
+  //     setSelectedNodeIds,
+  //     setSelectedEdgeIds,
+  //     setSelectedGroupIds: (ids) => {}, // Add proper handler if needed
+  //     lockedNodes,
+  //     onNodeClick,
+  //     onEdgeClick,
+  //     onGroupClick,
+  //     onBackgroundClick
+  //   });
 
-  // Event bus handlers for node/edge events
+  //   unifiedEventHandlerRef.current = handler;
+  //   handler.attach();
+
+  //   return () => {
+  //     handler.detach();
+  //   };
+  // }, [nodeList, edges, groups, pan, zoom, lockedNodes]);
+
+  // Update handler refs when dependencies change
   useEffect(() => {
-    eventBus.on('nodeClick', handleNodeClickWrapper);
-    eventBus.on('edgeClick', handleEdgeClickWrapper);
-    return () => {
-      eventBus.off('nodeClick', handleNodeClickWrapper);
-      eventBus.off('edgeClick', handleEdgeClickWrapper);
-    };
-  }, [setSelectedNodeIds, setSelectedEdgeIds, onNodeClick]);
+    if (unifiedEventHandlerRef.current) {
+      unifiedEventHandlerRef.current.updateRefs({
+        nodes: nodeList,
+        edges,
+        groups,
+        pan,
+        zoom,
+        setSelectedNodeIds,
+        setSelectedEdgeIds,
+        lockedNodes,
+        onNodeClick,
+        onEdgeClick,
+        onGroupClick,
+        onBackgroundClick
+      });
+    }
+  }, [nodeList, edges, groups, pan, zoom, setSelectedNodeIds, setSelectedEdgeIds, lockedNodes, onNodeClick, onEdgeClick, onGroupClick, onBackgroundClick]);
 
-  // Consolidate all event bus handler registration
+  // ============================================
+  // Handle Events - Create Edges
+  // ============================================
+  
   useEffect(() => {
-    const eventHandlers = [
-      { event: 'nodeMouseEnter', handler: (data) => handleNodeMouseEnter({ ...data, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) },
-      { event: 'nodeMouseLeave', handler: (data) => handleNodeMouseLeave({ ...data, setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle }) },
-      { event: 'nodeHover', handler: ({ id }) => setHoveredNodeId(id) },
-      { event: 'nodeUnhover', handler: () => setHoveredNodeId(null) },
-      { event: 'handleHover', handler: ({ nodeId }) => setHoveredNodeId(nodeId) },
-      { event: 'handleUnhover', handler: () => setHoveredNodeId(null) },
-    ];
+    const handleDrop = ({ handle, targetNode, targetNodeObject, position }) => {
+      if (!handle) return;
 
-    eventHandlers.forEach(({ event, handler }) => eventBus.on(event, handler));
+      // Handle type: 'new-link' or 'edge-source' or 'edge-target'
+      if (handle.type === 'new-link') {
+        // Creating a new edge from a node
+        if (targetNode && targetNode !== handle.nodeId) {
+          const newEdge = {
+            id: `edge_${Date.now()}`,
+            source: handle.nodeId,
+            target: targetNode,
+            type: 'default',
+            label: '',
+            style: {}
+          };
+
+          setEdges(prev => [...prev, newEdge]);
+          
+          if (setSnackbar) {
+            setSnackbar({ 
+              open: true, 
+              message: `Created edge from ${handle.nodeId} to ${targetNode}`, 
+              severity: 'success' 
+            });
+          }
+        }
+      } else if (handle.type === 'edge-source' || handle.type === 'edge-target') {
+        // Modifying existing edge
+        if (targetNode) {
+          const edge = edges.find(e => e.id === handle.edgeId);
+          if (!edge) return;
+
+          if (handle.type === 'edge-source') {
+            // Change source
+            setEdges(prev => prev.map(e => 
+              e.id === handle.edgeId 
+                ? { ...e, source: targetNode }
+                : e
+            ));
+          } else {
+            // Change target
+            setEdges(prev => prev.map(e => 
+              e.id === handle.edgeId 
+                ? { ...e, target: targetNode }
+                : e
+            ));
+          }
+
+          if (setSnackbar) {
+            setSnackbar({ 
+              open: true, 
+              message: `Updated edge connection`, 
+              severity: 'success' 
+            });
+          }
+        }
+      }
+    };
+
+    const handleDragMove = ({ handle, previewLine }) => {
+      setHandlePreviewLine(previewLine);
+    };
+
+    const handleDragEnd = () => {
+      setHandlePreviewLine(null);
+    };
+
+    eventBus.on('handleDrop', handleDrop);
+    eventBus.on('handleDragMove', handleDragMove);
+    eventBus.on('handleDragEnd', handleDragEnd);
 
     return () => {
-      eventHandlers.forEach(({ event, handler }) => eventBus.off(event, handler));
+      eventBus.off('handleDrop', handleDrop);
+      eventBus.off('handleDragMove', handleDragMove);
+      eventBus.off('handleDragEnd', handleDragEnd);
     };
-  }, [setHoveredNodeId, setIsNodeHovered, hoverTimeoutRef, isNodeHovered, isHandleHovered, draggingHandle]);
+  }, [edges, setEdges, setSnackbar]);
 
-  // Node drag logic
+  // ============================================
+  // Node Drag Handlers
+  // ============================================
+
+  useEffect(() => {
+    const handleNodeDragStart = ({ node, event }) => {
+      if (lockedNodes.has(node.id)) return;
+
+      let nodesToDrag = [node.id];
+      if (selectedNodeIds.includes(node.id) && selectedNodeIds.length > 1) {
+        nodesToDrag = [...selectedNodeIds];
+      }
+      
+      nodesToDrag = nodesToDrag.filter(id => !lockedNodes.has(id));
+      if (nodesToDrag.length === 0) return;
+      
+      setDraggingNodeId(node.id);
+      draggingNodeIdRef.current = nodesToDrag;
+      isDragging.current = false;
+      dragStartTime.current = Date.now();
+      dragStartPos.current = { x: event.clientX, y: event.clientY };
+      
+      const initialPositions = {};
+      nodesToDrag.forEach(id => {
+        const n = nodes.find(nd => nd.id === id);
+        if (n) {
+          initialPositions[id] = { x: n.position.x, y: n.position.y };
+        }
+      });
+      lastDragPosition.current = initialPositions;
+      
+      dragOffset.current = {
+        x: event.clientX - (node.position.x * zoom + pan.x),
+        y: event.clientY - (node.position.y * zoom + pan.y)
+      };
+      lastMousePos.current = { x: event.clientX, y: event.clientY };
+      
+      containerRef.current.addEventListener('mousemove', onNodeDragMove, { passive: false });
+      containerRef.current.addEventListener('mouseup', handleNodeDragEnd, { passive: false });
+    };
+
+    eventBus.on('nodeDragStart', handleNodeDragStart);
+    return () => eventBus.off('nodeDragStart', handleNodeDragStart);
+  }, [nodes, selectedNodeIds, lockedNodes, pan, zoom]);
+
   function onNodeDragMove(e) {
-    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current)) {
-      // Check if we've exceeded the drag threshold
-      const dragDistance = Math.hypot(
-        e.clientX - dragStartPos.current.x,
-        e.clientY - dragStartPos.current.y
-      );
-      
-      // Only start actual dragging if threshold is exceeded
-      if (dragDistance < dragThreshold) {
-        return;
-      }
+    if (!draggingNodeIdRef.current || !Array.isArray(draggingNodeIdRef.current)) return;
 
-      const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
-      const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
-      lastMousePos.current = { x: e.clientX, y: e.clientY };
+    const dragDistance = Math.hypot(
+      e.clientX - dragStartPos.current.x,
+      e.clientY - dragStartPos.current.y
+    );
+    
+    if (dragDistance < dragThreshold) return;
 
-      if (!draggingInfoRef.current) {
-        draggingInfoRef.current = { nodeIds: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
-      }
-      draggingInfoRef.current.offset.x += graphDx;
-      draggingInfoRef.current.offset.y += graphDy;
-      
-      // Snap to grid if enabled
-      if (snapToGrid) {
-        draggingInfoRef.current.offset.x = Math.round(draggingInfoRef.current.offset.x / gridSize) * gridSize;
-        draggingInfoRef.current.offset.y = Math.round(draggingInfoRef.current.offset.y / gridSize) * gridSize;
-      }
-      
-      // Mark that we've actually dragged
-      isDragging.current = true;
-
-      if (!dragRafRef.current) {
-        dragRafRef.current = requestAnimationFrame(() => {
-          // Move all dragging nodes
-          draggingNodeIdRef.current.forEach(nodeId => {
-            const nodeEl = nodeRefs.current.get(nodeId);
-            if (nodeEl) {
-              // Apply transform in graph space (wrapper will scale it)
-              nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
-            }
-          });
-
-          // Redraw canvases
-          if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
-          if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
-
-          dragRafRef.current = null;
-        });
-      }
-    }
-  }
-
-  function onNodeDragStart(e, node) {
-    e.preventDefault();
-    
-    // Check if node is locked
-    if (lockedNodes.has(node.id)) {
-      return; // Prevent dragging locked nodes
-    }
-    
-    // Determine which nodes to drag
-    let nodesToDrag = [node.id];
-    if (selectedNodeIds.includes(node.id) && selectedNodeIds.length > 1) {
-      nodesToDrag = [...selectedNodeIds];
-    }
-    
-    // Filter out locked nodes
-    nodesToDrag = nodesToDrag.filter(id => !lockedNodes.has(id));
-    
-    if (nodesToDrag.length === 0) return; // No draggable nodes
-    
-    setDraggingNodeId(node.id);
-    draggingNodeIdRef.current = nodesToDrag;
-    isDragging.current = false;
-    dragStartTime.current = Date.now();
-    dragStartPos.current = { x: e.clientX, y: e.clientY };
-    
-    // Store initial positions for all nodes being dragged
-    const initialPositions = {};
-    nodesToDrag.forEach(id => {
-      const n = nodes.find(nd => nd.id === id);
-      if (n) {
-        initialPositions[id] = { x: n.position.x, y: n.position.y };
-      }
-    });
-    lastDragPosition.current = initialPositions;
-    
-    dragOffset.current = {
-      x: e.clientX - (node.position.x * zoom + pan.x),
-      y: e.clientY - (node.position.y * zoom + pan.y)
-    };
+    const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
+    const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
     lastMousePos.current = { x: e.clientX, y: e.clientY };
-    containerRef.current.addEventListener('mousemove', onNodeDragMove, { passive: false });
-    containerRef.current.addEventListener('mouseup', handleNodeDragEnd, { passive: false });
+
+    if (!draggingInfoRef.current) {
+      draggingInfoRef.current = { nodeIds: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
+    }
+    draggingInfoRef.current.offset.x += graphDx;
+    draggingInfoRef.current.offset.y += graphDy;
+    
+    if (snapToGrid) {
+      draggingInfoRef.current.offset.x = Math.round(draggingInfoRef.current.offset.x / gridSize) * gridSize;
+      draggingInfoRef.current.offset.y = Math.round(draggingInfoRef.current.offset.y / gridSize) * gridSize;
+    }
+    
+    isDragging.current = true;
+
+    if (!dragRafRef.current) {
+      dragRafRef.current = requestAnimationFrame(() => {
+        draggingNodeIdRef.current.forEach(nodeId => {
+          const nodeEl = nodeRefs.current.get(nodeId);
+          if (nodeEl) {
+            nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
+          }
+        });
+
+        if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+        if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+
+        dragRafRef.current = null;
+      });
+    }
   }
 
   function handleNodeDragEnd() {
-    if (draggingNodeIdRef.current && Array.isArray(draggingNodeIdRef.current)) {
-      // Check if this was actually a drag or just a click
-      const dragDistance = Math.hypot(
-        lastMousePos.current.x - dragStartPos.current.x,
-        lastMousePos.current.y - dragStartPos.current.y
-      );
-      
-      if (dragDistance < dragThreshold) {
-        // Very small movement - treat as a click
-        const node = nodes.find(n => n.id === draggingNodeIdRef.current[0]);
-        if (node && typeof onNodeClick === 'function') {
-          onNodeClick(node.id, {});
-        }
-      } else if (draggingInfoRef.current) {
-        // This was an actual drag
-        const offset = draggingInfoRef.current.offset;
-        
-        // Update all dragged nodes and emit events
-        draggingNodeIdRef.current.forEach(id => {
-          const node = nodes.find(n => n.id === id);
-          if (node) {
-            const newPosition = { 
-              x: node.position.x + offset.x, 
-              y: node.position.y + offset.y 
-            };
-            eventBus.emit('nodeMove', { id, position: newPosition });
-          }
+    if (!draggingNodeIdRef.current || !Array.isArray(draggingNodeIdRef.current)) {
+      // Clean up listeners even if no drag
+      containerRef.current?.removeEventListener('mousemove', onNodeDragMove);
+      containerRef.current?.removeEventListener('mouseup', handleNodeDragEnd);
+      return;
+    }
 
-          // Reset transform
-          const nodeEl = nodeRefs.current.get(id);
-          if (nodeEl) nodeEl.style.transform = '';
-        });
-
-        draggingInfoRef.current = null;
-
-        // Force redraws after React state update completes
-        requestAnimationFrame(() => {
-          if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
-          if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
-        });
-
-        // Emit nodeMove event
-        if (lastDragPosition.current) {
-          draggingNodeIdRef.current.forEach(id => {
-            const initial = lastDragPosition.current[id];
-            if (initial) {
-              const finalPos = { x: initial.x + offset.x, y: initial.y + offset.y };
-              eventBus.emit('nodeMove', { id, position: finalPos });
-            }
-          });
-        }
+    const dragDistance = Math.hypot(
+      lastMousePos.current.x - dragStartPos.current.x,
+      lastMousePos.current.y - dragStartPos.current.y
+    );
+    
+    if (dragDistance < dragThreshold) {
+      const node = nodes.find(n => n.id === draggingNodeIdRef.current[0]);
+      if (node && typeof onNodeClick === 'function') {
+        onNodeClick(node.id, {});
       }
+    } else if (draggingInfoRef.current) {
+      const offset = draggingInfoRef.current.offset;
+      
+      draggingNodeIdRef.current.forEach(id => {
+        const node = nodes.find(n => n.id === id);
+        if (node) {
+          const newPosition = { 
+            x: node.position.x + offset.x, 
+            y: node.position.y + offset.y 
+          };
+          eventBus.emit('nodeMove', { id, position: newPosition });
+        }
+
+        const nodeEl = nodeRefs.current.get(id);
+        if (nodeEl) nodeEl.style.transform = '';
+      });
+
+      draggingInfoRef.current = null;
+
+      requestAnimationFrame(() => {
+        if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
+        if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+      });
+      
+      // Only emit nodeDragEnd if we actually dragged
+      eventBus.emit('nodeDragEnd', { nodeIds: draggingNodeIdRef.current });
     }
 
     setDraggingNodeId(null);
@@ -362,72 +425,67 @@ export default function NodeGraph({
       cancelAnimationFrame(dragRafRef.current);
       dragRafRef.current = null;
     }
-    containerRef.current.removeEventListener('mousemove', onNodeDragMove);
-    containerRef.current.removeEventListener('mouseup', handleNodeDragEnd);
-
-    // Emit nodeDragEnd event
-    eventBus.emit('nodeDragEnd', { nodeIds: draggingNodeIdRef.current });
+    containerRef.current?.removeEventListener('mousemove', onNodeDragMove);
+    containerRef.current?.removeEventListener('mouseup', handleNodeDragEnd);
   }
 
-  // Group drag logic
-  const groupDragOffsetRef = useRef({ x: 0, y: 0 });
+  // ============================================
+  // Group Drag Handlers
+  // ============================================
   
   function onGroupDragMove(e) {
-    if (draggingGroupIdRef.current && dragRafRef.current === null) {
-      dragRafRef.current = requestAnimationFrame(() => {
-        const group = groups.find(g => g.id === draggingGroupIdRef.current);
-        if (group && group.bounds) {
-          const rect = containerRef.current?.getBoundingClientRect();
-          if (rect) {
-            const currentX = (e.clientX - rect.left - pan.x) / zoom;
-            const currentY = (e.clientY - rect.top - pan.y) / zoom;
-            
-            const deltaX = currentX - dragOffset.current.x;
-            const deltaY = currentY - dragOffset.current.y;
-            
-            dragOffset.current.x = currentX;
-            dragOffset.current.y = currentY;
-            
-            groupDragOffsetRef.current.x += deltaX;
-            groupDragOffsetRef.current.y += deltaY;
-            
-            // Update node positions in the group
-            setNodes(prevNodes => prevNodes.map(node => {
-              if (group.nodeIds.includes(node.id)) {
-                return {
-                  ...node,
-                  position: {
-                    x: node.position.x + deltaX,
-                    y: node.position.y + deltaY
-                  }
-                };
-              }
-              return node;
-            }));
-            
-            // Update group bounds
-            setGroups(prevGroups => prevGroups.map(g => {
-              if (g.id === group.id) {
-                return {
-                  ...g,
-                  bounds: {
-                    ...g.bounds,
-                    x: g.bounds.x + deltaX,
-                    y: g.bounds.y + deltaY
-                  }
-                };
-              }
-              return g;
-            }));
-            
-            // Redraw handles to follow
-            if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
-            if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
-          }
+    if (!draggingGroupIdRef.current || dragRafRef.current !== null) return;
+    
+    dragRafRef.current = requestAnimationFrame(() => {
+      const group = groups.find(g => g.id === draggingGroupIdRef.current);
+      if (group && group.bounds) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          const currentX = (e.clientX - rect.left - pan.x) / zoom;
+          const currentY = (e.clientY - rect.top - pan.y) / zoom;
+          
+          const deltaX = currentX - dragOffset.current.x;
+          const deltaY = currentY - dragOffset.current.y;
+          
+          dragOffset.current.x = currentX;
+          dragOffset.current.y = currentY;
+          
+          groupDragOffsetRef.current.x += deltaX;
+          groupDragOffsetRef.current.y += deltaY;
+          
+          setNodes(prevNodes => prevNodes.map(node => {
+            if (group.nodeIds.includes(node.id)) {
+              return {
+                ...node,
+                position: {
+                  x: node.position.x + deltaX,
+                  y: node.position.y + deltaY
+                }
+              };
+            }
+            return node;
+          }));
+          
+          setGroups(prevGroups => prevGroups.map(g => {
+            if (g.id === group.id) {
+              return {
+                ...g,
+                bounds: {
+                  ...g.bounds,
+                  x: g.bounds.x + deltaX,
+                  y: g.bounds.y + deltaY
+                }
+              };
+            }
+            return g;
+          }));
+          
+          if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
+          if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
         }
-        dragRafRef.current = null;
-      });
-    }
+      }
+      dragRafRef.current = null;
+    });
   }
 
   function onGroupDragStart(e, group) {
@@ -457,19 +515,42 @@ export default function NodeGraph({
     window.removeEventListener('mousemove', onGroupDragMove);
     window.removeEventListener('mouseup', handleGroupDragEnd);
     
-    // Final redraw after drag ends
     if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
     if (edgeLayerImperativeRef.current) edgeLayerImperativeRef.current.redraw();
   }
 
-  // Handle background click from PanZoomLayer
-  function handleBackgroundClickFromPanZoom(event) {
-    if (typeof onBackgroundClick === 'function') {
-      onBackgroundClick(event);
-    }
-    if (setSelectedNodeIds) setSelectedNodeIds([]);
-    if (setSelectedEdgeIds) setSelectedEdgeIds([]);
-  }
+  // ============================================
+  // Edge Click Handler
+  // ============================================
+  
+  useEffect(() => {
+    const handleEdgeClickWrapper = ({ id, event }) => {
+      const isMultiSelect = event?.ctrlKey || event?.metaKey;
+      
+      if (isMultiSelect) {
+        setSelectedEdgeIds(prev => {
+          if (prev.includes(id)) {
+            return prev.filter(eid => eid !== id);
+          } else {
+            return [...prev, id];
+          }
+        });
+      } else {
+        setSelectedEdgeIds(prev => {
+          const already = prev.includes(id);
+          return already ? prev : [id];
+        });
+      }
+      setSelectedNodeIds([]);
+    };
+
+    eventBus.on('edgeClick', handleEdgeClickWrapper);
+    return () => eventBus.off('edgeClick', handleEdgeClickWrapper);
+  }, [setSelectedEdgeIds, setSelectedNodeIds]);
+
+  // ============================================
+  // Marquee Selection
+  // ============================================
 
   const {
     isSelecting,
@@ -487,17 +568,11 @@ export default function NodeGraph({
     containerRef
   });
 
-  // Marquee selection event listeners
   useEffect(() => {
     if (!isSelecting) return;
 
-    const handleMouseMove = (e) => {
-      updateSelection(e);
-    };
-
-    const handleMouseUp = (e) => {
-      endSelection(e);
-    };
+    const handleMouseMove = (e) => updateSelection(e);
+    const handleMouseUp = (e) => endSelection(e);
 
     const element = panZoomRef.current;
     if (element) {
@@ -511,40 +586,47 @@ export default function NodeGraph({
         element.removeEventListener('mouseup', handleMouseUp, { capture: true });
       }
     };
-  }, [isSelecting, updateSelection, endSelection, panZoomRef]);
+  }, [isSelecting, updateSelection, endSelection]);
 
-  // Redraw canvases when nodes or groups change
+  // ============================================
+  // Layer Redraws
+  // ============================================
+  
   useEffect(() => {
     requestAnimationFrame(() => {
       try {
-        if (handleLayerImperativeRef.current && typeof handleLayerImperativeRef.current.redraw === 'function') {
+        if (handleLayerImperativeRef.current?.redraw) {
           handleLayerImperativeRef.current.redraw();
         }
-        if (edgeLayerImperativeRef.current && typeof edgeLayerImperativeRef.current.redraw === 'function') {
+        if (edgeLayerImperativeRef.current?.redraw) {
           edgeLayerImperativeRef.current.redraw();
         }
       } catch (err) {
         console.warn('Error redrawing layers:', err);
       }
     });
-  }, [nodes, groups]);
+  }, [nodes, groups, edges]);
 
-  const [iframeError, setIframeError] = useState(false);
-
-  // When iframe load fails, notify host via eventBus so GraphEditor can clear or notify user
+  // ============================================
+  // Background Iframe Handlers
+  // ============================================
+  
   const handleIframeError = (e) => {
     console.warn('Background iframe error', e);
     setIframeError(true);
-    try { eventBus.emit('backgroundLoadFailed', { url: backgroundUrl }); } catch (err) { /* ignore */ }
+    try { eventBus.emit('backgroundLoadFailed', { url: backgroundUrl }); } catch (err) {}
     if (setSnackbar) {
       setSnackbar({ open: true, message: 'Background page failed to load or blocked by X-Frame-Options/CSP.', severity: 'warning' });
     }
   };
 
   const handleIframeLoad = () => {
-    // clear any previous error
     if (iframeError) setIframeError(false);
   };
+
+  // ============================================
+  // Render
+  // ============================================
 
   return (
     <div id="graph-canvas" ref={containerRef} style={{
@@ -556,7 +638,6 @@ export default function NodeGraph({
       zIndex: 0,
       pointerEvents: 'auto'
     }}>
-      {/* NEW: Web page background iframe */}
       {backgroundUrl && (
         <iframe
           src={backgroundUrl}
@@ -577,7 +658,6 @@ export default function NodeGraph({
         />
       )}
 
-      {/* If iframe reported an error, show an unobtrusive overlay explaining the issue */}
       {iframeError && (
         <div style={{ position: 'absolute', inset: 20, zIndex: -1, pointerEvents: 'none', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
           <div style={{ background: 'rgba(0,0,0,0.6)', color: 'white', padding: 12, borderRadius: 6, maxWidth: 520, pointerEvents: 'auto' }}>
@@ -591,7 +671,6 @@ export default function NodeGraph({
         </div>
       )}
 
-      {/* Background element updated by PreferencesDialog / useGraphEditorSetup */}
       <div
         id="graph-editor-background"
         style={{
@@ -611,7 +690,10 @@ export default function NodeGraph({
         zoom={zoom}
         onPanZoom={setPan}
         setZoom={setZoom}
-        onBackgroundClick={handleBackgroundClickFromPanZoom}
+        onBackgroundClick={() => {
+          if (setSelectedNodeIds) setSelectedNodeIds([]);
+          if (setSelectedEdgeIds) setSelectedEdgeIds([]);
+        }}
         theme={theme}
         onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })}
         layerRefs={layerRefs}
@@ -630,7 +712,7 @@ export default function NodeGraph({
           onGroupClick={onGroupClick}
           onGroupDoubleClick={onGroupClick}
           onGroupDragStart={onGroupDragStart}
-          onBackgroundClick={handleBackgroundClickFromPanZoom}
+          onBackgroundClick={() => {}}
           theme={theme}
         />
         
@@ -646,7 +728,6 @@ export default function NodeGraph({
           selectedEdgeIds={selectedEdgeIds}
           theme={theme}
           hoveredNodeId={hoveredNodeId}
-          handlePositions={handlePositions}
           onEdgeClick={(edge, event) => {
             eventBus.emit('edgeClick', { id: edge?.id, event });
           }}
@@ -666,96 +747,78 @@ export default function NodeGraph({
           edges={edges}
           pan={pan}
           zoom={zoom}
-          edgeTypes={edgeTypes}
-          draggingGroupId={draggingGroupId}
-          groupDragOffset={groupDragOffsetRef.current}
-          groups={groups}
+          edgeTypes={edgeTypes} 
+          selectedEdgeIds={selectedEdgeIds}
+          hoveredEdgeId={hoveredEdgeId}
         />
-
-        <div style={{ pointerEvents: draggingHandle ? 'none' : 'auto' }}>
-          <NodeLayer
-            containerRef={nodeContainerRef}
-            nodeRefs={nodeRefs}
-            nodes={visibleNodeList}
-            pan={pan}
-            zoom={zoom}
-            selectedNodeId={selectedNodeId}
-            selectedNodeIds={selectedNodeIds}
-            draggingNodeId={draggingNodeId}
-            theme={theme}
-            nodeTypes={nodeTypes}
-            lockedNodes={lockedNodes}
-            onNodeEvent={(id, e) => {
-              if (isDragging.current || (Date.now() - dragStartTime.current < 200 && draggingNodeIdRef.current)) {
-                isDragging.current = false;
-                return;
-              }
-              
-              if (onNodeClick) onNodeClick(id, e);
-              const node = nodes.find(n => n.id === id);
-              if (node && node.handleProgress === 1) {
-                const connectedEdges = edges.filter(edge => edge.source === id || edge.target === id);
-                connectedEdges.forEach(edge => {
-                  const isSource = edge.source === id;
-                  const otherNode = isSource ? nodeList.find(n => n.id === edge.target) : nodeList.find(n => n.id === edge.source);
-                  if (!otherNode) return;
-                  let handlePos;
-                  if (edge.type === 'curved') {
-                    handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-                  } else {
-                    handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, edge.type);
-                  }
-                });
-              }
-              if (e) {
-                e.stopPropagation();
-              }
-            }}
-            onNodeDoubleClick={(id) => {
-              if (typeof onNodeDoubleClick === 'function') {
-                onNodeDoubleClick(id);
-              }
-            }}
-            onNodeMouseEnter={handleNodeMouseEnter}
-            onNodeMouseLeave={handleNodeMouseLeave}
-            onNodeDragStart={onNodeDragStart}
-          />
-        </div>
-
-        {/* Preview edge during handle drag */}
-        {draggingHandle && draggingHandlePos && (
-          (() => {
-            const container = canvasRef.current?.parentElement;
-            const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
-            const mouseX = (draggingHandlePos.x - rect.left - pan.x) / zoom;
-            const mouseY = (draggingHandlePos.y - rect.top - pan.y) / zoom;
-            const node = nodeList.find(n => n.id === draggingHandle.nodeId);
-            let startX, startY;
-            if (node) {
-              const otherNode = nodeList.find(n => n.id === draggingHandle.otherNodeId);
-              const handlePos = getEdgeHandlePosition(node, otherNode, 1, { x: 0, y: 0 }, draggingHandle.edgeType || 'straight');
-              startX = handlePos.x;
-              startY = handlePos.y;
+      
+      <NodeLayer
+        containerRef={nodeContainerRef}
+        nodeRefs={nodeRefs}
+        nodes={visibleNodeList}
+        pan={pan}
+        zoom={zoom}
+        selectedNodeId={selectedNodeId}
+        selectedNodeIds={selectedNodeIds}
+        draggingNodeId={draggingNodeId}
+        theme={theme}
+        nodeTypes={nodeTypes}
+        lockedNodes={lockedNodes}
+        onNodeEvent={(id, e) => {
+          // Handle node click
+          if (onNodeClick) {
+            onNodeClick(id, e);
+          } else {
+            // Default behavior: select the node
+            const isMultiSelect = e?.ctrlKey || e?.metaKey;
+            if (isMultiSelect) {
+              setSelectedNodeIds(prev => {
+                if (prev.includes(id)) {
+                  return prev.filter(nid => nid !== id);
+                } else {
+                  return [...prev, id];
+                }
+              });
             } else {
-              startX = draggingHandle.x;
-              startY = draggingHandle.y;
+              setSelectedNodeIds([id]);
+              setSelectedEdgeIds([]);
             }
-            return (
-              <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100vw', height: '100vh' }}>
-                <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
-                  <line
-                    x1={startX}
-                    y1={startY}
-                    x2={mouseX}
-                    y2={mouseY}
-                    stroke={theme.palette.primary.main}
-                    strokeWidth={2}
-                    strokeDasharray="6,4"
-                  />
-                </g>
-              </svg>
-            );
-          })()
+          }
+        }}
+        onNodeDoubleClick={(id) => {
+          if (typeof onNodeDoubleClick === 'function') {
+            onNodeDoubleClick(id);
+          }
+        }}
+        onNodeMouseEnter={(id) => {
+          setHoveredNodeId(id);
+          eventBus.emit('nodeHover', { id });
+        }}
+        onNodeMouseLeave={(id) => {
+          setHoveredNodeId(null);
+          eventBus.emit('nodeUnhover', { id });
+        }}
+        onNodeDragStart={(e, node) => {
+          // Emit event that your existing handler will catch
+          eventBus.emit('nodeDragStart', { node, event: e });
+        }}
+      />
+
+        
+
+        {/* Preview line during handle drag */}
+        {handlePreviewLine && (
+          <svg style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', width: '100%', height: '100%', zIndex: 25 }}>
+            <line
+              x1={handlePreviewLine.startX}
+              y1={handlePreviewLine.startY}
+              x2={handlePreviewLine.endX}
+              y2={handlePreviewLine.endY}
+              stroke={theme.palette.primary.main}
+              strokeWidth={2}
+              strokeDasharray="6,4"
+            />
+          </svg>
         )}
 
         <MarqueeOverlay 
@@ -764,22 +827,20 @@ export default function NodeGraph({
         />
       </PanZoomLayer>
 
-    {/* Add Minimap at the end */}
-    {typeof showMinimap !== 'undefined' && showMinimap && (
-      <Minimap
-        nodes={nodeList}
-        groups={groups}
-        pan={pan}
-        zoom={zoom}
-        setPan={setPan}
-        containerWidth={window.innerWidth}
-        containerHeight={window.innerHeight}
-        width={220}
-        height={165}
-        position="bottom-right"
-      />
-    )}
-
+      {showMinimap && (
+        <Minimap
+          nodes={nodeList}
+          groups={groups}
+          pan={pan}
+          zoom={zoom}
+          setPan={setPan}
+          containerWidth={window.innerWidth}
+          containerHeight={window.innerHeight}
+          width={220}
+          height={165}
+          position="bottom-right"
+        />
+      )}
     </div>
   );
 }

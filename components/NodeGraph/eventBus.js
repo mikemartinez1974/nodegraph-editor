@@ -1,6 +1,8 @@
 // eventBus.js
 // Centralized event bus for NodeGraph
 
+
+
 class EventBus {
     constructor() {
         this.listeners = {};
@@ -21,4 +23,5 @@ class EventBus {
 }
 
 const eventBus = new EventBus();
+
 export default eventBus;

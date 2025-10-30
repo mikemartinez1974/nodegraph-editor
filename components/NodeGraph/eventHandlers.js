@@ -1,5 +1,11 @@
 // eventHandlers.js
+import React, { useEffect } from 'react';
+import eventBus from './eventBus';
 import { isPointNearLine, isPointNearBezier } from './utils.js';
+
+// ============================================
+// Legacy handlers (kept for backward compatibility)
+// ============================================
 
 export function handleCanvasClick(e, canvasRef, pan, zoom, edgeListRef, nodeList, setSelectedEdgeId, setSelectedNodeId) {
   const rect = canvasRef.current.getBoundingClientRect();
@@ -141,3 +147,369 @@ export function handleNodeMouseLeave({ id, setHoveredNodeId, setIsNodeHovered, h
     hoverTimeoutRef.current[id] = null;
   }, 250);
 }
+
+// ============================================
+// Unified Event Handler Class
+// Coordinates events across all layers
+// ============================================
+
+/**
+ * Unified Event Handler for NodeGraph
+ * Coordinates events across all layers in proper priority order
+ * 
+ * Priority Order (highest to lowest):
+ * 1. Handles (create new edges, modify existing edges)
+ * 2. Nodes (select, drag, click)
+ * 3. Edges (select, click)
+ * 4. Groups (select, click)
+ * 5. Background (deselect, pan)
+ */
+export class UnifiedEventHandler {
+  constructor({
+    containerRef,
+    handleLayerRef,
+    nodeRefs,
+    nodes,
+    edges,
+    groups,
+    pan,
+    zoom,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    setSelectedGroupIds,
+    lockedNodes,
+    onNodeClick,
+    onEdgeClick,
+    onGroupClick,
+    onBackgroundClick
+  }) {
+    this.containerRef = containerRef;
+    this.handleLayerRef = handleLayerRef;
+    this.nodeRefs = nodeRefs;
+    this.nodes = nodes;
+    this.edges = edges;
+    this.groups = groups;
+    this.pan = pan;
+    this.zoom = zoom;
+    this.setSelectedNodeIds = setSelectedNodeIds;
+    this.setSelectedEdgeIds = setSelectedEdgeIds;
+    this.setSelectedGroupIds = setSelectedGroupIds;
+    this.lockedNodes = lockedNodes;
+    this.onNodeClick = onNodeClick;
+    this.onEdgeClick = onEdgeClick;
+    this.onGroupClick = onGroupClick;
+    this.onBackgroundClick = onBackgroundClick;
+
+    // State
+    this.draggingHandle = null;
+    this.previewLine = null;
+    this.hoveredHandle = null;
+    this.mouseDownPos = null;
+    this.mouseDownTime = 0;
+    this.dragThreshold = 5; // pixels of movement to consider it a drag
+    
+    // Bind methods
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+  }
+
+  // Convert screen coordinates to graph coordinates
+  screenToGraph(screenX, screenY) {
+    const rect = this.containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+    return {
+      x: (screenX - rect.left - this.pan.x) / this.zoom,
+      y: (screenY - rect.top - this.pan.y) / this.zoom
+    };
+  }
+
+  // Check if point is inside a node
+  hitTestNode(graphX, graphY) {
+    for (const node of this.nodes) {
+      if (node.visible === false) continue;
+      
+      const nodeX = node.position?.x || node.x || 0;
+      const nodeY = node.position?.y || node.y || 0;
+      const nodeWidth = node.width || 60;
+      const nodeHeight = node.height || 60;
+      
+      if (graphX >= nodeX - nodeWidth / 2 &&
+          graphX <= nodeX + nodeWidth / 2 &&
+          graphY >= nodeY - nodeHeight / 2 &&
+          graphY <= nodeY + nodeHeight / 2) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  // Check if point is inside a group
+  hitTestGroup(graphX, graphY) {
+    for (const group of this.groups) {
+      if (!group.bounds || group.visible === false) continue;
+      
+      const { x, y, width, height } = group.bounds;
+      
+      if (graphX >= x && graphX <= x + width &&
+          graphY >= y && graphY <= y + height) {
+        return group;
+      }
+    }
+    return null;
+  }
+
+  // Main event handler
+  handleMouseDown(e) {
+    const rect = this.containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const screenX = e.clientX;
+    const screenY = e.clientY;
+    const graph = this.screenToGraph(screenX, screenY);
+
+    // 1. Check handles first (highest priority)
+    if (this.handleLayerRef.current) {
+      const handle = this.handleLayerRef.current.hitTest(screenX, screenY);
+      
+      if (handle) {
+        console.log('Handle clicked:', handle);
+        e.stopPropagation();
+        e.preventDefault();
+        this.startHandleDrag(handle, e);
+        return;
+      }
+    }
+
+    // 2. Check nodes
+    const hitNode = this.hitTestNode(graph.x, graph.y);
+    if (hitNode) {
+      e.stopPropagation();
+      
+      // Emit node click for selection handling
+      eventBus.emit('nodeClick', { id: hitNode.id, event: e });
+      
+      // Start node drag if not locked
+      if (!this.lockedNodes.has(hitNode.id)) {
+        eventBus.emit('nodeDragStart', { node: hitNode, event: e });
+      }
+      return;
+    }
+
+    // 3. Edges are handled by EdgeLayer's own click detection
+    // (EdgeLayer has sophisticated hit testing for curved edges)
+
+    // 4. Check groups
+    const hitGroup = this.hitTestGroup(graph.x, graph.y);
+    if (hitGroup) {
+      e.stopPropagation();
+      
+      if (this.onGroupClick) {
+        this.onGroupClick(hitGroup.id);
+      }
+      
+      if (this.setSelectedGroupIds) {
+        this.setSelectedGroupIds([hitGroup.id]);
+      }
+      return;
+    }
+
+    // 5. Background - clear selections
+    if (this.onBackgroundClick) {
+      this.onBackgroundClick(e);
+    }
+    
+    if (this.setSelectedNodeIds) this.setSelectedNodeIds([]);
+    if (this.setSelectedEdgeIds) this.setSelectedEdgeIds([]);
+    if (this.setSelectedGroupIds) this.setSelectedGroupIds([]);
+  }
+
+  handleMouseMove(e) {
+    const rect = this.containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const screenX = e.clientX;
+    const screenY = e.clientY;
+    const graph = this.screenToGraph(screenX, screenY);
+
+    // Check for node proximity (for showing handles)
+    const proximityMargin = 40; // pixels in graph space
+    let nearNode = null;
+    
+    for (const node of this.nodes) {
+      if (node.visible === false) continue;
+      
+      const nodeX = node.position?.x || node.x || 0;
+      const nodeY = node.position?.y || node.y || 0;
+      const nodeWidth = node.width || 60;
+      const nodeHeight = node.height || 60;
+      
+      // Expand hit area for proximity detection
+      if (graph.x >= nodeX - nodeWidth / 2 - proximityMargin &&
+          graph.x <= nodeX + nodeWidth / 2 + proximityMargin &&
+          graph.y >= nodeY - nodeHeight / 2 - proximityMargin &&
+          graph.y <= nodeY + nodeHeight / 2 + proximityMargin) {
+        nearNode = node;
+        break;
+      }
+    }
+
+    // Emit proximity events for handle visibility
+    if (nearNode) {
+      eventBus.emit('nodeProximity', { nodeId: nearNode.id });
+    }
+
+    // Update handle hover state
+    if (this.handleLayerRef.current && !this.draggingHandle) {
+      const handle = this.handleLayerRef.current.hitTest(screenX, screenY);
+      
+      if (handle !== this.hoveredHandle) {
+        if (this.hoveredHandle) {
+          eventBus.emit('handleUnhover', { handleId: this.hoveredHandle.id });
+        }
+        
+        this.hoveredHandle = handle;
+        
+        if (handle) {
+          eventBus.emit('handleHover', { handleId: handle.id, nodeId: handle.nodeId });
+          // Change cursor
+          if (this.containerRef.current) {
+            this.containerRef.current.style.cursor = 'pointer';
+          }
+        } else {
+          // Reset cursor
+          if (this.containerRef.current) {
+            this.containerRef.current.style.cursor = 'default';
+          }
+        }
+      }
+    }
+
+    // Handle drag in progress
+    if (this.draggingHandle) {
+      this.updateHandleDrag(screenX, screenY);
+    }
+  }
+
+  handleMouseUp(e) {
+    if (this.draggingHandle) {
+      this.endHandleDrag(e);
+    }
+  }
+
+  // Handle drag operations
+  startHandleDrag(handle, e) {
+    this.draggingHandle = handle;
+    
+    const rect = this.containerRef.current?.getBoundingClientRect();
+    this.previewLine = {
+      startX: e.clientX - rect.left,
+      startY: e.clientY - rect.top,
+      endX: e.clientX - rect.left,
+      endY: e.clientY - rect.top
+    };
+
+    eventBus.emit('handleDragStart', { handle });
+    
+    // Change cursor
+    if (this.containerRef.current) {
+      this.containerRef.current.style.cursor = 'crosshair';
+    }
+  }
+
+  updateHandleDrag(screenX, screenY) {
+    if (!this.draggingHandle) return;
+
+    const rect = this.containerRef.current?.getBoundingClientRect();
+    this.previewLine.endX = screenX - rect.left;
+    this.previewLine.endY = screenY - rect.top;
+
+    // Emit event for visual preview
+    eventBus.emit('handleDragMove', { 
+      handle: this.draggingHandle,
+      previewLine: this.previewLine
+    });
+  }
+
+  endHandleDrag(e) {
+    if (!this.draggingHandle) return;
+
+    const graph = this.screenToGraph(e.clientX, e.clientY);
+    const targetNode = this.hitTestNode(graph.x, graph.y);
+
+    // Emit event for edge creation/modification
+    eventBus.emit('handleDrop', {
+      handle: this.draggingHandle,
+      targetNode: targetNode?.id || null,
+      targetNodeObject: targetNode,
+      position: graph
+    });
+
+    this.draggingHandle = null;
+    this.previewLine = null;
+
+    eventBus.emit('handleDragEnd');
+    
+    // Reset cursor
+    if (this.containerRef.current) {
+      this.containerRef.current.style.cursor = 'default';
+    }
+  }
+
+  // Update references (call when props change)
+  updateRefs(updates) {
+    Object.assign(this, updates);
+  }
+
+  // Attach event listeners
+  attach() {
+    const container = this.containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('mousedown', this.handleMouseDown, { capture: true });
+    container.addEventListener('mousemove', this.handleMouseMove);
+    container.addEventListener('mouseup', this.handleMouseUp);
+  }
+
+  // Detach event listeners
+  detach() {
+    const container = this.containerRef.current;
+    if (!container) return;
+
+    container.removeEventListener('mousedown', this.handleMouseDown, { capture: true });
+    container.removeEventListener('mousemove', this.handleMouseMove);
+    container.removeEventListener('mouseup', this.handleMouseUp);
+  }
+}
+
+// Hook to use the unified event handler
+export function useUnifiedEventHandler(config) {
+  const handlerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!handlerRef.current) {
+      handlerRef.current = new UnifiedEventHandler(config);
+      handlerRef.current.attach();
+    } else {
+      handlerRef.current.updateRefs(config);
+    }
+
+    return () => {
+      if (handlerRef.current) {
+        handlerRef.current.detach();
+      }
+    };
+  }, [config]);
+
+  return handlerRef;
+}
+
+export function useHandleClickHandler(callback) {
+  useEffect(() => {
+    eventBus.on('handleClick', callback);
+    return () => {
+      eventBus.off('handleClick', callback);
+    };
+  }, [callback]);
+}
+
+export default UnifiedEventHandler;

@@ -2,21 +2,23 @@
 // 5. GraphEditor.js (MAIN - significantly reduced)
 // ============================================
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import NodeGraph from '../NodeGraph';
 import Toolbar from './components/Toolbar';
 import { getNodeTypes } from './nodeTypeRegistry';
+import EdgeTypes from './edgeTypes';
 import NodeListPanel from './components/NodeListPanel';
 import GroupListPanel from './components/GroupListPanel';
 import GroupPropertiesPanel from './components/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
 import NodePropertiesPanel from './components/NodePropertiesPanel';
 import EdgePropertiesPanel from './components/EdgePropertiesPanel';
-import EdgeTypes from './edgeTypes';
+import edgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
 import ScriptRunner from './Scripting/ScriptRunner';
 import ScriptPanel from './Scripting/ScriptPanel';
+import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
 
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
@@ -651,6 +653,90 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('applyScriptProposals', handleApplyProposals);
   }, [historyHook, setSnackbar]);
 
+  // Add this useEffect to your GraphEditor.js file
+  // Place it with the other event listener useEffects
+  // Import EdgeTypes at the top: import EdgeTypes from './edgeTypes';
+  
+  useEffect(() => {
+    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction }) => {
+      try {
+        // If dropped on a node, create an edge
+        if (targetNode) {
+          const newEdge = {
+            id: `edge_${Date.now()}`,
+            source: direction === 'source' ? sourceNode : targetNode,
+            target: direction === 'source' ? targetNode : sourceNode,
+            type: edgeType,
+            style: EdgeTypes[edgeType]?.style || {}
+          };
+          
+          setEdges(prev => {
+            const next = [...prev, newEdge];
+            edgesRef.current = next;
+            historyHook.saveToHistory(nodesRef.current, next);
+            return next;
+          });
+          
+          setSnackbar({ 
+            open: true, 
+            message: 'Edge created', 
+            severity: 'success' 
+          });
+        } 
+        // If dropped in empty space, create a new node and edge
+        else {
+          const newNodeId = `node_${Date.now()}`;
+          const newNode = {
+            id: newNodeId,
+            label: 'New Node',
+            type: 'default',
+            position: { x: graph.x, y: graph.y },
+            width: 200,
+            height: 120,
+            data: {}
+          };
+          
+          const newEdge = {
+            id: `edge_${Date.now()}`,
+            source: direction === 'source' ? sourceNode : newNodeId,
+            target: direction === 'source' ? newNodeId : sourceNode,
+            type: edgeType,
+            style: EdgeTypes[edgeType]?.style || {}
+          };
+          
+          setNodes(prev => {
+            const next = [...prev, newNode];
+            nodesRef.current = next;
+            return next;
+          });
+          
+          setEdges(prev => {
+            const next = [...prev, newEdge];
+            edgesRef.current = next;
+            historyHook.saveToHistory(nodesRef.current, next);
+            return next;
+          });
+          
+          setSnackbar({ 
+            open: true, 
+            message: 'Node and edge created', 
+            severity: 'success' 
+          });
+        }
+      } catch (error) {
+        console.error('Error in handleDrop:', error);
+        setSnackbar({ 
+          open: true, 
+          message: 'Failed to create connection', 
+          severity: 'error' 
+        });
+      }
+    };
+  
+    eventBus.on('handleDrop', handleHandleDrop);
+    return () => eventBus.off('handleDrop', handleHandleDrop);
+  }, [setNodes, setEdges, nodesRef, edgesRef, historyHook, setSnackbar]);
+
   // NEW: Listen for toggleMinimap event to sync minimap visibility with toolbar button
   useEffect(() => {
     const handleToggleMinimap = () => {
@@ -756,6 +842,31 @@ export default function GraphEditor({ backgroundImage }) {
     eventBus.on('nodeDragEnd', handleNodeDragEnd);
     return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
   }, []);
+
+  // Memoized values for nodes, edges, and groups
+  const memoizedNodes = useMemo(() => nodes, [nodes]);
+  const memoizedEdges = useMemo(() => edges, [edges]);
+  const memoizedGroups = useMemo(() => groups, [groups]);
+  const memoizedSelectedNodeIds = useMemo(() => selectedNodeIds, [selectedNodeIds]);
+  const memoizedSelectedEdgeIds = useMemo(() => selectedEdgeIds, [selectedEdgeIds]);
+  const memoizedSelectedGroupIds = useMemo(() => selectedGroupIds, [selectedGroupIds]);
+
+  const memoizedSetNodes = useCallback(setNodes, []);
+  const memoizedSetEdges = useCallback(setEdges, []);
+  const memoizedSetGroups = useCallback(setGroups, []);
+  const memoizedSetSelectedNodeIds = useCallback(setSelectedNodeIds, []);
+  const memoizedSetSelectedEdgeIds = useCallback(setSelectedEdgeIds, []);
+  const memoizedSetPan = useCallback(setPan, []);
+  const memoizedSetZoom = useCallback(setZoom, []);
+
+  // Register single handleClick event handler
+  const handleClickHandlerId = Math.random().toString(36).substr(2, 8);
+  useHandleClickHandler((payload) => {
+    console.log(`[GraphEditor.js] handleClick event received (handlerId: ${handleClickHandlerId})`, payload);
+    // Your handleClick logic here
+    // Example: console.log('Single handleClick event:', payload);
+  });
+  console.log(`[GraphEditor.js] useHandleClickHandler registered (handlerId: ${handleClickHandlerId})`);
 
   return (
     <div 
@@ -900,22 +1011,22 @@ export default function GraphEditor({ backgroundImage }) {
       />
       
       <NodeGraph 
-        nodes={nodes} 
-        setNodes={setNodes}
-        edges={edges} 
-        groups={groups}
-        setGroups={setGroups}
-        pan={pan} 
-        zoom={zoom} 
-        setPan={setPan} 
-        setZoom={setZoom}
-        selectedNodeId={selectedNodeIds[0] || null}
-        selectedEdgeId={selectedEdgeIds[0] || null}
-        selectedNodeIds={selectedNodeIds}
-        selectedEdgeIds={selectedEdgeIds}
-        selectedGroupIds={selectedGroupIds}
-        setSelectedNodeIds={setSelectedNodeIds}
-        setSelectedEdgeIds={setSelectedEdgeIds}
+        nodes={memoizedNodes}
+        setNodes={memoizedSetNodes}
+        edges={memoizedEdges}
+        groups={memoizedGroups}
+        setGroups={memoizedSetGroups}
+        pan={pan}
+        zoom={zoom}
+        setPan={memoizedSetPan}
+        setZoom={memoizedSetZoom}
+        selectedNodeId={memoizedSelectedNodeIds[0] || null}
+        selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
+        selectedNodeIds={memoizedSelectedNodeIds}
+        selectedEdgeIds={memoizedSelectedEdgeIds}
+        selectedGroupIds={memoizedSelectedGroupIds}
+        setSelectedNodeIds={memoizedSetSelectedNodeIds}
+        setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
         hoveredNodeId={hoveredNodeId}
         nodeTypes={nodeTypes}
         edgeTypes={EdgeTypes}
