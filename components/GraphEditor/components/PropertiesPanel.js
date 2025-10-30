@@ -1,109 +1,866 @@
-import React, { useState, useEffect } from 'react';
-import { Drawer, IconButton, Typography, Box } from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import NodePropertiesPanel from './NodePropertiesPanel';
-import EdgePropertiesPanel from './EdgePropertiesPanel';
-import GroupPropertiesPanel from './GroupPropertiesPanel';
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Paper, TextField, IconButton, Divider, FormControl, InputLabel, 
+  Select, MenuItem, FormControlLabel, Switch, Slider, Typography, 
+  Box, ToggleButton, ToggleButtonGroup, Accordion, AccordionSummary,
+  AccordionDetails, List, ListItem, ListItemText, ListItemSecondaryAction,
+  Button, Tooltip, Chip
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  Lock as LockIcon,
+  LockOpen as LockOpenIcon,
+  ExpandMore as ExpandMoreIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+  Note as NoteIcon,
+  Visibility as VisibilityIcon,
+  Edit as EditIcon,
+  InsertEmoticon as InsertEmoticonIcon,
+  Save as SaveIcon,
+  Add as AddIcon,
+  Remove as RemoveIcon
+} from '@mui/icons-material';
+import { createPortal } from 'react-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import nodeTypeRegistry from '../nodeTypeRegistry'; // Adjust path as needed
+import edgeTypesMap from '../edgeTypes'; // Correct import syntax
 
-const ANCHOR_KEY = 'propertiesPanelAnchor';
-
-export default function PropertiesPanel({
+export default function ConsolidatedPropertiesPanel({ 
   selectedNode,
   selectedEdge,
   selectedGroup,
+  nodes = [],
+  edgeTypes = {},
+  nodeTypes = {},
   onUpdateNode,
   onUpdateEdge,
   onUpdateGroup,
+  onUngroupGroup,
+  onAddNodes,
+  onRemoveNodes,
+  onClose, 
   theme,
-  defaultNodeColor,
-  defaultEdgeColor,
-  lockedNodes,
-  lockedEdges,
-  lockedGroups,
+  anchor = 'right',
+  onAnchorChange,
+  defaultNodeColor = '#1976d2',
+  defaultEdgeColor = '#666666',
+  lockedNodes = new Set(),
+  lockedEdges = new Set(),
+  lockedGroups = new Set(),
   onToggleNodeLock,
   onToggleEdgeLock,
-  onToggleGroupLock,
-  onClose
+  onToggleGroupLock
 }) {
-  // Remember anchor in localStorage
-  const [anchor, setAnchor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(ANCHOR_KEY) || 'right';
-    }
-    return 'right';
-  });
+  const [currentAnchor, setCurrentAnchor] = useState(anchor);
+  const [width, setWidth] = useState(400);
+  const [isOpen, setIsOpen] = useState(true);
+  
+  // Shared states
+  const [label, setLabel] = useState('');
+  
+  // Node-specific states
+  const [memo, setMemo] = useState('');
+  const [memoView, setMemoView] = useState('edit');
+  const [nodeColor, setNodeColor] = useState(defaultNodeColor);
+  const [nodeType, setNodeType] = useState('');
+  const [nodePosition, setNodePosition] = useState({ x: 0, y: 0 });
+  const [nodeSize, setNodeSize] = useState({ width: 200, height: 120 });
+  
+  // Edge-specific states
+  const [edgeType, setEdgeType] = useState('');
+  const [lineWidth, setLineWidth] = useState(2);
+  const [curved, setCurved] = useState(false);
+  const [edgeColor, setEdgeColor] = useState(defaultEdgeColor);
+  const [opacity, setOpacity] = useState(1);
+  const [dashPattern, setDashPattern] = useState('solid');
+  const [showArrow, setShowArrow] = useState(true);
+  const [arrowPosition, setArrowPosition] = useState('end');
+  const [arrowSize, setArrowSize] = useState(8);
+  const [animation, setAnimation] = useState('none');
+  const [animationSpeed, setAnimationSpeed] = useState(1);
+  const [gradientEnabled, setGradientEnabled] = useState(false);
+  const [gradientStart, setGradientStart] = useState('#2196f3');
+  const [gradientEnd, setGradientEnd] = useState('#03a9f4');
+  const [curveDirection, setCurveDirection] = useState('auto');
+  
+  // Group-specific states
+  const [backgroundColor, setBackgroundColor] = useState('rgba(25, 118, 210, 0.1)');
+  const [borderColor, setBorderColor] = useState('#1976d2');
+  const [borderWidth, setBorderWidth] = useState(2);
+  const [visible, setVisible] = useState(true);
+  
+  const resizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(width);
+  const memoInputRef = useRef();
+  const pendingRef = useRef({});
+  const timerRef = useRef(null);
+  const DEBOUNCE_MS = 400;
+
+  const dashPatterns = {
+    solid: [],
+    dashed: [8, 4],
+    dotted: [2, 4],
+    dashDot: [8, 4, 2, 4],
+    longDash: [16, 8]
+  };
+
+  // Determine what's selected
+  const entityType = selectedNode ? 'node' : selectedEdge ? 'edge' : selectedGroup ? 'group' : null;
+  const entityId = selectedNode?.id || selectedEdge?.id || selectedGroup?.id;
+  const isLocked = entityType === 'node' ? lockedNodes.has(entityId) :
+                   entityType === 'edge' ? lockedEdges.has(entityId) :
+                   entityType === 'group' ? lockedGroups.has(entityId) : false;
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(ANCHOR_KEY, anchor);
-    }
+    setCurrentAnchor(anchor);
   }, [anchor]);
 
-  let panelTitle = 'Properties';
-  let panelContent = null;
-  if (selectedNode) {
-    panelTitle = 'Node Properties';
-    panelContent = (
-      <NodePropertiesPanel
-        selectedNode={selectedNode}
-        onUpdateNode={onUpdateNode}
-        theme={theme}
-        defaultNodeColor={defaultNodeColor}
-        lockedNodes={lockedNodes}
-        onToggleNodeLock={onToggleNodeLock}
-      />
-    );
-  } else if (selectedEdge) {
-    panelTitle = 'Edge Properties';
-    panelContent = (
-      <EdgePropertiesPanel
-        selectedEdge={selectedEdge}
-        onUpdateEdge={onUpdateEdge}
-        theme={theme}
-        defaultEdgeColor={defaultEdgeColor}
-        lockedEdges={lockedEdges}
-        onToggleEdgeLock={onToggleEdgeLock}
-      />
-    );
-  } else if (selectedGroup) {
-    panelTitle = 'Group Properties';
-    panelContent = (
-      <GroupPropertiesPanel
-        selectedGroup={selectedGroup}
-        onUpdateGroup={onUpdateGroup}
-        theme={theme}
-        lockedGroups={lockedGroups}
-        onToggleGroupLock={onToggleGroupLock}
-      />
-    );
-  } else {
-    panelContent = (
-      <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
-        Select a node, edge, or group to edit its properties.
-      </Typography>
-    );
+  const toggleAnchor = () => {
+    const newAnchor = currentAnchor === 'right' ? 'left' : 'right';
+    setCurrentAnchor(newAnchor);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('propertiesPanelAnchor', newAnchor);
+    }
+    if (onAnchorChange) onAnchorChange(newAnchor);
+  };
+
+  // Update states based on selected entity
+  useEffect(() => {
+    if (selectedNode) {
+      setLabel(selectedNode.label || '');
+      setMemo(selectedNode.data?.memo || '');
+      setNodeColor(selectedNode.color || defaultNodeColor);
+      setNodeType(selectedNode.type || 'default');
+      setNodePosition(selectedNode.position || { x: 0, y: 0 });
+      setNodeSize({ width: selectedNode.width || 200, height: selectedNode.height || 120 });
+    } else if (selectedEdge) {
+      const edge = selectedEdge;
+      const typeDef = edgeTypes[edge.type] || {};
+      const styleDef = typeDef.style || {};
+      
+      setEdgeType(edge.type || 'child');
+      setLabel(edge.label || '');
+      setLineWidth(edge.style?.width ?? styleDef.width ?? 2);
+      setCurved(edge.style?.curved ?? styleDef.curved ?? false);
+      setEdgeColor(edge.color || edge.style?.color || defaultEdgeColor);
+      setOpacity(edge.style?.opacity ?? styleDef.opacity ?? 1);
+      setShowArrow(edge.style?.showArrow ?? styleDef.showArrow ?? true);
+      setArrowPosition(edge.style?.arrowPosition ?? styleDef.arrowPosition ?? 'end');
+      setArrowSize(edge.style?.arrowSize ?? styleDef.arrowSize ?? 8);
+      setAnimation(edge.style?.animation ?? styleDef.animation ?? 'none');
+      setAnimationSpeed(edge.style?.animationSpeed ?? styleDef.animationSpeed ?? 1);
+      setCurveDirection(edge.style?.curveDirection ?? styleDef.curveDirection ?? 'auto');
+      
+      const dash = edge.style?.dash ?? styleDef.dash ?? [];
+      const patternName = Object.keys(dashPatterns).find(
+        key => JSON.stringify(dashPatterns[key]) === JSON.stringify(dash)
+      ) || 'solid';
+      setDashPattern(patternName);
+      
+      const hasGradient = edge.style?.gradient || styleDef.gradient;
+      setGradientEnabled(!!hasGradient);
+      if (hasGradient) {
+        setGradientStart(hasGradient.start || '#2196f3');
+        setGradientEnd(hasGradient.end || '#03a9f4');
+      }
+    } else if (selectedGroup) {
+      setLabel(selectedGroup.label || '');
+      setBackgroundColor(selectedGroup.style?.backgroundColor || 'rgba(25, 118, 210, 0.1)');
+      setBorderColor(selectedGroup.style?.borderColor || '#1976d2');
+      setBorderWidth(selectedGroup.style?.borderWidth || 2);
+      setVisible(selectedGroup.visible !== false);
+    }
+  }, [entityId, entityType, defaultNodeColor, defaultEdgeColor]);
+
+  // Handlers
+  const handleLabelChange = (e) => {
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    if (entityType === 'node' && onUpdateNode) {
+      onUpdateNode(entityId, { label: newLabel }, true);
+    } else if (entityType === 'edge' && onUpdateEdge) {
+      onUpdateEdge(entityId, { label: newLabel });
+    } else if (entityType === 'group' && onUpdateGroup) {
+      scheduleGroupUpdate({ label: newLabel });
+    }
+  };
+
+  const handleMemoChange = (e) => {
+    const newMemo = e.target.value;
+    setMemo(newMemo);
+    if (onUpdateNode) onUpdateNode(entityId, { data: { memo: newMemo } });
+  };
+
+  const handleNodeColorChange = (color) => {
+    setNodeColor(color);
+    if (onUpdateNode) onUpdateNode(entityId, { color });
+  };
+
+  const handleEdgeStyleUpdate = (updates) => {
+    if (!entityId || isLocked) return;
+    const currentStyle = selectedEdge?.style || {};
+    onUpdateEdge(entityId, {
+      style: { ...currentStyle, ...updates }
+    });
+  };
+
+  const scheduleGroupUpdate = (fields) => {
+    pendingRef.current = { ...pendingRef.current, ...fields };
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      const payload = { ...pendingRef.current };
+      pendingRef.current = {};
+      timerRef.current = null;
+      if (selectedGroup) onUpdateGroup(selectedGroup.id, payload);
+    }, DEBOUNCE_MS);
+  };
+
+  const handleToggleLock = () => {
+    if (entityType === 'node' && onToggleNodeLock) onToggleNodeLock(entityId);
+    else if (entityType === 'edge' && onToggleEdgeLock) onToggleEdgeLock(entityId);
+    else if (entityType === 'group' && onToggleGroupLock) onToggleGroupLock(entityId);
+  };
+
+  // Resize handlers
+  const onResizeMouseDown = (e) => {
+    resizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = width;
+    document.addEventListener('mousemove', onResizeMouseMove);
+    document.addEventListener('mouseup', onResizeMouseUp);
+  };
+
+  const onResizeMouseMove = (e) => {
+    if (!resizing.current) return;
+    let delta = currentAnchor === 'right' ? startX.current - e.clientX : e.clientX - startX.current;
+    let newWidth = Math.max(240, Math.min(startWidth.current + delta, 700));
+    setWidth(newWidth);
+  };
+
+  const onResizeMouseUp = () => {
+    resizing.current = false;
+    document.removeEventListener('mousemove', onResizeMouseMove);
+    document.removeEventListener('mouseup', onResizeMouseUp);
+  };
+
+  // Add a stub for handleStyleUpdate to prevent ReferenceError
+  function handleStyleUpdate() {
+    // TODO: Implement style update logic
   }
 
-  return (
-    <Drawer
-      anchor={anchor}
-      open={true}
-      onClose={onClose}
-      PaperProps={{ sx: { width: 380, zIndex: 1300 } }}
+  if (!entityType) return null;
+
+  const panelTitle = entityType === 'node' ? 'Node Properties' :
+                     entityType === 'edge' ? 'Edge Properties' :
+                     'Group Properties';
+
+  return createPortal(
+    <Paper
+      elevation={8}
+      sx={{
+        position: 'fixed',
+        top: 64,
+        [currentAnchor === 'right' ? 'right' : 'left']: isOpen ? 0 : -width - 50,
+        width: width,
+        height: 'calc(100vh - 64px)',
+        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
+        borderLeft: currentAnchor === 'right' ? `1px solid ${theme?.palette?.divider}` : 'none',
+        borderRight: currentAnchor === 'left' ? `1px solid ${theme?.palette?.divider}` : 'none',
+        boxShadow: currentAnchor === 'right' ? '-2px 0 8px rgba(0,0,0,0.1)' : '2px 0 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 1200,
+        transition: 'right 0.3s ease, left 0.3s ease',
+        overflow: 'hidden',
+      }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
-        <Typography variant="h6">{panelTitle}</Typography>
-        <Box>
-          <IconButton onClick={() => setAnchor(anchor === 'right' ? 'left' : 'right')} size="small" title="Switch side">
-            {anchor === 'right' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+      {/* Resize handle */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          [currentAnchor === 'right' ? 'left' : 'right']: -6,
+          width: 12,
+          height: '100%',
+          cursor: 'ew-resize',
+          zIndex: 2000,
+          background: 'transparent',
+        }}
+        onMouseDown={onResizeMouseDown}
+      >
+        <div style={{
+          width: 6,
+          height: 48,
+          borderRadius: 3,
+          background: theme?.palette?.divider,
+          opacity: 0.7,
+          margin: 'auto',
+          marginTop: 24,
+        }} />
+      </div>
+
+      {/* Header */}
+      <Box sx={{ 
+        p: 2, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        backgroundColor: theme?.palette?.primary?.main || '#1976d2',
+        color: theme?.palette?.primary?.contrastText || '#fff',
+      }}>
+        <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
+          {panelTitle}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <IconButton onClick={toggleAnchor} size="small" sx={{ color: 'inherit' }}>
+            {currentAnchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
-          <IconButton onClick={onClose} size="small" title="Close">
-            <span aria-hidden>×</span>
+          <IconButton
+            onClick={handleToggleLock}
+            title={isLocked ? `Unlock ${entityType}` : `Lock ${entityType}`}
+            size="small"
+            sx={{ color: 'inherit' }}
+          >
+            {isLocked ? <LockIcon /> : <LockOpenIcon />}
+          </IconButton>
+          <IconButton 
+            size="small" 
+            onClick={onClose}
+            sx={{ color: 'inherit' }}
+          >
+            <CloseIcon />
           </IconButton>
         </Box>
       </Box>
-      <Box sx={{ p: 2 }}>{panelContent}</Box>
-    </Drawer>
+
+      <Divider />
+
+      {/* Content */}
+      <Box sx={{ p: 2, overflowY: 'auto', flexGrow: 1 }}>
+        {/* Entity ID */}
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          ID: {entityId}
+        </Typography>
+
+        {/* Label (common to all) */}
+        <TextField
+          fullWidth
+          label="Label"
+          value={label}
+          onChange={handleLabelChange}
+          variant="filled"
+          size="small"
+          disabled={isLocked}
+          sx={{ mb: 2, backgroundColor: theme?.palette?.background?.paper }}
+        />
+
+        {/* NODE-SPECIFIC CONTENT */}
+        {entityType === 'node' && (
+          <>
+            {/* Node Type */}
+            <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
+              <InputLabel>Node Type</InputLabel>
+              <Select
+                value={Object.keys(nodeTypeRegistry).includes(nodeType) ? nodeType : ''}
+                onChange={(e) => {
+                  setNodeType(e.target.value);
+                  if (onUpdateNode) onUpdateNode(entityId, { type: e.target.value });
+                }}
+                label="Node Type"
+              >
+                {Object.entries(nodeTypeRegistry).map(([key, meta]) => (
+                  <MenuItem key={key} value={key}>
+                    <Tooltip title={meta.description || ''}>
+                      <span>{meta.label || key}</span>
+                    </Tooltip>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Color */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="caption" color="text.secondary" gutterBottom>
+                Node Color
+              </Typography>
+              <TextField
+                fullWidth
+                type="color"
+                value={nodeColor}
+                onChange={(e) => handleNodeColorChange(e.target.value)}
+                disabled={isLocked}
+                size="small"
+                label="Node Color"
+              />
+            </Box>
+
+            {/* Position */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Position & Size</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <TextField
+                    label="X"
+                    type="number"
+                    value={nodePosition.x}
+                    onChange={(e) => {
+                      const newPos = { ...nodePosition, x: parseFloat(e.target.value) || 0 };
+                      setNodePosition(newPos);
+                      onUpdateNode(entityId, { position: newPos });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Y"
+                    type="number"
+                    value={nodePosition.y}
+                    onChange={(e) => {
+                      const newPos = { ...nodePosition, y: parseFloat(e.target.value) || 0 };
+                      setNodePosition(newPos);
+                      onUpdateNode(entityId, { position: newPos });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                    fullWidth
+                  />
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <TextField
+                    label="Width"
+                    type="number"
+                    value={nodeSize.width}
+                    onChange={(e) => {
+                      const newSize = { ...nodeSize, width: parseFloat(e.target.value) || 200 };
+                      setNodeSize(newSize);
+                      onUpdateNode(entityId, { width: newSize.width });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Height"
+                    type="number"
+                    value={nodeSize.height}
+                    onChange={(e) => {
+                      const newSize = { ...nodeSize, height: parseFloat(e.target.value) || 120 };
+                      setNodeSize(newSize);
+                      onUpdateNode(entityId, { height: newSize.height });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                    fullWidth
+                  />
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Memo */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Memo (Markdown)</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                  <ToggleButtonGroup
+                    value={memoView}
+                    exclusive
+                    onChange={(e, newView) => newView && setMemoView(newView)}
+                    size="small"
+                  >
+                    <ToggleButton value="edit">
+                      <EditIcon sx={{ fontSize: 16 }} />
+                    </ToggleButton>
+                    <ToggleButton value="preview">
+                      <VisibilityIcon sx={{ fontSize: 16 }} />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+                {memoView === 'edit' ? (
+                  <TextField
+                    inputRef={memoInputRef}
+                    multiline
+                    rows={8}
+                    value={memo}
+                    onChange={handleMemoChange}
+                    fullWidth
+                    variant="filled"
+                    disabled={isLocked}
+                    sx={{ backgroundColor: theme?.palette?.background?.paper }}
+                  />
+                ) : (
+                  <Box sx={{ 
+                    p: 2, 
+                    backgroundColor: theme?.palette?.background?.paper, 
+                    borderRadius: 1,
+                    minHeight: 200,
+                    maxHeight: 400,
+                    overflowY: 'auto'
+                  }}>
+                    {memo ? (
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {memo}
+                      </ReactMarkdown>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                        No content to preview
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  {memo.length} characters
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          </>
+        )}
+
+        {/* EDGE-SPECIFIC CONTENT */}
+        {entityType === 'edge' && (
+          <>
+            {/* Connection Info */}
+            <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'action.hover', borderRadius: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                Connection
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 12 }}>
+                {selectedEdge?.sourceNode?.label || selectedEdge?.source}
+                <br />
+                → {selectedEdge?.targetNode?.label || selectedEdge?.target}
+              </Typography>
+            </Box>
+
+            {/* Edge Type */}
+            <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
+              <InputLabel>Edge Type</InputLabel>
+              <Select
+                value={Object.keys(edgeTypesMap).includes(edgeType) ? edgeType : ''}
+                onChange={(e) => {
+                  setEdgeType(e.target.value);
+                  onUpdateEdge(entityId, { type: e.target.value });
+                }}
+                label="Edge Type"
+              >
+                <MenuItem value="">None</MenuItem>
+                {Object.entries(edgeTypesMap).map(([key, typeDef]) => (
+                  <MenuItem key={key} value={key}>
+                    <Tooltip title={typeDef.description || ''}>
+                      <span>{typeDef.label || key}</span>
+                    </Tooltip>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Basic Style */}
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Basic Style</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" gutterBottom>
+                    Line Width: {lineWidth}px
+                  </Typography>
+                  <Slider
+                    value={lineWidth}
+                    onChange={(e, val) => {
+                      setLineWidth(val);
+                      handleEdgeStyleUpdate({ width: val });
+                    }}
+                    min={1}
+                    max={10}
+                    step={0.5}
+                    disabled={isLocked}
+                  />
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" gutterBottom>
+                    Opacity: {Math.round(opacity * 100)}%
+                  </Typography>
+                  <Slider
+                    value={opacity}
+                    onChange={(e, val) => {
+                      setOpacity(val);
+                      handleEdgeStyleUpdate({ opacity: val });
+                    }}
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    disabled={isLocked}
+                  />
+                </Box>
+
+                <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
+                  <InputLabel>Line Style</InputLabel>
+                  <Select
+                    value={dashPattern}
+                    onChange={(e) => {
+                      setDashPattern(e.target.value);
+                      handleEdgeStyleUpdate({ dash: dashPatterns[e.target.value] });
+                    }}
+                    label="Line Style"
+                  >
+                    <MenuItem value="solid">Solid</MenuItem>
+                    <MenuItem value="dashed">Dashed</MenuItem>
+                    <MenuItem value="dotted">Dotted</MenuItem>
+                    <MenuItem value="dashDot">Dash-Dot</MenuItem>
+                    <MenuItem value="longDash">Long Dash</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={curved}
+                      onChange={(e) => {
+                        setCurved(e.target.checked);
+                        handleEdgeStyleUpdate({ curved: e.target.checked });
+                      }}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Curved"
+                />
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Color & Gradient */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Color & Gradient</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={gradientEnabled}
+                      onChange={(e) => {
+                        setGradientEnabled(e.target.checked);
+                        if (e.target.checked) {
+                          handleEdgeStyleUpdate({ 
+                            gradient: { start: gradientStart, end: gradientEnd },
+                            color: null 
+                          });
+                        } else {
+                          handleEdgeStyleUpdate({ gradient: null });
+                        }
+                      }}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Use Gradient"
+                  sx={{ mb: 2 }}
+                />
+
+                {!gradientEnabled && (
+                  <TextField
+                    fullWidth
+                    type="color"
+                    value={edgeColor}
+                    onChange={(e) => {
+                      setEdgeColor(e.target.value);
+                      if (!isLocked) onUpdateEdge(entityId, { color: e.target.value });
+                    }}
+                    disabled={isLocked}
+                    size="small"
+                    label="Edge Color"
+                  />
+                )}
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Animation Accordion */}
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="subtitle2">Animation</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
+                          <InputLabel>Animation Type</InputLabel>
+                          <Select
+                            value={animation || 'none'}
+                            onChange={(e) => {
+                              setAnimation(e.target.value === 'none' ? null : e.target.value);
+                              handleStyleUpdate({ 
+                                animation: e.target.value === 'none' ? null : e.target.value 
+                              });
+                            }}
+                            label="Animation Type"
+                          >
+                            <MenuItem value="none">None</MenuItem>
+                            <MenuItem value="flow">Flow (particles)</MenuItem>
+                            <MenuItem value="pulse">Pulse</MenuItem>
+                            <MenuItem value="dash">Animated Dash</MenuItem>
+                          </Select>
+                        </FormControl>
+            
+                        {animation && animation !== 'none' && (
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" gutterBottom>
+                              Animation Speed: {animationSpeed.toFixed(1)}x
+                            </Typography>
+                            <Slider
+                              value={animationSpeed}
+                              onChange={(e, val) => {
+                                setAnimationSpeed(val);
+                                handleStyleUpdate({ animationSpeed: val });
+                              }}
+                              min={0.1}
+                              max={3}
+                              step={0.1}
+                              disabled={isLocked}
+                              valueLabelDisplay="auto"
+                            />
+                          </Box>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+          </>
+        )}
+
+        {/* GROUP-SPECIFIC CONTENT */}
+        {entityType === 'group' && (
+          <>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+              Contains {selectedGroup.nodeIds?.length || 0} nodes
+            </Typography>
+
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Style</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" gutterBottom>
+                    Background Color
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => {
+                      setBackgroundColor(e.target.value);
+                      scheduleGroupUpdate({ style: { backgroundColor: e.target.value } });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                  />
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" gutterBottom>
+                    Border Color
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    type="color"
+                    value={borderColor}
+                    onChange={(e) => {
+                      setBorderColor(e.target.value);
+                      scheduleGroupUpdate({ style: { borderColor: e.target.value } });
+                    }}
+                    size="small"
+                    disabled={isLocked}
+                  />
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" gutterBottom>
+                    Border Width: {borderWidth}px
+                  </Typography>
+                  <Slider
+                    value={borderWidth}
+                    onChange={(e, val) => {
+                      setBorderWidth(val);
+                      scheduleGroupUpdate({ style: { borderWidth: val } });
+                    }}
+                    min={1}
+                    max={10}
+                    step={1}
+                    disabled={isLocked}
+                  />
+                </Box>
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={visible}
+                      onChange={(e) => {
+                        setVisible(e.target.checked);
+                        scheduleGroupUpdate({ visible: e.target.checked });
+                      }}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Visible"
+                />
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Nodes in Group</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <List dense sx={{ maxHeight: 200, overflow: 'auto' }}>
+                  {(selectedGroup.nodeIds || []).map((nodeId) => {
+                    const node = nodes.find(n => n.id === nodeId);
+                    if (!node) return null;
+                    return (
+                      <ListItem key={nodeId}>
+                        <ListItemText
+                          primary={node.label || `Node ${nodeId.slice(0, 8)}`}
+                          secondary={`ID: ${nodeId.slice(0, 8)}...`}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            edge="end"
+                            size="small"
+                            onClick={() => onRemoveNodes(selectedGroup.id, [nodeId])}
+                            disabled={isLocked}
+                          >
+                            <RemoveIcon fontSize="small" />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </AccordionDetails>
+            </Accordion>
+
+                    
+
+            <Button
+              fullWidth
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                if (onUngroupGroup) onUngroupGroup(selectedGroup.id);
+                onClose();
+              }}
+              disabled={isLocked}
+              sx={{ mt: 2 }}
+            >
+              Ungroup
+            </Button>
+          </>
+        )}
+      </Box>
+    </Paper>,
+    document.body
   );
 }

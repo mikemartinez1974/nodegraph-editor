@@ -38,6 +38,48 @@ This folder contains the built-in node components used by the graph editor. Each
   - Key features: Renders raw SVG markup (be careful to sanitize or validate SVG input), responds to theme colors if implemented.
   - Props: same standard props plus `node.data.svg`.
 
+- **APINode**
+
+  - Purpose: Make HTTP requests to APIs and display the response.
+  - Key features: URL, method, headers, and body input; fetch/cancel buttons; displays status and response preview; emits output and persists state via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **CounterNode**
+
+  - Purpose: Simple counter with increment, decrement, and reset controls.
+  - Key features: Displays count, step, min/max limits, emits value changes via eventBus, range indicator.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **DelayNode**
+
+  - Purpose: Delays output after receiving input, useful for timing and scheduling.
+  - Key features: Configurable delay, queueing, manual trigger/cancel, status display, emits output and persists state via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **GateNode**
+
+  - Purpose: Logical gate (AND, OR, NOT, XOR, NAND, NOR) for boolean operations.
+  - Key features: Editable inputs, operator selection, output display, emits output and persists state via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **ScriptNode**
+
+  - Purpose: Run user-defined scripts from a library and display results.
+  - Key features: Script selection, run/dry-run, mutation control, result display, emits output and persists state via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **TimerNode**
+
+  - Purpose: Timer with start, pause, and stop controls, displays elapsed time.
+  - Key features: Time formatting, control buttons, status indicator, emits output and persists state via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
+- **ToggleNode**
+
+  - Purpose: Boolean toggle switch with ON/OFF states.
+  - Key features: Toggle button, state indicator, emits value changes via eventBus.
+  - Props: `node`, `pan`, `zoom`, `style`, `isSelected`, `onMouseDown`, `onClick`, `onDoubleClick`, `nodeRefs`.
+
 ## Common conventions
 
 - Positioning: All nodes expect `node.position {x,y}` in graph coordinates. Node components apply the same pan/zoom transforms and center the node on that position.

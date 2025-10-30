@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
 import eventBus from './eventBus';
 
@@ -43,6 +43,10 @@ const NodeLayer = ({
         console.warn('Duplicate node ids detected in NodeLayer:', duplicates);
         console.log('Full nodes array with duplicates:', uniqueNodes);
     }
+
+    // Force re-render on mount to ensure nodes appear
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     return (
         <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, zIndex: 30 }}>

@@ -299,6 +299,16 @@ export default function GraphEditor({ backgroundImage }) {
           fullUrl = 'https://' + fullUrl;
         }
 
+        // Always use https for fetch URLs
+        if (fullUrl.startsWith('http://')) {
+          fullUrl = 'https://' + fullUrl.slice('http://'.length);
+        }
+
+        // Log the final URL and fetch options
+        // console.log('[GraphEditor] Fetching URL:', fullUrl);
+        const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit' };
+        // console.log('[GraphEditor] Fetch options:', fetchOptions);
+
         // Update address/history immediately so header/back works
         try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
 
@@ -306,7 +316,10 @@ export default function GraphEditor({ backgroundImage }) {
 
         const tryFetch = async (u) => {
           triedUrls.push(u);
-          const resp = await fetch(u);
+          // console.log('[GraphEditor] Attempting fetch:', u);
+          const resp = await fetch(u, fetchOptions);
+          console.log('[GraphEditor] Fetch response status:', resp.status);
+          console.log('[GraphEditor] Fetch response headers:', Array.from(resp.headers.entries()));
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           return resp;
         };
@@ -393,7 +406,7 @@ export default function GraphEditor({ backgroundImage }) {
         setSnackbar({ open: true, message: 'Fetched and created node from URL', severity: 'success' });
         eventBus.emit('setAddress', fullUrl);
       } catch (error) {
-        console.error('Error fetching URL:', error);
+        console.error('[GraphEditor] Error fetching URL:', error);
         // Provide clearer snackbar with attempted info
         const msg = error && error.message ? error.message : 'Unknown error';
         setSnackbar({ open: true, message: `Failed to fetch URL: ${msg}`, severity: 'error' });

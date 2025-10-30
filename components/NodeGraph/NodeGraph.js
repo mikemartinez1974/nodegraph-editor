@@ -609,6 +609,17 @@ export default function NodeGraph({
     });
   }, [nodes, groups, edges]);
 
+  // Force initial redraw of layers on mount
+  useEffect(() => {
+    // Force initial redraw of layers on mount
+    if (handleLayerImperativeRef.current?.redraw) {
+      handleLayerImperativeRef.current.redraw();
+    }
+    if (edgeLayerImperativeRef.current?.redraw) {
+      edgeLayerImperativeRef.current.redraw();
+    }
+  }, []);
+
   // ============================================
   // Background Iframe Handlers
   // ============================================

@@ -62,22 +62,59 @@ const HandleLayer = forwardRef(({
 
   const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
 
-  const getHandlePositionForEdge = useCallback((nodeId, edgeType, direction) => {
-    const handleId = `${nodeId}-${edgeType}-${direction}`;
-    const pos = handlePositionMap[handleId];
+  const getNodeEdgeIntersection = (node, x, y) => {
+    const nodeX = node.position?.x ?? node.x ?? 0;
+    const nodeY = node.position?.y ?? node.y ?? 0;
+    const nodeWidth = node.width || 60;
+    const nodeHeight = node.height || 60;
     
-    let curveDirection;
-    if (edgeType === 'parent' || edgeType === 'child') {
-      curveDirection = 'vertical';
-    } else if (edgeType === 'peer') {
-      curveDirection = 'horizontal';
-    }
+    const halfWidth = nodeWidth / 2;
+    const halfHeight = nodeHeight / 2;
     
-    if (pos) {
-      return { x: pos.x, y: pos.y, curveDirection };
+    // Check which edge is closer to the point (x, y)
+    const distances = {
+      left: Math.abs(x - (nodeX - halfWidth)),
+      right: Math.abs(x - (nodeX + halfWidth)),
+      top: Math.abs(y - (nodeY - halfHeight)),
+      bottom: Math.abs(y - (nodeY + halfHeight))
+    };
+    
+    const minEdge = Object.keys(distances).reduce((a, b) => distances[a] < distances[b] ? a : b);
+    
+    switch (minEdge) {
+      case 'left':
+        return { x: nodeX - halfWidth, y: nodeY };
+      case 'right':
+        return { x: nodeX + halfWidth, y: nodeY };
+      case 'top':
+        return { x: nodeX, y: nodeY - halfHeight };
+      case 'bottom':
+        return { x: nodeX, y: nodeY + halfHeight };
+      default:
+        return { x: nodeX, y: nodeY };
     }
-    return undefined;
-  }, [handlePositionMap]);
+  };
+
+  const getHandlePositionForEdge = useCallback((sourceId, targetId, direction) => {
+    const sourceNode = nodes.find(n => n.id === sourceId);
+    const targetNode = nodes.find(n => n.id === targetId);
+    if (sourceNode && targetNode) {
+      if (direction === 'source') {
+        return getNodeEdgeIntersection(sourceNode, targetNode.position?.x ?? targetNode.x ?? 0, targetNode.position?.y ?? targetNode.y ?? 0);
+      } else {
+        return getNodeEdgeIntersection(targetNode, sourceNode.position?.x ?? sourceNode.x ?? 0, sourceNode.position?.y ?? sourceNode.y ?? 0);
+      }
+    }
+    // Fallback: if only one node exists, use its center
+    if (sourceNode && !targetNode) {
+      return { x: sourceNode.position?.x ?? sourceNode.x ?? 0, y: sourceNode.position?.y ?? sourceNode.y ?? 0 };
+    }
+    if (!sourceNode && targetNode) {
+      return { x: targetNode.position?.x ?? targetNode.x ?? 0, y: targetNode.position?.y ?? targetNode.y ?? 0 };
+    }
+    // If neither node exists, fallback to origin
+    return { x: 0, y: 0 };
+  }, [nodes]);
 
   const getCurrentHandles = useCallback(() => {
     const allHandles = [];
@@ -374,3 +411,4 @@ const HandleLayer = forwardRef(({
 });
 
 export default HandleLayer;
+
