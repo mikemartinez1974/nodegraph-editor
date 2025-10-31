@@ -231,5 +231,62 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     return () => eventBus.off('tlzClick', handler);
   }, []);
 
+  // Attach viewport helpers to API returned to callers
+  if (typeof graphAPI.current !== 'undefined' && graphAPI.current) {
+    graphAPI.current.getViewport = () => {
+      try { return { pan: state?.pan || { x: 0, y: 0 }, zoom: state?.zoom || 1 }; } catch (e) { return { pan: { x: 0, y: 0 }, zoom: 1 }; }
+    };
+
+    graphAPI.current.setViewport = ({ pan, zoom } = {}) => {
+      try {
+        if (pan && typeof state?.setPan === 'function') state.setPan({ x: Number(pan.x) || 0, y: Number(pan.y) || 0 });
+        if (zoom !== undefined && typeof state?.setZoom === 'function') state.setZoom(Number(zoom));
+        return true;
+      } catch (e) { return false; }
+    };
+
+    graphAPI.current.fitToNodes = ({ padding = 40, minZoom = 0.2, maxZoom = 3 } = {}) => {
+      try {
+        const nodes = (state && state.nodes) ? state.nodes : [];
+        if (!nodes || nodes.length === 0) return null;
+
+        const positions = nodes.map((n) => ({
+          x: (n.position?.x ?? n.x ?? 0),
+          y: (n.position?.y ?? n.y ?? 0),
+          width: n.width || 60,
+          height: n.height || 60
+        }));
+
+        const minX = Math.min(...positions.map((p) => p.x - p.width / 2));
+        const maxX = Math.max(...positions.map((p) => p.x + p.width / 2));
+        const minY = Math.min(...positions.map((p) => p.y - p.height / 2));
+        const maxY = Math.max(...positions.map((p) => p.y + p.height / 2));
+
+        const bboxW = Math.max(1, maxX - minX);
+        const bboxH = Math.max(1, maxY - minY);
+
+        const container = document.getElementById('graph-canvas') || document.body;
+        const availW = Math.max(1, container.clientWidth - padding * 2);
+        const availH = Math.max(1, container.clientHeight - padding * 2);
+
+        const scaleX = availW / bboxW;
+        const scaleY = availH / bboxH;
+        let newZoomVal = Math.min(scaleX, scaleY, 1);
+        newZoomVal = Math.max(minZoom, Math.min(maxZoom, newZoomVal));
+
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+
+        const newPanX = container.clientWidth / 2 - centerX * newZoomVal;
+        const newPanY = container.clientHeight / 2 - centerY * newZoomVal;
+
+        if (typeof state?.setZoom === 'function') state.setZoom(newZoomVal);
+        if (typeof state?.setPan === 'function') state.setPan({ x: newPanX, y: newPanY });
+
+        return { pan: { x: newPanX, y: newPanY }, zoom: newZoomVal };
+      } catch (e) { return null; }
+    };
+  }
+
   return graphAPI;
 }

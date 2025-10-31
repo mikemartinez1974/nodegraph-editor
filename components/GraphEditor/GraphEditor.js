@@ -84,6 +84,60 @@ export default function GraphEditor({ backgroundImage }) {
     } catch (err) { }
   }, [backgroundUrl]);
 
+  useEffect(() => {
+    if (backgroundUrl) {
+      let frame = 0;
+      const animate = () => {
+        if (frame < 3) {
+          setPan(prev => ({ x: prev.x, y: prev.y })); // Force update with new reference
+          frame++;
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      const timer = setTimeout(() => {
+        requestAnimationFrame(animate);
+      }, 200);
+  
+      return () => clearTimeout(timer);
+    }
+  }, [backgroundUrl, setPan]);
+
+  useEffect(() => {
+    if (backgroundUrl) {
+      // Wait for iframe to load and render, then force redraw
+      const timers = [100, 300, 500].map(delay => 
+        setTimeout(() => {
+          eventBus.emit('forceRedraw');
+        }, delay)
+      );
+      
+      return () => timers.forEach(clearTimeout);
+    }
+  }, [backgroundUrl]);
+
+  useEffect(() => {
+    if (backgroundUrl) {
+      const timer = setTimeout(() => {
+        // Make an imperceptible change to pan to force all layers to redraw
+        setPan(prev => ({ 
+          x: prev.x + 0.001, 
+          y: prev.y + 0.001 
+        }));
+        
+        // Reset after next frame
+        requestAnimationFrame(() => {
+          setPan(prev => ({ 
+            x: prev.x - 0.001, 
+            y: prev.y - 0.001 
+          }));
+        });
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [backgroundUrl, setPan]);
+  
   // Respond to events emitted from NodeGraph (iframe error) or BackgroundControls
   useEffect(() => {
     const handleBackgroundLoadFailed = ({ url } = {}) => {
@@ -366,6 +420,7 @@ export default function GraphEditor({ backgroundImage }) {
             const edgesToLoadFromJson = jsonData.edges || [];
             const groupsToLoadFromJson = jsonData.groups || [];
             handlers.handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
+            try { eventBus.emit('forceRedraw'); } catch (e) { /* ignore */ }
             setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
             return;
@@ -464,6 +519,7 @@ export default function GraphEditor({ backgroundImage }) {
           const groupsToLoad = data.groups || [];
           if (handlers && typeof handlers.handleLoadGraph === 'function') {
             handlers.handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+            try { eventBus.emit('forceRedraw'); } catch (e) { }
           } else {
             // Fallback: merge into current state
             setNodes(prev => {
@@ -902,6 +958,72 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('nodeClick', handleNodeClick);
   }, [setSelectedNodeIds, setSelectedEdgeIds]);
 
+  // Consolidated background/document repaint & redraw effect
+  useEffect(() => {
+    if (!backgroundUrl) return;
+
+    const doRepaint = () => {
+      try {
+        // Attempt to force layout/repaint on key elements
+        const container = document.getElementById('graph-canvas') || document.getElementById('graph-editor-background');
+        if (container) {
+          // Force reflow
+          // eslint-disable-next-line no-unused-vars
+          const _ = container.offsetHeight;
+
+          // Temporarily toggle display to provoke paint without visible change
+          const origDisplay = container.style.display;
+          container.style.display = 'none';
+          // eslint-disable-next-line no-unused-vars
+          const _2 = container.offsetHeight;
+          container.style.display = origDisplay;
+        }
+
+        // Try repaint on iframe if present
+        const iframe = document.querySelector('#graph-editor-background iframe') || document.querySelector('iframe');
+        if (iframe) {
+          const orig = iframe.style.display;
+          iframe.style.display = 'none';
+          // eslint-disable-next-line no-unused-vars
+          const _3 = iframe.offsetHeight;
+          iframe.style.display = orig;
+        }
+
+        // Toggle visibility on canvas for a quick repaint
+        const canvas = document.getElementById('graph-canvas');
+        if (canvas) {
+          canvas.style.visibility = 'hidden';
+          requestAnimationFrame(() => { canvas.style.visibility = ''; });
+        }
+
+        // Dispatch a resize event as a fallback
+        window.dispatchEvent(new Event('resize'));
+      } catch (err) {
+        console.warn('Repaint attempt failed:', err);
+      }
+    };
+
+    // Nudge pan slightly to force React layers to re-evaluate (imperceptible)
+    try {
+      setPan(prev => ({ x: prev.x + 0.0001, y: prev.y + 0.0001 }));
+      requestAnimationFrame(() => {
+        setPan(prev => ({ x: prev.x - 0.0001, y: prev.y - 0.0001 }));
+      });
+    } catch (e) { /* ignore */ }
+
+    // Emit forceRedraw a few times spaced out to cover async iframe renders
+    const timers = [100, 300, 600].map(delay => setTimeout(() => {
+      try { eventBus.emit('forceRedraw'); } catch (e) { }
+      doRepaint();
+    }, delay));
+
+    // Initial immediate attempt
+    try { eventBus.emit('forceRedraw'); } catch (e) { }
+    doRepaint();
+
+    return () => timers.forEach(clearTimeout);
+  }, [backgroundUrl, setPan]);
+
   return (
     <div 
       id="graph-editor-background" 
@@ -1043,6 +1165,7 @@ export default function GraphEditor({ backgroundImage }) {
       />
       
       <NodeGraph 
+        key={backgroundUrl || 'no-background'}
         nodes={memoizedNodes}
         setNodes={memoizedSetNodes}
         setEdges={memoizedSetEdges}

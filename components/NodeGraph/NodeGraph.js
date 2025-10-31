@@ -665,6 +665,143 @@ export default function NodeGraph({
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
 
+  // Auto-fit nodes on first load or when nodes transition from empty to non-empty
+  const didAutoFitRef = useRef(false);
+  useEffect(() => {
+    if (didAutoFitRef.current) return;
+    if (!nodes || nodes.length === 0) return;
+
+    // Defer until layout is stable
+    const id = requestAnimationFrame(() => {
+      try {
+        // compute bounding box
+        const positions = nodes.map(n => ({
+          x: (n.position?.x ?? n.x ?? 0),
+          y: (n.position?.y ?? n.y ?? 0),
+          width: n.width || 60,
+          height: n.height || 60
+        }));
+
+        const minX = Math.min(...positions.map(p => p.x - p.width / 2));
+        const maxX = Math.max(...positions.map(p => p.x + p.width / 2));
+        const minY = Math.min(...positions.map(p => p.y - p.height / 2));
+        const maxY = Math.max(...positions.map(p => p.y + p.height / 2));
+
+        const bboxW = Math.max(1, maxX - minX);
+        const bboxH = Math.max(1, maxY - minY);
+
+        const container = containerRef.current;
+        if (!container) return;
+        const padding = 40;
+
+        const availW = Math.max(1, container.clientWidth - padding * 2);
+        const availH = Math.max(1, container.clientHeight - padding * 2);
+
+        const scaleX = availW / bboxW;
+        const scaleY = availH / bboxH;
+        let newZoomVal = Math.min(scaleX, scaleY, 1);
+        newZoomVal = Math.max(0.2, Math.min(3, newZoomVal));
+
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+
+        const newPanX = container.clientWidth / 2 - centerX * newZoomVal;
+        const newPanY = container.clientHeight / 2 - centerY * newZoomVal;
+
+        if (typeof setZoom === 'function') setZoom(newZoomVal);
+        if (typeof setPan === 'function') setPan({ x: newPanX, y: newPanY });
+
+        // Force immediate redraw
+        requestAnimationFrame(() => {
+          try { handleLayerImperativeRef.current?.redraw && handleLayerImperativeRef.current.redraw(); } catch (e) {}
+          try { edgeLayerImperativeRef.current?.redraw && edgeLayerImperativeRef.current.redraw(); } catch (e) {}
+        });
+
+        didAutoFitRef.current = true;
+      } catch (e) { /* ignore */ }
+    });
+
+    return () => cancelAnimationFrame(id);
+  }, [nodes, setPan, setZoom]);
+
+  // Debug helpers: expose viewport and force redraw to window for console diagnostics
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.__NG_VIEWPORT = {
+          get: () => ({ pan: panRef.current || pan, zoom: zoomRef.current || zoom }),
+          pan: () => (panRef.current || pan),
+          zoom: () => (zoomRef.current || zoom)
+        };
+
+        window.__NG_FORCE_REDRAW = () => {
+          try { if (handleLayerImperativeRef.current && typeof handleLayerImperativeRef.current.redraw === 'function') handleLayerImperativeRef.current.redraw(); } catch (e) {}
+          try { if (edgeLayerImperativeRef.current && typeof edgeLayerImperativeRef.current.redraw === 'function') edgeLayerImperativeRef.current.redraw(); } catch (e) {}
+        };
+        
+        // Allow setting viewport from console for diagnostics
+        window.__NG_SET_VIEWPORT = ({ pan: newPan, zoom: newZoom } = {}) => {
+          try {
+            if (newZoom !== undefined && typeof setZoom === 'function') setZoom(Number(newZoom));
+            if (newPan && typeof setPan === 'function') setPan({ x: Number(newPan.x) || 0, y: Number(newPan.y) || 0 });
+          } catch (e) { /* ignore */ }
+        };
+        
+        // Compute a fit-to-nodes viewport and apply it
+        window.__NG_FIT_TO_NODES = ({ padding = 40, minZoom = 0.2, maxZoom = 3 } = {}) => {
+          try {
+            const nodes = nodesRef.current || [];
+            const container = containerRef.current;
+            if (!container || !nodes || nodes.length === 0) return null;
+
+            const positions = nodes.map(n => ({
+              x: (n.position?.x ?? n.x ?? 0),
+              y: (n.position?.y ?? n.y ?? 0),
+              width: n.width || 60,
+              height: n.height || 60
+            }));
+
+            const minX = Math.min(...positions.map(p => p.x - p.width / 2));
+            const maxX = Math.max(...positions.map(p => p.x + p.width / 2));
+            const minY = Math.min(...positions.map(p => p.y - p.height / 2));
+            const maxY = Math.max(...positions.map(p => p.y + p.height / 2));
+
+            const bboxW = Math.max(1, maxX - minX);
+            const bboxH = Math.max(1, maxY - minY);
+
+            const availW = Math.max(1, container.clientWidth - padding * 2);
+            const availH = Math.max(1, container.clientHeight - padding * 2);
+
+            const scaleX = availW / bboxW;
+            const scaleY = availH / bboxH;
+            let newZoomVal = Math.min(scaleX, scaleY);
+            newZoomVal = Math.max(minZoom, Math.min(maxZoom, newZoomVal));
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            const newPanX = container.clientWidth / 2 - centerX * newZoomVal;
+            const newPanY = container.clientHeight / 2 - centerY * newZoomVal;
+
+            if (typeof setZoom === 'function') setZoom(newZoomVal);
+            if (typeof setPan === 'function') setPan({ x: newPanX, y: newPanY });
+
+            // force redraw after layout
+            requestAnimationFrame(() => {
+              try { window.__NG_FORCE_REDRAW && window.__NG_FORCE_REDRAW(); } catch (e) {}
+            });
+
+            return { pan: { x: newPanX, y: newPanY }, zoom: newZoomVal };
+          } catch (e) { return null; }
+        };
+       }
+     } catch (err) { /* ignore */ }
+ 
+     return () => {
+       try { if (typeof window !== 'undefined') { delete window.__NG_VIEWPORT; delete window.__NG_FORCE_REDRAW; } } catch (e) {}
+     };
+   }, [pan, zoom]);
+
   return (
     <div id="graph-canvas" ref={containerRef} style={{
       position: 'fixed',
