@@ -1,414 +1,246 @@
 # Copy/Paste w/ Me - User Manual
 
-Welcome! This guide will help you master the graph editor and work efficiently with AI to create amazing visual graphs, create content, understand complex topics, and generally help you *think*.
+Welcome to **Copy/Paste w/ Me**, your interactive graph editor for creating, editing, and visualizing ideas. This manual will guide you through the app’s features, helping you make the most of its powerful tools.
 
 ---
 
 ## What Is This App?
 
-**Copy/Paste w/ Me** is a visual graph editor designed for working with AI assistants (ChatGPT, Claude, Grok, etc.). Instead of manually clicking to build graphs, you describe what you want to an AI, and paste the results directly into the app.
+**Copy/Paste w/ Me** is a visual graph editor designed to work seamlessly with AI assistants (e.g., ChatGPT, Claude). Describe your ideas to an AI, paste the generated JSON into the app, and watch your graph come to life.
 
-### How It Works
-1. **You describe** what you want: "Create a graph about solar system planets"
-2. **AI generates** JSON graph data for you
-3. **You paste** the JSON into this app (Ctrl+V)
-4. **Graph appears** instantly - edit, refine, repeat!
+### Key Features
+- **Interactive Graph Editing**: Add, edit, and connect nodes and edges.
+- **AI Integration**: Paste AI-generated JSON to create graphs instantly.
+- **Scripting**: Automate tasks and analyze graphs with custom scripts.
+- **Customizable Nodes and Edges**: Use different types, styles, and properties.
+- **Groups**: Organize nodes into collapsible groups.
+- **Advanced Layouts**: Auto-layout options for clean and professional graphs.
 
 ---
 
-## Quick Start (Your First Graph in 60 Seconds!)
+## Quick Start
 
 ### Step 1: Set Up Your Workspace
-- **Split your screen**: This app on one side, AI chat on the other
-- This lets you copy/paste back and forth easily
+- Open this app and your AI chat side by side.
+- This makes it easy to copy/paste between them.
 
 ### Step 2: Onboard Your AI
-1. Click the **📋 Onboard LLM** button (first button on the left in the toolbar)
-2. Paste that text into your AI chat
+1. Click the **📋 Onboard LLM** button in the toolbar.
+2. Paste the onboarding text into your AI chat.
 3. The AI now knows how to create graphs for you!
 
 ### Step 3: Ask for a Graph
 Tell your AI what you want:
-- "Create a graph showing the water cycle"
-- "Make an org chart for a startup"
-- "Visualize the steps in making coffee"
+- "Create a graph showing the water cycle."
+- "Make an org chart for a startup."
+- "Visualize the steps in making coffee."
 
 ### Step 4: Paste & Watch Magic Happen
-1. Copy the AI's JSON response
-2. Click anywhere in this app
-3. Press **Ctrl+V** (or click the **📋 Paste** button, second from left in toolbar)
+1. Copy the AI's JSON response.
+2. Click anywhere in this app.
+3. Press **Ctrl+V** or click the **📋 Paste** button.
 4. Your graph appears instantly!
 
 ---
 
-## Your Toolbar (All the Buttons Explained!)
+## Toolbar Overview
 
-The main toolbar appears at the top of your screen and can be dragged around. Here are all the buttons from **left to right**:
+The toolbar provides quick access to all major features. Here’s what each button does:
 
-### Core Actions (First Group, Left Side)
-- **📋 Onboard LLM** (1st button): Copy the AI setup guide to clipboard - do this first to teach your AI how to make graphs!
-- **📋 Paste** (2nd button): Paste AI's JSON or create a node from plain text (same as Ctrl+V)
-- **📋 Copy Selected** (3rd button): Copy just the nodes you've selected (with their connecting edges)
-- **📋 Copy Graph** (4th button): Copy the entire graph to clipboard as JSON
-- **📖 Copy Manual** (5th button): Copy this entire user manual to clipboard
-- **➕ Add Node** (6th button): Create a blank node manually at the center of your view
-- **📑 Node List** (7th button): Toggle the node list panel on/off
-- **📁 Group List** (8th button): Toggle the group list panel on/off
-- **🗑️ Delete** (9th button): Remove selected items (nodes, edges, or groups)
-- **👎 Clear Graph** (10th button): Delete everything - clears the entire graph (asks for confirmation)
-- **💾 Save** (11th button): Download your graph as a .json file to your computer
-- **📂 Load** (12th button): Open a saved graph from your computer
+### Core Actions
+- **📋 Onboard LLM**: Copy the AI setup guide to clipboard.
+- **📋 Paste**: Paste AI-generated JSON or create a node from plain text.
+- **📋 Copy Selected**: Copy selected nodes and edges.
+- **📋 Copy Graph**: Copy the entire graph as JSON.
+- **📖 Copy Manual**: Copy this user manual to clipboard.
+- **➕ Add Node**: Create a blank node manually.
+- **📑 Node List**: Toggle the node list panel.
+- **📁 Group List**: Toggle the group list panel.
+- **🗑️ Delete**: Remove selected items.
+- **👎 Clear Graph**: Delete everything in the graph.
+- **💾 Save**: Download your graph as a .json file.
+- **📂 Load**: Open a saved graph from your computer.
 
-### History Controls (Second Group)
-- **↩️ Undo**: Go back to previous state (Ctrl+Z)
-- **↪️ Redo**: Go forward to next state (Ctrl+Y)
+### History Controls
+- **↩️ Undo**: Revert the last action.
+- **↪️ Redo**: Redo the last undone action.
 
-### Mode Selector (Third Group)
-- **✏️ Manual Mode**: Default mode - manually edit and arrange nodes
-- **🧭 Nav Mode**: Navigation only - can't edit, just explore (good for presentations!)
-- **🔧 Auto-Layout**: Enable automatic graph layout (then select type and click Apply)
-
-### Keyboard Shortcuts
-- **Ctrl+X**: Cut selected nodes/edges
-- **Ctrl+C**: Copy selected nodes/edges
-- **Ctrl+V**: Paste graph JSON
-- **Ctrl+Z**: Undo
-- **Ctrl+Y**: Redo
-- **Delete**: Remove selected items
-- **Tab/Shift+Tab**: Navigate between nodes (accessibility)
-- **Ctrl+Arrows**: Move selected nodes (1px)
-- **Ctrl+Shift+Arrows**: Move selected nodes (10px)
-
-### Using Your Mouse
-- **Click a node**: Select it (turns blue)
-- **Ctrl+Click**: Select multiple nodes
-- **Drag a node**: Move it around
-- **Drag empty space**: Pan the whole canvas
-- **Scroll wheel**: Zoom in and out
-- **Click a line**: Select an edge (connection)
-- **Drag from dots**: Create new connections between nodes
+### Layout and Modes
+- **✏️ Manual Mode**: Default mode for editing and arranging nodes.
+- **🧭 Nav Mode**: Explore the graph without editing.
+- **🔧 Auto-Layout**: Automatically arrange nodes for a clean layout.
 
 ---
 
-## Understanding Graph Format (For Power Users)
+## Scripting Features
 
-Your AI generates graphs in JSON format. You don't need to write this yourself, but understanding it helps you ask for exactly what you want:
+### ScriptPanel
+- Write, run, and manage custom scripts.
+- Automate tasks, analyze graph data, and create nodes/edges programmatically.
+- Save, import, and export scripts.
 
-```json
-{
-  "nodes": [
-    {
-      "id": "unique_id",
-      "label": "Node Label",
-      "position": { "x": 0, "y": 0 },
-      "width": 200,
-      "height": 100,
-      "type": "default",
-      "data": {
-        "memo": "**Markdown** content here"
-      }
-    }
-  ],
-  "edges": [
-    {
-      "id": "edge_id",
-      "type": "straight",
-      "source": "source_node_id",
-      "target": "target_node_id",
-      "label": "optional label"
-    }
-  ],
-  "groups": []
-}
-```
-
-### Node Properties
-- **id** (required): Unique string identifier
-- **label** (required): Short display name (shown on default nodes, not on markdown nodes)
-- **type**: "default" | "markdown" | "resizable" | "legacy"
-  - `default`: Standard resizable node showing label (most common)
-  - `markdown`: Display node rendering memo content as formatted text on a blackboard/whiteboard
-  - `legacy`: Old-style fixed-size node
-- **position** (required): `{ x: number, y: number }` coordinates
-- **width**: Node width in pixels (default: 200)
-- **height**: Node height in pixels (default: 100)
-- **color**: Node background color (supports hex colors, rgb, rgba, and CSS gradients)
-  - Hex: `"#2e7d32"` or `"rgb(46, 125, 50)"`
-  - Gradient: `"linear-gradient(135deg, #667eea 0%, #764ba2 100%)"`
-  - If omitted, uses your default color preference
-- **data.memo**: Markdown-formatted notes (renders as formatted text in markdown nodes, appears in properties panel for all nodes)
-- **data.link**: Optional URL
-
-### Edge Types
-- **child/parent**: Vertical hierarchy (top/bottom handles)
-- **peer**: Horizontal relationships (left/right handles)
-
-### Edge Properties
-- **color**: Edge line color (supports hex colors, rgb, and CSS gradients)
-  - Hex: `"#ff5722"` or `"rgb(255, 87, 34)"`
-  - Gradient: `"linear-gradient(90deg, #667eea 0%, #764ba2 100%)"`
-  - If omitted, uses your default edge color preference
-- Use colors to differentiate relationship types or importance
-
-### When Asking Your AI
-- **"Space them out more"** - If nodes overlap
-- **"Make it horizontal/vertical"** - Control layout direction
-- **"Add markdown notes"** - Include formatted text in nodes
-- **"Use curved edges"** - Make graphs prettier
-- **"Add a documentation node"** - Create a markdown-type node for instructions or reference
-- **"Put the description in a markdown node"** - Display rich formatted text directly on the canvas
-- **"Color the important nodes red"** - Add visual emphasis with colors
-- **"Use a gradient for the title node"** - Make key nodes stand out with gradients
+### ScriptRunner
+- Executes scripts in a secure, sandboxed environment.
+- Provides an API for interacting with the graph:
+  - `api.getNodes()`, `api.getEdges()`
+  - `api.createNode(data)`, `api.createEdge(data)`
+  - `api.updateNode(id, patch)`, `api.deleteNode(id)`
 
 ---
 
-## What You Can Do
+## Node, Edge, and Group Properties
 
-### 1. Start From Scratch
-**Say to AI:** "Create a graph about [topic]"
-- Be specific: "Create a graph showing the steps in brewing coffee"
-- AI generates a complete graph
-- Paste it in and see your idea visualized!
-
-### 2. Add to Your Graph
-**Say to AI:** "Add more nodes about X"
-- AI adds new nodes without replacing everything
-- Builds on what you already have
-- Keep iterating until it's perfect!
-
-### 3. Modify Existing Parts
-**Say to AI:** "Update the 'Earth' node to include more details"
-- AI changes just that node
-- Everything else stays the same
-- Fine-tune individual pieces
-
-### 4. Create Hierarchies
-**Say to AI:** "Create an org chart for a tech company"
-- AI uses special top-to-bottom connections
-- Perfect for family trees, taxonomies, reporting structures
-- Clean vertical layouts
-
----
-
-## Advanced Features
-
-### Groups
-Users can group related nodes:
-```json
-{
-  "groups": [
-    {
-      "id": "group1",
-      "label": "Category A",
-      "nodeIds": ["node1", "node2", "node3"],
-      "collapsed": false,
-      "visible": true
-    }
-  ]
-}
-```
+### PropertiesPanel
+- Edit properties for nodes, edges, and groups.
+- Change labels, colors, positions, sizes, and more.
+- Use the advanced options for gradients, animations, and custom styles.
 
 ### Node Types
-- **default**: Resizable node with label displayed at top
-- **markdown**: Display node showing formatted memo content (looks like a blackboard in dark mode, whiteboard in light mode)
-- **svg**: Display node showing an SVG graphic (pass SVG markup in `data.svg`)
-- **legacy**: Old fixed-size nodes (not recommended for new graphs)
 
-SVG nodes let you display custom graphics, diagrams, or icons directly on the graph. To use, set `type: "svg"` and provide SVG markup in `data.svg`.
+This app supports a variety of node types, each designed for specific use cases. Below is an overview of the available node types:
 
-#### Example SVG Node
-```json
-{
-  "id": "node_svg_1",
-  "type": "svg",
-  "label": "SVG Example",
-  "position": { "x": 200, "y": 200 },
-  "width": 120,
-  "height": 120,
-  "data": {
-    "svg": "<svg viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='#1976d2'/><text x='50' y='55' font-size='22' text-anchor='middle' fill='white'>SVG</text></svg>"
-  }
-}
-```
+- **DefaultNode**
+  - General-purpose, resizable node with label, memo/link indicators, and built-in styling derived from the MUI theme.
+  - Key Features: Resize handle, label rendering, optional memo/link icons, theme-aware color/gradient support.
 
-### Edge Routing
-- **straight**: Best for simple connections
-- **curved**: Good for avoiding visual clutter
-- **orthogonal**: Professional diagrams
-- **child/parent**: Top-to-bottom hierarchy
-- **peer**: Side-by-side relationships
+- **DivNode**
+  - Renders arbitrary HTML or memo content inside a resizable DefaultNode shell.
+  - Key Features: Markdown rendering, optional raw HTML fragments, inherits resizing/interaction from DefaultNode.
 
----
+- **FixedNode**
+  - Like DefaultNode but not resizable (fixed size). Useful for icons, small labels, or items that should remain stable.
 
-## When Things Go Wrong (Troubleshooting)
+- **MarkdownNode**
+  - Optimized for rich content and documentation. Renders `node.data.memo` as markdown in a larger default size.
+  - Key Features: Markdown rendering with remark/rehype, theme-aware styling for blackboard/whiteboard mode.
 
-### "Invalid graph format" Error
-**What happened:** The JSON isn't formatted correctly  
-**Fix it:** Tell your AI "That didn't work, can you check the format?" - they'll fix it!
+- **SvgNode**
+  - Renders an SVG graphic provided in `node.data.svg`. Use for icons, small diagrams, or visual indicators.
 
-### Nodes Are Overlapping
-**What happened:** AI packed nodes too close together  
-**Fix it:** Say "Spread them out more" - AI will space them better
+- **APINode**
+  - Makes HTTP requests to APIs and displays the response.
+  - Key Features: URL, method, headers, and body input; fetch/cancel buttons; displays status and response preview.
 
-### Can't See My Graph
-**What happened:** Graph might be way off to the side  
-**Fix it:** 
-- Zoom out with scroll wheel
-- Or tell AI "Center the graph around (0, 0)"
+- **CounterNode**
+  - Simple counter with increment, decrement, and reset controls.
+  - Key Features: Displays count, step, min/max limits, emits value changes via eventBus.
 
-### Line Won't Connect
-**What happened:** Edge references wrong node IDs  
-**Fix it:** Tell AI "The connection isn't working" - they'll fix the IDs
+- **DelayNode**
+  - Delays output after receiving input, useful for timing and scheduling.
+  - Key Features: Configurable delay, queueing, manual trigger/cancel, status display.
 
-### Graph Feels Cluttered
-**What happened:** Too much in one view  
-**Fix it:**
-- Ask AI to group related nodes
-- Request curved edges instead of straight
-- Break into multiple smaller graphs
+- **GateNode**
+  - Logical gate (AND, OR, NOT, XOR, NAND, NOR) for boolean operations.
+  - Key Features: Editable inputs, operator selection, output display.
 
-### Paste Isn't Working
-**What happened:** Might not have copied correctly  
-**Fix it:**
-- Make sure you copied the full JSON block
-- Click in the app first, then Ctrl+V
-- Try the **📋 Paste** button (2nd button from left) instead
+- **ScriptNode**
+  - Runs user-defined scripts from a library and displays results.
+  - Key Features: Script selection, run/dry-run, mutation control, result display.
 
----
+- **TimerNode**
+  - Timer with start, pause, and stop controls, displays elapsed time.
+  - Key Features: Time formatting, control buttons, status indicator.
 
-## Pro Tips & Best Practices
+- **ToggleNode**
+  - Boolean toggle switch with ON/OFF states.
+  - Key Features: Toggle button, state indicator, emits value changes via eventBus.
 
-### Getting Great Results From Your AI
+### Edge Types
 
-**Start Small**
-- Ask for 5-10 nodes first
-- It's easier to add more than fix a mess!
+This app supports a variety of edge types, each designed for specific relationships and visual styles. Below is an overview of the available edge types:
 
-**Be Specific**
-- "Create a flowchart" → "Create a flowchart showing how to make a sandwich"
-- More details = better results
+- **Child**
+  - Description: Parent-child hierarchical relationship.
+  - Key Features: Curved, vertical direction, arrow at the end.
 
-**Iterate Freely**
-- Don't worry about perfection on first try
-- "Make it better" and "Add more" are valid requests!
-- Use Undo (Ctrl+Z) fearlessly
+- **Parent**
+  - Description: Reverse parent relationship.
+  - Key Features: Curved, vertical direction, arrow at the start.
 
-**Save Your Work**
-- Click **💾 Save** (11th button from left) often
-- Your browser won't auto-save
-- Download .json files to keep your graphs
+- **Peer**
+  - Description: Peer-to-peer relationship.
+  - Key Features: Curved, horizontal direction, dashed line, no arrow.
 
-### Making Beautiful Graphs
+- **Data Flow**
+  - Description: Data flowing from source to target.
+  - Key Features: Curved, gradient color, arrow at the end, animated flow.
 
-**Use the Right Node Type**
-- Default nodes for tasks, items, concepts
-- Markdown nodes for instructions, documentation, or reference material
-- Say "Put that in a markdown node" for formatted content
+- **Dependency**
+  - Description: Dependency relationship.
+  - Key Features: Straight, dashed line, arrow at the end.
 
-**Good Spacing**
-- If nodes overlap, ask AI to "spread them out more"
-- Breathing room makes graphs easier to read
+- **Reference**
+  - Description: Reference or link.
+  - Key Features: Curved, dashed line, arrow at the end.
 
-**Use Curved Edges**
-- They look cleaner than straight lines
-- Say "Use curved edges" when requesting graphs
+- **Bidirectional**
+  - Description: Two-way relationship.
+  - Key Features: Curved, arrows at both ends.
 
-**Group Related Items**
-- "Put all the planet nodes in a group called Solar System"
-- Groups keep complex graphs organized
+- **Weak Link**
+  - Description: Weak or optional relationship.
+  - Key Features: Curved, dashed line, low opacity, no arrow.
 
-**Add Descriptions**
-- "Include details in the node notes"
-- Markdown nodes show the content directly
-- Other nodes show content in the properties panel when selected
+- **Strong Link**
+  - Description: Strong or required
+- **Use Markdown Nodes**: Add formatted text for instructions or descriptions.
+- **Group Related Nodes**: Keep your graph organized.
+- **Save Often**: Download your graph regularly to avoid data loss.
+- **Experiment Freely**: Undo (Ctrl+Z) is your friend!
 
 ---
 
-## Real Examples (Try These!)
-
-### Example 1: Your First Graph
-**Say to AI:** "Create a simple graph showing the solar system with the sun and 3 planets"
-
-**What you'll get:** A visual showing the sun in the center with planets connected to it. Each node can have emojis (⭐🌍) and details!
-
-### Example 2: Planning a Project
-**Say to AI:** "Create a timeline for a software project from start to launch"
-
-**What you'll get:** A horizontal flow showing phases of a project. Perfect for planning anything with steps!
-
-### Example 3: Learning Concepts
-**Say to AI:** "Create a graph explaining how photosynthesis works, with a markdown node containing the detailed explanation"
-
-**What you'll get:** An educational diagram breaking down complex topics into connected concepts, with a formatted reference card showing the full explanation.
+### Groups
+- Organize nodes into collapsible groups.
+- Edit group labels, styles, and visibility.
 
 ---
 
-## Frequently Asked Questions
+## Keyboard Shortcuts
 
-**Q: Will my graphs be saved automatically?**  
-A: No! Click **💾 Save** (11th button from left) to download .json files. Save often!
-
-**Q: Can I edit nodes manually?**  
-A: Yes! Click a node, then click the properties panel to edit labels and notes.
-
-**Q: What if I make a mistake?**  
-A: Press Ctrl+Z to undo, or use the **↩️ Undo** button! The app remembers your history.
-
-**Q: Can I share my graphs?**  
-A: Yes! Save as .json using **💾 Save** button and share the file. Others can load it with **📂 Load**.
-
-**Q: Do I need to know JSON?**  
-A: Nope! Your AI handles all the technical stuff. Just describe what you want.
-
-**Q: What browsers work?**  
-A: Any modern browser: Chrome, Firefox, Safari, Edge. JavaScript must be enabled.
-
-**Q: Can I use this offline?**  
-A: The app works offline once loaded, but you need internet to talk to your AI.
-
-**Q: How many nodes can I have?**  
-A: The app handles 1000+ nodes smoothly! But start small and grow your graph.
+- **Ctrl+X**: Cut selected nodes/edges.
+- **Ctrl+C**: Copy selected nodes/edges.
+- **Ctrl+V**: Paste JSON or text.
+- **Ctrl+Z**: Undo.
+- **Ctrl+Y**: Redo.
+- **Delete**: Remove selected items.
+- **Scroll**: Zoom in/out.
+- **Ctrl+Arrows**: Move selected nodes (1px).
+- **Ctrl+Shift+Arrows**: Move selected nodes (10px).
 
 ---
 
-## Quick Cheat Sheet
+## Troubleshooting
 
-**Essential Shortcuts:**
-- **Ctrl+X**: Cut selected nodes/edges
-- **Ctrl+C**: Copy selected nodes/edges
-- **Ctrl+V**: Paste AI's graph
-- **Ctrl+Z**: Undo
-- **Delete**: Remove selected items
-- **Scroll**: Zoom in/out
-
-**First Time Setup:**
-1. Click **📋 Onboard LLM** (1st button, far left)
-2. Paste into AI chat
-3. Ask AI to create a graph
-4. Copy & paste result
-5. Done!
-
-**Making Changes:**
-- **Add stuff**: "Add more nodes about X"
-- **Change stuff**: "Update node Y to say Z"
-- **Fix layout**: "Spread them out more"
-- **Save your work**: Click **💾 Save** (11th button)
+### Common Issues
+- **Invalid JSON**: Ensure the JSON is properly formatted.
+- **Overlapping Nodes**: Ask the AI to "spread them out more."
+- **Graph Not Visible**: Zoom out or center the graph.
+- **Paste Not Working**: Ensure you copied the full JSON block.
 
 ---
 
-## What's Next?
+## Pro Tips
 
-Now that you know the basics:
+- **Start Small**: Begin with 5-10 nodes and expand.
+- **Use Markdown Nodes**: Add formatted text for instructions or descriptions.
+- **Group Related Nodes**: Keep your graph organized.
+- **Save Often**: Download your graph regularly to avoid data loss.
+- **Experiment Freely**: Undo (Ctrl+Z) is your friend!
 
-1. **Try it!** Ask your AI to create a simple 3-node graph
-2. **Experiment** with different topics and layouts
-3. **Iterate** - keep refining until it's perfect
-4. **Share** - save and show off your creations!
+---
 
-The best way to learn is by doing. Don't be afraid to try things - Undo is your friend!
+## Examples
+
+### Example 1: Solar System
+**Prompt:** "Create a graph showing the solar system with the sun and 3 planets."
+
+### Example 2: Project Timeline
+**Prompt:** "Create a timeline for a software project from start to launch."
+
+### Example 3: Educational Diagram
+**Prompt:** "Create a graph explaining photosynthesis with a markdown node for details."
 
 ---
 
 **Happy graphing!** 🎨📊✨
-
-*Need the onboarding guide for your AI? Click **📋 Onboard LLM** (first button on the left) in the toolbar!*

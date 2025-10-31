@@ -3,6 +3,7 @@
 // All handler functions consolidated
 // ============================================
 import eventBus from '../../NodeGraph/eventBus';
+import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils';
 
 export function createGraphEditorHandlers({
   graphAPI,
@@ -395,91 +396,56 @@ export function createGraphEditorHandlers({
   };
 }
 
-function generateUUID(nodes) {
-  let id;
-  do {
-    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-  } while (nodes.some(n => n.id === id));
-  return id;
-}
-
-function ensureUniqueNodeIds(nodes, existingNodes) {
-  const existingIds = new Set(existingNodes.map(n => n.id));
-  return nodes.map(node => {
-    let id;
-    do {
-      id = generateUUID();
-    } while (existingIds.has(id));
-    existingIds.add(id);
-    return { ...node, id };
-  });
-}
-
-function deduplicateNodes(nodes) {
-  const seen = new Set();
-  const ids = nodes.map(n => n.id);
-  const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
-  if (duplicates.length > 0) {
-    console.warn('deduplicateNodes: duplicate IDs found:', duplicates);
-    console.log('deduplicateNodes: all IDs:', ids);
-  }
-  return nodes.filter(node => {
-    if (seen.has(node.id)) return false;
-    seen.add(node.id);
-    return true;
-  });
-}
-
+// Local helper: add a node directly to state (fallback path). Renamed to avoid clashing with exported handler.
 let addNodeGuard = false;
-
-function handleAddNode({ nodes, setNodes, pan, zoom, defaultNodeColor }) {
+export function handleAddNodeLocal({ nodesRef, setNodes, pan, zoom, defaultNodeColor = '#1976d2', nodeType = 'default' }) {
   if (addNodeGuard) return;
   addNodeGuard = true;
   setTimeout(() => { addNodeGuard = false; }, 100);
-  console.log('handleAddNode called');
+
   setNodes(prev => {
-    let id;
-    do {
-      id = (typeof crypto !== 'undefined' && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : `node_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-    } while (prev.some(n => n.id === id));
+    const existingIds = new Set(prev.map(n => n.id));
+    const id = generateUUID(existingIds);
+    const centerX = (window.innerWidth / 2 - (pan?.x || 0)) / (zoom || 1);
+    const centerY = (window.innerHeight / 2 - (pan?.y || 0)) / (zoom || 1);
+
     const newNode = {
-      id: `node_${Date.now()}`,
+      id,
       label: 'New Node',
-      type: type, // Use the passed type
-      position: { x: (window.innerWidth / 2 - pan.x) / zoom, y: (window.innerHeight / 2 - pan.y) / zoom },
+      type: nodeType,
+      position: { x: centerX, y: centerY },
       width: 120,
       height: 60,
       color: defaultNodeColor,
       data: {}
     };
-    // Remove any node with the same ID before adding
-    const filtered = prev.filter(n => n.id !== id);
-    const next = deduplicateNodes([...filtered, newNode]);
-    console.log('setNodes (handleAddNode):', next.map(n => n.id));
+
+    // Deduplicate and add
+    const next = deduplicateNodes([...prev, newNode]);
+    console.log('handleAddNodeLocal: added', id);
     return next;
   });
 }
 
-function handleImportNodes({ nodes, setNodes, importedNodes }) {
-  const uniqueNodes = ensureUniqueNodeIds(importedNodes, nodes);
+// Import helper to merge imported nodes safely
+export function handleImportNodes({ nodesRef, setNodes, importedNodes = [] }) {
   setNodes(prev => {
-    const next = deduplicateNodes([...prev, ...uniqueNodes]);
-    console.log('setNodes (handleImportNodes):', next.map(n => n.id));
+    const unique = ensureUniqueNodeIds(importedNodes, prev);
+    const next = deduplicateNodes([...prev, ...unique]);
+    console.log('handleImportNodes: setNodes ->', next.map(n => n.id));
     return next;
   });
 }
 
-function handlePasteGraph({ nodes, setNodes, pastedNodes }) {
-  const uniqueNodes = ensureUniqueNodeIds(pastedNodes, nodes);
+// Helper for pasting nodes programmatically (used by external paste handlers)
+export function handlePasteGraph({ nodesRef, setNodes, pastedNodes = [] }) {
   setNodes(prev => {
-    const next = deduplicateNodes([...prev, ...uniqueNodes]);
-    console.log('setNodes (handlePasteGraph):', next.map(n => n.id));
+    const unique = ensureUniqueNodeIds(pastedNodes, prev);
+    const next = deduplicateNodes([...prev, ...unique]);
+    console.log('handlePasteGraph: setNodes ->', next.map(n => n.id));
     return next;
   });
 }
 
+// Keep previous export if present; ensure nothing else is broken
 export { handleUpdateNodeData };

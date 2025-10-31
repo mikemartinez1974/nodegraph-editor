@@ -13,32 +13,31 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
     try { parsed = JSON.parse(text); } catch (err) { parsed = null; }
 
     if (parsed) {
-      // If a global handler is available, prefer it but still return counts based on parsed data
-      if (typeof window !== 'undefined' && typeof window.handlePasteGraphData === 'function') {
-        try {
-          await window.handlePasteGraphData(parsed);
-        } catch (err) {
-          console.warn('window.handlePasteGraphData failed:', err);
-        }
-        const nodeCount = Array.isArray(parsed.nodes) ? parsed.nodes.length : 0;
-        const edgeCount = Array.isArray(parsed.edges) ? parsed.edges.length : 0;
-        const groupCount = Array.isArray(parsed.groups) ? parsed.groups.length : 0;
-        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes and ${edgeCount} edges`, 'success');
-        return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
-      }
+      // Prefer an external handler if provided (handlers prop, global window handler, or graphEditorHandlers)
+      const externalHandler = (handlers && typeof handlers.handlePasteGraphData === 'function' && handlers.handlePasteGraphData)
+        || (typeof window !== 'undefined' && typeof window.handlePasteGraphData === 'function' && window.handlePasteGraphData)
+        || (typeof window !== 'undefined' && window.graphEditorHandlers && typeof window.graphEditorHandlers.handlePasteGraphData === 'function' && window.graphEditorHandlers.handlePasteGraphData);
 
-      // If handlers.provide paste, call it and return counts
-      if (handlers && typeof handlers.handlePasteGraphData === 'function') {
+      if (externalHandler && typeof externalHandler === 'function') {
         try {
-          await handlers.handlePasteGraphData(parsed);
+          const result = await externalHandler(parsed);
+          // If the external handler returned counts, respect them
+          if (result && typeof result === 'object' && ('nodes' in result || 'edges' in result || 'groups' in result)) {
+            if (onShowMessage) onShowMessage('Imported successfully', 'success');
+            return { nodes: result.nodes || 0, edges: result.edges || 0, groups: result.groups || 0 };
+          }
+
+          // Otherwise assume the handler performed the import; infer counts from parsed where possible
+          const nodeCount = Array.isArray(parsed.nodes) ? parsed.nodes.length : (Array.isArray(parsed) ? parsed.length : 0);
+          const edgeCount = Array.isArray(parsed.edges) ? parsed.edges.length : 0;
+          const groupCount = Array.isArray(parsed.groups) ? parsed.groups.length : 0;
+          if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes and ${edgeCount} edges`, 'success');
+          return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
         } catch (err) {
-          console.warn('handlers.handlePasteGraphData failed:', err);
+          console.warn('External paste handler failed, falling back to internal import:', err);
+          if (onShowMessage) onShowMessage('External paste handler failed — attempting local import', 'warning');
+          // fall through to local import
         }
-        const nodeCount = Array.isArray(parsed.nodes) ? parsed.nodes.length : 0;
-        const edgeCount = Array.isArray(parsed.edges) ? parsed.edges.length : 0;
-        const groupCount = Array.isArray(parsed.groups) ? parsed.groups.length : 0;
-        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes and ${edgeCount} edges`, 'success');
-        return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
       }
 
       // Otherwise, perform an internal merge (similar to previous paste logic)
