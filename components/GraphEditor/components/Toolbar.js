@@ -79,9 +79,12 @@ const Toolbar = ({
   pan,
   zoom,
   setNodes,
+  setEdges,
+  setGroups,
   nodesRef,
-  saveToHistory,
   edgesRef,
+  saveToHistory,
+  graphCRUD,
   currentTheme = 'light',
   backgroundImage = null,
   defaultNodeColor = '#1976d2',
@@ -189,12 +192,20 @@ const Toolbar = ({
     document.removeEventListener('mouseup', onMouseUp);
   };
 
-  const handleClear = () => {
-    if (onClearGraph) {
-      const confirmed = window.confirm('Are you sure you want to clear the entire graph? This cannot be undone.');
-      if (confirmed) {
+  const handleNewFile = () => {
+    const confirmed = window.confirm('Create a new file? Any unsaved changes will be lost.');
+    if (confirmed) {
+      // Clear via CRUD API if available for immediate ref sync
+      if (graphCRUDRef?.current) {
+        graphCRUDRef.current.clearGraph();
+      } else if (onClearGraph) {
         onClearGraph();
       }
+      // Update address bar to show local file
+      requestAnimationFrame(() => {
+        eventBus.emit('setAddress', 'local://untitled.node');
+        if (onShowMessage) onShowMessage('New file created', 'success');
+      });
     }
   };
 
@@ -230,8 +241,16 @@ const Toolbar = ({
           onLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
           if (onShowMessage) onShowMessage('Graph loaded successfully!', 'success');
 
+          // Update address bar with loaded filename
+          eventBus.emit('setAddress', `local://${file.name}`);
+
           try {
-            eventBus.emit('loadSaveFile', { settings: jsonData.settings || {}, viewport: jsonData.viewport || {}, scripts: jsonData.scripts || null });
+            eventBus.emit('loadSaveFile', { 
+              settings: jsonData.settings || {}, 
+              viewport: jsonData.viewport || {}, 
+              scripts: jsonData.scripts || null,
+              filename: file.name
+            });
           } catch (err) {
             console.warn('Failed to emit loadSaveFile event:', err);
           }
@@ -322,17 +341,35 @@ const Toolbar = ({
     const blob = new Blob([jsonString], { type: 'application/node' });
     const url = URL.createObjectURL(blob);
     
+    // Get filename from address bar (remove "local://" prefix)
+    let filename = currentUrl.startsWith('local://') 
+      ? currentUrl.slice('local://'.length) 
+      : currentUrl || 'untitled.node';
+    
+    // Ensure .node extension
+    if (!filename.endsWith('.node')) {
+      filename = filename + '.node';
+    }
+    
+    // Fallback to timestamp if empty
+    if (!filename || filename === '.node') {
+      filename = `graph_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.node`;
+    }
+    
     const link = document.createElement('a');
     link.href = url;
-    link.download = `graph-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.node`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
+    // Update address bar to show saved filename
+    eventBus.emit('setAddress', `local://${filename}`);
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    if (onShowMessage) onShowMessage('Graph saved to .node file!', 'success');
+    if (onShowMessage) onShowMessage(`Saved ${filename}`, 'success');
   };
 
   const handleCopyOnboard = async () => {
@@ -430,9 +467,20 @@ const Toolbar = ({
     }
   };
 
+  const graphCRUDRef = useRef(graphCRUD);
+  useEffect(() => {
+    graphCRUDRef.current = graphCRUD;
+  }, [graphCRUD]);
+
   const handlePasteUniversal = async () => {
     // Delegate to shared paste handler for consistent behavior
-    await pasteFromClipboardUnified({ handlers: null, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook: { saveToHistory }, onShowMessage });
+    await pasteFromClipboardUnified({ 
+      handlers: null, 
+      state: { setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom }, 
+      historyHook: { saveToHistory }, 
+      onShowMessage,
+      graphCRUD: graphCRUDRef.current
+    });
   };
 
   const handleCopyGraph = () => {
@@ -589,13 +637,12 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
-            onClick={handleClear}
-            title="Clear Graph"
+            onClick={handleNewFile}
+            title="New File"
             size="small"
-            color="error"
             disabled={isFreeUser}
           >
-            <ThumbDownOffAltIcon fontSize="small" />
+            <AddIcon fontSize="small" />
           </IconButton>
 
           <ButtonGroup size="small" sx={{ mr: 1 }}>

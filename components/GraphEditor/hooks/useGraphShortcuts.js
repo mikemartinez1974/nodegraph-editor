@@ -16,7 +16,12 @@ export default function useGraphShortcuts({
   saveToHistory,
   edgesRef,
   nodesRef,
-  setShowAllEdgeLabels // <-- Add this prop
+  setShowAllEdgeLabels, // <-- Add this prop
+  graphCRUD, // <-- Add graphCRUD
+  setGroups,
+  pan,
+  zoom,
+  onShowMessage
 }) {
   useEffect(() => {
     // Helper function to copy selected nodes and edges to clipboard as JSON
@@ -87,7 +92,13 @@ export default function useGraphShortcuts({
     // Helper function to paste nodes and edges from clipboard
     async function pasteFromClipboard() {
       try {
-        const result = await pasteFromClipboardUnified({ handlers: null, state: { setNodes, nodesRef, setEdges, edgesRef, setGroups: null, pan: null, zoom: null }, historyHook: { saveToHistory }, onShowMessage: (msg) => console.log(msg) });
+        const result = await pasteFromClipboardUnified({ 
+          handlers: null, 
+          state: { setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom }, 
+          historyHook: { saveToHistory }, 
+          onShowMessage: onShowMessage || ((msg) => console.log(msg)),
+          graphCRUD
+        });
         if (result) {
           console.log(`Pasted ${result.nodes || 0} nodes and ${result.edges || 0} edges`);
         }

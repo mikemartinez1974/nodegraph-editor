@@ -147,11 +147,15 @@ export function createGraphEditorHandlers({
   
   const handleClearGraph = () => {
     const newNodes = [], newEdges = [], newGroups = [];
-    setNodes(newNodes);
-    setEdges(newEdges);
+    setNodes(prev => {
+      nodesRef.current = newNodes;
+      return newNodes;
+    });
+    setEdges(prev => {
+      edgesRef.current = newEdges;
+      return newEdges;
+    });
     setGroups(newGroups);
-    nodesRef.current = newNodes;
-    edgesRef.current = newEdges;
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
@@ -161,11 +165,15 @@ export function createGraphEditorHandlers({
   
   // ===== LOAD/SAVE HANDLERS =====
   const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = []) => {
-    setNodes(loadedNodes);
-    setEdges(loadedEdges);
+    setNodes(prev => {
+      nodesRef.current = loadedNodes;
+      return loadedNodes;
+    });
+    setEdges(prev => {
+      edgesRef.current = loadedEdges;
+      return loadedEdges;
+    });
     setGroups(loadedGroups);
-    nodesRef.current = loadedNodes;
-    edgesRef.current = loadedEdges;
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
@@ -311,8 +319,14 @@ export function createGraphEditorHandlers({
         const nodeIdSet = new Set(pastedNodes.map(n => n.id));
         const groupsSanitized = sanitizeGroups(pastedGroups, nodeIdSet);
         
-        setNodes(pastedNodes);
-        setEdges(pastedEdges);
+        setNodes(prev => {
+          nodesRef.current = pastedNodes;
+          return pastedNodes;
+        });
+        setEdges(prev => {
+          edgesRef.current = pastedEdges;
+          return pastedEdges;
+        });
         setGroups([]);
         groupManager.current?.clear?.();
         setGroups(groupsSanitized);
@@ -343,8 +357,14 @@ export function createGraphEditorHandlers({
         const newEdges = [...edgesRef.current, ...edgesToAdd];
         const newGroups = [...groups, ...groupsToAdd];
 
-        setNodes(newNodes);
-        setEdges(newEdges);
+        setNodes(prev => {
+          nodesRef.current = newNodes;
+          return newNodes;
+        });
+        setEdges(prev => {
+          edgesRef.current = newEdges;
+          return newEdges;
+        });
         setGroups(newGroups);
 
         groupsToAdd.forEach(g => {

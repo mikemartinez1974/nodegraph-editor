@@ -17,12 +17,14 @@ function deduplicateNodes(nodes) {
 }
 
 export default class GraphCRUD {
-  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory) {
+  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef) {
     this.getNodes = getNodes;
     this.setNodes = setNodes;
     this.getEdges = getEdges;
     this.setEdges = setEdges;
     this.saveToHistory = saveToHistory;
+    this.nodesRef = nodesRef;
+    this.edgesRef = edgesRef;
   }
 
   // ==================== NODE CRUD ====================
@@ -116,7 +118,11 @@ export default class GraphCRUD {
         return node;
       });
 
-      this.setNodes(updatedNodes);
+      this.setNodes(prev => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
       this.saveToHistory(updatedNodes, this.getEdges());
 
       return { success: true, data: updatedNodes[nodeIndex] };
@@ -143,8 +149,16 @@ export default class GraphCRUD {
       const updatedNodes = currentNodes.filter(n => n.id !== id);
       const updatedEdges = currentEdges.filter(e => e.source !== id && e.target !== id);
       
-      this.setNodes(updatedNodes);
-      this.setEdges(updatedEdges);
+      this.setNodes(prev => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
+      this.setEdges(prev => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
       this.saveToHistory(updatedNodes, updatedEdges);
 
       return { success: true, data: { deletedNodeId: id, affectedEdges: currentEdges.length - updatedEdges.length } };
@@ -198,7 +212,11 @@ export default class GraphCRUD {
 
       const currentEdges = this.getEdges();
       const updatedEdges = [...currentEdges, newEdge];
-      this.setEdges(updatedEdges);
+      this.setEdges(prev => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
       this.saveToHistory(this.getNodes(), updatedEdges);
 
       return { success: true, data: newEdge };
@@ -252,7 +270,11 @@ export default class GraphCRUD {
         return edge;
       });
 
-      this.setEdges(updatedEdges);
+      this.setEdges(prev => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
       this.saveToHistory(this.getNodes(), updatedEdges);
 
       return { success: true, data: updatedEdges[edgeIndex] };
@@ -276,7 +298,11 @@ export default class GraphCRUD {
       }
 
       const updatedEdges = currentEdges.filter(e => e.id !== id);
-      this.setEdges(updatedEdges);
+      this.setEdges(prev => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
       this.saveToHistory(this.getNodes(), updatedEdges);
 
       return { success: true, data: { deletedEdgeId: id } };
@@ -294,19 +320,58 @@ export default class GraphCRUD {
    */
   createNodes(nodesArray) {
     try {
-      const results = nodesArray.map(opts => this.createNode(opts));
-      const successful = results.filter(r => r.success);
-      const failed = results.filter(r => !r.success);
-      // Deduplicate after batch creation
-      const allCreated = successful.map(r => r.data);
-      const updatedNodes = deduplicateNodes([...this.getNodes(), ...allCreated]);
-      this.setNodes(updatedNodes);
+      const currentNodes = this.getNodes();
+      const createdNodes = [];
+      const failed = [];
+
+      // Create all nodes without calling setNodes/saveToHistory for each
+      for (const opts of nodesArray) {
+        try {
+          let nodeId;
+          do {
+            nodeId = opts.id || this._generateId();
+          } while (currentNodes.some(n => n.id === nodeId) || createdNodes.some(n => n.id === nodeId));
+
+          const newNode = {
+            id: nodeId,
+            type: opts.type || 'default',
+            label: opts.label || '',
+            position: opts.position || { x: 100, y: 100 },
+            width: opts.width !== undefined ? opts.width : 160,
+            height: opts.height !== undefined ? opts.height : 80,
+            color: opts.color,
+            data: {
+              memo: opts.data?.memo || '',
+              link: opts.data?.link || '',
+              html: opts.data?.html || '',
+              svg: opts.data?.svg || '',
+              ...opts.data
+            },
+            resizable: opts.resizable !== undefined ? opts.resizable : true,
+            handlePosition: opts.handlePosition || 'center',
+            showLabel: opts.showLabel !== undefined ? opts.showLabel : true
+          };
+
+          createdNodes.push(newNode);
+        } catch (error) {
+          failed.push(error.message);
+        }
+      }
+
+      // Update state once with all nodes
+      const updatedNodes = deduplicateNodes([...currentNodes, ...createdNodes]);
+      this.setNodes(prev => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
       this.saveToHistory(updatedNodes, this.getEdges());
+
       return {
         success: failed.length === 0,
         data: {
-          created: allCreated,
-          failed: failed.map(r => r.error)
+          created: createdNodes,
+          failed: failed
         }
       };
     } catch (error) {
@@ -343,8 +408,14 @@ export default class GraphCRUD {
    */
   clearGraph() {
     try {
-      this.setNodes([]);
-      this.setEdges([]);
+      this.setNodes(prev => {
+        if (this.nodesRef) this.nodesRef.current = [];
+        return [];
+      });
+      this.setEdges(prev => {
+        if (this.edgesRef) this.edgesRef.current = [];
+        return [];
+      });
       this.saveToHistory([], []);
       return { success: true, data: { message: 'Graph cleared' } };
     } catch (error) {

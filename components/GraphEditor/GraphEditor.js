@@ -30,6 +30,8 @@ import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
 import PropertiesPanel from './components/PropertiesPanel';
+import GraphCRUD from './GraphCrud';
+import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 
 const nodeTypes = getNodeTypes();
 
@@ -209,6 +211,11 @@ export default function GraphEditor({ backgroundImage }) {
     };
   }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
 
+  // Initialize address bar to local file on mount
+  useEffect(() => {
+    eventBus.emit('setAddress', 'local://untitled.node');
+  }, []);
+
   // Load saved document from settings when loading a file
   useEffect(() => {
     function handleLoadSaveFile(payload = {}) {
@@ -289,6 +296,61 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Update handlers with graphAPI reference
   handlers.graphAPI = graphAPI;
+
+  // Create GraphCRUD instance (stable - don't recreate on every render)
+  const graphCRUD = useMemo(() => {
+    return new GraphCRUD(
+      () => nodesRef.current || [],
+      setNodes,
+      () => edgesRef.current || [],
+      setEdges,
+      historyHook.saveToHistory,
+      nodesRef,
+      edgesRef
+    );
+  }, [setNodes, setEdges, historyHook.saveToHistory]);
+
+  // Wire up paste event listener
+  useEffect(() => {
+    const handlePaste = async (e) => {
+      console.log('[GraphEditor] Paste event captured');
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        console.log('[GraphEditor] Calling pasteFromClipboardUnified with graphCRUD:', graphCRUD);
+        const result = await pasteFromClipboardUnified({
+          handlers,
+          state: {
+            setNodes,
+            nodesRef,
+            setEdges,
+            edgesRef,
+            setGroups,
+            pan,
+            zoom
+          },
+          historyHook,
+          onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity }),
+          graphCRUD
+        });
+        
+        console.log('[GraphEditor] Paste result:', result);
+        if (result && (result.nodes > 0 || result.edges > 0 || result.groups > 0)) {
+          console.log('[GraphEditor] Successfully pasted:', result);
+        }
+      } catch (err) {
+        console.error('[GraphEditor] Paste handler error:', err);
+        setSnackbar({ open: true, message: 'Paste failed', severity: 'error' });
+      }
+    };
+
+    console.log('[GraphEditor] Registering paste listener with graphCRUD:', graphCRUD);
+    window.addEventListener('paste', handlePaste, { capture: true });
+    return () => {
+      console.log('[GraphEditor] Removing paste listener');
+      window.removeEventListener('paste', handlePaste, { capture: true });
+    };
+  }, [graphCRUD, handlers, setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom, historyHook, setSnackbar]);
   
   useGraphShortcuts({
     setNodes,
@@ -304,7 +366,12 @@ export default function GraphEditor({ backgroundImage }) {
     saveToHistory: historyHook.saveToHistory,
     edgesRef,
     nodesRef,
-    setShowAllEdgeLabels
+    setShowAllEdgeLabels,
+    graphCRUD,
+    setGroups,
+    pan,
+    zoom,
+    onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity })
   });
 
   // Panel anchor synchronization
@@ -1046,9 +1113,12 @@ export default function GraphEditor({ backgroundImage }) {
         pan={pan}
         zoom={zoom}
         setNodes={setNodes}
+        setEdges={setEdges}
+        setGroups={setGroups}
         nodesRef={nodesRef}
-        saveToHistory={historyHook.saveToHistory}
         edgesRef={edgesRef}
+        saveToHistory={historyHook.saveToHistory}
+        graphCRUD={graphCRUD}
         currentTheme={theme.palette.mode}
         backgroundImage={backgroundImage}
         defaultNodeColor={defaultNodeColor}
