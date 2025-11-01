@@ -620,6 +620,8 @@ export default function NodeGraph({
     }
   }, []);
 
+
+
   // ============================================
   // Background Iframe Handlers
   // ============================================
@@ -665,11 +667,18 @@ export default function NodeGraph({
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
 
-  // Auto-fit nodes on first load or when nodes transition from empty to non-empty
+  // Auto-fit nodes on first load only (when nodes first appear, not on remounts)
   const didAutoFitRef = useRef(false);
+  const lastNodeCountRef = useRef(0);
+  
   useEffect(() => {
-    if (didAutoFitRef.current) return;
-    if (!nodes || nodes.length === 0) return;
+    // Only auto-fit once, when we first get nodes (transition from 0 to >0)
+    const currentNodeCount = nodes?.length || 0;
+    const isFirstTime = lastNodeCountRef.current === 0 && currentNodeCount > 0;
+    
+    lastNodeCountRef.current = currentNodeCount;
+    
+    if (didAutoFitRef.current || !isFirstTime) return;
 
     // Defer until layout is stable
     const id = requestAnimationFrame(() => {
@@ -894,8 +903,8 @@ export default function NodeGraph({
           ref={edgeLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={edgeCanvasRef}
-          edgeList={edgesRef.current}
-          nodeList={nodesRef.current}
+          edgeList={edges}
+          nodeList={nodes}
           pan={pan}
           zoom={zoom}
           selectedEdgeId={selectedEdgeId}
@@ -920,8 +929,8 @@ export default function NodeGraph({
           ref={handleLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={handleCanvasRef}
-          nodes={nodesRef.current}
-          edges={edgesRef.current}
+          nodes={nodes}
+          edges={edges}
           pan={pan}
           zoom={zoom}
           edgeTypes={edgeTypes} 

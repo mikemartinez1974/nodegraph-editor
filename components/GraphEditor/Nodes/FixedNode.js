@@ -117,6 +117,8 @@ const FixedNode = ({
       }}
       onClick={e => {
         e.stopPropagation();
+        // Prevent nodeClick if clicking a link
+        if (e.target && (e.target.tagName === 'A' || e.target.closest('a'))) return;
         if (typeof onClick === 'function') onClick(e);
         eventBus.emit('nodeClick', { id: node.id, event: e });
       }}

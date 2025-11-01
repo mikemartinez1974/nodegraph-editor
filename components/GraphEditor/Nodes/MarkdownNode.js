@@ -68,7 +68,12 @@ const MarkdownNode = ({
   // Render using DefaultNode as base, with custom markdown content
   return (
     <DefaultNode
-      {...{ node, pan, zoom, style, isSelected, onMouseDown, onClick, onDoubleClick, draggingHandle, nodeRefs, onResize }}
+      {...{ node, pan, zoom, style, isSelected, onMouseDown, onClick: (e) => {
+        // Prevent nodeClick if clicking a link
+        if (e.target && (e.target.tagName === 'A' || e.target.closest('a'))) return;
+        if (typeof onClick === 'function') onClick(e);
+        eventBus.emit('nodeClick', { id: node.id, event: e });
+      }, onDoubleClick, draggingHandle, nodeRefs, onResize }}
     >
       {/* Markdown content */}
       <div 

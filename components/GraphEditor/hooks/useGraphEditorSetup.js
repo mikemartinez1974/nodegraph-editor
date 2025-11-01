@@ -1,5 +1,5 @@
 // ============================================
-// 3. GraphEditor/useGraphEditorSetup.js
+// nodegraph-editor/components/GraphEditor/hooks/useGraphEditorSetup.js
 // Initialization, event listeners, and effects
 // ============================================
 import { useEffect, useRef } from 'react';
@@ -286,7 +286,21 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         return { pan: { x: newPanX, y: newPanY }, zoom: newZoomVal };
       } catch (e) { return null; }
     };
+
+    // Also expose the API on window.graphAPI for script access
+    try {
+      if (typeof window !== 'undefined') {
+        window.graphAPI = graphAPI.current;
+      }
+    } catch (e) { /* ignore */ }
   }
+
+  // Ensure we clean up window.graphAPI when the hook is torn down
+  useEffect(() => {
+    return () => {
+      try { if (typeof window !== 'undefined' && window.graphAPI === graphAPI.current) delete window.graphAPI; } catch (e) {}
+    };
+  }, []);
 
   return graphAPI;
 }

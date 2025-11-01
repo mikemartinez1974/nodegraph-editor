@@ -38,9 +38,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - **Auto-Layout Mode**: Hierarchical, radial, or grid layouts (GSAP-powered)
 
 ### Panels & UI
-- **Node Properties Panel**: Edit labels, markdown memos, links, emoji picker
-- **Edge Properties Panel**: Configure edge type, style, width, curvature
-- **Group Properties Panel**: Manage group membership, styling, visibility
+- **Properties Panel**: Edit labels, markdown memos, links, emoji picker, edge type, style, width, curvature, group membership, styling, visibility
 - **Node List**: Virtualized list with search and filtering (react-window)
 - **Group List**: Browse and manage all groups
 - **Draggable Toolbar**: Floating toolbar with all essential actions
@@ -147,9 +145,7 @@ nodegraph-editor/
 │   │   ├── Nodes/
 │   │   │   ├── DefaultNode.js      # Standard node component
 │   │   │   └── ResizableNode.js    # Resizable node variant
-│   │   ├── NodePropertiesPanel.js  # Node editing panel
-│   │   ├── EdgePropertiesPanel.js  # Edge styling panel
-│   │   ├── GroupPropertiesPanel.js # Group management panel
+│   │   ├── PropertiesPanel.js      # Unified properties panel for nodes, edges, and groups
 │   │   ├── NodeListPanel.js        # Virtualized node list
 │   │   ├── GroupListPanel.js       # Group browser
 │   │   ├── useGraphHistory.js      # Undo/redo hook

@@ -11,8 +11,8 @@ import NodeListPanel from './components/NodeListPanel';
 import GroupListPanel from './components/GroupListPanel';
 import GroupPropertiesPanel from './components/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
-import NodePropertiesPanel from './components/NodePropertiesPanel';
-import EdgePropertiesPanel from './components/EdgePropertiesPanel';
+// import NodePropertiesPanel from './components/NodePropertiesPanel';
+// import EdgePropertiesPanel from './components/EdgePropertiesPanel';
 import edgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
@@ -43,6 +43,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [lockedEdges, setLockedEdges] = useState(new Set());
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
+  const [graphRenderKey, setGraphRenderKey] = useState(0);
   const state = useGraphEditorState();
 
   // Destructure editor state immediately so variables like `pan` are available for subsequent effects
@@ -277,7 +278,15 @@ export default function GraphEditor({ backgroundImage }) {
   });
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
-  
+
+  const handleLoadGraph = useCallback((...args) => {
+    try {
+      handlers.handleLoadGraph?.(...args);
+    } finally {
+      setGraphRenderKey(prev => prev + 1);
+    }
+  }, [handlers]);
+
   // Update handlers with graphAPI reference
   handlers.graphAPI = graphAPI;
   
@@ -419,7 +428,7 @@ export default function GraphEditor({ backgroundImage }) {
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
             const groupsToLoadFromJson = jsonData.groups || [];
-            handlers.handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
+            handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             try { eventBus.emit('forceRedraw'); } catch (e) { /* ignore */ }
             setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
@@ -518,7 +527,7 @@ export default function GraphEditor({ backgroundImage }) {
           const edgesToLoad = data.edges || [];
           const groupsToLoad = data.groups || [];
           if (handlers && typeof handlers.handleLoadGraph === 'function') {
-            handlers.handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+            handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
             try { eventBus.emit('forceRedraw'); } catch (e) { }
           } else {
             // Fallback: merge into current state
@@ -953,6 +962,7 @@ export default function GraphEditor({ backgroundImage }) {
     const handleNodeClick = ({ id }) => {
       setSelectedNodeIds([id]);
       setSelectedEdgeIds([]);
+      // Removed any pan/zoom reset logic here
     };
     eventBus.on('nodeClick', handleNodeClick);
     return () => eventBus.off('nodeClick', handleNodeClick);
@@ -964,37 +974,8 @@ export default function GraphEditor({ backgroundImage }) {
 
     const doRepaint = () => {
       try {
-        // Attempt to force layout/repaint on key elements
-        const container = document.getElementById('graph-canvas') || document.getElementById('graph-editor-background');
-        if (container) {
-          // Force reflow
-          // eslint-disable-next-line no-unused-vars
-          const _ = container.offsetHeight;
-
-          // Temporarily toggle display to provoke paint without visible change
-          const origDisplay = container.style.display;
-          container.style.display = 'none';
-          // eslint-disable-next-line no-unused-vars
-          const _2 = container.offsetHeight;
-          container.style.display = origDisplay;
-        }
-
-        // Try repaint on iframe if present
-        const iframe = document.querySelector('#graph-editor-background iframe') || document.querySelector('iframe');
-        if (iframe) {
-          const orig = iframe.style.display;
-          iframe.style.display = 'none';
-          // eslint-disable-next-line no-unused-vars
-          const _3 = iframe.offsetHeight;
-          iframe.style.display = orig;
-        }
-
-        // Toggle visibility on canvas for a quick repaint
-        const canvas = document.getElementById('graph-canvas');
-        if (canvas) {
-          canvas.style.visibility = 'hidden';
-          requestAnimationFrame(() => { canvas.style.visibility = ''; });
-        }
+        // Only emit forceRedraw, don't modify pan
+        try { eventBus.emit('forceRedraw'); } catch (e) { }
 
         // Dispatch a resize event as a fallback
         window.dispatchEvent(new Event('resize'));
@@ -1003,26 +984,21 @@ export default function GraphEditor({ backgroundImage }) {
       }
     };
 
-    // Nudge pan slightly to force React layers to re-evaluate (imperceptible)
-    try {
-      setPan(prev => ({ x: prev.x + 0.0001, y: prev.y + 0.0001 }));
-      requestAnimationFrame(() => {
-        setPan(prev => ({ x: prev.x - 0.0001, y: prev.y - 0.0001 }));
-      });
-    } catch (e) { /* ignore */ }
-
     // Emit forceRedraw a few times spaced out to cover async iframe renders
     const timers = [100, 300, 600].map(delay => setTimeout(() => {
-      try { eventBus.emit('forceRedraw'); } catch (e) { }
       doRepaint();
     }, delay));
 
     // Initial immediate attempt
-    try { eventBus.emit('forceRedraw'); } catch (e) { }
     doRepaint();
 
     return () => timers.forEach(clearTimeout);
-  }, [backgroundUrl, setPan]);
+  }, [backgroundUrl]);
+
+  // Force redraw when nodes or edges change (fixes frame lag after delete)
+  useEffect(() => {
+    eventBus.emit('forceRedraw');
+  }, [nodes, edges]);
 
   return (
     <div 
@@ -1165,7 +1141,7 @@ export default function GraphEditor({ backgroundImage }) {
       />
       
       <NodeGraph 
-        key={backgroundUrl || 'no-background'}
+        key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
         nodes={memoizedNodes}
         setNodes={memoizedSetNodes}
         setEdges={memoizedSetEdges}
