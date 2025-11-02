@@ -201,21 +201,20 @@ export default function useGraphShortcuts({
       if (e.altKey && (e.key === 'l' || e.key === 'L')) {
         if (setShowAllEdgeLabels) setShowAllEdgeLabels(true);
       }
-      // Hide all edge labels when Alt or L is released
-      if (!e.altKey || (e.key === 'l' || e.key === 'L')) {
-        if (setShowAllEdgeLabels) setShowAllEdgeLabels(false);
-      }
-      // Example shortcut registration (add this near your node add shortcut logic)
-      function handleShortcutAddNode() {
-        console.log('Shortcut: Add Node triggered');
-        // ...existing code to add node...
-      }
     }
+    
+    // Separate keyup handler ONLY for Alt+L edge label toggle
+    const handleKeyUp = (e) => {
+      if (!e.altKey && setShowAllEdgeLabels) {
+        setShowAllEdgeLabels(false);
+      }
+    };
+    
     window.addEventListener('keydown', handleKeyboardShortcuts);
-    window.addEventListener('keyup', handleKeyboardShortcuts);
+    window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyboardShortcuts);
-      window.removeEventListener('keyup', handleKeyboardShortcuts);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef, setShowAllEdgeLabels]);
 }

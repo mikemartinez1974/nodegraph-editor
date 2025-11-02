@@ -5,6 +5,9 @@
 import eventBus from '../../NodeGraph/eventBus';
 import { generateUUID } from '../utils/idUtils';
 
+// Debounce guard for delete operations (must be outside function to persist)
+let deleteInProgress = false;
+
 export function createGraphEditorHandlers({
   graphAPI,
   state,
@@ -117,44 +120,100 @@ export function createGraphEditorHandlers({
   
   // ===== DELETE HANDLERS =====
   const handleDeleteSelected = () => {
-    if (selectedNodeIds.length > 0) {
-      const newNodes = nodes.filter(n => !selectedNodeIds.includes(n.id));
-      const newEdges = edges.filter(e => 
+    // Debounce guard to prevent double-execution
+    if (deleteInProgress) {
+      console.log('DELETE: Already in progress, ignoring duplicate call');
+      return;
+    }
+    
+    // Early return if nothing is selected
+    const hasSelection = 
+      (selectedNodeIds && selectedNodeIds.length > 0) ||
+      (selectedEdgeIds && selectedEdgeIds.length > 0) ||
+      (selectedGroupIds && selectedGroupIds.length > 0);
+    
+    if (!hasSelection) {
+      console.log('DELETE: No selection, ignoring');
+      return;
+    }
+    
+    deleteInProgress = true;
+    
+    console.log('DELETE DEBUG:', {
+      selectedNodeIds,
+      selectedEdgeIds,
+      selectedGroupIds,
+      edgesFromState: edges.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target })),
+      edgesFromRef: edgesRef.current.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target }))
+    });
+    
+    if (selectedNodeIds && selectedNodeIds.length > 0) {
+      // Use refs as source of truth for consistent deletion
+      const deletedNodeId = selectedNodeIds[0];
+      const affectedEdges = edgesRef.current.filter(e => 
+        e.source === deletedNodeId || e.target === deletedNodeId
+      );
+      
+      console.log('DELETING NODE:', deletedNodeId, 'WILL REMOVE EDGES:', affectedEdges.map(e => ({ id: e.id, type: e.type, label: e.label })));
+      
+      const newNodes = nodesRef.current.filter(n => !selectedNodeIds.includes(n.id));
+      const newEdges = edgesRef.current.filter(e => 
         !selectedNodeIds.includes(e.source) && !selectedNodeIds.includes(e.target)
       );
       
-      setNodes(newNodes);
-      setEdges(newEdges);
+      console.log('AFTER DELETE - Nodes:', newNodes.length, 'Edges:', newEdges.length);
+      
       nodesRef.current = newNodes;
       edgesRef.current = newEdges;
+      setNodes(newNodes);
+      setEdges(newEdges);
       setSelectedNodeIds([]);
       saveToHistory(newNodes, newEdges);
-    } else if (selectedEdgeIds.length > 0) {
-      const newEdges = edges.filter(e => !selectedEdgeIds.includes(e.id));
-      setEdges(newEdges);
+      
+      // Force canvas redraw
+      try {
+        eventBus.emit('forceRedraw');
+      } catch (e) {
+        console.warn('Failed to emit forceRedraw:', e);
+      }
+    } else if (selectedEdgeIds && selectedEdgeIds.length > 0) {
+      // Use ref as source of truth, update both ref and state atomically
+      console.log('DELETING EDGES:', selectedEdgeIds, 'FROM:', edgesRef.current.map(e => e.id));
+      const newEdges = edgesRef.current.filter(e => !selectedEdgeIds.includes(e.id));
+      console.log('AFTER FILTER - New edges:', newEdges.map(e => e.id));
       edgesRef.current = newEdges;
+      setEdges(newEdges);
       setSelectedEdgeIds([]);
       saveToHistory(nodesRef.current, newEdges);
-    } else if (selectedGroupIds.length > 0) {
+      
+      // Force canvas redraw to show edge removal immediately
+      try {
+        eventBus.emit('forceRedraw');
+      } catch (e) {
+        console.warn('Failed to emit forceRedraw:', e);
+      }
+    } else if (selectedGroupIds && selectedGroupIds.length > 0) {
       selectedGroupIds.forEach(groupId => {
         groupManager.current.removeGroup(groupId);
       });
       setGroups(groupManager.current.getAllGroups());
       setSelectedGroupIds([]);
-      saveToHistory(nodes, edges);
+      saveToHistory(nodesRef.current, edgesRef.current);
     }
+    
+    // Reset debounce guard after a short delay
+    setTimeout(() => {
+      deleteInProgress = false;
+    }, 100);
   };
   
   const handleClearGraph = () => {
     const newNodes = [], newEdges = [], newGroups = [];
-    setNodes(prev => {
-      nodesRef.current = newNodes;
-      return newNodes;
-    });
-    setEdges(prev => {
-      edgesRef.current = newEdges;
-      return newEdges;
-    });
+    // Update refs first, then state to ensure consistency
+    nodesRef.current = newNodes;
+    edgesRef.current = newEdges;
+    setNodes(newNodes);
+    setEdges(newEdges);
     setGroups(newGroups);
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);

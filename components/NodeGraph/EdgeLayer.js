@@ -65,6 +65,15 @@ const EdgeLayer = forwardRef(({
   const edgeDataRef = useRef([]);
   const animationFrameRef = useRef(null);
   const animationTimeRef = useRef(0);
+  
+  // Keep fresh references to avoid stale closures in animation loop
+  const edgeListRef = useRef(edgeList);
+  const nodeListRef = useRef(nodeList);
+  
+  useEffect(() => {
+    edgeListRef.current = edgeList;
+    nodeListRef.current = nodeList;
+  }, [edgeList, nodeList]);
 
   useImperativeHandle(ref, () => ({
     redraw: () => drawEdges()
@@ -85,10 +94,10 @@ const EdgeLayer = forwardRef(({
     ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
     
-    const visibleEdges = edgeList.filter(edge => {
+    const visibleEdges = edgeListRef.current.filter(edge => {
       if (edge.visible === false) return false;
-      const sourceNode = nodeList.find(n => n.id === edge.source);
-      const targetNode = nodeList.find(n => n.id === edge.target);
+      const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
+      const targetNode = nodeListRef.current.find(n => n.id === edge.target);
       if (sourceNode?.visible === false || targetNode?.visible === false) return false;
       return true;
     });
@@ -119,11 +128,11 @@ const EdgeLayer = forwardRef(({
       }
       
       if (!sourcePos) {
-        const sourceNode = nodeList.find(n => n.id === edge.source);
+        const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
         sourcePos = sourceNode ? { x: sourceNode.position.x, y: sourceNode.position.y } : { x: 0, y: 0 };
       }
       if (!targetPos) {
-        const targetNode = nodeList.find(n => n.id === edge.target);
+        const targetNode = nodeListRef.current.find(n => n.id === edge.target);
         targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
       }
 
