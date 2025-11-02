@@ -364,8 +364,16 @@ const EdgeLayer = forwardRef(({
       
       // Draw edge label if showAllEdgeLabels or edge.label is non-empty
       if (showAllEdgeLabels || (edge.label && edge.label.trim() !== '')) {
-        // Pass sourcePos and targetPos to drawEdgeLabel
-        drawEdgeLabel(ctx, { ...edge, sourcePos, targetPos }, theme);
+        // Pass sourcePos, targetPos, curve info to drawEdgeLabel
+        drawEdgeLabel(ctx, { 
+          ...edge, 
+          sourcePos, 
+          targetPos, 
+          midX, 
+          midY, 
+          curveDirection,
+          style: { ...edge.style, curved: isCurved }
+        }, theme);
       }
       
       // Store edge data for hit testing

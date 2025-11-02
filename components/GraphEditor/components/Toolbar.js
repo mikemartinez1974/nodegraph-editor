@@ -46,6 +46,9 @@ import {
   Map as MapIcon,  // NEW: Import minimap icon
   GridOn as GridOnIcon  // NEW: Import grid icon
 } from '@mui/icons-material';
+import PostAddIcon from '@mui/icons-material/PostAdd';  
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import ShapeLineIcon from '@mui/icons-material/ShapeLine';
 import eventBus from '../../NodeGraph/eventBus';
 import PreferencesDialog from './PreferencesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
@@ -627,7 +630,7 @@ const Toolbar = ({
             aria-label="Copy LLM onboarding guide to clipboard"
             size="small"
           >
-            <ContentPasteGoIcon fontSize="small" />
+            <ModelTrainingIcon fontSize="small" />
           </IconButton>
           
           <IconButton
@@ -636,7 +639,7 @@ const Toolbar = ({
             aria-label="Paste graph JSON or create node from text"
             size="small"
           >
-            <ContentPasteIcon fontSize="small" />
+            <ShapeLineIcon fontSize="small" />
           </IconButton>
 
           <IconButton
@@ -661,20 +664,11 @@ const Toolbar = ({
           </IconButton>
           
           <IconButton
-            onClick={handleCopyUserManual}
-            title="Copy User Manual"
-            aria-label="Copy the User Manual to clipboard"
-            size="small"
-          >
-            <MenuBookIcon fontSize="small" />
-          </IconButton>
-          
-          <IconButton
             onClick={(e) => setAddNodeMenuAnchor(e.currentTarget)}
             title="Add Node (Ctrl+N)"
             size="small"
           >
-            <AddIcon />
+            <PostAddIcon />
           </IconButton>
 
           <IconButton
@@ -685,15 +679,6 @@ const Toolbar = ({
             size="small"
           >
             <DeleteIcon />
-          </IconButton>
-
-          <IconButton
-            onClick={handleNewFile}
-            title="New File"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <AddIcon fontSize="small" />
           </IconButton>
 
           <ButtonGroup size="small" sx={{ mr: 1 }}>
@@ -743,6 +728,15 @@ const Toolbar = ({
             disabled={isFreeUser}
           >
             <GroupIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={handleNewFile}
+            title="New File"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <AddIcon fontSize="small" />
           </IconButton>
 
           <IconButton
