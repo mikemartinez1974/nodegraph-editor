@@ -209,6 +209,9 @@ export default function GraphEditor({ backgroundImage }) {
     };
   }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
 
+  // Determine if user is free (replace with real logic)
+  const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
+
   // Initialize address bar to local file on mount
   useEffect(() => {
     eventBus.emit('setAddress', 'local://untitled.node');
@@ -242,9 +245,6 @@ export default function GraphEditor({ backgroundImage }) {
     eventBus.on('loadSaveFile', handleLoadSaveFile);
     return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
   }, [setPan, setZoom, state, setBackgroundUrl]);
-  
-  // Determine if user is free (replace with real logic)
-  const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
   
   const selectionHook = useSelection({
     setSelectedNodeIds,
@@ -292,6 +292,29 @@ export default function GraphEditor({ backgroundImage }) {
     }
   }, [handlers]);
 
+  // Listen for undo/redo events from keyboard shortcuts (placed after historyHook is created)
+  useEffect(() => {
+    const handleUndo = () => {
+      if (historyHook && typeof historyHook.handleUndo === 'function') {
+        historyHook.handleUndo();
+      }
+    };
+
+    const handleRedo = () => {
+      if (historyHook && typeof historyHook.handleRedo === 'function') {
+        historyHook.handleRedo();
+      }
+    };
+
+    eventBus.on('undo', handleUndo);
+    eventBus.on('redo', handleRedo);
+
+    return () => {
+      eventBus.off('undo', handleUndo);
+      eventBus.off('redo', handleRedo);
+    };
+  }, [historyHook]);
+
   // Update handlers with graphAPI reference
   handlers.graphAPI = graphAPI;
 
@@ -304,9 +327,14 @@ export default function GraphEditor({ backgroundImage }) {
       setEdges,
       historyHook.saveToHistory,
       nodesRef,
-      edgesRef
+      edgesRef,
+      // provide group handlers so GraphCRUD.createGroups is available
+      () => groups || [],
+      setGroups,
+      // groupsRef may not exist in older state implementations; pass undefined if not present
+      undefined
     );
-  }, [setNodes, setEdges, historyHook.saveToHistory]);
+  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups]);
 
   // Wire up paste event listener
   useEffect(() => {
@@ -342,10 +370,10 @@ export default function GraphEditor({ backgroundImage }) {
       }
     };
 
-    console.log('[GraphEditor] Registering paste listener with graphCRUD:', graphCRUD);
+    // console.log('[GraphEditor] Registering paste listener with graphCRUD:', graphCRUD);
     window.addEventListener('paste', handlePaste, { capture: true });
     return () => {
-      console.log('[GraphEditor] Removing paste listener');
+      // console.log('[GraphEditor] Removing paste listener');
       window.removeEventListener('paste', handlePaste, { capture: true });
     };
   }, [graphCRUD, handlers, setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom, historyHook, setSnackbar]);
@@ -982,7 +1010,7 @@ export default function GraphEditor({ backgroundImage }) {
   useEffect(() => {
     const handleNodeDragEnd = ({ nodeIds }) => {
       // Handle node drag end - could trigger any post-drag logic
-      console.log('Node drag ended for nodes:', nodeIds);
+      // console.log('Node drag ended for nodes:', nodeIds);
     };
 
     eventBus.on('nodeDragEnd', handleNodeDragEnd);

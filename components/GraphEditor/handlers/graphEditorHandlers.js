@@ -122,7 +122,7 @@ export function createGraphEditorHandlers({
   const handleDeleteSelected = () => {
     // Debounce guard to prevent double-execution
     if (deleteInProgress) {
-      console.log('DELETE: Already in progress, ignoring duplicate call');
+      // console.log('DELETE: Already in progress, ignoring duplicate call');
       return;
     }
     
@@ -133,19 +133,19 @@ export function createGraphEditorHandlers({
       (selectedGroupIds && selectedGroupIds.length > 0);
     
     if (!hasSelection) {
-      console.log('DELETE: No selection, ignoring');
+      // console.log('DELETE: No selection, ignoring');
       return;
     }
     
     deleteInProgress = true;
     
-    console.log('DELETE DEBUG:', {
-      selectedNodeIds,
-      selectedEdgeIds,
-      selectedGroupIds,
-      edgesFromState: edges.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target })),
-      edgesFromRef: edgesRef.current.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target }))
-    });
+    // console.log('DELETE DEBUG:', {
+    //   selectedNodeIds,
+    //   selectedEdgeIds,
+    //   selectedGroupIds,
+    //   edgesFromState: edges.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target })),
+    //   edgesFromRef: edgesRef.current.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target }))
+    // });
     
     if (selectedNodeIds && selectedNodeIds.length > 0) {
       // Use refs as source of truth for consistent deletion
@@ -154,14 +154,14 @@ export function createGraphEditorHandlers({
         e.source === deletedNodeId || e.target === deletedNodeId
       );
       
-      console.log('DELETING NODE:', deletedNodeId, 'WILL REMOVE EDGES:', affectedEdges.map(e => ({ id: e.id, type: e.type, label: e.label })));
+      // console.log('DELETING NODE:', deletedNodeId, 'WILL REMOVE EDGES:', affectedEdges.map(e => ({ id: e.id, type: e.type, label: e.label })));
       
       const newNodes = nodesRef.current.filter(n => !selectedNodeIds.includes(n.id));
       const newEdges = edgesRef.current.filter(e => 
         !selectedNodeIds.includes(e.source) && !selectedNodeIds.includes(e.target)
       );
       
-      console.log('AFTER DELETE - Nodes:', newNodes.length, 'Edges:', newEdges.length);
+      // console.log('AFTER DELETE - Nodes:', newNodes.length, 'Edges:', newEdges.length);
       
       nodesRef.current = newNodes;
       edgesRef.current = newEdges;
@@ -178,9 +178,9 @@ export function createGraphEditorHandlers({
       }
     } else if (selectedEdgeIds && selectedEdgeIds.length > 0) {
       // Use ref as source of truth, update both ref and state atomically
-      console.log('DELETING EDGES:', selectedEdgeIds, 'FROM:', edgesRef.current.map(e => e.id));
+      // console.log('DELETING EDGES:', selectedEdgeIds, 'FROM:', edgesRef.current.map(e => e.id));
       const newEdges = edgesRef.current.filter(e => !selectedEdgeIds.includes(e.id));
-      console.log('AFTER FILTER - New edges:', newEdges.map(e => e.id));
+      // console.log('AFTER FILTER - New edges:', newEdges.map(e => e.id));
       edgesRef.current = newEdges;
       setEdges(newEdges);
       setSelectedEdgeIds([]);

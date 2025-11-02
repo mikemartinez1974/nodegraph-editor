@@ -216,5 +216,5 @@ export default function useGraphShortcuts({
       window.removeEventListener('keydown', handleKeyboardShortcuts);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef, setShowAllEdgeLabels]);
+  }, [selectedNodeIds, selectedEdgeIds, setNodes, setEdges, setSelectedNodeIds, setSelectedEdgeIds, handleDeleteSelected, clearSelection, handleCreateGroup, handleUngroupSelected, saveToHistory, edgesRef, nodesRef, setShowAllEdgeLabels, onShowMessage, graphCRUD]);
 }

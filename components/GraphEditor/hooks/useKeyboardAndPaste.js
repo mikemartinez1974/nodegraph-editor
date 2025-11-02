@@ -15,9 +15,25 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
   
   const { saveToHistory } = historyHook;
   
-  // Keyboard navigation
+  // Keyboard navigation and undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const mod = e.ctrlKey || e.metaKey;
+      
+      // Undo (Ctrl/Cmd+Z)
+      if (mod && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        eventBus.emit('undo');
+        return;
+      }
+
+      // Redo (Ctrl/Cmd+Y or Ctrl/Cmd+Shift+Z)
+      if ((mod && (e.key === 'y' || e.key === 'Y')) || (mod && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
+        e.preventDefault();
+        eventBus.emit('redo');
+        return;
+      }
+      
       // Tab navigation for nodes
       if (e.key === 'Tab' && selectedNodeIds.length > 0) {
         e.preventDefault();
@@ -62,7 +78,7 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNodeIds, setSelectedNodeIds, setSelectedEdgeIds, setNodes, saveToHistory]);
+  }, [selectedNodeIds, setSelectedNodeIds, setSelectedEdgeIds, setNodes, saveToHistory, nodesRef, edgesRef]);
 
   // Paste handler
   const handlePaste = useCallback(async (e) => {
@@ -83,9 +99,8 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
       if (!text?.trim()) return;
 
       // Try to parse as JSON
-      let parsedData;
       try {
-        parsedData = JSON.parse(text);
+        JSON.parse(text);
         // Delegate to unified handler so behavior matches toolbar
         await pasteFromClipboardUnified({ handlers, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook, onShowMessage: state.setSnackbar ? (msg, sev='info') => state.setSnackbar({ open: true, message: msg, severity: sev }) : null });
        } catch (jsonError) {
@@ -123,7 +138,7 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
     } catch (error) {
       console.error('Error handling paste:', error);
     }
-  }, [nodesRef, setNodes, saveToHistory, state.setSnackbar, pan, zoom, handlers]);
+  }, [nodesRef, setNodes, saveToHistory, state, pan, zoom, handlers, edgesRef, historyHook]);
 
   // Register paste handler
   useEffect(() => {
