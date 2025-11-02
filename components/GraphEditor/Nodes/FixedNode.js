@@ -27,12 +27,42 @@ const FixedNode = ({
   onDoubleClick, 
   children, 
   draggingHandle,
-  nodeRefs 
+  nodeRefs,
+  hideDefaultContent = false  // Allow children to hide default content
 }) => {
   const theme = useTheme();
   const width = (node?.width || 60) * zoom;
   const height = (node?.height || 60) * zoom;
   const nodeRef = useRef(null);
+  const [isRotating, setIsRotating] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const rotationStartRef = useRef({ angle: 0, mouseAngle: 0 });
+  
+  // Get current rotation from node data or default to 0
+  const rotation = node?.data?.rotation || 0;
+
+  // Track when node is being dragged to disable transitions
+  useEffect(() => {
+    const handleDragStart = ({ node: dragNode }) => {
+      if (dragNode?.id === node.id) {
+        setIsDragging(true);
+      }
+    };
+
+    const handleDragEnd = ({ nodeIds }) => {
+      if (nodeIds?.includes(node.id)) {
+        setIsDragging(false);
+      }
+    };
+
+    eventBus.on('nodeDragStart', handleDragStart);
+    eventBus.on('nodeDragEnd', handleDragEnd);
+
+    return () => {
+      eventBus.off('nodeDragStart', handleDragStart);
+      eventBus.off('nodeDragEnd', handleDragEnd);
+    };
+  }, [node.id]);
 
   // Register node in nodeRefs
   useEffect(() => {
@@ -43,6 +73,63 @@ const FixedNode = ({
       };
     }
   }, [node.id, nodeRefs]);
+
+  // Rotation handlers
+  const startRotation = (e) => {
+    e.stopPropagation();
+    setIsRotating(true);
+    
+    const rect = nodeRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const mouseAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    rotationStartRef.current = { angle: rotation, mouseAngle };
+  };
+
+  const handleRotation = (e) => {
+    if (!isRotating) return;
+    
+    const rect = nodeRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const currentMouseAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    const deltaAngle = currentMouseAngle - rotationStartRef.current.mouseAngle;
+    let newRotation = rotationStartRef.current.angle + deltaAngle;
+    
+    // Normalize to 0-360 range
+    newRotation = ((newRotation % 360) + 360) % 360;
+    
+    // Snap to 15 degree increments if shift is held
+    if (e.shiftKey) {
+      newRotation = Math.round(newRotation / 15) * 15;
+    }
+    
+    eventBus.emit('nodeUpdate', { 
+      id: node.id, 
+      updates: { 
+        data: { ...node.data, rotation: newRotation } 
+      } 
+    });
+  };
+
+  const stopRotation = () => {
+    setIsRotating(false);
+  };
+
+  // Add rotation event listeners
+  useEffect(() => {
+    if (!isRotating) return;
+    
+    window.addEventListener('mousemove', handleRotation);
+    window.addEventListener('mouseup', stopRotation);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleRotation);
+      window.removeEventListener('mouseup', stopRotation);
+    };
+  }, [isRotating, rotation, node.id, node.data]);
 
   // Prevent default wheel behavior
   useEffect(() => {
@@ -95,7 +182,7 @@ const FixedNode = ({
         top: baseTop,
         width,
         height,
-        cursor: draggingHandle ? 'grabbing' : 'grab',
+        cursor: isRotating ? 'grabbing' : (draggingHandle ? 'grabbing' : 'grab'),
         border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
         background: isSelected ? selected_gradient : unselected_gradient,
         borderRadius: 8,
@@ -103,15 +190,23 @@ const FixedNode = ({
         color: isSelected ? `${theme.textColors?.dark || '#000'}` : `${theme.textColors?.light || '#fff'}`,
         zIndex: 100,
         pointerEvents: 'auto',
-        display: 'flex',
+        display: hideDefaultContent ? 'block' : 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center',
+        transition: (isRotating || isDragging || draggingHandle) ? 'none' : 'transform 0.1s ease-out',
         ...style
       }}
       tabIndex={0}
       onMouseDown={e => {
         e.stopPropagation();
+        // Check if Alt key is held for rotation
+        if (e.altKey) {
+          startRotation(e);
+          return;
+        }
         if (onMouseDown) onMouseDown(e);
         eventBus.emit('nodeMouseDown', { id: node.id, event: e });
       }}
@@ -133,8 +228,8 @@ const FixedNode = ({
         eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
       }}
     >
-      {/* Render node label/markdown if present */}
-      {node?.label && (
+      {/* Render node label/markdown if present (unless hideDefaultContent is true) */}
+      {!hideDefaultContent && node?.label && (
         <div style={{ 
           textAlign: 'center', 
           fontWeight: 500, 
@@ -172,7 +267,7 @@ const FixedNode = ({
         </div>
       )}
       {/* Data indicators */}
-      {(hasMemo || hasLink) && (
+      {!hideDefaultContent && (hasMemo || hasLink) && (
         <div style={{
           position: 'absolute',
           bottom: 4,
@@ -211,7 +306,9 @@ const FixedNode = ({
           )}
         </div>
       )}
-      {children}  
+      
+      {/* Render children if provided (allows override of default content) */}
+      {children}
     </div>
   );
 };

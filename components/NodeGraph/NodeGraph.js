@@ -363,7 +363,12 @@ export default function NodeGraph({
         draggingNodeIdRef.current.forEach(nodeId => {
           const nodeEl = nodeRefs.current.get(nodeId);
           if (nodeEl) {
-            nodeEl.style.transform = `translate(${draggingInfoRef.current.offset.x * zoom}px, ${draggingInfoRef.current.offset.y * zoom}px)`;
+            // Preserve node rotation while translating during drag to avoid visual jump
+            const nodeObj = (nodesRef.current || nodes).find(n => n.id === nodeId);
+            const rotation = nodeObj && nodeObj.data && typeof nodeObj.data.rotation === 'number' ? nodeObj.data.rotation : 0;
+            const tx = draggingInfoRef.current.offset.x * zoom;
+            const ty = draggingInfoRef.current.offset.y * zoom;
+            nodeEl.style.transform = `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`;
           }
         });
 
@@ -407,7 +412,26 @@ export default function NodeGraph({
         }
 
         const nodeEl = nodeRefs.current.get(id);
-        if (nodeEl) nodeEl.style.transform = '';
+        if (nodeEl) {
+          // Get the current rotation to preserve it
+          const nodeObj = (nodesRef.current || nodes).find(n => n.id === id);
+          const rotation = nodeObj && nodeObj.data && typeof nodeObj.data.rotation === 'number' ? nodeObj.data.rotation : 0;
+          
+          // Aggressively disable all transitions to prevent animation on drop
+          nodeEl.style.transition = 'none !important';
+          nodeEl.style.transitionDuration = '0s !important';
+          nodeEl.style.transitionDelay = '0s !important';
+          // Clear drag offset but preserve rotation
+          nodeEl.style.transform = rotation !== 0 ? `rotate(${rotation}deg)` : '';
+          // Force a reflow to ensure styles are applied
+          void nodeEl.offsetHeight;
+          // Re-enable transitions in next frame
+          requestAnimationFrame(() => {
+            nodeEl.style.transition = '';
+            nodeEl.style.transitionDuration = '';
+            nodeEl.style.transitionDelay = '';
+          });
+        }
       });
 
       draggingInfoRef.current = null;

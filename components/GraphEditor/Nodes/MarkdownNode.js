@@ -1,62 +1,21 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm'
+import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { TlzLink } from '../components/TlzLink';
+import FixedNode from './FixedNode';
 import eventBus from '../../NodeGraph/eventBus';
-import LinkIcon from '@mui/icons-material/Link';
-import DefaultNode from './DefaultNode';
 
-const MarkdownNode = ({ 
-  node, 
-  pan = { x: 0, y: 0 }, 
-  zoom = 1, 
-  style = {}, 
-  isSelected, 
-  onMouseDown, 
-  onClick, 
-  onDoubleClick, 
-  children, 
-  draggingHandle,
-  nodeRefs,
-  onResize
-}) => {
+const MarkdownNode = (props) => {
+  const { node, zoom = 1, isSelected } = props;
   const theme = useTheme();
-  const memo = node?.data?.memo || '';
-  const hasLink = node?.data?.link && node.data.link.trim().length > 0;
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartPos = useRef({ x: 0, y: 0 });
+  const resizeStartSize = useRef({ width: 0, height: 0 });
 
-  // Theme-sensitive markdown styling
-  const isDark = theme.palette.mode === 'dark';
-
-  const nodeRef = useRef(null);
-
-  useEffect(() => {
-    const node = nodeRef.current;
-    if (!node) return;
-    const handleWheel = (e) => {
-      e.preventDefault();
-      // Scroll the node content and prevent the event from bubbling up to the PanZoomLayer
-      try {
-        const delta = e.deltaY;
-        const el = e.currentTarget;
-        if (el && Math.abs(delta) > 0) {
-          el.scrollTop += delta;
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      } catch (err) {
-        // swallow errors to avoid breaking the app
-        console.warn('Error handling node wheel:', err);
-      }
-    };
-    node.addEventListener('wheel', handleWheel, { passive: false });
-    return () => node.removeEventListener('wheel', handleWheel);
-  }, []);
-
-  // Extend the default rehype-sanitize schema to allow the custom 'tlz' protocol for hrefs
   const sanitizeSchema = {
     ...defaultSchema,
     protocols: {
@@ -65,79 +24,125 @@ const MarkdownNode = ({
     }
   };
 
-  // Render using DefaultNode as base, with custom markdown content
+  const markdownContent = node?.data?.memo || node?.label || 'No content';
+
+  // Resize handlers (same as DefaultNode)
+  const handleResizeStart = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsResizing(true);
+    resizeStartPos.current = { x: e.clientX, y: e.clientY };
+    resizeStartSize.current = { width: node.width || 60, height: node.height || 60 };
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleResizeMove = (e) => {
+      const dx = (e.clientX - resizeStartPos.current.x) / zoom;
+      const dy = (e.clientY - resizeStartPos.current.y) / zoom;
+      const newWidth = Math.max(60, resizeStartSize.current.width + dx);
+      const newHeight = Math.max(40, resizeStartSize.current.height + dy);
+      
+      eventBus.emit('nodeResize', { id: node.id, width: newWidth, height: newHeight });
+    };
+
+    const handleResizeEnd = () => {
+      setIsResizing(false);
+      eventBus.emit('nodeResizeEnd', { id: node.id });
+    };
+
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, [isResizing, node.id, zoom]);
+  
+  // Render FixedNode with markdown content and resize handle
   return (
-    <DefaultNode
-      {...{ node, pan, zoom, style, isSelected, onMouseDown, onClick: (e) => {
-        // Prevent nodeClick if clicking a link
-        if (e.target && (e.target.tagName === 'A' || e.target.closest('a'))) return;
-        if (typeof onClick === 'function') onClick(e);
-        eventBus.emit('nodeClick', { id: node.id, event: e });
-      }, onDoubleClick, draggingHandle, nodeRefs, onResize }}
-    >
+    <FixedNode {...props} hideDefaultContent={true}>
       {/* Markdown content */}
-      <div 
-        ref={nodeRef}
-        className="markdown-content"
-        style={{ 
-          flex: 1,
-          padding: '12px',
-          overflow: 'auto',
-          fontSize: Math.max(10, 12 * zoom),
-          lineHeight: 1.5,
-          fontFamily: isDark ? '"Courier New", Courier, monospace' : '"Comic Sans MS", "Trebuchet MS", sans-serif',
-          cursor: 'pointer',
-          pointerEvents: 'auto',
-          userSelect: 'text'
-        }}
+      <div className="markdown-content" style={{
+        position: 'absolute',
+        top: '8px',
+        left: '8px',
+        right: '8px',
+        bottom: '24px',
+        fontSize: Math.max(10, 12 * zoom),
+        lineHeight: 1.6,
+        userSelect: 'text',
+        cursor: 'text',
+        overflow: 'auto',
+        padding: '8px',
+        boxSizing: 'border-box',
+        zIndex: 1,
+        pointerEvents: 'auto',
+        backgroundColor: 'transparent',
+        color: '#000'
+      }}
+      onClick={(e) => {
+        // Prevent clicks on markdown content from triggering node drag
+        if (e.target.tagName === 'A' || e.target.closest('a')) return;
+        e.stopPropagation();
+      }}
       >
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
           urlTransform={(url) => url}
           components={{
-            // Style markdown elements to fit the board theme
-            p: ({node, ...props}) => <p style={{ margin: '0 0 8px 0' }} {...props} />,
-            h1: ({node, ...props}) => <h1 style={{ margin: '0 0 10px 0', fontSize: '1.5em', fontWeight: 'bold', borderBottom: isDark ? '2px solid #4a6b4a' : '2px solid #8b7355' }} {...props} />,
-            h2: ({node, ...props}) => <h2 style={{ margin: '0 0 8px 0', fontSize: '1.3em', fontWeight: 'bold' }} {...props} />,
-            h3: ({node, ...props}) => <h3 style={{ margin: '0 0 6px 0', fontSize: '1.15em', fontWeight: 'bold' }} {...props} />,
-            ul: ({node, ...props}) => <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px' }} {...props} />,
-            ol: ({node, ...props}) => <ol style={{ margin: '0 0 8px 0', paddingLeft: '20px' }} {...props} />,
-            li: ({node, ...props}) => <li style={{ margin: '3px 0' }} {...props} />,
-            code: ({node, inline, ...props}) => 
+            a: TlzLink,
+            p: ({node, ...props}) => <p style={{ margin: '0.5em 0' }} {...props} />,
+            h1: ({node, ...props}) => <h1 style={{ margin: '0.5em 0', fontSize: '1.5em' }} {...props} />,
+            h2: ({node, ...props}) => <h2 style={{ margin: '0.5em 0', fontSize: '1.3em' }} {...props} />,
+            h3: ({node, ...props}) => <h3 style={{ margin: '0.5em 0', fontSize: '1.1em' }} {...props} />,
+            ul: ({node, ...props}) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
+            ol: ({node, ...props}) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
+            code: ({node, inline, ...props}) => (
               inline 
-                ? <code style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', padding: '2px 5px', borderRadius: 3, fontFamily: 'monospace' }} {...props} />
-                : <code style={{ display: 'block', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', padding: '10px', borderRadius: 4, margin: '10px 0', overflow: 'auto', fontFamily: 'monospace', border: isDark ? '1px solid #4a6b4a' : '1px solid #d0d0d0' }} {...props} />,
-            strong: ({node, ...props}) => <strong style={{ fontWeight: 'bold', textShadow: isDark ? '0 0 1px rgba(200, 230, 201, 0.5)' : 'none' }} {...props} />,
-            em: ({node, ...props}) => <em style={{ fontStyle: 'italic' }} {...props} />,
-            a: TlzLink  // Use TlzLink instead of inline component
+                ? <code style={{ backgroundColor: 'rgba(0,0,0,0.1)', padding: '2px 4px', borderRadius: 2 }} {...props} />
+                : <code style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.1)', padding: '8px', borderRadius: 4, overflowX: 'auto' }} {...props} />
+            )
           }}
         >
-          {memo}
+          {markdownContent}
         </ReactMarkdown>
       </div>
-      
-      {/* Link indicator */}
-      {hasLink && (
-        <div style={{
+
+      {/* Resize handle */}
+      <div
+        onMouseDown={handleResizeStart}
+        style={{
           position: 'absolute',
-          bottom: 6,
-          right: 28,
-          backgroundColor: isDark ? 'rgba(200, 230, 201, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-          borderRadius: '50%',
-          width: 22,
-          height: 22,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.5)' : '0 1px 3px rgba(0,0,0,0.3)',
-          border: isDark ? '1px solid #4a6b4a' : '1px solid #8b7355'
-        }}>
-          <LinkIcon sx={{ fontSize: 14, color: isDark ? '#1a2b1a' : '#8b7355' }} />
-        </div>
-      )}
-      
-    </DefaultNode>
+          bottom: 0,
+          right: 0,
+          width: 16,
+          height: 16,
+          cursor: 'nwse-resize',
+          opacity: isSelected ? 0.7 : 0.3,
+          transition: 'opacity 0.2s ease',
+          zIndex: 2
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.opacity = '1';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.opacity = isSelected ? '0.7' : '0.3';
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16">
+          <path
+            d="M 16,0 L 16,16 L 0,16"
+            fill="none"
+            stroke={theme.palette.text.secondary}
+            strokeWidth="2"
+          />
+        </svg>
+      </div>
+    </FixedNode>
   );
 };
 
