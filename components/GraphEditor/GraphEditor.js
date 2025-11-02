@@ -11,8 +11,6 @@ import NodeListPanel from './components/NodeListPanel';
 import GroupListPanel from './components/GroupListPanel';
 import GroupPropertiesPanel from './components/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
-// import NodePropertiesPanel from './components/NodePropertiesPanel';
-// import EdgePropertiesPanel from './components/EdgePropertiesPanel';
 import edgeTypes from './edgeTypes';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
@@ -20,7 +18,7 @@ import ScriptRunner from './Scripting/ScriptRunner';
 import ScriptPanel from './Scripting/ScriptPanel';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
 import { v4 as uuidv4 } from 'uuid';
-
+import { generateUUID } from './utils/idUtils';
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
 import { useGraphEditorSetup } from './hooks/useGraphEditorSetup';

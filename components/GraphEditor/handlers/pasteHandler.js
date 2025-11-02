@@ -6,99 +6,137 @@ import eventBus from '../../NodeGraph/eventBus';
  */
 async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
   try {
-    const { action, nodes, edges, id, updates, criteria } = command;
+    const { action } = command;
+
+    // Handle combined create (nodes + edges + groups) in one command
+    if (action === 'create') {
+      const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
+      const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
+      const groups = Array.isArray(command.groups) ? command.groups : (command.group ? [command.group] : []);
+
+      let createdNodes = 0;
+      let createdEdges = 0;
+      let createdGroups = 0;
+
+      // Create nodes first (if any)
+      if (nodes.length > 0) {
+        const nodeResult = await graphCRUD.createNodes(nodes);
+        if (!nodeResult || !nodeResult.success) {
+          const err = nodeResult?.error || 'Failed to create nodes';
+          if (onShowMessage) onShowMessage(err, 'error');
+          return { nodes: 0, edges: 0, groups: 0 };
+        }
+        createdNodes = Array.isArray(nodeResult.data?.created) ? nodeResult.data.created.length : nodes.length;
+      }
+
+      // Then create edges (if any). graphCRUD.createEdges validates that source/target nodes exist.
+      if (edges.length > 0) {
+        const edgeResult = await graphCRUD.createEdges(edges);
+        if (!edgeResult || !edgeResult.success) {
+          const err = edgeResult?.error || 'Failed to create edges';
+          if (onShowMessage) onShowMessage(err, 'error');
+          // Return nodes created so far and zero edges/groups
+          return { nodes: createdNodes, edges: 0, groups: 0 };
+        }
+        createdEdges = Array.isArray(edgeResult.data?.created) ? edgeResult.data.created.length : edges.length;
+      }
+
+      // Finally create groups (if any). Groups typically reference node IDs, so create them last.
+      if (groups.length > 0 && typeof graphCRUD.createGroups === 'function') {
+        const groupResult = await graphCRUD.createGroups(groups);
+        if (!groupResult || !groupResult.success) {
+          const err = groupResult?.error || 'Failed to create groups';
+          if (onShowMessage) onShowMessage(err, 'error');
+          // Return counts so far
+          return { nodes: createdNodes, edges: createdEdges, groups: 0 };
+        }
+        createdGroups = Array.isArray(groupResult.data?.created) ? groupResult.data.created.length : groups.length;
+      }
+
+      if (onShowMessage) onShowMessage(`Created ${createdNodes} nodes, ${createdEdges} edges, ${createdGroups} groups`, 'success');
+      return { nodes: createdNodes, edges: createdEdges, groups: createdGroups };
+    }
+
+    // Fallback to switch-based handling for other actions
+    const { nodes, edges, id, updates, criteria } = command;
     let result;
 
     switch (action) {
-      case 'create':
-        if (nodes && Array.isArray(nodes)) {
-          result = graphCRUD.createNodes(nodes);
-        } else if (edges && Array.isArray(edges)) {
-          result = graphCRUD.createEdges(edges);
-        } else if (command.node) {
-          result = graphCRUD.createNode(command.node);
-        } else if (command.edge) {
-          result = graphCRUD.createEdge(command.edge);
-        }
-        break;
-
-      case 'update':
-        if (command.type === 'node' && id && updates) {
-          result = graphCRUD.updateNode(id, updates);
-        } else if (command.type === 'edge' && id && updates) {
-          result = graphCRUD.updateEdge(id, updates);
-        }
-        break;
-
-      case 'delete':
-        if (command.type === 'node' && id) {
-          result = graphCRUD.deleteNode(id);
-        } else if (command.type === 'edge' && id) {
-          result = graphCRUD.deleteEdge(id);
-        }
-        break;
-
-      case 'read':
-        if (command.type === 'node') {
-          result = graphCRUD.readNode(id);
-        } else if (command.type === 'edge') {
-          result = graphCRUD.readEdge(id);
-        }
-        break;
-
       case 'createNodes':
         if (nodes && Array.isArray(nodes)) {
-          result = graphCRUD.createNodes(nodes);
+          result = await graphCRUD.createNodes(nodes);
         }
         break;
 
       case 'createEdges':
         if (edges && Array.isArray(edges)) {
-          result = graphCRUD.createEdges(edges);
+          result = await graphCRUD.createEdges(edges);
+        }
+        break;
+
+      case 'update':
+        if (command.type === 'node' && id && updates) {
+          result = await graphCRUD.updateNode(id, updates);
+        } else if (command.type === 'edge' && id && updates) {
+          result = await graphCRUD.updateEdge(id, updates);
+        }
+        break;
+
+      case 'delete':
+        if (command.type === 'node' && id) {
+          result = await graphCRUD.deleteNode(id);
+        } else if (command.type === 'edge' && id) {
+          result = await graphCRUD.deleteEdge(id);
+        }
+        break;
+
+      case 'read':
+        if (command.type === 'node') {
+          result = await graphCRUD.readNode(id);
+        } else if (command.type === 'edge') {
+          result = await graphCRUD.readEdge(id);
         }
         break;
 
       case 'clearGraph':
-        result = graphCRUD.clearGraph();
+        result = await graphCRUD.clearGraph();
         break;
 
       case 'findNodes':
-        result = graphCRUD.findNodes(criteria || {});
+        result = await graphCRUD.findNodes(criteria || {});
         break;
 
       case 'findEdges':
-        result = graphCRUD.findEdges(criteria || {});
+        result = await graphCRUD.findEdges(criteria || {});
         break;
 
       case 'getStats':
-        result = graphCRUD.getStats();
+        result = await graphCRUD.getStats();
         break;
 
       default:
         result = { success: false, error: `Unknown action: ${action}` };
     }
 
-    if (result.success) {
+    if (result && result.success) {
       if (onShowMessage) {
         const message = result.data?.message || `${action} completed successfully`;
         onShowMessage(message, 'success');
       }
-      
-      // Return appropriate counts for actions that modify the graph
-      if (action === 'create' || action === 'createNodes') {
-        const created = result.data?.created || (result.data ? [result.data] : []);
+
+      // Return counts for create operations
+      if (action === 'createNodes') {
+        const created = result.data?.created || [];
         return { nodes: created.length, edges: 0, groups: 0 };
       } else if (action === 'createEdges') {
-        const created = result.data?.created || (result.data ? [result.data] : []);
+        const created = result.data?.created || [];
         return { nodes: 0, edges: created.length, groups: 0 };
-      } else if (action === 'delete') {
-        return { nodes: 0, edges: 0, groups: 0 };
       }
-      
+
       return { nodes: 0, edges: 0, groups: 0 };
     } else {
       if (onShowMessage) {
-        onShowMessage(result.error || 'CRUD command failed', 'error');
+        onShowMessage(result?.error || 'CRUD command failed', 'error');
       }
       return { nodes: 0, edges: 0, groups: 0 };
     }
@@ -220,18 +258,54 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
           });
         }
 
+        // If parsed contains groups, map node ids and add groups
+        let pastedGroups = [];
+        if (Array.isArray(parsed.groups) && parsed.groups.length) {
+          pastedGroups = parsed.groups.map((g) => {
+            const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.map(id => idMapping[id] || id).filter(id => newNodes.some(n => n.id === id)) : [];
+            return {
+              ...g,
+              id: g.id || `group_${Date.now()}_${Math.random().toString(36).substr(2,6)}`,
+              nodeIds
+            };
+          }).filter(g => Array.isArray(g.nodeIds) && g.nodeIds.length > 0);
+
+          if (pastedGroups.length > 0 && setGroups) {
+            setGroups(prev => {
+              const next = [...(prev || []), ...pastedGroups];
+              if (typeof prev === 'undefined' && typeof window !== 'undefined' && window.__INITIAL_GROUPS__) {
+                // no-op
+              }
+              return next;
+            });
+          }
+        }
+
         if (saveToHistory) saveToHistory(newNodes, newEdges);
         const nodeCount = pastedNodes.length;
         const edgeCount = pastedEdges.length;
-        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes and ${edgeCount} edges`, 'success');
-        return { nodes: nodeCount, edges: edgeCount, groups: Array.isArray(parsed.groups) ? parsed.groups.length : 0 };
+        const groupCount = pastedGroups.length;
+        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes, ${edgeCount} edges, ${groupCount} groups`, 'success');
+        return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
       }
 
       // If parsed JSON contains only groups
       if (Array.isArray(parsed.groups) && setGroups) {
-        setGroups(prev => [...prev, ...parsed.groups]);
-        if (onShowMessage) onShowMessage(`Pasted ${parsed.groups.length} groups`, 'success');
-        return { nodes: 0, edges: 0, groups: parsed.groups.length };
+        // Map nodeIds to existing ids where possible
+        const currentNodes = nodesRef?.current || [];
+        const nodeIdSet = new Set(currentNodes.map(n => n.id));
+        const validGroups = parsed.groups.map(g => ({
+          ...g,
+          nodeIds: Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => nodeIdSet.has(id)) : []
+        })).filter(g => g.nodeIds && g.nodeIds.length > 0);
+
+        if (validGroups.length > 0) {
+          setGroups(prev => [...prev, ...validGroups]);
+          if (onShowMessage) onShowMessage(`Pasted ${validGroups.length} groups`, 'success');
+          return { nodes: 0, edges: 0, groups: validGroups.length };
+        }
+
+        return { nodes: 0, edges: 0, groups: 0 };
       }
 
       // Fallback: emit event

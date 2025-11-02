@@ -7,34 +7,7 @@ import HandlePositionContext from './HandlePositionContext';
 import edgeTypes from '../GraphEditor/edgeTypes';
 import { setupHiDPICanvas, getCanvasContext, clearCanvas } from './canvasUtils';
 import { drawEdgeLabel } from './edgeLabelUtils';
-
-// Hit testing helpers
-function isPointNearLine(x, y, x1, y1, x2, y2, threshold = 8) {
-  const A = x - x1, B = y - y1, C = x2 - x1, D = y2 - y1;
-  const dot = A * C + B * D;
-  const len_sq = C * C + D * D;
-  let param = len_sq !== 0 ? dot / len_sq : -1;
-  let xx, yy;
-  if (param < 0) { xx = x1; yy = y1; }
-  else if (param > 1) { xx = x2; yy = y2; }
-  else { xx = x1 + param * C; yy = y1 + param * D; }
-  const dx = x - xx, dy = y - yy;
-  return Math.sqrt(dx * dx + dy * dy) < threshold;
-}
-
-function isPointNearBezier(x, y, x1, y1, cx1, cy1, cx2, cy2, x2, y2, threshold = 8) {
-  let minDist = Infinity;
-  for (let t = 0; t <= 1; t += 0.05) {
-    const bx = Math.pow(1 - t, 3) * x1 + 3 * Math.pow(1 - t, 2) * t * cx1 + 
-               3 * (1 - t) * Math.pow(t, 2) * cx2 + Math.pow(t, 3) * x2;
-    const by = Math.pow(1 - t, 3) * y1 + 3 * Math.pow(1 - t, 2) * t * cy1 + 
-               3 * (1 - t) * Math.pow(t, 2) * cy2 + Math.pow(t, 3) * y2;
-    const dist = Math.sqrt((x - bx) ** 2 + (y - by) ** 2);
-    if (dist < minDist) minDist = dist;
-    if (dist < threshold) return true;
-  }
-  return false;
-}
+import { getEdgeHandlePosition, isPointNearLine, isPointNearBezier } from './utils';
 
 // Draw arrow at position
 function drawArrow(ctx, x, y, angle, size, color) {

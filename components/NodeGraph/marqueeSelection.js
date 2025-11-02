@@ -1,5 +1,6 @@
 // Marquee selection functionality for multi-node selection
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { isPointNearLine } from './utils';
 
 export class MarqueeSelector {
   constructor() {

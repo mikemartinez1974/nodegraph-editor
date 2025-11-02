@@ -196,11 +196,28 @@ const Toolbar = ({
     const confirmed = window.confirm('Create a new file? Any unsaved changes will be lost.');
     if (confirmed) {
       // Clear via CRUD API if available for immediate ref sync
-      if (graphCRUDRef?.current) {
-        graphCRUDRef.current.clearGraph();
-      } else if (onClearGraph) {
-        onClearGraph();
+      let cleared = false;
+      if (graphCRUDRef?.current && typeof graphCRUDRef.current.clearGraph === 'function') {
+        try {
+          graphCRUDRef.current.clearGraph();
+          cleared = true;
+        } catch (err) {
+          console.warn('clearGraph via graphCRUDRef failed:', err);
+        }
       }
+      if (!cleared && typeof onClearGraph === 'function') {
+        try {
+          onClearGraph();
+          cleared = true;
+        } catch (err) {
+          console.warn('onClearGraph callback failed:', err);
+        }
+      }
+      if (!cleared) {
+        // Fallback: broadcast an event for any listeners to handle clearing
+        try { eventBus.emit('clearGraph'); } catch {}
+      }
+
       // Update address bar to show local file
       requestAnimationFrame(() => {
         eventBus.emit('setAddress', 'local://untitled.node');
@@ -265,7 +282,7 @@ const Toolbar = ({
     e.target.value = '';
   };
 
-  const handleSaveToFile = () => {
+  const handleSaveToFile = async () => {
     const now = new Date().toISOString();
     
     const themeObject = theme?.palette ? {
@@ -338,8 +355,6 @@ const Toolbar = ({
     };
 
     const jsonString = JSON.stringify(saveData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/node' });
-    const url = URL.createObjectURL(blob);
     
     // Get filename from address bar (remove "local://" prefix)
     let filename = currentUrl.startsWith('local://') 
@@ -355,6 +370,42 @@ const Toolbar = ({
     if (!filename || filename === '.node') {
       filename = `graph_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.node`;
     }
+
+    // Try File System Access API first (Chrome, Edge, Brave, Opera)
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+      try {
+        const fileHandle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{
+            description: 'Node Graph Files',
+            accept: { 'application/node': ['.node'] }
+          }]
+        });
+
+        const writable = await fileHandle.createWritable();
+        await writable.write(jsonString);
+        await writable.close();
+
+        // We now KNOW the actual filename!
+        const actualFilename = fileHandle.name;
+        eventBus.emit('setAddress', `local://${actualFilename}`);
+
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+        if (onShowMessage) onShowMessage(`Saved as ${actualFilename}`, 'success');
+        return;
+      } catch (err) {
+        // User cancelled or error occurred, fall through to legacy method
+        if (err.name === 'AbortError') {
+          return; // User cancelled, don't show error
+        }
+        console.warn('File System Access API failed, falling back to download:', err);
+      }
+    }
+
+    // Fallback: Legacy download method (Firefox, Safari, or if user denies permission)
+    const blob = new Blob([jsonString], { type: 'application/node' });
+    const url = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
     link.href = url;
@@ -364,12 +415,12 @@ const Toolbar = ({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    // Update address bar to show saved filename
+    // Update address bar assuming user kept the suggested filename
     eventBus.emit('setAddress', `local://${filename}`);
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    if (onShowMessage) onShowMessage(`Saved ${filename}`, 'success');
+    if (onShowMessage) onShowMessage(`Saved as ${filename}. If you renamed it, reload to sync.`, 'info');
   };
 
   const handleCopyOnboard = async () => {

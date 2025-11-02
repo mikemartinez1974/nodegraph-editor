@@ -3,7 +3,7 @@
 // All handler functions consolidated
 // ============================================
 import eventBus from '../../NodeGraph/eventBus';
-import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils';
+import { generateUUID } from '../utils/idUtils';
 
 export function createGraphEditorHandlers({
   graphAPI,

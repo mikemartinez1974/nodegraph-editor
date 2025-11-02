@@ -888,7 +888,7 @@ export default function NodeGraph({
         <GroupLayer
           ref={groupRef}
           groups={groups}
-          nodes={nodesRef.current}
+          nodes={nodes}
           pan={pan}
           zoom={zoom}
           selectedGroupIds={selectedGroupIds}
@@ -941,7 +941,7 @@ export default function NodeGraph({
       <NodeLayer
         containerRef={nodeContainerRef}
         nodeRefs={nodeRefs}
-        nodes={nodesRef.current}
+        nodes={nodes}
         pan={pan}
         zoom={zoom}
         selectedNodeId={selectedNodeId}

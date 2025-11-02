@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
+import { getEdgeHandlePosition } from './utils';
 
 const handleRadius = 8;
 

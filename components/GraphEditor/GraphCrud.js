@@ -1,23 +1,15 @@
 // GraphCRUD.js
 // LLM-friendly CRUD API for graph manipulation
 import { v4 as uuidv4 } from 'uuid';
+import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils';
 
 /**
  * CRUD API for Node Graph Editor
  * All functions return { success: boolean, data?: any, error?: string }
  */
 
-function deduplicateNodes(nodes) {
-  const seen = new Set();
-  return nodes.filter(node => {
-    if (seen.has(node.id)) return false;
-    seen.add(node.id);
-    return true;
-  });
-}
-
 export default class GraphCRUD {
-  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef) {
+  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef, getGroups, setGroups, groupsRef) {
     this.getNodes = getNodes;
     this.setNodes = setNodes;
     this.getEdges = getEdges;
@@ -25,6 +17,11 @@ export default class GraphCRUD {
     this.saveToHistory = saveToHistory;
     this.nodesRef = nodesRef;
     this.edgesRef = edgesRef;
+
+    // Optional group handlers (may be undefined in older callers)
+    this.getGroups = typeof getGroups === 'function' ? getGroups : (() => (groupsRef && groupsRef.current) || []);
+    this.setGroups = typeof setGroups === 'function' ? setGroups : (() => {});
+    this.groupsRef = groupsRef;
   }
 
   // ==================== NODE CRUD ====================
@@ -384,40 +381,195 @@ export default class GraphCRUD {
    * @param {Array} edgesArray - Array of edge options
    * @returns {Object} Result with created edges
    */
-  createEdges(edgesArray) {
+  createEdges(edges) {
     try {
-      const results = edgesArray.map(opts => this.createEdge(opts));
-      const successful = results.filter(r => r.success);
-      const failed = results.filter(r => !r.success);
+      if (!Array.isArray(edges)) {
+        return { success: false, error: 'edges must be an array' };
+      }
 
-      return {
-        success: failed.length === 0,
-        data: {
-          created: successful.map(r => r.data),
-          failed: failed.map(r => r.error)
+      const currentNodes = this.getNodes();
+      const currentEdges = this.getEdges();
+      const existingNodeIds = new Set(currentNodes.map(n => n.id));
+      const existingEdgeIds = new Set(currentEdges.map(e => e.id));
+      
+      // Validate that all source/target nodes exist
+      const missingNodes = new Set();
+      for (const edge of edges) {
+        if (edge.source && !existingNodeIds.has(edge.source)) {
+          missingNodes.add(edge.source);
         }
+        if (edge.target && !existingNodeIds.has(edge.target)) {
+          missingNodes.add(edge.target);
+        }
+      }
+      
+      if (missingNodes.size > 0) {
+        const missingList = Array.from(missingNodes).join(', ');
+        return { 
+          success: false, 
+          error: `Cannot create edges: the following nodes do not exist: ${missingList}. Create the nodes first, or use a batch operation that includes both nodes and edges.` 
+        };
+      }
+      
+      // Validate and sanitize edges
+      const validEdges = [];
+      const errors = [];
+      
+      for (let i = 0; i < edges.length; i++) {
+        const edge = edges[i];
+        
+        // Basic validation
+        if (!edge || typeof edge !== 'object') {
+          errors.push(`Edge ${i}: must be an object`);
+          continue;
+        }
+        
+        if (!edge.source || !edge.target) {
+          errors.push(`Edge ${i}: must have source and target`);
+          continue;
+        }
+        
+        // Generate ID if missing
+        let edgeId = edge.id;
+        if (!edgeId) {
+          edgeId = this._generateId();
+          existingEdgeIds.add(edgeId);
+        } else if (existingEdgeIds.has(edgeId)) {
+          // Skip duplicates instead of erroring
+          continue;
+        } else {
+          existingEdgeIds.add(edgeId);
+        }
+        
+        // Use edge type as-is
+        const edgeType = edge.type || 'straight';
+        
+        // Sanitize color
+        const color = edge.color || '#666';
+        
+        // Create sanitized edge
+        const sanitizedEdge = {
+          id: edgeId,
+          source: edge.source,
+          target: edge.target,
+          type: edgeType,
+          label: edge.label || '',
+          color,
+          visible: edge.visible !== false,
+          showLabel: edge.showLabel !== false,
+          data: edge.data || {}
+        };
+        
+        validEdges.push(sanitizedEdge);
+      }
+      
+      if (validEdges.length === 0) {
+        return { 
+          success: false, 
+          error: errors.length > 0 ? errors.join('; ') : 'No valid edges to create' 
+        };
+      }
+      
+      // Update state
+      const updatedEdges = [...currentEdges, ...validEdges];
+      this.setEdges(prev => {
+        this.edgesRef.current = updatedEdges;
+        return updatedEdges;
+      });
+      
+      this.saveToHistory(currentNodes, updatedEdges);
+      
+      const message = `Created ${validEdges.length} edge${validEdges.length > 1 ? 's' : ''}`;
+      if (errors.length > 0) {
+        console.warn('Edge creation warnings:', errors);
+      }
+      
+      return { 
+        success: true, 
+        data: { 
+          created: validEdges,
+          message,
+          warnings: errors.length > 0 ? errors : undefined
+        } 
       };
     } catch (error) {
+      console.error('createEdges error:', error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Clear entire graph
-   * @returns {Object} Result
+   * Create multiple groups at once
+   * @param {Array} groupsArray - Array of group options
+   * @returns {Object} Result with created groups
    */
-  clearGraph() {
+  createGroups(groupsArray) {
     try {
-      this.setNodes(prev => {
-        if (this.nodesRef) this.nodesRef.current = [];
-        return [];
+      if (!Array.isArray(groupsArray)) {
+        return { success: false, error: 'groups must be an array' };
+      }
+
+      const currentNodes = this.getNodes();
+      const currentGroups = this.getGroups ? this.getGroups() : (this.groupsRef ? this.groupsRef.current || [] : []);
+      const nodeIdSet = new Set((currentNodes || []).map(n => n.id));
+      const existingGroupIds = new Set((currentGroups || []).map(g => g.id));
+
+      const createdGroups = [];
+      const failed = [];
+
+      for (let i = 0; i < groupsArray.length; i++) {
+        const opts = groupsArray[i];
+        if (!opts || typeof opts !== 'object') {
+          failed.push(`Group ${i}: must be an object`);
+          continue;
+        }
+
+        const gid = opts.id || this._generateId();
+        if (existingGroupIds.has(gid)) {
+          failed.push(`Group ${gid}: already exists`);
+          continue;
+        }
+
+        const nodeIds = Array.isArray(opts.nodeIds) ? opts.nodeIds.filter(id => nodeIdSet.has(id)) : [];
+        if (nodeIds.length === 0) {
+          failed.push(`Group ${gid}: no valid nodeIds found (must reference existing nodes)`);
+          continue;
+        }
+
+        const newGroup = {
+          id: gid,
+          label: opts.label || '',
+          nodeIds: nodeIds,
+          bounds: opts.bounds || { x: 0, y: 0, width: 0, height: 0 },
+          visible: opts.visible !== false,
+          style: opts.style || {}
+        };
+
+        createdGroups.push(newGroup);
+        existingGroupIds.add(gid);
+      }
+
+      if (createdGroups.length === 0) {
+        return { success: false, error: failed.join('; ') || 'No valid groups to create' };
+      }
+
+      const updatedGroups = [...(currentGroups || []), ...createdGroups];
+      this.setGroups(prev => {
+        const next = updatedGroups;
+        if (this.groupsRef) this.groupsRef.current = next;
+        return next;
       });
-      this.setEdges(prev => {
-        if (this.edgesRef) this.edgesRef.current = [];
-        return [];
-      });
-      this.saveToHistory([], []);
-      return { success: true, data: { message: 'Graph cleared' } };
+
+      // Save history using current nodes/edges (groups are part of UI state but history handler can be used)
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return {
+        success: true,
+        data: {
+          created: createdGroups,
+          failed: failed.length ? failed : undefined
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
