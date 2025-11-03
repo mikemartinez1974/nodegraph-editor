@@ -207,6 +207,10 @@ const FixedNode = ({
       }}
       tabIndex={0}
       onMouseDown={e => {
+        // Don't stop propagation if clicking inside child elements (like html-content)
+        if (e.target.classList.contains('html-content') || e.target.closest('.html-content')) {
+          return; // Let the child handle it
+        }
         e.stopPropagation();
         // Check if Alt key is held for rotation
         if (e.altKey) {
@@ -217,6 +221,11 @@ const FixedNode = ({
         eventBus.emit('nodeMouseDown', { id: node.id, event: e });
       }}
       onClick={e => {
+        // Don't stop propagation if clicking inside child elements (like html-content)
+        if (e.target.classList.contains('html-content') || e.target.closest('.html-content')) {
+          console.log('[FixedNode] Click on html-content, not stopping propagation');
+          return; // Let the child handle it
+        }
         e.stopPropagation();
         // Prevent nodeClick if clicking a link
         if (e.target && (e.target.tagName === 'A' || e.target.closest('a'))) return;

@@ -45,3 +45,5 @@ package.json
 .vscode/launch.json
 .gitignore
 
+package-lock.json
+package.json
