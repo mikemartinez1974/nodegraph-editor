@@ -106,6 +106,12 @@ const FixedNode = ({
       newRotation = Math.round(newRotation / 15) * 15;
     }
     
+    // Apply rotation immediately to DOM for instant visual feedback
+    if (nodeRef.current) {
+      nodeRef.current.style.transform = `rotate(${newRotation}deg)`;
+    }
+    
+    // Also update the node data for persistence
     eventBus.emit('nodeUpdate', { 
       id: node.id, 
       updates: { 
@@ -215,7 +221,7 @@ const FixedNode = ({
         // Prevent nodeClick if clicking a link
         if (e.target && (e.target.tagName === 'A' || e.target.closest('a'))) return;
         if (typeof onClick === 'function') onClick(e);
-        eventBus.emit('nodeClick', { id: node.id, event: e });
+        // Note: NodeLayer will emit nodeClick, so we don't duplicate it here
       }}
       onDoubleClick={e => {
         e.stopPropagation();

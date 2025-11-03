@@ -131,6 +131,8 @@ export default function NodeGraph({
   const dragRafRef = useRef(null);
   const groupDragOffsetRef = useRef({ x: 0, y: 0 });
   const dragThreshold = 5;
+  const dragStartedRef = useRef(false);
+  const suppressClickRef = useRef(false);
 
   // Create layerRefs object
   const layerRefs = useMemo(() => ({
@@ -305,6 +307,7 @@ export default function NodeGraph({
       setDraggingNodeId(node.id);
       draggingNodeIdRef.current = nodesToDrag;
       isDragging.current = false;
+      dragStartedRef.current = false;
       dragStartTime.current = Date.now();
       dragStartPos.current = { x: event.clientX, y: event.clientY };
       
@@ -340,6 +343,9 @@ export default function NodeGraph({
     );
     
     if (dragDistance < dragThreshold) return;
+
+    dragStartedRef.current = true;
+    suppressClickRef.current = true;
 
     const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
     const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
@@ -393,7 +399,8 @@ export default function NodeGraph({
       lastMousePos.current.y - dragStartPos.current.y
     );
     
-    if (dragDistance < dragThreshold) {
+    // Only trigger click if we didn't actually drag
+    if (dragDistance < dragThreshold && !dragStartedRef.current) {
       const node = nodes.find(n => n.id === draggingNodeIdRef.current[0]);
       if (node && typeof onNodeClick === 'function') {
         onNodeClick(node.id, {});
@@ -447,6 +454,12 @@ export default function NodeGraph({
 
     setDraggingNodeId(null);
     draggingNodeIdRef.current = null;
+    
+    // Delay resetting suppressClick to ensure click handler sees it
+    setTimeout(() => {
+      suppressClickRef.current = false;
+    }, 10);
+    
     if (dragRafRef.current) {
       cancelAnimationFrame(dragRafRef.current);
       dragRafRef.current = null;
@@ -974,6 +987,7 @@ export default function NodeGraph({
         theme={theme}
         nodeTypes={nodeTypes}
         lockedNodes={lockedNodes}
+        suppressClickRef={suppressClickRef}
         onNodeEvent={(id, e) => {
           // Handle node click
           if (onNodeClick) {

@@ -24,7 +24,8 @@ const NodeLayer = ({
     onNodeDoubleClick,
     onNodeDragStart, 
     onNodeHover,
-    nodeTypes = { default: DefaultNode } 
+    nodeTypes = { default: DefaultNode },
+    suppressClickRef
 }) => {
     // Deduplicate nodes before rendering
     const uniqueNodes = deduplicateNodes(nodes);
@@ -80,7 +81,11 @@ const NodeLayer = ({
                                 return;
                               }
                             } catch (err) {}
-                            eventBus.emit('nodeClick', { id: node.id, event: e });
+                            // Don't trigger click if we just finished dragging
+                            if (suppressClickRef && suppressClickRef.current) {
+                              return;
+                            }
+                            onNodeEvent && onNodeEvent(node.id, e);
                         }}
                         onDoubleClick={onNodeDoubleClick ? (e) => {
                             e.stopPropagation();

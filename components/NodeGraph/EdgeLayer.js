@@ -24,6 +24,41 @@ function drawArrow(ctx, x, y, angle, size, color) {
   ctx.restore();
 }
 
+// Get intersection point of line from (x1,y1) to (x2,y2) with node boundary
+function getNodeBoundaryIntersection(x1, y1, x2, y2, nodeX, nodeY, nodeWidth, nodeHeight) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const distance = Math.hypot(dx, dy);
+  
+  if (distance === 0) return { x: nodeX, y: nodeY };
+  
+  const nx = dx / distance;
+  const ny = dy / distance;
+  
+  // Half dimensions
+  const hw = nodeWidth / 2;
+  const hh = nodeHeight / 2;
+  
+  // Calculate intersection with rectangle
+  let t = Infinity;
+  
+  // Right edge
+  if (nx > 0) t = Math.min(t, (hw - (x1 - nodeX)) / nx);
+  // Left edge
+  if (nx < 0) t = Math.min(t, (-hw - (x1 - nodeX)) / nx);
+  // Bottom edge
+  if (ny > 0) t = Math.min(t, (hh - (y1 - nodeY)) / ny);
+  // Top edge
+  if (ny < 0) t = Math.min(t, (-hh - (y1 - nodeY)) / ny);
+  
+  t = Math.max(0, t);
+  
+  return {
+    x: x1 + nx * t,
+    y: y1 + ny * t
+  };
+}
+
 // Get angle at point on bezier curve
 function getBezierAngle(t, x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
   const dx = 3 * Math.pow(1 - t, 2) * (cx1 - x1) + 
@@ -64,7 +99,7 @@ const EdgeLayer = forwardRef(({
   const prevHoveredEdgeRef = useRef(null);
   const edgeDataRef = useRef([]);
   const animationFrameRef = useRef(null);
-  const animationTimeRef = useRef(0);
+  const animationStartTimeRef = useRef(null);
   
   // Keep fresh references to avoid stale closures in animation loop
   const edgeListRef = useRef(edgeList);
@@ -88,7 +123,13 @@ const EdgeLayer = forwardRef(({
     clearCanvas(ctx, canvasSize.width, canvasSize.height);
 
     const newEdgeData = [];
-    const time = animationTimeRef.current;
+    
+    // Calculate time in seconds from animation start
+    if (!animationStartTimeRef.current) {
+      animationStartTimeRef.current = performance.now();
+    }
+    const elapsed = (performance.now() - animationStartTimeRef.current) / 1000;
+    const time = elapsed;
 
     ctx.save();
     ctx.translate(pan.x, pan.y);
@@ -150,6 +191,35 @@ const EdgeLayer = forwardRef(({
             y: targetPos.y + draggingInfoRef.current.offset.y
           };
         }
+      }
+
+      // Calculate edge-to-edge intersection points
+      const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
+      const targetNode = nodeListRef.current.find(n => n.id === edge.target);
+      
+      if (sourceNode && targetNode) {
+        const sourceWidth = sourceNode.width || 60;
+        const sourceHeight = sourceNode.height || 60;
+        const targetWidth = targetNode.width || 60;
+        const targetHeight = targetNode.height || 60;
+        
+        // Get intersection points on node boundaries
+        const edgeSourcePos = getNodeBoundaryIntersection(
+          sourcePos.x, sourcePos.y,
+          targetPos.x, targetPos.y,
+          sourcePos.x, sourcePos.y,
+          sourceWidth, sourceHeight
+        );
+        
+        const edgeTargetPos = getNodeBoundaryIntersection(
+          targetPos.x, targetPos.y,
+          sourcePos.x, sourcePos.y,
+          targetPos.x, targetPos.y,
+          targetWidth, targetHeight
+        );
+        
+        sourcePos = edgeSourcePos;
+        targetPos = edgeTargetPos;
       }
       
       ctx.save();
@@ -402,7 +472,6 @@ const EdgeLayer = forwardRef(({
     });
     
     if (hasAnimations) {
-      animationTimeRef.current += 0.016; // ~60fps
       animationFrameRef.current = requestAnimationFrame(() => drawEdges());
     }
   }

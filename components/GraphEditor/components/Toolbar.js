@@ -46,6 +46,8 @@ import {
   Map as MapIcon,  // NEW: Import minimap icon
   GridOn as GridOnIcon  // NEW: Import grid icon
 } from '@mui/icons-material';
+import CreateIcon from '@mui/icons-material/Create';
+import DrawIcon from '@mui/icons-material/Draw';
 import PostAddIcon from '@mui/icons-material/PostAdd';  
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import ShapeLineIcon from '@mui/icons-material/ShapeLine';
@@ -639,7 +641,7 @@ const Toolbar = ({
             aria-label="Paste graph JSON or create node from text"
             size="small"
           >
-            <ShapeLineIcon fontSize="small" />
+            <DrawIcon fontSize="small" />
           </IconButton>
 
           <IconButton
@@ -668,7 +670,7 @@ const Toolbar = ({
             title="Add Node (Ctrl+N)"
             size="small"
           >
-            <PostAddIcon />
+            <CreateIcon fontSize="small"   />
           </IconButton>
 
           <IconButton
