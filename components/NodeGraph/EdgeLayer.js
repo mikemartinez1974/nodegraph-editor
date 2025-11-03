@@ -565,6 +565,7 @@ const EdgeLayer = forwardRef(({
     
     for (const edgeData of edgeDataRef.current) {
       let hit = false;
+      // Edge path hit test
       if (edgeData.isCurved) {
         if (edgeData.curveDirection === 'horizontal') {
           hit = isPointNearBezier(
@@ -590,7 +591,10 @@ const EdgeLayer = forwardRef(({
           edgeData.targetPos.x, edgeData.targetPos.y
         );
       }
-      
+      // Edge label hit test
+      if (!hit) {
+        hit = isPointInEdgeLabel({ x: graphX, y: graphY }, edgeData, theme);
+      }
       if (hit) {
         found = edgeData.id;
         break;
@@ -625,11 +629,11 @@ const EdgeLayer = forwardRef(({
     const mouseX = (e.clientX - rect.left - pan.x) / zoom;
     const mouseY = (e.clientY - rect.top - pan.y) / zoom;
     let found = null;
-    
+
     for (const edge of edgeList) {
       const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
       if (!edgeData) continue;
-      
+
       let hit = false;
       if (edgeData.isCurved) {
         if (edgeData.curveDirection === 'horizontal') {
@@ -656,19 +660,22 @@ const EdgeLayer = forwardRef(({
           edgeData.targetPos.x, edgeData.targetPos.y
         );
       }
-      
+      // Edge label hit test
+      if (!hit) {
+        hit = isPointInEdgeLabel({ x: mouseX, y: mouseY }, edgeData, theme);
+      }
       if (hit) {
         found = edge.id;
         break;
       }
     }
-    
+
     if (found && onEdgeClick) {
       const foundEdge = edgeList.find(edge => edge.id === found);
       onEdgeClick(foundEdge || found, e);
     }
   }
-  
+
   function handleDoubleClick(e) {
     if (!canvasRef.current) return;
 
@@ -676,11 +683,11 @@ const EdgeLayer = forwardRef(({
     const mouseX = (e.clientX - rect.left - pan.x) / zoom;
     const mouseY = (e.clientY - rect.top - pan.y) / zoom;
     let found = null;
-    
+
     for (const edge of edgeList) {
       const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
       if (!edgeData) continue;
-      
+
       let hit = false;
       if (edgeData.isCurved) {
         if (edgeData.curveDirection === 'horizontal') {
@@ -707,13 +714,16 @@ const EdgeLayer = forwardRef(({
           edgeData.targetPos.x, edgeData.targetPos.y
         );
       }
-      
+      // Edge label hit test
+      if (!hit) {
+        hit = isPointInEdgeLabel({ x: mouseX, y: mouseY }, edgeData, theme);
+      }
       if (hit) {
         found = edge.id;
         break;
       }
     }
-    
+
     if (found && onEdgeDoubleClick) {
       onEdgeDoubleClick(found, e);
     }
