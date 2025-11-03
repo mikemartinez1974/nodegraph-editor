@@ -23,6 +23,8 @@ const NodeLayer = ({
     onNodeEvent, 
     onNodeDoubleClick,
     onNodeDragStart, 
+    onNodeMouseEnter, // Add this
+    onNodeMouseLeave, // Add this
     onNodeHover,
     nodeTypes = { default: DefaultNode },
     suppressClickRef
@@ -57,8 +59,20 @@ const NodeLayer = ({
                 const isMultiSelect = selectedNodeIds.length > 1;
 
                 return (
-                    <NodeComponent
-                        key={node.id}
+                    <div
+                      key={node.id}
+                      onMouseEnter={() => {
+                        console.log('NodeLayer: Mouse entered node', node.id);
+                        if (onNodeHover) onNodeHover(node.id);
+                        onNodeMouseEnter && onNodeMouseEnter(node.id); // Add this
+                      }}
+                      onMouseLeave={() => {
+                        console.log('NodeLayer: Mouse left node', node.id);
+                        if (onNodeHover) onNodeHover(node.id);
+                        onNodeMouseLeave && onNodeMouseLeave(node.id); // Add this
+                      }}
+                    >
+                      <NodeComponent
                         node={node}
                         pan={pan}
                         zoom={zoom}
@@ -97,7 +111,8 @@ const NodeLayer = ({
                         }}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                         nodeRefs={nodeRefs}
-                    />
+                      />
+                    </div>
                  );
             })}
         </div>

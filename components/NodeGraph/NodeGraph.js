@@ -114,7 +114,6 @@ export default function NodeGraph({
   // State
   const [draggingNodeId, setDraggingNodeId] = useState(null);
   const [draggingGroupId, setDraggingGroupId] = useState(null);
-  //const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [iframeError, setIframeError] = useState(false);
   const [handlePreviewLine, setHandlePreviewLine] = useState(null);
 
@@ -1015,11 +1014,9 @@ export default function NodeGraph({
           }
         }}
         onNodeMouseEnter={(id) => {
-          setHoveredNodeId(id);
           eventBus.emit('nodeHover', { id });
         }}
         onNodeMouseLeave={(id) => {
-          setHoveredNodeId(null);
           eventBus.emit('nodeUnhover', { id });
         }}
         onNodeDragStart={(e, node) => {

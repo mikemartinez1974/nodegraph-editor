@@ -39,6 +39,7 @@ const HandleLayer = forwardRef(({
   const [hoveredHandle, setHoveredHandle] = useState(null);
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [previewLine, setPreviewLine] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const animationFrameRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -49,6 +50,30 @@ const HandleLayer = forwardRef(({
       return findHandleAt(clientX, clientY);
     }
   }));
+
+  // Listen to node hover events from event bus (single listener)
+  useEffect(() => {
+    const handleNodeHover = ({ id }) => {
+      setHoveredNodeId(id);
+    };
+
+    const handleNodeUnhover = () => {
+      // Only hide handles if we're not hovering over a handle itself
+      setTimeout(() => {
+        if (!hoveredHandle) {
+          setHoveredNodeId(null);
+        }
+      }, 100);
+    };
+
+    eventBus.on('nodeHover', handleNodeHover);
+    eventBus.on('nodeUnhover', handleNodeUnhover);
+
+    return () => {
+      eventBus.off('nodeHover', handleNodeHover);
+      eventBus.off('nodeUnhover', handleNodeUnhover);
+    };
+  }, [hoveredHandle]);
 
   const handlePositionMap = React.useMemo(() => {
     const map = {};
@@ -120,22 +145,26 @@ const HandleLayer = forwardRef(({
   const getCurrentHandles = useCallback(() => {
     const allHandles = [];
     
-    nodes.filter(n => n.visible !== false).forEach(node => {
-      const handles = getHandlePositions(node);
-      
-      if (draggingInfoRef?.current?.nodeIds?.includes(node.id)) {
-        const offset = draggingInfoRef.current.offset;
-        handles.forEach(h => {
-          h.position.x += offset.x;
-          h.position.y += offset.y;
-        });
-      }
-      
-      allHandles.push(...handles);
-    });
+    // Only show handles for the hovered node (or dragging node)
+    const targetNodeId = draggingHandle?.nodeId || hoveredNodeId;
+    if (!targetNodeId) return allHandles;
     
+    const targetNode = nodes.find(n => n.id === targetNodeId && n.visible !== false);
+    if (!targetNode) return allHandles;
+    
+    const handles = getHandlePositions(targetNode);
+    
+    if (draggingInfoRef?.current?.nodeIds?.includes(targetNode.id)) {
+      const offset = draggingInfoRef.current.offset;
+      handles.forEach(h => {
+        h.position.x += offset.x;
+        h.position.y += offset.y;
+      });
+    }
+    
+    allHandles.push(...handles);
     return allHandles;
-  }, [nodes, draggingInfoRef]);
+  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle]);
 
   const findHandleAt = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
@@ -270,12 +299,13 @@ const HandleLayer = forwardRef(({
       return;
     }
     
+    // Check for handle hover
     const handle = findHandleAt(e.clientX, e.clientY);
     if (handle !== hoveredHandle) {
       setHoveredHandle(handle);
       scheduleRender();
     }
-  }, [draggingHandle, findHandleAt, hoveredHandle, scheduleRender]);
+  }, [draggingHandle, hoveredHandle, canvasRef, findHandleAt, scheduleRender]);
 
   const handleMouseUp = useCallback((e) => {
     if (!draggingHandle) return;
@@ -332,9 +362,7 @@ const HandleLayer = forwardRef(({
     return () => window.removeEventListener('resize', updateCanvasSize);
   }, [scheduleRender]);
 
-  useEffect(() => {
-    scheduleRender();
-  }, [nodes, edges, pan, zoom, scheduleRender]);
+
 
   useEffect(() => {
     if (!draggingHandle) return;
@@ -347,6 +375,11 @@ const HandleLayer = forwardRef(({
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [draggingHandle, handleMouseMove, handleMouseUp]);
+
+  // Main rendering effect
+  useEffect(() => {
+    drawCanvas();
+  }, [nodes, edges, pan, zoom, hoveredNodeId]); // Ensure hoveredNodeId is in dependencies
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>

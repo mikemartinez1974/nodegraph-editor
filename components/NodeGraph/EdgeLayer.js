@@ -98,8 +98,10 @@ const EdgeLayer = forwardRef(({
   const { getHandlePositionForEdge } = useContext(HandlePositionContext);
   const prevHoveredEdgeRef = useRef(null);
   const edgeDataRef = useRef([]);
-  const animationFrameRef = useRef(null);
+  
+  // Animation refs
   const animationStartTimeRef = useRef(null);
+  const animationFrameRef = useRef(null);
   
   // Keep fresh references to avoid stale closures in animation loop
   const edgeListRef = useRef(edgeList);
@@ -245,6 +247,14 @@ const EdgeLayer = forwardRef(({
       let lineWidth = style.width;
       let opacity = style.opacity;
       
+      // Apply pulse animation (modulate width and opacity)
+      if (style.animation === 'pulse') {
+        const pulsePhase = Math.sin(time * Math.PI * 2 * style.animationSpeed);
+        const pulseFactor = 0.5 + pulsePhase * 0.5; // 0 to 1
+        lineWidth = lineWidth * (1 + pulseFactor * 0.5); // Pulse width 100% to 150%
+        opacity = opacity * (0.6 + pulseFactor * 0.4); // Pulse opacity 60% to 100%
+      }
+      
       if (isSelected) {
         lineWidth = lineWidth + 2;
         opacity = 1;
@@ -271,13 +281,17 @@ const EdgeLayer = forwardRef(({
       
       ctx.lineWidth = lineWidth;
       ctx.globalAlpha = opacity;
-      ctx.setLineDash(style.dash);
       
-      // Animation offset for dashed lines
-      if (style.animation === 'dash' && style.dash.length > 0) {
-        const dashSum = style.dash.reduce((a, b) => a + b, 0);
-        const offset = (time * 20 * style.animationSpeed) % dashSum;
+      // Setup dash pattern
+      if (style.animation === 'dash') {
+        // Use dash pattern for animated dash, or create one if none exists
+        const dashArray = style.dash.length > 0 ? style.dash : [8, 4];
+        ctx.setLineDash(dashArray);
+        const dashSum = dashArray.reduce((a, b) => a + b, 0);
+        const offset = (time * 30 * style.animationSpeed) % dashSum;
         ctx.lineDashOffset = -offset;
+      } else {
+        ctx.setLineDash(style.dash);
       }
       
       const isCurved = style.curved;
@@ -393,13 +407,6 @@ const EdgeLayer = forwardRef(({
         }
       }
       
-      // Pulse animation (varying opacity)
-      if (style.animation === 'pulse') {
-        // Already handled by varying opacity based on time in future frames
-        const pulseOpacity = 0.5 + 0.5 * Math.sin(time * 2 * style.animationSpeed);
-        ctx.globalAlpha = pulseOpacity;
-      }
-      
       // Selection animation
       if (isSelected) {
         ctx.save();
@@ -475,6 +482,8 @@ const EdgeLayer = forwardRef(({
       animationFrameRef.current = requestAnimationFrame(() => drawEdges());
     }
   }
+
+
 
   useEffect(() => {
     drawEdges();

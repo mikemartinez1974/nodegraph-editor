@@ -249,11 +249,6 @@ export default function ConsolidatedPropertiesPanel({
     document.removeEventListener('mouseup', onResizeMouseUp);
   };
 
-  // Add a stub for handleStyleUpdate to prevent ReferenceError
-  function handleStyleUpdate() {
-    // TODO: Implement style update logic
-  }
-
   if (!entityType) return null;
 
   const panelTitle = entityType === 'node' ? 'Node Properties' :
@@ -383,7 +378,65 @@ export default function ConsolidatedPropertiesPanel({
                 ))}
               </Select>
             </FormControl>
-
+            {/* Memo */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Memo (Markdown)</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                  <ToggleButtonGroup
+                    value={memoView}
+                    exclusive
+                    onChange={(e, newView) => newView && setMemoView(newView)}
+                    size="small"
+                  >
+                    <ToggleButton value="edit">
+                      <EditIcon sx={{ fontSize: 16 }} />
+                    </ToggleButton>
+                    <ToggleButton value="preview">
+                      <VisibilityIcon sx={{ fontSize: 16 }} />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+                {memoView === 'edit' ? (
+                  <TextField
+                    inputRef={memoInputRef}
+                    multiline
+                    rows={8}
+                    value={memo}
+                    onChange={handleMemoChange}
+                    fullWidth
+                    variant="filled"
+                    disabled={isLocked}
+                    sx={{ backgroundColor: theme?.palette?.background?.paper }}
+                  />
+                ) : (
+                  <Box sx={{ 
+                    p: 2, 
+                    backgroundColor: theme?.palette?.background?.paper, 
+                    borderRadius: 1,
+                    minHeight: 200,
+                    maxHeight: 400,
+                    overflowY: 'auto'
+                  }}>
+                    {memo ? (
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {memo}
+                      </ReactMarkdown>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                        No content to preview
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  {memo.length} characters
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+            
             {/* Color */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="caption" color="text.secondary" gutterBottom>
@@ -465,64 +518,7 @@ export default function ConsolidatedPropertiesPanel({
               </AccordionDetails>
             </Accordion>
 
-            {/* Memo */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2">Memo (Markdown)</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                  <ToggleButtonGroup
-                    value={memoView}
-                    exclusive
-                    onChange={(e, newView) => newView && setMemoView(newView)}
-                    size="small"
-                  >
-                    <ToggleButton value="edit">
-                      <EditIcon sx={{ fontSize: 16 }} />
-                    </ToggleButton>
-                    <ToggleButton value="preview">
-                      <VisibilityIcon sx={{ fontSize: 16 }} />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Box>
-                {memoView === 'edit' ? (
-                  <TextField
-                    inputRef={memoInputRef}
-                    multiline
-                    rows={8}
-                    value={memo}
-                    onChange={handleMemoChange}
-                    fullWidth
-                    variant="filled"
-                    disabled={isLocked}
-                    sx={{ backgroundColor: theme?.palette?.background?.paper }}
-                  />
-                ) : (
-                  <Box sx={{ 
-                    p: 2, 
-                    backgroundColor: theme?.palette?.background?.paper, 
-                    borderRadius: 1,
-                    minHeight: 200,
-                    maxHeight: 400,
-                    overflowY: 'auto'
-                  }}>
-                    {memo ? (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {memo}
-                      </ReactMarkdown>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                        No content to preview
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                  {memo.length} characters
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
+
           </>
         )}
 
@@ -655,7 +651,7 @@ export default function ConsolidatedPropertiesPanel({
                             color: null 
                           });
                         } else {
-                          handleEdgeStyleUpdate({ gradient: null });
+                          handleEdgeStyleUpdate({ gradient: null, color: edgeColor });
                         }
                       }}
                       disabled={isLocked}
@@ -665,7 +661,46 @@ export default function ConsolidatedPropertiesPanel({
                   sx={{ mb: 2 }}
                 />
 
-                {!gradientEnabled && (
+                {gradientEnabled ? (
+                  <Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
+                        Gradient Start
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        type="color"
+                        value={gradientStart}
+                        onChange={(e) => {
+                          setGradientStart(e.target.value);
+                          handleEdgeStyleUpdate({ 
+                            gradient: { start: e.target.value, end: gradientEnd }
+                          });
+                        }}
+                        disabled={isLocked}
+                        size="small"
+                      />
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
+                        Gradient End
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        type="color"
+                        value={gradientEnd}
+                        onChange={(e) => {
+                          setGradientEnd(e.target.value);
+                          handleEdgeStyleUpdate({ 
+                            gradient: { start: gradientStart, end: e.target.value }
+                          });
+                        }}
+                        disabled={isLocked}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                ) : (
                   <TextField
                     fullWidth
                     type="color"
@@ -691,12 +726,12 @@ export default function ConsolidatedPropertiesPanel({
                         <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
                           <InputLabel>Animation Type</InputLabel>
                           <Select
-                            value={animation || 'none'}
+                            value={animation ?? 'none'}
                             onChange={(e) => {
-                              setAnimation(e.target.value === 'none' ? null : e.target.value);
-                              handleStyleUpdate({ 
-                                animation: e.target.value === 'none' ? null : e.target.value 
-                              });
+                              const val = e.target.value === 'none' ? 'none' : e.target.value;
+                              setAnimation(val);
+                              // store null to clear animation style when 'none' is selected
+                              handleEdgeStyleUpdate({ animation: val === 'none' ? null : val });
                             }}
                             label="Animation Type"
                           >
@@ -716,7 +751,7 @@ export default function ConsolidatedPropertiesPanel({
                               value={animationSpeed}
                               onChange={(e, val) => {
                                 setAnimationSpeed(val);
-                                handleStyleUpdate({ animationSpeed: val });
+                                handleEdgeStyleUpdate({ animationSpeed: val });
                               }}
                               min={0.1}
                               max={3}
