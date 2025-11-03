@@ -24,39 +24,59 @@ function drawArrow(ctx, x, y, angle, size, color) {
   ctx.restore();
 }
 
-// Get intersection point of line from (x1,y1) to (x2,y2) with node boundary
-function getNodeBoundaryIntersection(x1, y1, x2, y2, nodeX, nodeY, nodeWidth, nodeHeight) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
+// Helper to rotate a point around a center
+function rotatePoint(px, py, cx, cy, angleDeg) {
+  const angleRad = angleDeg * Math.PI / 180;
+  const dx = px - cx;
+  const dy = py - cy;
+  const cos = Math.cos(angleRad);
+  const sin = Math.sin(angleRad);
+  return {
+    x: cx + dx * cos - dy * sin,
+    y: cy + dx * sin + dy * cos
+  };
+}
+
+// Get intersection point of line from (x1,y1) to (x2,y2) with node boundary, accounting for rotation
+function getNodeBoundaryIntersection(x1, y1, x2, y2, nodeX, nodeY, nodeWidth, nodeHeight, rotation = 0) {
+  // Transform the line into the node's local (unrotated) space
+  const angleRad = -rotation * Math.PI / 180;
+  const rotate = (px, py) => {
+    const dx = px - nodeX;
+    const dy = py - nodeY;
+    return {
+      x: nodeX + dx * Math.cos(angleRad) - dy * Math.sin(angleRad),
+      y: nodeY + dx * Math.sin(angleRad) + dy * Math.cos(angleRad)
+    };
+  };
+  const p1 = rotate(x1, y1);
+  const p2 = rotate(x2, y2);
+
+  // Intersection math in local space
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
   const distance = Math.hypot(dx, dy);
-  
   if (distance === 0) return { x: nodeX, y: nodeY };
-  
+
   const nx = dx / distance;
   const ny = dy / distance;
-  
-  // Half dimensions
   const hw = nodeWidth / 2;
   const hh = nodeHeight / 2;
-  
-  // Calculate intersection with rectangle
   let t = Infinity;
-  
-  // Right edge
-  if (nx > 0) t = Math.min(t, (hw - (x1 - nodeX)) / nx);
-  // Left edge
-  if (nx < 0) t = Math.min(t, (-hw - (x1 - nodeX)) / nx);
-  // Bottom edge
-  if (ny > 0) t = Math.min(t, (hh - (y1 - nodeY)) / ny);
-  // Top edge
-  if (ny < 0) t = Math.min(t, (-hh - (y1 - nodeY)) / ny);
-  
+  if (nx > 0) t = Math.min(t, (hw - (p1.x - nodeX)) / nx);
+  if (nx < 0) t = Math.min(t, (-hw - (p1.x - nodeX)) / nx);
+  if (ny > 0) t = Math.min(t, (hh - (p1.y - nodeY)) / ny);
+  if (ny < 0) t = Math.min(t, (-hh - (p1.y - nodeY)) / ny);
   t = Math.max(0, t);
-  
-  return {
-    x: x1 + nx * t,
-    y: y1 + ny * t
+
+  // Intersection point in local space
+  const localIntersect = {
+    x: p1.x + nx * t,
+    y: p1.y + ny * t
   };
+  // Rotate back to global space
+  const globalIntersect = rotatePoint(localIntersect.x, localIntersect.y, nodeX, nodeY, rotation);
+  return globalIntersect;
 }
 
 // Get angle at point on bezier curve
@@ -204,22 +224,26 @@ const EdgeLayer = forwardRef(({
         const sourceHeight = sourceNode.height || 60;
         const targetWidth = targetNode.width || 60;
         const targetHeight = targetNode.height || 60;
-        
-        // Get intersection points on node boundaries
+        const sourceRotation = sourceNode.data?.rotation || 0;
+        const targetRotation = targetNode.data?.rotation || 0;
+
+        // Get intersection points on node boundaries, accounting for rotation
         const edgeSourcePos = getNodeBoundaryIntersection(
           sourcePos.x, sourcePos.y,
           targetPos.x, targetPos.y,
           sourcePos.x, sourcePos.y,
-          sourceWidth, sourceHeight
+          sourceWidth, sourceHeight,
+          sourceRotation
         );
-        
+
         const edgeTargetPos = getNodeBoundaryIntersection(
           targetPos.x, targetPos.y,
           sourcePos.x, sourcePos.y,
           targetPos.x, targetPos.y,
-          targetWidth, targetHeight
+          targetWidth, targetHeight,
+          targetRotation
         );
-        
+
         sourcePos = edgeSourcePos;
         targetPos = edgeTargetPos;
       }
