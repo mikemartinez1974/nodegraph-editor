@@ -6,8 +6,9 @@ import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
 import edgeTypes from '../GraphEditor/edgeTypes';
 import { setupHiDPICanvas, getCanvasContext, clearCanvas } from './canvasUtils';
-import { drawEdgeLabel } from './edgeLabelUtils';
+import { drawEdgeLabel, isPointInEdgeLabel } from './edgeLabelUtils';
 import { getEdgeHandlePosition, isPointNearLine, isPointNearBezier } from './utils';
+
 
 // Draw arrow at position
 function drawArrow(ctx, x, y, angle, size, color) {
@@ -485,7 +486,9 @@ const EdgeLayer = forwardRef(({
         isCurved,
         curveDirection,
         midX,
-        midY
+        midY,
+        label: edge.label,
+        style: edge.style
       });
       
       ctx.setLineDash([]);
@@ -562,13 +565,23 @@ const EdgeLayer = forwardRef(({
     }
     
     let found = null;
+    let hitLabel = false;
     
     for (const edgeData of edgeDataRef.current) {
-      let hit = false;
-      // Edge path hit test
+      // Check label hit test FIRST (labels take priority)
+      const labelHit = isPointInEdgeLabel({ x: graphX, y: graphY }, edgeData, theme);
+      
+      if (labelHit) {
+        found = edgeData.id;
+        hitLabel = true;
+        break;
+      }
+      
+      // Then check edge path hit test
+      let edgeHit = false;
       if (edgeData.isCurved) {
         if (edgeData.curveDirection === 'horizontal') {
-          hit = isPointNearBezier(
+          edgeHit = isPointNearBezier(
             graphX, graphY,
             edgeData.sourcePos.x, edgeData.sourcePos.y,
             edgeData.midX, edgeData.sourcePos.y,
@@ -576,7 +589,7 @@ const EdgeLayer = forwardRef(({
             edgeData.targetPos.x, edgeData.targetPos.y
           );
         } else {
-          hit = isPointNearBezier(
+          edgeHit = isPointNearBezier(
             graphX, graphY,
             edgeData.sourcePos.x, edgeData.sourcePos.y,
             edgeData.sourcePos.x, edgeData.midY,
@@ -585,18 +598,16 @@ const EdgeLayer = forwardRef(({
           );
         }
       } else {
-        hit = isPointNearLine(
+        edgeHit = isPointNearLine(
           graphX, graphY,
           edgeData.sourcePos.x, edgeData.sourcePos.y,
           edgeData.targetPos.x, edgeData.targetPos.y
         );
       }
-      // Edge label hit test
-      if (!hit) {
-        hit = isPointInEdgeLabel({ x: graphX, y: graphY }, edgeData, theme);
-      }
-      if (hit) {
+      
+      if (edgeHit) {
         found = edgeData.id;
+        hitLabel = false;
         break;
       }
     }

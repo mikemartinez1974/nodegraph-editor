@@ -147,26 +147,32 @@ export function getEdgeLabelStyle(edge, theme) {
 
 // Hit testing for edge labels
 export function isPointInEdgeLabel(point, edge, theme) {
-  if (!edge.showLabel || !edge.label) return false;
+  if (!edge.label) {
+    return false;
+  }
   
+  // Use the same position calculation as drawing
   const labelPosition = getEdgeLabelPosition(edge);
   const style = getEdgeLabelStyle(edge, theme);
   
-  // Create temporary canvas to measure text
-  const tempCanvas = document.createElement('canvas');
-  const tempCtx = tempCanvas.getContext('2d');
-  tempCtx.font = style.font;
+  // Parse fontSize and padding from string to number (e.g., "16px" -> 16)
+  const fontSize = typeof style.fontSize === 'string' ? parseFloat(style.fontSize) : (style.fontSize || 16);
+  const basePadding = typeof style.padding === 'string' ? parseFloat(style.padding) : (style.padding || 4);
+  const padding = basePadding * 2; // Double padding for easier clicking
+  const labelWidth = edge.label.length * fontSize * 0.7; // More generous width estimate
+  const labelHeight = fontSize * 1.5; // Account for line height
   
-  const metrics = tempCtx.measureText(edge.label);
-  const textWidth = metrics.width;
-  const textHeight = parseInt(style.fontSize);
-  const padding = 4;
+  const bounds = {
+    left: labelPosition.x - labelWidth / 2 - padding,
+    right: labelPosition.x + labelWidth / 2 + padding,
+    top: labelPosition.y - labelHeight / 2 - padding,
+    bottom: labelPosition.y + labelHeight / 2 + padding
+  };
   
-  // Check if point is within label bounds
   return (
-    point.x >= labelPosition.x - textWidth/2 - padding &&
-    point.x <= labelPosition.x + textWidth/2 + padding &&
-    point.y >= labelPosition.y - textHeight/2 - padding &&
-    point.y <= labelPosition.y + textHeight/2 + padding
+    point.x >= bounds.left &&
+    point.x <= bounds.right &&
+    point.y >= bounds.top &&
+    point.y <= bounds.bottom
   );
 }
