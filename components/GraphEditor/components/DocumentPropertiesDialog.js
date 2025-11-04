@@ -20,7 +20,7 @@ import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
 import { useTheme } from '@mui/material/styles';
 
-export default function PreferencesDialog({ open, onClose }) {
+export default function DocumentPropertiesDialog({ open, onClose }) {
   const [settings, setSettings] = useState(loadSettings());
   const [activeTab, setActiveTab] = useState('appearance');
   const currentTheme = useTheme();
@@ -84,6 +84,9 @@ export default function PreferencesDialog({ open, onClose }) {
     } catch (err) {
       console.warn('Failed to postMessage toggleScriptPanel:', err);
     }
+
+    // Close the dialog
+    if (onClose) onClose();
   };
 
   return (
@@ -91,14 +94,6 @@ export default function PreferencesDialog({ open, onClose }) {
       <DialogTitle>Document Properties</DialogTitle>
       <DialogContent>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Button
-            onClick={() => setActiveTab('appearance')}
-            variant={activeTab === 'appearance' ? 'contained' : 'text'}
-            size="small"
-            sx={{ mr: 1 }}
-          >
-            Appearance
-          </Button>
           <Button
             onClick={() => setActiveTab('theme')}
             variant={activeTab === 'theme' ? 'contained' : 'text'}
@@ -115,38 +110,6 @@ export default function PreferencesDialog({ open, onClose }) {
             Document
           </Button>
         </Box>
-
-        {activeTab === 'appearance' && (
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Quick Settings
-            </Typography>
-            <TextField
-              label="Default Node Color"
-              type="color"
-              value={settings.defaultNodeColor}
-              onChange={(e) => handleChange('defaultNodeColor', e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Default Edge Color"
-              type="color"
-              value={settings.defaultEdgeColor}
-              onChange={(e) => handleChange('defaultEdgeColor', e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Background Image URL"
-              type="url"
-              value={settings.backgroundImage || ''}
-              onChange={(e) => handleChange('backgroundImage', e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-          </Box>
-        )}
 
         {activeTab === 'theme' && (
           <ThemeBuilder
@@ -188,6 +151,14 @@ export default function PreferencesDialog({ open, onClose }) {
               Document Settings
             </Typography>
             <BackgroundControls />
+            <TextField
+              label="Background Image URL"
+              type="url"
+              value={settings.backgroundImage || ''}
+              onChange={(e) => handleChange('backgroundImage', e.target.value)}
+              fullWidth
+              margin="normal"
+            />
             <Box sx={{ mt: 2 }}>
               <Button 
                 size="small" 

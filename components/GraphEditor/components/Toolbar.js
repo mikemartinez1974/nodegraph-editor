@@ -53,9 +53,10 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import ShapeLineIcon from '@mui/icons-material/ShapeLine';
 import eventBus from '../../NodeGraph/eventBus';
-import PreferencesDialog from './PreferencesDialog';
+import DocumentPropertiesDialog from './DocumentPropertiesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 import AddNodeMenu from './AddNodeMenu';
+import PlumbingIcon from '@mui/icons-material/Plumbing';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -705,7 +706,7 @@ const Toolbar = ({
             size="small"
             color="primary"
           >
-            <SettingsIcon fontSize="small" />
+            <PlumbingIcon fontSize="small" />
           </IconButton>
 
           <IconButton
@@ -919,7 +920,7 @@ const Toolbar = ({
           style={{ display: 'none' }}
         />
 
-        <PreferencesDialog  
+        <DocumentPropertiesDialog  
           open={preferencesOpen}
           onClose={() => setPreferencesOpen(false)}
         />
