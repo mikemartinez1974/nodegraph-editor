@@ -32,6 +32,7 @@ import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUtils';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 
 const nodeTypes = getNodeTypes();
 
@@ -47,6 +48,10 @@ export default function GraphEditor({ backgroundImage }) {
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
+
+  // Document settings state (not localStorage)
+  const [documentUrl, setDocumentUrl] = useState('');
+  const [documentBackgroundImage, setDocumentBackgroundImage] = useState('');
   
   // Document theme (separate from browser theme)
   const [documentTheme, setDocumentTheme] = useState(() => {
@@ -86,21 +91,10 @@ export default function GraphEditor({ backgroundImage }) {
     groupManager
   } = state || {};
 
-  // NEW: document (background page) state (persisted under 'document')
-  const [backgroundUrl, setBackgroundUrl] = useState(
-    typeof window !== 'undefined' ? (localStorage.getItem('document') || '') : ''
-  );
+  // NEW: document (background page) state (no localStorage)
+  const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (backgroundUrl) {
-        localStorage.setItem('document', backgroundUrl);
-      } else {
-        localStorage.removeItem('document');
-      }
-    } catch (err) { }
-  }, [backgroundUrl]);
+  const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
 
   useEffect(() => {
     if (backgroundUrl) {
@@ -242,8 +236,18 @@ export default function GraphEditor({ backgroundImage }) {
         if (viewport.pan) setPan(viewport.pan);
         if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
         if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
-        if (settings.defaultEdgeColor) state.defaultEdgeColor = settings.defaultEdgeColor;
-        if (settings.document && settings.document.url) setBackgroundUrl(settings.document.url);
+        if (settings.document && settings.document.url) {
+          setDocumentUrl(settings.document.url);
+          setBackgroundUrl(settings.document.url); // Also set backgroundUrl to display iframe
+        } else {
+          setDocumentUrl(''); // Clear if not present
+          setBackgroundUrl(''); // Also clear backgroundUrl
+        }
+        if (settings.backgroundImage) {
+          setDocumentBackgroundImage(settings.backgroundImage);
+        } else {
+          setDocumentBackgroundImage(''); // Clear if not present
+        }
         // Prefer top-level scripts, fallback to settings.scripts
         try {
           const scriptsToLoad = Array.isArray(topLevelScripts) ? topLevelScripts : (Array.isArray(settings.scripts) ? settings.scripts : null);
@@ -265,7 +269,7 @@ export default function GraphEditor({ backgroundImage }) {
 
     eventBus.on('loadSaveFile', handleLoadSaveFile);
     return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
-  }, [setPan, setZoom, state, setBackgroundUrl]);
+  }, [setPan, setZoom, state]);
   
   const selectionHook = useSelection({
     setSelectedNodeIds,
@@ -1123,6 +1127,15 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('togglePropertiesPanel', handleTogglePropertiesPanel);
   }, []);
 
+  // Toggle document properties dialog via event
+  useEffect(() => {
+    const handleToggleDocumentProperties = () => {
+      setShowDocumentPropertiesDialog(prev => !prev);
+    };
+    eventBus.on('toggleDocumentProperties', handleToggleDocumentProperties);
+    return () => eventBus.off('toggleDocumentProperties', handleToggleDocumentProperties);
+  }, []);
+
   // Listen for node click events and select the node
   useEffect(() => {
     const handleNodeClick = ({ id }) => {
@@ -1220,6 +1233,8 @@ export default function GraphEditor({ backgroundImage }) {
         graphCRUD={graphCRUD}
         currentTheme={theme.palette.mode}
         backgroundImage={backgroundImage}
+        backgroundUrl={backgroundUrl}
+        setBackgroundUrl={setBackgroundUrl}
         defaultNodeColor={defaultNodeColor}
         defaultEdgeColor={defaultEdgeColor}
         isFreeUser={isFreeUser}
@@ -1393,6 +1408,14 @@ export default function GraphEditor({ backgroundImage }) {
       {/* Mount script runner and panel so scripts can run and panel can toggle */}
       <ScriptRunner onRequest={handleScriptRequest} />
       <ScriptPanel />
+      
+      {/* Document Properties Dialog */}
+      <DocumentPropertiesDialog 
+        open={showDocumentPropertiesDialog} 
+        onClose={() => setShowDocumentPropertiesDialog(false)} 
+        backgroundUrl={backgroundUrl} 
+        setBackgroundUrl={setBackgroundUrl}
+      />
     </div>
   );
 }

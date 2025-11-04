@@ -94,6 +94,8 @@ const Toolbar = ({
   graphCRUD,
   currentTheme = 'light',
   backgroundImage = null,
+  backgroundUrl = '',  // Document URL
+  setBackgroundUrl,  // Function to set document URL
   defaultNodeColor = '#1976d2',
   defaultEdgeColor = '#666666',
   isFreeUser = false,
@@ -923,6 +925,8 @@ const Toolbar = ({
         <DocumentPropertiesDialog  
           open={preferencesOpen}
           onClose={() => setPreferencesOpen(false)}
+          backgroundUrl={backgroundUrl}
+          setBackgroundUrl={setBackgroundUrl}
         />
         
         {/* Bookmarks Menu */}

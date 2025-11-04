@@ -20,9 +20,9 @@ import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
 import { useTheme } from '@mui/material/styles';
 
-export default function DocumentPropertiesDialog({ open, onClose }) {
+export default function DocumentPropertiesDialog({ open, onClose, backgroundUrl = '', setBackgroundUrl }) {
   const [settings, setSettings] = useState(loadSettings());
-  const [activeTab, setActiveTab] = useState('appearance');
+  const [activeTab, setActiveTab] = useState('document');
   const currentTheme = useTheme();
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function DocumentPropertiesDialog({ open, onClose }) {
             <Typography variant="h6" sx={{ mb: 2 }}>
               Document Settings
             </Typography>
-            <BackgroundControls />
+            <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
             <TextField
               label="Background Image URL"
               type="url"
