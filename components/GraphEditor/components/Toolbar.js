@@ -47,6 +47,7 @@ import {
   GridOn as GridOnIcon  // NEW: Import grid icon
 } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import DrawIcon from '@mui/icons-material/Draw';
 import PostAddIcon from '@mui/icons-material/PostAdd';  
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -128,6 +129,7 @@ const Toolbar = ({
   });
   const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
   const currentUrl = browserHistory[historyIndex] || '';
+  const [gridMenuAnchor, setGridMenuAnchor] = useState(null);
 
   // Snackbar state (replaces transient Chips)
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -670,7 +672,7 @@ const Toolbar = ({
             title="Add Node (Ctrl+N)"
             size="small"
           >
-            <CreateIcon fontSize="small"   />
+            <PostAddIcon fontSize="small"   />
           </IconButton>
 
           <IconButton
@@ -771,12 +773,12 @@ const Toolbar = ({
             <MapIcon fontSize="small" />
           </IconButton>
 
-          {/* NEW: Snap to grid toggle button */}
+          {/* NEW: Grid options button with menu */}
           <IconButton
-            onClick={onToggleSnapToGrid}
+            onClick={(e) => setGridMenuAnchor(e.currentTarget)}
             color={snapToGrid ? "primary" : "default"}
-            title="Toggle Snap to Grid"
-            aria-label="Toggle snap to grid"
+            title="Grid Options"
+            aria-label="Grid options menu"
             size="small"
             disabled={isFreeUser}
           >
@@ -790,7 +792,7 @@ const Toolbar = ({
             size="small"
             disabled={isFreeUser}
           >
-            <SettingsIcon fontSize="small" />
+            <HistoryEduIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
 
@@ -881,6 +883,39 @@ const Toolbar = ({
           onClose={() => setAddNodeMenuAnchor(null)}
           onAddNode={onAddNode}
         />
+
+        {/* Grid Options Menu */}
+        <Menu
+          anchorEl={gridMenuAnchor}
+          open={Boolean(gridMenuAnchor)}
+          onClose={() => setGridMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              eventBus.emit('toggleShowGrid');
+              setGridMenuAnchor(null);
+            }}
+          >
+            <Typography variant="body2">Show Grid</Typography>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              eventBus.emit('alignToGrid');
+              setGridMenuAnchor(null);
+              if (onShowMessage) onShowMessage('Nodes aligned to grid', 'success');
+            }}
+          >
+            <Typography variant="body2">Align to Grid</Typography>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onToggleSnapToGrid();
+              setGridMenuAnchor(null);
+            }}
+          >
+            <Typography variant="body2">Snap to Grid: {snapToGrid ? 'ON' : 'OFF'}</Typography>
+          </MenuItem>
+        </Menu>
 
         <input
           ref={fileInputRef}

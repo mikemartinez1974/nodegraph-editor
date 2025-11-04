@@ -38,6 +38,7 @@ export default function GraphEditor({ backgroundImage }) {
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
   const [gridSize, setGridSize] = useState(20);
   const [lockedNodes, setLockedNodes] = useState(new Set());
   const [lockedEdges, setLockedEdges] = useState(new Set());
@@ -920,6 +921,36 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('toggleMinimap', handleToggleMinimap);
   }, []);
 
+  // Listen for grid-related events
+  useEffect(() => {
+    const handleToggleShowGrid = () => {
+      setShowGrid(prev => !prev);
+    };
+
+    const handleAlignToGrid = () => {
+      setNodes(prev => {
+        const next = prev.map(node => ({
+          ...node,
+          position: {
+            x: Math.round(node.position.x / gridSize) * gridSize,
+            y: Math.round(node.position.y / gridSize) * gridSize
+          }
+        }));
+        nodesRef.current = next;
+        historyHook.saveToHistory(next, edgesRef.current);
+        return next;
+      });
+    };
+
+    eventBus.on('toggleShowGrid', handleToggleShowGrid);
+    eventBus.on('alignToGrid', handleAlignToGrid);
+
+    return () => {
+      eventBus.off('toggleShowGrid', handleToggleShowGrid);
+      eventBus.off('alignToGrid', handleAlignToGrid);
+    };
+  }, [setNodes, nodesRef, edgesRef, historyHook, gridSize]);
+
   // Listen for node update events from custom components
   useEffect(() => {
     const handleNodeUpdate = ({ id, updates }) => {
@@ -1264,6 +1295,7 @@ export default function GraphEditor({ backgroundImage }) {
         setSnackbar={setSnackbar}
         showMinimap={showMinimap}
         snapToGrid={snapToGrid}
+        showGrid={showGrid}
         gridSize={gridSize}
         lockedNodes={lockedNodes}
         lockedEdges={lockedEdges}

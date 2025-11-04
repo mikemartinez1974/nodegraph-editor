@@ -47,10 +47,11 @@ export default function NodeGraph({
   setSnackbar,
   showMinimap = true,
   snapToGrid = false,
+  showGrid = false,
   gridSize = 20,
   lockedNodes = new Set(),
   lockedEdges = new Set(),
-  showAllEdgeLabels = false, // <-- Add prop
+  showAllEdgeLabels = false,
 }) {
   const theme = useTheme();
   
@@ -353,13 +354,13 @@ export default function NodeGraph({
     if (!draggingInfoRef.current) {
       draggingInfoRef.current = { nodeIds: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
     }
+    
+    // Always accumulate the raw mouse movement
     draggingInfoRef.current.offset.x += graphDx;
     draggingInfoRef.current.offset.y += graphDy;
     
-    if (snapToGrid) {
-      draggingInfoRef.current.offset.x = Math.round(draggingInfoRef.current.offset.x / gridSize) * gridSize;
-      draggingInfoRef.current.offset.y = Math.round(draggingInfoRef.current.offset.y / gridSize) * gridSize;
-    }
+    // If snap-to-grid is enabled, visually snap the display (but keep accumulating raw offset)
+    // The actual snapping will happen on drag end
     
     isDragging.current = true;
 
@@ -410,10 +411,16 @@ export default function NodeGraph({
       draggingNodeIdRef.current.forEach(id => {
         const node = nodes.find(n => n.id === id);
         if (node) {
-          const newPosition = { 
-            x: node.position.x + offset.x, 
-            y: node.position.y + offset.y 
-          };
+          let newX = node.position.x + offset.x;
+          let newY = node.position.y + offset.y;
+          
+          // Apply snap-to-grid on release if enabled
+          if (snapToGrid) {
+            newX = Math.round(newX / gridSize) * gridSize;
+            newY = Math.round(newY / gridSize) * gridSize;
+          }
+          
+          const newPosition = { x: newX, y: newY };
           eventBus.emit('nodeMove', { id, position: newPosition });
         }
 
@@ -917,7 +924,7 @@ export default function NodeGraph({
         onMarqueeStart={(e) => handleMarqueeStart({ e, startSelection })}
         layerRefs={layerRefs}
       >
-        {snapToGrid && (
+        {showGrid && (
           <GridLayer pan={pan} zoom={zoom} gridSize={gridSize} theme={theme} />
         )}
 

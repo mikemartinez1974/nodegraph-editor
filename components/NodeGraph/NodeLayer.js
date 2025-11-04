@@ -62,12 +62,12 @@ const NodeLayer = ({
                     <div
                       key={node.id}
                       onMouseEnter={() => {
-                        console.log('NodeLayer: Mouse entered node', node.id);
+                        // console.log('NodeLayer: Mouse entered node', node.id);
                         if (onNodeHover) onNodeHover(node.id);
                         onNodeMouseEnter && onNodeMouseEnter(node.id); // Add this
                       }}
                       onMouseLeave={() => {
-                        console.log('NodeLayer: Mouse left node', node.id);
+                        // console.log('NodeLayer: Mouse left node', node.id);
                         if (onNodeHover) onNodeHover(node.id);
                         onNodeMouseLeave && onNodeMouseLeave(node.id); // Add this
                       }}
