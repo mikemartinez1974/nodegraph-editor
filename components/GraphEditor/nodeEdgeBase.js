@@ -41,6 +41,7 @@ export class Edge {
       dash: style.dash || [],
       curved: style.curved || false
     };
+    this.data = {}; // Placeholder for any edge-specific data
   }
 }
 

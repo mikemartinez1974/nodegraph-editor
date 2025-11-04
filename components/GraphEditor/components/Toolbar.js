@@ -99,9 +99,10 @@ const Toolbar = ({
   showMinimap = true,  // NEW: Add prop
   onToggleMinimap,  // NEW: Add prop
   snapToGrid = false,  // NEW: Add prop
-  onToggleSnapToGrid  // NEW: Add prop
+  onToggleSnapToGrid,  // NEW: Add prop
+  documentTheme = null  // Document theme (not browser theme)
 }) => {
-  const theme = useTheme();
+  const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -292,17 +293,9 @@ const Toolbar = ({
   const handleSaveToFile = async () => {
     const now = new Date().toISOString();
     
-    const themeObject = theme?.palette ? {
-      primary: theme.palette.primary?.main || '#1976d2',
-      primaryContrast: theme.palette.primary?.contrastText || '#ffffff',
-      secondary: theme.palette.secondary?.main || '#dc004e',
-      secondaryContrast: theme.palette.secondary?.contrastText || '#ffffff',
-      background: theme.palette.background?.default || '#f5f5f5',
-      paper: theme.palette.background?.paper || '#ffffff',
-      textPrimary: theme.palette.text?.primary || '#000000',
-      textSecondary: theme.palette.text?.secondary || '#666666',
-      divider: theme.palette.divider || '#e0e0e0'
-    } : null;
+    // Save document theme (not browser theme)
+    const themeToSave = documentTheme || null;
+    console.log('[Toolbar] Saving document theme:', themeToSave);
 
     const saveData = {
       fileVersion: "1.0",
@@ -315,10 +308,10 @@ const Toolbar = ({
         tags: []
       },
       settings: {
-        theme: themeObject,
+        theme: themeToSave,
         backgroundImage: backgroundImage || null,
-        defaultNodeColor: defaultNodeColor || '#1976d2',
-        defaultEdgeColor: defaultEdgeColor || '#666666',
+        defaultNodeColor: defaultNodeColor,
+        defaultEdgeColor: defaultEdgeColor,
         snapToGrid: false,
         gridSize: 20,
         autoSave: false
@@ -349,7 +342,8 @@ const Toolbar = ({
         source: edge.source,
         target: edge.target,
         label: edge.label || "",
-        style: edge.style || {}
+        style: edge.style || {},
+        data: edge.data || {}
       })),
       groups: groups.map(group => ({
         id: group.id,

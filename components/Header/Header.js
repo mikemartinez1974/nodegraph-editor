@@ -26,7 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Icon from '@mui/material/Icon';
 
-export default function Header({ themeName, setThemeName, setTempTheme, theme }) {
+export default function Header({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -438,7 +438,14 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme })
         <MenuItem onClick={handleResetHome}>Reset Home to default</MenuItem>
       </Menu>
 
-      <ThemeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} themeName={themeName} setThemeName={setThemeName} theme={theme} />
+      <ThemeDrawer 
+        open={drawerOpen} 
+        onClose={() => setDrawerOpen(false)} 
+        themeName={themeName} 
+        setThemeName={setThemeName} 
+        theme={theme}
+        applyBrowserTheme={applyBrowserTheme}
+      />
     </div>
   );
 }

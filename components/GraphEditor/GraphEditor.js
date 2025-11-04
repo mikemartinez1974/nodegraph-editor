@@ -30,11 +30,13 @@ import useGraphModes from './hooks/useGraphModes';
 import PropertiesPanel from './components/PropertiesPanel';
 import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
+import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUtils';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 
 const nodeTypes = getNodeTypes();
 
 export default function GraphEditor({ backgroundImage }) {
-  const theme = useTheme();
+  const theme = useTheme(); // Browser theme
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
@@ -45,6 +47,20 @@ export default function GraphEditor({ backgroundImage }) {
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
+  
+  // Document theme (separate from browser theme)
+  const [documentTheme, setDocumentTheme] = useState(() => {
+    // Initialize with browser theme on mount (new document)
+    const initial = themeConfigFromMuiTheme(theme);
+    console.log('[GraphEditor] Initializing document theme from browser theme:', initial);
+    return initial;
+  });
+  
+  // Log when document theme changes
+  useEffect(() => {
+    console.log('[GraphEditor] Document theme updated:', documentTheme);
+  }, [documentTheme]);
+  
   const state = useGraphEditorState();
 
   // Destructure editor state immediately so variables like `pan` are available for subsequent effects
@@ -235,8 +251,12 @@ export default function GraphEditor({ backgroundImage }) {
             localStorage.setItem('scripts', JSON.stringify(scriptsToLoad));
           }
         } catch (err) { }
+        // Load document theme if present (don't apply to browser)
         if (settings.theme) {
-          eventBus.emit('applyThemeFromSave', settings.theme);
+          console.log('[GraphEditor] Loading document theme from file:', settings.theme);
+          setDocumentTheme(settings.theme);
+        } else {
+          console.log('[GraphEditor] No theme in file, keeping current document theme');
         }
       } catch (err) {
         console.warn('Failed to apply loaded save settings:', err);
@@ -1037,6 +1057,18 @@ export default function GraphEditor({ backgroundImage }) {
     return () => eventBus.off('nodeHover', handleNodeHover);
   }, [setHoveredNodeId]);
 
+  // Listen for document theme updates from PreferencesDialog
+  useEffect(() => {
+    const handleUpdateDocumentTheme = (themeConfig) => {
+      if (themeConfig) {
+        setDocumentTheme(themeConfig);
+      }
+    };
+
+    eventBus.on('updateDocumentTheme', handleUpdateDocumentTheme);
+    return () => eventBus.off('updateDocumentTheme', handleUpdateDocumentTheme);
+  }, []);
+
   // Listen for node drag end events
   useEffect(() => {
     const handleNodeDragEnd = ({ nodeIds }) => {
@@ -1063,6 +1095,16 @@ export default function GraphEditor({ backgroundImage }) {
   const memoizedSetSelectedEdgeIds = useCallback(setSelectedEdgeIds, []);
   const memoizedSetPan = useCallback(setPan, []);
   const memoizedSetZoom = useCallback(setZoom, []);
+
+  // Create MUI theme from document theme config
+  const documentMuiTheme = useMemo(() => {
+    if (documentTheme) {
+      const theme = createThemeFromConfig(documentTheme);
+      console.log('[GraphEditor] Created document MUI theme:', theme);
+      return theme;
+    }
+    return null;
+  }, [documentTheme]);
 
   // Register single handleClick event handler
   const handleClickHandlerId = Math.random().toString(36).substr(2, 8);
@@ -1185,6 +1227,7 @@ export default function GraphEditor({ backgroundImage }) {
         onToggleMinimap={() => eventBus.emit('toggleMinimap')}
         snapToGrid={snapToGrid}
         onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
+        documentTheme={documentTheme}
       />
       
       {showPropertiesPanel && (
@@ -1267,48 +1310,89 @@ export default function GraphEditor({ backgroundImage }) {
         theme={theme}
       />
       
-      <NodeGraph 
-        key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
-        nodes={memoizedNodes}
-        setNodes={memoizedSetNodes}
-        setEdges={memoizedSetEdges}
-        edges={memoizedEdges}
-        groups={memoizedGroups}
-        setGroups={memoizedSetGroups}
-        pan={pan}
-        zoom={zoom}
-        setPan={memoizedSetPan}
-        setZoom={memoizedSetZoom}
-        selectedNodeId={memoizedSelectedNodeIds[0] || null}
-        selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
-        selectedNodeIds={memoizedSelectedNodeIds}
-        selectedEdgeIds={memoizedSelectedEdgeIds}
-        selectedGroupIds={memoizedSelectedGroupIds}
-        setSelectedNodeIds={memoizedSetSelectedNodeIds}
-        setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
-        hoveredNodeId={hoveredNodeId}
-        nodeTypes={nodeTypes}
-        edgeTypes={EdgeTypes}
-        mode={modesHook.mode}
-        backgroundUrl={backgroundUrl}
-        backgroundInteractive={backgroundInteractive}
-        setSnackbar={setSnackbar}
-        showMinimap={showMinimap}
-        snapToGrid={snapToGrid}
-        showGrid={showGrid}
-        gridSize={gridSize}
-        lockedNodes={lockedNodes}
-        lockedEdges={lockedEdges}
-        onEdgeClick={undefined}
-        onEdgeHover={undefined}
-        hoveredEdgeId={hoveredEdgeId}
-        showAllEdgeLabels={showAllEdgeLabels}
-      />
+      {documentMuiTheme ? (
+        <MuiThemeProvider theme={documentMuiTheme}>
+          <NodeGraph 
+            key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
+            nodes={memoizedNodes}
+            setNodes={memoizedSetNodes}
+            setEdges={memoizedSetEdges}
+            edges={memoizedEdges}
+            groups={memoizedGroups}
+            setGroups={memoizedSetGroups}
+            pan={pan}
+            zoom={zoom}
+            setPan={memoizedSetPan}
+            setZoom={memoizedSetZoom}
+            selectedNodeId={memoizedSelectedNodeIds[0] || null}
+            selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
+            selectedNodeIds={memoizedSelectedNodeIds}
+            selectedEdgeIds={memoizedSelectedEdgeIds}
+            selectedGroupIds={memoizedSelectedGroupIds}
+            setSelectedNodeIds={memoizedSetSelectedNodeIds}
+            setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
+            hoveredNodeId={hoveredNodeId}
+            nodeTypes={nodeTypes}
+            edgeTypes={EdgeTypes}
+            mode={modesHook.mode}
+            backgroundUrl={backgroundUrl}
+            backgroundInteractive={backgroundInteractive}
+            setSnackbar={setSnackbar}
+            showMinimap={showMinimap}
+            snapToGrid={snapToGrid}
+            showGrid={showGrid}
+            gridSize={gridSize}
+            lockedNodes={lockedNodes}
+            lockedEdges={lockedEdges}
+            onEdgeClick={undefined}
+            onEdgeHover={undefined}
+            hoveredEdgeId={hoveredEdgeId}
+            showAllEdgeLabels={showAllEdgeLabels}
+          />
+        </MuiThemeProvider>
+      ) : (
+        <NodeGraph 
+          key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
+          nodes={memoizedNodes}
+          setNodes={memoizedSetNodes}
+          setEdges={memoizedSetEdges}
+          edges={memoizedEdges}
+          groups={memoizedGroups}
+          setGroups={memoizedSetGroups}
+          pan={pan}
+          zoom={zoom}
+          setPan={memoizedSetPan}
+          setZoom={memoizedSetZoom}
+          selectedNodeId={memoizedSelectedNodeIds[0] || null}
+          selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
+          selectedNodeIds={memoizedSelectedNodeIds}
+          selectedEdgeIds={memoizedSelectedEdgeIds}
+          selectedGroupIds={memoizedSelectedGroupIds}
+          setSelectedNodeIds={memoizedSetSelectedNodeIds}
+          setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
+          hoveredNodeId={hoveredNodeId}
+          nodeTypes={nodeTypes}
+          edgeTypes={EdgeTypes}
+          mode={modesHook.mode}
+          backgroundUrl={backgroundUrl}
+          backgroundInteractive={backgroundInteractive}
+          setSnackbar={setSnackbar}
+          showMinimap={showMinimap}
+          snapToGrid={snapToGrid}
+          showGrid={showGrid}
+          gridSize={gridSize}
+          lockedNodes={lockedNodes}
+          lockedEdges={lockedEdges}
+          onEdgeClick={undefined}
+          onEdgeHover={undefined}
+          hoveredEdgeId={hoveredEdgeId}
+          showAllEdgeLabels={showAllEdgeLabels}
+        />
+      )}
 
       {/* Mount script runner and panel so scripts can run and panel can toggle */}
       <ScriptRunner onRequest={handleScriptRequest} />
       <ScriptPanel />
-
     </div>
   );
 }

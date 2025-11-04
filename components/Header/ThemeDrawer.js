@@ -15,6 +15,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import eventBus from '../NodeGraph/eventBus';
 import BackgroundControls from '../GraphEditor/components/BackgroundControls';
+import ThemeBuilder from '../GraphEditor/components/ThemeBuilder';
 
 const fallbackTheme = themeMap.default;
 
@@ -48,7 +49,7 @@ const backgroundImages = [
 
 export default function ThemeDrawer(props) {
   //console.log('ThemeDrawer props:', props);
-  const { open, onClose, themeName, setThemeName, theme, setBackgroundImage } = props;
+  const { open, onClose, themeName, setThemeName, theme, setBackgroundImage, applyBrowserTheme } = props;
   //console.log('ThemeDrawer setBackgroundImage:', setBackgroundImage);
   const safeSetBackgroundImage = typeof setBackgroundImage === 'function' 
     ? (file) => { 
@@ -211,6 +212,47 @@ export default function ThemeDrawer(props) {
             </Box>
           </AccordionDetails>
         </Accordion>
+        {/* Theme Builder Accordion */}
+        <Accordion sx={{ width: '100%' }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Theme Builder</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
+            <ThemeBuilder
+              initialTheme={activeTheme?.palette ? {
+                mode: activeTheme.palette.mode || 'light',
+                primary: {
+                  main: activeTheme.palette.primary?.main || '#1976d2',
+                  light: activeTheme.palette.primary?.light || '#42a5f5',
+                  dark: activeTheme.palette.primary?.dark || '#1565c0',
+                  contrastText: activeTheme.palette.primary?.contrastText || '#ffffff',
+                },
+                secondary: {
+                  main: activeTheme.palette.secondary?.main || '#dc004e',
+                  light: activeTheme.palette.secondary?.light || '#f50057',
+                  dark: activeTheme.palette.secondary?.dark || '#c51162',
+                  contrastText: activeTheme.palette.secondary?.contrastText || '#ffffff',
+                },
+                background: {
+                  default: activeTheme.palette.background?.default || '#f5f5f5',
+                  paper: activeTheme.palette.background?.paper || '#ffffff',
+                },
+                text: {
+                  primary: activeTheme.palette.text?.primary || '#000000',
+                  secondary: activeTheme.palette.text?.secondary || '#666666',
+                },
+                divider: activeTheme.palette.divider || '#e0e0e0',
+              } : null}
+              onThemeChange={(newThemeConfig) => {
+                // Apply to browser theme only (not document)
+                if (applyBrowserTheme) {
+                  applyBrowserTheme(newThemeConfig);
+                }
+                onClose();
+              }}
+            />
+          </AccordionDetails>
+        </Accordion>
         {/* Background Art Accordion */}
         <Accordion sx={{ width: '100%' }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -270,18 +312,6 @@ export default function ThemeDrawer(props) {
                 })}
               </ImageList>
             </Box>
-          </AccordionDetails>
-        </Accordion>
-        {/* Background Web Page Accordion */}
-        <Accordion sx={{ width: '100%' }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>
-              Document
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 2 }}>
-            <BackgroundControls />
-            <Button size="small" onClick={safeToggleScriptPanel}>Toggle Script Panel</Button>
           </AccordionDetails>
         </Accordion>
       </Box>
