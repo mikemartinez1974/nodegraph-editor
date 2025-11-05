@@ -44,6 +44,7 @@ export default function NodeGraph({
   hoveredEdgeId, 
   backgroundUrl,
   backgroundInteractive,
+  backgroundImage = '',
   setSnackbar,
   showMinimap = true,
   snapToGrid = false,
@@ -918,9 +919,14 @@ export default function NodeGraph({
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          backgroundImage: backgroundImage ? `url('${backgroundImage}')` : 'none'
         }}
       />
+
+      {(() => {
+        return null;
+      })()}
 
       <PanZoomLayer
         ref={panZoomRef}

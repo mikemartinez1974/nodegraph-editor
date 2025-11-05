@@ -7,21 +7,31 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
   const [tempUrl, setTempUrl] = useState(backgroundUrl);
   const [tempInteractive, setTempInteractive] = useState(backgroundInteractive);
   const [tempGridSize, setTempGridSize] = useState(20);
+  const [tempBackgroundImage, setTempBackgroundImage] = useState('');
 
-  // Request current gridSize from documentSettings when component mounts
+  // Request current gridSize and backgroundImage from documentSettings when component mounts
   useEffect(() => {
     const handleCurrentGridSize = ({ gridSize }) => {
-      console.log('[BackgroundControls] Received currentGridSize event:', gridSize);
       if (gridSize) {
         setTempGridSize(gridSize);
       }
     };
     
-    eventBus.on('currentGridSize', handleCurrentGridSize);
-    console.log('[BackgroundControls] Requesting grid size...');
-    eventBus.emit('requestGridSize'); // Ask GraphEditor for current value
+    const handleCurrentBackgroundImage = ({ backgroundImage }) => {
+      if (backgroundImage !== undefined) {
+        setTempBackgroundImage(backgroundImage);
+      }
+    };
     
-    return () => eventBus.off('currentGridSize', handleCurrentGridSize);
+    eventBus.on('currentGridSize', handleCurrentGridSize);
+    eventBus.on('currentBackgroundImage', handleCurrentBackgroundImage);
+    eventBus.emit('requestGridSize');
+    eventBus.emit('requestBackgroundImage');
+    
+    return () => {
+      eventBus.off('currentGridSize', handleCurrentGridSize);
+      eventBus.off('currentBackgroundImage', handleCurrentBackgroundImage);
+    };
   }, []);
 
   // Sync temp state when props change
@@ -31,7 +41,6 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
   }, [backgroundUrl, backgroundInteractive]);
 
   const apply = () => {
-    console.log('[BackgroundControls] Setting document background URL:', tempUrl);
     eventBus.emit('setBackgroundUrl', { url: tempUrl });
     eventBus.emit('setBackgroundInteractive', { interactive: tempInteractive });
   };
@@ -48,7 +57,6 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
         value={tempUrl} 
         onChange={(e) => setTempUrl(e.target.value)} 
         onBlur={() => {
-          console.log('[BackgroundControls] Setting document background URL (onBlur):', tempUrl);
           eventBus.emit('setBackgroundUrl', { url: tempUrl });
         }} 
         fullWidth 
@@ -67,20 +75,25 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
           setTempGridSize(value);
         }}
         onBlur={() => {
-          console.log('[BackgroundControls] Setting grid size:', tempGridSize);
           eventBus.emit('setGridSize', { gridSize: tempGridSize });
         }}
         inputProps={{ min: 5, max: 100, step: 5 }}
         helperText="Grid spacing (5-100px)"
         fullWidth 
       />
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <Button variant="contained" size="small" onClick={apply}>Apply</Button>
-        <Button variant="outlined" size="small" onClick={clear}>Clear</Button>
-      </Box>
-      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
-        This URL will be saved as the "document" field in saved .node files. The target server must allow embedding (CORS / X-Frame-Options).
-      </div>
+      <TextField 
+        size="small" 
+        label="Background Image URL" 
+        type="url"
+        value={tempBackgroundImage} 
+        onChange={(e) => setTempBackgroundImage(e.target.value)} 
+        onBlur={() => {
+          eventBus.emit('setBackgroundImage', { backgroundImage: tempBackgroundImage });
+        }} 
+        helperText="Background image for the editor canvas"
+        fullWidth 
+      />
+
     </Box>
   );
 }

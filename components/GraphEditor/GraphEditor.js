@@ -179,6 +179,10 @@ export default function GraphEditor({ backgroundImage }) {
       setBackgroundInteractive(Boolean(interactive));
     };
 
+    const handleSetBackgroundImage = ({ backgroundImage }) => {
+      setDocumentBackgroundImage(backgroundImage || '');
+    };
+
     const handleExportGraph = async () => {
       try {
         const data = {
@@ -219,6 +223,7 @@ export default function GraphEditor({ backgroundImage }) {
     eventBus.on('clearBackgroundUrl', handleClearBackground);
     eventBus.on('setBackgroundUrl', handleSetBackgroundUrl);
     eventBus.on('setBackgroundInteractive', handleSetBackgroundInteractive);
+    eventBus.on('setBackgroundImage', handleSetBackgroundImage);
     eventBus.on('exportGraph', handleExportGraph);
 
     return () => {
@@ -226,6 +231,7 @@ export default function GraphEditor({ backgroundImage }) {
       eventBus.off('clearBackgroundUrl', handleClearBackground);
       eventBus.off('setBackgroundUrl', handleSetBackgroundUrl);
       eventBus.off('setBackgroundInteractive', handleSetBackgroundInteractive);
+      eventBus.off('setBackgroundImage', handleSetBackgroundImage);
       eventBus.off('exportGraph', handleExportGraph);
     };
   }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
@@ -997,20 +1003,25 @@ export default function GraphEditor({ backgroundImage }) {
     };
 
     const handleRequestGridSize = () => {
-      console.log('[GraphEditor] Responding to requestGridSize with:', documentSettings.gridSize);
       eventBus.emit('currentGridSize', { gridSize: documentSettings.gridSize });
+    };
+
+    const handleRequestBackgroundImage = () => {
+      eventBus.emit('currentBackgroundImage', { backgroundImage: documentBackgroundImage });
     };
 
     eventBus.on('toggleShowGrid', handleToggleShowGrid);
     eventBus.on('alignToGrid', handleAlignToGrid);
     eventBus.on('setGridSize', handleSetGridSize);
     eventBus.on('requestGridSize', handleRequestGridSize);
+    eventBus.on('requestBackgroundImage', handleRequestBackgroundImage);
 
     return () => {
       eventBus.off('toggleShowGrid', handleToggleShowGrid);
       eventBus.off('alignToGrid', handleAlignToGrid);
       eventBus.off('setGridSize', handleSetGridSize);
       eventBus.off('requestGridSize', handleRequestGridSize);
+      eventBus.off('requestBackgroundImage', handleRequestBackgroundImage);
     };
   }, [setNodes, nodesRef, edgesRef, historyHook]);
 
@@ -1392,6 +1403,7 @@ export default function GraphEditor({ backgroundImage }) {
             mode={modesHook.mode}
             backgroundUrl={backgroundUrl}
             backgroundInteractive={backgroundInteractive}
+            backgroundImage={documentBackgroundImage}
             setSnackbar={setSnackbar}
             showMinimap={showMinimap}
             snapToGrid={snapToGrid}
@@ -1431,6 +1443,7 @@ export default function GraphEditor({ backgroundImage }) {
           mode={modesHook.mode}
           backgroundUrl={backgroundUrl}
           backgroundInteractive={backgroundInteractive}
+          backgroundImage={documentBackgroundImage}
           setSnackbar={setSnackbar}
           showMinimap={showMinimap}
           snapToGrid={snapToGrid}

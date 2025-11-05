@@ -151,24 +151,6 @@ export default function DocumentPropertiesDialog({ open, onClose, backgroundUrl 
               Document Settings
             </Typography>
             <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
-            <TextField
-              label="Background Image URL"
-              type="url"
-              value={settings.backgroundImage || ''}
-              onChange={(e) => handleChange('backgroundImage', e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <Box sx={{ mt: 2 }}>
-              <Button 
-                size="small" 
-                variant="outlined"
-                onClick={handleToggleScriptPanel}
-                fullWidth
-              >
-                Toggle Script Panel
-              </Button>
-            </Box>
           </Box>
         )}
       </DialogContent>

@@ -57,6 +57,7 @@ import DocumentPropertiesDialog from './DocumentPropertiesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 import AddNodeMenu from './AddNodeMenu';
 import PlumbingIcon from '@mui/icons-material/Plumbing';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -730,6 +731,16 @@ const Toolbar = ({
             disabled={isFreeUser}
           >
             <GroupIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={() => eventBus.emit('toggleScriptPanel')}
+            title="Toggle Script Panel"
+            aria-label="Toggle script panel"
+            size="small"
+            color="primary"
+          >
+            <DeveloperModeIcon fontSize="small" />
           </IconButton>
 
           <IconButton
