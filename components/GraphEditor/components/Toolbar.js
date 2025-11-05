@@ -103,6 +103,7 @@ const Toolbar = ({
   onToggleMinimap,  // NEW: Add prop
   snapToGrid = false,  // NEW: Add prop
   onToggleSnapToGrid,  // NEW: Add prop
+  gridSize = 20,  // Grid size from document settings
   documentTheme = null  // Document theme (not browser theme)
 }) => {
   const theme = useTheme();  // Browser theme for UI
@@ -315,8 +316,8 @@ const Toolbar = ({
         backgroundImage: backgroundImage || null,
         defaultNodeColor: defaultNodeColor,
         defaultEdgeColor: defaultEdgeColor,
-        snapToGrid: false,
-        gridSize: 20,
+        snapToGrid: snapToGrid,
+        gridSize: gridSize,
         autoSave: false
       },
       viewport: {

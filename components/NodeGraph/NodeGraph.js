@@ -133,6 +133,18 @@ export default function NodeGraph({
   const dragThreshold = 5;
   const dragStartedRef = useRef(false);
   const suppressClickRef = useRef(false);
+  
+  // Refs for snap-to-grid values (so drag handler always has current values)
+  const snapToGridRef = useRef(snapToGrid);
+  const gridSizeRef = useRef(gridSize);
+  
+  useEffect(() => {
+    snapToGridRef.current = snapToGrid;
+  }, [snapToGrid]);
+  
+  useEffect(() => {
+    gridSizeRef.current = gridSize;
+  }, [gridSize]);
 
   // Create layerRefs object
   const layerRefs = useMemo(() => ({
@@ -414,10 +426,10 @@ export default function NodeGraph({
           let newX = node.position.x + offset.x;
           let newY = node.position.y + offset.y;
           
-          // Apply snap-to-grid on release if enabled
-          if (snapToGrid) {
-            newX = Math.round(newX / gridSize) * gridSize;
-            newY = Math.round(newY / gridSize) * gridSize;
+          // Apply snap-to-grid on release if enabled (use refs for current values)
+          if (snapToGridRef.current && gridSizeRef.current) {
+            newX = Math.round(newX / gridSizeRef.current) * gridSizeRef.current;
+            newY = Math.round(newY / gridSizeRef.current) * gridSizeRef.current;
           }
           
           const newPosition = { x: newX, y: newY };

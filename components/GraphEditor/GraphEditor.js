@@ -2,7 +2,7 @@
 // 5. GraphEditor.js (MAIN - significantly reduced)
 // ============================================
 "use client";
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import NodeGraph from '../NodeGraph';
 import Toolbar from './components/Toolbar';
 import { getNodeTypes } from './nodeTypeRegistry';
@@ -42,24 +42,33 @@ export default function GraphEditor({ backgroundImage }) {
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
-  const [gridSize, setGridSize] = useState(20);
   const [lockedNodes, setLockedNodes] = useState(new Set());
   const [lockedEdges, setLockedEdges] = useState(new Set());
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
 
-  // Document settings state (not localStorage)
-  const [documentUrl, setDocumentUrl] = useState('');
-  const [documentBackgroundImage, setDocumentBackgroundImage] = useState('');
-  
-  // Document theme (separate from browser theme)
-  const [documentTheme, setDocumentTheme] = useState(() => {
+  // Document settings state (not localStorage) - consolidated into one object
+  const [documentSettings, setDocumentSettings] = useState(() => {
     // Initialize with browser theme on mount (new document)
     const initial = themeConfigFromMuiTheme(theme);
     console.log('[GraphEditor] Initializing document theme from browser theme:', initial);
-    return initial;
+    
+    return {
+      url: '',
+      backgroundImage: '',
+      gridSize: 20, // Default grid size
+      theme: initial
+    };
   });
+  
+  // Convenience accessors
+  const documentUrl = documentSettings.url;
+  const setDocumentUrl = (url) => setDocumentSettings(prev => ({ ...prev, url }));
+  const documentBackgroundImage = documentSettings.backgroundImage;
+  const setDocumentBackgroundImage = (backgroundImage) => setDocumentSettings(prev => ({ ...prev, backgroundImage }));
+  const documentTheme = documentSettings.theme;
+  const setDocumentTheme = (theme) => setDocumentSettings(prev => ({ ...prev, theme }));
   
   // Log when document theme changes
   useEffect(() => {
@@ -180,6 +189,7 @@ export default function GraphEditor({ backgroundImage }) {
           settings: {
             defaultNodeColor,
             defaultEdgeColor,
+            gridSize: documentSettings.gridSize,
             document: backgroundUrl ? { url: backgroundUrl } : null,
             theme: null
           },
@@ -247,6 +257,10 @@ export default function GraphEditor({ backgroundImage }) {
           setDocumentBackgroundImage(settings.backgroundImage);
         } else {
           setDocumentBackgroundImage(''); // Clear if not present
+        }
+        // Load gridSize if present
+        if (settings.gridSize && settings.gridSize >= 5 && settings.gridSize <= 100) {
+          setDocumentSettings(prev => ({ ...prev, gridSize: settings.gridSize }));
         }
         // Prefer top-level scripts, fallback to settings.scripts
         try {
@@ -952,28 +966,53 @@ export default function GraphEditor({ backgroundImage }) {
     };
 
     const handleAlignToGrid = () => {
-      setNodes(prev => {
-        const next = prev.map(node => ({
-          ...node,
-          position: {
-            x: Math.round(node.position.x / gridSize) * gridSize,
-            y: Math.round(node.position.y / gridSize) * gridSize
-          }
-        }));
-        nodesRef.current = next;
-        historyHook.saveToHistory(next, edgesRef.current);
-        return next;
+      setDocumentSettings(prevSettings => {
+        const currentGridSize = prevSettings.gridSize;
+        setNodes(prev => {
+          const next = prev.map(node => ({
+            ...node,
+            position: {
+              x: Math.round(node.position.x / currentGridSize) * currentGridSize,
+              y: Math.round(node.position.y / currentGridSize) * currentGridSize
+            }
+          }));
+          nodesRef.current = next;
+          historyHook.saveToHistory(next, edgesRef.current);
+          return next;
+        });
+        return prevSettings; // Don't modify settings
       });
+    };
+
+    const handleSetGridSize = ({ gridSize: newGridSize }) => {
+      if (newGridSize && newGridSize >= 5 && newGridSize <= 100) {
+        console.log('[GraphEditor] Setting gridSize to:', newGridSize);
+        setDocumentSettings(prev => {
+          const updated = { ...prev, gridSize: newGridSize };
+          // Immediately respond with the new value
+          setTimeout(() => eventBus.emit('currentGridSize', { gridSize: newGridSize }), 0);
+          return updated;
+        });
+      }
+    };
+
+    const handleRequestGridSize = () => {
+      console.log('[GraphEditor] Responding to requestGridSize with:', documentSettings.gridSize);
+      eventBus.emit('currentGridSize', { gridSize: documentSettings.gridSize });
     };
 
     eventBus.on('toggleShowGrid', handleToggleShowGrid);
     eventBus.on('alignToGrid', handleAlignToGrid);
+    eventBus.on('setGridSize', handleSetGridSize);
+    eventBus.on('requestGridSize', handleRequestGridSize);
 
     return () => {
       eventBus.off('toggleShowGrid', handleToggleShowGrid);
       eventBus.off('alignToGrid', handleAlignToGrid);
+      eventBus.off('setGridSize', handleSetGridSize);
+      eventBus.off('requestGridSize', handleRequestGridSize);
     };
-  }, [setNodes, nodesRef, edgesRef, historyHook, gridSize]);
+  }, [setNodes, nodesRef, edgesRef, historyHook]);
 
   // Listen for node update events from custom components
   useEffect(() => {
@@ -1242,6 +1281,7 @@ export default function GraphEditor({ backgroundImage }) {
         onToggleMinimap={() => eventBus.emit('toggleMinimap')}
         snapToGrid={snapToGrid}
         onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
+        gridSize={documentSettings.gridSize}
         documentTheme={documentTheme}
       />
       
@@ -1356,7 +1396,7 @@ export default function GraphEditor({ backgroundImage }) {
             showMinimap={showMinimap}
             snapToGrid={snapToGrid}
             showGrid={showGrid}
-            gridSize={gridSize}
+            gridSize={documentSettings.gridSize}
             lockedNodes={lockedNodes}
             lockedEdges={lockedEdges}
             onEdgeClick={undefined}
@@ -1395,7 +1435,7 @@ export default function GraphEditor({ backgroundImage }) {
           showMinimap={showMinimap}
           snapToGrid={snapToGrid}
           showGrid={showGrid}
-          gridSize={gridSize}
+          gridSize={documentSettings.gridSize}
           lockedNodes={lockedNodes}
           lockedEdges={lockedEdges}
           onEdgeClick={undefined}

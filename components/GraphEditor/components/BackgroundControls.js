@@ -3,25 +3,40 @@ import { Box, TextField, Button, Checkbox, FormControlLabel } from '@mui/materia
 import eventBus from '../../NodeGraph/eventBus';
 
 export default function BackgroundControls({ backgroundUrl = '', backgroundInteractive = false }) {
-  const [url, setUrl] = useState('');
-  const [interactive, setInteractive] = useState(false);
+  // Local state only for temporary editing before blur
+  const [tempUrl, setTempUrl] = useState(backgroundUrl);
+  const [tempInteractive, setTempInteractive] = useState(backgroundInteractive);
+  const [tempGridSize, setTempGridSize] = useState(20);
 
-  // Sync with current document state
+  // Request current gridSize from documentSettings when component mounts
   useEffect(() => {
-    console.log('[BackgroundControls] Received props:', { backgroundUrl, backgroundInteractive });
-    setUrl(backgroundUrl);
-    setInteractive(backgroundInteractive);
+    const handleCurrentGridSize = ({ gridSize }) => {
+      console.log('[BackgroundControls] Received currentGridSize event:', gridSize);
+      if (gridSize) {
+        setTempGridSize(gridSize);
+      }
+    };
+    
+    eventBus.on('currentGridSize', handleCurrentGridSize);
+    console.log('[BackgroundControls] Requesting grid size...');
+    eventBus.emit('requestGridSize'); // Ask GraphEditor for current value
+    
+    return () => eventBus.off('currentGridSize', handleCurrentGridSize);
+  }, []);
+
+  // Sync temp state when props change
+  useEffect(() => {
+    setTempUrl(backgroundUrl);
+    setTempInteractive(backgroundInteractive);
   }, [backgroundUrl, backgroundInteractive]);
 
   const apply = () => {
-    console.log('[BackgroundControls] Setting document background URL:', url);
-    eventBus.emit('setBackgroundUrl', { url });
-    eventBus.emit('setBackgroundInteractive', { interactive });
+    console.log('[BackgroundControls] Setting document background URL:', tempUrl);
+    eventBus.emit('setBackgroundUrl', { url: tempUrl });
+    eventBus.emit('setBackgroundInteractive', { interactive: tempInteractive });
   };
 
   const clear = () => {
-    setUrl('');
-    setInteractive(false);
     eventBus.emit('clearBackgroundUrl');
   };
 
@@ -30,15 +45,35 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
       <TextField 
         size="small" 
         label="Document URL" 
-        value={url} 
-        onChange={(e) => setUrl(e.target.value)} 
+        value={tempUrl} 
+        onChange={(e) => setTempUrl(e.target.value)} 
         onBlur={() => {
-          console.log('[BackgroundControls] Setting document background URL (onBlur):', url);
-          eventBus.emit('setBackgroundUrl', { url });
+          console.log('[BackgroundControls] Setting document background URL (onBlur):', tempUrl);
+          eventBus.emit('setBackgroundUrl', { url: tempUrl });
         }} 
         fullWidth 
       />
-      <FormControlLabel control={<Checkbox checked={interactive} onChange={(e) => setInteractive(e.target.checked)} />} label="Make interactive (captures pointer)" />
+      <FormControlLabel 
+        control={<Checkbox checked={tempInteractive} onChange={(e) => setTempInteractive(e.target.checked)} />} 
+        label="Make interactive (captures pointer)" 
+      />
+      <TextField 
+        size="small" 
+        label="Grid Size" 
+        type="number"
+        value={tempGridSize} 
+        onChange={(e) => {
+          const value = Math.max(5, Math.min(100, parseInt(e.target.value) || 20));
+          setTempGridSize(value);
+        }}
+        onBlur={() => {
+          console.log('[BackgroundControls] Setting grid size:', tempGridSize);
+          eventBus.emit('setGridSize', { gridSize: tempGridSize });
+        }}
+        inputProps={{ min: 5, max: 100, step: 5 }}
+        helperText="Grid spacing (5-100px)"
+        fullWidth 
+      />
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button variant="contained" size="small" onClick={apply}>Apply</Button>
         <Button variant="outlined" size="small" onClick={clear}>Clear</Button>
