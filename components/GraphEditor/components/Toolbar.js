@@ -58,6 +58,7 @@ import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 import AddNodeMenu from './AddNodeMenu';
 import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -749,7 +750,7 @@ const Toolbar = ({
             size="small"
             disabled={isFreeUser}
           >
-            <AddIcon fontSize="small" />
+            <NoteAddIcon fontSize="small" />
           </IconButton>
 
           <IconButton
