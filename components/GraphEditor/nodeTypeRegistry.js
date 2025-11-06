@@ -13,7 +13,7 @@ import GateNode from './Nodes/GateNode';
 import DelayNode from './Nodes/DelayNode';
 import APINode from './Nodes/APINode';
 import ScriptNode from './Nodes/ScriptNode';
-
+import ThreeDNode from './Nodes/ThreeDNode';
 
 // Registry structure: each entry has the component and display metadata
 const nodeTypeRegistry = {
@@ -100,6 +100,15 @@ const nodeTypeRegistry = {
     description: 'Runs a saved session script on trigger; emits result',
     icon: 'Code',
     category: 'logic'
+  },
+  '3d': {
+    component: ThreeDNode,
+    label: '3D View',
+    description: 'Interactive 3D scene with Three.js',
+    icon: 'ViewInAr',
+    category: 'media',
+    defaultWidth: 300,
+    defaultHeight: 300
   }
 };
 
