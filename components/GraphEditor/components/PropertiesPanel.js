@@ -526,15 +526,36 @@ export default function ConsolidatedPropertiesPanel({
         {entityType === 'edge' && (
           <>
             {/* Connection Info */}
-            <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'action.hover', borderRadius: 1 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                Connection
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 12 }}>
-                {selectedEdge?.sourceNode?.label || selectedEdge?.source}
-                <br />
-                → {selectedEdge?.targetNode?.label || selectedEdge?.target}
-              </Typography>
+            <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'action.hover', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                  Connection
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 12 }}>
+                  {selectedEdge?.sourceNode?.label || selectedEdge?.source}
+                  <br />
+                  → {selectedEdge?.targetNode?.label || selectedEdge?.target}
+                </Typography>
+              </div>
+              <Tooltip title="Reverse source/target">
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={isLocked}
+                    onClick={() => {
+                      if (onUpdateEdge && selectedEdge) {
+                        onUpdateEdge(selectedEdge.id, {
+                          source: selectedEdge.target,
+                          target: selectedEdge.source
+                        });
+                      }
+                    }}
+                    sx={{ ml: 1 }}
+                  >
+                    <ArrowForwardIcon sx={{ transform: 'rotate(180deg)' }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
             </Box>
 
             {/* Edge Type */}

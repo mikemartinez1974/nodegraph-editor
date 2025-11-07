@@ -505,19 +505,30 @@ const EdgeLayer = forwardRef(({
       return animation || selectedEdgeIds.length > 0 || selectedEdgeId;
     });
     
-    if (hasAnimations) {
-      animationFrameRef.current = requestAnimationFrame(() => drawEdges());
+    // Only schedule next frame if we don't already have one pending
+    if (hasAnimations && !animationFrameRef.current) {
+      animationFrameRef.current = requestAnimationFrame(() => {
+        animationFrameRef.current = null;
+        drawEdges();
+      });
     }
   }
 
 
 
   useEffect(() => {
+    // Cancel any existing animation frame before starting new one
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    
     drawEdges();
     
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, [edgeList, nodeList, pan, zoom, selectedEdgeId, selectedEdgeIds, canvasSize, hoveredEdge, theme, getHandlePositionForEdge, draggingInfoRef]);

@@ -53,7 +53,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       
       if (!window.__graphAPILogged) {
         window.__graphAPILogged = true;
-        console.log('Graph CRUD API available at window.graphAPI');
+        // console.log('Graph CRUD API available at window.graphAPI');
       }
     }
   }, [defaultNodeColor, defaultEdgeColor]);

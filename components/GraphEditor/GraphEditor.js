@@ -53,7 +53,6 @@ export default function GraphEditor({ backgroundImage }) {
   const [documentSettings, setDocumentSettings] = useState(() => {
     // Initialize with browser theme on mount (new document)
     const initial = themeConfigFromMuiTheme(theme);
-    console.log('[GraphEditor] Initializing document theme from browser theme:', initial);
     
     return {
       url: '',
@@ -70,11 +69,6 @@ export default function GraphEditor({ backgroundImage }) {
   const setDocumentBackgroundImage = (backgroundImage) => setDocumentSettings(prev => ({ ...prev, backgroundImage }));
   const documentTheme = documentSettings.theme;
   const setDocumentTheme = (theme) => setDocumentSettings(prev => ({ ...prev, theme }));
-  
-  // Log when document theme changes
-  useEffect(() => {
-    console.log('[GraphEditor] Document theme updated:', documentTheme);
-  }, [documentTheme]);
   
   const state = useGraphEditorState();
 
@@ -278,10 +272,7 @@ export default function GraphEditor({ backgroundImage }) {
         } catch (err) { }
         // Load document theme if present (don't apply to browser)
         if (settings.theme) {
-          console.log('[GraphEditor] Loading document theme from file:', settings.theme);
           setDocumentTheme(settings.theme);
-        } else {
-          console.log('[GraphEditor] No theme in file, keeping current document theme');
         }
       } catch (err) {
         console.warn('Failed to apply loaded save settings:', err);
@@ -385,11 +376,9 @@ export default function GraphEditor({ backgroundImage }) {
   // Wire up paste event listener
   useEffect(() => {
     const handlePaste = async (e) => {
-      console.log('[GraphEditor] Paste event captured');
       e.preventDefault();
       e.stopPropagation();
       try {
-        console.log('[GraphEditor] Calling pasteFromClipboardUnified with graphCRUD:', graphCRUD);
         const result = await pasteFromClipboardUnified({
           handlers,
           state: {
@@ -406,7 +395,6 @@ export default function GraphEditor({ backgroundImage }) {
           graphCRUD
         });
         
-        console.log('[GraphEditor] Paste result:', result);
         if (result && (result.nodes > 0 || result.edges > 0 || result.groups > 0)) {
           console.log('[GraphEditor] Successfully pasted:', result);
         }
@@ -520,8 +508,8 @@ export default function GraphEditor({ backgroundImage }) {
           triedUrls.push(u);
           // console.log('[GraphEditor] Attempting fetch:', u);
           const resp = await fetch(u, fetchOptions);
-          console.log('[GraphEditor] Fetch response status:', resp.status);
-          console.log('[GraphEditor] Fetch response headers:', Array.from(resp.headers.entries()));
+          // console.log('[GraphEditor] Fetch response status:', resp.status);
+          // console.log('[GraphEditor] Fetch response headers:', Array.from(resp.headers.entries()));
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           return resp;
         };
@@ -993,7 +981,6 @@ export default function GraphEditor({ backgroundImage }) {
 
     const handleSetGridSize = ({ gridSize: newGridSize }) => {
       if (newGridSize && newGridSize >= 5 && newGridSize <= 100) {
-        console.log('[GraphEditor] Setting gridSize to:', newGridSize);
         setDocumentSettings(prev => {
           const updated = { ...prev, gridSize: newGridSize };
           // Immediately respond with the new value
@@ -1155,7 +1142,6 @@ export default function GraphEditor({ backgroundImage }) {
   const documentMuiTheme = useMemo(() => {
     if (documentTheme) {
       const theme = createThemeFromConfig(documentTheme);
-      console.log('[GraphEditor] Created document MUI theme:', theme);
       return theme;
     }
     return null;
@@ -1164,7 +1150,7 @@ export default function GraphEditor({ backgroundImage }) {
   // Register single handleClick event handler
   const handleClickHandlerId = Math.random().toString(36).substr(2, 8);
   useHandleClickHandler((payload) => {
-    console.log(`[GraphEditor.js] handleClick event received (handlerId: ${handleClickHandlerId})`, payload);
+    // console.log(`[GraphEditor.js] handleClick event received (handlerId: ${handleClickHandlerId})`, payload);
     // Your handleClick logic here
     // Example: console.log('Single handleClick event:', payload);
   });
@@ -1232,13 +1218,13 @@ export default function GraphEditor({ backgroundImage }) {
 
   // Listen for addNode events from toolbar
   useEffect(() => {
-    console.log('[GraphEditor] Registering addNode event listener');
+    // console.log('[GraphEditor] Registering addNode event listener');
     const handleAddNodeEvent = ({ type }) => {
-      console.log('[GraphEditor] Received addNode event for type:', type);
+      // console.log('[GraphEditor] Received addNode event for type:', type);
       const meta = nodeTypeMetadata.find(m => m.type === type);
       const width = meta?.defaultWidth || 200;
       const height = meta?.defaultHeight || 120;
-      console.log('[GraphEditor] addNode event - type:', type, 'width:', width, 'height:', height, 'meta:', meta);
+      // console.log('[GraphEditor] addNode event - type:', type, 'width:', width, 'height:', height, 'meta:', meta);
       if (handlers && handlers.handleAddNode) {
         handlers.handleAddNode(type, { width, height });
       } else {
@@ -1248,7 +1234,7 @@ export default function GraphEditor({ backgroundImage }) {
     
     eventBus.on('addNode', handleAddNodeEvent);
     return () => {
-      console.log('[GraphEditor] Unregistering addNode event listener');
+      // console.log('[GraphEditor] Unregistering addNode event listener');
       eventBus.off('addNode', handleAddNodeEvent);
     };
   }, [handlers]);
