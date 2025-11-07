@@ -22,8 +22,8 @@
   - [x] Store graph data (nodes, edges, positions)
   - [x] Undo/redo functionality
 
-- [ ] **UI Features**
-  - [ ] Minimap for navigation
+- [x] **UI Features**
+  - [x] Minimap for navigation
   - [x] Sidebar or toolbar for actions
 
 - [ ] **Collaboration (optional)**

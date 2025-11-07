@@ -3,8 +3,9 @@ import React from 'react';
 import { Menu, MenuItem, ListItemIcon, ListItemText, Divider, Typography } from '@mui/material';
 import * as Icons from '@mui/icons-material';
 import { getNodeTypesByCategory } from '../nodeTypeRegistry';
+import eventBus from '../../NodeGraph/eventBus';
 
-const AddNodeMenu = ({ anchorEl, open, onClose, onAddNode }) => {
+const AddNodeMenu = ({ anchorEl, open, onClose }) => {
   const nodesByCategory = getNodeTypesByCategory();
   
   // Category display order and labels
@@ -51,7 +52,7 @@ const AddNodeMenu = ({ anchorEl, open, onClose, onAddNode }) => {
         <MenuItem
           key={type}
           onClick={() => {
-            onAddNode(type);
+            eventBus.emit('addNode', { type });
             onClose();
           }}
           sx={{ pl: 3 }}

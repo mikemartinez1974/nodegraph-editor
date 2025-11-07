@@ -33,6 +33,7 @@ import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUtils';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
+import { nodeTypeMetadata } from './nodeTypeRegistry';
 
 const nodeTypes = getNodeTypes();
 
@@ -1229,6 +1230,29 @@ export default function GraphEditor({ backgroundImage }) {
     eventBus.emit('forceRedraw');
   }, [nodes, edges]);
 
+  // Listen for addNode events from toolbar
+  useEffect(() => {
+    console.log('[GraphEditor] Registering addNode event listener');
+    const handleAddNodeEvent = ({ type }) => {
+      console.log('[GraphEditor] Received addNode event for type:', type);
+      const meta = nodeTypeMetadata.find(m => m.type === type);
+      const width = meta?.defaultWidth || 200;
+      const height = meta?.defaultHeight || 120;
+      console.log('[GraphEditor] addNode event - type:', type, 'width:', width, 'height:', height, 'meta:', meta);
+      if (handlers && handlers.handleAddNode) {
+        handlers.handleAddNode(type, { width, height });
+      } else {
+        console.error('[GraphEditor] handlers.handleAddNode is not available');
+      }
+    };
+    
+    eventBus.on('addNode', handleAddNodeEvent);
+    return () => {
+      console.log('[GraphEditor] Unregistering addNode event listener');
+      eventBus.off('addNode', handleAddNodeEvent);
+    };
+  }, [handlers]);
+
   return (
     <div 
       id="graph-editor-background" 
@@ -1253,10 +1277,6 @@ export default function GraphEditor({ backgroundImage }) {
         edges={edges} 
         groups={groups}
         onLoadGraph={handlers.handleLoadGraph}
-        onAddNode={(type) => {
-          console.log('GraphEditor.js: onAddNode called from Toolbar with type:', type);
-          handlers.handleAddNode(type);
-        }}
         onDeleteSelected={handlers.handleDeleteSelected}
         onClearGraph={handlers.handleClearGraph}
         onUndo={historyHook.handleUndo}

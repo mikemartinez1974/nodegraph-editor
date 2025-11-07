@@ -31,7 +31,11 @@ export function createGraphEditorHandlers({
   const { saveToHistory } = historyHook;
   
   // ===== NODE HANDLERS =====
-  const handleAddNode = (type = 'default') => {
+  const handleAddNode = (type = 'default', options = {}) => {
+    console.log('[handleAddNode] Called with type:', type, 'options:', options);
+    const { width = 200, height = 120 } = options;
+    console.log('[handleAddNode] Using width:', width, 'height:', height);
+    
     const centerX = (window.innerWidth / 2 - pan.x) / zoom;
     const centerY = (window.innerHeight / 2 - pan.y) / zoom;
     let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
@@ -44,8 +48,8 @@ export function createGraphEditorHandlers({
       label: 'New Node',
       data: { memo: '', link: '' },
       position: { x: centerX, y: centerY },
-      width: 200,
-      height: 100,
+      width: width,
+      height: height,
       resizable: true,
       handlePosition: 'center',
       showLabel: true

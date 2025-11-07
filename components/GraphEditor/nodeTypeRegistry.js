@@ -112,6 +112,29 @@ const nodeTypeRegistry = {
   }
 };
 
+// Define nodeTypeMetadata array with all node type definitions
+export const nodeTypeMetadata = [
+  {
+    type: 'default',
+    label: 'Default Node',
+    description: 'A basic node',
+    icon: 'Circle',
+    category: 'basic',
+    defaultWidth: 200,
+    defaultHeight: 120
+  },
+  {
+    type: '3d',
+    label: '3D View',
+    description: 'Interactive 3D scene with Three.js',
+    icon: 'ViewInAr',
+    category: 'media',
+    defaultWidth: 300,
+    defaultHeight: 300
+  }
+  // Add more node types here as needed
+];
+
 // Export helpers
 export function getNodeTypes() {
   const types = {};
@@ -142,4 +165,5 @@ export function getNodeTypeMetadata(type) {
   return nodeTypeRegistry[type] || null;
 }
 
+export { nodeTypeMetadata };
 export default nodeTypeRegistry;
