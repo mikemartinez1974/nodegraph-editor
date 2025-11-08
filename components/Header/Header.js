@@ -51,7 +51,7 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme, a
   const currentUrl = browserHistory[historyIndex] || '';
 
   // Home URL management
-  const DEFAULT_HOME = 'https://cpwith.me/tlz/IntroGraph.node';
+  const DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
 

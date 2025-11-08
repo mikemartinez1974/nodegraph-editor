@@ -376,6 +376,23 @@ export default function GraphEditor({ backgroundImage }) {
   // Wire up paste event listener
   useEffect(() => {
     const handlePaste = async (e) => {
+      // Check if the active element is a form control
+      const activeElement = document.activeElement;
+      const isFormControl = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable ||
+        activeElement.closest('[contenteditable="true"]') ||
+        activeElement.closest('input') ||
+        activeElement.closest('textarea')
+      );
+
+      // If a form control has focus, allow default paste behavior
+      if (isFormControl) {
+        return;
+      }
+
+      // Otherwise, handle graph paste
       e.preventDefault();
       e.stopPropagation();
       try {

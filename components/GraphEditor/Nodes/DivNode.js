@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
-import DOMPurify from 'isomorphic-dompurify';
 
 const DivNode = (props) => {
   const { node, zoom = 1, isSelected } = props;
@@ -11,22 +10,19 @@ const DivNode = (props) => {
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
-  const contentRef = useRef(null);
+  const iframeRef = useRef(null);
 
-  const htmlContent = node?.data?.memo || node?.label || '<p>No content</p>';
-
-  // Sanitize HTML using DOMPurify with tlz:// protocol support
-  const sanitizedHtml = useMemo(() => {
-    if (typeof window === 'undefined' || !DOMPurify) return htmlContent;
-    
-    return DOMPurify.sanitize(htmlContent, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'div', 'span', 'code', 'pre', 'blockquote'],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
-      ALLOW_DATA_ATTR: false,
-      // Allow tlz:// protocol in addition to standard protocols
-      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|tlz):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
-    });
-  }, [htmlContent]);
+  const content = node?.data?.memo || node?.label || '';
+  
+  // Detect if content looks like HTML
+  const isHTML = content.trim().startsWith('<') && content.trim().includes('>');
+  
+  // Extract video embed URL from iframe (YouTube, Vimeo, etc.) - handle escaped quotes
+  const embedMatch = content.match(/src=\\?["']([^"']*(?:youtube\.com\/embed|vimeo\.com\/video|player\.vimeo\.com)[^"']*)\\?["']/);
+  const embedUrl = embedMatch ? embedMatch[1] : null;
+  
+  console.log('[DivNode] Content:', content.substring(0, 200));
+  console.log('[DivNode] Embed URL extracted:', embedUrl);
 
   // Resize handlers (same as MarkdownNode)
   const handleResizeStart = (e) => {
@@ -63,150 +59,79 @@ const DivNode = (props) => {
     };
   }, [isResizing, node.id, zoom]);
 
-  // Handle all link clicks after render
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    const handleLinkClick = (e) => {
-      const target = e.target.closest('a');
-      if (!target) return;
-
-      const href = target.getAttribute('href');
-      if (!href) return;
-
-      console.log('[DivNode] Link clicked:', href);
-
-      // Handle tlz:// links
-      if (href.startsWith('tlz://')) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('[DivNode] Handling tlz:// link:', href);
-        const rest = href.slice('tlz://'.length);
-        const firstSlash = rest.indexOf('/');
-        let host = '';
-        let path = '';
-
-        if (firstSlash !== -1) {
-          host = rest.slice(0, firstSlash);
-          path = rest.slice(firstSlash);
-        } else {
-          path = '/' + rest;
-        }
-
-        const fullUrl = host ? `${window.location.protocol}//${host}${path}` : window.location.origin + path;
-        console.log('[DivNode] Emitting fetchUrl for:', fullUrl);
-        eventBus.emit('fetchUrl', { url: fullUrl });
-        return;
-      }
-
-      // Handle regular links - open in new tab
-      if (href.startsWith('http://') || href.startsWith('https://')) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('[DivNode] Opening regular link in new tab:', href);
-        window.open(href, '_blank', 'noopener,noreferrer');
-        return;
-      }
-
-      console.log('[DivNode] Link not handled:', href);
-    };
-
-    const content = contentRef.current;
-    content.addEventListener('click', handleLinkClick, true); // Use capture phase
-    
-    return () => {
-      content.removeEventListener('click', handleLinkClick, true);
-    };
-  }, []);
-  
-  // Render FixedNode with HTML content and resize handle
+  // Render FixedNode with HTML content or plain text
   return (
     <FixedNode {...props} hideDefaultContent={true}>
-      {/* HTML content */}
-      <div 
-        ref={contentRef}
-        className="html-content" 
-        style={{
-          position: 'absolute',
-          top: '8px',
-          left: '8px',
-          right: '8px',
-          bottom: '24px',
-          fontSize: Math.max(10, 12 * zoom),
-          lineHeight: 1.6,
-          userSelect: 'text',
-          cursor: 'auto',
-          overflow: 'auto',
-          padding: '8px',
-          boxSizing: 'border-box',
-          zIndex: 1,
-          pointerEvents: 'auto',
-          backgroundColor: 'transparent',
-          color: '#000'
-        }}
-        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-        onMouseDown={(e) => {
-          console.log('[DivNode] MouseDown on content, target:', e.target.tagName);
-          const link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
-          
-          if (link) {
-            const href = link.getAttribute('href');
-            console.log('[DivNode] MouseDown on link, href:', href);
-            
-            // Stop propagation to prevent node drag
-            e.stopPropagation();
-            e.preventDefault();
-            
-            // Handle the link click directly here since click event may not fire
-            if (!href) return;
-            
-            // Handle tlz:// links
-            if (href.startsWith('tlz://')) {
-              const rest = href.slice('tlz://'.length);
-              const firstSlash = rest.indexOf('/');
-              let host = '';
-              let path = '';
-
-              if (firstSlash !== -1) {
-                host = rest.slice(0, firstSlash);
-                path = rest.slice(firstSlash);
-              } else {
-                path = '/' + rest;
-              }
-
-              const fullUrl = host ? `${window.location.protocol}//${host}${path}` : window.location.origin + path;
-              console.log('[DivNode] Emitting fetchUrl for:', fullUrl);
-              eventBus.emit('fetchUrl', { url: fullUrl });
-              return;
-            }
-
-            // Handle regular links - open in new tab
-            if (href.startsWith('http://') || href.startsWith('https://')) {
-              console.log('[DivNode] Opening regular link in new tab:', href);
-              window.open(href, '_blank', 'noopener,noreferrer');
-              return;
-            }
-            
-            return;
-          }
-          
-          // Stop propagation for non-link mousedowns to prevent node drag
-          e.stopPropagation();
-        }}
-        onClick={(e) => {
-          console.log('[DivNode] onClick fired, target:', e.target.tagName, e.target);
-          const link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
-          if (link) {
-            console.log('[DivNode] Click on link detected, stopping propagation');
-            e.stopPropagation();
-            e.preventDefault();
-            return;
-          }
-          // Stop propagation for non-link clicks to prevent node selection
-          e.stopPropagation();
-        }}
-      />
+      {embedUrl ? (
+        /* Direct embed iframe - no sandbox for compatibility */
+        <iframe
+          ref={iframeRef}
+          src={embedUrl}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowFullScreen
+          style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px',
+            right: '8px',
+            bottom: '24px',
+            border: 'none',
+            width: 'calc(100% - 16px)',
+            height: 'calc(100% - 32px)',
+            backgroundColor: '#000',
+            zIndex: 1
+          }}
+          title={`Video embed for node ${node.id}`}
+        />
+      ) : isHTML ? (
+        /* Sandboxed iframe for other HTML content */
+        <iframe
+          ref={iframeRef}
+          srcDoc={content}
+          sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowFullScreen
+          style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px',
+            right: '8px',
+            bottom: '24px',
+            border: 'none',
+            width: 'calc(100% - 16px)',
+            height: 'calc(100% - 32px)',
+            backgroundColor: '#fff',
+            zIndex: 1
+          }}
+          title={`Content for node ${node.id}`}
+        />
+      ) : (
+        /* Plain text content */
+        <div
+          style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px',
+            right: '8px',
+            bottom: '24px',
+            fontSize: Math.max(10, 12 * zoom),
+            lineHeight: 1.6,
+            userSelect: 'text',
+            cursor: 'auto',
+            overflow: 'auto',
+            padding: '8px',
+            boxSizing: 'border-box',
+            zIndex: 1,
+            pointerEvents: 'auto',
+            backgroundColor: 'transparent',
+            color: theme.palette.text.primary,
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'monospace'
+          }}
+        >
+          {content}
+        </div>
+      )}
 
       {/* Resize handle */}
       <div
