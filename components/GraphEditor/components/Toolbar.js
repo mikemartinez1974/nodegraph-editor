@@ -1008,6 +1008,33 @@ const Toolbar = ({
             {snackbar.message}
           </Alert>
         </Snackbar>
+
+        {/* Viewport Indicator (compact stacked) */}
+        <Box
+          sx={{
+            ml: 1,
+            px: 0.5,
+            py: 0.250,
+            borderRadius: 1,
+            bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
+            color: theme.palette.text.secondary,
+            fontSize: 10,
+            minWidth: 0,
+            textAlign: 'center',
+            border: `1px solid ${theme.palette.divider}`,
+            display: 'inline-block',
+            lineHeight: 1.1,
+            userSelect: 'text',
+            whiteSpace: 'nowrap'
+          }}
+          title={`Viewport: x=${Math.round(pan?.x || 0)}, y=${Math.round(pan?.y || 0)}, zoom=${zoom?.toFixed(2) || 1}`}
+        >
+          <span>
+            x:{Math.round(pan?.x || 0)}<br />
+            y:{Math.round(pan?.y || 0)}<br />
+            z:{zoom?.toFixed(2) || 1}
+          </span>
+        </Box>
       </Box>
     </Paper>
   );
