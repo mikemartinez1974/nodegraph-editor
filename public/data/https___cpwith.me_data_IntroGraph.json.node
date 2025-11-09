@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2025-11-08T23:33:25.796Z",
-    "modified": "2025-11-08T23:33:25.796Z",
+    "created": "2025-11-08T22:57:39.716Z",
+    "modified": "2025-11-08T22:57:39.716Z",
     "author": "",
     "tags": []
   },
@@ -42,24 +42,30 @@
   },
   "viewport": {
     "pan": {
-      "x": 542.1082730713798,
-      "y": -1186.2862745426205
+      "x": 707.9954385403373,
+      "y": 322.0444178798989
     },
-    "zoom": 0.7364719894808005
+    "zoom": 1.0407736142082413
   },
   "document": null,
   "scripts": [
     {
-      "id": "script_1761684730975",
+      "id": "script_1762398766836",
       "name": "New Script",
       "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
       "tags": ""
     },
     {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
+      "id": "script_1761704515834",
+      "name": "New Script (copy)",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": "api, sample,"
+    },
+    {
+      "id": "script_1761704451643",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn nodes;",
+      "tags": "\"test\", \"sample\", \"tag\""
     }
   ],
   "nodes": [
@@ -318,8 +324,8 @@
       "type": "default",
       "label": "📋 Toolbar is at the Top",
       "position": {
-        "x": -300,
-        "y": -200
+        "x": -422.98543915083275,
+        "y": -62.60220469867889
       },
       "width": 200,
       "height": 100,
@@ -335,8 +341,8 @@
       "type": "default",
       "label": "📖 User's Manual",
       "position": {
-        "x": 300,
-        "y": -200
+        "x": 498.89051487673754,
+        "y": -146.19387037151068
       },
       "width": 200,
       "height": 100,
@@ -353,8 +359,8 @@
       "type": "svg",
       "label": "SVG Demo",
       "position": {
-        "x": 224.6154427491777,
-        "y": -4.102573791529619
+        "x": 423.9098313648236,
+        "y": 6.725232412567141
       },
       "width": 120,
       "height": 120,
@@ -362,22 +368,6 @@
       "showLabel": true,
       "data": {
         "svg": "<svg viewBox='0 0 100 100'><rect x='10' y='10' width='80' height='80' rx='18' fill='#ff9800'/><circle cx='50' cy='50' r='32' fill='#1976d2'/><text x='50' y='58' font-size='22' text-anchor='middle' fill='white'>SVG</text></svg>"
-      }
-    },
-    {
-      "id": "274d3150-3e47-4539-bab9-1e3aa1594eda",
-      "type": "markdown",
-      "label": "New Node",
-      "position": {
-        "x": -4.801644720098864,
-        "y": 2268.9744306088232
-      },
-      "width": 350,
-      "height": 300,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "Finally...\\n\\nI've got bigger plans for this app than just what you see here.  The node graph is a powerful tool, and I aim to exploit it in all of the ways that I can figure out how to exploit it.  This is probably not going to be the last such app, but it is the first! :) [See the Pitch Here](tlz://cpwith.me/tlz/thePitch.node).\\n"
       }
     }
   ],
