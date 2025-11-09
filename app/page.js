@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Header from '../components/Header/Header';
+import Browser from '../components/Browser/Browser';
 import { ThemeProvider } from '@mui/material/styles';
-import themeMap from '@/components/Header/themes';
+import themeMap from '@/components/Browser/themes';
 import GraphEditor from "@/components/GraphEditor/GraphEditor";
 
 export default function Home() {
@@ -89,7 +89,7 @@ export default function Home() {
   return (
     <ThemeProvider theme={muiTheme}>
       <div style={{ userSelect: "none", cursor: "default" }}>
-        <Header 
+        <Browser 
           themeName={themeName} 
           setThemeName={setThemeName} 
           theme={muiTheme}

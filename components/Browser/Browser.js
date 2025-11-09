@@ -26,7 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Icon from '@mui/material/Icon';
 
-export default function Header({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme }) {
+export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
