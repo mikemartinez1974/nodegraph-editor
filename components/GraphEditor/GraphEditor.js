@@ -561,7 +561,12 @@ export default function GraphEditor({ backgroundImage }) {
           }
         }
 
-        if (!response) throw new Error('Failed to fetch any candidate URLs: ' + triedUrls.join(', '));
+        if (!response) {
+          const errorMsg = 'Failed to fetch from any URL';
+          console.error('[GraphEditor] Error fetching URL:', errorMsg, triedUrls);
+          setSnackbar({ open: true, message: `Failed to fetch URL: ${errorMsg}`, severity: 'error' });
+          return;
+        }
 
         const text = await response.text();
 
@@ -1492,6 +1497,22 @@ export default function GraphEditor({ backgroundImage }) {
         backgroundUrl={backgroundUrl} 
         setBackgroundUrl={setBackgroundUrl}
       />
+      
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity || 'info'}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

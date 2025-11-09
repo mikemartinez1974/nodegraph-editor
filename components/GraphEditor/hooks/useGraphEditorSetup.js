@@ -163,43 +163,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     window.handlePasteGraphData = handlePasteGraphData;
   }
 
-  // One-time startup: if no nodes/edges are loaded, fetch the configured home URL
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      if (!initialGraphLoadedRef || initialGraphLoadedRef.current) return;
 
-      // Give the app a moment to fully initialize UI and other listeners
-      const t = setTimeout(() => {
-        try {
-          const DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
-          let home = DEFAULT_HOME;
-          try {
-            const stored = localStorage.getItem('homeUrl');
-            if (stored) home = stored;
-          } catch (err) {
-            // ignore localStorage errors
-          }
-
-          const hasNodes = Array.isArray(nodesRef.current) && nodesRef.current.length > 0;
-          const hasEdges = Array.isArray(edgesRef.current) && edgesRef.current.length > 0;
-
-          if (!hasNodes && !hasEdges && home) {
-            // Emit fetchUrl so GraphEditor will load the home document
-            eventBus.emit('fetchUrl', { url: home });
-          }
-        } catch (err) {
-          console.warn('Startup home navigation failed:', err);
-        } finally {
-          if (initialGraphLoadedRef) initialGraphLoadedRef.current = true;
-        }
-      }, 50);
-
-      return () => clearTimeout(t);
-    } catch (err) {
-      if (initialGraphLoadedRef) initialGraphLoadedRef.current = true;
-    }
-  }, []);
 
   // Handle tlzClick emitted by TlzLink: show tlz in address/history and fetch converted URL
   useEffect(() => {

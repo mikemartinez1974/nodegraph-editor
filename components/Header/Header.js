@@ -64,6 +64,26 @@ export default function Header({ themeName, setThemeName, setTempTheme, theme, a
     }
   }, []);
 
+  // One-time startup: navigate to home URL if no graph is loaded
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        // Check if there's already content loaded (via localStorage or other means)
+        const hasInitialContent = localStorage.getItem('lastLoadedUrl');
+        
+        // Only navigate to home if there's no initial content
+        if (!hasInitialContent && homeUrl) {
+          const fetchable = convertTlzToFetchUrl(homeUrl);
+          eventBus.emit('fetchUrl', { url: fetchable });
+        }
+      } catch (err) {
+        console.warn('Startup home navigation failed:', err);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [homeUrl]);
+
   // Load persisted bookmarks on mount
   useEffect(() => {
     try {
