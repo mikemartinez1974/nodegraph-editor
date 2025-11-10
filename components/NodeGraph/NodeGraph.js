@@ -723,71 +723,9 @@ export default function NodeGraph({
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
 
-  // Auto-fit nodes on first load only (when nodes first appear, not on remounts)
-  const didAutoFitRef = useRef(false);
-  const lastNodeCountRef = useRef(0);
-  
-  useEffect(() => {
-    // Only auto-fit once, when we first get nodes (transition from 0 to >0)
-    const currentNodeCount = nodes?.length || 0;
-    const isFirstTime = lastNodeCountRef.current === 0 && currentNodeCount > 0;
-    
-    lastNodeCountRef.current = currentNodeCount;
-    
-    if (didAutoFitRef.current || !isFirstTime) return;
-
-    // Defer until layout is stable
-    const id = requestAnimationFrame(() => {
-      try {
-        // compute bounding box
-        const positions = nodes.map(n => ({
-          x: (n.position?.x ?? n.x ?? 0),
-          y: (n.position?.y ?? n.y ?? 0),
-          width: n.width || 60,
-          height: n.height || 60
-        }));
-
-        const minX = Math.min(...positions.map(p => p.x - p.width / 2));
-        const maxX = Math.max(...positions.map(p => p.x + p.width / 2));
-        const minY = Math.min(...positions.map(p => p.y - p.height / 2));
-        const maxY = Math.max(...positions.map(p => p.y + p.height / 2));
-
-        const bboxW = Math.max(1, maxX - minX);
-        const bboxH = Math.max(1, maxY - minY);
-
-        const container = containerRef.current;
-        if (!container) return;
-        const padding = 40;
-
-        const availW = Math.max(1, container.clientWidth - padding * 2);
-        const availH = Math.max(1, container.clientHeight - padding * 2);
-
-        const scaleX = availW / bboxW;
-        const scaleY = availH / bboxH;
-        let newZoomVal = Math.min(scaleX, scaleY, 1);
-        newZoomVal = Math.max(0.2, Math.min(3, newZoomVal));
-
-        const centerX = (minX + maxX) / 2;
-        const centerY = (minY + maxY) / 2;
-
-        const newPanX = container.clientWidth / 2 - centerX * newZoomVal;
-        const newPanY = container.clientHeight / 2 - centerY * newZoomVal;
-
-        if (typeof setZoom === 'function') setZoom(newZoomVal);
-        if (typeof setPan === 'function') setPan({ x: newPanX, y: newPanY });
-
-        // Force immediate redraw
-        requestAnimationFrame(() => {
-          try { handleLayerImperativeRef.current?.redraw && handleLayerImperativeRef.current.redraw(); } catch (e) {}
-          try { edgeLayerImperativeRef.current?.redraw && edgeLayerImperativeRef.current.redraw(); } catch (e) {}
-        });
-
-        didAutoFitRef.current = true;
-      } catch (e) { /* ignore */ }
-    });
-
-    return () => cancelAnimationFrame(id);
-  }, [nodes, setPan, setZoom]);
+  // REMOVED: Auto-fit on load is now disabled
+  // Viewport should be controlled by saved viewport state in .node files
+  // or by explicit user actions (fit-to-nodes button, etc.)
 
   // Debug helpers: expose viewport and force redraw to window for console diagnostics
   useEffect(() => {

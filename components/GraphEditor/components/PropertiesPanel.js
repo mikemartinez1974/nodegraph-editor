@@ -67,6 +67,10 @@ export default function ConsolidatedPropertiesPanel({
   const [memo, setMemo] = useState('');
   const [memoView, setMemoView] = useState('edit');
   const [nodeColor, setNodeColor] = useState(defaultNodeColor);
+  const [nodeGradientEnabled, setNodeGradientEnabled] = useState(false);
+  const [nodeGradientStart, setNodeGradientStart] = useState('#2196f3');
+  const [nodeGradientEnd, setNodeGradientEnd] = useState('#1976d2');
+  const [nodeGradientDirection, setNodeGradientDirection] = useState('135deg');
   const [nodeType, setNodeType] = useState('');
   const [nodePosition, setNodePosition] = useState({ x: 0, y: 0 });
   const [nodeSize, setNodeSize] = useState({ width: 200, height: 120 });
@@ -135,7 +139,27 @@ export default function ConsolidatedPropertiesPanel({
     if (selectedNode) {
       setLabel(selectedNode.label || '');
       setMemo(selectedNode.data?.memo || '');
-      setNodeColor(selectedNode.color || defaultNodeColor);
+      
+      // Check if node color is a gradient
+      const currentColor = selectedNode.color || defaultNodeColor;
+      const isGradient = currentColor.includes('gradient');
+      setNodeGradientEnabled(isGradient);
+      
+      if (isGradient) {
+        // Parse gradient string to extract colors and direction
+        // Format: linear-gradient(135deg, #2196f3, #1976d2)
+        const dirMatch = currentColor.match(/linear-gradient\(([^,]+),/);
+        const colorMatches = currentColor.match(/#[0-9a-fA-F]{6}/g);
+        
+        if (dirMatch) setNodeGradientDirection(dirMatch[1].trim());
+        if (colorMatches && colorMatches.length >= 2) {
+          setNodeGradientStart(colorMatches[0]);
+          setNodeGradientEnd(colorMatches[1]);
+        }
+      } else {
+        setNodeColor(currentColor);
+      }
+      
       setNodeType(selectedNode.type || 'default');
       setNodePosition(selectedNode.position || { x: 0, y: 0 });
       setNodeSize({ width: selectedNode.width || 200, height: selectedNode.height || 120 });
@@ -438,20 +462,103 @@ export default function ConsolidatedPropertiesPanel({
             </Accordion>
             
             {/* Color */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
-                Node Color
-              </Typography>
-              <TextField
-                fullWidth
-                type="color"
-                value={nodeColor}
-                onChange={(e) => handleNodeColorChange(e.target.value)}
-                disabled={isLocked}
-                size="small"
-                label="Node Color"
-              />
-            </Box>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Color & Gradient</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={nodeGradientEnabled}
+                      onChange={(e) => {
+                        setNodeGradientEnabled(e.target.checked);
+                        if (e.target.checked) {
+                          const gradientColor = `linear-gradient(${nodeGradientDirection}, ${nodeGradientStart}, ${nodeGradientEnd})`;
+                          if (onUpdateNode) onUpdateNode(entityId, { color: gradientColor });
+                        } else {
+                          if (onUpdateNode) onUpdateNode(entityId, { color: nodeColor });
+                        }
+                      }}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Use Gradient"
+                  sx={{ mb: 2 }}
+                />
+
+                {nodeGradientEnabled ? (
+                  <Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
+                        Gradient Direction
+                      </Typography>
+                      <FormControl fullWidth size="small" disabled={isLocked}>
+                        <Select
+                          value={nodeGradientDirection}
+                          onChange={(e) => {
+                            setNodeGradientDirection(e.target.value);
+                            const gradientColor = `linear-gradient(${e.target.value}, ${nodeGradientStart}, ${nodeGradientEnd})`;
+                            if (onUpdateNode) onUpdateNode(entityId, { color: gradientColor });
+                          }}
+                        >
+                          <MenuItem value="135deg">Diagonal ↘</MenuItem>
+                          <MenuItem value="90deg">Vertical ↓</MenuItem>
+                          <MenuItem value="180deg">Horizontal →</MenuItem>
+                          <MenuItem value="45deg">Diagonal ↗</MenuItem>
+                          <MenuItem value="225deg">Diagonal ↙</MenuItem>
+                          <MenuItem value="315deg">Diagonal ↖</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
+                        Gradient Start
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        type="color"
+                        value={nodeGradientStart}
+                        onChange={(e) => {
+                          setNodeGradientStart(e.target.value);
+                          const gradientColor = `linear-gradient(${nodeGradientDirection}, ${e.target.value}, ${nodeGradientEnd})`;
+                          if (onUpdateNode) onUpdateNode(entityId, { color: gradientColor });
+                        }}
+                        disabled={isLocked}
+                        size="small"
+                      />
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
+                        Gradient End
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        type="color"
+                        value={nodeGradientEnd}
+                        onChange={(e) => {
+                          setNodeGradientEnd(e.target.value);
+                          const gradientColor = `linear-gradient(${nodeGradientDirection}, ${nodeGradientStart}, ${e.target.value})`;
+                          if (onUpdateNode) onUpdateNode(entityId, { color: gradientColor });
+                        }}
+                        disabled={isLocked}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                ) : (
+                  <TextField
+                    fullWidth
+                    type="color"
+                    value={nodeColor}
+                    onChange={(e) => handleNodeColorChange(e.target.value)}
+                    disabled={isLocked}
+                    size="small"
+                    label="Node Color"
+                  />
+                )}
+              </AccordionDetails>
+            </Accordion>
 
             {/* Position */}
             <Accordion>
