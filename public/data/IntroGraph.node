@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2025-11-08T23:33:25.796Z",
-    "modified": "2025-11-08T23:33:25.796Z",
+    "created": "2025-11-10T08:32:27.411Z",
+    "modified": "2025-11-10T08:32:27.411Z",
     "author": "",
     "tags": []
   },
@@ -42,10 +42,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 542.1082730713798,
-      "y": -1186.2862745426205
+      "x": 666.1680848537923,
+      "y": -1663.4601295274288
     },
-    "zoom": 0.7364719894808005
+    "zoom": 0.98471933788607
   },
   "document": null,
   "scripts": [
@@ -77,7 +77,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Copy/Paste w/ Me on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click on the Welcome node to toggle this panel closed.  (Clicking the selected node will reopen it.)\nTeam up with your AI assistant to build stunning visual graphs. Follow the steps below! 🚀"
+        "memo": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Copy/Paste w/ Me on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click and drag to scroll the page, and follow the steps below. 🚀"
       }
     },
     {
@@ -318,8 +318,8 @@
       "type": "default",
       "label": "📋 Toolbar is at the Top",
       "position": {
-        "x": -300,
-        "y": -200
+        "x": -407.96007401384156,
+        "y": -98.66905333788553
       },
       "width": 200,
       "height": 100,
@@ -335,8 +335,8 @@
       "type": "default",
       "label": "📖 User's Manual",
       "position": {
-        "x": 300,
-        "y": -200
+        "x": 481.8274930759436,
+        "y": -224.6224730207007
       },
       "width": 200,
       "height": 100,
@@ -353,8 +353,8 @@
       "type": "svg",
       "label": "SVG Demo",
       "position": {
-        "x": 224.6154427491777,
-        "y": -4.102573791529619
+        "x": 352.46289881820053,
+        "y": -5.049591984633493
       },
       "width": 120,
       "height": 120,
@@ -369,15 +369,15 @@
       "type": "markdown",
       "label": "New Node",
       "position": {
-        "x": -4.801644720098864,
-        "y": 2268.9744306088232
+        "x": -0.7395735835789701,
+        "y": 2294.3623752120725
       },
-      "width": 350,
-      "height": 300,
+      "width": 345.93792886348007,
+      "height": 187.27752596157256,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "Finally...\\n\\nI've got bigger plans for this app than just what you see here.  The node graph is a powerful tool, and I aim to exploit it in all of the ways that I can figure out how to exploit it.  This is probably not going to be the last such app, but it is the first! :) [See the Pitch Here](tlz://cpwith.me/tlz/thePitch.node).\\n"
+        "memo": "Finally...<br><br>I've got bigger plans for this app than just what you see here.  The node graph is a powerful tool, and I aim to exploit it in *all* of the ways. 😉\n  \n [See the Pitch Here](tlz://cpwith.me/tlz/thePitch.node)."
       }
     }
   ],
@@ -532,6 +532,15 @@
       "source": "node_welcome_center",
       "target": "node_svg_demo",
       "label": "SVG node",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762763523204",
+      "type": "temporal",
+      "source": "node_ready_cta",
+      "target": "274d3150-3e47-4539-bab9-1e3aa1594eda",
+      "label": "",
       "style": {},
       "data": {}
     }

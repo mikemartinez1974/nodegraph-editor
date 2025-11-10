@@ -26,7 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Icon from '@mui/material/Icon';
 
-export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme }) {
+export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -317,52 +317,56 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         background: `linear-gradient(135deg, ${muiTheme.palette.primary.light} 0%, ${muiTheme.palette.primary.dark} 100%)`,
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
       }}>
-        <Toolbar>
+        <Toolbar variant={isMobile ? "dense" : "regular"}>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ButtonGroup variant="outlined" size="small" sx={{ borderColor: muiTheme.palette.divider }}>
-              <IconButton
-                onClick={handleBrowserBack}
-                disabled={historyIndex <= 0}
-                title="Back"
-                aria-label="Navigate back"
-                size="small"
-              >
-                <ArrowBackIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                onClick={handleBrowserForward}
-                disabled={historyIndex >= browserHistory.length - 1}
-                title="Forward"
-                aria-label="Navigate forward"
-                size="small"
-              >
-                <ArrowForwardIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                onClick={handleRefresh}
-                disabled={!currentUrl && !address}
-                title="Refresh"
-                aria-label="Refresh current URL"
-                size="small"
-              >
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                onClick={handleHome}
-                onContextMenu={handleHomeContext}
-                title="Home"
-                aria-label="Home"
-                size="small"
-              >
-                <HomeIcon fontSize="small" />
-              </IconButton>
-            </ButtonGroup>
-          </Box>
+          {/* Navigation buttons - hide on mobile portrait, show on landscape */}
+          {(!isMobile || (isMobile && isLandscape)) && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ButtonGroup variant="outlined" size="small" sx={{ borderColor: muiTheme.palette.divider }}>
+                <IconButton
+                  onClick={handleBrowserBack}
+                  disabled={historyIndex <= 0}
+                  title="Back"
+                  aria-label="Navigate back"
+                  size="small"
+                >
+                  <ArrowBackIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  onClick={handleBrowserForward}
+                  disabled={historyIndex >= browserHistory.length - 1}
+                  title="Forward"
+                  aria-label="Navigate forward"
+                  size="small"
+                >
+                  <ArrowForwardIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  onClick={handleRefresh}
+                  disabled={!currentUrl && !address}
+                  title="Refresh"
+                  aria-label="Refresh current URL"
+                  size="small"
+                >
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  onClick={handleHome}
+                  onContextMenu={handleHomeContext}
+                  title="Home"
+                  aria-label="Home"
+                  size="small"
+                >
+                  <HomeIcon fontSize="small" />
+                </IconButton>
+              </ButtonGroup>
+            </Box>
+          )}
+          
           <TextField
             variant="outlined"
             size="small"
-            placeholder="Enter URL or search..."
+            placeholder={isMobile && isPortrait ? "URL..." : "Enter URL or search..."}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={(e) => {
@@ -376,7 +380,6 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   return trimmed;
                 })(address);
                 if (fetchUrl) {
-                  // Do not push history here; GraphEditor will emit setAddress when it starts fetching
                   eventBus.emit('fetchUrl', { url: fetchUrl });
                 } else {
                   eventBus.emit('fetchUrl', { url: address });
@@ -384,49 +387,56 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
               }
             }}
             InputProps={{
-              startAdornment: (
+              startAdornment: (!isMobile || isLandscape) && (
                 <InputAdornment position="start">
                   <SearchIcon />
                 </InputAdornment>
               )
             }}
             sx={{
-              width: 525, // Increased width by 75%
+              width: isMobile && isPortrait ? '100%' : 
+                     isMobile && isLandscape ? 300 :
+                     isSmallScreen ? 350 : 525,
+              flexGrow: (isMobile && isPortrait) ? 1 : 0,
               '& .MuiOutlinedInput-root': {
                 backgroundColor: muiTheme.palette.background.paper,
                 borderRadius: 1,
               },
             }}
           />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              onClick={handleToggleBookmark}
-              disabled={!currentUrl}
-              title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-              aria-label="Toggle bookmark"
-              size="small"
-              color={isBookmarked ? "primary" : "default"}
-            >
-              {isBookmarked ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
-            </IconButton>
-            <IconButton
-              onClick={handleOpenBookmarksMenu}
-              disabled={bookmarks.length === 0}
-              title="View bookmarks"
-              aria-label="Open bookmarks menu"
-              size="small"
-            >
-              <BookmarkIcon fontSize="small" />
-              {bookmarks.length > 0 && (
-                <Typography variant="caption" sx={{ ml: 0.5, fontSize: '0.65rem' }}>
-                  {bookmarks.length}
-                </Typography>
-              )}
-            </IconButton>
-          </Box>
+          
+          {/* Bookmark buttons - show in landscape, hide in portrait on mobile */}
+          {(!isMobile || (isMobile && isLandscape)) && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton
+                onClick={handleToggleBookmark}
+                disabled={!currentUrl}
+                title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+                aria-label="Toggle bookmark"
+                size="small"
+                color={isBookmarked ? "primary" : "default"}
+              >
+                {isBookmarked ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
+              </IconButton>
+              <IconButton
+                onClick={handleOpenBookmarksMenu}
+                disabled={bookmarks.length === 0}
+                title="View bookmarks"
+                aria-label="Open bookmarks menu"
+                size="small"
+              >
+                <BookmarkIcon fontSize="small" />
+                {bookmarks.length > 0 && (
+                  <Typography variant="caption" sx={{ ml: 0.5, fontSize: '0.65rem' }}>
+                    {bookmarks.length}
+                  </Typography>
+                )}
+              </IconButton>
+            </Box>
+          )}
 
           {/* Spacer to push drawer button to far right */}
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: (isMobile && isPortrait) ? 0 : 1 }} />
 
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon />

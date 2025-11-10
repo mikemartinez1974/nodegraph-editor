@@ -4,6 +4,7 @@ import Browser from '../components/Browser/Browser';
 import { ThemeProvider } from '@mui/material/styles';
 import themeMap from '@/components/Browser/themes';
 import GraphEditor from "@/components/GraphEditor/GraphEditor";
+import { useMediaQuery } from '@mui/material';
 
 export default function Home() {
   const getSystemTheme = () => {
@@ -16,6 +17,13 @@ export default function Home() {
   const [themeName, setThemeName] = useState('default');
   const [themeReady, setThemeReady] = useState(false);
   const [muiTheme, setMuiTheme] = useState(() => themeMap['default']);
+  
+  // Detect mobile devices and orientation
+  const isMobile = useMediaQuery('(max-width:768px)');
+  const isTablet = useMediaQuery('(min-width:769px) and (max-width:1024px)');
+  const isSmallScreen = isMobile || isTablet;
+  const isPortrait = useMediaQuery('(orientation: portrait)');
+  const isLandscape = useMediaQuery('(orientation: landscape)');
   
   // Handler to apply theme to browser (not document)
   const applyBrowserTheme = (themeConfigOrName) => {
@@ -94,9 +102,18 @@ export default function Home() {
           setThemeName={setThemeName} 
           theme={muiTheme}
           applyBrowserTheme={applyBrowserTheme}
+          isMobile={isMobile}
+          isSmallScreen={isSmallScreen}
+          isPortrait={isPortrait}
+          isLandscape={isLandscape}
         />
         <div>
-          <GraphEditor />
+          <GraphEditor 
+            isMobile={isMobile} 
+            isSmallScreen={isSmallScreen}
+            isPortrait={isPortrait}
+            isLandscape={isLandscape}
+          />
         </div>
       </div>
     </ThemeProvider>

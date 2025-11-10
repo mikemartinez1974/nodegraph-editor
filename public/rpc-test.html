@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPC Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .status {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .status.ready {
+      background: rgba(76, 175, 80, 0.3);
+    }
+    .log {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #4CAF50;
+      padding-left: 10px;
+    }
+    button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 BackgroundFrame RPC Test</h1>
+    <p>This page demonstrates the secure postMessage RPC protocol.</p>
+    
+    <div id="status" class="status">
+      <strong>Status:</strong> <span id="statusText">Waiting for handshake...</span>
+    </div>
+
+    <div>
+      <h3>Available Methods:</h3>
+      <div id="methods"></div>
+    </div>
+
+    <div class="log" id="log">
+      <div class="log-entry">Waiting for messages from parent...</div>
+    </div>
+  </div>
+
+  <script>
+    // Allowed parent origins - customize for your deployment
+    const ALLOWED_PARENT_ORIGINS = [
+      'http://localhost:3000',
+      'https://localhost:3000',
+      window.location.origin
+    ];
+
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    const statusTextEl = document.getElementById('statusText');
+    const methodsEl = document.getElementById('methods');
+
+    function log(message, data = null) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      if (data) {
+        entry.textContent += ': ' + JSON.stringify(data, null, 2);
+      }
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setStatus(text, ready = false) {
+      statusTextEl.textContent = text;
+      if (ready) {
+        statusEl.classList.add('ready');
+      } else {
+        statusEl.classList.remove('ready');
+      }
+    }
+
+    // RPC Methods this page exposes
+    const methods = {
+      echo: ({ message }) => {
+        log('echo() called', { message });
+        return { echo: message, timestamp: Date.now() };
+      },
+
+      getState: () => {
+        log('getState() called');
+        return {
+          title: document.title,
+          url: window.location.href,
+          timestamp: Date.now(),
+          readyState: document.readyState
+        };
+      },
+
+      getDocumentInfo: () => {
+        log('getDocumentInfo() called');
+        return {
+          title: document.title,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          scrollY: window.scrollY
+        };
+      },
+
+      setBackgroundColor: ({ color }) => {
+        log('setBackgroundColor() called', { color });
+        document.body.style.background = color;
+        return { success: true, color };
+      }
+    };
+
+    function postResponse(target, requestId, ok, result, error) {
+      try {
+        target.postMessage(
+          { type: 'rpc:response', requestId, ok, result, error },
+          '*'
+        );
+      } catch (err) {
+        log('Failed to post response', err.message);
+      }
+    }
+
+    function handleMessage(e) {
+      // Validate origin
+      if (!ALLOWED_PARENT_ORIGINS.includes(e.origin)) {
+        log('Message from disallowed origin: ' + e.origin);
+        return;
+      }
+
+      const msg = e.data;
+      if (!msg || typeof msg !== 'object') return;
+
+      // Handshake
+      if (msg.type === 'handshake:probe') {
+        log('Handshake probe received from ' + e.origin);
+        e.source.postMessage(
+          { type: 'handshake', methods: Object.keys(methods) },
+          e.origin
+        );
+        setStatus('Connected and ready!', true);
+        
+        // Show available methods
+        methodsEl.innerHTML = Object.keys(methods).map(m => 
+          `<button onclick="parent.postMessage({type:'testRpc',method:'${m}'},'*')">${m}()</button>`
+        ).join('');
+        
+        return;
+      }
+
+      // RPC request
+      if (msg.type === 'rpc:request' && msg.requestId && typeof msg.method === 'string') {
+        log('RPC request: ' + msg.method, msg.args);
+        
+        const fn = methods[msg.method];
+        if (!fn) {
+          postResponse(e.source, msg.requestId, false, null, 'Method not found');
+          return;
+        }
+
+        Promise.resolve()
+          .then(() => fn(msg.args || {}))
+          .then(result => {
+            log('RPC response sent', result);
+            postResponse(e.source, msg.requestId, true, result, null);
+          })
+          .catch(err => {
+            log('RPC error', err.message);
+            postResponse(e.source, msg.requestId, false, null, String(err));
+          });
+        return;
+      }
+
+      // Event from parent
+      if (msg.type === 'event' && msg.event) {
+        log('Event received: ' + msg.event, msg.payload);
+        return;
+      }
+    }
+
+    window.addEventListener('message', handleMessage);
+    log('RPC listener initialized');
+    log('Allowed origins: ' + ALLOWED_PARENT_ORIGINS.join(', '));
+
+    // Send handshake with retry
+    let handshakeSent = false;
+    function sendHandshake() {
+      if (handshakeSent) return;
+      
+      log('🤝 Sending handshake...');
+      try {
+        window.parent.postMessage({
+          type: 'handshake',  // Match what BackgroundFrame.js expects (lowercase!)
+          methods: Object.keys(methods)
+        }, window.location.origin);
+        
+        handshakeSent = true;
+        setStatus('Ready ✓', true);
+        methodsEl.innerHTML = Object.keys(methods)
+          .map(m => `<button onclick="parent.postMessage({type:'testRpc',method:'${m}'},'*')">${m}()</button>`)
+          .join('');
+        log('✅ Handshake sent successfully');
+      } catch (error) {
+        log(`❌ Handshake error: ${error.message}`);
+      }
+    }
+
+    // Try multiple times to ensure handshake is received
+    sendHandshake();
+    setTimeout(sendHandshake, 100);
+    setTimeout(sendHandshake, 500);
+    window.addEventListener('load', sendHandshake);
+  </script>
+</body>
+</html>

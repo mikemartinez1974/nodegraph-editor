@@ -34,10 +34,12 @@ import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUti
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import { nodeTypeMetadata } from './nodeTypeRegistry';
+import { useBackgroundRpc } from './hooks/useBackgroundRpc';
+import BackgroundFrame from './components/BackgroundFrame';
 
 const nodeTypes = getNodeTypes();
 
-export default function GraphEditor({ backgroundImage }) {
+export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const theme = useTheme(); // Browser theme
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
@@ -99,6 +101,9 @@ export default function GraphEditor({ backgroundImage }) {
   const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
   const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
+  
+  // BackgroundFrame RPC hook
+  const { bgRef, rpc: backgroundRpc, postEvent: backgroundPostEvent, isReady: backgroundRpcReady, methods: backgroundRpcMethods, handleHandshakeComplete } = useBackgroundRpc();
 
   useEffect(() => {
     if (backgroundUrl) {
@@ -178,6 +183,23 @@ export default function GraphEditor({ backgroundImage }) {
       setDocumentBackgroundImage(backgroundImage || '');
     };
 
+    // Test RPC call handler
+    const handleTestBackgroundRpc = async ({ method, args }) => {
+      try {
+        if (!backgroundRpcReady) {
+          setSnackbar({ open: true, message: 'Background RPC not ready. Wait for handshake.', severity: 'warning' });
+          return;
+        }
+        
+        const result = await backgroundRpc(method || 'echo', args || { message: 'Hello from host!' });
+        console.log('[GraphEditor] RPC result:', result);
+        setSnackbar({ open: true, message: `RPC success: ${JSON.stringify(result)}`, severity: 'success' });
+      } catch (err) {
+        console.error('[GraphEditor] RPC error:', err);
+        setSnackbar({ open: true, message: `RPC error: ${err.message}`, severity: 'error' });
+      }
+    };
+
     const handleExportGraph = async () => {
       try {
         const data = {
@@ -220,6 +242,7 @@ export default function GraphEditor({ backgroundImage }) {
     eventBus.on('setBackgroundInteractive', handleSetBackgroundInteractive);
     eventBus.on('setBackgroundImage', handleSetBackgroundImage);
     eventBus.on('exportGraph', handleExportGraph);
+    eventBus.on('testBackgroundRpc', handleTestBackgroundRpc);
 
     return () => {
       eventBus.off('backgroundLoadFailed', handleBackgroundLoadFailed);
@@ -228,8 +251,9 @@ export default function GraphEditor({ backgroundImage }) {
       eventBus.off('setBackgroundInteractive', handleSetBackgroundInteractive);
       eventBus.off('setBackgroundImage', handleSetBackgroundImage);
       eventBus.off('exportGraph', handleExportGraph);
+      eventBus.off('testBackgroundRpc', handleTestBackgroundRpc);
     };
-  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar]);
+  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady]);
 
   // Determine if user is free (replace with real logic)
   const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
@@ -316,7 +340,9 @@ export default function GraphEditor({ backgroundImage }) {
     historyHook,
     groupManagerHook,
     selectionHook,
-    modesHook
+    modesHook,
+    backgroundRpc,
+    backgroundRpcReady
   });
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
@@ -476,6 +502,50 @@ export default function GraphEditor({ backgroundImage }) {
       window.graphAPI = graphAPI.current;
     }
   }, [graphAPI]);
+  
+  // Expose eventBus and RPC helpers to window for console testing
+  useEffect(() => {
+    // Expose eventBus for console access
+    window.eventBus = eventBus;
+    
+    // Expose a helper for testing background RPC
+    window.testBackgroundRpc = async (method, args) => {
+      try {
+        if (!backgroundRpcReady) {
+          console.warn('Background RPC not ready. Wait for handshake.');
+          return { error: 'RPC not ready' };
+        }
+        const result = await backgroundRpc(method, args);
+        console.log('✅ RPC Success:', result);
+        return result;
+      } catch (err) {
+        console.error('❌ RPC Error:', err.message);
+        return { error: err.message };
+      }
+    };
+    
+    // Expose RPC status helper
+    window.backgroundRpcStatus = () => {
+      console.log('Background RPC Status:', {
+        ready: backgroundRpcReady,
+        methods: backgroundRpcMethods,
+        url: backgroundUrl
+      });
+      return { ready: backgroundRpcReady, methods: backgroundRpcMethods, url: backgroundUrl };
+    };
+    
+    // Log available helpers
+    console.log('🔧 Global helpers available:');
+    console.log('  - window.eventBus - Event bus');
+    console.log('  - window.graphAPI - Graph API');
+    console.log('  - window.testBackgroundRpc(method, args) - Test RPC');
+    console.log('  - window.backgroundRpcStatus() - Check RPC status');
+    
+    return () => {
+      delete window.testBackgroundRpc;
+      delete window.backgroundRpcStatus;
+    };
+  }, [backgroundRpc, backgroundRpcReady, backgroundRpcMethods, backgroundUrl]);
   
   // Listen for 'fetchUrl' event from address bar
   useEffect(() => {
@@ -1276,6 +1346,16 @@ export default function GraphEditor({ backgroundImage }) {
         backgroundRepeat: 'no-repeat',
       }}
     >
+      {/* BackgroundFrame for RPC */}
+      {backgroundUrl && (
+        <BackgroundFrame 
+          ref={bgRef}
+          url={backgroundUrl}
+          interactive={backgroundInteractive}
+          onHandshakeComplete={handleHandshakeComplete}
+        />
+      )}
+      
       <Toolbar 
         onToggleNodeList={() => setShowNodeList(!showNodeList)}
         showNodeList={showNodeList}
@@ -1322,6 +1402,10 @@ export default function GraphEditor({ backgroundImage }) {
         onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
         gridSize={documentSettings.gridSize}
         documentTheme={documentTheme}
+        isMobile={isMobile}
+        isSmallScreen={isSmallScreen}
+        isPortrait={isPortrait}
+        isLandscape={isLandscape}
       />
       
       {showPropertiesPanel && (

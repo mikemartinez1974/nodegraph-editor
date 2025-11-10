@@ -14,7 +14,9 @@ export function createGraphEditorHandlers({
   historyHook,
   groupManagerHook,
   selectionHook,
-  modesHook
+  modesHook,
+  backgroundRpc, // NEW: RPC function for calling iframe methods
+  backgroundRpcReady // NEW: boolean indicating if RPC is ready
 }) {
   const {
     nodes, setNodes, nodesRef,
@@ -445,6 +447,23 @@ export function createGraphEditorHandlers({
     }
   };
   
+  // Example: Add a handler that can call iframe RPC
+  const handleCallBackgroundMethod = async (method, args) => {
+    if (!backgroundRpcReady) {
+      console.warn('[Handlers] Background RPC not ready');
+      setSnackbar?.({ open: true, message: 'Background not ready', severity: 'warning' });
+      return { success: false, error: 'RPC not ready' };
+    }
+    
+    try {
+      const result = await backgroundRpc(method, args);
+      return { success: true, result };
+    } catch (err) {
+      console.error('[Handlers] RPC error:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
   return {
     // Node
     handleAddNode,
@@ -475,7 +494,10 @@ export function createGraphEditorHandlers({
     handleAddNodesToGroup,
     handleRemoveNodesFromGroup,
     handleCreateGroupWrapper,
-    handleUngroupSelectedWrapper
+    handleUngroupSelectedWrapper,
+
+    // RPC
+    handleCallBackgroundMethod
   };
 }
 
