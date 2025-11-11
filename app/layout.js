@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Copy/Paste w/ Me",
-  description: "An AI Assisted Node Graph Editor",
+  title: "Twilight Node Browser",
+  description: ""
 };
 
 export const viewport = {

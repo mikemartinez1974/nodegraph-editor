@@ -1,1 +1,0 @@
-- The editor now uses a unified PropertiesPanel for editing nodes, edges, and groups. NodePropertiesPanel and EdgePropertiesPanel have been replaced.

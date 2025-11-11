@@ -24,12 +24,14 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Icon from '@mui/material/Icon';
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
+import TemplateGallery from './TemplateGallery';
 
 export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   // Use refs as the authoritative source for history and index to avoid stale closures
   const historyIndexRef = useRef(-1);
   const browserHistoryRef = useRef([]);
@@ -311,6 +313,15 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     setBookmarks(next);
   };
 
+  const handleOpenGallery = () => setGalleryOpen(true);
+  const handleCloseGallery = () => setGalleryOpen(false);
+  const handleTemplateSelect = (template) => {
+    if (!template || !template.resolvedUrl) return;
+    setGalleryOpen(false);
+    setAddress(template.resolvedUrl);
+    eventBus.emit('fetchUrl', { url: template.resolvedUrl });
+  };
+
   return (
     <div>
       <AppBar position="fixed" color="primary" sx={{
@@ -358,6 +369,14 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   size="small"
                 >
                   <HomeIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  onClick={handleOpenGallery}
+                  title="Template gallery"
+                  aria-label="Open template gallery"
+                  size="small"
+                >
+                  <DashboardCustomizeIcon fontSize="small" />
                 </IconButton>
               </ButtonGroup>
             </Box>
@@ -464,6 +483,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       </Menu>
 
       <Menu anchorEl={homeMenuAnchor} open={Boolean(homeMenuAnchor)} onClose={handleCloseHomeMenu}>
+        <MenuItem onClick={() => { handleCloseHomeMenu(); handleOpenGallery(); }}>Browse Template Gallery</MenuItem>
         <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>
         <MenuItem onClick={handleResetHome}>Reset Home to default</MenuItem>
       </Menu>
@@ -476,6 +496,8 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         theme={theme}
         applyBrowserTheme={applyBrowserTheme}
       />
+
+      <TemplateGallery open={galleryOpen} onClose={handleCloseGallery} onSelect={handleTemplateSelect} />
     </div>
   );
 }

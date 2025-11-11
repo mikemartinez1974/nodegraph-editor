@@ -1,7 +1,7 @@
 ```text
 # Security Policy
 
-Thank you for taking the time to report a security issue in Copy/Paste w/Me. We take security seriously. This document describes how to report vulnerabilities and what to expect after you do.
+Thank you for taking the time to report a security issue in the Twilight Node Browser. We take security seriously. This document describes how to report vulnerabilities and what to expect after you do.
 
 1) Reporting a Vulnerability
 - Preferred: Email security reports to: security@your-domain.example (replace with your preferred security contact).

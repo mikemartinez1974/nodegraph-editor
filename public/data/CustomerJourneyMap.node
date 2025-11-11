@@ -1,0 +1,101 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Customer Journey Map",
+    "description": "Visualize awareness, activation, retention, and advocacy touchpoints.",
+    "created": "2024-01-02T00:00:00.000Z",
+    "modified": "2024-01-02T00:00:00.000Z",
+    "tags": [
+      "customer",
+      "journey",
+      "marketing"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "node_awareness",
+      "type": "markdown",
+      "label": "Awareness",
+      "position": {
+        "x": -480,
+        "y": -60
+      },
+      "width": 300,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Awareness\nKey signals:\n- Ads / SEO\n- Social buzz\n- Word of mouth\n\nMetrics:\n- Impressions\n- CTR"
+      }
+    },
+    {
+      "id": "node_activation",
+      "type": "markdown",
+      "label": "Activation",
+      "position": {
+        "x": -120,
+        "y": -40
+      },
+      "width": 300,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Activation\nFocus the first experience:\n- Onboarding flow\n- Template gallery\n- Guided checklist\n\nMetric: First value moment"
+      }
+    },
+    {
+      "id": "node_retention",
+      "type": "markdown",
+      "label": "Retention",
+      "position": {
+        "x": 240,
+        "y": -20
+      },
+      "width": 300,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Retention\nKeep momentum:\n- Weekly digests\n- In-product nudges\n- Community events\n\nMetric: WAU/MAU"
+      }
+    },
+    {
+      "id": "node_advocacy",
+      "type": "markdown",
+      "label": "Advocacy",
+      "position": {
+        "x": 600,
+        "y": 0
+      },
+      "width": 300,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Advocacy\nTurn users into champions:\n- Case studies\n- Referral loops\n- Champions slack\n\nMetric: NPS"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_awareness_activation",
+      "source": "node_awareness",
+      "target": "node_activation",
+      "type": "default"
+    },
+    {
+      "id": "edge_activation_retention",
+      "source": "node_activation",
+      "target": "node_retention",
+      "type": "default"
+    },
+    {
+      "id": "edge_retention_advocacy",
+      "source": "node_retention",
+      "target": "node_advocacy",
+      "type": "default"
+    }
+  ],
+  "groups": []
+}

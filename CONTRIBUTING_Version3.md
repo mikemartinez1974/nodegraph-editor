@@ -1,5 +1,5 @@
 ```text
-Contributing to Copy/Paste w/Me
+Contributing to the Twilight Node Browser
 
 Thank you for your interest in contributing. At this time the project is proprietary and contributions are accepted only under the Contributor License Agreement (CLA) located at CONTRIBUTOR_LICENSE_AGREEMENT.md in the project root.
 

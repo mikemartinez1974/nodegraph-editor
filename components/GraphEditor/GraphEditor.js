@@ -568,17 +568,37 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
             path = '/' + rest;
           }
 
-          fullUrl = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host + path;
+          const localhostNames = ['localhost', '127.0.0.1', '[::1]'];
+          if (!host) {
+            const origin = typeof window !== 'undefined' ? window.location.origin : 'https://localhost';
+            fullUrl = origin + path;
+          } else if (localhostNames.includes(host)) {
+            const protocol = typeof window !== 'undefined' ? window.location.protocol || 'http:' : 'http:';
+            fullUrl = `${protocol}//${host}${path}`;
+          } else {
+            fullUrl = `https://${host}${path}`;
+          }
         }
 
-        // Prepend https if missing
-        if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-          fullUrl = 'https://' + fullUrl;
+        if (!/^https?:\/\//i.test(fullUrl)) {
+          fullUrl = `https://${fullUrl}`;
         }
 
-        // Always use https for fetch URLs
-        if (fullUrl.startsWith('http://')) {
-          fullUrl = 'https://' + fullUrl.slice('http://'.length);
+        try {
+          const parsed = new URL(fullUrl);
+          const localhostNames = ['localhost', '127.0.0.1', '[::1]'];
+          const isLocalHost = localhostNames.includes(parsed.hostname);
+          const matchesOrigin = typeof window !== 'undefined' && parsed.host === window.location.host;
+
+          if (parsed.protocol === 'http:' && !isLocalHost && !matchesOrigin) {
+            parsed.protocol = 'https:';
+          }
+
+          fullUrl = parsed.toString();
+        } catch (parseError) {
+          if (fullUrl.startsWith('http://')) {
+            fullUrl = 'https://' + fullUrl.slice('http://'.length);
+          }
         }
 
         // Log the final URL and fetch options

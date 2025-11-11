@@ -1,0 +1,107 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Realtime Ops Dashboard",
+    "description": "Track uptime, latency, and incident workflows from a single pane.",
+    "created": "2024-01-03T00:00:00.000Z",
+    "modified": "2024-01-03T00:00:00.000Z",
+    "tags": [
+      "operations",
+      "dashboard",
+      "monitoring"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "node_metrics_ingest",
+      "type": "markdown",
+      "label": "Metrics Ingest",
+      "position": {
+        "x": -360,
+        "y": -120
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Metrics Ingest\n- Ping synthetic monitors\n- Collect latency percentiles\n- Pull service SLOs"
+      }
+    },
+    {
+      "id": "node_alerting",
+      "type": "markdown",
+      "label": "Alerting Rules",
+      "position": {
+        "x": 0,
+        "y": -140
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Alerting Rules\n- Track burn rate\n- Escalate by severity\n- Auto-mute noisy monitors"
+      }
+    },
+    {
+      "id": "node_incident_hub",
+      "type": "markdown",
+      "label": "Incident Hub",
+      "position": {
+        "x": 360,
+        "y": -60
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Incident Hub\n- Assign responders\n- Link playbooks\n- Capture postmortem notes"
+      }
+    },
+    {
+      "id": "node_dashboard",
+      "type": "markdown",
+      "label": "Live Dashboard",
+      "position": {
+        "x": 0,
+        "y": 180
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Live Dashboard\nCombine metrics and incident context for leadership updates."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_ingest_alerting",
+      "source": "node_metrics_ingest",
+      "target": "node_alerting",
+      "type": "default"
+    },
+    {
+      "id": "edge_alerting_incident",
+      "source": "node_alerting",
+      "target": "node_incident_hub",
+      "type": "default"
+    },
+    {
+      "id": "edge_incident_dashboard",
+      "source": "node_incident_hub",
+      "target": "node_dashboard",
+      "type": "default"
+    },
+    {
+      "id": "edge_alerting_dashboard",
+      "source": "node_alerting",
+      "target": "node_dashboard",
+      "type": "default"
+    }
+  ],
+  "groups": []
+}
