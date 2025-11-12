@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Drawer,
   TextField,
   Typography,
   IconButton,
@@ -11,23 +10,19 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  Collapse,
   InputAdornment,
   Chip,
   Menu,
   MenuItem,
-  Tooltip,
-  Paper
+  Paper,
+  SwipeableDrawer
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  ExpandLess,
-  ExpandMore,
   Close as CloseIcon,
   FilterList as FilterIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  LocationOn as LocationIcon
+  VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
 import * as ReactWindow from 'react-window';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
@@ -44,16 +39,14 @@ export default function NodeListPanel({
   onClose,
   isOpen = false,
   theme,
-  propertiesPanelAnchor = 'right'
+  propertiesPanelAnchor = 'right',
+  isMobile = false
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState(new Set());
   const [showVisible, setShowVisible] = useState(true);
   const [showHidden, setShowHidden] = useState(true);
-  const [pos, setPos] = useState({ x: 16, y: 88 });
-  const dragging = useRef(false);
-  const offset = useRef({ x: 0, y: 0 });
 
   // Get unique node types for filtering
   const nodeTypes = useMemo(() => {
@@ -100,32 +93,6 @@ export default function NodeListPanel({
     setFilterMenuAnchor(null);
   };
 
-  const activeFiltersCount = selectedTypes.size + (showVisible && showHidden ? 0 : 1);
-
-  const onMouseDown = e => {
-    dragging.current = true;
-    offset.current = {
-      x: e.clientX - pos.x,
-      y: e.clientY - pos.y,
-    };
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  };
-
-  const onMouseMove = e => {
-    if (!dragging.current) return;
-    setPos({
-      x: Math.max(0, Math.min(e.clientX - offset.current.x, window.innerWidth - 240)),
-      y: Math.max(0, Math.min(e.clientY - offset.current.y, window.innerHeight - 56)),
-    });
-  };
-
-  const onMouseUp = () => {
-    dragging.current = false;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-  };
-
   const anchor = propertiesPanelAnchor === 'right' ? 'left' : 'right';
 
   // Virtualized row renderer
@@ -170,6 +137,170 @@ export default function NodeListPanel({
   // Use virtualization when list is large (>100 items)
   const useVirtualization = nodes.length > 100;
 
+  const handleClosePanel = () => {
+    if (onClose) onClose();
+  };
+
+  const statsChips = (
+    <Box sx={{ px: 2, pb: 1 }}>
+      <Chip label={`${nodes.length} nodes`} size="small" color="primary" />
+      {selectedNodeIds.length > 0 && (
+        <Chip label={`${selectedNodeIds.length} selected`} size="small" color="secondary" sx={{ ml: 1 }} />
+      )}
+    </Box>
+  );
+
+  const listSection = useVirtualization ? (
+    <Box sx={{ flex: 1, overflow: 'hidden' }}>
+      <FixedSizeList
+        height={typeof window !== 'undefined' ? window.innerHeight - 200 : 400}
+        itemCount={nodes.length}
+        itemSize={72}
+        width="100%"
+        overscanCount={5}
+      >
+        {VirtualRow}
+      </FixedSizeList>
+    </Box>
+  ) : (
+    <List sx={{ height: 'calc(100vh - 180px)', overflowY: 'auto' }}>
+      {nodes.map((node) => {
+        const isSelected = selectedNodeIds?.includes(node.id);
+        return (
+          <ListItem
+            key={node.id}
+            disablePadding
+            sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="focus on node"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onNodeFocus) onNodeFocus(node.id);
+                }}
+              >
+                <CenterFocusStrongIcon />
+              </IconButton>
+            }
+          >
+            <ListItemButton
+              selected={isSelected}
+              onClick={(e) => {
+                const isMultiSelect = e.ctrlKey || e.metaKey;
+                if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
+              }}
+            >
+              <ListItemText
+                primary={node.label || node.id}
+                secondary={`Type: ${node.type || 'default'}`}
+              />
+            </ListItemButton>
+          </ListItem>
+        );
+      })}
+    </List>
+  );
+
+  const panelHeader = (
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'space-between', 
+      p: 2, 
+      backgroundColor: isMobile ? theme.palette.background.paper : theme.palette.primary.main, 
+      color: isMobile ? theme.palette.text.primary : theme.palette.primary.contrastText 
+    }}>
+      <Typography variant="h6">Nodes</Typography>
+      <IconButton onClick={handleClosePanel} aria-label="close node list" sx={{ color: 'inherit' }}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+  );
+
+  const panelBody = (
+    <>
+      {statsChips}
+      <Box sx={{ px: 2, pb: 1 }}>
+        <TextField
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search nodes..."
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton size="small" onClick={(e) => setFilterMenuAnchor(e.currentTarget)}>
+                  <FilterIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
+        />
+      </Box>
+      <Menu
+        anchorEl={filterMenuAnchor}
+        open={Boolean(filterMenuAnchor)}
+        onClose={() => setFilterMenuAnchor(null)}
+      >
+        <MenuItem onClick={clearFilters}>Clear filters</MenuItem>
+        <Divider />
+        <MenuItem onClick={() => setShowVisible(prev => !prev)}>
+          <ListItemText primary={showVisible ? 'Hide visible nodes' : 'Show visible nodes'} />
+        </MenuItem>
+        <MenuItem onClick={() => setShowHidden(prev => !prev)}>
+          <ListItemText primary={showHidden ? 'Hide hidden nodes' : 'Show hidden nodes'} />
+        </MenuItem>
+        <Divider />
+        {nodeTypes.map(type => (
+          <MenuItem key={type} onClick={() => handleTypeFilter(type)}>
+            <ListItemText primary={type} />
+            {selectedTypes.has(type) ? <VisibilityIcon fontSize="small" /> : <VisibilityOffIcon fontSize="small" />}
+          </MenuItem>
+        ))}
+      </Menu>
+      {listSection}
+    </>
+  );
+
+  if (isMobile) {
+    return createPortal(
+      <SwipeableDrawer
+        anchor="bottom"
+        open={isOpen}
+        onClose={() => handleClosePanel()}
+        onOpen={() => {}}
+        disableDiscovery
+        ModalProps={{ keepMounted: true }}
+        PaperProps={{
+          sx: {
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        <Box sx={{ px: 1.5, pt: 1, pb: `calc(12px + env(safe-area-inset-bottom, 16px))`, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <Box sx={{ width: 36, height: 4, borderRadius: 999, backgroundColor: theme.palette.divider, mx: 'auto', mb: 1.5 }} />
+          {panelHeader}
+          <Divider />
+          <Box sx={{ flex: 1, overflowY: 'auto' }}>
+            {panelBody}
+          </Box>
+        </Box>
+      </SwipeableDrawer>,
+      document.body
+    );
+  }
+
   return createPortal(
     <Paper
       elevation={8}
@@ -191,80 +322,11 @@ export default function NodeListPanel({
         overflow: 'hidden',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
-        <Typography variant="h6">Nodes</Typography>
-        <IconButton onClick={onClose} aria-label="close node list" sx={{ color: 'inherit' }}>
-          <CloseIcon />
-        </IconButton>
+      {panelHeader}
+      <Divider />
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {panelBody}
       </Box>
-      <Box sx={{ px: 2, pb: 1 }}>
-        <Chip label={`${nodes.length} nodes`} size="small" color="primary" />
-        {selectedNodeIds.length > 0 && (
-          <Chip label={`${selectedNodeIds.length} selected`} size="small" color="secondary" sx={{ ml: 1 }} />
-        )}
-      </Box>
-      
-      {useVirtualization ? (
-        <Box sx={{ flex: 1, overflow: 'hidden' }}>
-          <FixedSizeList
-            height={window.innerHeight - 200}
-            itemCount={nodes.length}
-            itemSize={72}
-            width="100%"
-            overscanCount={5}
-          >
-            {VirtualRow}
-          </FixedSizeList>
-        </Box>
-      ) : (
-        <List sx={{ height: 'calc(100vh - 180px)', overflowY: 'auto' }}>
-          {nodes.map((node) => {
-            const isSelected = selectedNodeIds?.includes(node.id);
-            return (
-              <ListItem
-                key={node.id}
-                disablePadding
-                sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    aria-label="focus on node"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onNodeFocus) onNodeFocus(node.id);
-                    }}
-                  >
-                    <CenterFocusStrongIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemButton
-                  selected={isSelected}
-                  onClick={(e) => {
-                    const isMultiSelect = e.ctrlKey || e.metaKey;
-                    if (onNodeSelect) onNodeSelect(node.id, isMultiSelect);
-                  }}
-                  sx={{
-                    backgroundColor: isSelected ? theme.palette.secondary.main : theme.palette.background.paper,
-                    color: isSelected ? theme.palette.secondary.contrastText : theme.palette.text.primary,
-                    boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
-                    borderRadius: 1,
-                    fontWeight: isSelected ? 600 : 400,
-                    '&:hover': {
-                      backgroundColor: isSelected ? theme.palette.secondary.dark : theme.palette.action.hover
-                    }
-                  }}
-                >
-                  <ListItemText
-                    primary={node.label || node.id}
-                    secondary={`Type: ${node.type || 'default'}`}
-                  />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-      )}
     </Paper>,
     document.body
   );

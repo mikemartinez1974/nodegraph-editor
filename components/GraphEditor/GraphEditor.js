@@ -1597,6 +1597,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           }}
           onToggleGroupLock={groupManager?.toggleGroupLock}
           onClose={() => setShowPropertiesPanel(false)}
+          isMobile={isMobile}
         />
       )}
       
@@ -1611,6 +1612,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         theme={theme}
         anchor={nodeListAnchor}
         propertiesPanelAnchor={nodePanelAnchor}
+        isMobile={isMobile}
       />
 
       <GroupListPanel

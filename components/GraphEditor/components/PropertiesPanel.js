@@ -7,6 +7,7 @@ import {
   AccordionDetails, List, ListItem, ListItemText, ListItemSecondaryAction,
   Button, Tooltip, Chip
 } from '@mui/material';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import {
   Close as CloseIcon,
   Lock as LockIcon,
@@ -54,7 +55,8 @@ export default function ConsolidatedPropertiesPanel({
   lockedGroups = new Set(),
   onToggleNodeLock,
   onToggleEdgeLock,
-  onToggleGroupLock
+  onToggleGroupLock,
+  isMobile = false
 }) {
   const [currentAnchor, setCurrentAnchor] = useState(anchor);
   const [width, setWidth] = useState(400);
@@ -273,95 +275,61 @@ export default function ConsolidatedPropertiesPanel({
     document.removeEventListener('mouseup', onResizeMouseUp);
   };
 
+  useEffect(() => {
+    if (entityType) setIsOpen(true);
+  }, [entityType]);
+
+  const handlePanelClose = () => {
+    setIsOpen(false);
+    if (onClose) onClose();
+  };
+
   if (!entityType) return null;
 
   const panelTitle = entityType === 'node' ? 'Node Properties' :
                      entityType === 'edge' ? 'Edge Properties' :
                      'Group Properties';
 
-  return createPortal(
-    <Paper
-      elevation={8}
-      sx={{
-        position: 'fixed',
-        top: 64,
-        [currentAnchor === 'right' ? 'right' : 'left']: isOpen ? 0 : -width - 50,
-        width: width,
-        height: 'calc(100vh - 64px)',
-        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
-        borderLeft: currentAnchor === 'right' ? `1px solid ${theme?.palette?.divider}` : 'none',
-        borderRight: currentAnchor === 'left' ? `1px solid ${theme?.palette?.divider}` : 'none',
-        boxShadow: currentAnchor === 'right' ? '-2px 0 8px rgba(0,0,0,0.1)' : '2px 0 8px rgba(0,0,0,0.1)',
-        display: 'flex',
-        flexDirection: 'column',
-        zIndex: 1200,
-        transition: 'right 0.3s ease, left 0.3s ease',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Resize handle */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          [currentAnchor === 'right' ? 'left' : 'right']: -6,
-          width: 12,
-          height: '100%',
-          cursor: 'ew-resize',
-          zIndex: 2000,
-          background: 'transparent',
-        }}
-        onMouseDown={onResizeMouseDown}
-      >
-        <div style={{
-          width: 6,
-          height: 48,
-          borderRadius: 3,
-          background: theme?.palette?.divider,
-          opacity: 0.7,
-          margin: 'auto',
-          marginTop: 24,
-        }} />
-      </div>
-
-      {/* Header */}
-      <Box sx={{ 
-        p: 2, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        backgroundColor: theme?.palette?.primary?.main || '#1976d2',
-        color: theme?.palette?.primary?.contrastText || '#fff',
-      }}>
-        <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-          {panelTitle}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+  const panelHeader = (
+    <Box sx={{ 
+      p: 2, 
+      pb: isMobile ? 1.5 : 2,
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'space-between',
+      backgroundColor: isMobile ? theme?.palette?.background?.paper : (theme?.palette?.primary?.main || '#1976d2'),
+      color: isMobile ? theme?.palette?.text?.primary : (theme?.palette?.primary?.contrastText || '#fff'),
+    }}>
+      <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
+        {panelTitle}
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {!isMobile && (
           <IconButton onClick={toggleAnchor} size="small" sx={{ color: 'inherit' }}>
             {currentAnchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
-          <IconButton
-            onClick={handleToggleLock}
-            title={isLocked ? `Unlock ${entityType}` : `Lock ${entityType}`}
-            size="small"
-            sx={{ color: 'inherit' }}
-          >
-            {isLocked ? <LockIcon /> : <LockOpenIcon />}
-          </IconButton>
-          <IconButton 
-            size="small" 
-            onClick={onClose}
-            sx={{ color: 'inherit' }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        )}
+        <IconButton
+          onClick={handleToggleLock}
+          title={isLocked ? `Unlock ${entityType}` : `Lock ${entityType}`}
+          size="small"
+          sx={{ color: 'inherit' }}
+        >
+          {isLocked ? <LockIcon /> : <LockOpenIcon />}
+        </IconButton>
+        <IconButton 
+          size="small" 
+          onClick={handlePanelClose}
+          sx={{ color: 'inherit' }}
+        >
+          <CloseIcon />
+        </IconButton>
       </Box>
+    </Box>
+  );
 
-      <Divider />
-
-      {/* Content */}
-      <Box sx={{ p: 2, overflowY: 'auto', flexGrow: 1 }}>
+  const panelContent = (
+      <Box sx={{ p: 2, pt: isMobile ? 1 : 2, overflowY: 'auto', flexGrow: 1, maxHeight: isMobile ? '65vh' : 'auto' }}>
         {/* Entity ID */}
         <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
           ID: {entityId}
@@ -1013,7 +981,7 @@ export default function ConsolidatedPropertiesPanel({
               color="error"
               onClick={() => {
                 if (onUngroupGroup) onUngroupGroup(selectedGroup.id);
-                onClose();
+                handlePanelClose();
               }}
               disabled={isLocked}
               sx={{ mt: 2 }}
@@ -1023,6 +991,91 @@ export default function ConsolidatedPropertiesPanel({
           </>
         )}
       </Box>
+  );
+
+  if (isMobile) {
+    return createPortal(
+      <SwipeableDrawer
+        anchor="bottom"
+        open={Boolean(isOpen && entityType)}
+        onClose={(_, reason) => {
+          if (reason !== 'keydown') handlePanelClose();
+        }}
+        onOpen={() => setIsOpen(true)}
+        disableDiscovery
+        ModalProps={{ keepMounted: true }}
+        PaperProps={{
+          sx: {
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: theme?.palette?.background?.default
+          }
+        }}
+      >
+        <Box sx={{ px: 1.5, pt: 1, pb: `calc(12px + env(safe-area-inset-bottom, 16px))`, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <Box sx={{ width: 36, height: 4, borderRadius: 999, backgroundColor: theme?.palette?.divider, mx: 'auto', mb: 1.5 }} />
+          {panelHeader}
+          <Divider />
+          {panelContent}
+        </Box>
+      </SwipeableDrawer>,
+      document.body
+    );
+  }
+
+  return createPortal(
+    <Paper
+      elevation={8}
+      sx={{
+        position: 'fixed',
+        top: 64,
+        [currentAnchor === 'right' ? 'right' : 'left']: isOpen ? 0 : -width - 50,
+        width: width,
+        height: 'calc(100vh - 64px)',
+        background: `linear-gradient(135deg, ${theme?.palette?.primary?.light} 0%, ${theme?.palette?.primary?.dark} 100%)`,
+        borderLeft: currentAnchor === 'right' ? `1px solid ${theme?.palette?.divider}` : 'none',
+        borderRight: currentAnchor === 'left' ? `1px solid ${theme?.palette?.divider}` : 'none',
+        boxShadow: currentAnchor === 'right' ? '-2px 0 8px rgba(0,0,0,0.1)' : '2px 0 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 1200,
+        transition: 'right 0.3s ease, left 0.3s ease',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Resize handle */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          [currentAnchor === 'right' ? 'left' : 'right']: -6,
+          width: 12,
+          height: '100%',
+          cursor: 'ew-resize',
+          zIndex: 2000,
+          background: 'transparent',
+        }}
+        onMouseDown={onResizeMouseDown}
+      >
+        <div style={{
+          width: 6,
+          height: 48,
+          borderRadius: 3,
+          background: theme?.palette?.divider,
+          opacity: 0.7,
+          margin: 'auto',
+          marginTop: 24,
+        }} />
+      </div>
+
+      {panelHeader}
+
+      <Divider />
+
+      {panelContent}
     </Paper>,
     document.body
   );
