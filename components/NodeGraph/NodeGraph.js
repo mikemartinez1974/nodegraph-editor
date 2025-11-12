@@ -13,6 +13,8 @@ import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqu
 import Minimap from './Minimap';
 import GridLayer from './GridLayer';
 
+const NON_PASSIVE_LISTENER = { passive: false };
+
 export default function NodeGraph({ 
   nodes = [], 
   setNodes,
@@ -306,6 +308,20 @@ export default function NodeGraph({
   // ============================================
 
   useEffect(() => {
+    const getClientPoint = (evt) => {
+      if (!evt) return null;
+      if (evt.touches && evt.touches.length > 0) {
+        return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
+      }
+      if (evt.changedTouches && evt.changedTouches.length > 0) {
+        return { x: evt.changedTouches[0].clientX, y: evt.changedTouches[0].clientY };
+      }
+      if (typeof evt.clientX === 'number' && typeof evt.clientY === 'number') {
+        return { x: evt.clientX, y: evt.clientY };
+      }
+      return null;
+    };
+
     const handleNodeDragStart = ({ node, event }) => {
       if (lockedNodes.has(node.id)) return;
 
@@ -322,7 +338,9 @@ export default function NodeGraph({
       isDragging.current = false;
       dragStartedRef.current = false;
       dragStartTime.current = Date.now();
-      dragStartPos.current = { x: event.clientX, y: event.clientY };
+      const point = getClientPoint(event);
+      if (!point) return;
+      dragStartPos.current = { x: point.x, y: point.y };
       
       const initialPositions = {};
       nodesToDrag.forEach(id => {
@@ -334,25 +352,43 @@ export default function NodeGraph({
       lastDragPosition.current = initialPositions;
       
       dragOffset.current = {
-        x: event.clientX - (node.position.x * zoom + pan.x),
-        y: event.clientY - (node.position.y * zoom + pan.y)
+        x: point.x - (node.position.x * zoom + pan.x),
+        y: point.y - (node.position.y * zoom + pan.y)
       };
-      lastMousePos.current = { x: event.clientX, y: event.clientY };
+      lastMousePos.current = { x: point.x, y: point.y };
       
-      containerRef.current.addEventListener('mousemove', onNodeDragMove, { passive: false });
-      containerRef.current.addEventListener('mouseup', handleNodeDragEnd, { passive: false });
+      addWindowDragListeners();
     };
 
     eventBus.on('nodeDragStart', handleNodeDragStart);
-    return () => eventBus.off('nodeDragStart', handleNodeDragStart);
+    return () => {
+      eventBus.off('nodeDragStart', handleNodeDragStart);
+      removeWindowDragListeners();
+    };
   }, [nodes, selectedNodeIds, lockedNodes, pan, zoom]);
 
   function onNodeDragMove(e) {
+    if (e.touches && e.touches.length > 1) return;
+    const point = (() => {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    })();
+
     if (!draggingNodeIdRef.current || !Array.isArray(draggingNodeIdRef.current)) return;
+    if (typeof point.x !== 'number' || typeof point.y !== 'number') return;
+
+    if (e && e.cancelable && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
 
     const dragDistance = Math.hypot(
-      e.clientX - dragStartPos.current.x,
-      e.clientY - dragStartPos.current.y
+      point.x - dragStartPos.current.x,
+      point.y - dragStartPos.current.y
     );
     
     if (dragDistance < dragThreshold) return;
@@ -360,9 +396,9 @@ export default function NodeGraph({
     dragStartedRef.current = true;
     suppressClickRef.current = true;
 
-    const graphDx = (e.clientX - lastMousePos.current.x) / zoom;
-    const graphDy = (e.clientY - lastMousePos.current.y) / zoom;
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
+    const graphDx = (point.x - lastMousePos.current.x) / zoom;
+    const graphDy = (point.y - lastMousePos.current.y) / zoom;
+    lastMousePos.current = { x: point.x, y: point.y };
 
     if (!draggingInfoRef.current) {
       draggingInfoRef.current = { nodeIds: draggingNodeIdRef.current, offset: { x: 0, y: 0 } };
@@ -399,12 +435,50 @@ export default function NodeGraph({
     }
   }
 
-  function handleNodeDragEnd() {
+  function addWindowDragListeners() {
+    window.addEventListener('mousemove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.addEventListener('mouseup', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.addEventListener('touchmove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.addEventListener('touchend', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.addEventListener('touchcancel', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.addEventListener('pointermove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.addEventListener('pointerup', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.addEventListener('pointercancel', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+  }
+
+  function removeWindowDragListeners() {
+    window.removeEventListener('mousemove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.removeEventListener('mouseup', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.removeEventListener('touchmove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.removeEventListener('touchend', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.removeEventListener('touchcancel', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.removeEventListener('pointermove', onNodeDragMove, NON_PASSIVE_LISTENER);
+    window.removeEventListener('pointerup', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+    window.removeEventListener('pointercancel', handleNodeDragEnd, NON_PASSIVE_LISTENER);
+  }
+
+  function handleNodeDragEnd(event) {
+    removeWindowDragListeners();
+
     if (!draggingNodeIdRef.current || !Array.isArray(draggingNodeIdRef.current)) {
-      // Clean up listeners even if no drag
-      containerRef.current?.removeEventListener('mousemove', onNodeDragMove);
-      containerRef.current?.removeEventListener('mouseup', handleNodeDragEnd);
       return;
+    }
+
+    const point = (() => {
+      if (event?.changedTouches && event.changedTouches.length > 0) {
+        return { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+      }
+      if (event?.touches && event.touches.length > 0) {
+        return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      }
+      if (event && typeof event.clientX === 'number') {
+        return { x: event.clientX, y: event.clientY };
+      }
+      return null;
+    })();
+
+    if (point) {
+      lastMousePos.current = { x: point.x, y: point.y };
     }
 
     const dragDistance = Math.hypot(
@@ -483,8 +557,6 @@ export default function NodeGraph({
       cancelAnimationFrame(dragRafRef.current);
       dragRafRef.current = null;
     }
-    containerRef.current?.removeEventListener('mousemove', onNodeDragMove);
-    containerRef.current?.removeEventListener('mouseup', handleNodeDragEnd);
   }
 
   // ============================================

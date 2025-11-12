@@ -51,6 +51,21 @@ const NodeLayer = ({
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
 
+    const shouldSkipDrag = (target) => {
+      if (!target || typeof target.closest !== 'function') return false;
+      const markdownContent = target.closest('.markdown-content');
+      if (!markdownContent) return false;
+      if (markdownContent.dataset.allowTouchScroll === 'true') {
+        const canScroll =
+          markdownContent.scrollHeight > markdownContent.clientHeight + 2 ||
+          markdownContent.scrollWidth > markdownContent.clientWidth + 2;
+        if (canScroll) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     return (
         <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, zIndex: 30 }}>
             {uniqueNodes.map(node => {
@@ -82,11 +97,19 @@ const NodeLayer = ({
                         selectedCount={selectedNodeIds.length}
                         draggingHandle={draggingNodeId === node.id}
                         onMouseDown={e => {
-                            const target = e.target;
-                            if (target && target.closest && target.closest('.markdown-content')) {
-                                return;
-                            }
-                            onNodeDragStart && onNodeDragStart(e, node);
+                          if (e.button !== 0) return;
+                          const target = e.target;
+                          if (shouldSkipDrag(target)) return;
+                          onNodeDragStart && onNodeDragStart(e.nativeEvent || e, node);
+                        }}
+                        onTouchStart={(e) => {
+                          if (e.touches && e.touches.length > 1) return;
+                          const target = e.target;
+                          if (shouldSkipDrag(target)) return;
+                          const native = e.nativeEvent || e;
+                          if (native.stopPropagation) native.stopPropagation();
+                          if (native.stopImmediatePropagation) native.stopImmediatePropagation();
+                          onNodeDragStart && onNodeDragStart(native, node);
                         }}
                         onClick={e => {
                             try {

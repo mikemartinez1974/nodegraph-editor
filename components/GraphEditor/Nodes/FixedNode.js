@@ -22,7 +22,8 @@ const FixedNode = ({
   zoom = 1, 
   style = {}, 
   isSelected, 
-  onMouseDown, 
+  onMouseDown,
+  onTouchStart,
   onClick, 
   onDoubleClick, 
   children, 
@@ -181,6 +182,7 @@ const FixedNode = ({
   return (
     <div
       ref={nodeRef}
+      data-node-draggable="true"
       className="node-or-handle"
       style={{
         position: 'absolute',
@@ -218,6 +220,14 @@ const FixedNode = ({
           return;
         }
         if (onMouseDown) onMouseDown(e);
+        eventBus.emit('nodeMouseDown', { id: node.id, event: e });
+      }}
+      onTouchStart={e => {
+        if (e.touches && e.touches.length > 1) return;
+        if (e.target.classList.contains('html-content') || e.target.closest('.html-content')) {
+          return;
+        }
+        if (onTouchStart) onTouchStart(e);
         eventBus.emit('nodeMouseDown', { id: node.id, event: e });
       }}
       onClick={e => {

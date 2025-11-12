@@ -28,6 +28,8 @@ import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
 import PropertiesPanel from './components/PropertiesPanel';
+import MobileFabToolbar from './components/MobileFabToolbar';
+import MobileAddNodeSheet from './components/MobileAddNodeSheet';
 import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUtils';
@@ -50,6 +52,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
+  const [mobileAddNodeOpen, setMobileAddNodeOpen] = useState(false);
+  const [mobileAddNodeSearch, setMobileAddNodeSearch] = useState('');
 
   // Document settings state (not localStorage) - consolidated into one object
   const [documentSettings, setDocumentSettings] = useState(() => {
@@ -101,6 +105,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
   const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
+
+  const lastNodeTapRef = useRef({ id: null, time: 0 });
+  const lastEdgeTapRef = useRef({ id: null, time: 0 });
+  const lastGroupTapRef = useRef({ id: null, time: 0 });
   
   // BackgroundFrame RPC hook
   const { bgRef, rpc: backgroundRpc, postEvent: backgroundPostEvent, isReady: backgroundRpcReady, methods: backgroundRpcMethods, handleHandshakeComplete } = useBackgroundRpc();
@@ -346,6 +354,38 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   });
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
+
+  const handleOpenMobileAddNode = useCallback(() => {
+    setMobileAddNodeOpen(true);
+  }, []);
+
+  const handleCloseMobileAddNode = useCallback(() => {
+    setMobileAddNodeOpen(false);
+    setMobileAddNodeSearch('');
+  }, []);
+
+  const togglePropertiesPanel = useCallback(() => {
+    setShowPropertiesPanel(prev => !prev);
+  }, []);
+
+  const toggleNodeList = useCallback(() => {
+    setShowNodeList(prev => !prev);
+  }, [setShowNodeList]);
+
+  const toggleGroupList = useCallback(() => {
+    setShowGroupList(prev => !prev);
+  }, [setShowGroupList]);
+
+  const handleFitToNodes = useCallback(() => {
+    const fit = graphAPI?.current?.fitToNodes;
+    if (typeof fit === 'function') {
+      fit({
+        padding: isSmallScreen ? 96 : 48,
+        minZoom: 0.1,
+        maxZoom: isMobile ? 1.2 : 3
+      });
+    }
+  }, [graphAPI, isMobile, isSmallScreen]);
 
   const handleLoadGraph = useCallback((...args) => {
     try {
@@ -826,6 +866,57 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [backgroundUrl, backgroundInteractive, setSnackbar]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      lastNodeTapRef.current = { id: null, time: 0 };
+      return;
+    }
+    if (selectedNodeIds.length === 1) {
+      const nodeId = selectedNodeIds[0];
+      const now = Date.now();
+      if (lastNodeTapRef.current.id === nodeId && now - lastNodeTapRef.current.time < 350) {
+        setShowPropertiesPanel(true);
+      }
+      lastNodeTapRef.current = { id: nodeId, time: now };
+    } else if (selectedNodeIds.length === 0) {
+      lastNodeTapRef.current = { id: null, time: 0 };
+    }
+  }, [isMobile, selectedNodeIds, setShowPropertiesPanel]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      lastEdgeTapRef.current = { id: null, time: 0 };
+      return;
+    }
+    if (selectedEdgeIds.length === 1) {
+      const edgeId = selectedEdgeIds[0];
+      const now = Date.now();
+      if (lastEdgeTapRef.current.id === edgeId && now - lastEdgeTapRef.current.time < 350) {
+        setShowPropertiesPanel(true);
+      }
+      lastEdgeTapRef.current = { id: edgeId, time: now };
+    } else if (selectedEdgeIds.length === 0) {
+      lastEdgeTapRef.current = { id: null, time: 0 };
+    }
+  }, [isMobile, selectedEdgeIds, setShowPropertiesPanel]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      lastGroupTapRef.current = { id: null, time: 0 };
+      return;
+    }
+    if (selectedGroupIds.length === 1) {
+      const groupId = selectedGroupIds[0];
+      const now = Date.now();
+      if (lastGroupTapRef.current.id === groupId && now - lastGroupTapRef.current.time < 350) {
+        setShowPropertiesPanel(true);
+      }
+      lastGroupTapRef.current = { id: groupId, time: now };
+    } else if (selectedGroupIds.length === 0) {
+      lastGroupTapRef.current = { id: null, time: 0 };
+    }
+  }, [isMobile, selectedGroupIds, setShowPropertiesPanel]);
   
   // Host RPC handler used by ScriptRunner iframe
   const handleScriptRequest = async (method, args = [], meta = {}) => {
@@ -1270,11 +1361,11 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   // Toggle properties panel via event
   useEffect(() => {
     const handleTogglePropertiesPanel = () => {
-      setShowPropertiesPanel(prev => !prev);
+      togglePropertiesPanel();
     };
     eventBus.on('togglePropertiesPanel', handleTogglePropertiesPanel);
     return () => eventBus.off('togglePropertiesPanel', handleTogglePropertiesPanel);
-  }, []);
+  }, [togglePropertiesPanel]);
 
   // Toggle document properties dialog via event
   useEffect(() => {
@@ -1376,56 +1467,84 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         />
       )}
       
-      <Toolbar 
-        onToggleNodeList={() => setShowNodeList(!showNodeList)}
-        showNodeList={showNodeList}
-        onToggleGroupList={() => setShowGroupList(!showGroupList)}
-        showGroupList={showGroupList}
-        nodes={nodes} 
-        edges={edges} 
-        groups={groups}
-        onLoadGraph={handlers.handleLoadGraph}
-        onDeleteSelected={handlers.handleDeleteSelected}
-        onClearGraph={handlers.handleClearGraph}
-        onUndo={historyHook.handleUndo}
-        onRedo={historyHook.handleRedo}
-        selectedNodeId={selectedNodeIds[0] || null}
-        selectedNodeIds={selectedNodeIds}
-        selectedEdgeId={selectedEdgeIds[0] || null}
-        canUndo={historyHook.canUndo}
-        canRedo={historyHook.canRedo}
-        mode={modesHook.mode}
-        autoLayoutType={modesHook.autoLayoutType}
-        onModeChange={modesHook.handleModeChange}
-        onAutoLayoutChange={modesHook.setAutoLayoutType}
-        onApplyLayout={modesHook.applyAutoLayout}
-        onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
-        pan={pan}
-        zoom={zoom}
-        setNodes={setNodes}
-        setEdges={setEdges}
-        setGroups={setGroups}
-        nodesRef={nodesRef}
-        edgesRef={edgesRef}
-        saveToHistory={historyHook.saveToHistory}
-        graphCRUD={graphCRUD}
-        currentTheme={theme.palette.mode}
-        backgroundImage={backgroundImage}
-        backgroundUrl={backgroundUrl}
-        setBackgroundUrl={setBackgroundUrl}
-        defaultNodeColor={defaultNodeColor}
-        defaultEdgeColor={defaultEdgeColor}
-        isFreeUser={isFreeUser}
-        showMinimap={showMinimap}
-        onToggleMinimap={() => eventBus.emit('toggleMinimap')}
-        snapToGrid={snapToGrid}
-        onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
-        gridSize={documentSettings.gridSize}
-        documentTheme={documentTheme}
-        isMobile={isMobile}
-        isSmallScreen={isSmallScreen}
-        isPortrait={isPortrait}
-        isLandscape={isLandscape}
+      {!isMobile && (
+        <Toolbar 
+          onToggleNodeList={toggleNodeList}
+          showNodeList={showNodeList}
+          onToggleGroupList={toggleGroupList}
+          showGroupList={showGroupList}
+          nodes={nodes} 
+          edges={edges} 
+          groups={groups}
+          onLoadGraph={handlers.handleLoadGraph}
+          onDeleteSelected={handlers.handleDeleteSelected}
+          onClearGraph={handlers.handleClearGraph}
+          onUndo={historyHook.handleUndo}
+          onRedo={historyHook.handleRedo}
+          selectedNodeId={selectedNodeIds[0] || null}
+          selectedNodeIds={selectedNodeIds}
+          selectedEdgeId={selectedEdgeIds[0] || null}
+          canUndo={historyHook.canUndo}
+          canRedo={historyHook.canRedo}
+          mode={modesHook.mode}
+          autoLayoutType={modesHook.autoLayoutType}
+          onModeChange={modesHook.handleModeChange}
+          onAutoLayoutChange={modesHook.setAutoLayoutType}
+          onApplyLayout={modesHook.applyAutoLayout}
+          onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
+          pan={pan}
+          zoom={zoom}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          setGroups={setGroups}
+          nodesRef={nodesRef}
+          edgesRef={edgesRef}
+          saveToHistory={historyHook.saveToHistory}
+          graphCRUD={graphCRUD}
+          currentTheme={theme.palette.mode}
+          backgroundImage={backgroundImage}
+          backgroundUrl={backgroundUrl}
+          setBackgroundUrl={setBackgroundUrl}
+          defaultNodeColor={defaultNodeColor}
+          defaultEdgeColor={defaultEdgeColor}
+          isFreeUser={isFreeUser}
+          showMinimap={showMinimap}
+          onToggleMinimap={() => eventBus.emit('toggleMinimap')}
+          snapToGrid={snapToGrid}
+          onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
+          gridSize={documentSettings.gridSize}
+          documentTheme={documentTheme}
+          isMobile={isMobile}
+          isSmallScreen={isSmallScreen}
+          isPortrait={isPortrait}
+          isLandscape={isLandscape}
+        />
+      )}
+
+      {isMobile && (
+        <MobileFabToolbar
+          onAddNode={handleOpenMobileAddNode}
+          onUndo={historyHook.handleUndo}
+          onRedo={historyHook.handleRedo}
+          onFitToNodes={handleFitToNodes}
+          onToggleProperties={togglePropertiesPanel}
+          onToggleNodeList={toggleNodeList}
+          onToggleGroupList={toggleGroupList}
+          onDeleteSelected={handlers.handleDeleteSelected}
+          canUndo={historyHook.canUndo}
+          canRedo={historyHook.canRedo}
+          hasSelection={selectedNodeIds.length > 0 || selectedEdgeIds.length > 0 || selectedGroupIds.length > 0}
+          showPropertiesPanel={showPropertiesPanel}
+          showNodeList={showNodeList}
+          showGroupList={showGroupList}
+        />
+      )}
+
+      <MobileAddNodeSheet
+        open={Boolean(isMobile && mobileAddNodeOpen)}
+        onClose={handleCloseMobileAddNode}
+        search={mobileAddNodeSearch}
+        onSearchChange={setMobileAddNodeSearch}
       />
       
       {showPropertiesPanel && (
