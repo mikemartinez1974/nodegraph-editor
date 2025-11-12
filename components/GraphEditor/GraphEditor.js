@@ -39,6 +39,39 @@ import { nodeTypeMetadata } from './nodeTypeRegistry';
 import { useBackgroundRpc } from './hooks/useBackgroundRpc';
 import BackgroundFrame from './components/BackgroundFrame';
 
+const DEFAULT_NODE_WIDTH = 200;
+const DEFAULT_NODE_HEIGHT = 120;
+const roundTo3 = (value) => Math.round(value * 1000) / 1000;
+const ensureNumber = (value, fallback) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+};
+const getNodeMetrics = (node) => {
+  const position = node?.position || {};
+  const x = ensureNumber(position.x, 0);
+  const y = ensureNumber(position.y, 0);
+  const width = ensureNumber(
+    node?.width,
+    ensureNumber(node?.data?.width, DEFAULT_NODE_WIDTH)
+  );
+  const height = ensureNumber(
+    node?.height,
+    ensureNumber(node?.data?.height, DEFAULT_NODE_HEIGHT)
+  );
+  const safeWidth = width > 0 ? width : DEFAULT_NODE_WIDTH;
+  const safeHeight = height > 0 ? height : DEFAULT_NODE_HEIGHT;
+  return {
+    x,
+    y,
+    width: safeWidth,
+    height: safeHeight,
+    right: x + safeWidth,
+    bottom: y + safeHeight,
+    centerX: x + safeWidth / 2,
+    centerY: y + safeHeight / 2
+  };
+};
+
 const createDefaultProjectMeta = () => {
   const iso = new Date().toISOString();
   return {
@@ -500,6 +533,170 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       }
     }
   }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
+
+  const handleAlignSelection = useCallback((mode) => {
+    const selectedSet = new Set(selectedNodeIds);
+    if (!mode || selectedSet.size <= 1) {
+      return false;
+    }
+
+    let mutated = false;
+    let snapshot = null;
+
+    setNodes(prev => {
+      const selectedNodes = prev.filter(node => selectedSet.has(node.id));
+      if (selectedNodes.length <= 1) {
+        snapshot = prev;
+        return prev;
+      }
+
+      const metricsList = selectedNodes.map(getNodeMetrics);
+      const bounds = {
+        minX: Math.min(...metricsList.map(m => m.x)),
+        minY: Math.min(...metricsList.map(m => m.y)),
+        maxX: Math.max(...metricsList.map(m => m.right)),
+        maxY: Math.max(...metricsList.map(m => m.bottom))
+      };
+      bounds.centerX = (bounds.minX + bounds.maxX) / 2;
+      bounds.centerY = (bounds.minY + bounds.maxY) / 2;
+
+      const updatePosition = (node, maybeX, maybeY) => {
+        const currentPos = node.position || { x: 0, y: 0 };
+        const targetX = typeof maybeX === 'number' ? roundTo3(maybeX) : currentPos.x;
+        const targetY = typeof maybeY === 'number' ? roundTo3(maybeY) : currentPos.y;
+        if (Math.abs(targetX - currentPos.x) < 0.0001 && Math.abs(targetY - currentPos.y) < 0.0001) {
+          return node;
+        }
+        mutated = true;
+        return {
+          ...node,
+          position: { ...currentPos, x: targetX, y: targetY }
+        };
+      };
+
+      const next = prev.map(node => {
+        if (!selectedSet.has(node.id)) return node;
+        const metrics = getNodeMetrics(node);
+        switch (mode) {
+          case 'left':
+            return updatePosition(node, bounds.minX, null);
+          case 'right':
+            return updatePosition(node, bounds.maxX - metrics.width, null);
+          case 'center-horizontal':
+            return updatePosition(node, bounds.centerX - metrics.width / 2, null);
+          case 'top':
+            return updatePosition(node, null, bounds.minY);
+          case 'bottom':
+            return updatePosition(node, null, bounds.maxY - metrics.height);
+          case 'center-vertical':
+            return updatePosition(node, null, bounds.centerY - metrics.height / 2);
+          default:
+            return node;
+        }
+      });
+
+      snapshot = mutated ? next : prev;
+      return mutated ? next : prev;
+    });
+
+    if (mutated && snapshot) {
+      nodesRef.current = snapshot;
+      historyHook.saveToHistory(snapshot, edgesRef.current);
+    }
+
+    return mutated;
+  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef]);
+
+  const handleDistributeSelection = useCallback((axis) => {
+    const selectedSet = new Set(selectedNodeIds);
+    if (!axis || selectedSet.size <= 2) {
+      return false;
+    }
+
+    let mutated = false;
+    let snapshot = null;
+
+    setNodes(prev => {
+      const selectedNodes = prev.filter(node => selectedSet.has(node.id));
+      if (selectedNodes.length <= 2) {
+        snapshot = prev;
+        return prev;
+      }
+
+      const metricsList = selectedNodes.map(node => ({
+        id: node.id,
+        metrics: getNodeMetrics(node)
+      }));
+
+      const sorted = [...metricsList].sort((a, b) => (
+        axis === 'horizontal'
+          ? a.metrics.centerX - b.metrics.centerX
+          : a.metrics.centerY - b.metrics.centerY
+      ));
+
+      const firstMetrics = sorted[0].metrics;
+      const lastMetrics = sorted[sorted.length - 1].metrics;
+      const span = axis === 'horizontal'
+        ? lastMetrics.centerX - firstMetrics.centerX
+        : lastMetrics.centerY - firstMetrics.centerY;
+
+      if (Math.abs(span) < 0.0001) {
+        snapshot = prev;
+        return prev;
+      }
+
+      const step = span / (sorted.length - 1);
+      const centerMap = new Map();
+      sorted.forEach((item, index) => {
+        let targetCenter;
+        if (index === 0 || index === sorted.length - 1) {
+          targetCenter = axis === 'horizontal' ? item.metrics.centerX : item.metrics.centerY;
+        } else {
+          targetCenter = axis === 'horizontal'
+            ? firstMetrics.centerX + step * index
+            : firstMetrics.centerY + step * index;
+        }
+        centerMap.set(item.id, targetCenter);
+      });
+
+      const updatePosition = (node, maybeX, maybeY) => {
+        const currentPos = node.position || { x: 0, y: 0 };
+        const targetX = typeof maybeX === 'number' ? roundTo3(maybeX) : currentPos.x;
+        const targetY = typeof maybeY === 'number' ? roundTo3(maybeY) : currentPos.y;
+        if (Math.abs(targetX - currentPos.x) < 0.0001 && Math.abs(targetY - currentPos.y) < 0.0001) {
+          return node;
+        }
+        mutated = true;
+        return {
+          ...node,
+          position: { ...currentPos, x: targetX, y: targetY }
+        };
+      };
+
+      const next = prev.map(node => {
+        if (!selectedSet.has(node.id)) return node;
+        const metrics = getNodeMetrics(node);
+        const targetCenter = centerMap.get(node.id);
+        if (targetCenter == null) return node;
+        if (axis === 'horizontal') {
+          const targetX = targetCenter - metrics.width / 2;
+          return updatePosition(node, targetX, null);
+        }
+        const targetY = targetCenter - metrics.height / 2;
+        return updatePosition(node, null, targetY);
+      });
+
+      snapshot = mutated ? next : prev;
+      return mutated ? next : prev;
+    });
+
+    if (mutated && snapshot) {
+      nodesRef.current = snapshot;
+      historyHook.saveToHistory(snapshot, edgesRef.current);
+    }
+
+    return mutated;
+  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef]);
 
   // Listen for undo/redo events from keyboard shortcuts (placed after historyHook is created)
   useEffect(() => {
@@ -1597,6 +1794,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           onModeChange={modesHook.handleModeChange}
           onAutoLayoutChange={modesHook.setAutoLayoutType}
           onApplyLayout={modesHook.applyAutoLayout}
+          onAlignSelection={handleAlignSelection}
+          onDistributeSelection={handleDistributeSelection}
           onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
           pan={pan}
           zoom={zoom}

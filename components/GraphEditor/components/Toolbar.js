@@ -14,7 +14,9 @@ import {
   Menu,
   MenuItem,
   Snackbar,
-  Alert
+  Alert,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -44,7 +46,15 @@ import {
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Map as MapIcon,  // NEW: Import minimap icon
-  GridOn as GridOnIcon  // NEW: Import grid icon
+  GridOn as GridOnIcon,  // NEW: Import grid icon
+  FormatAlignLeft as FormatAlignLeftIcon,
+  FormatAlignCenter as FormatAlignCenterIcon,
+  FormatAlignRight as FormatAlignRightIcon,
+  VerticalAlignTop as VerticalAlignTopIcon,
+  VerticalAlignCenter as VerticalAlignCenterIcon,
+  VerticalAlignBottom as VerticalAlignBottomIcon,
+  SwapHoriz as SwapHorizIcon,
+  SwapVert as SwapVertIcon
 } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -84,6 +94,8 @@ const Toolbar = ({
   onModeChange,
   onAutoLayoutChange,
   onApplyLayout,
+  onAlignSelection,
+  onDistributeSelection,
   onShowMessage,
   pan,
   zoom,
@@ -137,6 +149,30 @@ const Toolbar = ({
   const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
   const currentUrl = browserHistory[historyIndex] || '';
   const [gridMenuAnchor, setGridMenuAnchor] = useState(null);
+  const [alignMenuAnchor, setAlignMenuAnchor] = useState(null);
+  const selectionCount = Array.isArray(selectedNodeIds) ? selectedNodeIds.length : 0;
+  const canAlign = selectionCount > 1;
+  const canDistribute = selectionCount > 2;
+
+  const handleAlignmentAction = (mode, successMessage) => {
+    if (typeof onAlignSelection === 'function') {
+      const didAlign = onAlignSelection(mode);
+      if (didAlign && typeof onShowMessage === 'function') {
+        onShowMessage(successMessage, 'success');
+      }
+    }
+    setAlignMenuAnchor(null);
+  };
+
+  const handleDistributionAction = (axis, successMessage) => {
+    if (typeof onDistributeSelection === 'function') {
+      const didDistribute = onDistributeSelection(axis);
+      if (didDistribute && typeof onShowMessage === 'function') {
+        onShowMessage(successMessage, 'success');
+      }
+    }
+    setAlignMenuAnchor(null);
+  };
 
   // Snackbar state (replaces transient Chips)
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -778,9 +814,19 @@ const Toolbar = ({
             title="Toggle Minimap"
             aria-label="Toggle minimap visibility"
             size="small"
-            disabled={isFreeUser}
+          disabled={isFreeUser}
+        >
+          <MapIcon fontSize="small" />
+        </IconButton>
+
+          <IconButton
+            onClick={(e) => setAlignMenuAnchor(e.currentTarget)}
+            title="Alignment Tools"
+            aria-label="Alignment tools menu"
+            size="small"
+            disabled={isFreeUser || selectionCount === 0}
           >
-            <MapIcon fontSize="small" />
+            <FormatAlignCenterIcon fontSize="small" />
           </IconButton>
 
           {/* NEW: Grid options button with menu */}
@@ -893,6 +939,63 @@ const Toolbar = ({
           onClose={() => setAddNodeMenuAnchor(null)}
           onAddNode={onAddNode}
         />
+
+        {/* Alignment Tools Menu */}
+        <Menu
+          anchorEl={alignMenuAnchor}
+          open={Boolean(alignMenuAnchor)}
+          onClose={() => setAlignMenuAnchor(null)}
+        >
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('left', 'Aligned nodes to left edge')}>
+            <ListItemIcon>
+              <FormatAlignLeftIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Left" />
+          </MenuItem>
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('center-horizontal', 'Aligned nodes to horizontal center')}>
+            <ListItemIcon>
+              <FormatAlignCenterIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Horizontal Center" />
+          </MenuItem>
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('right', 'Aligned nodes to right edge')}>
+            <ListItemIcon>
+              <FormatAlignRightIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Right" />
+          </MenuItem>
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('top', 'Aligned nodes to top edge')}>
+            <ListItemIcon>
+              <VerticalAlignTopIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Top" />
+          </MenuItem>
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('center-vertical', 'Aligned nodes to vertical center')}>
+            <ListItemIcon>
+              <VerticalAlignCenterIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Vertical Center" />
+          </MenuItem>
+          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('bottom', 'Aligned nodes to bottom edge')}>
+            <ListItemIcon>
+              <VerticalAlignBottomIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Align Bottom" />
+          </MenuItem>
+          <Divider />
+          <MenuItem disabled={!canDistribute} onClick={() => handleDistributionAction('horizontal', 'Distributed nodes horizontally')}>
+            <ListItemIcon>
+              <SwapHorizIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Distribute Horizontally" />
+          </MenuItem>
+          <MenuItem disabled={!canDistribute} onClick={() => handleDistributionAction('vertical', 'Distributed nodes vertically')}>
+            <ListItemIcon>
+              <SwapVertIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Distribute Vertically" />
+          </MenuItem>
+        </Menu>
 
         {/* Grid Options Menu */}
         <Menu

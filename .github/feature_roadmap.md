@@ -22,8 +22,8 @@
 
 ## Polish & Developer Experience
 
-- [ ] **Alignment Tools**  
-      Pair snap-to-grid with align/distribute actions (`components/GraphEditor/GraphEditor.js:46`, `components/GraphEditor/components/Toolbar.js:922`).
+- [x] **Alignment Tools**  
+      Pair snap-to-grid with align/distribute actions (`components/GraphEditor/GraphEditor.js:516`, `components/GraphEditor/components/Toolbar.js:822`).
 
 - [ ] **Advanced Search**  
       Power node list search via GraphCRUD filters and saved queries (`components/GraphEditor/components/NodeListPanel.js:49`, `components/GraphEditor/GraphCrud.js:585`).
