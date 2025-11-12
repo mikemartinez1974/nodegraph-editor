@@ -105,6 +105,9 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
   const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
+  const handleOpenDocumentProperties = useCallback(() => {
+    setShowDocumentPropertiesDialog(true);
+  }, [setShowDocumentPropertiesDialog]);
 
   const lastNodeTapRef = useRef({ id: null, time: 0 });
   const lastEdgeTapRef = useRef({ id: null, time: 0 });
@@ -1528,6 +1531,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           onRedo={historyHook.handleRedo}
           onFitToNodes={handleFitToNodes}
           onToggleProperties={togglePropertiesPanel}
+          onOpenDocumentProperties={handleOpenDocumentProperties}
           onToggleNodeList={toggleNodeList}
           onToggleGroupList={toggleGroupList}
           onDeleteSelected={handlers.handleDeleteSelected}

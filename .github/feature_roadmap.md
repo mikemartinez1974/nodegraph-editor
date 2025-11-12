@@ -34,7 +34,7 @@
 - [ ] **History Timeline**  
       Add a visible timeline with diff previews and checkpoints (`components/GraphEditor/hooks/useGraphHistory.js:3`, `components/GraphEditor/components/Toolbar.js:690`).
 
-- [ ] **Responsive Layout**  
+- [x] **Responsive Layout**  
       Use media-query flags for condensed mobile/tablet UI (`app/page.js:22`, `components/GraphEditor/GraphEditor.js:42`).
       - [x] Ship mobile FAB toolbar variant and migrate primary actions into its menu (`components/GraphEditor/components/Toolbar.js`, `components/GraphEditor/GraphEditor.js`).
       - [x] Convert Node/Properties panels into swipeable bottom sheets with touch friendly controls (`components/GraphEditor/components/PropertiesPanel.js`).

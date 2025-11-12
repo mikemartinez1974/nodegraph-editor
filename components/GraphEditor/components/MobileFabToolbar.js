@@ -12,6 +12,7 @@ import ListIcon from '@mui/icons-material/List';
 import GroupIcon from '@mui/icons-material/FolderSpecial';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import DeleteIcon from '@mui/icons-material/Delete';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 
 export default function MobileFabToolbar({
   onAddNode,
@@ -19,6 +20,7 @@ export default function MobileFabToolbar({
   onRedo,
   onFitToNodes,
   onToggleProperties,
+  onOpenDocumentProperties,
   onToggleNodeList,
   onToggleGroupList,
   onDeleteSelected,
@@ -65,6 +67,13 @@ export default function MobileFabToolbar({
           tooltipTitle="Fit nodes to view"
           onClick={onFitToNodes}
         />
+        {onOpenDocumentProperties && (
+          <SpeedDialAction
+            icon={<HistoryEduIcon />}
+            tooltipTitle="Document properties"
+            onClick={onOpenDocumentProperties}
+          />
+        )}
         <SpeedDialAction
           icon={<PlumbingIcon color={showPropertiesPanel ? 'primary' : undefined} />}
           tooltipTitle={showPropertiesPanel ? "Hide properties" : "Show properties"}
