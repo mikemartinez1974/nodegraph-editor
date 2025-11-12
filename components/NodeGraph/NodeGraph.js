@@ -12,8 +12,11 @@ import UnifiedEventHandler from './eventHandlers';
 import { handleMarqueeStart, useMarqueeSelection, MarqueeOverlay } from './marqueeSelection';
 import Minimap from './Minimap';
 import GridLayer from './GridLayer';
+import useTouchGestures from './hooks/useTouchGestures';
 
 const NON_PASSIVE_LISTENER = { passive: false };
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 3;
 
 export default function NodeGraph({ 
   nodes = [], 
@@ -57,6 +60,7 @@ export default function NodeGraph({
   showAllEdgeLabels = false,
 }) {
   const theme = useTheme();
+  const clampZoom = useCallback((value) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value)), []);
   
   // Auto-update group bounds when nodes move
   useEffect(() => {
@@ -113,6 +117,7 @@ export default function NodeGraph({
   const nodeRefs = useRef(new Map());
   const edgeLayerImperativeRef = useRef(null);
   const handleLayerImperativeRef = useRef(null);
+  const pinchStateRef = useRef(null);
   const unifiedEventHandlerRef = useRef(null);
 
   // State
@@ -794,6 +799,54 @@ export default function NodeGraph({
   useEffect(() => { edgesRef.current = edges; }, [edges]);
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+
+  useTouchGestures(containerRef, {
+    onPinchStart: ({ center, distance }) => {
+      const container = containerRef.current;
+      if (!container || !distance || distance <= 0) return;
+      const rect = container.getBoundingClientRect();
+      const initialZoom = zoomRef.current || zoom;
+      const initialPan = panRef.current || pan;
+      const relativeCenter = {
+        x: center.x - rect.left,
+        y: center.y - rect.top
+      };
+      const graphPoint = {
+        x: (relativeCenter.x - initialPan.x) / initialZoom,
+        y: (relativeCenter.y - initialPan.y) / initialZoom
+      };
+      pinchStateRef.current = {
+        initialDistance: distance,
+        initialZoom,
+        initialPan,
+        graphPoint,
+        rect
+      };
+    },
+    onPinchMove: ({ center, distance }) => {
+      const pinch = pinchStateRef.current;
+      const container = containerRef.current;
+      if (!pinch || !container || !distance || distance <= 0 || !pinch.initialDistance) return;
+      const rawScale = distance / pinch.initialDistance;
+      if (!rawScale || !isFinite(rawScale)) return;
+      const nextZoom = clampZoom(pinch.initialZoom * rawScale);
+      const rect = pinch.rect || container.getBoundingClientRect();
+      const relativeCenter = {
+        x: center.x - rect.left,
+        y: center.y - rect.top
+      };
+      const { graphPoint } = pinch;
+      const newPan = {
+        x: relativeCenter.x - graphPoint.x * nextZoom,
+        y: relativeCenter.y - graphPoint.y * nextZoom
+      };
+      if (typeof setZoom === 'function') setZoom(nextZoom);
+      if (typeof setPan === 'function') setPan(newPan);
+    },
+    onPinchEnd: () => {
+      pinchStateRef.current = null;
+    }
+  });
 
   // REMOVED: Auto-fit on load is now disabled
   // Viewport should be controlled by saved viewport state in .node files
