@@ -14,6 +14,7 @@ import DelayNode from './Nodes/DelayNode';
 import APINode from './Nodes/APINode';
 import ScriptNode from './Nodes/ScriptNode';
 import ThreeDNode from './Nodes/ThreeDNode';
+import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
 
 // Registry structure: each entry has the component and display metadata
 const nodeTypeRegistry = {
@@ -101,6 +102,13 @@ const nodeTypeRegistry = {
     icon: 'Code',
     category: 'logic'
   },
+  backgroundRpc: {
+    component: BackgroundRpcNode,
+    label: 'Background RPC',
+    description: 'Call methods exposed by the embedded background frame',
+    icon: 'Lan',
+    category: 'integration'
+  },
   '3d': {
     component: ThreeDNode,
     label: '3D View',
@@ -131,6 +139,15 @@ export const nodeTypeMetadata = [
     category: 'media',
     defaultWidth: 300,
     defaultHeight: 300
+  },
+  {
+    type: 'backgroundRpc',
+    label: 'Background RPC',
+    description: 'Invoke methods provided by BackgroundFrame RPC',
+    icon: 'Lan',
+    category: 'integration',
+    defaultWidth: 260,
+    defaultHeight: 220
   }
   // Add more node types here as needed
 ];

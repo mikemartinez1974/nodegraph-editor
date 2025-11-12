@@ -179,6 +179,19 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const { bgRef, rpc: backgroundRpc, postEvent: backgroundPostEvent, isReady: backgroundRpcReady, methods: backgroundRpcMethods, handleHandshakeComplete } = useBackgroundRpc();
 
   useEffect(() => {
+    eventBus.emit('backgroundRpc:methods', {
+      ready: backgroundRpcReady,
+      methods: backgroundRpcMethods || []
+    });
+  }, [backgroundRpcReady, backgroundRpcMethods]);
+
+  useEffect(() => {
+    if (!backgroundUrl) {
+      eventBus.emit('backgroundRpc:methods', { ready: false, methods: [] });
+    }
+  }, [backgroundUrl]);
+
+  useEffect(() => {
     if (backgroundUrl) {
       let frame = 0;
       const animate = () => {
@@ -533,6 +546,44 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       }
     }
   }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
+
+  useEffect(() => {
+    const handleRpcCallEvent = async ({ nodeId, method, args = {}, timeout = 10000 } = {}) => {
+      if (!nodeId || !method) return;
+      if (!backgroundRpcReady) {
+        eventBus.emit('backgroundRpc:error', {
+          nodeId,
+          method,
+          error: 'Background RPC not ready'
+        });
+        return;
+      }
+      try {
+        const result = await backgroundRpc(method, args, timeout);
+        eventBus.emit('backgroundRpc:response', { nodeId, method, result });
+      } catch (err) {
+        const message = err?.message || String(err);
+        eventBus.emit('backgroundRpc:error', { nodeId, method, error: message });
+      }
+    };
+
+    eventBus.on('backgroundRpc:call', handleRpcCallEvent);
+    return () => eventBus.off('backgroundRpc:call', handleRpcCallEvent);
+  }, [backgroundRpc, backgroundRpcReady]);
+
+  useEffect(() => {
+    const handlePostEvent = ({ eventName, payload } = {}) => {
+      if (!eventName) return;
+      try {
+        backgroundPostEvent(eventName, payload);
+      } catch (err) {
+        console.warn('[GraphEditor] Failed to post background event:', err);
+      }
+    };
+
+    eventBus.on('backgroundRpc:postEvent', handlePostEvent);
+    return () => eventBus.off('backgroundRpc:postEvent', handlePostEvent);
+  }, [backgroundPostEvent]);
 
   const handleAlignSelection = useCallback((mode) => {
     const selectedSet = new Set(selectedNodeIds);

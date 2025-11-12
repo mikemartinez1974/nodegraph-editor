@@ -94,8 +94,8 @@ const Toolbar = ({
   onModeChange,
   onAutoLayoutChange,
   onApplyLayout,
-  onAlignSelection,
-  onDistributeSelection,
+  onAlignSelection = () => false,
+  onDistributeSelection = () => false,
   onShowMessage,
   pan,
   zoom,
@@ -824,7 +824,7 @@ const Toolbar = ({
             title="Alignment Tools"
             aria-label="Alignment tools menu"
             size="small"
-            disabled={isFreeUser || selectionCount === 0}
+            disabled={isFreeUser || selectionCount < 2}
           >
             <FormatAlignCenterIcon fontSize="small" />
           </IconButton>

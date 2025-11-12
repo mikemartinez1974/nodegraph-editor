@@ -8,7 +8,7 @@
 - [x] **Template Gallery**  
       Browser now includes a curated template gallery with search, TLS-first links, and one-click loading (`components/Browser/Browser.js:54`, `components/Browser/TemplateGallery.js:1`).
 
-- [ ] **Background RPC Integrations**  
+- [x] **Background RPC Integrations**  
       Expose handshake methods as connectable graph inputs/outputs (`components/GraphEditor/GraphEditor.js:106`, `components/GraphEditor/components/BackgroundFrame.js:47`).
 
 - [ ] **Automation Platform**  
