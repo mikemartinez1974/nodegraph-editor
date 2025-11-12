@@ -56,7 +56,8 @@ export default function ConsolidatedPropertiesPanel({
   onToggleNodeLock,
   onToggleEdgeLock,
   onToggleGroupLock,
-  isMobile = false
+  isMobile = false,
+  memoAutoExpandToken = 0
 }) {
   const [currentAnchor, setCurrentAnchor] = useState(anchor);
   const [width, setWidth] = useState(400);
@@ -68,6 +69,7 @@ export default function ConsolidatedPropertiesPanel({
   // Node-specific states
   const [memo, setMemo] = useState('');
   const [memoView, setMemoView] = useState('edit');
+  const [memoExpanded, setMemoExpanded] = useState(false);
   const [nodeColor, setNodeColor] = useState(defaultNodeColor);
   const [nodeGradientEnabled, setNodeGradientEnabled] = useState(false);
   const [nodeGradientStart, setNodeGradientStart] = useState('#2196f3');
@@ -126,6 +128,22 @@ export default function ConsolidatedPropertiesPanel({
   useEffect(() => {
     setCurrentAnchor(anchor);
   }, [anchor]);
+
+  useEffect(() => {
+    if (memoAutoExpandToken > 0) {
+      setMemoExpanded(true);
+    }
+  }, [memoAutoExpandToken]);
+
+  useEffect(() => {
+    if (memoExpanded && memoView === 'edit' && memoInputRef.current) {
+      try {
+        memoInputRef.current.focus();
+      } catch (err) {
+        /* ignore focus errors */
+      }
+    }
+  }, [memoExpanded, memoView]);
 
   const toggleAnchor = () => {
     const newAnchor = currentAnchor === 'right' ? 'left' : 'right';
@@ -371,7 +389,10 @@ export default function ConsolidatedPropertiesPanel({
               </Select>
             </FormControl>
             {/* Memo */}
-            <Accordion>
+            <Accordion
+              expanded={memoExpanded}
+              onChange={(_, expanded) => setMemoExpanded(expanded)}
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle2">Memo (Markdown)</Typography>
               </AccordionSummary>

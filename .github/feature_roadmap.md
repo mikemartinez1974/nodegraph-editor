@@ -28,7 +28,7 @@
 - [ ] **Advanced Search**  
       Power node list search via GraphCRUD filters and saved queries (`components/GraphEditor/components/NodeListPanel.js:49`, `components/GraphEditor/GraphCrud.js:585`).
 
-- [ ] **Project Dashboard**  
+- [x] **Project Dashboard**  
       Expand Document Properties into a project hub (`components/GraphEditor/components/DocumentPropertiesDialog.js:103`, `components/GraphEditor/components/BackgroundControls.js:5`).
 
 - [ ] **History Timeline**  

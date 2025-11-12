@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,61 +11,182 @@ import {
   Select,
   MenuItem,
   Typography,
-  Divider,
   Box,
+  Tabs,
+  Tab,
+  Chip,
+  Stack,
+  Grid,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  Tooltip,
+  Avatar,
+  InputAdornment
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
 import eventBus from '../../NodeGraph/eventBus';
 import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
-export default function DocumentPropertiesDialog({ open, onClose, backgroundUrl = '', setBackgroundUrl }) {
-  const [settings, setSettings] = useState(loadSettings());
-  const [activeTab, setActiveTab] = useState('document');
+const ROLE_OPTIONS = ['Owner', 'Editor', 'Viewer'];
+
+const formatTimestamp = (iso) => {
+  if (!iso) return '—';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleString();
+};
+
+const mapProjectMeta = (meta = {}, fallbackLink = '') => {
+  const collaborators = Array.isArray(meta?.collaborators)
+    ? meta.collaborators.map((collab) => ({ ...collab }))
+    : [];
+
+  if (!collaborators.length) {
+    collaborators.push({ id: 'owner', name: 'You', email: 'you@example.com', role: 'Owner' });
+  }
+
+  return {
+    title: meta?.title || 'Untitled Project',
+    description: meta?.description || '',
+    tags: Array.isArray(meta?.tags) ? [...meta.tags] : [],
+    shareLink: meta?.shareLink || fallbackLink,
+    allowComments: typeof meta?.allowComments === 'boolean' ? meta.allowComments : true,
+    allowEdits: typeof meta?.allowEdits === 'boolean' ? meta.allowEdits : true,
+    collaborators,
+    createdAt: meta?.createdAt || null,
+    lastModified: meta?.lastModified || null
+  };
+};
+
+const uniqueCollaboratorId = () => `collab-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+export default function DocumentPropertiesDialog({
+  open,
+  onClose,
+  backgroundUrl = '',
+  projectMeta,
+  onProjectMetaChange,
+  onResetProjectMeta,
+  graphStats,
+  recentSnapshots = []
+}) {
   const currentTheme = useTheme();
   const isMobile = useMediaQuery(currentTheme.breakpoints.down('sm'));
+  const defaultShareLink = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    return window.location.href;
+  }, []);
+
+  const [settings, setSettings] = useState(loadSettings());
+  const [activeTab, setActiveTab] = useState('overview');
+  const [meta, setMeta] = useState(mapProjectMeta(projectMeta, defaultShareLink));
+  const [tagInput, setTagInput] = useState('');
+  const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
+
+  const safeStats = useMemo(() => ({
+    nodeCount: graphStats?.nodeCount ?? 0,
+    edgeCount: graphStats?.edgeCount ?? 0,
+    groupCount: graphStats?.groupCount ?? 0,
+    snapshotCount: graphStats?.snapshotCount ?? 0,
+    historyIndex: graphStats?.historyIndex ?? 0
+  }), [graphStats]);
 
   useEffect(() => {
-    if (open) {
-      setSettings(loadSettings());
-    }
-  }, [open]);
+    if (!open) return;
+    setSettings(loadSettings());
+    setMeta(mapProjectMeta(projectMeta, defaultShareLink));
+    setActiveTab('overview');
+    setTagInput('');
+    setNewCollaborator({ name: '', email: '', role: 'Editor' });
+  }, [open, projectMeta, defaultShareLink]);
 
-  const handleSave = () => {
-    saveSettings(settings);
-    try {
-      if (typeof window !== 'undefined') {
-        // Persist top-level backgroundImage key for compatibility with the editor loader
-        if (settings.backgroundImage) {
-          localStorage.setItem('backgroundImage', settings.backgroundImage);
-        } else {
-          localStorage.removeItem('backgroundImage');
-        }
-      }
-      // Notify other components to update background immediately
-      eventBus.emit('backgroundChanged', { backgroundImage: settings.backgroundImage || null });
-    } catch (err) {
-      console.warn('Failed to persist background image preference:', err);
-    }
-    onClose();
-  };
-
-  const handleReset = () => {
-    const defaultSettings = resetSettings();
-    setSettings(defaultSettings);
-  };
-
-  const handleChange = (key, value) => {
+  const handleSettingsChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleToggleScriptPanel = (e) => {
-    if (e && typeof e.stopPropagation === 'function') {
-      try { e.stopPropagation(); } catch (err) { /* ignore */ }
-    }
+  const handleMetaChange = (key, value) => {
+    setMeta((prev) => ({ ...prev, [key]: value }));
+  };
 
+  const handleAddTag = () => {
+    const value = tagInput.trim();
+    if (!value) return;
+    setMeta((prev) => {
+      if (prev.tags.includes(value)) return prev;
+      return { ...prev, tags: [...prev.tags, value] };
+    });
+    setTagInput('');
+  };
+
+  const handleTagKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      handleAddTag();
+    } else if (event.key === 'Backspace' && !tagInput) {
+      setMeta((prev) => {
+        if (!prev.tags.length) return prev;
+        const nextTags = prev.tags.slice(0, -1);
+        return { ...prev, tags: nextTags };
+      });
+    }
+  };
+
+  const handleCollaboratorRoleChange = (id, role) => {
+    setMeta((prev) => ({
+      ...prev,
+      collaborators: prev.collaborators.map((collab) =>
+        collab.id === id ? { ...collab, role } : collab
+      )
+    }));
+  };
+
+  const handleRemoveCollaborator = (id) => {
+    setMeta((prev) => ({
+      ...prev,
+      collaborators: prev.collaborators.filter((collab) => collab.id !== id)
+    }));
+  };
+
+  const handleAddCollaborator = () => {
+    if (!newCollaborator.email.trim()) return;
+    setMeta((prev) => {
+      const exists = prev.collaborators.some(
+        (collab) => collab.email.toLowerCase() === newCollaborator.email.trim().toLowerCase()
+      );
+      if (exists) return prev;
+      const collaborator = {
+        id: uniqueCollaboratorId(),
+        name: newCollaborator.name.trim() || newCollaborator.email.trim(),
+        email: newCollaborator.email.trim(),
+        role: newCollaborator.role
+      };
+      return { ...prev, collaborators: [...prev.collaborators, collaborator] };
+    });
+    setNewCollaborator({ name: '', email: '', role: 'Editor' });
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(meta.shareLink);
+    } catch (err) {
+      console.warn('Failed to copy share link:', err);
+    }
+  };
+
+  const handleToggleScriptPanel = () => {
     try {
       if (eventBus && typeof eventBus.emit === 'function') {
         eventBus.emit('toggleScriptPanel');
@@ -86,10 +207,46 @@ export default function DocumentPropertiesDialog({ open, onClose, backgroundUrl 
     } catch (err) {
       console.warn('Failed to postMessage toggleScriptPanel:', err);
     }
-
-    // Close the dialog
-    if (onClose) onClose();
   };
+
+  const handleSave = () => {
+    saveSettings(settings);
+    try {
+      if (typeof window !== 'undefined') {
+        if (settings.backgroundImage) {
+          localStorage.setItem('backgroundImage', settings.backgroundImage);
+        } else {
+          localStorage.removeItem('backgroundImage');
+        }
+      }
+      eventBus.emit('backgroundChanged', { backgroundImage: settings.backgroundImage || null });
+    } catch (err) {
+      console.warn('Failed to persist background image preference:', err);
+    }
+
+    const sanitizedTags = meta.tags.map((tag) => tag.trim()).filter(Boolean);
+    if (onProjectMetaChange) {
+      onProjectMetaChange({
+        ...meta,
+        tags: Array.from(new Set(sanitizedTags)),
+        lastModified: new Date().toISOString()
+      });
+    }
+
+    onClose();
+  };
+
+  const handleReset = () => {
+    const defaultSettings = resetSettings();
+    setSettings(defaultSettings);
+    if (onResetProjectMeta) {
+      onResetProjectMeta();
+    }
+    setMeta(mapProjectMeta({}, meta.shareLink || defaultShareLink));
+  };
+
+  const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
+  const sectionSpacing = 3;
 
   return (
     <Dialog
@@ -100,73 +257,360 @@ export default function DocumentPropertiesDialog({ open, onClose, backgroundUrl 
       fullScreen={isMobile}
       PaperProps={isMobile ? { sx: { m: 0 } } : undefined}
     >
-      <DialogTitle>Document Properties</DialogTitle>
-      <DialogContent sx={isMobile ? { p: 0, flex: '1 1 auto', overflowY: 'auto' } : undefined}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, px: isMobile ? 2 : 0, pt: isMobile ? 2 : 0 }}>
-          <Button
-            onClick={() => setActiveTab('theme')}
-            variant={activeTab === 'theme' ? 'contained' : 'text'}
-            size="small"
-            sx={{ mr: 1 }}
-          >
-            Theme Builder
-          </Button>
-          <Button
-            onClick={() => setActiveTab('document')}
-            variant={activeTab === 'document' ? 'contained' : 'text'}
-            size="small"
-          >
-            Document
-          </Button>
+      <DialogTitle>Project Dashboard</DialogTitle>
+      <DialogContent sx={isMobile ? { p: 0, flex: '1 1 auto', overflowY: 'auto' } : {}}>
+        <Box sx={{ px: isMobile ? 2 : 3, pt: isMobile ? 2 : 3, pb: 2 }}>
+          <Typography variant="h6">{meta.title || 'Untitled Project'}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Manage project metadata, sharing options, activity, and appearance from a single place.
+          </Typography>
         </Box>
+        <Tabs
+          value={activeTab}
+          onChange={(_, value) => setActiveTab(value)}
+          variant={isMobile ? 'scrollable' : 'standard'}
+          allowScrollButtonsMobile
+          sx={{ px: isMobile ? 1 : 3, borderBottom: 1, borderColor: 'divider' }}
+        >
+          <Tab label="Overview" value="overview" />
+          <Tab label="Collaboration" value="collaboration" />
+          <Tab label="Activity" value="activity" />
+          <Tab label="Appearance" value="appearance" />
+        </Tabs>
 
-        {activeTab === 'theme' && (
-          <Box sx={isMobile ? { px: 2, pb: 2 } : undefined}>
-            <ThemeBuilder
-              initialTheme={settings.theme || (currentTheme?.palette ? {
-                mode: currentTheme.palette.mode || 'light',
-                primary: {
-                  main: currentTheme.palette.primary?.main || '#1976d2',
-                  light: currentTheme.palette.primary?.light || '#42a5f5',
-                  dark: currentTheme.palette.primary?.dark || '#1565c0',
-                  contrastText: currentTheme.palette.primary?.contrastText || '#ffffff',
-                },
-                secondary: {
-                  main: currentTheme.palette.secondary?.main || '#dc004e',
-                  light: currentTheme.palette.secondary?.light || '#f50057',
-                  dark: currentTheme.palette.secondary?.dark || '#c51162',
-                  contrastText: currentTheme.palette.secondary?.contrastText || '#ffffff',
-                },
-                background: {
-                  default: currentTheme.palette.background?.default || '#f5f5f5',
-                  paper: currentTheme.palette.background?.paper || '#ffffff',
-                },
-                text: {
-                  primary: currentTheme.palette.text?.primary || '#000000',
-                  secondary: currentTheme.palette.text?.secondary || '#666666',
-                },
-                divider: currentTheme.palette.divider || '#e0e0e0',
-              } : null)}
-              onThemeChange={(newTheme) => {
-                handleChange('theme', newTheme);
-                // Update document theme (not browser theme)
-                eventBus.emit('updateDocumentTheme', newTheme);
-              }}
-            />
-          </Box>
+        {activeTab === 'overview' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Project Details
+              </Typography>
+              <Stack spacing={2}>
+                <TextField
+                  label="Project title"
+                  value={meta.title}
+                  onChange={(event) => handleMetaChange('title', event.target.value)}
+                  fullWidth
+                />
+                <TextField
+                  label="Description"
+                  value={meta.description}
+                  onChange={(event) => handleMetaChange('description', event.target.value)}
+                  fullWidth
+                  multiline
+                  minRows={isMobile ? 4 : 3}
+                />
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Tags
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 1 }}>
+                    {meta.tags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        onDelete={() =>
+                          setMeta((prev) => ({
+                            ...prev,
+                            tags: prev.tags.filter((existing) => existing !== tag)
+                          }))
+                        }
+                        size="small"
+                        sx={{ mb: 1 }}
+                      />
+                    ))}
+                  </Stack>
+                  <TextField
+                    label="Add tag"
+                    value={tagInput}
+                    onChange={(event) => setTagInput(event.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                    helperText="Press Enter to add a tag"
+                    fullWidth
+                  />
+                </Box>
+              </Stack>
+            </Paper>
+
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                At a Glance
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6} md={3}>
+                  <Stack spacing={0.5}>
+                    <Typography variant="caption" color="text.secondary">
+                      Nodes
+                    </Typography>
+                    <Typography variant="h6">{safeStats.nodeCount}</Typography>
+                  </Stack>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Stack spacing={0.5}>
+                    <Typography variant="caption" color="text.secondary">
+                      Edges
+                    </Typography>
+                    <Typography variant="h6">{safeStats.edgeCount}</Typography>
+                  </Stack>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Stack spacing={0.5}>
+                    <Typography variant="caption" color="text.secondary">
+                      Groups
+                    </Typography>
+                    <Typography variant="h6">{safeStats.groupCount}</Typography>
+                  </Stack>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Stack spacing={0.5}>
+                    <Typography variant="caption" color="text.secondary">
+                      Snapshots
+                    </Typography>
+                    <Typography variant="h6">{safeStats.snapshotCount}</Typography>
+                  </Stack>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Created
+                  </Typography>
+                  <Typography variant="body2">{formatTimestamp(meta.createdAt)}</Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Last modified
+                  </Typography>
+                  <Typography variant="body2">{formatTimestamp(meta.lastModified)}</Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Stack>
         )}
 
-        {activeTab === 'document' && (
-          <Box sx={isMobile ? { px: 2, pb: 2 } : undefined}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Document Settings
-            </Typography>
-            <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
-          </Box>
+        {activeTab === 'collaboration' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Share Link
+              </Typography>
+              <TextField
+                label="Share link"
+                value={meta.shareLink}
+                onChange={(event) => handleMetaChange('shareLink', event.target.value)}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Copy link">
+                        <IconButton size="small" onClick={handleCopyLink}>
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={meta.allowComments}
+                      onChange={(event) => handleMetaChange('allowComments', event.target.checked)}
+                    />
+                  }
+                  label="Allow comments"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={meta.allowEdits}
+                      onChange={(event) => handleMetaChange('allowEdits', event.target.checked)}
+                    />
+                  }
+                  label="Allow edits"
+                />
+              </Stack>
+            </Paper>
+
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                <Typography variant="subtitle1">Collaborators</Typography>
+                <Avatar sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', width: 32, height: 32 }}>
+                  <GroupAddIcon fontSize="small" />
+                </Avatar>
+              </Stack>
+              <List dense disablePadding>
+                {(meta.collaborators || []).map((collaborator) => (
+                  <ListItem key={collaborator.id} disableGutters sx={{ mb: 1.5 }}>
+                    <ListItemText
+                      primary={collaborator.name || collaborator.email}
+                      secondary={collaborator.email}
+                    />
+                    <Select
+                      size="small"
+                      value={collaborator.role}
+                      onChange={(event) => handleCollaboratorRoleChange(collaborator.id, event.target.value)}
+                      sx={{ mr: 1.5, minWidth: 120 }}
+                    >
+                      {ROLE_OPTIONS.map((role) => (
+                        <MenuItem key={role} value={role} disabled={role === 'Owner' && collaborator.id !== 'owner'}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <ListItemSecondaryAction>
+                      <Tooltip title="Remove collaborator">
+                        <span>
+                          <IconButton
+                            edge="end"
+                            size="small"
+                            onClick={() => handleRemoveCollaborator(collaborator.id)}
+                            disabled={collaborator.role === 'Owner'}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+              </List>
+
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mt: 2 }}>
+                <TextField
+                  label="Name"
+                  value={newCollaborator.name}
+                  onChange={(event) => setNewCollaborator((prev) => ({ ...prev, name: event.target.value }))}
+                  fullWidth
+                />
+                <TextField
+                  label="Email"
+                  value={newCollaborator.email}
+                  onChange={(event) => setNewCollaborator((prev) => ({ ...prev, email: event.target.value }))}
+                  fullWidth
+                />
+                <Select
+                  size="small"
+                  value={newCollaborator.role}
+                  onChange={(event) => setNewCollaborator((prev) => ({ ...prev, role: event.target.value }))}
+                  sx={{ minWidth: 140 }}
+                >
+                  {ROLE_OPTIONS.map((role) => (
+                    <MenuItem key={role} value={role}>
+                      {role}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCollaborator}>
+                  Add
+                </Button>
+              </Stack>
+            </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'activity' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <QueryStatsIcon color="primary" fontSize="small" />
+                <Typography variant="subtitle1">Recent Activity</Typography>
+              </Stack>
+              <List dense disablePadding>
+                {recentSnapshots.length === 0 ? (
+                  <ListItem disableGutters>
+                    <ListItemText primary="No history captured yet." />
+                  </ListItem>
+                ) : (
+                  recentSnapshots.map((snapshot) => (
+                    <ListItem key={snapshot.id} disableGutters sx={{ mb: 1.25 }}>
+                      <ListItemText
+                        primary={`Snapshot #${snapshot.id}`}
+                        secondary={`${snapshot.nodeCount} nodes • ${snapshot.edgeCount} edges • ${snapshot.groupCount} groups`}
+                      />
+                    </ListItem>
+                  ))
+                )}
+              </List>
+            </Paper>
+
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Quick Actions
+              </Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<RocketLaunchIcon />}
+                  onClick={handleToggleScriptPanel}
+                >
+                  Toggle Script Panel
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={handleCopyLink}
+                >
+                  Copy Share Link
+                </Button>
+              </Stack>
+            </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'appearance' && (
+          <Stack
+            spacing={sectionSpacing}
+            sx={contentPadding}
+          >
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Theme
+              </Typography>
+              <ThemeBuilder
+                initialTheme={settings.theme || (currentTheme?.palette ? {
+                  mode: currentTheme.palette.mode || 'light',
+                  primary: {
+                    main: currentTheme.palette.primary?.main || '#1976d2',
+                    light: currentTheme.palette.primary?.light || '#42a5f5',
+                    dark: currentTheme.palette.primary?.dark || '#1565c0',
+                    contrastText: currentTheme.palette.primary?.contrastText || '#ffffff',
+                  },
+                  secondary: {
+                    main: currentTheme.palette.secondary?.main || '#dc004e',
+                    light: currentTheme.palette.secondary?.light || '#f50057',
+                    dark: currentTheme.palette.secondary?.dark || '#c51162',
+                    contrastText: currentTheme.palette.secondary?.contrastText || '#ffffff',
+                  },
+                  background: {
+                    default: currentTheme.palette.background?.default || '#f5f5f5',
+                    paper: currentTheme.palette.background?.paper || '#ffffff',
+                  },
+                  text: {
+                    primary: currentTheme.palette.text?.primary || '#000000',
+                    secondary: currentTheme.palette.text?.secondary || '#666666',
+                  },
+                  divider: currentTheme.palette.divider || '#e0e0e0',
+                } : null)}
+                onThemeChange={(newTheme) => {
+                  handleSettingsChange('theme', newTheme);
+                  eventBus.emit('updateDocumentTheme', newTheme);
+                }}
+              />
+            </Paper>
+
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Canvas & Background
+              </Typography>
+              <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
+            </Paper>
+          </Stack>
         )}
       </DialogContent>
       <DialogActions
-        sx={isMobile ? { flexDirection: 'column', alignItems: 'stretch', gap: 1, px: 3, pb: 3 } : undefined}
+        sx={isMobile ? { flexDirection: 'column', alignItems: 'stretch', gap: 1, px: 3, pb: 3 } : { px: 3, pb: 3 }}
       >
         <Button onClick={handleReset} color="secondary" fullWidth={isMobile}>
           Reset to Defaults

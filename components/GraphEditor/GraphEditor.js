@@ -39,6 +39,23 @@ import { nodeTypeMetadata } from './nodeTypeRegistry';
 import { useBackgroundRpc } from './hooks/useBackgroundRpc';
 import BackgroundFrame from './components/BackgroundFrame';
 
+const createDefaultProjectMeta = () => {
+  const iso = new Date().toISOString();
+  return {
+    title: 'Untitled Project',
+    description: '',
+    tags: [],
+    shareLink: '',
+    allowComments: true,
+    allowEdits: true,
+    collaborators: [
+      { id: 'owner', name: 'You', email: 'you@example.com', role: 'Owner' }
+    ],
+    createdAt: iso,
+    lastModified: iso
+  };
+};
+
 const nodeTypes = getNodeTypes();
 
 export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
@@ -54,6 +71,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [graphRenderKey, setGraphRenderKey] = useState(0);
   const [mobileAddNodeOpen, setMobileAddNodeOpen] = useState(false);
   const [mobileAddNodeSearch, setMobileAddNodeSearch] = useState('');
+  const [memoAutoExpandToken, setMemoAutoExpandToken] = useState(0);
+  const firstGraphLoadHandledRef = useRef(false);
 
   // Document settings state (not localStorage) - consolidated into one object
   const [documentSettings, setDocumentSettings] = useState(() => {
@@ -67,6 +86,16 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       theme: initial
     };
   });
+  const [projectMeta, setProjectMeta] = useState(() => createDefaultProjectMeta());
+  const projectActivityInitializedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setProjectMeta((prev) => {
+      if (prev.shareLink) return prev;
+      return { ...prev, shareLink: window.location.href };
+    });
+  }, []);
   
   // Convenience accessors
   const documentUrl = documentSettings.url;
@@ -325,6 +354,67 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   });
   
   const historyHook = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
+
+  useEffect(() => {
+    if (!projectActivityInitializedRef.current) {
+      projectActivityInitializedRef.current = true;
+      return;
+    }
+    setProjectMeta(prev => ({ ...prev, lastModified: new Date().toISOString() }));
+  }, [historyHook.historyIndex]);
+
+  useEffect(() => {
+    if (memoAutoExpandToken > 0) {
+      const timer = typeof window !== 'undefined'
+        ? window.setTimeout(() => setMemoAutoExpandToken(0), 0)
+        : null;
+      return () => {
+        if (timer !== null && typeof window !== 'undefined') {
+          window.clearTimeout(timer);
+        }
+      };
+    }
+    return undefined;
+  }, [memoAutoExpandToken, setMemoAutoExpandToken]);
+
+  const graphStats = useMemo(() => {
+    const nodeCount = Array.isArray(nodes) ? nodes.length : 0;
+    const edgeCount = Array.isArray(edges) ? edges.length : 0;
+    const groupCount = Array.isArray(groups) ? groups.length : 0;
+    return {
+      nodeCount,
+      edgeCount,
+      groupCount,
+      snapshotCount: historyHook.history.length,
+      historyIndex: historyHook.historyIndex
+    };
+  }, [nodes, edges, groups, historyHook.history, historyHook.historyIndex]);
+
+  const recentSnapshots = useMemo(() => {
+    const snapshots = historyHook.history.slice(-5);
+    const offset = historyHook.history.length - snapshots.length;
+    return snapshots.map((snapshot, idx) => ({
+      id: offset + idx + 1,
+      nodeCount: (snapshot?.nodes || []).length,
+      edgeCount: (snapshot?.edges || []).length,
+      groupCount: (snapshot?.groups || []).length
+    }));
+  }, [historyHook.history]);
+
+  const handleUpdateProjectMeta = useCallback((updates) => {
+    setProjectMeta(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const handleResetProjectMeta = useCallback(() => {
+    setProjectMeta(prev => {
+      const defaults = createDefaultProjectMeta();
+      return {
+        ...defaults,
+        shareLink: prev.shareLink || defaults.shareLink,
+        createdAt: prev.createdAt || defaults.createdAt
+      };
+    });
+  }, []);
   
   const modesHook = useGraphModes({
     nodes,
@@ -390,13 +480,26 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     }
   }, [graphAPI, isMobile, isSmallScreen]);
 
-  const handleLoadGraph = useCallback((...args) => {
+  const handleLoadGraph = useCallback((nodesToLoad = [], edgesToLoad = [], groupsToLoad = []) => {
     try {
-      handlers.handleLoadGraph?.(...args);
+      handlers.handleLoadGraph?.(nodesToLoad, edgesToLoad, groupsToLoad);
     } finally {
       setGraphRenderKey(prev => prev + 1);
+      if (!firstGraphLoadHandledRef.current) {
+        firstGraphLoadHandledRef.current = true;
+        if (Array.isArray(nodesToLoad) && nodesToLoad.length > 0) {
+          const firstNodeId = nodesToLoad[0]?.id;
+          if (firstNodeId) {
+            setSelectedNodeIds([firstNodeId]);
+            setSelectedEdgeIds([]);
+            setSelectedGroupIds([]);
+          }
+        }
+        setShowPropertiesPanel(true);
+        setMemoAutoExpandToken((token) => token + 1);
+      }
     }
-  }, [handlers]);
+  }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
 
   // Listen for undo/redo events from keyboard shortcuts (placed after historyHook is created)
   useEffect(() => {
@@ -1602,6 +1705,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           onToggleGroupLock={groupManager?.toggleGroupLock}
           onClose={() => setShowPropertiesPanel(false)}
           isMobile={isMobile}
+          memoAutoExpandToken={memoAutoExpandToken}
         />
       )}
       
@@ -1725,6 +1829,11 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         onClose={() => setShowDocumentPropertiesDialog(false)} 
         backgroundUrl={backgroundUrl} 
         setBackgroundUrl={setBackgroundUrl}
+        projectMeta={projectMeta}
+        onProjectMetaChange={handleUpdateProjectMeta}
+        onResetProjectMeta={handleResetProjectMeta}
+        graphStats={graphStats}
+        recentSnapshots={recentSnapshots}
       />
       
       {/* Snackbar for notifications */}
