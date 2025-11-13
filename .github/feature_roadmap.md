@@ -51,7 +51,7 @@
         Add aria labels, keyboard focus management, and screen reader hints across drawers, panels, and icon-only controls (`components/GraphEditor/components/PropertiesPanel.js`, `components/GraphEditor/components/NodeListPanel.js`).
   - [ ] **Performance Profiling**  
         Benchmark large graphs, memoise expensive selectors, and investigate worker offloading for heavy search/layout tasks (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/components/NodeListPanel.js`).
-  - [ ] **Script & Plugin Hardening**  
+  - [x] **Script & Plugin Hardening**  
         Enforce origin allowlists, timeouts, and sandboxing for background RPC and script execution before shipping user plugins (`components/GraphEditor/components/BackgroundFrame.js`, `components/GraphEditor/Scripting/ScriptRunner.js`).
 
 - [x] **Responsive Layout**  

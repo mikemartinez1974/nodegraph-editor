@@ -32,6 +32,9 @@ const ensureNumber = (value, fallback) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
 };
+const MAX_SCRIPT_RPC_CALLS = 200;
+const MAX_SCRIPT_MUTATIONS = 100;
+const MUTATION_METHODS = new Set(['createNode', 'updateNode', 'deleteNode', 'createEdge', 'deleteEdge']);
 const getNodeMetrics = (node) => {
   const position = node?.position || {};
   const x = ensureNumber(position.x, 0);
@@ -160,6 +163,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const lastNodeTapRef = useRef({ id: null, time: 0 });
   const lastEdgeTapRef = useRef({ id: null, time: 0 });
   const lastGroupTapRef = useRef({ id: null, time: 0 });
+  const scriptRunStatsRef = useRef(new Map());
   
   // BackgroundFrame RPC hook
   const { bgRef, rpc: backgroundRpc, postEvent: backgroundPostEvent, isReady: backgroundRpcReady, methods: backgroundRpcMethods, handleHandshakeComplete } = useBackgroundRpc();
@@ -1341,23 +1345,63 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   }, [isMobile, selectedGroupIds, setShowPropertiesPanel]);
   
   // Host RPC handler used by ScriptRunner iframe
+  const safeClone = (value) => {
+    try {
+      return JSON.parse(JSON.stringify(value));
+    } catch (err) {
+      throw new Error('Unable to serialize script payload');
+    }
+  };
+
   const handleScriptRequest = async (method, args = [], meta = {}) => {
     try {
       const isDry = meta && meta.dry === true;
       const allowMutations = meta && meta.allowMutations === true;
+      const runId = meta && meta.runId ? String(meta.runId) : null;
+
+      if (runId) {
+        const current = scriptRunStatsRef.current.get(runId) || { calls: 0, mutations: 0 };
+        current.calls += 1;
+        if (current.calls > MAX_SCRIPT_RPC_CALLS) {
+          scriptRunStatsRef.current.delete(runId);
+          throw new Error('Script exceeded RPC call budget');
+        }
+        if (MUTATION_METHODS.has(method)) {
+          current.mutations += 1;
+          if (current.mutations > MAX_SCRIPT_MUTATIONS) {
+            scriptRunStatsRef.current.delete(runId);
+            throw new Error('Script exceeded mutation allowance');
+          }
+        }
+        scriptRunStatsRef.current.set(runId, current);
+      }
 
       switch (method) {
         case 'getNodes':
-          return nodesRef.current || nodes;
+          return safeClone(nodesRef.current || nodes);
         case 'getNode': {
           const [id] = args;
-          return (nodesRef.current || nodes).find(n => n.id === id) || null;
+          const node = (nodesRef.current || nodes).find(n => n.id === id) || null;
+          return node ? safeClone(node) : null;
         }
         case 'getEdges':
-          return edgesRef.current || edges;
+          return safeClone(edgesRef.current || edges);
         case 'createNode': {
           const [nodeData] = args || [{}];
-          const newNode = { id: nodeData.id || `node_${Date.now()}`, type: nodeData.type || 'default', label: nodeData.label || 'New Node', position: nodeData.position || { x: 0, y: 0 }, width: nodeData.width || 200, height: nodeData.height || 120, data: nodeData.data || {} };
+          if (!nodeData || typeof nodeData !== 'object') {
+            throw new Error('createNode expects a node object');
+          }
+          const newNode = {
+            id: typeof nodeData.id === 'string' && nodeData.id.trim() ? nodeData.id.trim() : `node_${Date.now()}`,
+            type: typeof nodeData.type === 'string' ? nodeData.type : 'default',
+            label: typeof nodeData.label === 'string' ? nodeData.label : 'New Node',
+            position: nodeData.position && typeof nodeData.position === 'object'
+              ? { x: Number(nodeData.position.x) || 0, y: Number(nodeData.position.y) || 0 }
+              : { x: 0, y: 0 },
+            width: Number(nodeData.width) || 200,
+            height: Number(nodeData.height) || 120,
+            data: nodeData.data && typeof nodeData.data === 'object' ? safeClone(nodeData.data) : {}
+          };
 
           if (!allowMutations || isDry) {
             // Return proposed mutation instead of applying
@@ -1368,47 +1412,82 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           try { eventBus.emit('nodeAdded', { node: newNode }); } catch (err) {}
           // optimistic local update
           setNodes(prev => { const next = [...prev, newNode]; nodesRef.current = next; return next; });
-          return { applied: true, node: newNode };
+          return { applied: true, node: safeClone(newNode) };
         }
         case 'updateNode': {
           const [id, patch] = args;
+          const nodeId = typeof id === 'string' ? id.trim() : '';
+          if (!nodeId) throw new Error('updateNode requires an id');
+          if (!patch || typeof patch !== 'object') throw new Error('updateNode requires a patch object');
+          const sanitizedPatch = safeClone(patch);
           if (!allowMutations || isDry) {
-            return { proposed: { action: 'updateNode', id, patch }, applied: false };
+            return { proposed: { action: 'updateNode', id: nodeId, patch: sanitizedPatch }, applied: false };
           }
-          try { eventBus.emit('nodeUpdated', { id, patch, source: 'script' }); } catch (err) {}
-          setNodes(prev => { const next = prev.map(n => n.id === id ? { ...n, ...patch, data: patch && patch.data ? { ...n.data, ...patch.data } : n.data } : n); nodesRef.current = next; return next; });
-          return { applied: true, id, patch };
+          try { eventBus.emit('nodeUpdated', { id: nodeId, patch: sanitizedPatch, source: 'script' }); } catch (err) {}
+          setNodes(prev => {
+            const next = prev.map(n => n.id === nodeId
+              ? {
+                  ...n,
+                  ...sanitizedPatch,
+                  data: sanitizedPatch && sanitizedPatch.data
+                    ? { ...n.data, ...sanitizedPatch.data }
+                    : n.data
+                }
+              : n);
+            nodesRef.current = next;
+            return next;
+          });
+          return { applied: true, id: nodeId, patch: sanitizedPatch };
         }
         case 'deleteNode': {
           const [id] = args;
+          const nodeId = typeof id === 'string' ? id.trim() : '';
+          if (!nodeId) throw new Error('deleteNode requires an id');
           if (!allowMutations || isDry) {
-            return { proposed: { action: 'deleteNode', id }, applied: false };
+            return { proposed: { action: 'deleteNode', id: nodeId }, applied: false };
           }
-          try { eventBus.emit('nodeDeleted', { id, source: 'script' }); } catch (err) {}
-          setNodes(prev => { const next = prev.filter(n => n.id !== id); nodesRef.current = next; return next; });
-          return { applied: true, id };
+          try { eventBus.emit('nodeDeleted', { id: nodeId, source: 'script' }); } catch (err) {}
+          setNodes(prev => { const next = prev.filter(n => n.id !== nodeId); nodesRef.current = next; return next; });
+          return { applied: true, id: nodeId };
         }
         case 'createEdge': {
           const [edgeData] = args || [{}];
+          if (!edgeData || typeof edgeData !== 'object') throw new Error('createEdge expects an edge object');
+          const source = String(edgeData.source || '').trim();
+          const target = String(edgeData.target || '').trim();
+          if (!source || !target) throw new Error('createEdge requires source and target');
+          const newEdge = {
+            id: typeof edgeData.id === 'string' && edgeData.id.trim() ? edgeData.id.trim() : `edge_${Date.now()}`,
+            source,
+            target,
+            type: typeof edgeData.type === 'string' ? edgeData.type : 'child',
+            label: typeof edgeData.label === 'string' ? edgeData.label : '',
+            style: edgeData.style && typeof edgeData.style === 'object' ? safeClone(edgeData.style) : {}
+          };
           if (!allowMutations || isDry) {
-            return { proposed: { action: 'createEdge', edge: edgeData }, applied: false };
+            return { proposed: { action: 'createEdge', edge: newEdge }, applied: false };
           }
-          try { eventBus.emit('edgeAdded', { edge: edgeData }); } catch (err) {}
-          setEdges(prev => { const next = [...prev, edgeData]; edgesRef.current = next; return next; });
-          return { applied: true, edge: edgeData };
+          try { eventBus.emit('edgeAdded', { edge: newEdge }); } catch (err) {}
+          setEdges(prev => { const next = [...prev, newEdge]; edgesRef.current = next; return next; });
+          return { applied: true, edge: safeClone(newEdge) };
         }
         case 'deleteEdge': {
           const [id] = args;
+          const edgeId = typeof id === 'string' ? id.trim() : '';
+          if (!edgeId) throw new Error('deleteEdge requires an id');
           if (!allowMutations || isDry) {
-            return { proposed: { action: 'deleteEdge', id }, applied: false };
+            return { proposed: { action: 'deleteEdge', id: edgeId }, applied: false };
           }
-          try { eventBus.emit('edgeDeleted', { id, source: 'script' }); } catch (err) {}
-          setEdges(prev => { const next = prev.filter(e => e.id !== id); edgesRef.current = next; return next; });
-          return { applied: true, id };
+          try { eventBus.emit('edgeDeleted', { id: edgeId, source: 'script' }); } catch (err) {}
+          setEdges(prev => { const next = prev.filter(e => e.id !== edgeId); edgesRef.current = next; return next; });
+          return { applied: true, id: edgeId };
         }
         case 'log': {
           const [level, message] = args;
-          console.log('[script]', level || 'info', message);
+          const normalizedLevel = ['info', 'warn', 'error'].includes(level) ? level : 'info';
+          const serializedMessage = typeof message === 'object' ? JSON.stringify(message).slice(0, 2000) : String(message).slice(0, 2000);
+          // eslint-disable-next-line no-console
+          console[normalizedLevel === 'error' ? 'error' : normalizedLevel === 'warn' ? 'warn' : 'info']('[script]', serializedMessage);
           return true;
         }
         default:
@@ -1419,6 +1498,28 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       throw err;
     }
   };
+
+  useEffect(() => {
+    const handleScriptResult = (event) => {
+      const detail = event.detail || event;
+      if (!detail || detail.type !== 'scriptResult') return;
+
+      if (detail.runId) {
+        scriptRunStatsRef.current.delete(String(detail.runId));
+      } else {
+        scriptRunStatsRef.current.clear();
+      }
+
+      if (detail.success) {
+        setSnackbar({ open: true, message: 'Script executed successfully', severity: 'success' });
+      } else if (detail.success === false) {
+        setSnackbar({ open: true, message: detail.error || 'Script execution failed', severity: 'error' });
+      }
+    };
+
+    window.addEventListener('scriptRunnerResult', handleScriptResult);
+    return () => window.removeEventListener('scriptRunnerResult', handleScriptResult);
+  }, [setSnackbar]);
 
   // Listen for external apply proposals from ScriptPanel
   useEffect(() => {

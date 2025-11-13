@@ -69,10 +69,12 @@ export default function IframeRpcListener({ allowedOrigins = [] }) {
       // etc.
     };
 
+    let sessionToken = null;
+
     function postResponse(target, requestId, ok, result, error) {
       try {
         target.postMessage(
-          { type: 'rpc:response', requestId, ok, result, error },
+          { type: 'rpc:response', requestId, ok, result, error, token: sessionToken },
           '*' // Origin is validated on receive, not send
         );
       } catch (err) {
@@ -92,9 +94,14 @@ export default function IframeRpcListener({ allowedOrigins = [] }) {
 
       // Handshake probe - advertise available methods
       if (msg.type === 'handshake:probe') {
+        if (!msg.token) {
+          console.warn('[IframeRpcListener] Handshake probe missing token');
+          return;
+        }
+        sessionToken = msg.token;
         try {
           e.source.postMessage(
-            { type: 'handshake', methods: Object.keys(methods) },
+            { type: 'handshake', methods: Object.keys(methods), token: sessionToken },
             e.origin
           );
           console.log('[IframeRpcListener] Handshake sent to', e.origin);
@@ -106,6 +113,10 @@ export default function IframeRpcListener({ allowedOrigins = [] }) {
 
       // RPC request
       if (msg.type === 'rpc:request' && msg.requestId && typeof msg.method === 'string') {
+        if (!sessionToken || msg.token !== sessionToken) {
+          console.warn('[IframeRpcListener] Rejected RPC request with invalid token');
+          return;
+        }
         const fn = methods[msg.method];
         
         if (!fn) {
@@ -127,6 +138,10 @@ export default function IframeRpcListener({ allowedOrigins = [] }) {
 
       // One-way event from parent
       if (msg.type === 'event' && msg.event) {
+        if (!sessionToken || msg.token !== sessionToken) {
+          console.warn('[IframeRpcListener] Rejected event with invalid token');
+          return;
+        }
         console.log('[IframeRpcListener] Received event:', msg.event, msg.payload);
         // Handle events here if needed
         // Example: if (msg.event === 'navigate') { window.location.href = msg.payload.url; }

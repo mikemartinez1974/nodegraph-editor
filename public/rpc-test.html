@@ -146,10 +146,12 @@
       }
     };
 
+    let sessionToken = null;
+
     function postResponse(target, requestId, ok, result, error) {
       try {
         target.postMessage(
-          { type: 'rpc:response', requestId, ok, result, error },
+          { type: 'rpc:response', requestId, ok, result, error, token: sessionToken },
           '*'
         );
       } catch (err) {
@@ -169,23 +171,38 @@
 
       // Handshake
       if (msg.type === 'handshake:probe') {
+        if (!msg.token) {
+          log('Handshake probe missing token');
+          return;
+        }
+        sessionToken = msg.token;
         log('Handshake probe received from ' + e.origin);
         e.source.postMessage(
-          { type: 'handshake', methods: Object.keys(methods) },
+          { type: 'handshake', methods: Object.keys(methods), token: sessionToken },
           e.origin
         );
         setStatus('Connected and ready!', true);
         
         // Show available methods
-        methodsEl.innerHTML = Object.keys(methods).map(m => 
-          `<button onclick="parent.postMessage({type:'testRpc',method:'${m}'},'*')">${m}()</button>`
-        ).join('');
+        methodsEl.innerHTML = '';
+        Object.keys(methods).forEach(m => {
+          const btn = document.createElement('button');
+          btn.textContent = `${m}()`;
+          btn.addEventListener('click', () => {
+            window.parent.postMessage({ type: 'testRpc', method: m, token: sessionToken }, '*');
+          });
+          methodsEl.appendChild(btn);
+        });
         
         return;
       }
 
       // RPC request
       if (msg.type === 'rpc:request' && msg.requestId && typeof msg.method === 'string') {
+        if (!sessionToken || msg.token !== sessionToken) {
+          log('Rejected RPC request with invalid token');
+          return;
+        }
         log('RPC request: ' + msg.method, msg.args);
         
         const fn = methods[msg.method];
@@ -221,20 +238,31 @@
     // Send handshake with retry
     let handshakeSent = false;
     function sendHandshake() {
+      if (!sessionToken) {
+        log('Deferred handshake until token is received');
+        return;
+      }
       if (handshakeSent) return;
       
       log('🤝 Sending handshake...');
       try {
         window.parent.postMessage({
           type: 'handshake',  // Match what BackgroundFrame.js expects (lowercase!)
-          methods: Object.keys(methods)
+          methods: Object.keys(methods),
+          token: sessionToken
         }, window.location.origin);
         
         handshakeSent = true;
         setStatus('Ready ✓', true);
-        methodsEl.innerHTML = Object.keys(methods)
-          .map(m => `<button onclick="parent.postMessage({type:'testRpc',method:'${m}'},'*')">${m}()</button>`)
-          .join('');
+        methodsEl.innerHTML = '';
+        Object.keys(methods).forEach(m => {
+          const btn = document.createElement('button');
+          btn.textContent = `${m}()`;
+          btn.addEventListener('click', () => {
+            window.parent.postMessage({ type: 'testRpc', method: m, token: sessionToken }, '*');
+          });
+          methodsEl.appendChild(btn);
+        });
         log('✅ Handshake sent successfully');
       } catch (error) {
         log(`❌ Handshake error: ${error.message}`);
@@ -242,9 +270,11 @@
     }
 
     // Try multiple times to ensure handshake is received
-    sendHandshake();
-    setTimeout(sendHandshake, 100);
-    setTimeout(sendHandshake, 500);
+    if (window.parent) {
+      sendHandshake();
+      setTimeout(sendHandshake, 100);
+      setTimeout(sendHandshake, 500);
+    }
     window.addEventListener('load', sendHandshake);
   </script>
 </body>

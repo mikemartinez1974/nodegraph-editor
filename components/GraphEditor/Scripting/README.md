@@ -35,6 +35,13 @@ Scripts receive an `api` object with the following methods:
 
 All API methods are asynchronous and should be called with `await` inside your script.
 
+### Safety Limits
+
+- Each script run is isolated with a one-time capability token. Messages that do not include this token are ignored.
+- Scripts are limited to a maximum of 200 RPC invocations per run and a bounded number of mutation calls. Hitting the limit aborts execution with an error.
+- When a script exceeds the configured timeout (default: 8 seconds), the runner iframe is recycled to ensure no background work continues.
+- API responses are deep-cloned before being returned so scripts cannot mutate shared state accidentally.
+
 ## Example Script
 
 ```js
@@ -68,6 +75,7 @@ return { count: nodes.length };
 
 - Scripts are executed in a sandboxed iframe for safety.
 - Only the provided API is available; scripts cannot access the main app or browser environment.
+- Every run uses a short-lived token, per-run operation quotas, and enforced timeouts.
 
 ---
 For more details, see ScriptPanel.js and ScriptRunner.js in the Scripting folder.

@@ -1,26 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 const DEFAULT_TIMEOUT = 8000;
+const MAX_CALLS_PER_RUN = 200;
 
-const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></head><body><script>
+const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta charset="utf-8"/></head><body><script>
 (function(){
   const pending = new Map();
   let seq = 1;
-  // current run meta (set by host when runScript is posted)
+  const SESSION_TOKEN = "${token}";
   window.__runMeta = null;
+
+  function post(msg) {
+    try {
+      parent.postMessage({ ...msg, token: SESSION_TOKEN }, '*');
+    } catch (err) {
+      console.error('[ScriptRunner] failed to post message', err);
+    }
+  }
 
   function hostCall(method, args) {
     return new Promise((resolve, reject) => {
       const id = String(seq++);
       pending.set(id, { resolve, reject });
-      parent.postMessage({ type: 'rpcRequest', id, method, args, meta: window.__runMeta }, '*');
+      post({ type: 'rpcRequest', id, method, args, meta: window.__runMeta });
     });
   }
 
   window.addEventListener('message', (ev) => {
     try {
+      if (ev.source !== parent) return;
       const msg = ev.data;
-      if (!msg || typeof msg !== 'object') return;
+      if (!msg || typeof msg !== 'object' || msg.token !== SESSION_TOKEN) return;
 
       if (msg.type === 'rpcResponse') {
         const p = pending.get(msg.id);
@@ -31,7 +41,6 @@ const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></hea
 
       if (msg.type === 'runScript') {
         (async () => {
-          // store meta for hostCall to include
           window.__runMeta = msg.meta || null;
           const scriptText = msg.script || '';
           const api = {
@@ -49,33 +58,52 @@ const bootstrapSrcDoc = `<!doctype html><html><head><meta charset="utf-8"/></hea
           try {
             const userFn = new Function('api', '"use strict"; return (async (api)=>{ ' + scriptText + ' })(api);');
             const result = await userFn(api);
-            parent.postMessage({ type: 'scriptResult', success: true, result }, '*');
+            post({ type: 'scriptResult', success: true, result, runId: msg.meta?.runId || null });
           } catch (err) {
-            parent.postMessage({ type: 'scriptResult', success: false, error: String(err && err.stack ? err.stack : err) }, '*');
+            post({ type: 'scriptResult', success: false, error: String(err && err.stack ? err.stack : err), runId: msg.meta?.runId || null });
           } finally {
-            // clear run meta after script completes
             window.__runMeta = null;
           }
         })();
       }
-
-    } catch (e) { }
+    } catch (e) {
+      post({ type: 'scriptResult', success: false, error: 'Runner error: ' + e, runId: null });
+    }
   }, false);
 
-  parent.postMessage({ type: 'runnerReady' }, '*');
+  post({ type: 'runnerReady' });
 })();
 </script></body></html>`;
+
+function generateToken() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
 export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT }) {
   const iframeRef = useRef(null);
   const readyRef = useRef(false);
   const waitersRef = useRef([]);
   const [lastResult, setLastResult] = useState(null);
+  const [runnerKey, setRunnerKey] = useState(0);
+  const activeRunRef = useRef(null);
+  const pendingTimeoutRef = useRef(null);
+  const callCountRef = useRef(0);
+
+  const sessionToken = useMemo(() => generateToken(), [runnerKey]);
+  const srcDoc = useMemo(() => createBootstrapSrcDoc(sessionToken), [sessionToken]);
+
+  useEffect(() => {
+    readyRef.current = false;
+    waitersRef.current = [];
+    activeRunRef.current = null;
+    callCountRef.current = 0;
+  }, [sessionToken]);
 
   useEffect(() => {
     function handleMessage(ev) {
+      if (ev.source !== iframeRef.current?.contentWindow) return;
       const msg = ev.data;
-      if (!msg || typeof msg !== 'object') return;
+      if (!msg || typeof msg !== 'object' || msg.token !== sessionToken) return;
 
       if (msg.type === 'runnerReady') {
         readyRef.current = true;
@@ -85,72 +113,111 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
       }
 
       if (msg.type === 'rpcRequest' && typeof onRequest === 'function') {
+        if (activeRunRef.current && msg.meta?.runId !== activeRunRef.current) {
+          iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id: msg.id, error: 'Run aborted', token: sessionToken }, '*');
+          return;
+        }
+
+        callCountRef.current += 1;
+        if (callCountRef.current > MAX_CALLS_PER_RUN) {
+          iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id: msg.id, error: 'Operation limit exceeded', token: sessionToken }, '*');
+          return;
+        }
+
         const { id, method, args, meta } = msg;
-        Promise.resolve().then(() => onRequest(method, args, meta)).then(result => {
-          iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result }, '*');
-        }).catch(err => {
-          iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result: null, error: String(err) }, '*');
-        });
+        Promise.resolve()
+          .then(() => onRequest(method, args, meta))
+          .then(result => {
+            iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result, token: sessionToken }, '*');
+          })
+          .catch(err => {
+            iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id, result: null, error: String(err), token: sessionToken }, '*');
+          });
         return;
       }
 
       if (msg.type === 'scriptResult') {
+        if (activeRunRef.current && msg.runId && msg.runId !== activeRunRef.current) {
+          return;
+        }
+        activeRunRef.current = null;
+        if (pendingTimeoutRef.current) {
+          clearTimeout(pendingTimeoutRef.current);
+          pendingTimeoutRef.current = null;
+        }
         setLastResult(msg);
+        callCountRef.current = 0;
         window.dispatchEvent(new CustomEvent('scriptRunnerResult', { detail: msg }));
       }
     }
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onRequest]);
+  }, [onRequest, sessionToken]);
 
   const ensureReady = () => {
     if (readyRef.current) return Promise.resolve();
     return new Promise(resolve => waitersRef.current.push(resolve));
   };
 
+  const resetRunner = (reason) => {
+    readyRef.current = false;
+    waitersRef.current = [];
+    activeRunRef.current = null;
+    callCountRef.current = 0;
+    if (pendingTimeoutRef.current) {
+      clearTimeout(pendingTimeoutRef.current);
+      pendingTimeoutRef.current = null;
+    }
+    setRunnerKey(key => key + 1);
+    window.dispatchEvent(new CustomEvent('scriptRunnerResult', { detail: { type: 'scriptResult', success: false, error: reason || 'Script runner reset', runId: null } }));
+  };
+
   async function runScript(scriptText = '', meta = {}) {
-    // ensure iframe mounted
     if (!iframeRef.current) {
-      // wait for React to mount iframe
       await new Promise(r => setTimeout(r, 0));
     }
 
     await ensureReady();
 
     return new Promise(resolve => {
-      let finished = false;
+      const runId = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      activeRunRef.current = runId;
+      callCountRef.current = 0;
+
       const onResult = (ev) => {
         const msg = ev.detail || ev.data;
         if (!msg || msg.type !== 'scriptResult') return;
-        finished = true;
+        if (msg.runId && msg.runId !== runId) return;
         window.removeEventListener('scriptRunnerResult', onResult);
         resolve(msg);
       };
 
       window.addEventListener('scriptRunnerResult', onResult);
-      iframeRef.current?.contentWindow?.postMessage({ type: 'runScript', script: scriptText, meta }, '*');
+      iframeRef.current?.contentWindow?.postMessage({ type: 'runScript', script: scriptText, meta: { ...meta, runId }, token: sessionToken }, '*');
 
-      setTimeout(() => {
-        if (!finished) {
+      pendingTimeoutRef.current = setTimeout(() => {
+        if (activeRunRef.current === runId) {
           window.removeEventListener('scriptRunnerResult', onResult);
-          resolve({ success: false, error: 'Script timed out' });
+          resolve({ success: false, error: 'Script timed out', runId });
+          resetRunner('Script timed out');
         }
       }, timeoutMs);
     });
   }
 
   useEffect(() => {
-    window.__scriptRunner = { run: runScript, lastResult };
+    window.__scriptRunner = { run: runScript, reset: resetRunner, lastResult };
     return () => { if (window.__scriptRunner) delete window.__scriptRunner; };
-  }, [lastResult]);
+  }, [lastResult, sessionToken]);
 
   return (
     <iframe
+      key={runnerKey}
       ref={iframeRef}
       title="script-runner"
       sandbox="allow-scripts"
-      srcDoc={bootstrapSrcDoc}
+      srcDoc={srcDoc}
       style={{ display: 'none' }}
     />
   );
