@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Paper,
@@ -62,7 +62,7 @@ import DrawIcon from '@mui/icons-material/Draw';
 import PostAddIcon from '@mui/icons-material/PostAdd';  
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import ShapeLineIcon from '@mui/icons-material/ShapeLine';
-import eventBus from '../../NodeGraph/eventBus';
+import eventBus, { useEventBusListener } from '../../NodeGraph/eventBus';
 import DocumentPropertiesDialog from './DocumentPropertiesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 import AddNodeMenu from './AddNodeMenu';
@@ -181,22 +181,20 @@ const Toolbar = ({
     if (typeof window !== 'undefined') {
       setPos({ x: window.innerWidth - 600, y: 88 });
     }
-    
-    // Listen for address changes to update history
-    const handleAddressSet = (data) => {
-      const url = typeof data === 'string' ? data : data?.url;
-      if (url && url !== currentUrl) {
-        setBrowserHistory(prev => {
-          const newHistory = prev.slice(0, historyIndex + 1);
-          return [...newHistory, url];
-        });
-        setHistoryIndex(prev => prev + 1);
-      }
-    };
-    
-    eventBus.on('setAddress', handleAddressSet);
-    return () => eventBus.off('setAddress', handleAddressSet);
-  }, [historyIndex, currentUrl]);
+  }, []);
+
+  const handleAddressSet = useCallback((data) => {
+    const url = typeof data === 'string' ? data : data?.url;
+    if (url && url !== currentUrl) {
+      setBrowserHistory(prev => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        return [...newHistory, url];
+      });
+      setHistoryIndex(prev => prev + 1);
+    }
+  }, [currentUrl, historyIndex, setBrowserHistory, setHistoryIndex]);
+
+  useEventBusListener('setAddress', handleAddressSet);
 
   // Watch transient flags and show snackbar when they become true
   useEffect(() => {

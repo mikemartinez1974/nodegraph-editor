@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useId, useRef } from 'react';
 import {
   TextField,
   Typography,
@@ -33,6 +33,7 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import * as ReactWindow from 'react-window';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import { createPortal } from 'react-dom';
+import { filterNodesForPanel } from '../utils/nodeFilters';
 
 const { FixedSizeList } = ReactWindow;
 
@@ -65,6 +66,9 @@ export default function NodeListPanel({
   const [activeQueryId, setActiveQueryId] = useState(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [newQueryName, setNewQueryName] = useState('');
+  const headingId = useId();
+  const liveStatusId = useId();
+  const headerRef = useRef(null);
 
   const parseMetric = (value) => {
     if (value === null || value === undefined) return undefined;
@@ -197,6 +201,12 @@ export default function NodeListPanel({
     }
   }, [savedQueries]);
 
+  useEffect(() => {
+    if (isOpen && headerRef.current) {
+      headerRef.current.focus({ preventScroll: true });
+    }
+  }, [isOpen]);
+
   // Get unique node types for filtering
   const nodeTypes = useMemo(() => {
     const types = new Set(nodes.map(node => node.type || 'default'));
@@ -205,66 +215,6 @@ export default function NodeListPanel({
 
   const filteredNodes = useMemo(() => {
     const criteria = filterCriteria;
-
-    const applyFallback = (list) => list.filter(node => {
-      const nodeType = node.type || 'default';
-
-      if (criteria.types && criteria.types.length && !criteria.types.includes(nodeType)) {
-        return false;
-      }
-
-      if (criteria.text) {
-        const term = criteria.text.toLowerCase();
-        const labelLower = (node.label || '').toLowerCase();
-        const idLower = (node.id || '').toLowerCase();
-        const memoLower = (node.data?.memo || '').toLowerCase();
-        const linkLower = (node.data?.link || '').toLowerCase();
-        if (
-          !labelLower.includes(term) &&
-          !idLower.includes(term) &&
-          !memoLower.includes(term) &&
-          !linkLower.includes(term)
-        ) {
-          return false;
-        }
-      }
-
-      if (criteria.hasMemo === true) {
-        if (!(node.data?.memo && node.data.memo.trim().length > 0)) {
-          return false;
-        }
-      }
-
-      if (criteria.hasLink === true) {
-        if (!(node.data?.link && node.data.link.trim().length > 0)) {
-          return false;
-        }
-      }
-
-      const isVisible = node.visible !== false;
-      if (criteria.includeVisible === false && isVisible) return false;
-      if (criteria.includeHidden === false && !isVisible) return false;
-
-      const widthValueRaw = node.width ?? node.data?.width;
-      const widthValue = Number(widthValueRaw);
-      if (criteria.minWidth !== undefined) {
-        if (!Number.isFinite(widthValue) || widthValue < criteria.minWidth) return false;
-      }
-      if (criteria.maxWidth !== undefined) {
-        if (!Number.isFinite(widthValue) || widthValue > criteria.maxWidth) return false;
-      }
-
-      const heightValueRaw = node.height ?? node.data?.height;
-      const heightValue = Number(heightValueRaw);
-      if (criteria.minHeight !== undefined) {
-        if (!Number.isFinite(heightValue) || heightValue < criteria.minHeight) return false;
-      }
-      if (criteria.maxHeight !== undefined) {
-        if (!Number.isFinite(heightValue) || heightValue > criteria.maxHeight) return false;
-      }
-
-      return true;
-    });
 
     if (graphApiRef?.current && typeof graphApiRef.current.findNodes === 'function') {
       try {
@@ -277,7 +227,7 @@ export default function NodeListPanel({
       }
     }
 
-    return applyFallback(nodes);
+    return filterNodesForPanel(nodes, criteria);
   }, [graphApiRef, nodes, filterCriteria]);
 
   const handleTypeFilter = (type) => {
@@ -371,7 +321,7 @@ export default function NodeListPanel({
         secondaryAction={
           <IconButton
             edge="end"
-            aria-label="focus on node"
+            aria-label={`Focus canvas on ${node.label || node.id}`}
             onClick={(e) => {
               e.stopPropagation();
               if (onNodeFocus) onNodeFocus(node.id);
@@ -404,6 +354,10 @@ export default function NodeListPanel({
     if (onClose) onClose();
   };
 
+  const nodeSummary = `${filteredNodes.length} of ${nodes.length} nodes match the current filters${
+    selectedNodeIds.length ? `, ${selectedNodeIds.length} selected` : ''
+  }.`;
+
   const statsChips = (
     <Box sx={{ px: 2, pb: 1 }}>
       <Chip label={`${nodes.length} total`} size="small" color="primary" />
@@ -421,6 +375,7 @@ export default function NodeListPanel({
           key={query.id}
           label={query.name}
           variant={activeQueryId === query.id ? 'filled' : 'outlined'}
+          aria-pressed={activeQueryId === query.id}
           onClick={() => applySavedQuery(query)}
           onDelete={() => handleDeleteSavedQuery(query.id)}
           size="small"
@@ -453,7 +408,7 @@ export default function NodeListPanel({
             secondaryAction={
               <IconButton
                 edge="end"
-                aria-label="focus on node"
+                aria-label={`Focus canvas on ${node.label || node.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (onNodeFocus) onNodeFocus(node.id);
@@ -490,8 +445,15 @@ export default function NodeListPanel({
       backgroundColor: isMobile ? theme.palette.background.paper : theme.palette.primary.main, 
       color: isMobile ? theme.palette.text.primary : theme.palette.primary.contrastText 
     }}>
-      <Typography variant="h6">Nodes</Typography>
-      <IconButton onClick={handleClosePanel} aria-label="close node list" sx={{ color: 'inherit' }}>
+      <Typography
+        variant="h6"
+        id={headingId}
+        tabIndex={-1}
+        ref={headerRef}
+      >
+        Nodes
+      </Typography>
+      <IconButton onClick={handleClosePanel} aria-label="Close node list panel" sx={{ color: 'inherit' }}>
         <CloseIcon />
       </IconButton>
     </Box>
@@ -499,6 +461,24 @@ export default function NodeListPanel({
 
   const panelBody = (
     <>
+      <Typography
+        id={liveStatusId}
+        component="p"
+        role="status"
+        sx={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap',
+          border: 0,
+        }}
+      >
+        {nodeSummary}
+      </Typography>
       {statsChips}
       {savedQueryChips}
       <Box sx={{ px: 2, pb: 1 }}>
@@ -506,7 +486,7 @@ export default function NodeListPanel({
           fullWidth
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search nodes..."
+          label="Search nodes"
           size="small"
           InputProps={{
             startAdornment: (
@@ -528,6 +508,8 @@ export default function NodeListPanel({
                   size="small"
                   aria-label="Open filter menu"
                   onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
+                  aria-haspopup="menu"
+                  aria-expanded={Boolean(filterMenuAnchor)}
                 >
                   <FilterIcon fontSize="small" />
                 </IconButton>
@@ -699,7 +681,7 @@ export default function NodeListPanel({
         onClose={() => handleClosePanel()}
         onOpen={() => {}}
         disableDiscovery
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{ keepMounted: true, disableRestoreFocus: true }}
         PaperProps={{
           sx: {
             borderTopLeftRadius: 16,
@@ -707,7 +689,11 @@ export default function NodeListPanel({
             maxHeight: '80vh',
             display: 'flex',
             flexDirection: 'column'
-          }
+          },
+          role: 'dialog',
+          'aria-modal': true,
+          'aria-labelledby': headingId,
+          'aria-describedby': liveStatusId
         }}
       >
         <Box sx={{ px: 1.5, pt: 1, pb: `calc(12px + env(safe-area-inset-bottom, 16px))`, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
@@ -733,6 +719,9 @@ export default function NodeListPanel({
   const desktopPanel = createPortal(
     <Paper
       elevation={8}
+      role="complementary"
+      aria-labelledby={headingId}
+      aria-describedby={liveStatusId}
       sx={{
         position: 'fixed',
         [anchor]: isOpen ? 0 : -300,

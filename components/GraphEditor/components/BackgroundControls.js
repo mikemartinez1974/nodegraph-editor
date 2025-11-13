@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
-import eventBus from '../../NodeGraph/eventBus';
+import eventBus, { useEventBusListener } from '../../NodeGraph/eventBus';
 
 export default function BackgroundControls({ backgroundUrl = '', backgroundInteractive = false }) {
   // Local state only for temporary editing before blur
@@ -9,30 +9,23 @@ export default function BackgroundControls({ backgroundUrl = '', backgroundInter
   const [tempGridSize, setTempGridSize] = useState(20);
   const [tempBackgroundImage, setTempBackgroundImage] = useState('');
 
-  // Request current gridSize and backgroundImage from documentSettings when component mounts
+  // Request current gridSize and backgroundImage when component mounts
   useEffect(() => {
-    const handleCurrentGridSize = ({ gridSize }) => {
-      if (gridSize) {
-        setTempGridSize(gridSize);
-      }
-    };
-    
-    const handleCurrentBackgroundImage = ({ backgroundImage }) => {
-      if (backgroundImage !== undefined) {
-        setTempBackgroundImage(backgroundImage);
-      }
-    };
-    
-    eventBus.on('currentGridSize', handleCurrentGridSize);
-    eventBus.on('currentBackgroundImage', handleCurrentBackgroundImage);
     eventBus.emit('requestGridSize');
     eventBus.emit('requestBackgroundImage');
-    
-    return () => {
-      eventBus.off('currentGridSize', handleCurrentGridSize);
-      eventBus.off('currentBackgroundImage', handleCurrentBackgroundImage);
-    };
   }, []);
+
+  useEventBusListener('currentGridSize', ({ gridSize }) => {
+    if (gridSize) {
+      setTempGridSize(gridSize);
+    }
+  });
+
+  useEventBusListener('currentBackgroundImage', ({ backgroundImage }) => {
+    if (backgroundImage !== undefined) {
+      setTempBackgroundImage(backgroundImage);
+    }
+  });
 
   // Sync temp state when props change
   useEffect(() => {

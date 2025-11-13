@@ -31,7 +31,7 @@
 - [x] **Alignment Tools**  
       Pair snap-to-grid with align/distribute actions (`components/GraphEditor/GraphEditor.js:516`, `components/GraphEditor/components/Toolbar.js:822`).
 
-- [ ] **Advanced Search**  
+- [x] **Advanced Search**  
       Power node list search via GraphCRUD filters and saved queries (`components/GraphEditor/components/NodeListPanel.js:49`, `components/GraphEditor/GraphCrud.js:585`).
 
 - [x] **Project Dashboard**  
@@ -43,11 +43,11 @@
 - [ ] **Engineering Backlog**
   - [x] **GraphEditor Decomposition**  
         Break `GraphEditor.js` into focused providers for state, history, RPC, and layout so the main component stops acting as a god object (`components/GraphEditor/GraphEditor.js`).
-  - [ ] **Safe Event Bus Hooks**  
+  - [x] **Safe Event Bus Hooks**  
         Wrap `eventBus` subscriptions in a cleanup-aware hook to prevent leaked listeners when panels mount/unmount (`components/NodeGraph/eventBus.js`, `components/GraphEditor/components/*`).
-  - [ ] **Automated CRUD/Search Tests**  
+  - [x] **Automated CRUD/Search Tests**  
         Cover `GraphCRUD` create/update/find flows plus the advanced NodeList filters with unit + integration tests (`components/GraphEditor/GraphCrud.js`, `components/GraphEditor/components/NodeListPanel.js`).
-  - [ ] **Accessibility Audit**  
+  - [x] **Accessibility Audit**  
         Add aria labels, keyboard focus management, and screen reader hints across drawers, panels, and icon-only controls (`components/GraphEditor/components/PropertiesPanel.js`, `components/GraphEditor/components/NodeListPanel.js`).
   - [ ] **Performance Profiling**  
         Benchmark large graphs, memoise expensive selectors, and investigate worker offloading for heavy search/layout tasks (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/components/NodeListPanel.js`).

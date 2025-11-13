@@ -1,3 +1,5 @@
+import { createTheme } from '@mui/material/styles';
+
 /**
  * Converts a MUI theme object to a serializable theme config
  * Used when creating new documents to capture the current browser theme
@@ -37,8 +39,6 @@ export function themeConfigFromMuiTheme(theme) {
  */
 export function createThemeFromConfig(themeConfig) {
   if (!themeConfig) return null;
-  
-  const { createTheme } = require('@mui/material/styles');
   
   return createTheme({
     palette: {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import {
   Paper, TextField, IconButton, Divider, FormControl, InputLabel, 
   Select, MenuItem, FormControlLabel, Switch, Slider, Typography, 
@@ -110,6 +110,9 @@ export default function ConsolidatedPropertiesPanel({
   const pendingRef = useRef({});
   const timerRef = useRef(null);
   const DEBOUNCE_MS = 400;
+  const panelTitleId = useId();
+  const descriptionId = useId();
+  const headerRef = useRef(null);
 
   const dashPatterns = {
     solid: [],
@@ -310,6 +313,10 @@ export default function ConsolidatedPropertiesPanel({
 
   useEffect(() => {
     if (entityType) setIsOpen(true);
+    if (entityType && headerRef.current) {
+      // Move focus to panel heading when newly opened for screen reader context
+      headerRef.current.focus({ preventScroll: true });
+    }
   }, [entityType]);
 
   const handlePanelClose = () => {
@@ -333,12 +340,23 @@ export default function ConsolidatedPropertiesPanel({
       backgroundColor: isMobile ? theme?.palette?.background?.paper : (theme?.palette?.primary?.main || '#1976d2'),
       color: isMobile ? theme?.palette?.text?.primary : (theme?.palette?.primary?.contrastText || '#fff'),
     }}>
-      <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
+      <Typography
+        variant="h6"
+        id={panelTitleId}
+        sx={{ fontSize: 16, fontWeight: 600 }}
+        tabIndex={-1}
+        ref={headerRef}
+      >
         {panelTitle}
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {!isMobile && (
-          <IconButton onClick={toggleAnchor} size="small" sx={{ color: 'inherit' }}>
+          <IconButton
+            onClick={toggleAnchor}
+            size="small"
+            sx={{ color: 'inherit' }}
+            aria-label={currentAnchor === 'right' ? 'Dock properties panel to left side' : 'Dock properties panel to right side'}
+          >
             {currentAnchor === 'right' ? <ArrowBackIcon /> : <ArrowForwardIcon />}
           </IconButton>
         )}
@@ -347,6 +365,8 @@ export default function ConsolidatedPropertiesPanel({
           title={isLocked ? `Unlock ${entityType}` : `Lock ${entityType}`}
           size="small"
           sx={{ color: 'inherit' }}
+          aria-pressed={isLocked}
+          aria-label={isLocked ? `Unlock selected ${entityType}` : `Lock selected ${entityType}`}
         >
           {isLocked ? <LockIcon /> : <LockOpenIcon />}
         </IconButton>
@@ -354,6 +374,7 @@ export default function ConsolidatedPropertiesPanel({
           size="small" 
           onClick={handlePanelClose}
           sx={{ color: 'inherit' }}
+          aria-label="Close properties panel"
         >
           <CloseIcon />
         </IconButton>
@@ -363,6 +384,24 @@ export default function ConsolidatedPropertiesPanel({
 
   const panelContent = (
       <Box sx={{ p: 2, pt: isMobile ? 1 : 2, overflowY: 'auto', flexGrow: 1, maxHeight: isMobile ? '65vh' : 'auto' }}>
+        <Typography
+          id={descriptionId}
+          component="p"
+          sx={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            padding: 0,
+            margin: -1,
+            overflow: 'hidden',
+            clip: 'rect(0 0 0 0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        >
+          Use tab or shift plus tab to move between properties. Escape closes the panel.
+        </Typography>
+
         {/* Entity ID */}
         <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
           ID: {entityId}
@@ -418,11 +457,11 @@ export default function ConsolidatedPropertiesPanel({
                     exclusive
                     onChange={(e, newView) => newView && setMemoView(newView)}
                     size="small"
-                  >
-                    <ToggleButton value="edit">
+                    >
+                    <ToggleButton value="edit" aria-label="Edit memo content">
                       <EditIcon sx={{ fontSize: 16 }} />
                     </ToggleButton>
-                    <ToggleButton value="preview">
+                    <ToggleButton value="preview" aria-label="Preview memo content">
                       <VisibilityIcon sx={{ fontSize: 16 }} />
                     </ToggleButton>
                   </ToggleButtonGroup>
@@ -461,7 +500,7 @@ export default function ConsolidatedPropertiesPanel({
                     )}
                   </Box>
                 )}
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }} role="status">
                   {memo.length} characters
                 </Typography>
               </AccordionDetails>
@@ -664,6 +703,7 @@ export default function ConsolidatedPropertiesPanel({
                       }
                     }}
                     sx={{ ml: 1 }}
+                    aria-label="Swap edge source and target"
                   >
                     <ArrowForwardIcon sx={{ transform: 'rotate(180deg)' }} />
                   </IconButton>
@@ -1000,6 +1040,7 @@ export default function ConsolidatedPropertiesPanel({
                             size="small"
                             onClick={() => onRemoveNodes(selectedGroup.id, [nodeId])}
                             disabled={isLocked}
+                            aria-label={`Remove ${node.label || nodeId} from group`}
                           >
                             <RemoveIcon fontSize="small" />
                           </IconButton>
@@ -1050,7 +1091,11 @@ export default function ConsolidatedPropertiesPanel({
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: theme?.palette?.background?.default
-          }
+          },
+          role: 'dialog',
+          'aria-modal': true,
+          'aria-labelledby': panelTitleId,
+          'aria-describedby': descriptionId
         }}
       >
         <Box sx={{ px: 1.5, pt: 1, pb: `calc(12px + env(safe-area-inset-bottom, 16px))`, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
@@ -1083,6 +1128,9 @@ export default function ConsolidatedPropertiesPanel({
         transition: 'right 0.3s ease, left 0.3s ease',
         overflow: 'hidden',
       }}
+      role="complementary"
+      aria-labelledby={panelTitleId}
+      aria-describedby={descriptionId}
     >
       {/* Resize handle */}
       <div
