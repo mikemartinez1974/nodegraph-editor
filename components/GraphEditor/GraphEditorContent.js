@@ -260,7 +260,10 @@ const GraphEditorContent = () => {
             setNodes(prev => {
               const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates?.data ? { ...n.data, ...updates.data } : n.data } : n);
               nodesRef.current = next;
-              try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
+              // Only save to history if not explicitly skipped
+              if (!options || options !== true) {
+                try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
+              }
               return next;
             });
             try {

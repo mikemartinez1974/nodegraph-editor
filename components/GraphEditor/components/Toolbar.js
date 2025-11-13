@@ -901,6 +901,7 @@ const Toolbar = ({
             display: 'inline-block',
             lineHeight: 1.1,
             userSelect: 'text',
+           
             whiteSpace: 'nowrap'
           }}
           title={`Viewport: x=${Math.round(pan?.x || 0)}, y=${Math.round(pan?.y || 0)}, zoom=${zoom?.toFixed(2) || 1}`}

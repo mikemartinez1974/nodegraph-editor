@@ -143,25 +143,15 @@ export default function ConsolidatedPropertiesPanel({
     if (memoExpanded && memoView === 'edit' && memoInputRef.current) {
       try {
         memoInputRef.current.focus();
-      } catch (err) {
-        /* ignore focus errors */
-      }
-    }
-  }, [memoExpanded, memoView]);
-
-  useEffect(() => {
-    if (memoExpanded && memoView === 'edit' && memoInputRef.current) {
-      try {
-        memoInputRef.current.setSelectionRange(0, 0);
         memoInputRef.current.scrollTop = 0;
       } catch (err) {
-        /* ignore selection errors */
+        /* ignore focus errors */
       }
     }
     if (memoExpanded && memoView === 'preview' && memoPreviewRef.current) {
       memoPreviewRef.current.scrollTop = 0;
     }
-  }, [memoExpanded, memoView, memoAutoExpandToken, memo]);
+  }, [memoExpanded, memoView]);
 
   const toggleAnchor = () => {
     const newAnchor = currentAnchor === 'right' ? 'left' : 'right';
@@ -238,7 +228,7 @@ export default function ConsolidatedPropertiesPanel({
       setBorderWidth(selectedGroup.style?.borderWidth || 2);
       setVisible(selectedGroup.visible !== false);
     }
-  }, [entityId, entityType, defaultNodeColor, defaultEdgeColor]);
+  }, [entityId, defaultNodeColor, defaultEdgeColor]);
 
   // Handlers
   const handleLabelChange = (e) => {
@@ -256,7 +246,8 @@ export default function ConsolidatedPropertiesPanel({
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
     setMemo(newMemo);
-    if (onUpdateNode) onUpdateNode(entityId, { data: { memo: newMemo } });
+    // Use the same third parameter (true) as label to skip history
+    if (onUpdateNode) onUpdateNode(entityId, { data: { memo: newMemo } }, true);
   };
 
   const handleNodeColorChange = (color) => {
