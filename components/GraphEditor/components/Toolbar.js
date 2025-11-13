@@ -70,6 +70,13 @@ import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
+// Import toolbar section components
+import FileActions from './Toolbar/FileActions';
+import HistoryActions from './Toolbar/HistoryActions';
+import NodeActions from './Toolbar/NodeActions';
+import ViewActions from './Toolbar/ViewActions';
+import PanelActions from './Toolbar/PanelActions';
+
 const Toolbar = ({ 
   nodes = [], 
   edges = [], 
@@ -153,6 +160,40 @@ const Toolbar = ({
   const selectionCount = Array.isArray(selectedNodeIds) ? selectedNodeIds.length : 0;
   const canAlign = selectionCount > 1;
   const canDistribute = selectionCount > 2;
+
+  // Retractable drawer state
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const retractTimerRef = useRef(null);
+
+  // Auto-retract after delay when mouse leaves
+  useEffect(() => {
+    if (!isHovering && isExpanded) {
+      retractTimerRef.current = setTimeout(() => {
+        setIsExpanded(false);
+      }, 800); // 800ms delay before retracting
+    } else {
+      if (retractTimerRef.current) {
+        clearTimeout(retractTimerRef.current);
+        retractTimerRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (retractTimerRef.current) {
+        clearTimeout(retractTimerRef.current);
+      }
+    };
+  }, [isHovering, isExpanded]);
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+    setIsExpanded(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
 
   const handleAlignmentAction = (mode, successMessage) => {
     if (typeof onAlignSelection === 'function') {
@@ -634,34 +675,149 @@ const Toolbar = ({
 
   const isBookmarked = currentUrl && bookmarks.some(b => b.url === currentUrl);
 
+  // Calculate address bar height (typically 64px for MUI AppBar)
+  const addressBarHeight = 64;
+
   return (
-    <Paper
-      elevation={3}
-      role="toolbar"
-      aria-label="Graph editor toolbar"
-      sx={{
-        position: 'fixed',
-        top: pos.y,
-        left: pos.x,
-        zIndex: 1300,
-        backgroundColor: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 2,
-        cursor: dragging.current ? 'grabbing' : 'grab',
-        userSelect: 'none',
-        maxWidth: '90vw'
-      }}
-      onMouseDown={onMouseDown}
-    >
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: 1, 
-        p: 1,
-        flexWrap: 'nowrap'
-      }}>
-        {/* Main Toolbar Controls */}
-        <ButtonGroup variant="contained" size="small" sx={{ mr: 1 }}>
+    <>
+      {/* Hover trigger area just below address bar */}
+      <Box
+        onMouseEnter={handleMouseEnter}
+        sx={{
+          position: 'fixed',
+          top: addressBarHeight,
+          left: 0,
+          right: 0,
+          height: 8,
+          zIndex: 1299,
+          pointerEvents: 'auto',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 0, 0, 0.03)'
+          }
+        }}
+      />
+
+      {/* Retractable toolbar */}
+      <Paper
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        elevation={6}
+        role="toolbar"
+        aria-label="Graph editor toolbar"
+        sx={{
+          position: 'fixed',
+          top: addressBarHeight,
+          left: 0,
+          right: 0,
+          zIndex: 1000, // Behind address bar (which is typically 1100)
+          backgroundColor: theme.palette.background.paper,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderBottomLeftRadius: 12,
+          borderBottomRightRadius: 12,
+          transform: isExpanded ? 'translateY(0)' : 'translateY(-100%)',
+          transition: 'transform 0.3s ease-in-out',
+          maxWidth: '100vw',
+          overflow: 'auto'
+        }}
+      >
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1, 
+          p: 1,
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
+          {/* File Actions Section */}
+        <ButtonGroup variant="contained" size="small">
+          <FileActions 
+            onSave={handleSaveToFile}
+            onLoad={handleLoadFile}
+            onExport={() => eventBus.emit('exportGraph')}
+            onNewFile={handleNewFile}
+            isMobile={false}
+            isFreeUser={isFreeUser}
+          />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        {/* History Actions Section */}
+        <ButtonGroup variant="contained" size="small">
+          <HistoryActions 
+            onUndo={onUndo}
+            onRedo={onRedo}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            isMobile={false}
+          />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        {/* Node Actions Section */}
+        <ButtonGroup variant="contained" size="small">
+          <NodeActions 
+            onAddNode={onAddNode}
+            onDeleteSelected={onDeleteSelected}
+            onCopySelected={handleCopySelected}
+            onPaste={handlePasteUniversal}
+            onCopyGraph={handleCopyGraph}
+            selectedNodeIds={selectedNodeIds}
+            selectedNodeId={selectedNodeId}
+            selectedEdgeId={selectedEdgeId}
+            isMobile={false}
+          />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        {/* View Actions Section */}
+        <ButtonGroup variant="contained" size="small">
+          <ViewActions 
+            onToggleMinimap={onToggleMinimap}
+            onToggleGrid={() => eventBus.emit('toggleShowGrid')}
+            onAutoLayout={onApplyLayout}
+            onAlignNodes={(mode) => {
+              const didAlign = onAlignSelection(mode);
+              if (didAlign && onShowMessage) {
+                onShowMessage(`Aligned nodes to ${mode}`, 'success');
+              }
+            }}
+            onDistributeNodes={(axis) => {
+              const didDistribute = onDistributeSelection(axis);
+              if (didDistribute && onShowMessage) {
+                onShowMessage(`Distributed nodes ${axis}`, 'success');
+              }
+            }}
+            showMinimap={showMinimap}
+            snapToGrid={snapToGrid}
+            selectionCount={selectionCount}
+            isMobile={false}
+            isFreeUser={isFreeUser}
+          />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        {/* Panel Actions Section */}
+        <ButtonGroup variant="contained" size="small">
+          <PanelActions 
+            onToggleNodeList={onToggleNodeList}
+            onToggleGroupList={onToggleGroupList}
+            onToggleScriptPanel={() => eventBus.emit('toggleScriptPanel')}
+            onToggleProperties={() => eventBus.emit('togglePropertiesPanel')}
+            showNodeList={showNodeList}
+            showGroupList={showGroupList}
+            isMobile={false}
+            isFreeUser={isFreeUser}
+          />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        {/* Utility Actions */}
+        <ButtonGroup variant="contained" size="small">
           <IconButton
             onClick={handleCopyOnboard}
             title="Onboard LLM"
@@ -669,174 +825,6 @@ const Toolbar = ({
             size="small"
           >
             <ModelTrainingIcon fontSize="small" />
-          </IconButton>
-          
-          <IconButton
-            onClick={handlePasteUniversal}
-            title="Paste (JSON or Text)"
-            aria-label="Paste graph JSON or create node from text"
-            size="small"
-          >
-            <DrawIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={handleCopySelected}
-            disabled={selectedNodeIds.length === 0}
-            title="Copy Selected Nodes + Edges"
-            aria-label={`Copy ${selectedNodeIds.length} selected nodes to clipboard`}
-            size="small"
-            color={selectedNodeIds.length > 0 ? "primary" : "default"}
-          >
-            <ContentCopyIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={handleCopyGraph}
-            title="Copy Entire Graph"
-            aria-label="Copy entire graph JSON"
-            size="small"
-            disabled={!nodes || nodes.length === 0}
-          >
-            <FileCopyIcon fontSize="small" />
-          </IconButton>
-          
-          <IconButton
-            onClick={(e) => setAddNodeMenuAnchor(e.currentTarget)}
-            title="Add Node (Ctrl+N)"
-            size="small"
-          >
-            <PostAddIcon fontSize="small"   />
-          </IconButton>
-
-          <IconButton
-            onClick={onDeleteSelected}
-            disabled={!selectedNodeId && !selectedEdgeId}
-            color={selectedNodeId || selectedEdgeId ? "error" : "inherit"}
-            title="Delete Selected (Delete)"
-            size="small"
-          >
-            <DeleteIcon />
-          </IconButton>
-
-          <ButtonGroup size="small" sx={{ mr: 1 }}>
-            <IconButton
-              onClick={onUndo}
-              disabled={!canUndo}
-              title="Undo (Ctrl+Z)"
-              size="small"
-            >
-              <UndoIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              onClick={onRedo}
-              disabled={!canRedo}
-              title="Redo (Ctrl+Y)"
-              size="small"
-            >
-              <RedoIcon fontSize="small" />
-            </IconButton>
-          </ButtonGroup>
-          
-          <IconButton
-            onClick={() => eventBus.emit('togglePropertiesPanel')}
-            title="Toggle Properties Panel"
-            aria-label="Toggle properties panel"
-            size="small"
-            color="primary"
-          >
-            <PlumbingIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={onToggleNodeList}
-            color={showNodeList ? "primary" : "default"}
-            title="Toggle Node List"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <ListIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={onToggleGroupList}
-            color={showGroupList ? "primary" : "default"}
-            title="Toggle Group List"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <GroupIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={() => eventBus.emit('toggleScriptPanel')}
-            title="Toggle Script Panel"
-            aria-label="Toggle script panel"
-            size="small"
-            color="primary"
-          >
-            <DeveloperModeIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={handleNewFile}
-            title="New File"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <NoteAddIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={handleSaveToFile}
-            title="Save Graph to File (.nodegraph)"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <SaveIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={handleLoadFile}
-            title="Load Graph from File"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <LoadIcon fontSize="small" />
-          </IconButton>
-
-          {/* NEW: Minimap toggle button */}
-          <IconButton
-            onClick={onToggleMinimap}
-            color={showMinimap ? "primary" : "default"}
-            title="Toggle Minimap"
-            aria-label="Toggle minimap visibility"
-            size="small"
-          disabled={isFreeUser}
-        >
-          <MapIcon fontSize="small" />
-        </IconButton>
-
-          <IconButton
-            onClick={(e) => setAlignMenuAnchor(e.currentTarget)}
-            title="Alignment Tools"
-            aria-label="Alignment tools menu"
-            size="small"
-            disabled={isFreeUser || selectionCount < 2}
-          >
-            <FormatAlignCenterIcon fontSize="small" />
-          </IconButton>
-
-          {/* NEW: Grid options button with menu */}
-          <IconButton
-            onClick={(e) => setGridMenuAnchor(e.currentTarget)}
-            color={snapToGrid ? "primary" : "default"}
-            title="Grid Options"
-            aria-label="Grid options menu"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <GridOnIcon fontSize="small" />
           </IconButton>
 
           <IconButton
@@ -850,6 +838,7 @@ const Toolbar = ({
           </IconButton>
         </ButtonGroup>
 
+        {/* Mode Toggle */}
         <ToggleButtonGroup
           value={mode}
           exclusive
@@ -859,7 +848,7 @@ const Toolbar = ({
             }
           }}
           size="small"
-          sx={{ mr: 1 }}
+          sx={{ ml: 1 }}
           disabled={isFreeUser}
         >
           <ToggleButton value="manual" title="Manual Mode">
@@ -874,11 +863,9 @@ const Toolbar = ({
         </ToggleButtonGroup>
 
         {mode === 'auto' && (
-          <ButtonGroup size="small" sx={{ mr: 1 }}>
+          <ButtonGroup size="small" sx={{ ml: 1 }}>
             <Button
-              onClick={(event) => {
-                setAutoLayoutMenuAnchor(event.currentTarget);
-              }}
+              onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
               endIcon={<ExpandMoreIcon fontSize="small" />}
               size="small"
               variant="outlined"
@@ -897,225 +884,13 @@ const Toolbar = ({
             </Button>
           </ButtonGroup>
         )}
-        <Menu
-          anchorEl={autoLayoutMenuAnchor}
-          open={Boolean(autoLayoutMenuAnchor)}
-          onClose={() => setAutoLayoutMenuAnchor(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              onAutoLayoutChange('hierarchical');
-              setAutoLayoutMenuAnchor(null);
-            }}
-            selected={autoLayoutType === 'hierarchical'}
-          >
-            Hierarchical
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onAutoLayoutChange('radial');
-              setAutoLayoutMenuAnchor(null);
-            }}
-            selected={autoLayoutType === 'radial'}
-          >
-            Radial
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onAutoLayoutChange('grid');
-              setAutoLayoutMenuAnchor(null);
-            }}
-            selected={autoLayoutType === 'grid'}
-          >
-            Grid
-          </MenuItem>
-        </Menu>
 
-        <AddNodeMenu
-          anchorEl={addNodeMenuAnchor}
-          open={Boolean(addNodeMenuAnchor)}
-          onClose={() => setAddNodeMenuAnchor(null)}
-          onAddNode={onAddNode}
-        />
-
-        {/* Alignment Tools Menu */}
-        <Menu
-          anchorEl={alignMenuAnchor}
-          open={Boolean(alignMenuAnchor)}
-          onClose={() => setAlignMenuAnchor(null)}
-        >
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('left', 'Aligned nodes to left edge')}>
-            <ListItemIcon>
-              <FormatAlignLeftIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Left" />
-          </MenuItem>
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('center-horizontal', 'Aligned nodes to horizontal center')}>
-            <ListItemIcon>
-              <FormatAlignCenterIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Horizontal Center" />
-          </MenuItem>
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('right', 'Aligned nodes to right edge')}>
-            <ListItemIcon>
-              <FormatAlignRightIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Right" />
-          </MenuItem>
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('top', 'Aligned nodes to top edge')}>
-            <ListItemIcon>
-              <VerticalAlignTopIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Top" />
-          </MenuItem>
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('center-vertical', 'Aligned nodes to vertical center')}>
-            <ListItemIcon>
-              <VerticalAlignCenterIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Vertical Center" />
-          </MenuItem>
-          <MenuItem disabled={!canAlign} onClick={() => handleAlignmentAction('bottom', 'Aligned nodes to bottom edge')}>
-            <ListItemIcon>
-              <VerticalAlignBottomIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Align Bottom" />
-          </MenuItem>
-          <Divider />
-          <MenuItem disabled={!canDistribute} onClick={() => handleDistributionAction('horizontal', 'Distributed nodes horizontally')}>
-            <ListItemIcon>
-              <SwapHorizIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Distribute Horizontally" />
-          </MenuItem>
-          <MenuItem disabled={!canDistribute} onClick={() => handleDistributionAction('vertical', 'Distributed nodes vertically')}>
-            <ListItemIcon>
-              <SwapVertIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Distribute Vertically" />
-          </MenuItem>
-        </Menu>
-
-        {/* Grid Options Menu */}
-        <Menu
-          anchorEl={gridMenuAnchor}
-          open={Boolean(gridMenuAnchor)}
-          onClose={() => setGridMenuAnchor(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              eventBus.emit('toggleShowGrid');
-              setGridMenuAnchor(null);
-            }}
-          >
-            <Typography variant="body2">Show Grid</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              eventBus.emit('alignToGrid');
-              setGridMenuAnchor(null);
-              if (onShowMessage) onShowMessage('Nodes aligned to grid', 'success');
-            }}
-          >
-            <Typography variant="body2">Align to Grid</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onToggleSnapToGrid();
-              setGridMenuAnchor(null);
-            }}
-          >
-            <Typography variant="body2">Snap to Grid: {snapToGrid ? 'ON' : 'OFF'}</Typography>
-          </MenuItem>
-        </Menu>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json,.node"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
-
-        <DocumentPropertiesDialog  
-          open={preferencesOpen}
-          onClose={() => setPreferencesOpen(false)}
-          backgroundUrl={backgroundUrl}
-          setBackgroundUrl={setBackgroundUrl}
-        />
-        
-        {/* Bookmarks Menu */}
-        <Menu
-          anchorEl={bookmarkMenuAnchor}
-          open={Boolean(bookmarkMenuAnchor)}
-          onClose={() => setBookmarkMenuAnchor(null)}
-          PaperProps={{
-            style: {
-              maxHeight: 400,
-              minWidth: 300,
-            },
-          }}
-        >
-          {bookmarks.length === 0 ? (
-            <MenuItem disabled>
-              <Typography variant="body2" color="text.secondary">
-                No bookmarks yet
-              </Typography>
-            </MenuItem>
-          ) : (
-            bookmarks.map((bookmark, index) => (
-              <MenuItem
-                key={index}
-                onClick={() => handleBookmarkClick(bookmark.url)}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  py: 1,
-                  pr: 6
-                }}
-              >
-                <Typography variant="body2" noWrap sx={{ maxWidth: 280, fontWeight: 500 }}>
-                  {bookmark.title || bookmark.url}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 280 }}>
-                  {bookmark.url}
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newBookmarks = bookmarks.filter((_, i) => i !== index);
-                    setBookmarks(newBookmarks);
-                    localStorage.setItem('graphBrowserBookmarks', JSON.stringify(newBookmarks));
-                    if (onShowMessage) onShowMessage('Bookmark removed', 'success');
-                  }}
-                  sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)' }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </MenuItem>
-            ))
-          )}
-        </Menu>
-
-        {/* Snackbar for transient messages */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-
-        {/* Viewport Indicator (compact stacked) */}
+        {/* Viewport Indicator */}
         <Box
           sx={{
             ml: 1,
             px: 0.5,
-            py: 0.250,
+            py: 0.25,
             borderRadius: 1,
             bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
             color: theme.palette.text.secondary,
@@ -1137,7 +912,51 @@ const Toolbar = ({
           </span>
         </Box>
       </Box>
+
+      {/* Menus and Dialogs */}
+      <Menu
+        anchorEl={autoLayoutMenuAnchor}
+        open={Boolean(autoLayoutMenuAnchor)}
+        onClose={() => setAutoLayoutMenuAnchor(null)}
+      >
+        <MenuItem onClick={() => { onAutoLayoutChange('hierarchical'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'hierarchical'}>
+          Hierarchical
+        </MenuItem>
+        <MenuItem onClick={() => { onAutoLayoutChange('radial'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'radial'}>
+          Radial
+        </MenuItem>
+        <MenuItem onClick={() => { onAutoLayoutChange('grid'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'grid'}>
+          Grid
+        </MenuItem>
+      </Menu>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,.node"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+
+      <DocumentPropertiesDialog  
+        open={preferencesOpen}
+        onClose={() => setPreferencesOpen(false)}
+        backgroundUrl={backgroundUrl}
+        setBackgroundUrl={setBackgroundUrl}
+      />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Paper>
+    </>
   );
 };
 
