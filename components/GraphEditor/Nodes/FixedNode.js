@@ -209,9 +209,14 @@ const FixedNode = ({
       }}
       tabIndex={0}
       onMouseDown={e => {
-        // Don't stop propagation if clicking inside child elements (like html-content)
-        if (e.target.classList.contains('html-content') || e.target.closest('.html-content')) {
-          return; // Let the child handle it
+        // Allow embedded HTML or links to handle the event without triggering node drag/selection
+        if (
+          e.target.classList?.contains('html-content') ||
+          e.target.closest?.('.html-content') ||
+          e.target.closest?.('a')
+        ) {
+          e.stopPropagation();
+          return;
         }
         e.stopPropagation();
         // Check if Alt key is held for rotation
@@ -224,7 +229,12 @@ const FixedNode = ({
       }}
       onTouchStart={e => {
         if (e.touches && e.touches.length > 1) return;
-        if (e.target.classList.contains('html-content') || e.target.closest('.html-content')) {
+        if (
+          e.target.classList?.contains('html-content') ||
+          e.target.closest?.('.html-content') ||
+          e.target.closest?.('a')
+        ) {
+          e.stopPropagation();
           return;
         }
         if (onTouchStart) onTouchStart(e);

@@ -5,7 +5,9 @@ import eventBus from '../../NodeGraph/eventBus';
 
 export const TlzLink = ({ href, children, ...props }) => {
   // If no href, render children
-  if (!href) return <a {...props}>{children}</a>;
+  if (!href) {
+    return <a {...props}>{children}</a>;
+  }
 
   // SSR-safe render
   if (typeof window === 'undefined') {
@@ -21,22 +23,34 @@ export const TlzLink = ({ href, children, ...props }) => {
 
     if (firstSlash !== -1) {
       host = rest.slice(0, firstSlash);
-      path = rest.slice(firstSlash); // includes leading '/'
+      path = rest.slice(firstSlash);
     } else {
       path = '/' + rest;
     }
 
-    const fullUrl = host ? `${window.location.protocol}//${host}${path}` : window.location.origin + path;
+    const localPath = path.startsWith('/') ? path : `/${path}`;
+    const remoteHttps = host ? `https://${host}${localPath}` : null;
 
     const onClick = (e) => {
       e.preventDefault();
       e.stopPropagation();
       try {
-       // Let the app handle fetching/loading the resource using the fetchable https URL
-        eventBus.emit('fetchUrl', { url: fullUrl });
+        eventBus.emit('tlzClick', { href });
+        eventBus.emit('fetchUrl', { url: localPath, source: 'tlz-local' });
+        if (remoteHttps) {
+          eventBus.emit('fetchUrl', { url: remoteHttps, source: 'tlz-remote' });
+        }
       } catch (err) {
         console.warn('TLZ fetch emit failed, falling back to full navigation', err);
-        try { window.location.assign(fullUrl); } catch (err2) { console.warn('Full navigation failed', err2); }
+        try {
+          if (remoteHttps) {
+            window.location.assign(remoteHttps);
+          } else {
+            window.location.assign(localPath);
+          }
+        } catch (err2) {
+          console.warn('Full navigation failed', err2);
+        }
       }
     };
 

@@ -38,6 +38,7 @@ import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import { nodeTypeMetadata } from './nodeTypeRegistry';
 import { useBackgroundRpc } from './hooks/useBackgroundRpc';
 import BackgroundFrame from './components/BackgroundFrame';
+import { GraphEditorContextProvider } from './providers/GraphEditorContext';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -934,10 +935,43 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   
   // Listen for 'fetchUrl' event from address bar
   useEffect(() => {
-    const handleFetchUrl = async ({ url }) => {
+    const handleFetchUrl = async ({ url, source = 'unknown' }) => {
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.log('[GraphEditor] fetchUrl event received', { url, source });
+      }
       try {
         if (!url) return;
         let fullUrl = url;
+        let originalTlzPath = null;
+
+        const ensureAbsoluteFromRelative = (input) => {
+          if (!input) return input;
+          if (input.startsWith('http://') || input.startsWith('https://')) return input;
+          if (typeof window === 'undefined') return input;
+          const origin = window.location && window.location.origin && window.location.origin !== 'null'
+            ? window.location.origin
+            : '';
+          if (!origin) return input;
+          if (input.startsWith('/')) {
+            return `${origin}${input}`;
+          }
+          if (input.startsWith('./')) {
+            const base = window.location.pathname.replace(/\/[^/]*$/, '/');
+            return `${origin}${base}${input.slice(2)}`;
+          }
+          if (input.startsWith('../')) {
+            const baseParts = window.location.pathname.split('/');
+            let remainder = input;
+            while (remainder.startsWith('../') && baseParts.length > 1) {
+              remainder = remainder.slice(3);
+              baseParts.pop();
+            }
+            const basePath = baseParts.join('/');
+            return `${origin}${basePath}/${remainder}`;
+          }
+          return `${origin}/${input}`;
+        };
 
         // Normalize tlz:// to fetchable https://
         if (fullUrl.startsWith('tlz://')) {
@@ -952,6 +986,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           } else {
             path = '/' + rest;
           }
+          originalTlzPath = path;
 
           const localhostNames = ['localhost', '127.0.0.1', '[::1]'];
           if (!host) {
@@ -963,6 +998,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           } else {
             fullUrl = `https://${host}${path}`;
           }
+        }
+
+        if (!originalTlzPath && (fullUrl.startsWith('/') || fullUrl.startsWith('./') || fullUrl.startsWith('../'))) {
+          fullUrl = ensureAbsoluteFromRelative(fullUrl);
         }
 
         if (!/^https?:\/\//i.test(fullUrl)) {
@@ -987,9 +1026,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         }
 
         // Log the final URL and fetch options
-        // console.log('[GraphEditor] Fetching URL:', fullUrl);
         const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit' };
-        // console.log('[GraphEditor] Fetch options:', fetchOptions);
 
         // Update address/history immediately so header/back works
         try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
@@ -1008,8 +1045,39 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
 
         let response = null;
 
+        const localCandidates = [];
+        if (originalTlzPath) {
+          const relPath = originalTlzPath.startsWith('/') ? originalTlzPath : `/${originalTlzPath}`;
+          const localOrigin = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null')
+            ? window.location.origin
+            : null;
+          if (localOrigin) {
+            const localUrl = `${localOrigin}${relPath}`;
+            if (!localCandidates.includes(localUrl)) localCandidates.push(localUrl);
+          }
+          if (!localCandidates.includes(relPath)) localCandidates.push(relPath);
+        }
+
+        for (const candidate of localCandidates) {
+          if (candidate === fullUrl || triedUrls.includes(candidate)) continue;
+          try {
+            if (typeof window !== 'undefined') {
+              // eslint-disable-next-line no-console
+              console.log('[GraphEditor] trying local candidate', candidate);
+            }
+            response = await tryFetch(candidate);
+            fullUrl = candidate;
+            try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+            break;
+          } catch (err) {
+            // continue to next candidate
+          }
+        }
+
         try {
-          response = await tryFetch(fullUrl);
+          if (!response) {
+            response = await tryFetch(fullUrl);
+          }
         } catch (err) {
           // generate alternates to try
           const alternates = [];
@@ -1021,6 +1089,30 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           }
           if (fullUrl.endsWith('/')) {
             alternates.push(fullUrl + 'index.node');
+          }
+          if (originalTlzPath) {
+            const relPath = originalTlzPath.startsWith('/') ? originalTlzPath : `/${originalTlzPath}`;
+            const localOrigin = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null')
+              ? window.location.origin
+              : null;
+            if (localOrigin) {
+              const localUrl = `${localOrigin}${relPath}`;
+              if (!alternates.includes(localUrl) && !triedUrls.includes(localUrl)) alternates.push(localUrl);
+            }
+            if (!alternates.includes(relPath) && !triedUrls.includes(relPath)) alternates.push(relPath);
+          } else {
+            try {
+              const parsed = new URL(fullUrl);
+              const localOrigin = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null')
+                ? window.location.origin
+                : null;
+              if (localOrigin && parsed.origin !== localOrigin) {
+                const localUrl = `${localOrigin}${parsed.pathname}`;
+                if (!alternates.includes(localUrl) && !triedUrls.includes(localUrl)) alternates.push(localUrl);
+              }
+            } catch (ignore) {
+              // ignore parse failure
+            }
           }
 
           for (const alt of alternates) {
@@ -1787,7 +1879,171 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     };
   }, [handlers]);
 
+  const rpcContextValue = useMemo(() => ({
+    bgRef,
+    backgroundRpc,
+    backgroundRpcReady,
+    backgroundPostEvent,
+    handleHandshakeComplete,
+    backgroundRpcMethods
+  }), [bgRef, backgroundRpc, backgroundRpcReady, backgroundPostEvent, handleHandshakeComplete, backgroundRpcMethods]);
+
+  const layoutContextValue = useMemo(() => ({
+    showEdgePanel,
+    setShowEdgePanel,
+    showMinimap,
+    setShowMinimap,
+    snapToGrid,
+    setSnapToGrid,
+    showGrid,
+    setShowGrid,
+    lockedNodes,
+    setLockedNodes,
+    lockedEdges,
+    setLockedEdges,
+    showAllEdgeLabels,
+    setShowAllEdgeLabels,
+    showPropertiesPanel,
+    setShowPropertiesPanel,
+    graphRenderKey,
+    setGraphRenderKey,
+    mobileAddNodeOpen,
+    setMobileAddNodeOpen,
+    mobileAddNodeSearch,
+    setMobileAddNodeSearch,
+    memoAutoExpandToken,
+    setMemoAutoExpandToken,
+    documentSettings,
+    setDocumentSettings,
+    documentTheme,
+    setDocumentTheme,
+    documentBackgroundImage,
+    setDocumentBackgroundImage,
+    documentUrl,
+    setDocumentUrl,
+    projectMeta,
+    setProjectMeta,
+    backgroundUrl,
+    setBackgroundUrl,
+    backgroundInteractive,
+    setBackgroundInteractive,
+    showDocumentPropertiesDialog,
+    setShowDocumentPropertiesDialog,
+    showNodeList,
+    setShowNodeList,
+    showGroupList,
+    setShowGroupList,
+    showGroupProperties,
+    setShowGroupProperties,
+    handleOpenDocumentProperties,
+    handleOpenMobileAddNode,
+    handleCloseMobileAddNode,
+    togglePropertiesPanel,
+    toggleNodeList,
+    toggleGroupList,
+    handlePropertiesPanelAnchorChange,
+    isMobile,
+    isSmallScreen,
+    isPortrait,
+    isLandscape,
+    backgroundImage,
+    isFreeUser
+  }), [
+    showEdgePanel,
+    setShowEdgePanel,
+    showMinimap,
+    setShowMinimap,
+    snapToGrid,
+    setSnapToGrid,
+    showGrid,
+    setShowGrid,
+    lockedNodes,
+    setLockedNodes,
+    lockedEdges,
+    setLockedEdges,
+    showAllEdgeLabels,
+    setShowAllEdgeLabels,
+    showPropertiesPanel,
+    setShowPropertiesPanel,
+    graphRenderKey,
+    setGraphRenderKey,
+    mobileAddNodeOpen,
+    setMobileAddNodeOpen,
+    mobileAddNodeSearch,
+    setMobileAddNodeSearch,
+    memoAutoExpandToken,
+    setMemoAutoExpandToken,
+    documentSettings,
+    setDocumentSettings,
+    documentTheme,
+    setDocumentTheme,
+    documentBackgroundImage,
+    setDocumentBackgroundImage,
+    documentUrl,
+    setDocumentUrl,
+    projectMeta,
+    setProjectMeta,
+    backgroundUrl,
+    setBackgroundUrl,
+    backgroundInteractive,
+    setBackgroundInteractive,
+    showDocumentPropertiesDialog,
+    setShowDocumentPropertiesDialog,
+    showNodeList,
+    setShowNodeList,
+    showGroupList,
+    setShowGroupList,
+    showGroupProperties,
+    setShowGroupProperties,
+    handleOpenDocumentProperties,
+    handleOpenMobileAddNode,
+    handleCloseMobileAddNode,
+    togglePropertiesPanel,
+    toggleNodeList,
+    toggleGroupList,
+    handlePropertiesPanelAnchorChange,
+    isMobile,
+    isSmallScreen,
+    isPortrait,
+    isLandscape,
+    backgroundImage,
+    isFreeUser
+  ]);
+
+  const servicesContextValue = useMemo(() => ({
+    handlers,
+    graphAPI,
+    graphCRUD,
+    handleLoadGraph,
+    handleFitToNodes,
+    handleAlignSelection,
+    handleDistributeSelection,
+    selectionHook,
+    groupManagerHook,
+    modesHook,
+    nodeTypes,
+    nodeTypeMetadata
+  }), [
+    handlers,
+    graphAPI,
+    graphCRUD,
+    handleLoadGraph,
+    handleFitToNodes,
+    handleAlignSelection,
+    handleDistributeSelection,
+    selectionHook,
+    groupManagerHook,
+    modesHook
+  ]);
+
   return (
+    <GraphEditorContextProvider
+      state={state}
+      history={historyHook}
+      rpc={rpcContextValue}
+      layout={layoutContextValue}
+      services={servicesContextValue}
+    >
     <div 
       id="graph-editor-background" 
       role="application"
@@ -1868,25 +2124,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         />
       )}
 
-      {isMobile && (
-        <MobileFabToolbar
-          onAddNode={handleOpenMobileAddNode}
-          onUndo={historyHook.handleUndo}
-          onRedo={historyHook.handleRedo}
-          onFitToNodes={handleFitToNodes}
-          onToggleProperties={togglePropertiesPanel}
-          onOpenDocumentProperties={handleOpenDocumentProperties}
-          onToggleNodeList={toggleNodeList}
-          onToggleGroupList={toggleGroupList}
-          onDeleteSelected={handlers.handleDeleteSelected}
-          canUndo={historyHook.canUndo}
-          canRedo={historyHook.canRedo}
-          hasSelection={selectedNodeIds.length > 0 || selectedEdgeIds.length > 0 || selectedGroupIds.length > 0}
-          showPropertiesPanel={showPropertiesPanel}
-          showNodeList={showNodeList}
-          showGroupList={showGroupList}
-        />
-      )}
+      {isMobile && <MobileFabToolbar />}
 
       <MobileAddNodeSheet
         open={Boolean(isMobile && mobileAddNodeOpen)}
@@ -2095,5 +2333,6 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         </Alert>
       </Snackbar>
     </div>
+    </GraphEditorContextProvider>
   );
 }

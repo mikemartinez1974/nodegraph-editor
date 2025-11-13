@@ -13,24 +13,45 @@ import GroupIcon from '@mui/icons-material/FolderSpecial';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import {
+  useGraphEditorStateContext,
+  useGraphEditorHistoryContext,
+  useGraphEditorLayoutContext,
+  useGraphEditorServicesContext
+} from '../providers/GraphEditorContext';
 
-export default function MobileFabToolbar({
-  onAddNode,
-  onUndo,
-  onRedo,
-  onFitToNodes,
-  onToggleProperties,
-  onOpenDocumentProperties,
-  onToggleNodeList,
-  onToggleGroupList,
-  onDeleteSelected,
-  canUndo = false,
-  canRedo = false,
-  hasSelection = false,
-  showPropertiesPanel = false,
-  showNodeList = false,
-  showGroupList = false
-}) {
+export default function MobileFabToolbar() {
+  const {
+    selectedNodeIds = [],
+    selectedEdgeIds = [],
+    selectedGroupIds = []
+  } = useGraphEditorStateContext();
+  const {
+    handleUndo,
+    handleRedo,
+    canUndo = false,
+    canRedo = false
+  } = useGraphEditorHistoryContext();
+  const layout = useGraphEditorLayoutContext();
+  const services = useGraphEditorServicesContext();
+
+  const onAddNode = layout?.handleOpenMobileAddNode;
+  const onToggleProperties = layout?.togglePropertiesPanel;
+  const onOpenDocumentProperties = layout?.handleOpenDocumentProperties;
+  const onToggleNodeList = layout?.toggleNodeList;
+  const onToggleGroupList = layout?.toggleGroupList;
+  const onFitToNodes = services?.handleFitToNodes;
+  const onDeleteSelected = services?.handlers?.handleDeleteSelected;
+
+  const showPropertiesPanel = !!layout?.showPropertiesPanel;
+  const showNodeList = !!layout?.showNodeList;
+  const showGroupList = !!layout?.showGroupList;
+
+  const hasSelection =
+    (selectedNodeIds?.length || 0) +
+    (selectedEdgeIds?.length || 0) +
+    (selectedGroupIds?.length || 0) > 0;
+
   return (
     <Box
       sx={{
@@ -48,52 +69,52 @@ export default function MobileFabToolbar({
         <SpeedDialAction
           icon={<PostAddIcon />}
           tooltipTitle="Add node"
-          onClick={onAddNode}
+          onClick={() => onAddNode?.()}
         />
         <SpeedDialAction
           icon={<UndoIcon />}
           tooltipTitle={canUndo ? "Undo" : "Nothing to undo"}
           FabProps={{ disabled: !canUndo }}
-          onClick={canUndo ? onUndo : undefined}
+          onClick={canUndo ? handleUndo : undefined}
         />
         <SpeedDialAction
           icon={<RedoIcon />}
           tooltipTitle={canRedo ? "Redo" : "Nothing to redo"}
           FabProps={{ disabled: !canRedo }}
-          onClick={canRedo ? onRedo : undefined}
+          onClick={canRedo ? handleRedo : undefined}
         />
         <SpeedDialAction
           icon={<CenterFocusStrongIcon />}
           tooltipTitle="Fit nodes to view"
-          onClick={onFitToNodes}
+          onClick={() => onFitToNodes?.()}
         />
         {onOpenDocumentProperties && (
           <SpeedDialAction
             icon={<HistoryEduIcon />}
             tooltipTitle="Document properties"
-            onClick={onOpenDocumentProperties}
+            onClick={() => onOpenDocumentProperties?.()}
           />
         )}
         <SpeedDialAction
           icon={<PlumbingIcon color={showPropertiesPanel ? 'primary' : undefined} />}
           tooltipTitle={showPropertiesPanel ? "Hide properties" : "Show properties"}
-          onClick={onToggleProperties}
+          onClick={() => onToggleProperties?.()}
         />
         <SpeedDialAction
           icon={<ListIcon color={showNodeList ? 'primary' : undefined} />}
           tooltipTitle={showNodeList ? "Hide node list" : "Show node list"}
-          onClick={onToggleNodeList}
+          onClick={() => onToggleNodeList?.()}
         />
         <SpeedDialAction
           icon={<GroupIcon color={showGroupList ? 'primary' : undefined} />}
           tooltipTitle={showGroupList ? "Hide group list" : "Show group list"}
-          onClick={onToggleGroupList}
+          onClick={() => onToggleGroupList?.()}
         />
         <SpeedDialAction
           icon={<DeleteIcon color={hasSelection ? 'error' : undefined} />}
           tooltipTitle={hasSelection ? "Delete selection" : "Nothing selected"}
           FabProps={{ disabled: !hasSelection }}
-          onClick={hasSelection ? onDeleteSelected : undefined}
+          onClick={hasSelection ? () => onDeleteSelected?.() : undefined}
         />
       </SpeedDial>
     </Box>
