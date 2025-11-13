@@ -3,22 +3,13 @@
 // ============================================
 "use client";
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import NodeGraph from '../NodeGraph';
-import Toolbar from './components/Toolbar';
-import { getNodeTypes } from './nodeTypeRegistry';
-import EdgeTypes from './edgeTypes';
-import NodeListPanel from './components/NodeListPanel';
-import GroupListPanel from './components/GroupListPanel';
-import GroupPropertiesPanel from './components/GroupPropertiesPanel';
 import { useTheme } from '@mui/material/styles';
-import edgeTypes from './edgeTypes';
-import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import eventBus from '../NodeGraph/eventBus';
-import ScriptRunner from './Scripting/ScriptRunner';
-import ScriptPanel from './Scripting/ScriptPanel';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
 import { v4 as uuidv4 } from 'uuid';
 import { generateUUID } from './utils/idUtils';
+import { getNodeTypes, nodeTypeMetadata } from './nodeTypeRegistry';
+import EdgeTypes from './edgeTypes';
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
 import { useGraphEditorSetup } from './hooks/useGraphEditorSetup';
@@ -27,18 +18,12 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
-import PropertiesPanel from './components/PropertiesPanel';
-import MobileFabToolbar from './components/MobileFabToolbar';
-import MobileAddNodeSheet from './components/MobileAddNodeSheet';
 import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
-import { themeConfigFromMuiTheme, createThemeFromConfig } from './utils/themeUtils';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
-import { nodeTypeMetadata } from './nodeTypeRegistry';
+import { themeConfigFromMuiTheme } from './utils/themeUtils';
 import { useBackgroundRpc } from './hooks/useBackgroundRpc';
-import BackgroundFrame from './components/BackgroundFrame';
 import { GraphEditorContextProvider } from './providers/GraphEditorContext';
+import GraphEditorContent from './GraphEditorContent';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -1505,8 +1490,6 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
 
   // Add this useEffect to your GraphEditor.js file
   // Place it with the other event listener useEffects
-  // Import EdgeTypes at the top: import EdgeTypes from './edgeTypes';
-  
   useEffect(() => {
     const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction }) => {
       try {
@@ -1762,31 +1745,6 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
   }, []);
 
-  // Memoized values for nodes, edges, and groups
-  const memoizedNodes = useMemo(() => nodes, [nodes]);
-  const memoizedEdges = useMemo(() => edges, [edges]);
-  const memoizedGroups = useMemo(() => groups, [groups]);
-  const memoizedSelectedNodeIds = useMemo(() => selectedNodeIds, [selectedNodeIds]);
-  const memoizedSelectedEdgeIds = useMemo(() => selectedEdgeIds, [selectedEdgeIds]);
-  const memoizedSelectedGroupIds = useMemo(() => selectedGroupIds, [selectedGroupIds]);
-
-  const memoizedSetNodes = useCallback(setNodes, []);
-  const memoizedSetEdges = useCallback(setEdges, []);
-  const memoizedSetGroups = useCallback(setGroups, []);
-  const memoizedSetSelectedNodeIds = useCallback(setSelectedNodeIds, []);
-  const memoizedSetSelectedEdgeIds = useCallback(setSelectedEdgeIds, []);
-  const memoizedSetPan = useCallback(setPan, []);
-  const memoizedSetZoom = useCallback(setZoom, []);
-
-  // Create MUI theme from document theme config
-  const documentMuiTheme = useMemo(() => {
-    if (documentTheme) {
-      const theme = createThemeFromConfig(documentTheme);
-      return theme;
-    }
-    return null;
-  }, [documentTheme]);
-
   // Register single handleClick event handler
   const handleClickHandlerId = Math.random().toString(36).substr(2, 8);
   useHandleClickHandler((payload) => {
@@ -1942,6 +1900,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     toggleNodeList,
     toggleGroupList,
     handlePropertiesPanelAnchorChange,
+    graphStats,
+    recentSnapshots,
+    handleUpdateProjectMeta,
+    handleResetProjectMeta,
     isMobile,
     isSmallScreen,
     isPortrait,
@@ -2002,6 +1964,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     toggleNodeList,
     toggleGroupList,
     handlePropertiesPanelAnchorChange,
+    graphStats,
+    recentSnapshots,
+    handleUpdateProjectMeta,
+    handleResetProjectMeta,
     isMobile,
     isSmallScreen,
     isPortrait,
@@ -2022,7 +1988,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     groupManagerHook,
     modesHook,
     nodeTypes,
-    nodeTypeMetadata
+    nodeTypeMetadata,
+    handleScriptRequest
   }), [
     handlers,
     graphAPI,
@@ -2033,7 +2000,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     handleDistributeSelection,
     selectionHook,
     groupManagerHook,
-    modesHook
+    modesHook,
+    nodeTypes,
+    nodeTypeMetadata,
+    handleScriptRequest
   ]);
 
   return (
@@ -2044,295 +2014,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       layout={layoutContextValue}
       services={servicesContextValue}
     >
-    <div 
-      id="graph-editor-background" 
-      role="application"
-      aria-label="Node graph editor"
-      style={{
-        minHeight: '100vh',
-        minWidth: '100vw',
-        backgroundColor: theme.palette.background.default,
-        backgroundImage: backgroundImage ? `url('/background art/${backgroundImage}')` : undefined,
-        backgroundSize: 'auto',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      {/* BackgroundFrame for RPC */}
-      {backgroundUrl && (
-        <BackgroundFrame 
-          ref={bgRef}
-          url={backgroundUrl}
-          interactive={backgroundInteractive}
-          onHandshakeComplete={handleHandshakeComplete}
-        />
-      )}
-      
-      {!isMobile && (
-        <Toolbar 
-          onToggleNodeList={toggleNodeList}
-          showNodeList={showNodeList}
-          onToggleGroupList={toggleGroupList}
-          showGroupList={showGroupList}
-          nodes={nodes} 
-          edges={edges} 
-          groups={groups}
-          onLoadGraph={handlers.handleLoadGraph}
-          onDeleteSelected={handlers.handleDeleteSelected}
-          onClearGraph={handlers.handleClearGraph}
-          onUndo={historyHook.handleUndo}
-          onRedo={historyHook.handleRedo}
-          selectedNodeId={selectedNodeIds[0] || null}
-          selectedNodeIds={selectedNodeIds}
-          selectedEdgeId={selectedEdgeIds[0] || null}
-          canUndo={historyHook.canUndo}
-          canRedo={historyHook.canRedo}
-          mode={modesHook.mode}
-          autoLayoutType={modesHook.autoLayoutType}
-          onModeChange={modesHook.handleModeChange}
-          onAutoLayoutChange={modesHook.setAutoLayoutType}
-          onApplyLayout={modesHook.applyAutoLayout}
-          onAlignSelection={handleAlignSelection}
-          onDistributeSelection={handleDistributeSelection}
-          onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
-          pan={pan}
-          zoom={zoom}
-          setNodes={setNodes}
-          setEdges={setEdges}
-          setGroups={setGroups}
-          nodesRef={nodesRef}
-          edgesRef={edgesRef}
-          saveToHistory={historyHook.saveToHistory}
-          graphCRUD={graphCRUD}
-          currentTheme={theme.palette.mode}
-          backgroundImage={backgroundImage}
-          backgroundUrl={backgroundUrl}
-          setBackgroundUrl={setBackgroundUrl}
-          defaultNodeColor={defaultNodeColor}
-          defaultEdgeColor={defaultEdgeColor}
-          isFreeUser={isFreeUser}
-          showMinimap={showMinimap}
-          onToggleMinimap={() => eventBus.emit('toggleMinimap')}
-          snapToGrid={snapToGrid}
-          onToggleSnapToGrid={() => setSnapToGrid(prev => !prev)}
-          gridSize={documentSettings.gridSize}
-          documentTheme={documentTheme}
-          isMobile={isMobile}
-          isSmallScreen={isSmallScreen}
-          isPortrait={isPortrait}
-          isLandscape={isLandscape}
-        />
-      )}
-
-      {isMobile && <MobileFabToolbar />}
-
-      <MobileAddNodeSheet
-        open={Boolean(isMobile && mobileAddNodeOpen)}
-        onClose={handleCloseMobileAddNode}
-        search={mobileAddNodeSearch}
-        onSearchChange={setMobileAddNodeSearch}
-      />
-      
-      {showPropertiesPanel && (
-        <PropertiesPanel
-          selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
-          selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
-          selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
-          onUpdateNode={(id, updates, options) => {
-            setNodes(prev => {
-              const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates && updates.data ? { ...n.data, ...updates.data } : n.data } : n);
-              nodesRef.current = next;
-              try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
-              return next;
-            });
-            try { if (handlers && typeof handlers.handleUpdateNodeData === 'function') { handlers.handleUpdateNodeData(id, updates, options); } } catch (err) {}
-          }}
-          onUpdateEdge={(id, updates) => {
-            setEdges(prev => {
-              const next = prev.map(e => e.id === id ? { ...e, ...updates } : e);
-              edgesRef.current = next;
-              try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
-              return next;
-            });
-          }}
-          onUpdateGroup={(id, updates) => {
-            setGroups(prev => {
-              const next = prev.map(g => g.id === id ? { ...g, ...updates } : g);
-              return next;
-            });
-          }}
-          theme={theme}
-          defaultNodeColor={defaultNodeColor}
-          defaultEdgeColor={defaultEdgeColor}
-          lockedNodes={lockedNodes}
-          lockedEdges={lockedEdges}
-          lockedGroups={groupManager?.lockedGroups}
-          onToggleNodeLock={(nodeId) => {
-            setLockedNodes(prev => {
-              const newSet = new Set(prev);
-              if (newSet.has(nodeId)) { newSet.delete(nodeId); } else { newSet.add(nodeId); }
-              return newSet;
-            });
-          }}
-          onToggleEdgeLock={(edgeId) => {
-            setLockedEdges(prev => {
-              const newSet = new Set(prev);
-              if (newSet.has(edgeId)) { newSet.delete(edgeId); } else { newSet.add(edgeId); }
-              return newSet;
-            });
-          }}
-          onToggleGroupLock={groupManager?.toggleGroupLock}
-          onClose={() => setShowPropertiesPanel(false)}
-          anchor={nodePanelAnchor}
-          onAnchorChange={handlePropertiesPanelAnchorChange}
-          isMobile={isMobile}
-          memoAutoExpandToken={memoAutoExpandToken}
-        />
-      )}
-      
-      <NodeListPanel
-        nodes={nodes}
-        selectedNodeId={selectedNodeIds[0] || null}
-        selectedNodeIds={selectedNodeIds}
-        onNodeSelect={handlers.handleNodeListSelect}
-        onNodeFocus={handlers.handleNodeFocus}
-        onClose={() => setShowNodeList(false)}
-        isOpen={showNodeList}
-        theme={theme}
-        propertiesPanelAnchor={nodePanelAnchor}
-        isMobile={isMobile}
-        graphApiRef={graphAPI}
-      />
-
-      <GroupListPanel
-        groups={groups}
-        selectedGroupId={selectedGroupIds[0] || null}
-        selectedGroupIds={selectedGroupIds}
-        onGroupSelect={handlers.handleGroupListSelect}
-        onGroupFocus={handlers.handleGroupFocus}
-        onGroupDoubleClick={handlers.handleGroupDoubleClickFromList}
-        onGroupToggleVisibility={handlers.handleGroupToggleVisibility}
-        onGroupDelete={handlers.handleGroupDelete}
-        onClose={() => setShowGroupList(false)}
-        isOpen={showGroupList}
-        theme={theme}
-      />
-      
-      {documentMuiTheme ? (
-        <MuiThemeProvider theme={documentMuiTheme}>
-          <NodeGraph 
-            key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
-            nodes={memoizedNodes}
-            setNodes={memoizedSetNodes}
-            setEdges={memoizedSetEdges}
-            edges={memoizedEdges}
-            groups={memoizedGroups}
-            setGroups={memoizedSetGroups}
-            pan={pan}
-            zoom={zoom}
-            setPan={memoizedSetPan}
-            setZoom={memoizedSetZoom}
-            selectedNodeId={memoizedSelectedNodeIds[0] || null}
-            selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
-            selectedNodeIds={memoizedSelectedNodeIds}
-            selectedEdgeIds={memoizedSelectedEdgeIds}
-            selectedGroupIds={memoizedSelectedGroupIds}
-            setSelectedNodeIds={memoizedSetSelectedNodeIds}
-            setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
-            hoveredNodeId={hoveredNodeId}
-            nodeTypes={nodeTypes}
-            edgeTypes={EdgeTypes}
-            mode={modesHook.mode}
-            backgroundUrl={backgroundUrl}
-            backgroundInteractive={backgroundInteractive}
-            backgroundImage={documentBackgroundImage}
-            setSnackbar={setSnackbar}
-            showMinimap={showMinimap}
-            snapToGrid={snapToGrid}
-            showGrid={showGrid}
-            gridSize={documentSettings.gridSize}
-            lockedNodes={lockedNodes}
-            lockedEdges={lockedEdges}
-            onEdgeClick={undefined}
-            onEdgeHover={undefined}
-            hoveredEdgeId={hoveredEdgeId}
-            showAllEdgeLabels={showAllEdgeLabels}
-          />
-        </MuiThemeProvider>
-      ) : (
-        <NodeGraph 
-          key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
-          nodes={memoizedNodes}
-          setNodes={memoizedSetNodes}
-          setEdges={memoizedSetEdges}
-          edges={memoizedEdges}
-          groups={memoizedGroups}
-          setGroups={memoizedSetGroups}
-          pan={pan}
-          zoom={zoom}
-          setPan={memoizedSetPan}
-          setZoom={memoizedSetZoom}
-          selectedNodeId={memoizedSelectedNodeIds[0] || null}
-          selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
-          selectedNodeIds={memoizedSelectedNodeIds}
-          selectedEdgeIds={memoizedSelectedEdgeIds}
-          selectedGroupIds={memoizedSelectedGroupIds}
-          setSelectedNodeIds={memoizedSetSelectedNodeIds}
-          setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
-          hoveredNodeId={hoveredNodeId}
-          nodeTypes={nodeTypes}
-          edgeTypes={EdgeTypes}
-          mode={modesHook.mode}
-          backgroundUrl={backgroundUrl}
-          backgroundInteractive={backgroundInteractive}
-          backgroundImage={documentBackgroundImage}
-          setSnackbar={setSnackbar}
-          showMinimap={showMinimap}
-          snapToGrid={snapToGrid}
-          showGrid={showGrid}
-          gridSize={documentSettings.gridSize}
-          lockedNodes={lockedNodes}
-          lockedEdges={lockedEdges}
-          onEdgeClick={undefined}
-          onEdgeHover={undefined}
-          hoveredEdgeId={hoveredEdgeId}
-          showAllEdgeLabels={showAllEdgeLabels}
-        />
-      )}
-
-      {/* Mount script runner and panel so scripts can run and panel can toggle */}
-      <ScriptRunner onRequest={handleScriptRequest} />
-      <ScriptPanel />
-      
-      {/* Document Properties Dialog */}
-      <DocumentPropertiesDialog 
-        open={showDocumentPropertiesDialog} 
-        onClose={() => setShowDocumentPropertiesDialog(false)} 
-        backgroundUrl={backgroundUrl} 
-        setBackgroundUrl={setBackgroundUrl}
-        projectMeta={projectMeta}
-        onProjectMetaChange={handleUpdateProjectMeta}
-        onResetProjectMeta={handleResetProjectMeta}
-        graphStats={graphStats}
-        recentSnapshots={recentSnapshots}
-      />
-      
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity || 'info'}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </div>
+      <GraphEditorContent />
     </GraphEditorContextProvider>
   );
 }
