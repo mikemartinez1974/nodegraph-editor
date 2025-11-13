@@ -515,6 +515,10 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     setShowGroupList(prev => !prev);
   }, [setShowGroupList]);
 
+  const handlePropertiesPanelAnchorChange = useCallback((nextAnchor) => {
+    setNodePanelAnchor(nextAnchor);
+  }, [setNodePanelAnchor]);
+
   const handleFitToNodes = useCallback(() => {
     const fit = graphAPI?.current?.fitToNodes;
     if (typeof fit === 'function') {
@@ -871,24 +875,11 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity })
   });
 
-  // Panel anchor synchronization
+  // Keep node list docked opposite the properties panel
   useEffect(() => {
-    const handlePropertiesOpen = () => {
-      const oppositeAnchor = nodePanelAnchor === 'right' ? 'left' : 'right';
-      setNodeListAnchor(oppositeAnchor);
-    };
-    
-    eventBus.on('openNodeProperties', handlePropertiesOpen);
-    
-    if (showNodeList) {
-      const oppositeAnchor = nodePanelAnchor === 'right' ? 'left' : 'right';
-      setNodeListAnchor(oppositeAnchor);
-    }
-    
-    return () => {
-      eventBus.off('openNodeProperties', handlePropertiesOpen);
-    };
-  }, [showNodeList, nodePanelAnchor, setNodeListAnchor]);
+    const oppositeAnchor = nodePanelAnchor === 'right' ? 'left' : 'right';
+    setNodeListAnchor(prev => (prev === oppositeAnchor ? prev : oppositeAnchor));
+  }, [nodePanelAnchor, setNodeListAnchor]);
   
   // After GraphCRUD instance is created (assume variable is graphAPI)
   useEffect(() => {
@@ -1954,6 +1945,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           }}
           onToggleGroupLock={groupManager?.toggleGroupLock}
           onClose={() => setShowPropertiesPanel(false)}
+          anchor={nodePanelAnchor}
+          onAnchorChange={handlePropertiesPanelAnchorChange}
           isMobile={isMobile}
           memoAutoExpandToken={memoAutoExpandToken}
         />
@@ -1968,9 +1961,9 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         onClose={() => setShowNodeList(false)}
         isOpen={showNodeList}
         theme={theme}
-        anchor={nodeListAnchor}
         propertiesPanelAnchor={nodePanelAnchor}
         isMobile={isMobile}
+        graphApiRef={graphAPI}
       />
 
       <GroupListPanel

@@ -13,17 +13,23 @@ import {
   InputAdornment,
   Chip,
   Menu,
-  MenuItem,
   Paper,
-  SwipeableDrawer
+  SwipeableDrawer,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Close as CloseIcon,
-  FilterList as FilterIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  FilterList as FilterIcon
 } from '@mui/icons-material';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import * as ReactWindow from 'react-window';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import { createPortal } from 'react-dom';
@@ -40,13 +46,156 @@ export default function NodeListPanel({
   isOpen = false,
   theme,
   propertiesPanelAnchor = 'right',
-  isMobile = false
+  isMobile = false,
+  graphApiRef
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState(new Set());
   const [showVisible, setShowVisible] = useState(true);
   const [showHidden, setShowHidden] = useState(true);
+  const SAVED_QUERIES_KEY = 'nodegraph-editor:nodes:savedQueries';
+  const [hasMemoOnly, setHasMemoOnly] = useState(false);
+  const [hasLinkOnly, setHasLinkOnly] = useState(false);
+  const [minWidth, setMinWidth] = useState('');
+  const [maxWidth, setMaxWidth] = useState('');
+  const [minHeight, setMinHeight] = useState('');
+  const [maxHeight, setMaxHeight] = useState('');
+  const [savedQueries, setSavedQueries] = useState([]);
+  const [activeQueryId, setActiveQueryId] = useState(null);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [newQueryName, setNewQueryName] = useState('');
+
+  const parseMetric = (value) => {
+    if (value === null || value === undefined) return undefined;
+    const trimmed = typeof value === 'string' ? value.trim() : value;
+    if (trimmed === '') return undefined;
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : undefined;
+  };
+
+  const selectedTypeArray = useMemo(() => Array.from(selectedTypes), [selectedTypes]);
+
+  const filterCriteria = useMemo(() => {
+    const criteria = {
+      includeVisible: showVisible,
+      includeHidden: showHidden
+    };
+
+    const textValue = searchTerm.trim();
+    if (textValue.length > 0) {
+      criteria.text = textValue;
+    }
+
+    if (selectedTypeArray.length > 0) {
+      criteria.types = selectedTypeArray;
+    }
+
+    if (hasMemoOnly) {
+      criteria.hasMemo = true;
+    }
+
+    if (hasLinkOnly) {
+      criteria.hasLink = true;
+    }
+
+    const minWidthNum = parseMetric(minWidth);
+    if (minWidthNum !== undefined) {
+      criteria.minWidth = minWidthNum;
+    }
+
+    const maxWidthNum = parseMetric(maxWidth);
+    if (maxWidthNum !== undefined) {
+      criteria.maxWidth = maxWidthNum;
+    }
+
+    const minHeightNum = parseMetric(minHeight);
+    if (minHeightNum !== undefined) {
+      criteria.minHeight = minHeightNum;
+    }
+
+    const maxHeightNum = parseMetric(maxHeight);
+    if (maxHeightNum !== undefined) {
+      criteria.maxHeight = maxHeightNum;
+    }
+
+    return criteria;
+  }, [
+    searchTerm,
+    selectedTypeArray,
+    showVisible,
+    showHidden,
+    hasMemoOnly,
+    hasLinkOnly,
+    minWidth,
+    maxWidth,
+    minHeight,
+    maxHeight
+  ]);
+
+  const hasActiveFilter = useMemo(() => Boolean(
+    (filterCriteria.text && filterCriteria.text.length > 0) ||
+    (filterCriteria.types && filterCriteria.types.length > 0) ||
+    filterCriteria.hasMemo === true ||
+    filterCriteria.hasLink === true ||
+    filterCriteria.minWidth !== undefined ||
+    filterCriteria.maxWidth !== undefined ||
+    filterCriteria.minHeight !== undefined ||
+    filterCriteria.maxHeight !== undefined ||
+    filterCriteria.includeVisible === false ||
+    filterCriteria.includeHidden === false
+  ), [filterCriteria]);
+
+  const currentSavedState = useMemo(
+    () => ({
+      searchTerm,
+      types: selectedTypeArray,
+      includeVisible: showVisible,
+      includeHidden: showHidden,
+      hasMemo: hasMemoOnly,
+      hasLink: hasLinkOnly,
+      minWidth,
+      maxWidth,
+      minHeight,
+      maxHeight
+    }),
+    [
+      searchTerm,
+      selectedTypeArray,
+      showVisible,
+      showHidden,
+      hasMemoOnly,
+      hasLinkOnly,
+      minWidth,
+      maxWidth,
+      minHeight,
+      maxHeight
+    ]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(SAVED_QUERIES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setSavedQueries(parsed);
+        }
+      }
+    } catch (err) {
+      console.warn('[NodeListPanel] Failed to load saved queries', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(SAVED_QUERIES_KEY, JSON.stringify(savedQueries));
+    } catch (err) {
+      console.warn('[NodeListPanel] Failed to persist saved queries', err);
+    }
+  }, [savedQueries]);
 
   // Get unique node types for filtering
   const nodeTypes = useMemo(() => {
@@ -54,25 +203,82 @@ export default function NodeListPanel({
     return Array.from(types);
   }, [nodes]);
 
-  // Filter nodes based on search term and filters
   const filteredNodes = useMemo(() => {
-    return nodes.filter(node => {
-      // Search filter
-      const matchesSearch = !searchTerm || 
-        node.label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        node.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        node.data?.memo?.toLowerCase().includes(searchTerm.toLowerCase());
+    const criteria = filterCriteria;
 
-      // Type filter
-      const matchesType = selectedTypes.size === 0 || selectedTypes.has(node.type || 'default');
+    const applyFallback = (list) => list.filter(node => {
+      const nodeType = node.type || 'default';
 
-      // Visibility filter
+      if (criteria.types && criteria.types.length && !criteria.types.includes(nodeType)) {
+        return false;
+      }
+
+      if (criteria.text) {
+        const term = criteria.text.toLowerCase();
+        const labelLower = (node.label || '').toLowerCase();
+        const idLower = (node.id || '').toLowerCase();
+        const memoLower = (node.data?.memo || '').toLowerCase();
+        const linkLower = (node.data?.link || '').toLowerCase();
+        if (
+          !labelLower.includes(term) &&
+          !idLower.includes(term) &&
+          !memoLower.includes(term) &&
+          !linkLower.includes(term)
+        ) {
+          return false;
+        }
+      }
+
+      if (criteria.hasMemo === true) {
+        if (!(node.data?.memo && node.data.memo.trim().length > 0)) {
+          return false;
+        }
+      }
+
+      if (criteria.hasLink === true) {
+        if (!(node.data?.link && node.data.link.trim().length > 0)) {
+          return false;
+        }
+      }
+
       const isVisible = node.visible !== false;
-      const matchesVisibility = (isVisible && showVisible) || (!isVisible && showHidden);
+      if (criteria.includeVisible === false && isVisible) return false;
+      if (criteria.includeHidden === false && !isVisible) return false;
 
-      return matchesSearch && matchesType && matchesVisibility;
+      const widthValueRaw = node.width ?? node.data?.width;
+      const widthValue = Number(widthValueRaw);
+      if (criteria.minWidth !== undefined) {
+        if (!Number.isFinite(widthValue) || widthValue < criteria.minWidth) return false;
+      }
+      if (criteria.maxWidth !== undefined) {
+        if (!Number.isFinite(widthValue) || widthValue > criteria.maxWidth) return false;
+      }
+
+      const heightValueRaw = node.height ?? node.data?.height;
+      const heightValue = Number(heightValueRaw);
+      if (criteria.minHeight !== undefined) {
+        if (!Number.isFinite(heightValue) || heightValue < criteria.minHeight) return false;
+      }
+      if (criteria.maxHeight !== undefined) {
+        if (!Number.isFinite(heightValue) || heightValue > criteria.maxHeight) return false;
+      }
+
+      return true;
     });
-  }, [nodes, searchTerm, selectedTypes, showVisible, showHidden]);
+
+    if (graphApiRef?.current && typeof graphApiRef.current.findNodes === 'function') {
+      try {
+        const result = graphApiRef.current.findNodes(criteria);
+        if (result?.success && Array.isArray(result.data)) {
+          return result.data;
+        }
+      } catch (err) {
+        console.warn('[NodeListPanel] Graph API search failed, using fallback filter', err);
+      }
+    }
+
+    return applyFallback(nodes);
+  }, [graphApiRef, nodes, filterCriteria]);
 
   const handleTypeFilter = (type) => {
     const newTypes = new Set(selectedTypes);
@@ -82,7 +288,6 @@ export default function NodeListPanel({
       newTypes.add(type);
     }
     setSelectedTypes(newTypes);
-    setFilterMenuAnchor(null);
   };
 
   const clearFilters = () => {
@@ -90,14 +295,72 @@ export default function NodeListPanel({
     setShowVisible(true);
     setShowHidden(true);
     setSearchTerm('');
+    setHasMemoOnly(false);
+    setHasLinkOnly(false);
+    setMinWidth('');
+    setMaxWidth('');
+    setMinHeight('');
+    setMaxHeight('');
+    setActiveQueryId(null);
     setFilterMenuAnchor(null);
   };
 
   const anchor = propertiesPanelAnchor === 'right' ? 'left' : 'right';
 
+  const handleSaveQueryRequest = () => {
+    setFilterMenuAnchor(null);
+    const suggestedName = currentSavedState.searchTerm?.trim()
+      ? currentSavedState.searchTerm.trim()
+      : `Query ${savedQueries.length + 1}`;
+    setNewQueryName(suggestedName);
+    setSaveDialogOpen(true);
+  };
+
+  const handleConfirmSaveQuery = () => {
+    const name = newQueryName.trim();
+    if (!name) return;
+
+    const payload = {
+      id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `query-${Date.now()}`,
+      name,
+      criteria: { ...currentSavedState }
+    };
+
+    setSavedQueries(prev => {
+      const remaining = prev.filter(q => q.name !== name);
+      return [payload, ...remaining];
+    });
+    setActiveQueryId(payload.id);
+    setSaveDialogOpen(false);
+  };
+
+  const handleDeleteSavedQuery = (id) => {
+    setSavedQueries(prev => prev.filter(q => q.id !== id));
+    if (activeQueryId === id) {
+      setActiveQueryId(null);
+    }
+  };
+
+  const applySavedQuery = (query) => {
+    if (!query) return;
+    const { criteria = {} } = query;
+    setActiveQueryId(query.id);
+    setSearchTerm(criteria.searchTerm ?? '');
+    setSelectedTypes(new Set(criteria.types || []));
+    setShowVisible(criteria.includeVisible !== undefined ? !!criteria.includeVisible : true);
+    setShowHidden(criteria.includeHidden !== undefined ? !!criteria.includeHidden : true);
+    setHasMemoOnly(!!criteria.hasMemo);
+    setHasLinkOnly(!!criteria.hasLink);
+    setMinWidth(criteria.minWidth ?? '');
+    setMaxWidth(criteria.maxWidth ?? '');
+    setMinHeight(criteria.minHeight ?? '');
+    setMaxHeight(criteria.maxHeight ?? '');
+    setFilterMenuAnchor(null);
+  };
+
   // Virtualized row renderer
   const VirtualRow = ({ index, style }) => {
-    const node = nodes[index];
+    const node = filteredNodes[index];
     const isSelected = selectedNodeIds?.includes(node.id);
     
     return (
@@ -135,7 +398,7 @@ export default function NodeListPanel({
   };
 
   // Use virtualization when list is large (>100 items)
-  const useVirtualization = nodes.length > 100;
+  const useVirtualization = filteredNodes.length > 100;
 
   const handleClosePanel = () => {
     if (onClose) onClose();
@@ -143,18 +406,34 @@ export default function NodeListPanel({
 
   const statsChips = (
     <Box sx={{ px: 2, pb: 1 }}>
-      <Chip label={`${nodes.length} nodes`} size="small" color="primary" />
+      <Chip label={`${nodes.length} total`} size="small" color="primary" />
+      <Chip label={`${filteredNodes.length} shown`} size="small" sx={{ ml: 1 }} />
       {selectedNodeIds.length > 0 && (
         <Chip label={`${selectedNodeIds.length} selected`} size="small" color="secondary" sx={{ ml: 1 }} />
       )}
     </Box>
   );
 
+  const savedQueryChips = savedQueries.length > 0 ? (
+    <Box sx={{ px: 2, pb: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+      {savedQueries.map((query) => (
+        <Chip
+          key={query.id}
+          label={query.name}
+          variant={activeQueryId === query.id ? 'filled' : 'outlined'}
+          onClick={() => applySavedQuery(query)}
+          onDelete={() => handleDeleteSavedQuery(query.id)}
+          size="small"
+        />
+      ))}
+    </Box>
+  ) : null;
+
   const listSection = useVirtualization ? (
     <Box sx={{ flex: 1, overflow: 'hidden' }}>
       <FixedSizeList
         height={typeof window !== 'undefined' ? window.innerHeight - 200 : 400}
-        itemCount={nodes.length}
+        itemCount={filteredNodes.length}
         itemSize={72}
         width="100%"
         overscanCount={5}
@@ -164,7 +443,7 @@ export default function NodeListPanel({
     </Box>
   ) : (
     <List sx={{ height: 'calc(100vh - 180px)', overflowY: 'auto' }}>
-      {nodes.map((node) => {
+      {filteredNodes.map((node) => {
         const isSelected = selectedNodeIds?.includes(node.id);
         return (
           <ListItem
@@ -221,6 +500,7 @@ export default function NodeListPanel({
   const panelBody = (
     <>
       {statsChips}
+      {savedQueryChips}
       <Box sx={{ px: 2, pb: 1 }}>
         <TextField
           fullWidth
@@ -236,7 +516,19 @@ export default function NodeListPanel({
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton size="small" onClick={(e) => setFilterMenuAnchor(e.currentTarget)}>
+                <IconButton
+                  size="small"
+                  aria-label="Save current filters"
+                  onClick={handleSaveQueryRequest}
+                  disabled={!hasActiveFilter}
+                >
+                  <SaveAltIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  aria-label="Open filter menu"
+                  onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
+                >
                   <FilterIcon fontSize="small" />
                 </IconButton>
               </InputAdornment>
@@ -249,28 +541,158 @@ export default function NodeListPanel({
         open={Boolean(filterMenuAnchor)}
         onClose={() => setFilterMenuAnchor(null)}
       >
-        <MenuItem onClick={clearFilters}>Clear filters</MenuItem>
-        <Divider />
-        <MenuItem onClick={() => setShowVisible(prev => !prev)}>
-          <ListItemText primary={showVisible ? 'Hide visible nodes' : 'Show visible nodes'} />
-        </MenuItem>
-        <MenuItem onClick={() => setShowHidden(prev => !prev)}>
-          <ListItemText primary={showHidden ? 'Hide hidden nodes' : 'Show hidden nodes'} />
-        </MenuItem>
-        <Divider />
-        {nodeTypes.map(type => (
-          <MenuItem key={type} onClick={() => handleTypeFilter(type)}>
-            <ListItemText primary={type} />
-            {selectedTypes.has(type) ? <VisibilityIcon fontSize="small" /> : <VisibilityOffIcon fontSize="small" />}
-          </MenuItem>
-        ))}
+        <Box sx={{ p: 1.5, width: 300 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="subtitle2">Filters</Typography>
+            <Button size="small" onClick={clearFilters}>Clear</Button>
+          </Box>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showVisible}
+                  onChange={(e) => setShowVisible(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Include visible nodes"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showHidden}
+                  onChange={(e) => setShowHidden(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Include hidden nodes"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hasMemoOnly}
+                  onChange={(e) => setHasMemoOnly(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Require memo content"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hasLinkOnly}
+                  onChange={(e) => setHasLinkOnly(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Require link value"
+            />
+          </FormGroup>
+          <Divider sx={{ my: 1.5 }} />
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+            Dimensions
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, mt: 1 }}>
+            <TextField
+              label="Min width"
+              size="small"
+              type="number"
+              value={minWidth}
+              onChange={(e) => setMinWidth(e.target.value)}
+              InputLabelProps={{ shrink: Boolean(minWidth) }}
+            />
+            <TextField
+              label="Max width"
+              size="small"
+              type="number"
+              value={maxWidth}
+              onChange={(e) => setMaxWidth(e.target.value)}
+              InputLabelProps={{ shrink: Boolean(maxWidth) }}
+            />
+            <TextField
+              label="Min height"
+              size="small"
+              type="number"
+              value={minHeight}
+              onChange={(e) => setMinHeight(e.target.value)}
+              InputLabelProps={{ shrink: Boolean(minHeight) }}
+            />
+            <TextField
+              label="Max height"
+              size="small"
+              type="number"
+              value={maxHeight}
+              onChange={(e) => setMaxHeight(e.target.value)}
+              InputLabelProps={{ shrink: Boolean(maxHeight) }}
+            />
+          </Box>
+          <Divider sx={{ my: 1.5 }} />
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+            Node types
+          </Typography>
+          <FormGroup sx={{ mt: 1, maxHeight: 180, overflowY: 'auto', pr: 1 }}>
+            {nodeTypes.map(type => (
+              <FormControlLabel
+                key={type}
+                control={
+                  <Checkbox
+                    checked={selectedTypes.has(type)}
+                    onChange={() => handleTypeFilter(type)}
+                    size="small"
+                  />
+                }
+                label={type}
+              />
+            ))}
+          </FormGroup>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<SaveAltIcon fontSize="small" />}
+              onClick={handleSaveQueryRequest}
+              disabled={!hasActiveFilter}
+            >
+              Save filters
+            </Button>
+          </Box>
+        </Box>
       </Menu>
       {listSection}
     </>
   );
 
+  const saveQueryDialog = (
+    <Dialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)}>
+      <DialogTitle>Save filter preset</DialogTitle>
+      <DialogContent sx={{ pt: 1 }}>
+        <TextField
+          autoFocus
+          fullWidth
+          margin="dense"
+          label="Preset name"
+          value={newQueryName}
+          onChange={(e) => setNewQueryName(e.target.value)}
+        />
+        <Typography variant="caption" color="text.secondary">
+          Presets are stored locally so you can quickly reapply complex searches.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setSaveDialogOpen(false)}>Cancel</Button>
+        <Button
+          variant="contained"
+          onClick={handleConfirmSaveQuery}
+          disabled={!newQueryName.trim()}
+        >
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   if (isMobile) {
-    return createPortal(
+    const mobileDrawer = createPortal(
       <SwipeableDrawer
         anchor="bottom"
         open={isOpen}
@@ -299,9 +721,16 @@ export default function NodeListPanel({
       </SwipeableDrawer>,
       document.body
     );
+
+    return (
+      <>
+        {saveQueryDialog}
+        {mobileDrawer}
+      </>
+    );
   }
 
-  return createPortal(
+  const desktopPanel = createPortal(
     <Paper
       elevation={8}
       sx={{
@@ -329,5 +758,12 @@ export default function NodeListPanel({
       </Box>
     </Paper>,
     document.body
+  );
+
+  return (
+    <>
+      {saveQueryDialog}
+      {desktopPanel}
+    </>
   );
 }

@@ -3,6 +3,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils';
 
+const toNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
+
+const hasContent = (value) => typeof value === 'string' && value.trim().length > 0;
+
+const toLower = (value) => (value ?? '').toString().toLowerCase();
+
 /**
  * CRUD API for Node Graph Editor
  * All functions return { success: boolean, data?: any, error?: string }
@@ -582,24 +591,101 @@ export default class GraphCRUD {
    * @param {Object} criteria - Search criteria
    * @returns {Object} Result with matching nodes
    */
-  findNodes(criteria) {
+  findNodes(criteria = {}) {
     try {
-      let nodes = this.getNodes();
-
-      if (criteria.type) {
-        nodes = nodes.filter(n => n.type === criteria.type);
-      }
-      if (criteria.label) {
-        nodes = nodes.filter(n => n.label && n.label.includes(criteria.label));
-      }
-      if (criteria.hasMemo !== undefined) {
-        nodes = nodes.filter(n => criteria.hasMemo ? (n.data?.memo || '').length > 0 : !n.data?.memo);
-      }
-      if (criteria.hasLink !== undefined) {
-        nodes = nodes.filter(n => criteria.hasLink ? (n.data?.link || '').length > 0 : !n.data?.link);
+      const nodes = [...this.getNodes()];
+      if (!criteria || Object.keys(criteria).length === 0) {
+        return { success: true, data: nodes };
       }
 
-      return { success: true, data: nodes };
+      const {
+        type,
+        types,
+        label,
+        text,
+        id,
+        ids,
+        memoContains,
+        hasMemo,
+        hasLink,
+        includeHidden = true,
+        includeVisible = true,
+        visible,
+        minWidth,
+        maxWidth,
+        minHeight,
+        maxHeight,
+        custom
+      } = criteria;
+
+      const normalizedTypes = Array.isArray(types) ? types.filter(Boolean) : null;
+      const idSet = Array.isArray(ids) ? new Set(ids) : null;
+      const textQuery = hasContent(text) ? toLower(text.trim()) : null;
+      const memoQuery = hasContent(memoContains) ? toLower(memoContains.trim()) : null;
+      const labelQuery = hasContent(label) ? toLower(label.trim()) : null;
+      const minWidthNum = toNumber(minWidth);
+      const maxWidthNum = toNumber(maxWidth);
+      const minHeightNum = toNumber(minHeight);
+      const maxHeightNum = toNumber(maxHeight);
+
+      const filtered = nodes.filter(node => {
+        const nodeType = node.type || 'default';
+
+        if (type && nodeType !== type) return false;
+        if (normalizedTypes && normalizedTypes.length && !normalizedTypes.includes(nodeType)) return false;
+        if (id && node.id !== id) return false;
+        if (idSet && !idSet.has(node.id)) return false;
+        if (labelQuery && !toLower(node.label).includes(labelQuery)) return false;
+
+        const labelLower = toLower(node.label);
+        const idLower = toLower(node.id);
+        const memoLower = toLower(node.data?.memo);
+        const linkLower = toLower(node.data?.link);
+
+        if (textQuery) {
+          const matchesText =
+            labelLower.includes(textQuery) ||
+            idLower.includes(textQuery) ||
+            memoLower.includes(textQuery) ||
+            linkLower.includes(textQuery);
+          if (!matchesText) return false;
+        }
+
+        if (memoQuery && !memoLower.includes(memoQuery)) return false;
+
+        if (hasMemo === true && !hasContent(node.data?.memo)) return false;
+        if (hasMemo === false && hasContent(node.data?.memo)) return false;
+
+        if (hasLink === true && !hasContent(node.data?.link)) return false;
+        if (hasLink === false && hasContent(node.data?.link)) return false;
+
+        const isVisible = node.visible !== false;
+        if (visible === true && !isVisible) return false;
+        if (visible === false && isVisible) return false;
+        if (!includeVisible && isVisible) return false;
+        if (!includeHidden && !isVisible) return false;
+
+        const widthValue = toNumber(node.width ?? node.data?.width);
+        if (minWidthNum !== null && (widthValue === null || widthValue < minWidthNum)) return false;
+        if (maxWidthNum !== null && (widthValue === null || widthValue > maxWidthNum)) return false;
+
+        const heightValue = toNumber(node.height ?? node.data?.height);
+        if (minHeightNum !== null && (heightValue === null || heightValue < minHeightNum)) return false;
+        if (maxHeightNum !== null && (heightValue === null || heightValue > maxHeightNum)) return false;
+
+        if (typeof custom === 'function') {
+          try {
+            return !!custom(node);
+          } catch (err) {
+            console.warn('[GraphCRUD] custom node filter failed:', err);
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      return { success: true, data: filtered };
     } catch (error) {
       return { success: false, error: error.message };
     }

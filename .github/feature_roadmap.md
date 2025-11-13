@@ -16,6 +16,12 @@
 
 - [ ] **Plugin Node Registry**  
       Turn `nodeTypeRegistry` into an extensible plugin API with validation and lazy loading (`components/GraphEditor/nodeTypeRegistry.js:19`).
+      - [ ] Publish plugin API contract (manifest schema, exports, lifecycle hooks).
+      - [ ] Build secure loader with origin allow-list and bundle validation.
+      - [ ] Implement runtime registry with register/unregister, caching, persistence.
+      - [ ] Ship plugin manager UI for install/update/disable and Add Node integration.
+      - [ ] Integrate plugin nodes with CRUD, serialization, theming, scripting.
+      - [ ] Provide developer tooling: starter template, docs, types, sample tests.
 
 - [ ] **Operational Dashboards**  
       Use graph stats to build health dashboards and alerts (`components/GraphEditor/GraphCrud.js:637`).

@@ -42,7 +42,7 @@ const defaultSettings = {
   pan: { x: 0, y: 0 },
   zoom: 1,
   toolbarPosition: { x: 0, y: 88 },
-  nodeListPanelAnchor: 'left',
+  nodeListPanelAnchor: 'right',
   groupListPanelPosition: 'right',
   nodePropertiesPanelAnchor: 'right',
   nodePropertiesPanelWidth: 300,

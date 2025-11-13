@@ -106,6 +106,7 @@ export default function ConsolidatedPropertiesPanel({
   const startX = useRef(0);
   const startWidth = useRef(width);
   const memoInputRef = useRef();
+  const memoPreviewRef = useRef(null);
   const pendingRef = useRef({});
   const timerRef = useRef(null);
   const DEBOUNCE_MS = 400;
@@ -144,6 +145,20 @@ export default function ConsolidatedPropertiesPanel({
       }
     }
   }, [memoExpanded, memoView]);
+
+  useEffect(() => {
+    if (memoExpanded && memoView === 'edit' && memoInputRef.current) {
+      try {
+        memoInputRef.current.setSelectionRange(0, 0);
+        memoInputRef.current.scrollTop = 0;
+      } catch (err) {
+        /* ignore selection errors */
+      }
+    }
+    if (memoExpanded && memoView === 'preview' && memoPreviewRef.current) {
+      memoPreviewRef.current.scrollTop = 0;
+    }
+  }, [memoExpanded, memoView, memoAutoExpandToken, memo]);
 
   const toggleAnchor = () => {
     const newAnchor = currentAnchor === 'right' ? 'left' : 'right';
@@ -425,7 +440,9 @@ export default function ConsolidatedPropertiesPanel({
                     sx={{ backgroundColor: theme?.palette?.background?.paper }}
                   />
                 ) : (
-                  <Box sx={{ 
+                  <Box
+                    ref={memoPreviewRef}
+                    sx={{ 
                     p: 2, 
                     backgroundColor: theme?.palette?.background?.paper, 
                     borderRadius: 1,
