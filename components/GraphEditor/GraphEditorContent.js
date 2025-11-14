@@ -11,6 +11,7 @@ import PropertiesPanel from './components/PropertiesPanel';
 import NodeListPanel from './components/NodeListPanel';
 import GroupListPanel from './components/GroupListPanel';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
+import NewTabPage from './components/NewTabPage';
 import ScriptRunner from './Scripting/ScriptRunner';
 import ScriptPanel from './Scripting/ScriptPanel';
 import BackgroundFrame from './components/BackgroundFrame';
@@ -162,6 +163,47 @@ const GraphEditorContent = () => {
     setSnapToGrid(prev => !prev);
   }, [setSnapToGrid]);
 
+  const showSnackbar = useCallback((message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  }, [setSnackbar]);
+
+  const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
+  const showNewTabPage = !loading && isGraphEmpty;
+
+  const handleCreateBlankGraph = useCallback(() => {
+    const newNode = {
+      id: `node_${Date.now()}`,
+      label: 'New Node',
+      type: 'default',
+      position: { x: 0, y: 0 },
+      width: 200,
+      height: 120,
+      data: { memo: '' }
+    };
+
+    setNodes(() => {
+      const next = [newNode];
+      nodesRef.current = next;
+      return next;
+    });
+
+    setEdges(() => {
+      const next = [];
+      edgesRef.current = next;
+      return next;
+    });
+
+    setGroups(() => []);
+    historyHook.saveToHistory([newNode], []);
+    setSelectedNodeIds([newNode.id]);
+  }, [setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
+
+  const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
+    if (typeof handleLoadGraph === 'function') {
+      handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+    }
+  }, [handleLoadGraph]);
+
   return (
     <div
       id="graph-editor-background"
@@ -174,7 +216,8 @@ const GraphEditorContent = () => {
         backgroundImage: backgroundImage ? `url('/background art/${backgroundImage}')` : undefined,
         backgroundSize: 'auto',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        position: 'relative'
       }}
     >
       {backgroundUrl && (
@@ -212,7 +255,7 @@ const GraphEditorContent = () => {
           onApplyLayout={modesHook.applyAutoLayout}
           onAlignSelection={handleAlignSelection}
           onDistributeSelection={handleDistributeSelection}
-          onShowMessage={(message, severity = 'info') => setSnackbar({ open: true, message, severity })}
+          onShowMessage={showSnackbar}
           pan={pan}
           zoom={zoom}
           setNodes={setNodes}
@@ -348,7 +391,15 @@ const GraphEditorContent = () => {
         theme={theme}
       />
 
-      {documentMuiTheme ? (
+      {showNewTabPage ? (
+        <NewTabPage
+          onCreateBlank={handleCreateBlankGraph}
+          onImportGraph={handleImportGraph}
+          onShowMessage={showSnackbar}
+          recentSnapshots={recentSnapshots}
+          isFreeUser={isFreeUser}
+        />
+      ) : documentMuiTheme ? (
         <MuiThemeProvider theme={documentMuiTheme}>
           <NodeGraph
             key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}

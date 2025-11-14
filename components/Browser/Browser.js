@@ -53,14 +53,24 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const currentUrl = browserHistory[historyIndex] || '';
 
   // Home URL management
-  const DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
+  const DEFAULT_HOME = '';
+  const LEGACY_DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem('homeUrl');
-      if (stored) setHomeUrl(stored); else setHomeUrl(DEFAULT_HOME);
+      if (stored) {
+        if (stored === LEGACY_DEFAULT_HOME) {
+          localStorage.removeItem('homeUrl');
+          setHomeUrl(DEFAULT_HOME);
+        } else {
+          setHomeUrl(stored);
+        }
+      } else {
+        setHomeUrl(DEFAULT_HOME);
+      }
     } catch (err) {
       setHomeUrl(DEFAULT_HOME);
     }
@@ -232,13 +242,12 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   };
 
   const handleHome = () => {
-    // Navigate to the configured home URL (display canonical URL)
     if (!homeUrl) {
-      alert('Home URL not set');
+      eventBus.emit('clearBackgroundUrl');
+      eventBus.emit('setAddress', 'local://untitled.node');
       return;
     }
     setAddress(homeUrl);
-    // Do not push history here; GraphEditor will emit setAddress when it starts fetching
     const fetchable = convertTlzToFetchUrl(homeUrl);
     eventBus.emit('fetchUrl', { url: fetchable });
   };
@@ -269,14 +278,14 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     setHomeMenuAnchor(null);
   };
 
-  const handleResetHome = () => {
+  const handleClearHome = () => {
     try {
       localStorage.removeItem('homeUrl');
-      setHomeUrl(DEFAULT_HOME);
-      alert('Home reset to default');
+      setHomeUrl('');
+      alert('Home page cleared. New tab will appear next time.');
     } catch (err) {
-      console.warn('Failed to reset home URL:', err);
-      alert('Failed to reset home URL');
+      console.warn('Failed to clear home URL:', err);
+      alert('Failed to clear home URL');
     }
     setHomeMenuAnchor(null);
   };
@@ -321,6 +330,19 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     setAddress(template.resolvedUrl);
     eventBus.emit('fetchUrl', { url: template.resolvedUrl });
   };
+
+  useEffect(() => {
+    const handleToggleTemplateGallery = ({ open } = {}) => {
+      if (typeof open === 'boolean') {
+        setGalleryOpen(open);
+      } else {
+        setGalleryOpen(prev => !prev);
+      }
+    };
+
+    eventBus.on('toggleTemplateGallery', handleToggleTemplateGallery);
+    return () => eventBus.off('toggleTemplateGallery', handleToggleTemplateGallery);
+  }, []);
 
   return (
     <div>
@@ -485,7 +507,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       <Menu anchorEl={homeMenuAnchor} open={Boolean(homeMenuAnchor)} onClose={handleCloseHomeMenu}>
         <MenuItem onClick={() => { handleCloseHomeMenu(); handleOpenGallery(); }}>Browse Template Gallery</MenuItem>
         <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>
-        <MenuItem onClick={handleResetHome}>Reset Home to default</MenuItem>
+        <MenuItem onClick={handleClearHome}>Clear Home page</MenuItem>
       </Menu>
 
       <ThemeDrawer 
