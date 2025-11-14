@@ -6,13 +6,14 @@ import HandlePositionContext from './HandlePositionContext';
 import { getEdgeHandlePosition } from './utils';
 
 const handleRadius = 8;
+const handleExtension = 12; // was 20, now closer to node
+const nodeHoverMargin = 24; // px, for easier node hover
 
 function getHandlePositions(node) {
   const x = node.position?.x ?? node.x ?? 0;
   const y = node.position?.y ?? node.y ?? 0;
   const width = node.width || 60;
   const height = node.height || 60;
-  const handleExtension = 20;
   // Position handle at lower right
   return [{
     id: `${node.id}-new-link`,
@@ -36,11 +37,13 @@ const HandleLayer = forwardRef(({
   children,
   draggingInfoRef,
 }, ref) => {
-  const [hoveredHandle, setHoveredHandle] = useState(null);
+  const [hoveredHandleId, setHoveredHandleId] = useState(null);
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [previewLine, setPreviewLine] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const animationFrameRef = useRef(null);
+  const handleHoverRef = useRef(false);
+  const blurTimeoutRef = useRef();
 
   useImperativeHandle(ref, () => ({
     redraw: () => {
@@ -58,12 +61,12 @@ const HandleLayer = forwardRef(({
     };
 
     const handleNodeUnhover = () => {
-      // Only hide handles if we're not hovering over a handle itself
-      setTimeout(() => {
-        if (!hoveredHandle) {
+      // Only clear node hover if not hovering handle
+      blurTimeoutRef.current = setTimeout(() => {
+        if (!draggingHandle && !handleHoverRef.current) {
           setHoveredNodeId(null);
         }
-      }, 100);
+      }, 30);
     };
 
     eventBus.on('nodeHover', handleNodeHover);
@@ -72,8 +75,9 @@ const HandleLayer = forwardRef(({
     return () => {
       eventBus.off('nodeHover', handleNodeHover);
       eventBus.off('nodeUnhover', handleNodeUnhover);
+      clearTimeout(blurTimeoutRef.current);
     };
-  }, [hoveredHandle]);
+  }, [draggingHandle]);
 
   const handlePositionMap = React.useMemo(() => {
     const map = {};
@@ -142,6 +146,7 @@ const HandleLayer = forwardRef(({
     return { x: 0, y: 0 };
   }, [nodes]);
 
+  // Override getCurrentHandles to allow handle to appear if mouse is near node
   const getCurrentHandles = useCallback(() => {
     const allHandles = [];
     
@@ -151,6 +156,25 @@ const HandleLayer = forwardRef(({
     
     const targetNode = nodes.find(n => n.id === targetNodeId && n.visible !== false);
     if (!targetNode) return allHandles;
+    
+    // If not dragging, check if mouse is within margin of node bounds
+    if (!draggingHandle && hoveredNodeId === targetNodeId && window.__NG_LAST_MOUSE) {
+      const { x, y } = window.__NG_LAST_MOUSE;
+      const nodeX = targetNode.position?.x ?? targetNode.x ?? 0;
+      const nodeY = targetNode.position?.y ?? targetNode.y ?? 0;
+      const width = targetNode.width || 60;
+      const height = targetNode.height || 60;
+      const left = nodeX - width / 2 - nodeHoverMargin;
+      const right = nodeX + width / 2 + nodeHoverMargin;
+      const top = nodeY - height / 2 - nodeHoverMargin;
+      const bottom = nodeY + height / 2 + nodeHoverMargin;
+      // Convert screen to graph coords
+      const graphX = (x - pan.x) / zoom;
+      const graphY = (y - pan.y) / zoom;
+      if (graphX < left || graphX > right || graphY < top || graphY > bottom) {
+        return allHandles;
+      }
+    }
     
     const handles = getHandlePositions(targetNode);
     
@@ -164,7 +188,16 @@ const HandleLayer = forwardRef(({
     
     allHandles.push(...handles);
     return allHandles;
-  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle]);
+  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle, pan, zoom]);
+
+  // Track last mouse position globally for node hover margin
+  useEffect(() => {
+    const update = e => {
+      window.__NG_LAST_MOUSE = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', update);
+    return () => window.removeEventListener('mousemove', update);
+  }, []);
 
   const findHandleAt = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
@@ -210,7 +243,7 @@ const HandleLayer = forwardRef(({
         return;
       }
       
-      const isHovered = hoveredHandle?.id === handle.id;
+      const isHovered = hoveredHandleId === handle.id;
       const isDragging = draggingHandle?.id === handle.id;
       const radius = (isHovered || isDragging) ? handleRadius * 1.3 : handleRadius;
       
@@ -260,7 +293,7 @@ const HandleLayer = forwardRef(({
       
       ctx.restore();
     }
-  }, [getCurrentHandles, pan, zoom, hoveredHandle, draggingHandle, previewLine]);
+  }, [getCurrentHandles, pan, zoom, hoveredHandleId, draggingHandle, previewLine]);
 
   const scheduleRender = useCallback(() => {
     if (animationFrameRef.current) return;
@@ -301,11 +334,11 @@ const HandleLayer = forwardRef(({
     
     // Check for handle hover
     const handle = findHandleAt(e.clientX, e.clientY);
-    if (handle !== hoveredHandle) {
-      setHoveredHandle(handle);
+    if (handle !== hoveredHandleId) {
+      setHoveredHandleId(handle);
       scheduleRender();
     }
-  }, [draggingHandle, hoveredHandle, canvasRef, findHandleAt, scheduleRender]);
+  }, [draggingHandle, hoveredHandleId, canvasRef, findHandleAt, scheduleRender]);
 
   const handleMouseUp = useCallback((e) => {
     if (!draggingHandle) return;
@@ -383,7 +416,6 @@ const HandleLayer = forwardRef(({
 
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
-      {/* Canvas for drawing handles - no pointer events */}
       <canvas
         ref={canvasRef}
         style={{
@@ -396,8 +428,6 @@ const HandleLayer = forwardRef(({
           zIndex: 25
         }}
       />
-      
-      {/* Render clickable areas ONLY where handles are */}
       <div style={{ 
         position: 'absolute', 
         top: 0, 
@@ -411,30 +441,37 @@ const HandleLayer = forwardRef(({
           const screenX = handle.position.x * zoom + pan.x;
           const screenY = handle.position.y * zoom + pan.y;
           const hitRadius = handleRadius * 2;
-          
+          const extendedHit = hitRadius + 16;
           return (
             <div
               key={handle.id}
               style={{
                 position: 'absolute',
-                left: screenX - hitRadius,
-                top: screenY - hitRadius,
-                width: hitRadius * 2,
-                height: hitRadius * 2,
-                pointerEvents: 'auto', // Only THIS div captures events
+                left: screenX - extendedHit,
+                top: screenY - extendedHit,
+                width: extendedHit * 2,
+                height: extendedHit * 2,
+                pointerEvents: 'auto',
                 cursor: 'pointer',
                 borderRadius: '50%',
               }}
               onMouseDown={handleMouseDown}
               onMouseEnter={() => {
-                setHoveredHandle(handle);
+                handleHoverRef.current = true;
+                setHoveredHandleId(handle.id);
                 scheduleRender();
+                clearTimeout(blurTimeoutRef.current);
               }}
               onMouseLeave={() => {
-                if (!draggingHandle) {
-                  setHoveredHandle(null);
-                  scheduleRender();
-                }
+                handleHoverRef.current = false;
+                setHoveredHandleId(null);
+                scheduleRender();
+                // If node is not hovered, clear node hover after delay
+                blurTimeoutRef.current = setTimeout(() => {
+                  if (!draggingHandle && !handleHoverRef.current) {
+                    setHoveredNodeId(null);
+                  }
+                }, 30);
               }}
             />
           );
