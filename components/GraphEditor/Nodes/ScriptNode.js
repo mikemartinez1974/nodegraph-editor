@@ -1,9 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const SCRIPT_INPUTS = [
+  { key: 'trigger', label: 'Trigger', type: 'trigger' }
+];
+const SCRIPT_OUTPUTS = [
+  { key: 'result', label: 'Result', type: 'value' }
+];
 
 export default function ScriptNode({
-  node,
+  node: origNode,
   pan = { x: 0, y: 0 },
   zoom = 1,
   style = {},
@@ -16,6 +25,7 @@ export default function ScriptNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const runTokenRef = useRef(0);
+  const node = useNodeHandleSchema(origNode, SCRIPT_INPUTS, SCRIPT_OUTPUTS);
 
   const width = (node?.width || 260) * zoom;
   const height = (node?.height || 160) * zoom;
@@ -27,6 +37,7 @@ export default function ScriptNode({
   const [running, setRunning] = useState(false);
   const [lastResult, setLastResult] = useState(node?.data?.lastResult || null);
   const [lastRunAt, setLastRunAt] = useState(node?.data?.lastRunAt || null);
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     if (nodeRef.current && nodeRefs) {
@@ -125,6 +136,7 @@ export default function ScriptNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
+  // Handles are rendered via HandleLayer
   return (
     <div
       ref={nodeRef}
@@ -160,6 +172,7 @@ export default function ScriptNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <div style={{ fontWeight: 700 }}>{node?.label || 'Script'}</div>
         <div style={{ fontSize: 11, opacity: 0.85 }}>{running ? 'Running…' : (lastRunAt ? new Date(lastRunAt).toLocaleTimeString() : '')}</div>
@@ -182,7 +195,14 @@ export default function ScriptNode({
         <label style={{ fontSize: 11, opacity: 0.85 }}>
           <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)} /> Dry Run
         </label>
+        <button onClick={e => { e.stopPropagation(); setShowResult(v => !v); }} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, border: 'none', background: showResult ? theme.palette.secondary.dark : theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}>{showResult ? 'Hide Result' : 'Show Result'}</button>
       </div>
+
+      {showResult && lastResult && (
+        <pre style={{ marginTop: 8, fontSize: 12, background: 'rgba(0,0,0,0.18)', borderRadius: 6, padding: 8, maxHeight: 120, overflow: 'auto', color: lastResult.success === false ? theme.palette.error.main : 'inherit' }}>
+          {typeof lastResult === 'object' ? JSON.stringify(lastResult, null, 2) : String(lastResult)}
+        </pre>
+      )}
 
       <div style={{ marginTop: 8, fontSize: 11, opacity: 0.85 }}>
         {lastResult ? (lastResult.success ? 'Last run: success' : `Last run error: ${String(lastResult.error || '')}`) : 'No runs yet'}

@@ -162,11 +162,15 @@ export default function NodeGraph({
     nodeContainer: nodeContainerRef
   }), []);
 
-  // Process nodes with defaults
-  const nodeList = useMemo(() => nodes.map(node => ({
+  // Provide default handles for any node missing them
+  const ensureHandles = node => ({
     ...node,
-    visible: node.visible !== undefined ? node.visible : true
-  })), [nodes]);
+    inputs: Array.isArray(node.inputs) && node.inputs.length > 0 ? node.inputs : [{ key: 'in', label: 'In', type: 'trigger' }],
+    outputs: Array.isArray(node.outputs) && node.outputs.length > 0 ? node.outputs : [{ key: 'out', label: 'Out', type: 'trigger' }],
+  });
+
+  // Process nodes with defaults
+  const nodeList = useMemo(() => nodes.map(ensureHandles), [nodes]);
 
   const visibleNodeList = useMemo(() => nodeList.filter(n => n.visible !== false), [nodeList]);
 
@@ -230,62 +234,44 @@ export default function NodeGraph({
   // ============================================
   
   useEffect(() => {
-    const handleDrop = ({ handle, targetNode, targetNodeObject, position }) => {
+    const handleDrop = ({ handle, targetNode, targetNodeObject, position, targetHandle }) => {
       if (!handle) return;
 
-      // Handle type: 'new-link' or 'edge-source' or 'edge-target'
-      if (handle.type === 'new-link') {
-        // Creating a new edge from a node
-        if (targetNode && targetNode !== handle.nodeId) {
-          const newEdge = {
-            id: `edge_${Date.now()}`,
-            source: handle.nodeId,
-            target: targetNode,
-            type: 'default',
-            label: '',
-            style: {}
-          };
-
-          setEdges(prev => [...prev, newEdge]);
-          
+      // Only allow output→input connections with matching types
+      if (handle.type === 'output' && targetHandle && targetHandle.type === 'input') {
+        // Validate type match
+        if (handle.handleType && targetHandle.handleType && handle.handleType !== targetHandle.handleType) {
           if (setSnackbar) {
-            setSnackbar({ 
-              open: true, 
-              message: `Created edge from ${handle.nodeId} to ${targetNode}`, 
-              severity: 'success' 
-            });
+            setSnackbar({ open: true, message: `Handle types do not match: ${handle.handleType} → ${targetHandle.handleType}`, severity: 'warning' });
           }
+          return;
         }
-      } else if (handle.type === 'edge-source' || handle.type === 'edge-target') {
-        // Modifying existing edge
-        if (targetNode) {
-          const edge = edges.find(e => e.id === handle.edgeId);
-          if (!edge) return;
-
-          if (handle.type === 'edge-source') {
-            // Change source
-            setEdges(prev => prev.map(e => 
-              e.id === handle.edgeId 
-                ? { ...e, source: targetNode }
-                : e
-            ));
-          } else {
-            // Change target
-            setEdges(prev => prev.map(e => 
-              e.id === handle.edgeId 
-                ? { ...e, target: targetNode }
-                : e
-            ));
-          }
-
-          if (setSnackbar) {
-            setSnackbar({ 
-              open: true, 
-              message: `Updated edge connection`, 
-              severity: 'success' 
-            });
-          }
+        // Prevent self-connection
+        if (handle.nodeId === targetHandle.nodeId) return;
+        // Create edge with handle keys
+        const newEdge = {
+          id: `edge_${Date.now()}`,
+          source: handle.nodeId,
+          target: targetHandle.nodeId,
+          sourceHandle: handle.key,
+          targetHandle: targetHandle.key,
+          handleMeta: {
+            source: { label: handle.label, type: handle.handleType },
+            target: { label: targetHandle.label, type: targetHandle.handleType }
+          },
+          type: 'default',
+          label: '',
+          style: {}
+        };
+        setEdges(prev => [...prev, newEdge]);
+        if (setSnackbar) {
+          setSnackbar({ open: true, message: `Created edge from ${handle.label} to ${targetHandle.label}`, severity: 'success' });
         }
+        return;
+      }
+      // Invalid connection
+      if (setSnackbar) {
+        setSnackbar({ open: true, message: 'Invalid connection: only output→input allowed, and types must match.', severity: 'warning' });
       }
     };
 
@@ -1053,7 +1039,7 @@ export default function NodeGraph({
           ref={handleLayerImperativeRef}
           draggingInfoRef={draggingInfoRef}
           canvasRef={handleCanvasRef}
-          nodes={nodes}
+          nodes={nodeList}
           edges={edges}
           pan={pan}
           zoom={zoom}

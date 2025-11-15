@@ -1,9 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const GATE_INPUTS = [
+  { key: 'a', label: 'A', type: 'value' },
+  { key: 'b', label: 'B', type: 'value' }
+];
+const GATE_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'value' }
+];
 
 export default function GateNode({
-  node,
+  node: origNode,
   pan = { x: 0, y: 0 },
   zoom = 1,
   style = {},
@@ -15,9 +25,10 @@ export default function GateNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
+  const node = useNodeHandleSchema(origNode, GATE_INPUTS, GATE_OUTPUTS);
 
-  const width = (node?.width || 180) * zoom;
-  const height = (node?.height || 160) * zoom;
+  const width = (node?.width || 200) * zoom;
+  const height = (node?.height || 250) * zoom;
 
   // Local editable state derived from node.data
   const initialInputs = node?.data?.inputs || { a: false, b: false };
@@ -85,6 +96,23 @@ export default function GateNode({
     } catch (err) {}
   }, [inputs, operator, output, node.id]);
 
+  // Ensure handle schema reflects operator (NOT only needs A)
+  useEffect(() => {
+    const desiredInputs = operator === 'not' ? [GATE_INPUTS[0]] : GATE_INPUTS;
+    const current = Array.isArray(node.inputs) ? node.inputs : [];
+    const matches = current.length === desiredInputs.length &&
+      current.every((handle, idx) => handle.key === desiredInputs[idx]?.key);
+    if (!matches) {
+      eventBus.emit('nodeUpdate', {
+        id: node.id,
+        updates: {
+          inputs: desiredInputs,
+          outputs: GATE_OUTPUTS
+        }
+      });
+    }
+  }, [operator, node.id, node.inputs]);
+
   // Handle external input events (so edges/other nodes can push inputs to this gate)
   useEffect(() => {
     const handler = ({ targetNodeId, inputName, value } = {}) => {
@@ -116,6 +144,7 @@ export default function GateNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
+  // Handles are rendered via HandleLayer
   return (
     <div
       ref={nodeRef}
@@ -173,25 +202,21 @@ export default function GateNode({
           <option value="nor">NOR</option>
         </select>
       </div>
-
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 11, opacity: 0.85 }}>A</div>
           <button onClick={toggleInput('a')} title="Toggle A" style={{ width: 48, height: 28, borderRadius: 8, border: 'none', background: inputs.a ? theme.palette.success.main : 'rgba(255,255,255,0.12)', color: 'white', cursor: 'pointer' }}>{inputs.a ? '1' : '0'}</button>
         </div>
-
         {/* For NOT operator we hide or disable B */}
         <div style={{ display: operator === 'not' ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 11, opacity: 0.85 }}>B</div>
           <button onClick={toggleInput('b')} title="Toggle B" style={{ width: 48, height: 28, borderRadius: 8, border: 'none', background: inputs.b ? theme.palette.success.main : 'rgba(255,255,255,0.12)', color: 'white', cursor: 'pointer' }}>{inputs.b ? '1' : '0'}</button>
         </div>
       </div>
-
       <div style={{ textAlign: 'center', padding: '8px 0', borderRadius: 6, background: 'rgba(0,0,0,0.08)' }}>
         <div style={{ fontSize: 10, opacity: 0.8 }}>Output</div>
         <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'monospace' }}>{output ? '1' : '0'}</div>
       </div>
-
     </div>
   );
 }

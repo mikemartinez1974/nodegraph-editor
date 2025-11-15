@@ -10,14 +10,22 @@ import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import { alpha } from '@mui/material';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
 
 // Helper to check if a color is a gradient
 const isGradientColor = (color) => {
   return color && (color.includes('gradient') || color.includes('linear-') || color.includes('radial-'));
 };
 
+const DEFAULT_INPUTS = [
+  { key: 'set', label: 'Set', type: 'value' }
+];
+const DEFAULT_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'value' }
+];
+
 const FixedNode = ({ 
-  node, 
+  node: rawNode, 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
   style = {}, 
@@ -31,6 +39,7 @@ const FixedNode = ({
   nodeRefs,
   hideDefaultContent = false  // Allow children to hide default content
 }) => {
+  const node = useNodeHandleSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
   const width = (node?.width || 60) * zoom;
   const height = (node?.height || 60) * zoom;

@@ -127,11 +127,11 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const documentTheme = documentSettings.theme;
   const setDocumentTheme = (theme) => setDocumentSettings(prev => ({ ...prev, theme }));
   
-  const state = useGraphEditorState();
+const state = useGraphEditorState();
 
-  // Destructure editor state immediately so variables like `pan` are available for subsequent effects
-  const {
-    nodes, setNodes, nodesRef,
+// Destructure editor state immediately so variables like `pan` are available for subsequent effects
+const {
+  nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
     groups, setGroups,
     pan, setPan, zoom, setZoom,
@@ -155,10 +155,68 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   // NEW: document (background page) state (no localStorage)
   const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
-  const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
-  const handleOpenDocumentProperties = useCallback(() => {
-    setShowDocumentPropertiesDialog(true);
-  }, [setShowDocumentPropertiesDialog]);
+const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState(false);
+const handleOpenDocumentProperties = useCallback(() => {
+  setShowDocumentPropertiesDialog(true);
+}, [setShowDocumentPropertiesDialog]);
+
+// Route node outputs through connected edges to target node inputs
+useEffect(() => {
+  const handleNodeOutput = ({ nodeId, outputName, value }) => {
+    if (!nodeId) return;
+    const currentEdges = edgesRef.current || [];
+    currentEdges.forEach(edge => {
+      if (!edge || edge.source !== nodeId) return;
+      if (edge.sourceHandle && outputName && edge.sourceHandle !== outputName) return;
+      if (!edge.target) return;
+      eventBus.emit('nodeInput', {
+        targetNodeId: edge.target,
+        inputName: edge.targetHandle,
+        value,
+        edgeId: edge.id,
+        sourceNodeId: nodeId,
+        outputName: outputName || edge.sourceHandle || null
+      });
+    });
+  };
+
+  eventBus.on('nodeOutput', handleNodeOutput);
+  return () => eventBus.off('nodeOutput', handleNodeOutput);
+}, [edgesRef]);
+
+// Normalize edges created with legacy handle objects so downstream logic sees string ids
+useEffect(() => {
+    if (!Array.isArray(edges) || edges.length === 0) return;
+    let needsUpdate = false;
+    const normalized = edges.map(edge => {
+      if (edge && typeof edge.source === 'object' && edge.source !== null) {
+        needsUpdate = true;
+        const sourceNodeId = edge.source.nodeId ?? edge.source.id ?? '';
+        const targetNodeObj = edge.target && typeof edge.target === 'object' ? edge.target : null;
+        const targetNodeId = targetNodeObj ? (targetNodeObj.nodeId ?? targetNodeObj.id ?? '') : edge.target;
+        return {
+          ...edge,
+          source: sourceNodeId || edge.source,
+          target: targetNodeId || edge.target,
+          sourceHandle: edge.source.handleKey || edge.sourceHandle,
+          targetHandle: targetNodeObj?.handleKey || edge.targetHandle
+        };
+      }
+      if (edge && typeof edge.target === 'object' && edge.target !== null) {
+        needsUpdate = true;
+        const targetNodeId = edge.target.nodeId ?? edge.target.id ?? '';
+        return {
+          ...edge,
+          target: targetNodeId || edge.target,
+          targetHandle: edge.target.handleKey || edge.targetHandle
+        };
+      }
+      return edge;
+    });
+    if (needsUpdate) {
+      setEdges(normalized);
+    }
+  }, [edges, setEdges]);
 
   const lastNodeTapRef = useRef({ id: null, time: 0 });
   const lastEdgeTapRef = useRef({ id: null, time: 0 });

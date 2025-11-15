@@ -5,9 +5,18 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import TimerIcon from '@mui/icons-material/Timer';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const TIMER_INPUTS = [
+  { key: 'reset', label: 'Reset', type: 'trigger' }
+];
+const TIMER_OUTPUTS = [
+  { key: 'tick', label: 'Tick', type: 'trigger' }
+];
 
 export default function TimerNode({ 
-  node, 
+  node: origNode, 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
   style = {}, 
@@ -20,6 +29,7 @@ export default function TimerNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const intervalRef = useRef(null);
+  const node = useNodeHandleSchema(origNode, TIMER_INPUTS, TIMER_OUTPUTS);
   
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 140) * zoom;
@@ -136,6 +146,7 @@ export default function TimerNode({
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
 
+  // Handles are rendered centrally via HandleLayer
   return (
     <div
       ref={nodeRef}

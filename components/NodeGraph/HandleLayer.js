@@ -9,22 +9,52 @@ const handleRadius = 8;
 const handleExtension = 12; // was 20, now closer to node
 const nodeHoverMargin = 24; // px, for easier node hover
 
+// --- NEW: Get handles from node schema ---
 function getHandlePositions(node) {
   const x = node.position?.x ?? node.x ?? 0;
   const y = node.position?.y ?? node.y ?? 0;
   const width = node.width || 60;
   const height = node.height || 60;
-  // Position handle at lower right
-  return [{
-    id: `${node.id}-new-link`,
-    nodeId: node.id,
-    type: 'new-link',
-    position: {
-      x: x + width / 2 + handleExtension,
-      y: y + height / 2 + handleExtension
-    },
-    color: '#1976d2'
-  }];
+  const handles = [];
+  // Inputs (left)
+  if (Array.isArray(node.inputs)) {
+    node.inputs.forEach((h, i) => {
+      handles.push({
+        id: `${node.id}-${h.key}`,
+        nodeId: node.id,
+        type: 'input',
+        direction: 'target',
+        key: h.key,
+        label: h.label,
+        handleType: h.type,
+        position: {
+          x: x - width / 2 - handleExtension,
+          y: y - height / 2 + ((i + 1) / (node.inputs.length + 1)) * height
+        },
+        color: '#0288d1',
+      });
+    });
+  }
+  // Outputs (right)
+  if (Array.isArray(node.outputs)) {
+    node.outputs.forEach((h, i) => {
+      handles.push({
+        id: `${node.id}-${h.key}`,
+        nodeId: node.id,
+        type: 'output',
+        direction: 'source',
+        key: h.key,
+        label: h.label,
+        handleType: h.type,
+        position: {
+          x: x + width / 2 + handleExtension,
+          y: y - height / 2 + ((i + 1) / (node.outputs.length + 1)) * height
+        },
+        color: '#43a047',
+      });
+    });
+  }
+  return handles;
 }
 
 const HandleLayer = forwardRef(({ 
@@ -41,6 +71,7 @@ const HandleLayer = forwardRef(({
   const [draggingHandle, setDraggingHandle] = useState(null);
   const [previewLine, setPreviewLine] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [dragTargetNodeId, setDragTargetNodeId] = useState(null);
   const animationFrameRef = useRef(null);
   const handleHoverRef = useRef(false);
   const blurTimeoutRef = useRef();
@@ -146,17 +177,16 @@ const HandleLayer = forwardRef(({
     return { x: 0, y: 0 };
   }, [nodes]);
 
-  // Override getCurrentHandles to allow handle to appear if mouse is near node
+  // --- NEW: getCurrentHandles uses schema handles ---
   const getCurrentHandles = useCallback(() => {
     const allHandles = [];
-    
     // Only show handles for the hovered node (or dragging node)
-    const targetNodeId = draggingHandle?.nodeId || hoveredNodeId;
+    const targetNodeId = draggingHandle
+      ? (dragTargetNodeId || hoveredNodeId || draggingHandle.nodeId)
+      : hoveredNodeId;
     if (!targetNodeId) return allHandles;
-    
     const targetNode = nodes.find(n => n.id === targetNodeId && n.visible !== false);
     if (!targetNode) return allHandles;
-    
     // If not dragging, check if mouse is within margin of node bounds
     if (!draggingHandle && hoveredNodeId === targetNodeId && window.__NG_LAST_MOUSE) {
       const { x, y } = window.__NG_LAST_MOUSE;
@@ -175,9 +205,8 @@ const HandleLayer = forwardRef(({
         return allHandles;
       }
     }
-    
+    // Use schema handles
     const handles = getHandlePositions(targetNode);
-    
     if (draggingInfoRef?.current?.nodeIds?.includes(targetNode.id)) {
       const offset = draggingInfoRef.current.offset;
       handles.forEach(h => {
@@ -185,10 +214,9 @@ const HandleLayer = forwardRef(({
         h.position.y += offset.y;
       });
     }
-    
     allHandles.push(...handles);
     return allHandles;
-  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle, pan, zoom]);
+  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle, dragTargetNodeId, pan, zoom]);
 
   // Track last mouse position globally for node hover margin
   useEffect(() => {
@@ -328,6 +356,32 @@ const HandleLayer = forwardRef(({
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       });
+      const graphX = (e.clientX - rect.left - pan.x) / zoom;
+      const graphY = (e.clientY - rect.top - pan.y) / zoom;
+      let hoveredNode = null;
+      for (const node of nodes) {
+        if (node.visible === false) continue;
+        const nodeX = node.position?.x ?? node.x ?? 0;
+        const nodeY = node.position?.y ?? node.y ?? 0;
+        const width = node.width || 60;
+        const height = node.height || 60;
+        const extendedX = handleExtension + handleRadius * 2;
+        const extendedY = handleRadius * 2;
+        const left = nodeX - width / 2 - extendedX;
+        const right = nodeX + width / 2 + extendedX;
+        const top = nodeY - height / 2 - extendedY;
+        const bottom = nodeY + height / 2 + extendedY;
+        if (graphX >= left && graphX <= right && graphY >= top && graphY <= bottom) {
+          hoveredNode = node;
+          break;
+        }
+      }
+      setDragTargetNodeId(hoveredNode?.id || null);
+      if (hoveredNode) {
+        setHoveredNodeId(hoveredNode.id);
+      } else if (dragTargetNodeId) {
+        setHoveredNodeId(null);
+      }
       scheduleRender();
       return;
     }
@@ -338,44 +392,45 @@ const HandleLayer = forwardRef(({
       setHoveredHandleId(handle);
       scheduleRender();
     }
-  }, [draggingHandle, hoveredHandleId, canvasRef, findHandleAt, scheduleRender]);
+  }, [draggingHandle, hoveredHandleId, canvasRef, findHandleAt, scheduleRender, pan, zoom, nodes, dragTargetNodeId]);
 
   const handleMouseUp = useCallback((e) => {
     if (!draggingHandle) return;
-    
     const rect = canvasRef.current.getBoundingClientRect();
     const graphX = (e.clientX - rect.left - pan.x) / zoom;
     const graphY = (e.clientY - rect.top - pan.y) / zoom;
-    
-    const targetNode = nodes.find(node => {
-      if (node.id === draggingHandle.nodeId) return false;
-      
-      const nodeX = node.position?.x ?? node.x ?? 0;
-      const nodeY = node.position?.y ?? node.y ?? 0;
-      const nodeWidth = node.width || 60;
-      const nodeHeight = node.height || 60;
-      
-      return (
-        graphX >= nodeX - nodeWidth / 2 && 
-        graphX <= nodeX + nodeWidth / 2 && 
-        graphY >= nodeY - nodeHeight / 2 && 
-        graphY <= nodeY + nodeHeight / 2
-      );
-    });
-    
+    // Find target handle (not just node)
+    let targetHandle = null;
+    let targetNode = null;
+    for (const node of nodes) {
+      if (node.id === draggingHandle.nodeId) continue;
+      const handles = getHandlePositions(node);
+      for (const h of handles) {
+        const screenX = h.position.x * zoom + pan.x;
+        const screenY = h.position.y * zoom + pan.y;
+        const dist = Math.sqrt(Math.pow(e.clientX - rect.left - screenX, 2) + Math.pow(e.clientY - rect.top - screenY, 2));
+        if (dist <= handleRadius * 2) {
+          targetHandle = h;
+          targetNode = node;
+          break;
+        }
+      }
+      if (targetHandle) break;
+    }
     const dropEvent = {
       graph: { x: graphX, y: graphY },
       screen: { x: e.clientX, y: e.clientY },
       sourceNode: draggingHandle.nodeId,
       targetNode: targetNode?.id || null,
       edgeType: draggingHandle.edgeType,
-      direction: draggingHandle.direction
+      direction: draggingHandle.direction,
+      handle: draggingHandle,
+      targetHandle: targetHandle
     };
-    
     eventBus.emit('handleDrop', dropEvent);
     eventBus.emit('handleDragEnd', { handle: draggingHandle });
-    
     setDraggingHandle(null);
+    setDragTargetNodeId(null);
     setPreviewLine(null);
     scheduleRender();
   }, [draggingHandle, nodes, pan, zoom, scheduleRender]);
@@ -424,7 +479,7 @@ const HandleLayer = forwardRef(({
           left: 0,
           width: '100vw',
           height: '100vh',
-          pointerEvents: 'none',
+          pointerEvents: 'none', // <-- ensure canvas does not block handle events
           zIndex: 25
         }}
       />
@@ -435,7 +490,7 @@ const HandleLayer = forwardRef(({
         width: '100vw', 
         height: '100vh',
         pointerEvents: 'none',
-        zIndex: 26
+        zIndex: 26 // <-- ensure handle hit areas are above canvas
       }}>
         {getCurrentHandles().map(handle => {
           const screenX = handle.position.x * zoom + pan.x;
@@ -451,9 +506,10 @@ const HandleLayer = forwardRef(({
                 top: screenY - extendedHit,
                 width: extendedHit * 2,
                 height: extendedHit * 2,
-                pointerEvents: 'auto',
+                pointerEvents: 'auto', // <-- ensure hit area receives mouse events
                 cursor: 'pointer',
                 borderRadius: '50%',
+                zIndex: 27 // <-- above canvas and other overlays
               }}
               onMouseDown={handleMouseDown}
               onMouseEnter={() => {

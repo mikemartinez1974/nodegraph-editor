@@ -3,21 +3,27 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
 
-const CARD_WIDTH = 260;
+const CARD_WIDTH = 300;
 const CARD_HEIGHT = 220;
+const RPC_INPUTS = [{ key: 'trigger', label: 'Trigger', type: 'trigger' }];
+const RPC_OUTPUTS = [{ key: 'result', label: 'Result', type: 'value' }];
 
 export default function BackgroundRpcNode({
-  node,
+  node: origNode,
   pan = { x: 0, y: 0 },
   zoom = 1,
   style = {},
   isSelected,
   onMouseDown,
+  onClick,
+  onDoubleClick,
   nodeRefs
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
+  const node = useNodeHandleSchema(origNode, RPC_INPUTS, RPC_OUTPUTS);
 
   const width = (node?.width || CARD_WIDTH) * zoom;
   const height = (node?.height || CARD_HEIGHT) * zoom;
@@ -209,151 +215,179 @@ export default function BackgroundRpcNode({
     ...style
   }), [baseLeft, baseTop, width, height, isSelected, theme, style]);
 
+  // Add a static method for properties panel support
+  BackgroundRpcNode.getProperties = function(node) {
+    const data = node?.data || {};
+    return [
+      { label: 'Selected Method', value: data.selectedMethod || '' },
+      { label: 'Args', value: data.argsText || '' },
+      { label: 'Last Result', value: data.lastResult || '' },
+      { label: 'Last Error', value: data.lastError || '' },
+      { label: 'Is Ready', value: data.isReady ? 'Yes' : 'No' },
+      { label: 'Available Methods', value: Array.isArray(data.availableMethods) ? data.availableMethods.join(', ') : '' },
+    ];
+  };
+
   return (
     <div
       ref={nodeRef}
       className="node-or-handle"
       style={containerStyle}
+      tabIndex={0}
       onMouseDown={e => {
-        if (onMouseDown) onMouseDown(e);
         e.stopPropagation();
+        if (onMouseDown) onMouseDown(e);
+        eventBus.emit('nodeMouseDown', { id: node.id, event: e });
       }}
+      onClick={e => {
+        e.stopPropagation();
+        if (onClick) onClick(e);
+        eventBus.emit('nodeClick', { id: node.id, event: e });
+      }}
+      onDoubleClick={e => {
+        e.stopPropagation();
+        if (onDoubleClick) onDoubleClick(e);
+      }}
+      onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
+      onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
-          Background RPC
-        </h4>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 500,
-            padding: '2px 6px',
-            borderRadius: 6,
-            background: isReady
-              ? theme.palette.success.light
-              : theme.palette.warning.light,
-            color: isReady
-              ? theme.palette.success.contrastText
-              : theme.palette.warning.contrastText
-          }}
-        >
-          {isReady ? 'Connected' : 'Waiting'}
-        </span>
-      </div>
-
-      <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: theme.palette.text.secondary }}>
-        Method
-      </label>
-      <select
-        value={selectedMethod}
-        onChange={e => setSelectedMethod(e.target.value)}
-        disabled={!availableMethods.length}
-        style={{
-          width: '100%',
-          padding: '6px 8px',
-          borderRadius: 6,
-          border: `1px solid ${theme.palette.divider}`,
-          fontSize: 12,
-          background: theme.palette.background.default,
-          color: theme.palette.text.primary,
-          outline: 'none'
-        }}
-      >
-        {availableMethods.length === 0 ? (
-          <option value="">No methods available</option>
-        ) : (
-          availableMethods.map(method => (
-            <option key={method} value={method}>{method}</option>
-          ))
-        )}
-      </select>
-
-      <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: theme.palette.text.secondary }}>
-        Args (JSON)
-      </label>
-      <textarea
-        value={argsText}
-        onChange={e => setArgsText(e.target.value)}
-        rows={4}
-        style={{
-          width: '100%',
-          resize: 'vertical',
-          minHeight: 60,
-          maxHeight: 140,
-          borderRadius: 6,
-          border: `1px solid ${theme.palette.divider}`,
-          fontSize: 12,
-          padding: 8,
-          background: theme.palette.background.default,
-          color: theme.palette.text.primary,
-          fontFamily: 'Monaco, monospace'
-        }}
-      />
-
-      <button
-        onClick={() => invokeRpc()}
-        disabled={!isReady || !selectedMethod || isCalling}
-        style={{
-          marginTop: 4,
-          borderRadius: 6,
-          border: 'none',
-          padding: '8px 10px',
-          fontSize: 12,
-          fontWeight: 600,
-          cursor: (!isReady || !selectedMethod || isCalling) ? 'not-allowed' : 'pointer',
-          background: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
-          opacity: (!isReady || !selectedMethod || isCalling) ? 0.5 : 1,
-          transition: 'background 0.2s ease'
-        }}
-      >
-        {isCalling ? 'Calling…' : 'Invoke'}
-      </button>
-
-      {lastError && (
-        <div
-          style={{
-            marginTop: 6,
-            padding: '6px 8px',
-            borderRadius: 6,
-            background: theme.palette.error.light,
-            color: theme.palette.error.contrastText,
-            fontSize: 11,
-            lineHeight: 1.4
-          }}
-        >
-          {lastError}
-        </div>
-      )}
-
-      {lastResult && (
-        <div
-          style={{
-            marginTop: 6,
-            padding: '6px 8px',
-            borderRadius: 6,
-            background: theme.palette.background.default,
-            color: theme.palette.text.primary,
-            fontSize: 11,
-            lineHeight: 1.4,
-            maxHeight: 120,
-            overflow: 'auto',
-            border: `1px solid ${theme.palette.divider}`
-          }}
-        >
-          <strong style={{ display: 'block', marginBottom: 4 }}>Last Result:</strong>
-          <pre
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
+            Background RPC
+          </h4>
+          <span
             style={{
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              fontFamily: 'Monaco, monospace'
+              fontSize: 11,
+              fontWeight: 500,
+              padding: '2px 6px',
+              borderRadius: 6,
+              background: isReady
+                ? theme.palette.success.light
+                : theme.palette.warning.light,
+              color: isReady
+                ? theme.palette.success.contrastText
+                : theme.palette.warning.contrastText
             }}
           >
-            {lastResult}
-          </pre>
+            {isReady ? 'Connected' : 'Waiting'}
+          </span>
         </div>
-      )}
+
+        <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: theme.palette.text.secondary }}>
+          Method
+        </label>
+        <select
+          value={selectedMethod}
+          onChange={e => setSelectedMethod(e.target.value)}
+          disabled={!availableMethods.length}
+          style={{
+            width: '100%',
+            padding: '6px 8px',
+            borderRadius: 6,
+            border: `1px solid ${theme.palette.divider}`,
+            fontSize: 12,
+            background: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            outline: 'none'
+          }}
+        >
+          {availableMethods.length === 0 ? (
+            <option value="">No methods available</option>
+          ) : (
+            availableMethods.map(method => (
+              <option key={method} value={method}>{method}</option>
+            ))
+          )}
+        </select>
+
+        <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: theme.palette.text.secondary }}>
+          Args (JSON)
+        </label>
+        <textarea
+          value={argsText}
+          onChange={e => setArgsText(e.target.value)}
+          rows={4}
+          style={{
+            width: '100%',
+            resize: 'vertical',
+            minHeight: 60,
+            maxHeight: 140,
+            borderRadius: 6,
+            border: `1px solid ${theme.palette.divider}`,
+            fontSize: 12,
+            padding: 8,
+            background: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            fontFamily: 'Monaco, monospace'
+          }}
+        />
+
+        <button
+          onClick={() => invokeRpc()}
+          disabled={!isReady || !selectedMethod || isCalling}
+          style={{
+            marginTop: 4,
+            borderRadius: 6,
+            border: 'none',
+            padding: '8px 10px',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: (!isReady || !selectedMethod || isCalling) ? 'not-allowed' : 'pointer',
+            background: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            opacity: (!isReady || !selectedMethod || isCalling) ? 0.5 : 1,
+            transition: 'background 0.2s ease'
+          }}
+        >
+          {isCalling ? 'Calling…' : 'Invoke'}
+        </button>
+
+        {lastError && (
+          <div
+            style={{
+              marginTop: 6,
+              padding: '6px 8px',
+              borderRadius: 6,
+              background: theme.palette.error.light,
+              color: theme.palette.error.contrastText,
+              fontSize: 11,
+              lineHeight: 1.4
+            }}
+          >
+            {lastError}
+          </div>
+        )}
+
+        {lastResult && (
+          <div
+            style={{
+              marginTop: 6,
+              padding: '6px 8px',
+              borderRadius: 6,
+              background: theme.palette.background.default,
+              color: theme.palette.text.primary,
+              fontSize: 11,
+              lineHeight: 1.4,
+              maxHeight: 120,
+              overflow: 'auto',
+              border: `1px solid ${theme.palette.divider}`
+            }}
+          >
+            <strong style={{ display: 'block', marginBottom: 4 }}>Last Result:</strong>
+            <pre
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontFamily: 'Monaco, monospace'
+              }}
+            >
+              {lastResult}
+            </pre>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

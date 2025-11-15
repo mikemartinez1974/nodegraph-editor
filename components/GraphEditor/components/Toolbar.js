@@ -417,15 +417,28 @@ const Toolbar = ({
         showLabel: node.showLabel !== false,
         data: node.data || {}
       })),
-      edges: edges.map(edge => ({
-        id: edge.id,
-        type: edge.type,
-        source: edge.source,
-        target: edge.target,
-        label: edge.label || "",
-        style: edge.style || {},
-        data: edge.data || {}
-      })),
+      edges: edges.map(edge => {
+        const sourceNodeId = typeof edge.source === 'object' && edge.source
+          ? (edge.source.nodeId ?? edge.source.id ?? '')
+          : edge.source;
+        const targetNodeId = typeof edge.target === 'object' && edge.target
+          ? (edge.target.nodeId ?? edge.target.id ?? '')
+          : edge.target;
+        const sourceHandle = edge.sourceHandle || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
+        const targetHandle = edge.targetHandle || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
+        return {
+          id: edge.id,
+          type: edge.type,
+          source: sourceNodeId,
+          target: targetNodeId,
+          sourceHandle: sourceHandle,
+          targetHandle: targetHandle,
+          handleMeta: edge.handleMeta || undefined,
+          label: edge.label || "",
+          style: edge.style || {},
+          data: edge.data || {}
+        };
+      }),
       groups: groups.map(group => ({
         id: group.id,
         label: group.label || "",

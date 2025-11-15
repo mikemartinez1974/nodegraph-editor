@@ -5,9 +5,20 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import PinIcon from '@mui/icons-material/Pin';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const COUNTER_INPUTS = [
+  { key: 'increment', label: 'Increment', type: 'trigger' },
+  { key: 'decrement', label: 'Decrement', type: 'trigger' },
+  { key: 'reset', label: 'Reset', type: 'trigger' }
+];
+const COUNTER_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'value' }
+];
 
 export default function CounterNode({ 
-  node, 
+  node: origNode, 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
   style = {}, 
@@ -19,9 +30,10 @@ export default function CounterNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
+  const node = useNodeHandleSchema(origNode, COUNTER_INPUTS, COUNTER_OUTPUTS);
   
-  const width = (node?.width || 180) * zoom;
-  const height = (node?.height || 160) * zoom;
+  const width = (node?.width || 200) * zoom;
+  const height = (node?.height || 300) * zoom;
   
   // Counter state
   const count = node?.data?.count || 0;
@@ -46,11 +58,22 @@ export default function CounterNode({
     });
   }, [count, node.id]);
 
+  // Handle external input events (so edges/other nodes can trigger increment/decrement/reset)
+  useEffect(() => {
+    const handler = ({ targetNodeId, inputName } = {}) => {
+      if (targetNodeId !== node.id) return;
+      if (inputName === 'increment') handleIncrement({ stopPropagation: () => {} });
+      else if (inputName === 'decrement') handleDecrement({ stopPropagation: () => {} });
+      else if (inputName === 'reset') handleReset({ stopPropagation: () => {} });
+    };
+    eventBus.on('nodeInput', handler);
+    return () => eventBus.off('nodeInput', handler);
+  }, [count, step, min, max, node.id]);
+
   const handleIncrement = (e) => {
     e.stopPropagation();
     const newCount = count + step;
     if (max !== null && newCount > max) return;
-    
     eventBus.emit('nodeUpdate', { 
       id: node.id, 
       updates: { 
@@ -66,7 +89,6 @@ export default function CounterNode({
     e.stopPropagation();
     const newCount = count - step;
     if (min !== null && newCount < min) return;
-    
     eventBus.emit('nodeUpdate', { 
       id: node.id, 
       updates: { 
@@ -102,6 +124,7 @@ export default function CounterNode({
   const atMax = max !== null && count >= max;
   const atMin = min !== null && count <= min;
 
+  // Handles are rendered centrally via HandleLayer
   return (
     <div
       ref={nodeRef}

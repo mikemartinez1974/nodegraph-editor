@@ -6,12 +6,26 @@ import FixedNode from './FixedNode';
 
 const NON_PASSIVE_LISTENER = { passive: false };
 
+const DEFAULT_INPUTS = [
+  { key: 'in', label: 'In', type: 'trigger' }
+];
+const DEFAULT_OUTPUTS = [
+  { key: 'out', label: 'Out', type: 'trigger' }
+];
+
 const DefaultNode = (props) => {
   const { node, zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
+
+  // --- Ensure handles always exist ---
+  const nodeWithHandles = {
+    ...node,
+    inputs: (node.inputs && node.inputs.length > 0) ? node.inputs : DEFAULT_INPUTS,
+    outputs: (node.outputs && node.outputs.length > 0) ? node.outputs : DEFAULT_OUTPUTS
+  };
 
   // Resize handlers
   const getPointerPosition = (event) => {
@@ -71,7 +85,7 @@ const DefaultNode = (props) => {
 
   // Render FixedNode with a resize handle overlay
   return (
-    <FixedNode {...props}>
+    <FixedNode {...props} node={nodeWithHandles}>
       {/* Resize handle */}
       <div
         onMouseDown={handleResizeStart}

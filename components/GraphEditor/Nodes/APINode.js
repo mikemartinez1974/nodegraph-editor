@@ -4,8 +4,16 @@ import eventBus from '../../NodeGraph/eventBus';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CancelIcon from '@mui/icons-material/Cancel';
 
+// --- Unified handle schema ---
+const API_INPUTS = [
+  { key: 'trigger', label: 'Trigger', type: 'trigger' }
+];
+const API_OUTPUTS = [
+  { key: 'response', label: 'Response', type: 'value' }
+];
+
 export default function APINode({
-  node,
+  node: origNode,
   pan = { x: 0, y: 0 },
   zoom = 1,
   style = {},
@@ -15,12 +23,18 @@ export default function APINode({
   onDoubleClick,
   nodeRefs
 }) {
+  // Ensure node has inputs/outputs for handle system
+  const node = {
+    ...origNode,
+    inputs: Array.isArray(origNode?.inputs) && origNode.inputs.length > 0 ? origNode.inputs : API_INPUTS,
+    outputs: Array.isArray(origNode?.outputs) && origNode.outputs.length > 0 ? origNode.outputs : API_OUTPUTS,
+  };
   const theme = useTheme();
   const nodeRef = useRef(null);
   const controllerRef = useRef(null);
 
-  const width = (node?.width || 220) * zoom;
-  const height = (node?.height || 180) * zoom;
+  const width = (node?.width || 350) * zoom;
+  const height = (node?.height || 250) * zoom;
 
   const initial = node?.data || {};
   const [url, setUrl] = useState(initial.url || '');
@@ -207,49 +221,146 @@ export default function APINode({
         e.stopPropagation();
         if (onDoubleClick) onDoubleClick(e);
       }}
-      onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
-      onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ fontWeight: 700 }}>{node?.label || 'API'}</div>
-        <div style={{ fontSize: 11, opacity: 0.85 }}>{loading ? 'Loading…' : lastStatus ? `Status ${lastStatus}` : ''}</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ flexGrow: 1, marginRight: 8 }}>
+          <input
+            type="text"
+            placeholder="Enter URL"
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            style={{
+              width: '100%',
+              padding: 8,
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              fontSize: 14,
+            }}
+          />
+        </div>
+        <div>
+          <button
+            onClick={() => doFetch()}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 4,
+              border: 'none',
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <CloudDownloadIcon style={{ marginRight: 4 }} />
+            Fetch
+          </button>
+        </div>
       </div>
-
-      <div style={{ display: 'flex', gap: 8, flexDirection: 'column', marginBottom: 8 }}>
-        <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://api.example.com/…" style={{ padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white' }} />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <select value={method} onChange={e => setMethod(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.06)', color: 'white' }}>
-            <option>GET</option>
-            <option>POST</option>
-            <option>PUT</option>
-            <option>PATCH</option>
-            <option>DELETE</option>
-            <option>HEAD</option>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ flexGrow: 1, marginRight: 8 }}>
+          <select
+            value={method}
+            onChange={e => setMethod(e.target.value)}
+            style={{
+              width: '100%',
+              padding: 8,
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              fontSize: 14,
+            }}
+          >
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
+            <option value="OPTIONS">OPTIONS</option>
+            <option value="HEAD">HEAD</option>
           </select>
-          <button onClick={(e) => { e.stopPropagation(); doFetch(); }} title="Fetch" style={{ padding: '6px 10px', borderRadius: 6, border: 'none', background: theme.palette.primary.dark, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CloudDownloadIcon sx={{ fontSize: 18 }} />FETCH
-          </button>
-          <button onClick={(e) => { e.stopPropagation(); cancelFetch(); }} title="Cancel" style={{ padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CancelIcon sx={{ fontSize: 18 }} />CANCEL
+        </div>
+        <div>
+          <button
+            onClick={cancelFetch}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 4,
+              border: 'none',
+              backgroundColor: theme.palette.error.main,
+              color: theme.palette.error.contrastText,
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <CancelIcon style={{ marginRight: 4 }} />
+            Cancel
           </button>
         </div>
       </div>
-
-      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', marginBottom: 8 }}>
-        <textarea value={headersText} onChange={e => setHeadersText(e.target.value)} placeholder='{"Authorization":"Bearer …"}' style={{ flex: 1, minHeight: 40, borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.04)', color: 'white', padding: 8 }} />
-      </div>
-
-      {method !== 'GET' && (
-        <div style={{ marginBottom: 8 }}>
-          <textarea value={bodyText} onChange={e => setBodyText(e.target.value)} placeholder='Request body (raw)' style={{ width: '100%', minHeight: 40, borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.04)', color: 'white', padding: 8 }} />
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ flexGrow: 1, marginRight: 8 }}>
+          <textarea
+            placeholder="Enter headers as JSON"
+            value={headersText}
+            onChange={e => setHeadersText(e.target.value)}
+            style={{
+              width: '100%',
+              padding: 8,
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              fontSize: 14,
+              minHeight: 80,
+              resize: 'vertical',
+            }}
+          />
         </div>
-      )}
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
-        <div style={{ fontSize: 11, opacity: 0.85 }}>Preview: {lastResponsePreview ? `${lastResponsePreview.slice(0, 60).replace(/\n/g, ' ')}${lastResponsePreview.length > 60 ? '…' : ''}` : '—'}</div>
-        <div style={{ color: errorMsg ? theme.palette.error.main : 'inherit', fontSize: 11 }}>{errorMsg || ''}</div>
       </div>
-
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ flexGrow: 1, marginRight: 8 }}>
+          <textarea
+            placeholder="Enter body text"
+            value={bodyText}
+            onChange={e => setBodyText(e.target.value)}
+            style={{
+              width: '100%',
+              padding: 8,
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              fontSize: 14,
+              minHeight: 80,
+              resize: 'vertical',
+            }}
+          />
+        </div>
+      </div>
+      <div style={{ marginTop: 8, fontSize: 12, color: theme.palette.text.secondary }}>
+        {loading && <div>Loading...</div>}
+        {errorMsg && <div style={{ color: theme.palette.error.main }}>{errorMsg}</div>}
+        {!loading && lastStatus !== null && (
+          <div>
+            Last Status: <strong>{lastStatus}</strong>
+          </div>
+        )}
+        {!loading && lastResponsePreview && (
+          <div>
+            Last Response Preview:
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: '8px 0' }}>
+              {lastResponsePreview}
+            </pre>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

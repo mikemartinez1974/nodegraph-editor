@@ -3,9 +3,18 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const TOGGLE_INPUTS = [
+  { key: 'set', label: 'Set', type: 'trigger' }
+];
+const TOGGLE_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'value' }
+];
 
 export default function ToggleNode({ 
-  node, 
+  node: origNode, 
   pan = { x: 0, y: 0 }, 
   zoom = 1, 
   style = {}, 
@@ -17,9 +26,10 @@ export default function ToggleNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
+  const node = useNodeHandleSchema(origNode, TOGGLE_INPUTS, TOGGLE_OUTPUTS);
   
-  const width = (node?.width || 160) * zoom;
-  const height = (node?.height || 140) * zoom;
+  const width = (node?.width || 200) * zoom;
+  const height = (node?.height || 200) * zoom;
   
   // Toggle state
   const value = node?.data?.value || false;
@@ -63,6 +73,7 @@ export default function ToggleNode({
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
 
+  // Handles are rendered via the shared HandleLayer
   return (
     <div
       ref={nodeRef}
@@ -74,8 +85,8 @@ export default function ToggleNode({
         width,
         height,
         cursor: 'grab',
-        border: isSelected 
-          ? `2px solid ${theme.palette.secondary.main}` 
+        border: isSelected
+          ? `2px solid ${theme.palette.secondary.main}`
           : `1px solid ${theme.palette.primary.main}`,
         background: isSelected ? selected_gradient : unselected_gradient,
         borderRadius: 8,
@@ -125,7 +136,6 @@ export default function ToggleNode({
           {node?.label || 'Toggle'}
         </span>
       </div>
-
       {/* Toggle Button */}
       <button
         onClick={handleToggle}
@@ -165,7 +175,6 @@ export default function ToggleNode({
         }}>
           {value ? '✓' : '✕'}
         </div>
-        
         {/* Label */}
         <div style={{
           position: 'absolute',
@@ -181,7 +190,6 @@ export default function ToggleNode({
           {value ? onLabel : offLabel}
         </div>
       </button>
-
       {/* State indicator */}
       <div style={{
         marginTop: 16,
@@ -194,7 +202,6 @@ export default function ToggleNode({
       }}>
         {value ? 'Active' : 'Inactive'}
       </div>
-
       {/* Boolean value display */}
       <div style={{
         marginTop: 4,

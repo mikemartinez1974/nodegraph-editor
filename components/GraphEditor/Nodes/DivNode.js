@@ -4,8 +4,22 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
 
+// Unified handle schema for display nodes
+const DEFAULT_INPUTS = [
+  { key: 'set', label: 'Set', type: 'value' }
+];
+const DEFAULT_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'value' }
+];
+
 const DivNode = (props) => {
-  const { node, zoom = 1, isSelected } = props;
+  // Ensure node has inputs/outputs for handle system
+  const node = {
+    ...props.node,
+    inputs: Array.isArray(props.node?.inputs) && props.node.inputs.length > 0 ? props.node.inputs : DEFAULT_INPUTS,
+    outputs: Array.isArray(props.node?.outputs) && props.node.outputs.length > 0 ? props.node.outputs : DEFAULT_OUTPUTS,
+  };
+  const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartPos = useRef({ x: 0, y: 0 });
@@ -61,7 +75,7 @@ const DivNode = (props) => {
 
   // Render FixedNode with HTML content or plain text
   return (
-    <FixedNode {...props} hideDefaultContent={true}>
+    <FixedNode {...props} node={node} hideDefaultContent={true}>
       {embedUrl ? (
         /* Direct embed iframe - no sandbox for compatibility */
         <iframe

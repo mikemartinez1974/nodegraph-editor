@@ -1,9 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+
+// --- New schema handles ---
+const DELAY_INPUTS = [
+  { key: 'trigger', label: 'Trigger', type: 'trigger' }
+];
+const DELAY_OUTPUTS = [
+  { key: 'value', label: 'Value', type: 'trigger' }
+];
 
 export default function DelayNode({
-  node,
+  node: origNode,
   pan = { x: 0, y: 0 },
   zoom = 1,
   style = {},
@@ -18,9 +27,10 @@ export default function DelayNode({
   const timersRef = useRef([]);
   const queueRef = useRef([]);
   const [, setTick] = useState(0); // force update for UI
+  const node = useNodeHandleSchema(origNode, DELAY_INPUTS, DELAY_OUTPUTS);
 
-  const width = (node?.width || 200) * zoom;
-  const height = (node?.height || 140) * zoom;
+  const width = (node?.width || 300) * zoom;
+  const height = (node?.height || 150) * zoom;
 
   const defaultDelay = typeof node?.data?.delay === 'number' ? node.data.delay : 1000;
   const [delayMs, setDelayMs] = useState(defaultDelay);
@@ -48,7 +58,11 @@ export default function DelayNode({
   // Helper: schedule next trigger from queue
   const scheduleNext = () => {
     if (queueRef.current.length === 0) {
+      // Reset timers and status so new items will fire
+      timersRef.current.forEach(t => clearTimeout(t));
+      timersRef.current = [];
       setStatus('idle');
+      setTick(t => t + 1);
       return;
     }
     const payload = queueRef.current.shift();
@@ -126,6 +140,7 @@ export default function DelayNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
+  // Handles are rendered centrally via HandleLayer
   return (
     <div
       ref={nodeRef}
