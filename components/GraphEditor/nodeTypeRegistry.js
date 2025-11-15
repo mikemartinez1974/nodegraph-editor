@@ -15,6 +15,7 @@ import APINode from './Nodes/APINode';
 import ScriptNode from './Nodes/ScriptNode';
 import ThreeDNode from './Nodes/ThreeDNode';
 import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
+import ValueTriggerNode from './Nodes/ValueTriggerNode';
 
 // Registry structure: each entry has the component and display metadata
 const nodeTypeRegistry = {
@@ -88,6 +89,13 @@ const nodeTypeRegistry = {
     icon: 'Timer',
     category: 'utility'
   },
+  valueTrigger: {
+    component: ValueTriggerNode,
+    label: 'Value Adapter',
+    description: 'Convert value changes into trigger pulses (edge/change detection)',
+    icon: 'Bolt',
+    category: 'logic'
+  },
   api: {
     component: APINode,
     label: 'API Node',
@@ -148,6 +156,15 @@ export const nodeTypeMetadata = [
     category: 'integration',
     defaultWidth: 260,
     defaultHeight: 220
+  },
+  {
+    type: 'valueTrigger',
+    label: 'Value Adapter',
+    description: 'Convert value changes into trigger pulses',
+    icon: 'Bolt',
+    category: 'logic',
+    defaultWidth: 240,
+    defaultHeight: 180
   }
   // Add more node types here as needed
 ];

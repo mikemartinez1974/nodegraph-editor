@@ -9,11 +9,14 @@ const AddNodeMenu = ({ anchorEl, open, onClose }) => {
   const nodesByCategory = getNodeTypesByCategory();
   
   // Category display order and labels
-  const categoryOrder = ['basic', 'content', 'media', 'advanced', 'other'];
+  const categoryOrder = ['basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
   const categoryLabels = {
     basic: 'Basic Nodes',
+    utility: 'Utility Nodes',
+    logic: 'Logic Nodes',
     content: 'Content Nodes',
     media: 'Media Nodes',
+    integration: 'Integration',
     advanced: 'Advanced Nodes',
     other: 'Other'
   };
