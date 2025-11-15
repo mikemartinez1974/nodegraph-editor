@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useContext, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, useState, useContext, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from './eventBus';
 import HandlePositionContext from './HandlePositionContext';
@@ -644,15 +644,13 @@ const EdgeLayer = forwardRef(({
     setHoveredEdge(null);
   }
   
-  function handleClick(e) {
-    if (!canvasRef.current) return;
-
+  const handleEdgeHitTest = useCallback((clientX, clientY) => {
+    if (!canvasRef.current) return null;
     const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left - pan.x) / zoom;
-    const mouseY = (e.clientY - rect.top - pan.y) / zoom;
-    let found = null;
+    const mouseX = (clientX - rect.left - pan.x) / zoom;
+    const mouseY = (clientY - rect.top - pan.y) / zoom;
 
-    for (const edge of edgeList) {
+    for (const edge of edgeListRef.current) {
       const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
       if (!edgeData) continue;
 
@@ -682,74 +680,29 @@ const EdgeLayer = forwardRef(({
           edgeData.targetPos.x, edgeData.targetPos.y
         );
       }
-      // Edge label hit test
       if (!hit) {
         hit = isPointInEdgeLabel({ x: mouseX, y: mouseY }, edgeData, theme);
       }
       if (hit) {
-        found = edge.id;
-        break;
+        return edge;
       }
     }
+    return null;
+  }, [pan, zoom, theme]);
 
-    if (found && onEdgeClick) {
-      const foundEdge = edgeList.find(edge => edge.id === found);
-      onEdgeClick(foundEdge || found, e);
+  const handleClick = useCallback((e) => {
+    const edge = handleEdgeHitTest(e.clientX, e.clientY);
+    if (edge && onEdgeClick) {
+      onEdgeClick(edge, e);
     }
-  }
+  }, [handleEdgeHitTest, onEdgeClick]);
 
-  function handleDoubleClick(e) {
-    if (!canvasRef.current) return;
-
-    const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left - pan.x) / zoom;
-    const mouseY = (e.clientY - rect.top - pan.y) / zoom;
-    let found = null;
-
-    for (const edge of edgeList) {
-      const edgeData = edgeDataRef.current.find(ed => ed.id === edge.id);
-      if (!edgeData) continue;
-
-      let hit = false;
-      if (edgeData.isCurved) {
-        if (edgeData.curveDirection === 'horizontal') {
-          hit = isPointNearBezier(
-            mouseX, mouseY,
-            edgeData.sourcePos.x, edgeData.sourcePos.y,
-            edgeData.midX, edgeData.sourcePos.y,
-            edgeData.midX, edgeData.targetPos.y,
-            edgeData.targetPos.x, edgeData.targetPos.y
-          );
-        } else {
-          hit = isPointNearBezier(
-            mouseX, mouseY,
-            edgeData.sourcePos.x, edgeData.sourcePos.y,
-            edgeData.sourcePos.x, edgeData.midY,
-            edgeData.targetPos.x, edgeData.midY,
-            edgeData.targetPos.x, edgeData.targetPos.y
-          );
-        }
-      } else {
-        hit = isPointNearLine(
-          mouseX, mouseY,
-          edgeData.sourcePos.x, edgeData.sourcePos.y,
-          edgeData.targetPos.x, edgeData.targetPos.y
-        );
-      }
-      // Edge label hit test
-      if (!hit) {
-        hit = isPointInEdgeLabel({ x: mouseX, y: mouseY }, edgeData, theme);
-      }
-      if (hit) {
-        found = edge.id;
-        break;
-      }
+  const handleDoubleClick = useCallback((e) => {
+    const edge = handleEdgeHitTest(e.clientX, e.clientY);
+    if (edge && onEdgeDoubleClick) {
+      onEdgeDoubleClick(edge, e);
     }
-
-    if (found && onEdgeDoubleClick) {
-      onEdgeDoubleClick(found, e);
-    }
-  }
+  }, [handleEdgeHitTest, onEdgeDoubleClick]);
 
   return (
     <canvas

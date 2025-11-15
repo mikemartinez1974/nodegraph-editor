@@ -32,6 +32,22 @@ export function createGraphEditorHandlers({
   
   const { saveToHistory } = historyHook;
   
+  const normalizeEdgeSchema = (edge) => {
+    if (!edge || typeof edge !== 'object') return edge;
+    const normalized = { ...edge };
+    if (normalized.source && typeof normalized.source === 'object') {
+      const sourceObj = normalized.source;
+      normalized.sourceHandle = normalized.sourceHandle || sourceObj.handleKey;
+      normalized.source = sourceObj.nodeId ?? sourceObj.id ?? normalized.source;
+    }
+    if (normalized.target && typeof normalized.target === 'object') {
+      const targetObj = normalized.target;
+      normalized.targetHandle = normalized.targetHandle || targetObj.handleKey;
+      normalized.target = targetObj.nodeId ?? targetObj.id ?? normalized.target;
+    }
+    return normalized;
+  };
+  
   // ===== NODE HANDLERS =====
   const handleAddNode = (type = 'default', options = {}) => {
     console.log('[handleAddNode] Called with type:', type, 'options:', options);
@@ -230,19 +246,38 @@ export function createGraphEditorHandlers({
   
   // ===== LOAD/SAVE HANDLERS =====
   const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = []) => {
+    const edgeMap = new Map();
+    (loadedEdges || []).forEach(edge => {
+      const normalized = normalizeEdgeSchema(edge);
+      if (!normalized || !normalized.id) return;
+      const previous = edgeMap.get(normalized.id);
+      if (!previous) {
+        edgeMap.set(normalized.id, normalized);
+        return;
+      }
+      const takeNew =
+        (!previous.sourceHandle && normalized.sourceHandle) ||
+        (!previous.targetHandle && normalized.targetHandle) ||
+        (!previous.handleMeta && normalized.handleMeta);
+      if (takeNew) {
+        edgeMap.set(normalized.id, normalized);
+      }
+    });
+    const normalizedEdges = Array.from(edgeMap.values());
+
     setNodes(prev => {
       nodesRef.current = loadedNodes;
       return loadedNodes;
     });
     setEdges(prev => {
-      edgesRef.current = loadedEdges;
-      return loadedEdges;
+      edgesRef.current = normalizedEdges;
+      return normalizedEdges;
     });
     setGroups(loadedGroups);
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
-    saveToHistory(loadedNodes, loadedEdges);
+    saveToHistory(loadedNodes, normalizedEdges);
 
     if (loadedNodes.length > 0) {
       const firstNode = loadedNodes[0];

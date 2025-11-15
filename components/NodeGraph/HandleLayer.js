@@ -541,71 +541,86 @@ const HandleLayer = forwardRef(({
           left: 0,
           width: '100vw',
           height: '100vh',
-          pointerEvents: 'none', // <-- ensure canvas does not block handle events
+          pointerEvents: 'none',
           zIndex: 25
         }}
       />
-      <div style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100vw', 
-        height: '100vh',
-        pointerEvents: 'auto',
-        zIndex: 26 // <-- ensure handle hit areas are above canvas
-      }}>
-        {getCurrentHandles().map(handle => {
-          const screenX = handle.position.x * zoom + pan.x;
-          const screenY = handle.position.y * zoom + pan.y;
-          const hitRadius = handleRadius * 2;
-          const extendedHit = hitRadius + 16;
-          return (
-            <div
-              key={handle.id}
-              style={{
-                position: 'absolute',
-                left: screenX - extendedHit,
-                top: screenY - extendedHit,
-                width: extendedHit * 2,
-                height: extendedHit * 2,
-                pointerEvents: 'auto', // <-- ensure hit area receives mouse events
-                cursor: 'pointer',
-                borderRadius: '50%',
-                zIndex: 27 // <-- above canvas and other overlays
-              }}
-              onMouseDown={handleMouseDown}
-              onMouseEnter={() => {
-                handleHoverRef.current = true;
-                setHoveredHandleId(handle.id);
-                showTooltipForHandle(handle);
-                scheduleRender();
-                clearTimeout(blurTimeoutRef.current);
-              }}
-              onMouseLeave={() => {
-                handleHoverRef.current = false;
-                setHoveredHandleId(null);
-                hideTooltip();
-                const hoveredNode = nodes.find(n => n.id === handle.nodeId);
-                if (hoveredNode && isPointerInsideNode(hoveredNode)) {
-                  setHoveredNodeId(handle.nodeId);
-                }
-                scheduleRender();
-                // If node is not hovered, clear node hover after delay
-                blurTimeoutRef.current = setTimeout(() => {
-                  if (!draggingHandle && !handleHoverRef.current) {
-                    const node = nodes.find(n => n.id === handle.nodeId);
-                    if (node && isPointerInsideNode(node)) {
-                      return;
-                    }
-                    setHoveredNodeId(null);
+      {getCurrentHandles().map(handle => {
+        const screenX = handle.position.x * zoom + pan.x;
+        const screenY = handle.position.y * zoom + pan.y;
+        const hitRadius = handleRadius * 2;
+        const extendedHit = hitRadius + 16;
+        return (
+          <div
+            key={handle.id}
+            style={{
+              position: 'fixed',
+              left: screenX - extendedHit,
+              top: screenY - extendedHit,
+              width: extendedHit * 2,
+              height: extendedHit * 2,
+              pointerEvents: 'auto',
+              cursor: 'pointer',
+              borderRadius: '50%',
+              zIndex: 27
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseEnter={() => {
+              handleHoverRef.current = true;
+              setHoveredHandleId(handle.id);
+              showTooltipForHandle(handle);
+              scheduleRender();
+              clearTimeout(blurTimeoutRef.current);
+            }}
+            onMouseLeave={() => {
+              handleHoverRef.current = false;
+              setHoveredHandleId(null);
+              hideTooltip();
+              const hoveredNode = nodes.find(n => n.id === handle.nodeId);
+              if (hoveredNode && isPointerInsideNode(hoveredNode)) {
+                setHoveredNodeId(handle.nodeId);
+              }
+              scheduleRender();
+              blurTimeoutRef.current = setTimeout(() => {
+                if (!draggingHandle && !handleHoverRef.current) {
+                  const node = nodes.find(n => n.id === handle.nodeId);
+                  if (node && isPointerInsideNode(node)) {
+                    return;
                   }
-                }, 30);
-              }}
-              title={`${handle.label || 'Handle'} • ${handle.handleType || 'unknown'}`}
-            />
-          );
-        })}
-      </div>
+                  setHoveredNodeId(null);
+                }
+              }, 30);
+            }}
+            title={`${handle.label || 'Handle'} • ${handle.handleType || 'unknown'}`}
+          />
+        );
+      })}
+      {handleTooltip && (
+        <div
+          style={{
+            position: 'fixed',
+            left: handleTooltip.side === 'output' ? handleTooltip.x + 14 : handleTooltip.x - 14,
+            top: handleTooltip.y,
+            transform: handleTooltip.side === 'output' ? 'translateY(-50%)' : 'translate(-100%, -50%)',
+            background: 'rgba(19, 23, 32, 0.9)',
+            color: '#fff',
+            padding: '4px 8px',
+            borderRadius: 6,
+            fontSize: 11,
+            fontWeight: 600,
+            pointerEvents: 'none',
+            zIndex: 40,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+            whiteSpace: 'nowrap',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}
+        >
+          <div>{handleTooltip.label || 'Handle'}</div>
+          <div style={{ fontSize: 10, opacity: 0.8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            {handleTooltip.type || 'unknown'}
+          </div>
+        </div>
+      )}
     </HandlePositionContext.Provider>
   );
 });
