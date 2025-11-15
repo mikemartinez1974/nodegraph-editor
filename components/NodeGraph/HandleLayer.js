@@ -72,9 +72,11 @@ const HandleLayer = forwardRef(({
   const [previewLine, setPreviewLine] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [dragTargetNodeId, setDragTargetNodeId] = useState(null);
+  const [handleTooltip, setHandleTooltip] = useState(null);
   const animationFrameRef = useRef(null);
   const handleHoverRef = useRef(false);
   const blurTimeoutRef = useRef();
+  const tooltipTimeoutRef = useRef();
 
   useImperativeHandle(ref, () => ({
     redraw: () => {
@@ -86,15 +88,36 @@ const HandleLayer = forwardRef(({
   }));
 
   // Listen to node hover events from event bus (single listener)
+  const isPointerInsideNode = useCallback((node) => {
+    if (!node) return false;
+    const lastMouse = typeof window !== 'undefined' ? window.__NG_LAST_MOUSE : null;
+    if (!lastMouse) return false;
+    const graphX = (lastMouse.x - pan.x) / zoom;
+    const graphY = (lastMouse.y - pan.y) / zoom;
+    const nodeX = node.position?.x ?? node.x ?? 0;
+    const nodeY = node.position?.y ?? node.y ?? 0;
+    const width = node.width || 60;
+    const height = node.height || 60;
+    const left = nodeX - width / 2;
+    const right = nodeX + width / 2;
+    const top = nodeY - height / 2;
+    const bottom = nodeY + height / 2;
+    return graphX >= left && graphX <= right && graphY >= top && graphY <= bottom;
+  }, [pan, zoom]);
+
   useEffect(() => {
     const handleNodeHover = ({ id }) => {
       setHoveredNodeId(id);
     };
 
     const handleNodeUnhover = () => {
-      // Only clear node hover if not hovering handle
+      // Only clear node hover if not hovering handle and pointer actually left the node
       blurTimeoutRef.current = setTimeout(() => {
         if (!draggingHandle && !handleHoverRef.current) {
+          const hoveredNode = nodes.find(n => n.id === hoveredNodeId);
+          if (hoveredNode && isPointerInsideNode(hoveredNode)) {
+            return;
+          }
           setHoveredNodeId(null);
         }
       }, 30);
@@ -108,20 +131,21 @@ const HandleLayer = forwardRef(({
       eventBus.off('nodeUnhover', handleNodeUnhover);
       clearTimeout(blurTimeoutRef.current);
     };
-  }, [draggingHandle]);
+  }, [draggingHandle, nodes, hoveredNodeId, isPointerInsideNode]);
 
   const handlePositionMap = React.useMemo(() => {
     const map = {};
     nodes.filter(n => n.visible !== false).forEach(node => {
       const handles = getHandlePositions(node);
       handles.forEach(h => {
-        map[h.id] = h.position;
+        map[h.id] = h;
       });
     });
     return map;
   }, [nodes]);
 
-  const getHandlePosition = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
+  const getHandlePosition = useCallback(handleId => handlePositionMap[handleId]?.position, [handlePositionMap]);
+  const getHandleData = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
 
   const getNodeEdgeIntersection = (node, x, y) => {
     const nodeX = node.position?.x ?? node.x ?? 0;
@@ -332,12 +356,39 @@ const HandleLayer = forwardRef(({
     });
   }, [drawCanvas]);
 
+  const getHandleScreenPosition = useCallback((handle) => {
+    return {
+      x: handle.position.x * zoom + pan.x,
+      y: handle.position.y * zoom + pan.y
+    };
+  }, [pan, zoom]);
+
+  const showTooltipForHandle = useCallback((handle) => {
+    if (!handle) return;
+    const pos = getHandleScreenPosition(handle);
+    clearTimeout(tooltipTimeoutRef.current);
+    setHandleTooltip({
+      id: handle.id,
+      label: handle.label,
+      type: handle.handleType,
+      x: pos.x,
+      y: pos.y,
+      side: handle.type
+    });
+  }, [getHandleScreenPosition]);
+
+  const hideTooltip = useCallback(() => {
+    clearTimeout(tooltipTimeoutRef.current);
+    tooltipTimeoutRef.current = setTimeout(() => setHandleTooltip(null), 60);
+  }, []);
+
   const handleMouseDown = useCallback((e) => {
     const handle = findHandleAt(e.clientX, e.clientY);
     if (!handle) return;
     
     e.stopPropagation();
     e.preventDefault();
+    showTooltipForHandle(handle);
     
     setDraggingHandle(handle);
     const rect = canvasRef.current.getBoundingClientRect();
@@ -347,7 +398,7 @@ const HandleLayer = forwardRef(({
     });
     
     eventBus.emit('handleDragStart', { handle });
-  }, [findHandleAt]);
+  }, [findHandleAt, showTooltipForHandle]);
 
   const handleMouseMove = useCallback((e) => {
     if (draggingHandle) {
@@ -388,11 +439,17 @@ const HandleLayer = forwardRef(({
     
     // Check for handle hover
     const handle = findHandleAt(e.clientX, e.clientY);
-    if (handle !== hoveredHandleId) {
-      setHoveredHandleId(handle);
+    const handleId = handle?.id || null;
+    if (handleId !== hoveredHandleId) {
+      if (handle) {
+        showTooltipForHandle(handle);
+      } else {
+        hideTooltip();
+      }
+      setHoveredHandleId(handleId);
       scheduleRender();
     }
-  }, [draggingHandle, hoveredHandleId, canvasRef, findHandleAt, scheduleRender, pan, zoom, nodes, dragTargetNodeId]);
+  }, [draggingHandle, hoveredHandleId, canvasRef, findHandleAt, scheduleRender, pan, zoom, nodes, dragTargetNodeId, showTooltipForHandle, hideTooltip]);
 
   const handleMouseUp = useCallback((e) => {
     if (!draggingHandle) return;
@@ -431,9 +488,10 @@ const HandleLayer = forwardRef(({
     eventBus.emit('handleDragEnd', { handle: draggingHandle });
     setDraggingHandle(null);
     setDragTargetNodeId(null);
+    hideTooltip();
     setPreviewLine(null);
     scheduleRender();
-  }, [draggingHandle, nodes, pan, zoom, scheduleRender]);
+  }, [draggingHandle, nodes, pan, zoom, scheduleRender, hideTooltip]);
 
   useEffect(() => {
     const updateCanvasSize = () => {
@@ -469,6 +527,10 @@ const HandleLayer = forwardRef(({
     drawCanvas();
   }, [nodes, edges, pan, zoom, hoveredNodeId]); // Ensure hoveredNodeId is in dependencies
 
+  useEffect(() => {
+    return () => clearTimeout(tooltipTimeoutRef.current);
+  }, []);
+
   return (
     <HandlePositionContext.Provider value={{ getHandlePosition, getHandlePositionForEdge }}>
       <canvas
@@ -489,7 +551,7 @@ const HandleLayer = forwardRef(({
         left: 0, 
         width: '100vw', 
         height: '100vh',
-        pointerEvents: 'none',
+        pointerEvents: 'auto',
         zIndex: 26 // <-- ensure handle hit areas are above canvas
       }}>
         {getCurrentHandles().map(handle => {
@@ -515,20 +577,31 @@ const HandleLayer = forwardRef(({
               onMouseEnter={() => {
                 handleHoverRef.current = true;
                 setHoveredHandleId(handle.id);
+                showTooltipForHandle(handle);
                 scheduleRender();
                 clearTimeout(blurTimeoutRef.current);
               }}
               onMouseLeave={() => {
                 handleHoverRef.current = false;
                 setHoveredHandleId(null);
+                hideTooltip();
+                const hoveredNode = nodes.find(n => n.id === handle.nodeId);
+                if (hoveredNode && isPointerInsideNode(hoveredNode)) {
+                  setHoveredNodeId(handle.nodeId);
+                }
                 scheduleRender();
                 // If node is not hovered, clear node hover after delay
                 blurTimeoutRef.current = setTimeout(() => {
                   if (!draggingHandle && !handleHoverRef.current) {
+                    const node = nodes.find(n => n.id === handle.nodeId);
+                    if (node && isPointerInsideNode(node)) {
+                      return;
+                    }
                     setHoveredNodeId(null);
                   }
                 }, 30);
               }}
+              title={`${handle.label || 'Handle'} • ${handle.handleType || 'unknown'}`}
             />
           );
         })}

@@ -4,7 +4,7 @@
 - [x] Refactor logic nodes to use only the new handle schema (remove legacy handle logic)
 - [ ] Ensure HandleLayer renders and manages all handles from the schema for every node
 - [ ] Validate edge creation (output→input, type match, no self-connection)
-- [ ] Add tooltips and highlighting for handle labels/types
+- [x] Add tooltips and highlighting for handle labels/types
 - [ ] Migrate all node types to the new system, one by one
 - [ ] Remove any old/duplicate handle code
 - [ ] Test edge creation, drag, and undo/redo for all node types
