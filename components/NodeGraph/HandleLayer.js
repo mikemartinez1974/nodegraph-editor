@@ -484,6 +484,26 @@ const HandleLayer = forwardRef(({
       handle: draggingHandle,
       targetHandle: targetHandle
     };
+    if (targetHandle) {
+      let validation = { ok: true, message: '' };
+      if (draggingHandle.type !== 'output') {
+        validation = { ok: false, message: 'Start connections from an output handle.' };
+      } else if (targetHandle.type !== 'input') {
+        validation = { ok: false, message: 'Connections must end on an input handle.' };
+      } else if (draggingHandle.nodeId === targetHandle.nodeId) {
+        validation = { ok: false, message: 'Cannot connect a node to itself.' };
+      } else if (
+        draggingHandle.handleType &&
+        targetHandle.handleType &&
+        draggingHandle.handleType !== targetHandle.handleType
+      ) {
+        validation = {
+          ok: false,
+          message: `Handle types do not match: ${draggingHandle.handleType} → ${targetHandle.handleType}`
+        };
+      }
+      dropEvent.validation = validation;
+    }
     eventBus.emit('handleDrop', dropEvent);
     eventBus.emit('handleDragEnd', { handle: draggingHandle });
     setDraggingHandle(null);

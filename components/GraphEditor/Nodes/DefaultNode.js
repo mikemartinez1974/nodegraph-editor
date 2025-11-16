@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
 
 const NON_PASSIVE_LISTENER = { passive: false };
 
@@ -14,18 +15,14 @@ const DEFAULT_OUTPUTS = [
 ];
 
 const DefaultNode = (props) => {
-  const { node, zoom = 1, isSelected } = props;
+  const { node: origNode, zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
 
   // --- Ensure handles always exist ---
-  const nodeWithHandles = {
-    ...node,
-    inputs: (node.inputs && node.inputs.length > 0) ? node.inputs : DEFAULT_INPUTS,
-    outputs: (node.outputs && node.outputs.length > 0) ? node.outputs : DEFAULT_OUTPUTS
-  };
+  const node = useNodeHandleSchema(origNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
 
   // Resize handlers
   const getPointerPosition = (event) => {
@@ -85,7 +82,7 @@ const DefaultNode = (props) => {
 
   // Render FixedNode with a resize handle overlay
   return (
-    <FixedNode {...props} node={nodeWithHandles}>
+    <FixedNode {...props} node={node}>
       {/* Resize handle */}
       <div
         onMouseDown={handleResizeStart}

@@ -3,9 +3,9 @@
 - [x] Audit all node types to ensure they use the new `inputs`/`outputs` schema
 - [x] Refactor logic nodes to use only the new handle schema (remove legacy handle logic)
 - [ ] Ensure HandleLayer renders and manages all handles from the schema for every node
-- [ ] Validate edge creation (output→input, type match, no self-connection)
+- [x] Validate edge creation (output→input, type match, no self-connection)
 - [x] Add tooltips and highlighting for handle labels/types
-- [ ] Migrate all node types to the new system, one by one
+- [x] Migrate all node types to the new system, one by one
 - [ ] Remove any old/duplicate handle code
 - [ ] Test edge creation, drag, and undo/redo for all node types
 - [ ] Document the unified handle/logic system for future contributors
@@ -125,8 +125,8 @@
 - [x] Define the new node/edge schema (with handles).
 - [x] Refactor one node (e.g., TimerNode) to use this schema.
 - [x] Update HandleLayer to render handles from schema.
-- [ ] Implement edge validation and connection logic.
-- [ ] Gradually migrate other nodes.
+- [x] Implement edge validation and connection logic.
+- [x] Gradually migrate other nodes.
 
 ---
 

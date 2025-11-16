@@ -234,8 +234,14 @@ export default function NodeGraph({
   // ============================================
   
   useEffect(() => {
-    const handleDrop = ({ handle, targetNode, targetNodeObject, position, targetHandle }) => {
+    const handleDrop = ({ handle, targetNode, targetNodeObject, position, targetHandle, validation }) => {
       if (!handle) return;
+      if (validation && validation.ok === false) {
+        if (setSnackbar && validation.message) {
+          setSnackbar({ open: true, message: validation.message, severity: 'warning' });
+        }
+        return;
+      }
 
       // Only allow output→input connections with matching types
       if (handle.type === 'output' && targetHandle && targetHandle.type === 'input') {
@@ -271,7 +277,8 @@ export default function NodeGraph({
       }
       // Invalid connection
       if (setSnackbar) {
-        setSnackbar({ open: true, message: 'Invalid connection: only output→input allowed, and types must match.', severity: 'warning' });
+        const message = validation?.message || 'Invalid connection: only output→input allowed, and types must match.';
+        setSnackbar({ open: true, message, severity: 'warning' });
       }
     };
 

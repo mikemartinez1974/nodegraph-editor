@@ -1650,8 +1650,11 @@ useEffect(() => {
   // Add this useEffect to your GraphEditor.js file
   // Place it with the other event listener useEffects
   useEffect(() => {
-    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction, targetHandle }) => {
+    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction, targetHandle, validation }) => {
       try {
+        if (validation && validation.ok === false) {
+          return;
+        }
         // Ignore events that already include a resolved target handle. NodeGraph handles
         // real handle-to-handle connections and we only care about open-space drops here.
         if (targetHandle) {
