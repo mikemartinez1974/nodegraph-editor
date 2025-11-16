@@ -6,7 +6,6 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../NodeGraph/eventBus';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
-import { v4 as uuidv4 } from 'uuid';
 import { generateUUID } from './utils/idUtils';
 import { getNodeTypes, nodeTypeMetadata } from './nodeTypeRegistry';
 import EdgeTypes from './edgeTypes';
@@ -1650,90 +1649,183 @@ useEffect(() => {
   // Add this useEffect to your GraphEditor.js file
   // Place it with the other event listener useEffects
   useEffect(() => {
-    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction, targetHandle, validation }) => {
+    const getNodeById = (id) => {
+      const source = nodesRef?.current || [];
+      return source.find(n => n.id === id) || null;
+    };
+
+    const fallbackHandle = (kind) => kind === 'inputs'
+      ? { key: 'in', label: 'In', type: 'trigger' }
+      : { key: 'out', label: 'Out', type: 'trigger' };
+
+    const sanitizeHandle = (handle, kind, index = 0) => {
+      if (handle && typeof handle === 'object') {
+        const key = handle.key || handle.id || `${kind === 'inputs' ? 'in' : 'out'}-${index}`;
+        return {
+          key,
+          label: handle.label || key,
+          type: handle.type || handle.dataType || 'trigger'
+        };
+      }
+      const fallback = fallbackHandle(kind);
+      const suffix = index ? `-${index}` : '';
+      return { ...fallback, key: `${fallback.key}${suffix}` };
+    };
+
+    const buildHandleSchema = (handles, kind) => {
+      if (!Array.isArray(handles) || handles.length === 0) {
+        return [fallbackHandle(kind)];
+      }
+      return handles.map((handle, index) => sanitizeHandle(handle, kind, index));
+    };
+
+    const pickHandle = (nodeLike, kind, desiredType) => {
+      const list = buildHandleSchema(nodeLike?.[kind], kind);
+      if (desiredType) {
+        const exact = list.find(h => h.type === desiredType);
+        if (exact) return exact;
+        if (desiredType !== 'trigger') {
+          const triggerHandle = list.find(h => h.type === 'trigger');
+          if (triggerHandle) return triggerHandle;
+        }
+      }
+      return list[0];
+    };
+
+    const createEdgeViaCrud = (api, payload, successMessage) => {
+      const result = api.createEdge(payload);
+      if (result?.success) {
+        setSnackbar({ open: true, message: successMessage, severity: 'success' });
+        return true;
+      }
+      setSnackbar({
+        open: true,
+        message: result?.error || 'Failed to create connection',
+        severity: 'error'
+      });
+      return false;
+    };
+
+    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction, targetHandle, validation, handle }) => {
       try {
         if (validation && validation.ok === false) {
           return;
         }
-        // Ignore events that already include a resolved target handle. NodeGraph handles
-        // real handle-to-handle connections and we only care about open-space drops here.
         if (targetHandle) {
           return;
         }
-        // If dropped on a node, create an edge
-        if (targetNode) {
-          const newEdge = {
-            id: `edge_${Date.now()}`,
-            source: direction === 'source' ? sourceNode : targetNode,
-            target: direction === 'source' ? targetNode : sourceNode,
-            type: edgeType,
-            style: EdgeTypes[edgeType]?.style || {}
-          };
-          
-          setEdges(prev => {
-            const next = [...prev, newEdge];
-            edgesRef.current = next;
-            historyHook.saveToHistory(nodesRef.current, next);
-            return next;
-          });
-          
-          setSnackbar({ 
-            open: true, 
-            message: 'Edge created', 
-            severity: 'success' 
-          });
-        } 
-        // If dropped in empty space, create a new node and edge
-        else {
-          // Only create one node with UUID and correct type
-          const parentNode = nodes.find(n => n.id === sourceNode);
-          const newNodeId = uuidv4();
-          const newNode = {
-            id: newNodeId,
-            label: 'New Node',
-            type: parentNode?.type || 'default',
-            position: { x: graph.x, y: graph.y },
-            width: parentNode?.width || 200,
-            height: parentNode?.height || 120,
-            data: {}
-          };
-          const newEdge = {
-            id: `edge_${Date.now()}`,
-            source: direction === 'source' ? sourceNode : newNodeId,
-            target: direction === 'source' ? newNodeId : sourceNode,
-            type: edgeType,
-            style: EdgeTypes[edgeType]?.style || {}
-          };
-          setNodes(prev => {
-            const next = [...prev, newNode];
-            nodesRef.current = next;
-            return next;
-          });
-          setEdges(prev => {
-            const next = [...prev, newEdge];
-            edgesRef.current = next;
-            historyHook.saveToHistory(nodesRef.current, next);
-            return next;
-          });
-          setSnackbar({ 
-            open: true, 
-            message: 'Node and edge created', 
-            severity: 'success' 
-          });
+        const api = graphAPI?.current;
+        if (!api || typeof api.createEdge !== 'function') {
+          console.warn('Graph API not ready; ignoring handle drop.');
+          return;
         }
+
+        const startHandleKey = handle?.key || handle?.handleKey || (direction === 'source' ? 'out' : 'in');
+        const startHandleType = handle?.handleType || 'trigger';
+        const resolvedEdgeType = edgeType || 'default';
+        const edgeStyle = EdgeTypes[resolvedEdgeType]?.style || {};
+
+        if (targetNode) {
+          const targetNodeObj = getNodeById(targetNode);
+          if (!targetNodeObj) {
+            setSnackbar({ open: true, message: 'Target node not found', severity: 'error' });
+            return;
+          }
+          const counterpartHandle = direction === 'source'
+            ? pickHandle(targetNodeObj, 'inputs', startHandleType)
+            : pickHandle(targetNodeObj, 'outputs', startHandleType);
+
+          const edgePayload = direction === 'source'
+            ? {
+                source: sourceNode,
+                target: targetNode,
+                sourceHandle: startHandleKey,
+                targetHandle: counterpartHandle.key,
+                type: resolvedEdgeType,
+                style: edgeStyle
+              }
+            : {
+                source: targetNode,
+                target: sourceNode,
+                sourceHandle: counterpartHandle.key,
+                targetHandle: startHandleKey,
+                type: resolvedEdgeType,
+                style: edgeStyle
+              };
+          createEdgeViaCrud(api, edgePayload, 'Edge created');
+          return;
+        }
+
+        const parentNode = getNodeById(sourceNode);
+        if (!parentNode) {
+          setSnackbar({ open: true, message: 'Source node not found', severity: 'error' });
+          return;
+        }
+
+        const clonedInputs = buildHandleSchema(parentNode.inputs, 'inputs');
+        const clonedOutputs = buildHandleSchema(parentNode.outputs, 'outputs');
+
+        if (typeof api.createNode !== 'function') {
+          setSnackbar({ open: true, message: 'Graph API unavailable for node creation', severity: 'error' });
+          return;
+        }
+
+        const nodeResult = api.createNode({
+          label: 'New Node',
+          type: parentNode.type || 'default',
+          position: { x: graph.x, y: graph.y },
+          width: parentNode.width || 200,
+          height: parentNode.height || 120,
+          inputs: clonedInputs.map(h => ({ ...h })),
+          outputs: clonedOutputs.map(h => ({ ...h }))
+        });
+
+        if (!nodeResult?.success || !nodeResult.data?.id) {
+          setSnackbar({
+            open: true,
+            message: nodeResult?.error || 'Failed to create node',
+            severity: 'error'
+          });
+          return;
+        }
+
+        const createdNodeId = nodeResult.data.id;
+        const newNodeHandle = direction === 'source'
+          ? pickHandle({ inputs: clonedInputs }, 'inputs', startHandleType)
+          : pickHandle({ outputs: clonedOutputs }, 'outputs', startHandleType);
+
+        const edgePayload = direction === 'source'
+          ? {
+              source: sourceNode,
+              target: createdNodeId,
+              sourceHandle: startHandleKey,
+              targetHandle: newNodeHandle.key,
+              type: resolvedEdgeType,
+              style: edgeStyle
+            }
+          : {
+              source: createdNodeId,
+              target: sourceNode,
+              sourceHandle: newNodeHandle.key,
+              targetHandle: startHandleKey,
+              type: resolvedEdgeType,
+              style: edgeStyle
+            };
+
+        createEdgeViaCrud(api, edgePayload, 'Node and edge created');
       } catch (error) {
         console.error('Error in handleDrop:', error);
-        setSnackbar({ 
-          open: true, 
-          message: 'Failed to create connection', 
-          severity: 'error' 
+        setSnackbar({
+          open: true,
+          message: 'Failed to create connection',
+          severity: 'error'
         });
       }
     };
-  
+
     eventBus.on('handleDrop', handleHandleDrop);
     return () => eventBus.off('handleDrop', handleHandleDrop);
-  }, [setNodes, setEdges, nodes, nodesRef, edgesRef, historyHook, setSnackbar]);
+  }, [graphAPI, nodesRef, setSnackbar]);
 
   // NEW: Listen for toggleMinimap event to sync minimap visibility with toolbar button
   useEffect(() => {

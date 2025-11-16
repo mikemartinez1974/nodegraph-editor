@@ -1,246 +1,185 @@
-# Copy/Paste w/ Me - User Manual
+# Copy/Paste w/ Me – Supercharged User Manual
 
-Welcome to **Copy/Paste w/ Me**, your interactive graph editor for creating, editing, and visualizing ideas. This manual will guide you through the app’s features, helping you make the most of its powerful tools.
-
----
-
-## What Is This App?
-
-**Copy/Paste w/ Me** is a visual graph editor designed to work seamlessly with AI assistants (e.g., ChatGPT, Claude). Describe your ideas to an AI, paste the generated JSON into the app, and watch your graph come to life.
-
-### Key Features
-- **Interactive Graph Editing**: Add, edit, and connect nodes and edges.
-- **AI Integration**: Paste AI-generated JSON to create graphs instantly.
-- **Scripting**: Automate tasks and analyze graphs with custom scripts.
-- **Customizable Nodes and Edges**: Use different types, styles, and properties.
-- **Groups**: Organize nodes into collapsible groups.
-- **Advanced Layouts**: Auto-layout options for clean and professional graphs.
+Welcome to **Copy/Paste w/ Me**, your interactive graph editor that transforms AI prompts into beautiful, editable visual diagrams. Whether you're mapping systems, visualizing concepts, or just playing with ideas—this manual will help you unlock the app's full potential.
 
 ---
 
-## Quick Start
+## 🚀 What is This App?
 
-### Step 1: Set Up Your Workspace
-- Open this app and your AI chat side by side.
-- This makes it easy to copy/paste between them.
+**Copy/Paste w/ Me** turns AI-generated JSON into interactive graphs. Describe an idea to your favorite AI (like ChatGPT), paste the response here, and voilà—a visual diagram you can edit, style, and expand.
 
-### Step 2: Onboard Your AI
-1. Click the **📋 Onboard LLM** button in the toolbar.
-2. Paste the onboarding text into your AI chat.
-3. The AI now knows how to create graphs for you!
+### ✨ Core Features
+
+- **Visual Graph Editing**: Drag, connect, and customize nodes and edges.
+- **AI Workflow**: Paste in AI-generated JSON to auto-generate diagrams.
+- **Scripting Support**: Run custom logic to analyze or modify graphs.
+- **Rich Node Types**: From markdown to counters, timers, and even APIs.
+- **Groups & Layouts**: Stay organized with collapsible groups and auto-arranged graphs.
+
+---
+
+## ⚡ Quick Start: From Idea to Graph in 30 Seconds
+
+### Step 1: Set Up Side-by-Side
+
+Open this app and your AI chat window (ChatGPT, Claude, etc.).
+
+### Step 2: Onboard the AI
+
+1. Click **📋 Onboard LLM** in the toolbar.
+2. Paste the copied prompt into your AI chat.
 
 ### Step 3: Ask for a Graph
-Tell your AI what you want:
-- "Create a graph showing the water cycle."
-- "Make an org chart for a startup."
-- "Visualize the steps in making coffee."
 
-### Step 4: Paste & Watch Magic Happen
-1. Copy the AI's JSON response.
+Examples:
+
+- "Create a graph of a product development lifecycle."
+- "Visualize an e-commerce checkout flow."
+- "Show a pros/cons decision tree for remote work."
+
+### Step 4: Paste and Watch It Appear
+
+1. Copy the JSON response from the AI.
 2. Click anywhere in this app.
-3. Press **Ctrl+V** or click the **📋 Paste** button.
-4. Your graph appears instantly!
+3. Hit **Ctrl+V** or click **📋 Paste**.
+4. Magic! Your graph is live and editable.
 
 ---
 
-## Toolbar Overview
-
-The toolbar provides quick access to all major features. Here’s what each button does:
+## 🛠️ Toolbar: Your Command Center
 
 ### Core Actions
-- **📋 Onboard LLM**: Copy the AI setup guide to clipboard.
-- **📋 Paste**: Paste AI-generated JSON or create a node from plain text.
-- **📋 Copy Selected**: Copy selected nodes and edges.
-- **📋 Copy Graph**: Copy the entire graph as JSON.
-- **📖 Copy Manual**: Copy this user manual to clipboard.
-- **➕ Add Node**: Create a blank node manually.
-- **📑 Node List**: Toggle the node list panel.
-- **📁 Group List**: Toggle the group list panel.
-- **🗑️ Delete**: Remove selected items.
-- **👎 Clear Graph**: Delete everything in the graph.
-- **💾 Save**: Download your graph as a .json file.
-- **📂 Load**: Open a saved graph from your computer.
 
-### History Controls
-- **↩️ Undo**: Revert the last action.
-- **↪️ Redo**: Redo the last undone action.
+- **📋 Onboard LLM**: Copy setup prompt for AI.
+- **📋 Paste**: Paste JSON or create node from text.
+- **📋 Copy Selected**: Copy highlighted nodes/edges.
+- **📋 Copy Graph**: Copy entire graph as JSON.
+- **➕ Add Node**: Add a blank node manually.
+- **📁 Group List / 📑 Node List**: Toggle visibility.
+- **🗑️ Delete / 👎 Clear Graph**: Remove selected or all.
+- **💾 Save / 📂 Load**: Export/import JSON graph files.
 
-### Layout and Modes
-- **✏️ Manual Mode**: Default mode for editing and arranging nodes.
-- **🧭 Nav Mode**: Explore the graph without editing.
-- **🔧 Auto-Layout**: Automatically arrange nodes for a clean layout.
+### History + Layout
+
+- **↩️ Undo / ↪️ Redo**: Revert mistakes instantly.
+- **✏️ Manual Mode**: Free editing.
+- **🧭 Nav Mode**: Move around without editing.
+- **🔧 Auto-Layout**: Clean it up automatically.
 
 ---
 
-## Scripting Features
+## 🖱️ Power Shortcuts
 
-### ScriptPanel
-- Write, run, and manage custom scripts.
-- Automate tasks, analyze graph data, and create nodes/edges programmatically.
-- Save, import, and export scripts.
-
-### ScriptRunner
-- Executes scripts in a secure, sandboxed environment.
-- Provides an API for interacting with the graph:
-  - `api.getNodes()`, `api.getEdges()`
-  - `api.createNode(data)`, `api.createEdge(data)`
-  - `api.updateNode(id, patch)`, `api.deleteNode(id)`
+| Action | Shortcut |
+|--------|----------|
+| Undo | Ctrl+Z |
+| Redo | Ctrl+Y |
+| Paste | Ctrl+V |
+| Copy | Ctrl+C |
+| Delete | Delete |
+| Move (1px) | Ctrl + Arrows |
+| Move (10px) | Ctrl + Shift + Arrows |
 
 ---
 
-## Node, Edge, and Group Properties
+## 🧠 Smart Node Types
 
-### PropertiesPanel
-- Edit properties for nodes, edges, and groups.
-- Change labels, colors, positions, sizes, and more.
-- Use the advanced options for gradients, animations, and custom styles.
+Here’s when to use each type:
 
-### Node Types
+- **DefaultNode**: All-purpose visual box. Use for most ideas.
+- **DivNode**: Add raw HTML or markdown blocks.
+- **MarkdownNode**: Rich text, notes, and documentation.
+- **APINode**: Call APIs and preview responses.
+- **CounterNode**: Track increments, quantities, or states.
+- **TimerNode**: Useful for timelines or stopwatch logic.
+- **ScriptNode**: Run code on your graph.
+- **GateNode**: Logic flows (AND, OR, XOR, etc.).
+- **DelayNode**: Introduce intentional pauses.
+- **ToggleNode**: Simple ON/OFF states.
+- **SvgNode**: Add inline vector graphics.
+- **FixedNode**: Small labels/icons that stay fixed.
 
-This app supports a variety of node types, each designed for specific use cases. Below is an overview of the available node types:
+### Pro Tip
 
-- **DefaultNode**
-  - General-purpose, resizable node with label, memo/link indicators, and built-in styling derived from the MUI theme.
-  - Key Features: Resize handle, label rendering, optional memo/link icons, theme-aware color/gradient support.
-
-- **DivNode**
-  - Renders arbitrary HTML or memo content inside a resizable DefaultNode shell.
-  - Key Features: Markdown rendering, optional raw HTML fragments, inherits resizing/interaction from DefaultNode.
-
-- **FixedNode**
-  - Like DefaultNode but not resizable (fixed size). Useful for icons, small labels, or items that should remain stable.
-
-- **MarkdownNode**
-  - Optimized for rich content and documentation. Renders `node.data.memo` as markdown in a larger default size.
-  - Key Features: Markdown rendering with remark/rehype, theme-aware styling for blackboard/whiteboard mode.
-
-- **SvgNode**
-  - Renders an SVG graphic provided in `node.data.svg`. Use for icons, small diagrams, or visual indicators.
-
-- **APINode**
-  - Makes HTTP requests to APIs and displays the response.
-  - Key Features: URL, method, headers, and body input; fetch/cancel buttons; displays status and response preview.
-
-- **CounterNode**
-  - Simple counter with increment, decrement, and reset controls.
-  - Key Features: Displays count, step, min/max limits, emits value changes via eventBus.
-
-- **DelayNode**
-  - Delays output after receiving input, useful for timing and scheduling.
-  - Key Features: Configurable delay, queueing, manual trigger/cancel, status display.
-
-- **GateNode**
-  - Logical gate (AND, OR, NOT, XOR, NAND, NOR) for boolean operations.
-  - Key Features: Editable inputs, operator selection, output display.
-
-- **ScriptNode**
-  - Runs user-defined scripts from a library and displays results.
-  - Key Features: Script selection, run/dry-run, mutation control, result display.
-
-- **TimerNode**
-  - Timer with start, pause, and stop controls, displays elapsed time.
-  - Key Features: Time formatting, control buttons, status indicator.
-
-- **ToggleNode**
-  - Boolean toggle switch with ON/OFF states.
-  - Key Features: Toggle button, state indicator, emits value changes via eventBus.
-
-### Edge Types
-
-This app supports a variety of edge types, each designed for specific relationships and visual styles. Below is an overview of the available edge types:
-
-- **Child**
-  - Description: Parent-child hierarchical relationship.
-  - Key Features: Curved, vertical direction, arrow at the end.
-
-- **Parent**
-  - Description: Reverse parent relationship.
-  - Key Features: Curved, vertical direction, arrow at the start.
-
-- **Peer**
-  - Description: Peer-to-peer relationship.
-  - Key Features: Curved, horizontal direction, dashed line, no arrow.
-
-- **Data Flow**
-  - Description: Data flowing from source to target.
-  - Key Features: Curved, gradient color, arrow at the end, animated flow.
-
-- **Dependency**
-  - Description: Dependency relationship.
-  - Key Features: Straight, dashed line, arrow at the end.
-
-- **Reference**
-  - Description: Reference or link.
-  - Key Features: Curved, dashed line, arrow at the end.
-
-- **Bidirectional**
-  - Description: Two-way relationship.
-  - Key Features: Curved, arrows at both ends.
-
-- **Weak Link**
-  - Description: Weak or optional relationship.
-  - Key Features: Curved, dashed line, low opacity, no arrow.
-
-- **Strong Link**
-  - Description: Strong or required
-- **Use Markdown Nodes**: Add formatted text for instructions or descriptions.
-- **Group Related Nodes**: Keep your graph organized.
-- **Save Often**: Download your graph regularly to avoid data loss.
-- **Experiment Freely**: Undo (Ctrl+Z) is your friend!
+Use **MarkdownNode** for step-by-step instructions directly in the graph. Or nest **ToggleNodes** inside **Groups** for collapsible workflows.
 
 ---
 
-### Groups
-- Organize nodes into collapsible groups.
-- Edit group labels, styles, and visibility.
+## ➿ Edge Types Cheat Sheet
+
+| Type | Use Case |
+|------|----------|
+| Child / Parent | Hierarchies (trees, outlines) |
+| Peer | Sibling nodes (e.g., teams, features) |
+| Data Flow | Show movement of info or inputs |
+| Dependency | Requirements or order dependencies |
+| Reference | Documentation links |
+| Bidirectional | Mutual relationships |
+| Weak Link | Optional or inferred relationships |
+| Strong Link | Must-have connections |
 
 ---
 
-## Keyboard Shortcuts
+## 🧩 Scripting Magic
 
-- **Ctrl+X**: Cut selected nodes/edges.
-- **Ctrl+C**: Copy selected nodes/edges.
-- **Ctrl+V**: Paste JSON or text.
-- **Ctrl+Z**: Undo.
-- **Ctrl+Y**: Redo.
-- **Delete**: Remove selected items.
-- **Scroll**: Zoom in/out.
-- **Ctrl+Arrows**: Move selected nodes (1px).
-- **Ctrl+Shift+Arrows**: Move selected nodes (10px).
+Scripts run in a secure sandbox—great for data processing or procedural generation.
 
 ---
 
-## Troubleshooting
+## 🗂️ Groups
 
-### Common Issues
-- **Invalid JSON**: Ensure the JSON is properly formatted.
-- **Overlapping Nodes**: Ask the AI to "spread them out more."
-- **Graph Not Visible**: Zoom out or center the graph.
-- **Paste Not Working**: Ensure you copied the full JSON block.
+Group related nodes for:
 
----
+- Collapsible views  
+- Organizing by theme or workflow  
+- Managing complexity  
 
-## Pro Tips
-
-- **Start Small**: Begin with 5-10 nodes and expand.
-- **Use Markdown Nodes**: Add formatted text for instructions or descriptions.
-- **Group Related Nodes**: Keep your graph organized.
-- **Save Often**: Download your graph regularly to avoid data loss.
-- **Experiment Freely**: Undo (Ctrl+Z) is your friend!
+Each group can be styled, labeled, and edited just like a node.
 
 ---
 
-## Examples
+## 🧪 Examples To Try Right Now
 
-### Example 1: Solar System
+### 🪐 Solar System  
+
 **Prompt:** "Create a graph showing the solar system with the sun and 3 planets."
 
-### Example 2: Project Timeline
-**Prompt:** "Create a timeline for a software project from start to launch."
+### 🗃️ Product Roadmap  
 
-### Example 3: Educational Diagram
-**Prompt:** "Create a graph explaining photosynthesis with a markdown node for details."
+**Prompt:** "Make a quarterly product roadmap with milestones and dependencies."
+
+### ⚙️ DevOps Pipeline  
+
+**Prompt:** "Visualize a CI/CD pipeline for a SaaS app."
+
+### 📖 Story Outline  
+
+**Prompt:** "Show a plot structure for a mystery novel with intro, conflict, climax, resolution."
+
+### 🧬 Biology Diagram  
+
+**Prompt:** "Graph the process of DNA replication."
 
 ---
 
-**Happy graphing!** 🎨📊✨
+## 🛠️ Troubleshooting Tips
+
+- **Graph doesn’t show?** Zoom out or click "Auto-Layout."  
+- **Paste not working?** Check if JSON copied fully.  
+- **Overlaps?** Ask AI: "spread out the layout more."  
+- **Errors?** Validate JSON before pasting.
+
+---
+
+## 🧙 Pro Tips
+
+- **Start small**: 5–10 nodes = fast iteration.  
+- **Markdown everywhere**: Use it for notes, docs, or structure.  
+- **Save often**: Don’t trust your browser session!  
+- **Group to declutter**: Hide complexity till you need it.  
+- **Undo is your friend**: Ctrl+Z gets you out of trouble.
+
+---
+
+**Happy Graphing!** 🎨📊  
+Questions? Ideas? Want more examples? You know where to find us.

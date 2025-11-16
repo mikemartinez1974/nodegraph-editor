@@ -1,4 +1,4 @@
-# Chatbot Onboarding Guide for Copy/Paste w/ Me
+# Chatbot Onboarding Guide for the Twilight Node Browser
 
 This guide shows how to generate JSON commands the editor will execute when pasted. Keep outputs small, precise, and valid JSON.
 

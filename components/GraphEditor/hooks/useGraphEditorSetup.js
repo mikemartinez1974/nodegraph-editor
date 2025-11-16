@@ -25,7 +25,12 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       setNodes,
       () => edgesRef.current,
       setEdges,
-      saveToHistory
+      saveToHistory,
+      nodesRef,
+      edgesRef,
+      undefined,
+      setGroups,
+      undefined
     );
     
     const originalCreateNode = graphAPI.current.createNode;

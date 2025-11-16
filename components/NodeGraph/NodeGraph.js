@@ -242,6 +242,10 @@ export default function NodeGraph({
         }
         return;
       }
+      // Ignore open-space drops; GraphEditor handles node creation + edge wiring.
+      if (!targetHandle) {
+        return;
+      }
 
       // Only allow output→input connections with matching types
       if (handle.type === 'output' && targetHandle && targetHandle.type === 'input') {

@@ -1,5 +1,13 @@
 import eventBus from '../../NodeGraph/eventBus';
 
+const HANDLE_IMPORT_HINT = 'Edges must include sourceHandle/targetHandle keys that match each node\'s handle schema.';
+const maybeAugmentHandleError = (message) => {
+  if (message && typeof message === 'string' && /handle/i.test(message)) {
+    return `${message} (${HANDLE_IMPORT_HINT})`;
+  }
+  return message;
+};
+
 /**
  * Execute CRUD commands from pasted JSON
  * Supported actions: create, update, delete, read, createNodes, createEdges, clearGraph, findNodes, findEdges, getStats
@@ -33,7 +41,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       if (edges.length > 0) {
         const edgeResult = await graphCRUD.createEdges(edges);
         if (!edgeResult || !edgeResult.success) {
-          const err = edgeResult?.error || 'Failed to create edges';
+          const err = maybeAugmentHandleError(edgeResult?.error || 'Failed to create edges');
           if (onShowMessage) onShowMessage(err, 'error');
           // Return nodes created so far and zero edges/groups
           return { nodes: createdNodes, edges: 0, groups: 0 };
@@ -71,6 +79,9 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       case 'createEdges':
         if (edges && Array.isArray(edges)) {
           result = await graphCRUD.createEdges(edges);
+          if (result && !result.success) {
+            result.error = maybeAugmentHandleError(result.error);
+          }
         }
         break;
 

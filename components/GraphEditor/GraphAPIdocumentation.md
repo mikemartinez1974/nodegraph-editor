@@ -70,6 +70,8 @@ window.graphAPI.createEdge({
   id: "optional-custom-id",
   source: "source-node-id",
   target: "target-node-id",
+  sourceHandle: "output-handle-key",
+  targetHandle: "input-handle-key",
   type: "child",              // "child" | "peer" | custom
   label: "Edge Label",
   style: {
@@ -81,6 +83,7 @@ window.graphAPI.createEdge({
 })
 // Returns: { success: true, data: <edge object> }
 ```
+> **Note:** Handles are required. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to determine the proper `sourceHandle` and `targetHandle` keys. Handle types must match (or be `trigger`).
 
 ### Read Edge(s)
 ```javascript
@@ -130,8 +133,8 @@ window.graphAPI.createNodes([
 ### Create Multiple Edges
 ```javascript
 window.graphAPI.createEdges([
-  { source: "node1", target: "node2", type: "child" },
-  { source: "node2", target: "node3", type: "peer" }
+  { source: "node1", target: "node2", sourceHandle: "tick", targetHandle: "trigger" },
+  { source: "node2", target: "node3", sourceHandle: "out", targetHandle: "in" }
 ])
 // Returns: { success: true, data: { created: [...], failed: [] } }
 ```
@@ -223,16 +226,20 @@ const n3 = window.graphAPI.createNode({
   position: { x: 500, y: 100 } 
 });
 
-// Connect them
+// Connect them (default nodes expose handles named "out" and "in")
 window.graphAPI.createEdge({ 
   source: n1.data.id, 
   target: n2.data.id, 
-  type: "child" 
+  sourceHandle: "out",
+  targetHandle: "in",
+  type: "child"
 });
 window.graphAPI.createEdge({ 
   source: n2.data.id, 
   target: n3.data.id, 
-  type: "child" 
+  sourceHandle: "out",
+  targetHandle: "in",
+  type: "child"
 });
 ```
 
@@ -275,6 +282,8 @@ children.data.created.forEach(child => {
   window.graphAPI.createEdge({
     source: root.data.id,
     target: child.id,
+    sourceHandle: "out",
+    targetHandle: "in",
     type: "child"
   });
 });

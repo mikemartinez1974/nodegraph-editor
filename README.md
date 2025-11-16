@@ -193,6 +193,8 @@ window.graphAPI.findNodes({ type: "default", hasMemo: true });
 window.graphAPI.createEdge({
   source: "node1",
   target: "node2",
+  sourceHandle: "out",
+  targetHandle: "in",
   type: "curved"
 });
 
@@ -200,6 +202,7 @@ window.graphAPI.createEdge({
 window.graphAPI.getStats();
 // { nodeCount: 10, edgeCount: 15, ... }
 ```
+> ℹ️ Edge creation now requires `sourceHandle`/`targetHandle` keys. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to pick the correct connection points.
 
 See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) for full API reference.
 

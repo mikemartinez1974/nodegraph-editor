@@ -1,7 +1,7 @@
 // GraphCRUD.js
 // LLM-friendly CRUD API for graph manipulation
 import { v4 as uuidv4 } from 'uuid';
-import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils';
+import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils.js';
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -11,6 +11,167 @@ const toNumber = (value) => {
 const hasContent = (value) => typeof value === 'string' && value.trim().length > 0;
 
 const toLower = (value) => (value ?? '').toString().toLowerCase();
+
+const DEFAULT_INPUT_HANDLE = Object.freeze({ key: 'in', label: 'In', type: 'trigger' });
+const DEFAULT_OUTPUT_HANDLE = Object.freeze({ key: 'out', label: 'Out', type: 'trigger' });
+
+const cloneHandleDescriptor = (handle) => ({
+  key: handle.key,
+  label: handle.label || handle.key,
+  type: handle.type || handle.dataType || 'value'
+});
+
+const getHandleList = (node, field, fallback) => {
+  if (!node) return [cloneHandleDescriptor(fallback)];
+  const handles = Array.isArray(node[field]) ? node[field].filter(Boolean) : [];
+  if (handles.length === 0) {
+    return [cloneHandleDescriptor(fallback)];
+  }
+  return handles
+    .map((handle, index) => {
+      if (typeof handle === 'string') {
+        return { key: handle, label: handle, type: 'value' };
+      }
+      if (typeof handle !== 'object') return null;
+      const key = handle.key || handle.id || handle.name || `handle-${index}`;
+      if (!key) return null;
+      return {
+        key,
+        label: handle.label || handle.name || key,
+        type: handle.type || handle.dataType || 'value'
+      };
+    })
+    .filter(Boolean);
+};
+
+const normalizeEndpoint = (endpoint, explicitHandleKey) => {
+  if (typeof endpoint === 'string') {
+    return { nodeId: endpoint, handleKey: explicitHandleKey || null };
+  }
+  if (endpoint && typeof endpoint === 'object') {
+    const nodeId = endpoint.nodeId ?? endpoint.id ?? endpoint.node ?? null;
+    const derivedHandle = endpoint.handleKey ?? endpoint.key ?? endpoint.handle ?? null;
+    return {
+      nodeId,
+      handleKey: explicitHandleKey || derivedHandle || null
+    };
+  }
+  return { nodeId: endpoint ?? null, handleKey: explicitHandleKey || null };
+};
+
+const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandleKey) => {
+  if (!sourceNode || !sourceNode.id) {
+    return { error: 'Source node not found' };
+  }
+  if (!targetNode || !targetNode.id) {
+    return { error: 'Target node not found' };
+  }
+  if (!sourceHandleKey) {
+    return { error: `sourceHandle is required for node ${sourceNode.id}` };
+  }
+  if (!targetHandleKey) {
+    return { error: `targetHandle is required for node ${targetNode.id}` };
+  }
+
+  const sourceHandles = getHandleList(sourceNode, 'outputs', DEFAULT_OUTPUT_HANDLE);
+  const targetHandles = getHandleList(targetNode, 'inputs', DEFAULT_INPUT_HANDLE);
+
+  const sourceHandle = sourceHandles.find(h => h.key === sourceHandleKey);
+  if (!sourceHandle) {
+    return { error: `Output handle "${sourceHandleKey}" not found on node ${sourceNode.id}` };
+  }
+  const targetHandle = targetHandles.find(h => h.key === targetHandleKey);
+  if (!targetHandle) {
+    return { error: `Input handle "${targetHandleKey}" not found on node ${targetNode.id}` };
+  }
+
+  if (
+    sourceHandle.type &&
+    targetHandle.type &&
+    sourceHandle.type !== targetHandle.type &&
+    sourceHandle.type !== 'trigger' &&
+    targetHandle.type !== 'trigger'
+  ) {
+    return { error: `Handle types do not match: ${sourceHandle.type} → ${targetHandle.type}` };
+  }
+
+  return {
+    meta: {
+      source: { key: sourceHandle.key, label: sourceHandle.label, type: sourceHandle.type },
+      target: { key: targetHandle.key, label: targetHandle.label, type: targetHandle.type }
+    }
+  };
+};
+
+const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, defaultType }) => {
+  if (!edgeInput || typeof edgeInput !== 'object') {
+    return { error: 'Edge definition must be an object' };
+  }
+
+  const { nodeId: normalizedSource, handleKey: normalizedSourceHandle } = normalizeEndpoint(
+    edgeInput.source,
+    edgeInput.sourceHandle
+  );
+  const { nodeId: normalizedTarget, handleKey: normalizedTargetHandle } = normalizeEndpoint(
+    edgeInput.target,
+    edgeInput.targetHandle
+  );
+
+  if (!normalizedSource || !normalizedTarget) {
+    return { error: 'Edges require both source and target node ids' };
+  }
+
+  const sourceNode = nodeMap.get(normalizedSource);
+  const targetNode = nodeMap.get(normalizedTarget);
+
+  if (!sourceNode) {
+    return { error: `Source node ${normalizedSource} not found` };
+  }
+  if (!targetNode) {
+    return { error: `Target node ${normalizedTarget} not found` };
+  }
+
+  const handleValidation = validateHandlePair(
+    sourceNode,
+    targetNode,
+    normalizedSourceHandle,
+    normalizedTargetHandle
+  );
+  if (handleValidation.error) {
+    return { error: handleValidation.error };
+  }
+
+  let edgeId = edgeInput.id || generateId();
+  while (existingEdgeIds.has(edgeId)) {
+    edgeId = generateId();
+  }
+  existingEdgeIds.add(edgeId);
+
+  const style = edgeInput.style || {};
+
+  const sanitizedEdge = {
+    id: edgeId,
+    source: normalizedSource,
+    target: normalizedTarget,
+    sourceHandle: normalizedSourceHandle,
+    targetHandle: normalizedTargetHandle,
+    type: edgeInput.type || defaultType || 'child',
+    label: edgeInput.label || '',
+    color: edgeInput.color,
+    visible: edgeInput.visible !== false,
+    showLabel: edgeInput.showLabel === true,
+    data: edgeInput.data || {},
+    style: {
+      width: style.width || 2,
+      dash: style.dash || [],
+      curved: style.curved !== undefined ? style.curved : true,
+      color: style.color
+    },
+    handleMeta: handleValidation.meta
+  };
+
+  return { edge: sanitizedEdge };
+};
 
 /**
  * CRUD API for Node Graph Editor
@@ -47,7 +208,17 @@ export default class GraphCRUD {
    * @param {number} options.height - Node height
    * @returns {Object} Result with created node
    */
-  createNode({ id, type = 'default', label = '', position = { x: 100, y: 100 }, data = {}, width, height } = {}) {
+  createNode({
+    id,
+    type = 'default',
+    label = '',
+    position = { x: 100, y: 100 },
+    data = {},
+    width,
+    height,
+    inputs,
+    outputs
+  } = {}) {
     try {
       const currentNodes = this.getNodes();
       let nodeId;
@@ -65,12 +236,17 @@ export default class GraphCRUD {
           memo: data.memo || '',
           link: data.link || ''
         },
+        inputs: Array.isArray(inputs) ? inputs.map(handle => ({ ...handle })) : [],
+        outputs: Array.isArray(outputs) ? outputs.map(handle => ({ ...handle })) : [],
         resizable: true,
         handlePosition: 'center',
         showLabel: true
       };
       const updatedNodes = deduplicateNodes([...currentNodes, newNode]);
-      this.setNodes(updatedNodes);
+      this.setNodes(prev => {
+        if (this.nodesRef) this.nodesRef.current = updatedNodes;
+        return updatedNodes;
+      });
       this.saveToHistory(updatedNodes, this.getEdges());
       return { success: true, data: newNode };
     } catch (error) {
@@ -186,46 +362,32 @@ export default class GraphCRUD {
    * @param {Object} options.style - {width, dash, curved, color}
    * @returns {Object} Result with created edge
    */
-  createEdge({ id, source, target, type = 'child', label = '', style = {} } = {}) {
+  createEdge(edgeInput = {}) {
     try {
-      if (!source || !target) {
-        return { success: false, error: 'Source and target are required' };
+      const nodes = this.getNodes();
+      const nodeMap = new Map(nodes.map(n => [n.id, n]));
+      const currentEdges = this.getEdges();
+      const existingEdgeIds = new Set(currentEdges.map(e => e.id));
+      const { edge, error } = buildEdgePayload(edgeInput, {
+        nodeMap,
+        existingEdgeIds,
+        generateId: () => this._generateId(),
+        defaultType: edgeInput.type || 'child'
+      });
+
+      if (error) {
+        return { success: false, error };
       }
 
-      // Get fresh node state to ensure we have the latest nodes
-      const nodes = this.getNodes();
-      const sourceExists = nodes.some(n => n.id === source);
-      const targetExists = nodes.some(n => n.id === target);
-
-      if (!sourceExists) return { success: false, error: `Source node ${source} not found` };
-      if (!targetExists) return { success: false, error: `Target node ${target} not found` };
-
-      const edgeId = id || this._generateId();
-      const newEdge = {
-        id: edgeId,
-        source,
-        target,
-        type,
-        label,
-        showLabel: false,
-        style: {
-          width: style.width || 2,
-          dash: style.dash || [],
-          curved: style.curved !== undefined ? style.curved : true,
-          color: style.color
-        }
-      };
-
-      const currentEdges = this.getEdges();
-      const updatedEdges = [...currentEdges, newEdge];
+      const updatedEdges = [...currentEdges, edge];
       this.setEdges(prev => {
         const next = updatedEdges;
         if (this.edgesRef) this.edgesRef.current = next;
         return next;
       });
-      this.saveToHistory(this.getNodes(), updatedEdges);
+      this.saveToHistory(nodes, updatedEdges);
 
-      return { success: true, data: newEdge };
+      return { success: true, data: edge };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -265,25 +427,40 @@ export default class GraphCRUD {
         return { success: false, error: `Edge ${id} not found` };
       }
 
-      const updatedEdges = currentEdges.map(edge => {
-        if (edge.id === id) {
-          return {
-            ...edge,
-            ...updates,
-            style: updates.style ? { ...edge.style, ...updates.style } : edge.style
-          };
-        }
-        return edge;
-      });
+      const existingEdge = currentEdges[edgeIndex];
+      const mergedEdge = {
+        ...existingEdge,
+        ...updates,
+        style: updates.style ? { ...existingEdge.style, ...updates.style } : existingEdge.style
+      };
+      if (updates.data) {
+        mergedEdge.data = { ...existingEdge.data, ...updates.data };
+      }
+
+      const nodes = this.getNodes();
+      const sourceNode = nodes.find(n => n.id === mergedEdge.source);
+      const targetNode = nodes.find(n => n.id === mergedEdge.target);
+      const handleValidation = validateHandlePair(
+        sourceNode,
+        targetNode,
+        mergedEdge.sourceHandle,
+        mergedEdge.targetHandle
+      );
+      if (handleValidation.error) {
+        return { success: false, error: handleValidation.error };
+      }
+      mergedEdge.handleMeta = handleValidation.meta;
+
+      const updatedEdges = currentEdges.map(edge => (edge.id === id ? mergedEdge : edge));
 
       this.setEdges(prev => {
         const next = updatedEdges;
         if (this.edgesRef) this.edgesRef.current = next;
         return next;
       });
-      this.saveToHistory(this.getNodes(), updatedEdges);
+      this.saveToHistory(nodes, updatedEdges);
 
-      return { success: true, data: updatedEdges[edgeIndex] };
+      return { success: true, data: mergedEdge };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -397,109 +574,55 @@ export default class GraphCRUD {
       }
 
       const currentNodes = this.getNodes();
+      const nodeMap = new Map(currentNodes.map(n => [n.id, n]));
       const currentEdges = this.getEdges();
-      const existingNodeIds = new Set(currentNodes.map(n => n.id));
       const existingEdgeIds = new Set(currentEdges.map(e => e.id));
-      
-      // Validate that all source/target nodes exist
-      const missingNodes = new Set();
-      for (const edge of edges) {
-        if (edge.source && !existingNodeIds.has(edge.source)) {
-          missingNodes.add(edge.source);
-        }
-        if (edge.target && !existingNodeIds.has(edge.target)) {
-          missingNodes.add(edge.target);
-        }
-      }
-      
-      if (missingNodes.size > 0) {
-        const missingList = Array.from(missingNodes).join(', ');
-        return { 
-          success: false, 
-          error: `Cannot create edges: the following nodes do not exist: ${missingList}. Create the nodes first, or use a batch operation that includes both nodes and edges.` 
-        };
-      }
-      
-      // Validate and sanitize edges
+
       const validEdges = [];
       const errors = [];
-      
+
       for (let i = 0; i < edges.length; i++) {
-        const edge = edges[i];
-        
-        // Basic validation
-        if (!edge || typeof edge !== 'object') {
-          errors.push(`Edge ${i}: must be an object`);
+        const rawEdge = edges[i];
+        const { edge, error } = buildEdgePayload(rawEdge, {
+          nodeMap,
+          existingEdgeIds,
+          generateId: () => this._generateId(),
+          defaultType: (rawEdge && rawEdge.type) || 'straight'
+        });
+        if (error) {
+          errors.push(`Edge ${i}: ${error}`);
           continue;
         }
-        
-        if (!edge.source || !edge.target) {
-          errors.push(`Edge ${i}: must have source and target`);
-          continue;
-        }
-        
-        // Generate ID if missing
-        let edgeId = edge.id;
-        if (!edgeId) {
-          edgeId = this._generateId();
-          existingEdgeIds.add(edgeId);
-        } else if (existingEdgeIds.has(edgeId)) {
-          // Skip duplicates instead of erroring
-          continue;
-        } else {
-          existingEdgeIds.add(edgeId);
-        }
-        
-        // Use edge type as-is
-        const edgeType = edge.type || 'straight';
-        
-        // Sanitize color
-        const color = edge.color || '#666';
-        
-        // Create sanitized edge
-        const sanitizedEdge = {
-          id: edgeId,
-          source: edge.source,
-          target: edge.target,
-          type: edgeType,
-          label: edge.label || '',
-          color,
-          visible: edge.visible !== false,
-          showLabel: edge.showLabel !== false,
-          data: edge.data || {}
-        };
-        
-        validEdges.push(sanitizedEdge);
+        validEdges.push(edge);
       }
-      
+
       if (validEdges.length === 0) {
-        return { 
-          success: false, 
-          error: errors.length > 0 ? errors.join('; ') : 'No valid edges to create' 
+        return {
+          success: false,
+          error: errors.length > 0 ? errors.join('; ') : 'No valid edges to create'
         };
       }
-      
-      // Update state
+
       const updatedEdges = [...currentEdges, ...validEdges];
       this.setEdges(prev => {
-        this.edgesRef.current = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = updatedEdges;
         return updatedEdges;
       });
-      
+
       this.saveToHistory(currentNodes, updatedEdges);
-      
+
       const message = `Created ${validEdges.length} edge${validEdges.length > 1 ? 's' : ''}`;
       if (errors.length > 0) {
         console.warn('Edge creation warnings:', errors);
       }
-      
-      return { 
-        success: true, 
-        data: { 
+
+      return {
+        success: true,
+        data: {
           created: validEdges,
           message,
           warnings: errors.length > 0 ? errors : undefined
-        } 
+        }
       };
     } catch (error) {
       console.error('createEdges error:', error);
@@ -776,6 +899,8 @@ crud.createNode({
 crud.createEdge({
   source: "node1",
   target: "node2",
+  sourceHandle: "out",
+  targetHandle: "in",
   type: "child"
 });
 

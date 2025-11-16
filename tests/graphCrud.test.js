@@ -96,6 +96,26 @@ describe('GraphCRUD core CRUD flows', () => {
     assert.equal(fixture.history.length, 2);
   });
 
+  it('persists provided handle schemas when creating nodes', () => {
+    const fixture = createCrudFixture();
+    const customInputs = [{ key: 'in1', label: 'Input', type: 'value' }];
+    const customOutputs = [
+      { key: 'out1', label: 'Trigger', type: 'trigger' },
+      { key: 'out2', label: 'Value', type: 'value' }
+    ];
+
+    const created = fixture.crud.createNode({
+      label: 'Schema Node',
+      inputs: customInputs,
+      outputs: customOutputs
+    });
+
+    assert.equal(created.success, true);
+    const stored = fixture.nodes[0];
+    assert.deepEqual(stored.inputs, customInputs);
+    assert.deepEqual(stored.outputs, customOutputs);
+  });
+
   it('updates node fields while preserving existing nested data', () => {
     const fixture = createCrudFixture({
       nodes: [
@@ -146,20 +166,123 @@ describe('GraphCRUD core CRUD flows', () => {
   it('creates edges between existing nodes and validates missing nodes', () => {
     const fixture = createCrudFixture({
       nodes: [
-        { id: 'source', label: 'Source', data: {} },
-        { id: 'target', label: 'Target', data: {} },
+        {
+          id: 'source',
+          label: 'Source',
+          data: {},
+          outputs: [{ key: 'tick', label: 'Tick', type: 'trigger' }],
+        },
+        {
+          id: 'target',
+          label: 'Target',
+          data: {},
+          inputs: [{ key: 'fire', label: 'Fire', type: 'trigger' }],
+        },
       ],
     });
 
-    const invalid = fixture.crud.createEdge({ source: 'source', target: 'missing' });
+    const invalid = fixture.crud.createEdge({
+      source: 'source',
+      target: { nodeId: 'missing', handleKey: 'fire' },
+      sourceHandle: 'tick',
+      targetHandle: 'fire',
+    });
     assert.equal(invalid.success, false);
     assert.match(invalid.error, /not found/);
 
-    const created = fixture.crud.createEdge({ source: 'source', target: 'target', label: 'Edge' });
+    const created = fixture.crud.createEdge({
+      source: 'source',
+      target: 'target',
+      sourceHandle: 'tick',
+      targetHandle: 'fire',
+      label: 'Edge',
+    });
     assert.equal(created.success, true);
     assert.equal(fixture.edges.length, 1);
     assert.equal(fixture.edges[0].label, 'Edge');
+    assert.equal(fixture.edges[0].sourceHandle, 'tick');
+    assert.equal(fixture.edges[0].targetHandle, 'fire');
     assert.equal(fixture.history.length, 1);
+  });
+
+  it('bulk creates handle-aware edges and surfaces invalid entries', () => {
+    const fixture = createCrudFixture({
+      nodes: [
+        {
+          id: 'a',
+          label: 'A',
+          data: {},
+          outputs: [{ key: 'out', label: 'Out', type: 'trigger' }],
+        },
+        {
+          id: 'b',
+          label: 'B',
+          data: {},
+          inputs: [{ key: 'in', label: 'In', type: 'trigger' }],
+          outputs: [{ key: 'pass', label: 'Pass', type: 'trigger' }],
+        },
+        {
+          id: 'c',
+          label: 'C',
+          data: {},
+          inputs: [{ key: 'in', label: 'In', type: 'trigger' }],
+        },
+      ],
+    });
+
+    const result = fixture.crud.createEdges([
+      { source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' },
+      { source: 'b', target: 'c', sourceHandle: 'pass', targetHandle: 'missing' },
+    ]);
+
+    assert.equal(result.success, true);
+    assert.equal(result.data.created.length, 1);
+    assert.equal(fixture.edges.length, 1);
+    assert.ok(result.data.warnings);
+    assert.match(result.data.warnings[0], /Edge 1: Input handle "missing"/);
+  });
+
+  it('rejects edges without explicit handle keys or mismatched handle types', () => {
+    const fixture = createCrudFixture({
+      nodes: [
+        {
+          id: 'source',
+          label: 'Source',
+          data: {},
+          outputs: [
+            { key: 'tick', label: 'Tick', type: 'trigger' },
+            { key: 'value', label: 'Value', type: 'value' },
+          ],
+        },
+        {
+          id: 'target',
+          label: 'Target',
+          data: {},
+          inputs: [
+            { key: 'trigger', label: 'Trigger', type: 'trigger' },
+            { key: 'val', label: 'Val', type: 'number' },
+          ],
+        },
+      ],
+    });
+
+    const missingHandle = fixture.crud.createEdge({
+      source: 'source',
+      target: 'target',
+      sourceHandle: 'tick',
+      // targetHandle omitted intentionally
+    });
+    assert.equal(missingHandle.success, false);
+    assert.match(missingHandle.error, /targetHandle is required/i);
+
+    const typeMismatch = fixture.crud.createEdge({
+      source: 'source',
+      target: 'target',
+      sourceHandle: 'value',
+      targetHandle: 'trigger',
+    });
+    assert.equal(typeMismatch.success, false);
+    assert.match(typeMismatch.error, /Handle types do not match/i);
   });
 });
 
