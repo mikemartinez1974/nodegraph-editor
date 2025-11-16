@@ -28,7 +28,7 @@ export default function GateNode({
   const node = useNodeHandleSchema(origNode, GATE_INPUTS, GATE_OUTPUTS);
 
   const width = (node?.width || 200) * zoom;
-  const height = (node?.height || 250) * zoom;
+  const height = (node?.height || 300) * zoom;
 
   // Local editable state derived from node.data
   const initialInputs = node?.data?.inputs || { a: false, b: false };
@@ -191,16 +191,30 @@ export default function GateNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 12 }}>
         <div style={{ fontWeight: 700 }}>{node?.label || 'Gate'}</div>
-        <select value={operator} onChange={handleOperatorChange} style={{ background: 'rgba(255,255,255,0.12)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: 6 }}>
-          <option value="and">AND</option>
-          <option value="or">OR</option>
-          <option value="not">NOT</option>
-          <option value="xor">XOR</option>
-          <option value="nand">NAND</option>
-          <option value="nor">NOR</option>
-        </select>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: 11, opacity: 0.85 }}>
+          Mode
+          <select
+            value={operator}
+            onChange={handleOperatorChange}
+            style={{
+              marginTop: 4,
+              background: 'rgba(0,0,0,0.2)',
+              color: 'inherit',
+              border: '1px solid rgba(255,255,255,0.3)',
+              padding: '4px 8px',
+              borderRadius: 6
+            }}
+          >
+            <option value="and">AND</option>
+            <option value="or">OR</option>
+            <option value="not">NOT</option>
+            <option value="xor">XOR</option>
+            <option value="nand">NAND</option>
+            <option value="nor">NOR</option>
+          </select>
+        </label>
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

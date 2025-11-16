@@ -45,7 +45,7 @@ const DefaultNode = (props) => {
     if (event.cancelable && event.preventDefault) event.preventDefault();
     setIsResizing(true);
     resizeStartPos.current = { x: point.x, y: point.y };
-    resizeStartSize.current = { width: node.width || 60, height: node.height || 60 };
+    resizeStartSize.current = { width: node.width || 200, height: node.height || 50 };
   };
 
   useEffect(() => {

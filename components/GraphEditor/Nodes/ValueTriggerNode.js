@@ -55,8 +55,8 @@ export default function ValueTriggerNode({
   const nodeRef = useRef(null);
   const node = useNodeHandleSchema(origNode, INPUTS, OUTPUTS);
 
-  const width = (node?.width || 240) * zoom;
-  const height = (node?.height || 180) * zoom;
+  const width = (node?.width || 250) * zoom;
+  const height = (node?.height || 300) * zoom;
 
   const [mode, setMode] = useState(node?.data?.mode || 'rising');
   const [lastValue, setLastValue] = useState(

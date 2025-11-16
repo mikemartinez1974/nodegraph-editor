@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -9,6 +9,10 @@ import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
 
 // --- New schema handles ---
 const TIMER_INPUTS = [
+  { key: 'start', label: 'Start', type: 'trigger' },
+  { key: 'pause', label: 'Pause', type: 'trigger' },
+  { key: 'resume', label: 'Resume', type: 'trigger' },
+  { key: 'stop', label: 'Stop', type: 'trigger' },
   { key: 'reset', label: 'Reset', type: 'trigger' }
 ];
 const TIMER_OUTPUTS = [
@@ -29,17 +33,22 @@ export default function TimerNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const intervalRef = useRef(null);
+  const tickIntervalRef = useRef(null);
   const node = useNodeHandleSchema(origNode, TIMER_INPUTS, TIMER_OUTPUTS);
   
   const width = (node?.width || 200) * zoom;
-  const height = (node?.height || 140) * zoom;
+  const height = (node?.height || 250) * zoom;
   
   // Timer state
   const [elapsed, setElapsed] = useState(0);
+  const elapsedRef = useRef(0);
   const isRunning = node?.data?.isRunning || false;
   const isPaused = node?.data?.isPaused || false;
   const startTime = node?.data?.startTime || null;
   const pausedElapsed = node?.data?.pausedElapsed || 0;
+  const intervalMs = typeof node?.data?.intervalMs === 'number' && node.data.intervalMs > 0
+    ? node.data.intervalMs
+    : 1000;
 
   // Register node ref
   useEffect(() => {
@@ -78,66 +87,148 @@ export default function TimerNode({
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${deciseconds}`;
   };
 
+  const performStart = useCallback(() => {
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          isRunning: true,
+          isPaused: false,
+          startTime: Date.now(),
+          pausedElapsed: 0
+        }
+      }
+    });
+  }, [node.id, node.data]);
+
+  const performResume = useCallback(() => {
+    if (!isRunning) {
+      performStart();
+      return;
+    }
+    if (!isPaused) return;
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          isPaused: false,
+          startTime: Date.now()
+        }
+      }
+    });
+  }, [node.id, node.data, isRunning, isPaused, performStart]);
+
+  const performPause = useCallback(() => {
+    if (!isRunning || isPaused) return;
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          isPaused: true,
+          pausedElapsed: elapsedRef.current
+        }
+      }
+    });
+  }, [node.id, node.data, isRunning, isPaused]);
+
+  const performStop = useCallback(() => {
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          isRunning: false,
+          isPaused: false,
+          startTime: null,
+          pausedElapsed: 0
+        }
+      }
+    });
+  }, [node.id, node.data]);
+
   const handleStart = (e) => {
     e.stopPropagation();
     if (!isRunning) {
-      eventBus.emit('nodeUpdate', { 
-        id: node.id, 
-        updates: { 
-          data: { 
-            ...node.data, 
-            isRunning: true, 
-            isPaused: false,
-            startTime: Date.now(),
-            pausedElapsed: 0
-          } 
-        } 
-      });
+      performStart();
     } else if (isPaused) {
-      eventBus.emit('nodeUpdate', { 
-        id: node.id, 
-        updates: { 
-          data: { 
-            ...node.data, 
-            isPaused: false,
-            startTime: Date.now()
-          } 
-        } 
-      });
+      performResume();
     }
   };
 
   const handlePause = (e) => {
     e.stopPropagation();
-    if (isRunning && !isPaused) {
-      eventBus.emit('nodeUpdate', { 
-        id: node.id, 
-        updates: { 
-          data: { 
-            ...node.data, 
-            isPaused: true,
-            pausedElapsed: elapsed
-          } 
-        } 
-      });
-    }
+    performPause();
   };
+
+  // Emit tick events while running so downstream nodes receive trigger pulses
+  useEffect(() => {
+    if (tickIntervalRef.current) {
+      clearInterval(tickIntervalRef.current);
+      tickIntervalRef.current = null;
+    }
+    if (!isRunning || isPaused || !startTime) {
+      return;
+    }
+    const emitTick = () => {
+      eventBus.emit('nodeOutput', {
+        nodeId: node.id,
+        outputName: 'tick',
+        value: {
+          elapsed: Date.now() - startTime + pausedElapsed,
+          startedAt: startTime,
+          timestamp: Date.now()
+        }
+      });
+    };
+    emitTick();
+    tickIntervalRef.current = setInterval(emitTick, intervalMs);
+    return () => {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
+      }
+    };
+  }, [isRunning, isPaused, startTime, pausedElapsed, intervalMs, node.id]);
+
+  useEffect(() => {
+    elapsedRef.current = elapsed;
+  }, [elapsed]);
 
   const handleStop = (e) => {
     e.stopPropagation();
-    eventBus.emit('nodeUpdate', { 
-      id: node.id, 
-      updates: { 
-        data: { 
-          ...node.data, 
-          isRunning: false,
-          isPaused: false,
-          startTime: null,
-          pausedElapsed: 0
-        } 
-      } 
-    });
+    performStop();
   };
+
+  // Allow external trigger inputs to control the timer
+  useEffect(() => {
+    const handler = ({ targetNodeId, inputName } = {}) => {
+      if (targetNodeId !== node.id) return;
+      const key = inputName || 'reset';
+      switch (key) {
+        case 'start':
+          performStart();
+          break;
+        case 'pause':
+          performPause();
+          break;
+        case 'resume':
+          performResume();
+          break;
+        case 'stop':
+          performStop();
+          break;
+        case 'reset':
+        default:
+          performStart();
+          break;
+      }
+    };
+    eventBus.on('nodeInput', handler);
+    return () => eventBus.off('nodeInput', handler);
+  }, [node.id, performStart, performPause, performResume, performStop]);
 
   const nodeColor = node?.color || theme.palette.primary.main;
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;

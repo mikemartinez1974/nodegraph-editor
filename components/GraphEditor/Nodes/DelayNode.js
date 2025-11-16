@@ -29,8 +29,8 @@ export default function DelayNode({
   const [, setTick] = useState(0); // force update for UI
   const node = useNodeHandleSchema(origNode, DELAY_INPUTS, DELAY_OUTPUTS);
 
-  const width = (node?.width || 300) * zoom;
-  const height = (node?.height || 150) * zoom;
+  const width = (node?.width || 400) * zoom;
+  const height = (node?.height || 200) * zoom;
 
   const defaultDelay = typeof node?.data?.delay === 'number' ? node.data.delay : 1000;
   const [delayMs, setDelayMs] = useState(defaultDelay);

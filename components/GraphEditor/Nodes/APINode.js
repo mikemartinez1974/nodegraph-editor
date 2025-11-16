@@ -33,8 +33,8 @@ export default function APINode({
   const nodeRef = useRef(null);
   const controllerRef = useRef(null);
 
-  const width = (node?.width || 350) * zoom;
-  const height = (node?.height || 250) * zoom;
+  const width = (node?.width || 400) * zoom;
+  const height = (node?.height || 400) * zoom;
 
   const initial = node?.data || {};
   const [url, setUrl] = useState(initial.url || '');

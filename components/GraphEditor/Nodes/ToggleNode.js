@@ -28,11 +28,13 @@ export default function ToggleNode({
   const nodeRef = useRef(null);
   const node = useNodeHandleSchema(origNode, TOGGLE_INPUTS, TOGGLE_OUTPUTS);
   
-  const width = (node?.width || 200) * zoom;
-  const height = (node?.height || 200) * zoom;
+  const width = (node?.width || 250) * zoom;
+  const height = (node?.height || 350) * zoom;
   
   // Toggle state
-  const value = node?.data?.value || false;
+  const value = !!(node?.data?.value);
+  const mode = node?.data?.mode || 'toggle';
+  const isMomentary = mode === 'momentary';
   const onLabel = node?.data?.onLabel || 'ON';
   const offLabel = node?.data?.offLabel || 'OFF';
 
@@ -53,16 +55,48 @@ export default function ToggleNode({
     });
   }, [value, node.id]);
 
+  const updateValue = (next) => {
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          value: !!next
+        }
+      }
+    });
+  };
+
   const handleToggle = (e) => {
     e.stopPropagation();
-    eventBus.emit('nodeUpdate', { 
-      id: node.id, 
-      updates: { 
-        data: { 
-          ...node.data, 
-          value: !value
-        } 
-      } 
+    if (isMomentary) return;
+    updateValue(!value);
+  };
+
+  const handleMomentaryDown = (e) => {
+    if (!isMomentary) return;
+    e.stopPropagation();
+    updateValue(true);
+  };
+
+  const handleMomentaryUp = (e) => {
+    if (!isMomentary) return;
+    e.stopPropagation();
+    updateValue(false);
+  };
+
+  const handleModeChange = (e) => {
+    e.stopPropagation();
+    const nextMode = e.target.value;
+    eventBus.emit('nodeUpdate', {
+      id: node.id,
+      updates: {
+        data: {
+          ...node.data,
+          mode: nextMode,
+          value: nextMode === 'momentary' ? false : value
+        }
+      }
     });
   };
 
@@ -139,6 +173,12 @@ export default function ToggleNode({
       {/* Toggle Button */}
       <button
         onClick={handleToggle}
+        onMouseDown={handleMomentaryDown}
+        onMouseUp={handleMomentaryUp}
+        onMouseLeave={handleMomentaryUp}
+        onTouchStart={handleMomentaryDown}
+        onTouchEnd={handleMomentaryUp}
+        onTouchCancel={handleMomentaryUp}
         style={{
           width: '100%',
           height: 60,
@@ -200,7 +240,7 @@ export default function ToggleNode({
         letterSpacing: 1,
         color: value ? theme.palette.success.light : 'rgba(255,255,255,0.6)'
       }}>
-        {value ? 'Active' : 'Inactive'}
+        {isMomentary ? (value ? 'Pressed' : 'Idle') : value ? 'Active' : 'Inactive'}
       </div>
       {/* Boolean value display */}
       <div style={{
@@ -212,6 +252,25 @@ export default function ToggleNode({
       }}>
         {value ? 'true' : 'false'}
       </div>
+      <label style={{ marginTop: 12, fontSize: 11, width: '100%', textAlign: 'left', opacity: 0.8 }}>
+        Mode
+        <select
+          value={mode}
+          onChange={handleModeChange}
+          style={{
+            width: '100%',
+            marginTop: 4,
+            borderRadius: 6,
+            padding: '6px 8px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            background: 'rgba(0,0,0,0.2)',
+            color: 'inherit'
+          }}
+        >
+          <option value="toggle">Toggle (latching)</option>
+          <option value="momentary">Momentary (spring)</option>
+        </select>
+      </label>
     </div>
   );
 }

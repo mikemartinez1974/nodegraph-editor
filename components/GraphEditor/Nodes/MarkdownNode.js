@@ -40,7 +40,8 @@ const MarkdownNode = (props) => {
     }
   };
 
-  const markdownContent = node?.data?.memo || node?.label || 'No content';
+  const nodeLabel = node?.label || 'Markdown';
+  const markdownContent = node?.data?.memo || '';
 
   // Resize handlers (same as DefaultNode)
   const getPointerPosition = (event) => {
@@ -112,13 +113,15 @@ const MarkdownNode = (props) => {
         lineHeight: 1.6,
         userSelect: 'text',
         cursor: 'text',
-        overflow: 'auto',
+        overflow: 'hidden',
         padding: '8px',
         boxSizing: 'border-box',
         zIndex: 1,
         pointerEvents: 'auto',
         backgroundColor: 'transparent',
-        color: '#000'
+        color: '#000',
+        display: 'flex',
+        flexDirection: 'column'
       }}
       onClick={(e) => {
         // Prevent clicks on markdown content from triggering node drag
@@ -126,27 +129,49 @@ const MarkdownNode = (props) => {
         e.stopPropagation();
       }}
       >
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
-          urlTransform={(url) => url}
-          components={{
-            a: TlzLink,
-            p: ({node, ...props}) => <p style={{ margin: '0.5em 0' }} {...props} />,
-            h1: ({node, ...props}) => <h1 style={{ margin: '0.5em 0', fontSize: '1.5em' }} {...props} />,
-            h2: ({node, ...props}) => <h2 style={{ margin: '0.5em 0', fontSize: '1.3em' }} {...props} />,
-            h3: ({node, ...props}) => <h3 style={{ margin: '0.5em 0', fontSize: '1.1em' }} {...props} />,
-            ul: ({node, ...props}) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
-            ol: ({node, ...props}) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
-            code: ({node, inline, ...props}) => (
-              inline 
-                ? <code style={{ backgroundColor: 'rgba(0,0,0,0.1)', padding: '2px 4px', borderRadius: 2 }} {...props} />
-                : <code style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.1)', padding: '8px', borderRadius: 4, overflowX: 'auto' }} {...props} />
-            )
-          }}
-        >
-          {markdownContent}
-        </ReactMarkdown>
+        <div style={{ flexShrink: 0 }}>
+          {nodeLabel ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+              urlTransform={(url) => url}
+              components={{
+                a: TlzLink,
+                p: ({ node, ...props }) => <p style={{ margin: 0, fontWeight: 600, fontSize: '1rem' }} {...props} />
+              }}
+            >
+              {nodeLabel}
+            </ReactMarkdown>
+          ) : null}
+          <hr style={{ width: '100%', opacity: 0.3, margin: '8px 0' }} />
+        </div>
+        <div style={{ overflow: 'auto', flex: 1 }}>
+          {markdownContent ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+              urlTransform={(url) => url}
+              components={{
+                a: TlzLink,
+                p: ({node, ...props}) => <p style={{ margin: '0.5em 0' }} {...props} />,
+                h1: ({node, ...props}) => <h1 style={{ margin: '0.5em 0', fontSize: '1.5em' }} {...props} />,
+                h2: ({node, ...props}) => <h2 style={{ margin: '0.5em 0', fontSize: '1.3em' }} {...props} />,
+                h3: ({node, ...props}) => <h3 style={{ margin: '0.5em 0', fontSize: '1.1em' }} {...props} />,
+                ul: ({node, ...props}) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
+                ol: ({node, ...props}) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }} {...props} />,
+                code: ({node, inline, ...props}) => (
+                  inline 
+                    ? <code style={{ backgroundColor: 'rgba(0,0,0,0.1)', padding: '2px 4px', borderRadius: 2 }} {...props} />
+                    : <code style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.1)', padding: '8px', borderRadius: 4, overflowX: 'auto' }} {...props} />
+                )
+              }}
+            >
+              {markdownContent}
+            </ReactMarkdown>
+          ) : (
+            <div style={{ opacity: 0.6, fontStyle: 'italic' }}>No content</div>
+          )}
+        </div>
       </div>
 
       {/* Resize handle */}

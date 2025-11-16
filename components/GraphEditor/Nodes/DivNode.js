@@ -3,6 +3,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { TlzLink } from '../components/TlzLink';
 
 // Unified handle schema for display nodes
 const DEFAULT_INPUTS = [
@@ -27,6 +32,7 @@ const DivNode = (props) => {
   const iframeRef = useRef(null);
 
   const content = node?.data?.memo || node?.label || '';
+  const nodeLabel = node?.label || 'Div';
   
   // Detect if content looks like HTML
   const isHTML = content.trim().startsWith('<') && content.trim().includes('>');
@@ -37,6 +43,14 @@ const DivNode = (props) => {
   
   console.log('[DivNode] Content:', content.substring(0, 200));
   console.log('[DivNode] Embed URL extracted:', embedUrl);
+
+  const sanitizeSchema = useMemo(() => ({
+    ...defaultSchema,
+    protocols: {
+      ...defaultSchema.protocols,
+      href: [...(defaultSchema.protocols?.href || []), 'tlz']
+    }
+  }), []);
 
   // Resize handlers (same as MarkdownNode)
   const handleResizeStart = (e) => {
@@ -76,76 +90,90 @@ const DivNode = (props) => {
   // Render FixedNode with HTML content or plain text
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
-      {embedUrl ? (
-        /* Direct embed iframe - no sandbox for compatibility */
-        <iframe
-          ref={iframeRef}
-          src={embedUrl}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-          allowFullScreen
-          style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            right: '8px',
-            bottom: '24px',
-            border: 'none',
-            width: 'calc(100% - 16px)',
-            height: 'calc(100% - 32px)',
-            backgroundColor: '#000',
-            zIndex: 1
-          }}
-          title={`Video embed for node ${node.id}`}
-        />
-      ) : isHTML ? (
-        /* Sandboxed iframe for other HTML content */
-        <iframe
-          ref={iframeRef}
-          srcDoc={content}
-          sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-          allowFullScreen
-          style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            right: '8px',
-            bottom: '24px',
-            border: 'none',
-            width: 'calc(100% - 16px)',
-            height: 'calc(100% - 32px)',
-            backgroundColor: '#fff',
-            zIndex: 1
-          }}
-          title={`Content for node ${node.id}`}
-        />
-      ) : (
-        /* Plain text content */
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            right: '8px',
-            bottom: '24px',
-            fontSize: Math.max(10, 12 * zoom),
-            lineHeight: 1.6,
-            userSelect: 'text',
-            cursor: 'auto',
-            overflow: 'auto',
-            padding: '8px',
-            boxSizing: 'border-box',
-            zIndex: 1,
-            pointerEvents: 'auto',
-            backgroundColor: 'transparent',
-            color: theme.palette.text.primary,
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'monospace'
-          }}
-        >
-          {content}
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          left: '8px',
+          right: '8px',
+          bottom: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          padding: '8px',
+          zIndex: 1,
+          pointerEvents: 'auto',
+          backgroundColor: 'transparent'
+        }}
+      >
+        {nodeLabel ? (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+            urlTransform={(url) => url}
+            components={{
+              a: TlzLink,
+              p: ({ node, ...props }) => <p style={{ margin: 0, fontWeight: 600, fontSize: '1rem' }} {...props} />
+            }}
+          >
+            {nodeLabel}
+          </ReactMarkdown>
+        ) : null}
+        <hr style={{ width: '100%', opacity: 0.3, margin: '8px 0' }} />
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {embedUrl ? (
+            /* Direct embed iframe - no sandbox for compatibility */
+            <iframe
+              ref={iframeRef}
+              src={embedUrl}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowFullScreen
+              style={{
+                border: 'none',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#000'
+              }}
+              title={`Video embed for node ${node.id}`}
+            />
+          ) : isHTML ? (
+            /* Sandboxed iframe for other HTML content */
+            <iframe
+              ref={iframeRef}
+              srcDoc={content}
+              sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowFullScreen
+              style={{
+                border: 'none',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#fff'
+              }}
+              title={`Content for node ${node.id}`}
+            />
+          ) : (
+            /* Plain text content */
+            <div
+              style={{
+                fontSize: Math.max(10, 12 * zoom),
+                lineHeight: 1.6,
+                userSelect: 'text',
+                cursor: 'auto',
+                overflow: 'auto',
+                width: '100%',
+                height: '100%',
+                color: theme.palette.text.primary,
+                whiteSpace: 'pre-wrap',
+                fontFamily: 'monospace'
+              }}
+            >
+              {content}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Resize handle */}
       <div
