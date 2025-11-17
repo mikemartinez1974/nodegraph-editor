@@ -55,9 +55,9 @@
         Teach Edge CRUD helpers to require `sourceHandle`/`targetHandle`, validate them against node schemas, and persist handle metadata so downstream nodes receive the right inputs (`components/GraphEditor/GraphCrud.js`, `components/GraphEditor/handlers/pasteHandler.js`, `types/logicSchema.js`).
   - [x] **Retire Legacy Handle UI**  
         Delete the unused canvas handle components/utilities that predate the unified schema so nobody accidentally revives the wrong API (`components/NodeGraph/Handle.js`, `components/NodeGraph/utils/handleUtils.js`, `components/NodeGraph/portUtils.js`).
-  - [ ] **Edge Creation Parity**  
+  - [x] **Edge Creation Parity**  
         Update the GraphEditor `handleDrop` flow to rely solely on resolved handles and route everything through GraphCRUD so auto-created nodes/edges also get proper handle keys (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/handlers/graphEditorHandlers.js`).
-  - [x] **Unified Handle Docs & Tests**  
+  - [ ] **Unified Handle Docs & Tests**  
         Expand the GraphCRUD tests plus contributor docs to cover handle-aware edges and keep plugin authors aligned with the new contract (`tests/graphCrud.test.js`, `components/GraphEditor/GraphAPIdocumentation.md`, `.github/NodeLogicSystem.md`).
   - [x] **Script & Plugin Hardening**  
         Enforce origin allowlists, timeouts, and sandboxing for background RPC and script execution before shipping user plugins (`components/GraphEditor/components/BackgroundFrame.js`, `components/GraphEditor/Scripting/ScriptRunner.js`).
