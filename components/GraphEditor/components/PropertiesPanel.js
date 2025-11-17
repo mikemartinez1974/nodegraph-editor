@@ -31,6 +31,52 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import nodeTypeRegistry from '../nodeTypeRegistry'; // Adjust path as needed
 import edgeTypesMap from '../edgeTypes'; // Correct import syntax
 
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+
+const deepEqual = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i += 1) {
+      if (!deepEqual(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  if (isPlainObject(a)) {
+    if (!isPlainObject(b)) return false;
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length !== keysB.length) return false;
+    for (const key of keysA) {
+      if (!deepEqual(a[key], b[key])) return false;
+    }
+    return true;
+  }
+  return false;
+};
+
+const buildUpdatesFromDiff = (original = {}, updated = {}) => {
+  const updates = {};
+  const keys = new Set([
+    ...Object.keys(original || {}),
+    ...Object.keys(updated || {})
+  ]);
+
+  keys.forEach((key) => {
+    if (!(key in updated)) {
+      updates[key] = undefined;
+    } else if (!deepEqual(original?.[key], updated[key])) {
+      updates[key] = updated[key];
+    }
+  });
+
+  return Object.keys(updates).reduce((acc, key) => {
+    acc[key] = updates[key];
+    return acc;
+  }, {});
+};
+
 export default function ConsolidatedPropertiesPanel({ 
   selectedNode,
   selectedEdge,
@@ -101,6 +147,12 @@ export default function ConsolidatedPropertiesPanel({
   const [borderColor, setBorderColor] = useState('#1976d2');
   const [borderWidth, setBorderWidth] = useState(2);
   const [visible, setVisible] = useState(true);
+
+  // Advanced JSON editor state
+  const [nodeJson, setNodeJson] = useState('');
+  const [nodeJsonError, setNodeJsonError] = useState('');
+  const [edgeJson, setEdgeJson] = useState('');
+  const [edgeJsonError, setEdgeJsonError] = useState('');
   
   const resizing = useRef(false);
   const startX = useRef(0);
@@ -230,6 +282,36 @@ export default function ConsolidatedPropertiesPanel({
     }
   }, [entityId, defaultNodeColor, defaultEdgeColor]);
 
+  useEffect(() => {
+    if (selectedNode) {
+      try {
+        setNodeJson(JSON.stringify(selectedNode, null, 2));
+        setNodeJsonError('');
+      } catch (error) {
+        setNodeJson('');
+        setNodeJsonError('Unable to serialize node');
+      }
+    } else {
+      setNodeJson('');
+      setNodeJsonError('');
+    }
+  }, [selectedNode]);
+
+  useEffect(() => {
+    if (selectedEdge) {
+      try {
+        setEdgeJson(JSON.stringify(selectedEdge, null, 2));
+        setEdgeJsonError('');
+      } catch (error) {
+        setEdgeJson('');
+        setEdgeJsonError('Unable to serialize edge');
+      }
+    } else {
+      setEdgeJson('');
+      setEdgeJsonError('');
+    }
+  }, [selectedEdge]);
+
   // Handlers
   const handleLabelChange = (e) => {
     const newLabel = e.target.value;
@@ -261,6 +343,50 @@ export default function ConsolidatedPropertiesPanel({
     onUpdateEdge(entityId, {
       style: { ...currentStyle, ...updates }
     });
+  };
+
+  const handleApplyNodeJson = () => {
+    if (!selectedNode || !onUpdateNode || isLocked) return;
+    try {
+      const parsed = JSON.parse(nodeJson);
+      if (Array.isArray(parsed) || typeof parsed !== 'object' || parsed === null) {
+        throw new Error('Node JSON must be an object');
+      }
+      if (parsed.id && parsed.id !== selectedNode.id) {
+        throw new Error('Node ID cannot be changed here');
+      }
+      const updates = buildUpdatesFromDiff(selectedNode, parsed);
+      if (Object.keys(updates).length === 0) {
+        setNodeJsonError('No changes detected');
+        return;
+      }
+      onUpdateNode(selectedNode.id, updates);
+      setNodeJsonError('');
+    } catch (error) {
+      setNodeJsonError(error.message);
+    }
+  };
+
+  const handleApplyEdgeJson = () => {
+    if (!selectedEdge || !onUpdateEdge || isLocked) return;
+    try {
+      const parsed = JSON.parse(edgeJson);
+      if (Array.isArray(parsed) || typeof parsed !== 'object' || parsed === null) {
+        throw new Error('Edge JSON must be an object');
+      }
+      if (parsed.id && parsed.id !== selectedEdge.id) {
+        throw new Error('Edge ID cannot be changed here');
+      }
+      const updates = buildUpdatesFromDiff(selectedEdge, parsed);
+      if (Object.keys(updates).length === 0) {
+        setEdgeJsonError('No changes detected');
+        return;
+      }
+      onUpdateEdge(selectedEdge.id, updates);
+      setEdgeJsonError('');
+    } catch (error) {
+      setEdgeJsonError(error.message);
+    }
   };
 
   const scheduleGroupUpdate = (fields) => {
@@ -661,6 +787,40 @@ export default function ConsolidatedPropertiesPanel({
               </AccordionDetails>
             </Accordion>
 
+            <Accordion defaultExpanded sx={{ mt: 2 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">All Node Properties (JSON)</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Edit every field on this node via JSON. Invalid JSON will be rejected.
+                </Typography>
+                <TextField
+                  multiline
+                  minRows={10}
+                  value={nodeJson}
+                  onChange={(e) => {
+                    setNodeJson(e.target.value);
+                    setNodeJsonError('');
+                  }}
+                  fullWidth
+                  size="small"
+                  disabled={isLocked}
+                  error={Boolean(nodeJsonError)}
+                  helperText={nodeJsonError || 'Changes apply to the selected node.'}
+                  sx={{ mb: 1.5, fontFamily: 'monospace', backgroundColor: theme?.palette?.background?.paper }}
+                />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleApplyNodeJson}
+                  disabled={isLocked || !nodeJson.trim()}
+                >
+                  Apply Node JSON
+                </Button>
+              </AccordionDetails>
+            </Accordion>
+
 
           </>
         )}
@@ -928,6 +1088,40 @@ export default function ConsolidatedPropertiesPanel({
                         )}
                       </AccordionDetails>
                     </Accordion>
+
+            <Accordion defaultExpanded sx={{ mt: 2 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="edge-json-editor">
+                <Typography variant="subtitle2">All Edge Properties (JSON)</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Review or edit the full edge object. Invalid JSON will be rejected.
+                </Typography>
+                <TextField
+                  multiline
+                  minRows={8}
+                  value={edgeJson}
+                  onChange={(e) => {
+                    setEdgeJson(e.target.value);
+                    setEdgeJsonError('');
+                  }}
+                  fullWidth
+                  size="small"
+                  disabled={isLocked}
+                  error={Boolean(edgeJsonError)}
+                  helperText={edgeJsonError || 'Changes apply to the selected edge.'}
+                  sx={{ mb: 1.5, fontFamily: 'monospace', backgroundColor: theme?.palette?.background?.paper }}
+                />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleApplyEdgeJson}
+                  disabled={isLocked || !edgeJson.trim()}
+                >
+                  Apply Edge JSON
+                </Button>
+              </AccordionDetails>
+            </Accordion>
           </>
         )}
 

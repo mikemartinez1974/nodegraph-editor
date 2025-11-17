@@ -4,6 +4,7 @@
 // ============================================
 import eventBus from '../../NodeGraph/eventBus';
 import { generateUUID } from '../utils/idUtils';
+import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation';
 
 // Debounce guard for delete operations (must be outside function to persist)
 let deleteInProgress = false;
@@ -413,6 +414,20 @@ export function createGraphEditorHandlers({
         }).filter(g => g.nodeIds?.length >= 2);
       };
 
+      const nodeValidation = validateNodes(pastedNodes);
+      const edgeValidation = validateEdges(pastedEdges);
+      const groupValidation = validateGroups(pastedGroups);
+      pastedNodes = nodeValidation.valid;
+      pastedEdges = edgeValidation.valid.map(normalizeEdgeSchema);
+      pastedGroups = groupValidation.valid;
+      const validationErrors = [...nodeValidation.errors, ...edgeValidation.errors, ...groupValidation.errors];
+      if (validationErrors.length) {
+        const summary = summarizeValidationErrors(validationErrors);
+        console.warn('[handlePasteGraphData] Skipping invalid items:', validationErrors);
+        setSnackbar?.({ open: true, message: summary, severity: 'warning' });
+      }
+
+  
       let action = pastedData.action || (pastedNodes.length && pastedEdges.length ? 'replace' : 'add');
 
       if (action === 'replace') {

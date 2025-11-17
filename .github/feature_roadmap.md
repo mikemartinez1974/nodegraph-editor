@@ -26,6 +26,46 @@
 - [ ] **Operational Dashboards**  
       Use graph stats to build health dashboards and alerts (`components/GraphEditor/GraphCrud.js:637`).
 
+## Plugin Platform Roadmap
+
+- [ ] **Phase 0 – Discovery & Guardrails**  
+      Document plugin goals (3rd-party nodes, breadboard demo), threat model, and API boundaries in `.github/Requirements.md` + `components/GraphEditor/GraphAPIdocumentation.md`.
+  - [ ] Define success metrics (external teams can author/render nodes without forking core).
+  - [ ] List supported extension points (node types, panels, RPC hooks) and out-of-scope areas.
+  - [ ] Capture security constraints (origin allowlist, sandbox type, capability-based APIs).
+
+- [ ] **Phase 1 – Manifest & Registry**  
+      Ship a manifest schema and runtime registry that discovers, validates, and stores plugin metadata.
+  - [ ] Author JSON schema for plugin manifest (id, version, bundle URL, exposed nodes/panels, permissions).
+  - [ ] Add registry persistence + CRUD (install, update, disable) in `components/GraphEditor/nodeTypeRegistry.js`.
+  - [ ] Build validation + signature checks before loading remote bundles.
+
+- [ ] **Phase 2 – Sandbox & Runtime Loader**  
+      Create a hardened loader (iframe/worker) that evaluates plugin bundles and exposes a minimal Graph API surface.
+  - [ ] Implement loader host (BackgroundFrame or new worker) with handshake, capability negotiation, and timeout enforcement.
+  - [ ] Whitelist APIs (GraphCRUD, eventBus, selection) and proxy events/messages through typed bridges.
+  - [ ] Add crash isolation + telemetry so faulty plugins fail gracefully.
+
+- [ ] **Phase 3 – Node Definition APIs**  
+      Give plugin authors declarative ways to define nodes, handles, and panels that render inside NodeGraph.
+  - [ ] Publish node definition contract (props, data schema, handles, property panel hooks).
+  - [ ] Provide helper SDK (React hooks + TypeScript types) so developers can register custom node components.
+  - [ ] Support plugin-provided styles/assets while enforcing theming + sanitization rules.
+
+- [ ] **Phase 4 – Tooling & Distribution**  
+      Deliver authoring tooling and UX for discovering/installing plugins.
+  - [ ] Release a starter template/CLI to scaffold plugin projects with lint/tests.
+  - [ ] Build Plugin Manager UI (install from URL, browse gallery) integrated into Toolbar/AddNodeMenu.
+  - [ ] Surface permission prompts, changelog notices, and version pinning.
+
+- [ ] **Phase 5 – QA, Docs, Rollout**  
+      Validate the platform and prep public launch.
+  - [ ] Add automated tests covering manifest validation, sandboxed execution, and node rendering lifecycle.
+  - [ ] Document plugin author guide + API reference in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/CONTRIBUTING.md`.
+  - [ ] Ship behind feature flag, onboard pilot partners, collect feedback before GA.
+
+> **Dependency:** Breadboard roadmap remains intact but is blocked on Phases 0–3 of the plugin platform so the breadboard ships as a showcase plugin rather than core-only code.
+
 ## Polish & Developer Experience
 
 - [x] **Alignment Tools**  
@@ -100,3 +140,35 @@
   - [ ] Plan multi-user VR leveraging realtime collaboration.
   - [ ] Connect VR rooms to gallery/template pipeline (`components/Browser/Browser.js:54`).
   - [ ] Expose WebXR session data to scripting (`components/GraphEditor/Scripting/ScriptPanel.js:1`).
+
+## Breadboard Roadmap
+
+- [ ] **Phase 1 – Discovery & Requirements**  
+      Capture personas/use-cases, map current nodes/handles to breadboard concepts, and record UX storyboards + requirements in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/feature_roadmap.md` for alignment.
+  - [ ] Define breadboard component catalog, rails/power semantics, and interaction goals.
+  - [ ] Audit existing validators/CRUD flows for compatibility with breadboard constraints and log deltas.
+  - [ ] Storyboard breadboard mode entry/exit, palettes, and simulation touchpoints in `components/GraphEditor/README.md`.
+
+- [ ] **Phase 2 – Data & Schema Layer**  
+      Extend node/group schema plus validation so footprints/pins/board metadata round-trip through GraphCRUD/history.
+  - [ ] Add `data.pins[]`, footprint dimensions, and board metadata to schema definitions (`components/NodeGraph/schema.js`, `types/logicSchema.js`).
+  - [ ] Teach `GraphCrud` and `validationGuards` to enforce pin counts, rail constraints, and placement rules; add unit tests in `tests/graphCrud.test.js`.
+  - [ ] Decide storage for breadboard-level state (board presets, import/export) and document API contracts.
+
+- [ ] **Phase 3 – Canvas & Interaction Layer**  
+      Build the board surface, snapping, and component footprints within the existing NodeGraph renderer.
+  - [ ] Implement `BreadboardLayer` for rails/sockets/grid visuals inside `components/NodeGraph/` with snap-to-hole drag helpers.
+  - [ ] Create breadboard-aware node components/footprints (e.g., resistors, ICs) and register via `components/GraphEditor/nodeTypeRegistry.js`.
+  - [ ] Update `handleDrop` and selection/drag handlers to respect socket occupancy and highlight valid targets (`components/NodeGraph/HandleLayer.js`, `components/GraphEditor/GraphEditor.js`). 
+
+- [ ] **Phase 4 – Simulation & Tooling**  
+      Provide inspection + simulation workflows leveraging ScriptNode/Background RPC.
+  - [ ] Define simulation API (voltage/logic updates, measurement events) and wire to `components/GraphEditor/components/BackgroundFrame.js` or ScriptNode.
+  - [ ] Add measurement tool nodes/panels (virtual multimeter, logic analyzer) and hook toolbar controls into board context.
+  - [ ] Document and implement safety checks (power toggles, shorts detection) surfaced via snackbar/dialog flows.
+
+- [ ] **Phase 5 – Testing, Docs, Rollout**  
+      Harden the experience and prepare public launch materials.
+  - [ ] Add integration tests for board creation, validation errors, and simulation results.
+  - [ ] Update `README.md`, `public/data/UserManual.md`, and onboarding docs with breadboard tutorials and warnings.
+  - [ ] Ship behind a feature flag or beta toggle, gather feedback, then graduate to default mode.
