@@ -5,6 +5,7 @@ This API is available globally at `window.graphAPI` and provides full CRUD opera
 ## Response Format
 
 All functions return an object with this structure:
+
 ```javascript
 {
   success: boolean,
@@ -18,6 +19,7 @@ All functions return an object with this structure:
 ## Node Operations
 
 ### Create Node
+
 ```javascript
 window.graphAPI.createNode({
   id: "optional-custom-id",  // Auto-generated if omitted
@@ -33,6 +35,7 @@ window.graphAPI.createNode({
 ```
 
 ### Read Node(s)
+
 ```javascript
 // Get all nodes
 window.graphAPI.readNode()
@@ -44,6 +47,7 @@ window.graphAPI.readNode("node-id")
 ```
 
 ### Update Node
+
 ```javascript
 window.graphAPI.updateNode("node-id", {
   label: "Updated Label",
@@ -54,6 +58,7 @@ window.graphAPI.updateNode("node-id", {
 ```
 
 ### Delete Node
+
 ```javascript
 window.graphAPI.deleteNode("node-id")
 // Returns: { success: true, data: { deletedNodeId: "...", affectedEdges: 2 } }
@@ -65,6 +70,7 @@ window.graphAPI.deleteNode("node-id")
 ## Edge Operations
 
 ### Create Edge
+
 ```javascript
 window.graphAPI.createEdge({
   id: "optional-custom-id",
@@ -83,9 +89,11 @@ window.graphAPI.createEdge({
 })
 // Returns: { success: true, data: <edge object> }
 ```
+
 > **Note:** Handles are required. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to determine the proper `sourceHandle` and `targetHandle` keys. Handle types must match (or be `trigger`).
 
 ### Read Edge(s)
+
 ```javascript
 // Get all edges
 window.graphAPI.readEdge()
@@ -97,6 +105,7 @@ window.graphAPI.readEdge("edge-id")
 ```
 
 ### Update Edge
+
 ```javascript
 window.graphAPI.updateEdge("edge-id", {
   type: "peer",
@@ -111,6 +120,7 @@ window.graphAPI.updateEdge("edge-id", {
 ```
 
 ### Delete Edge
+
 ```javascript
 window.graphAPI.deleteEdge("edge-id")
 // Returns: { success: true, data: { deletedEdgeId: "..." } }
@@ -121,6 +131,7 @@ window.graphAPI.deleteEdge("edge-id")
 ## Bulk Operations
 
 ### Create Multiple Nodes
+
 ```javascript
 window.graphAPI.createNodes([
   { label: "Node 1", position: { x: 100, y: 100 } },
@@ -131,6 +142,7 @@ window.graphAPI.createNodes([
 ```
 
 ### Create Multiple Edges
+
 ```javascript
 window.graphAPI.createEdges([
   { source: "node1", target: "node2", sourceHandle: "tick", targetHandle: "trigger" },
@@ -140,6 +152,7 @@ window.graphAPI.createEdges([
 ```
 
 ### Clear Entire Graph
+
 ```javascript
 window.graphAPI.clearGraph()
 // Returns: { success: true, data: { message: "Graph cleared" } }
@@ -150,6 +163,7 @@ window.graphAPI.clearGraph()
 ## Query Operations
 
 ### Find Nodes
+
 ```javascript
 // Find by type
 window.graphAPI.findNodes({ type: "default" })
@@ -172,6 +186,7 @@ window.graphAPI.findNodes({
 ```
 
 ### Find Edges
+
 ```javascript
 // Find by type
 window.graphAPI.findEdges({ type: "child" })
@@ -191,6 +206,7 @@ window.graphAPI.findEdges({
 ```
 
 ### Get Statistics
+
 ```javascript
 window.graphAPI.getStats()
 // Returns: {
@@ -211,6 +227,7 @@ window.graphAPI.getStats()
 ## Common Use Cases
 
 ### Create a Simple Graph
+
 ```javascript
 // Create nodes
 const n1 = window.graphAPI.createNode({ 
@@ -244,6 +261,7 @@ window.graphAPI.createEdge({
 ```
 
 ### Update All Nodes of a Type
+
 ```javascript
 const result = window.graphAPI.findNodes({ type: "default" });
 if (result.success) {
@@ -256,6 +274,7 @@ if (result.success) {
 ```
 
 ### Delete All Edges of a Type
+
 ```javascript
 const result = window.graphAPI.findEdges({ type: "peer" });
 if (result.success) {
@@ -266,6 +285,7 @@ if (result.success) {
 ```
 
 ### Create a Tree Structure
+
 ```javascript
 const root = window.graphAPI.createNode({
   label: "Root",

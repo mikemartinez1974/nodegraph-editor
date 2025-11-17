@@ -1,6 +1,6 @@
-# Copy/Paste w/ Me - Interactive Node Graph Editor
+# Twilight Node Browser
 
-A production-grade, AI-first visual graph editor built with React, Next.js, and Material-UI. Design, organize, and think visually by collaborating with AI assistants (ChatGPT, Claude, Grok, etc.) through a simple copy/paste workflow.
+A production-grade, AI-first visual graph editor/browser built with React, Next.js, and Material-UI. Design, organize, and think visually by collaborating with AI assistants (ChatGPT, Claude, Grok, etc.) through a simple copy/paste workflow.
 
 **Live Demo:** [cpwith.me](https://cpwith.me)
 
@@ -9,6 +9,7 @@ A production-grade, AI-first visual graph editor built with React, Next.js, and 
 ## What Makes This Different
 
 Instead of manually clicking and dragging to build graphs:
+
 1. **Describe** what you want to an AI assistant
 2. **AI generates** graph JSON for you
 3. **Paste** into the app (Ctrl+V)
@@ -21,6 +22,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ## Features
 
 ### Core Functionality
+
 - ✅ **AI-First Workflow**: Copy/paste JSON directly from AI assistants
 - ✅ **Drag & Drop**: Smooth 60fps node dragging with RAF batching
 - ✅ **Pan & Zoom**: Mouse wheel zoom, drag-to-pan, HiDPI canvas support
@@ -33,17 +35,20 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - ✅ **Accessibility**: ARIA labels, keyboard navigation (Tab, Ctrl+Arrows), focus management
 
 ### Modes
+
 - **Manual Mode**: Full editing control (default)
 - **Nav Mode**: Navigation-only with physics simulation for exploration
 - **Auto-Layout Mode**: Hierarchical, radial, or grid layouts (GSAP-powered)
 
 ### Panels & UI
+
 - **Properties Panel**: Edit labels, markdown memos, links, emoji picker, edge type, style, width, curvature, group membership, styling, visibility
 - **Node List**: Virtualized list with search and filtering (react-window)
 - **Group List**: Browse and manage all groups
 - **Draggable Toolbar**: Floating toolbar with all essential actions
 
 ### Keyboard Shortcuts
+
 - **Ctrl+C/X/V**: Copy, cut, paste nodes/edges
 - **Ctrl+Z/Y**: Undo, redo
 - **Ctrl+G**: Create group from selection
@@ -56,6 +61,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - **Ctrl+Shift+Arrows**: Move selected nodes (10px)
 
 ### Advanced Features
+
 - **GraphCRUD API**: Global JavaScript API for programmatic graph manipulation (`window.graphAPI`)
 - **Plain Text → Node**: Paste any text to auto-create a node
 - **Theme System**: 29 built-in themes with dark/light mode support
@@ -68,6 +74,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ## Architecture
 
 ### Layered Rendering
+
 - **EdgeLayer** (Canvas): High-performance bezier curve rendering with hit detection
 - **HandleLayer** (Canvas): Connection points with proximity-based activation
 - **NodeLayer** (React/DOM): Interactive node components with selection and hover
@@ -75,11 +82,13 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - **PanZoomLayer** (SVG): Unified viewport transform with marquee selection
 
 ### Event System
+
 - **Event Bus**: Decoupled cross-component communication (`eventBus.js`)
 - **Handle System**: Context-aware positioning with real-time drag updates (no React re-renders)
 - **Physics Simulation**: Force-directed layout in Nav Mode (attraction, repulsion, damping)
 
 ### State Management
+
 - **History**: Undo/redo with debounced batching
 - **Refs**: Transient state for 60fps drag performance
 - **LocalStorage**: Panel positions, theme preferences, background settings
@@ -134,7 +143,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
 
-```
+```text
 nodegraph-editor/
 ├── components/
 │   ├── Header/
@@ -202,6 +211,7 @@ window.graphAPI.createEdge({
 window.graphAPI.getStats();
 // { nodeCount: 10, edgeCount: 15, ... }
 ```
+
 > ℹ️ Edge creation now requires `sourceHandle`/`targetHandle` keys. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to pick the correct connection points.
 
 See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) for full API reference.
@@ -256,11 +266,16 @@ Requires JavaScript enabled. Canvas API and Clipboard API required for full func
 
 ## Documentation
 
-- **[User Manual](public/data/UserManual.md)**: Complete guide for end users
-- **[LLM Onboarding](public/data/OnboardLLM.md)**: Guide for AI assistants
-- **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)**: Programmatic API reference
-- **[NodeGraph README](components/NodeGraph/README.md)**: Component architecture
-- **[Copilot Instructions](.github/copilot-instructions.md)**: Development guidelines
+Use these docs as a launchpad when working with other assistants—the descriptions call out exactly what each file covers:
+
+| Doc | Purpose |
+| --- | --- |
+| **[User Manual](public/data/UserManual.md)** | End-user playbook for Twilight Node Browser (AI workflow, toolbar, shortcuts). |
+| **[LLM Onboarding](public/data/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
+| **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)** | Reference for `window.graphAPI` with create/update/delete/find examples. |
+| **[NodeGraph README](components/NodeGraph/README.md)** | Deep dive into the layered renderer (EdgeLayer, HandleLayer, PanZoomLayer). |
+| **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for handles, edges, and trigger/data flow. |
+| **[Copilot Instructions](.github/copilot-instructions.md)** | Contributor guidelines and expectations for AI/code reviewers. |
 
 ---
 
@@ -290,6 +305,7 @@ MIT License - see LICENSE file for details
 ## Acknowledgments
 
 Built with:
+
 - React & Next.js
 - Material-UI
 - GSAP Animation

@@ -21,9 +21,10 @@
 - **Display Nodes**: Show results (Markdown, Div, Svg, ThreeD).
 
 ### B. Handles/Ports
-- **Input Handles**: Accept data or triggers (left side).
-- **Output Handles**: Emit data or triggers (right side).
+- **Input Handles**: Accept data or triggers (left side by default).
+- **Output Handles**: Emit data or triggers (right side by default).
 - **Multiple Handles**: Nodes can have multiple inputs/outputs, each with a label and type (e.g., “Trigger”, “Value”, “Result”).
+- **Repositionable**: Handles can be reassigned to any node edge (left/top/right/bottom) to tidy up routing; edges always attach to the exact handle coordinates.
 
 ### C. Edges
 - **Connect output to input** (never output→output or input→input).

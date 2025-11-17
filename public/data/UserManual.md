@@ -1,12 +1,12 @@
-# Copy/Paste w/ Me – Supercharged User Manual
+# Twilight Node Browser – Supercharged User Manual
 
-Welcome to **Copy/Paste w/ Me**, your interactive graph editor that transforms AI prompts into beautiful, editable visual diagrams. Whether you're mapping systems, visualizing concepts, or just playing with ideas—this manual will help you unlock the app's full potential.
+Welcome to **Twilight Node Browser**, your interactive graph editor that transforms AI prompts into beautiful, editable visual diagrams. Whether you're mapping systems, visualizing concepts, or just playing with ideas—this manual will help you unlock the app's full potential.
 
 ---
 
 ## 🚀 What is This App?
 
-**Copy/Paste w/ Me** turns AI-generated JSON into interactive graphs. Describe an idea to your favorite AI (like ChatGPT), paste the response here, and voilà—a visual diagram you can edit, style, and expand.
+**Twilight Node Browser** turns AI-generated JSON into interactive graphs. Describe an idea to your favorite AI (like ChatGPT), paste the response here, and voilà—a visual diagram you can edit, style, and expand.
 
 ### ✨ Core Features
 
