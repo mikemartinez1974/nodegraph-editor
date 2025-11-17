@@ -69,6 +69,8 @@ import AddNodeMenu from './AddNodeMenu';
 import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import ExtensionIcon from '@mui/icons-material/Extension';
+import PluginManagerPanel from './PluginManagerPanel';
 
 // Import toolbar section components
 import FileActions from './Toolbar/FileActions';
@@ -137,6 +139,7 @@ const Toolbar = ({
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
+  const [pluginManagerOpen, setPluginManagerOpen] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -844,6 +847,15 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
+            onClick={() => setPluginManagerOpen(true)}
+            title="Plugin Manager"
+            aria-label="Open Plugin Manager"
+            size="small"
+          >
+            <ExtensionIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
             onClick={() => setPreferencesOpen(true)}
             title="Preferences"
             aria-label="Open Preferences"
@@ -960,6 +972,10 @@ const Toolbar = ({
         onClose={() => setPreferencesOpen(false)}
         backgroundUrl={backgroundUrl}
         setBackgroundUrl={setBackgroundUrl}
+      />
+      <PluginManagerPanel
+        open={pluginManagerOpen}
+        onClose={() => setPluginManagerOpen(false)}
       />
 
       <Snackbar

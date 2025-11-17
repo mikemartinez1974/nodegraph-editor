@@ -129,6 +129,12 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## Sample Plugin
+
+There is a reference plugin under `public/plugins/twilight-hello`. In development you can open the toolbar Plugin Manager (puzzle icon) and paste `http://localhost:3000/plugins/twilight-hello/manifest.json` to install it. The manifest shows the required metadata (id, version, bundle, nodes, permissions) and the bundle responds to the BackgroundFrame handshake so future runtime hooks can pull the custom node definition.
+
+---
+
 ## Technology Stack
 
 - **Framework**: Next.js 14 (React 18)

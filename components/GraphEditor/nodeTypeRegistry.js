@@ -16,9 +16,11 @@ import ScriptNode from './Nodes/ScriptNode';
 import ThreeDNode from './Nodes/ThreeDNode';
 import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
 import ValueTriggerNode from './Nodes/ValueTriggerNode';
+import PluginNodePlaceholder from './Nodes/PluginNodePlaceholder';
+import { getInstalledPlugins } from './plugins/pluginRegistry';
 
 // Registry structure: each entry has the component and display metadata
-const nodeTypeRegistry = {
+const baseNodeTypeRegistry = {
   default: {
     component: DefaultNode,
     label: 'Default Node',
@@ -169,17 +171,65 @@ export const nodeTypeMetadata = [
   // Add more node types here as needed
 ];
 
+// Plugin helpers
+const getPluginNodeEntries = () => {
+  const entries = {};
+  try {
+    const plugins = getInstalledPlugins() || [];
+    plugins
+      .filter(plugin => plugin && plugin.enabled !== false)
+      .forEach(plugin => {
+        (plugin.nodes || []).forEach(node => {
+          const key = `${plugin.id}:${node.type}`;
+          entries[key] = {
+            component: PluginNodePlaceholder,
+            label: node.label || node.type,
+            description: node.description || `Plugin node from ${plugin.name || plugin.id}`,
+            icon: node.icon || 'Extension',
+            category: node.category || 'plugin',
+            pluginId: plugin.id,
+            pluginNodeType: node.type,
+            pluginManifestUrl: plugin.manifestUrl,
+            defaultWidth: node.defaultWidth,
+            defaultHeight: node.defaultHeight
+          };
+        });
+      });
+  } catch (err) {
+    console.warn('[nodeTypeRegistry] Failed to read plugin registry', err);
+  }
+  return entries;
+};
+
+const buildRegistry = () => ({
+  ...baseNodeTypeRegistry,
+  ...getPluginNodeEntries()
+});
+
+const buildNodeTypeMetadataList = () => {
+  const pluginEntries = Object.entries(getPluginNodeEntries()).map(([type, meta]) => ({
+    type,
+    label: meta.label,
+    description: meta.description,
+    icon: meta.icon || 'Extension',
+    category: meta.category || 'plugin',
+    defaultWidth: meta.defaultWidth,
+    defaultHeight: meta.defaultHeight
+  }));
+  return [...nodeTypeMetadata, ...pluginEntries];
+};
+
 // Export helpers
 export function getNodeTypes() {
   const types = {};
-  Object.entries(nodeTypeRegistry).forEach(([key, { component }]) => {
+  Object.entries(buildRegistry()).forEach(([key, { component }]) => {
     types[key] = component;
   });
   return types;
 }
 
 export function getNodeTypeList() {
-  return Object.entries(nodeTypeRegistry).map(([key, meta]) => ({
+  return Object.entries(buildRegistry()).map(([key, meta]) => ({
     type: key,
     ...meta
   }));
@@ -187,7 +237,7 @@ export function getNodeTypeList() {
 
 export function getNodeTypesByCategory() {
   const byCategory = {};
-  Object.entries(nodeTypeRegistry).forEach(([key, meta]) => {
+  Object.entries(buildRegistry()).forEach(([key, meta]) => {
     const cat = meta.category || 'other';
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push({ type: key, ...meta });
@@ -196,8 +246,10 @@ export function getNodeTypesByCategory() {
 }
 
 export function getNodeTypeMetadata(type) {
-  return nodeTypeRegistry[type] || null;
+  const registry = buildRegistry();
+  return registry[type] || null;
 }
 
-export { nodeTypeMetadata };
-export default nodeTypeRegistry;
+export function getAllNodeTypeMetadata() {
+  return buildNodeTypeMetadataList();
+}

@@ -4,9 +4,11 @@ import { Menu, MenuItem, ListItemIcon, ListItemText, Divider, Typography } from 
 import * as Icons from '@mui/icons-material';
 import { getNodeTypesByCategory } from '../nodeTypeRegistry';
 import eventBus from '../../NodeGraph/eventBus';
+import usePluginRegistry from '../hooks/usePluginRegistry';
 
 const AddNodeMenu = ({ anchorEl, open, onClose }) => {
-  const nodesByCategory = getNodeTypesByCategory();
+  const { plugins } = usePluginRegistry();
+  const nodesByCategory = React.useMemo(() => getNodeTypesByCategory(), [plugins]);
   
   // Category display order and labels
   const categoryOrder = ['basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];

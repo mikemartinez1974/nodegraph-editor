@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useId } from 'react';
+import React, { useState, useEffect, useRef, useId, useMemo } from 'react';
 import {
   Paper, TextField, IconButton, Divider, FormControl, InputLabel, 
   Select, MenuItem, FormControlLabel, Switch, Slider, Typography, 
@@ -28,8 +28,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-import nodeTypeRegistry from '../nodeTypeRegistry'; // Adjust path as needed
+import { getNodeTypeList } from '../nodeTypeRegistry';
 import edgeTypesMap from '../edgeTypes'; // Correct import syntax
+import { subscribe as subscribeToPluginRegistry } from '../plugins/pluginRegistry';
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
@@ -178,6 +179,14 @@ export default function ConsolidatedPropertiesPanel({
   const [nodeSize, setNodeSize] = useState({ width: 200, height: 120 });
   const [nodeHandles, setNodeHandles] = useState([]);
   const [nodeStateFields, setNodeStateFields] = useState({ locked: false, collapsed: false, hidden: false });
+  const [nodeTypeOptions, setNodeTypeOptions] = useState(() => getNodeTypeList());
+  const nodeTypeMap = useMemo(() => {
+    const map = {};
+    nodeTypeOptions.forEach(entry => {
+      map[entry.type] = entry;
+    });
+    return map;
+  }, [nodeTypeOptions]);
   
   // Edge-specific states
   const [edgeType, setEdgeType] = useState('');
@@ -241,6 +250,17 @@ export default function ConsolidatedPropertiesPanel({
   const isLocked = entityType === 'node' ? lockedNodes.has(entityId) :
                    entityType === 'edge' ? lockedEdges.has(entityId) :
                    entityType === 'group' ? lockedGroups.has(entityId) : false;
+
+  useEffect(() => {
+    const unsubscribe = subscribeToPluginRegistry(() => {
+      setNodeTypeOptions(getNodeTypeList());
+    });
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setCurrentAnchor(anchor);
@@ -667,17 +687,17 @@ export default function ConsolidatedPropertiesPanel({
             <FormControl fullWidth size="small" disabled={isLocked} sx={{ mb: 2 }}>
               <InputLabel>Node Type</InputLabel>
               <Select
-                value={Object.keys(nodeTypeRegistry).includes(nodeType) ? nodeType : ''}
+                value={nodeTypeMap[nodeType] ? nodeType : ''}
                 onChange={(e) => {
                   setNodeType(e.target.value);
                   if (onUpdateNode) onUpdateNode(entityId, { type: e.target.value });
                 }}
                 label="Node Type"
               >
-                {Object.entries(nodeTypeRegistry).map(([key, meta]) => (
-                  <MenuItem key={key} value={key}>
-                    <Tooltip title={meta.description || ''}>
-                      <span>{meta.label || key}</span>
+                {nodeTypeOptions.map(({ type, label: optionLabel, description }) => (
+                  <MenuItem key={type} value={type}>
+                    <Tooltip title={description || ''}>
+                      <span>{optionLabel || type}</span>
                     </Tooltip>
                   </MenuItem>
                 ))}

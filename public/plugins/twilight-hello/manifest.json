@@ -1,0 +1,32 @@
+{
+  "id": "com.twilight.hello",
+  "version": "0.1.0",
+  "name": "Hello from the Twilight Zone",
+  "description": "Demo plugin that exposes a single node which shows a friendly greeting.",
+  "permissions": ["graph.read"],
+  "bundle": {
+    "url": "/plugins/twilight-hello/helloPlugin.js",
+    "sandbox": "iframe",
+    "integrity": ""
+  },
+  "nodes": [
+    {
+      "type": "twilight-hello",
+      "label": "Twilight Hello",
+      "description": "A plugin-backed node that emits a friendly greeting.",
+      "category": "demo",
+      "icon": "WavingHand",
+      "entry": "/plugins/twilight-hello/helloPlugin.js#TwilightHelloNode",
+      "defaultWidth": 220,
+      "defaultHeight": 160
+    }
+  ],
+  "panels": [],
+  "metadata": {
+    "homepage": "https://example.com/twilight",
+    "license": "MIT",
+    "author": {
+      "name": "Twilight Lab"
+    }
+  }
+}

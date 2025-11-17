@@ -56,10 +56,10 @@
   - [x] List supported extension points (node types, panels, RPC hooks) and out-of-scope areas.
   - [x] Capture security constraints (origin allowlist, sandbox type, capability-based APIs).
 
-- [ ] **Phase 1 – Manifest & Registry**  
+- [x] **Phase 1 – Manifest & Registry**  
       Ship a manifest schema and runtime registry that discovers, validates, and stores plugin metadata.
-  - [ ] Author JSON schema for plugin manifest (id, version, bundle URL, exposed nodes/panels, permissions).
-  - [ ] Add registry persistence + CRUD (install, update, disable) in `components/GraphEditor/nodeTypeRegistry.js`.
+  - [x] Author JSON schema for plugin manifest (id, version, bundle URL, exposed nodes/panels, permissions).
+  - [x] Add registry persistence + CRUD (install, update, disable) in `components/GraphEditor/nodeTypeRegistry.js`.
   - [ ] Build validation + signature checks before loading remote bundles.
 
 - [ ] **Phase 2 – Sandbox & Runtime Loader**  
