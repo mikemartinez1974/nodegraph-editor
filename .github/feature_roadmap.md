@@ -26,13 +26,35 @@
 - [ ] **Operational Dashboards**  
       Use graph stats to build health dashboards and alerts (`components/GraphEditor/GraphCrud.js:637`).
 
-## Plugin Platform Roadmap
+## [x] Core Schema Modernization
 
-- [ ] **Phase 0 – Discovery & Guardrails**  
+- [x] **Phase 1 – Specification**  
+      Lock down the expanded node/edge/group schema (handles, state flags, extensions) and update contracts in `components/NodeGraph/schema.js` + docs.
+  - [x] Document node handles/capabilities, state (locked, collapsed), plugin `extensions`, and group metadata.
+  - [x] Define global graph options (grid, snap, theme) and persist group/board structures.
+  - [x] Publish migration guidance in `components/GraphEditor/GraphAPIdocumentation.md`.
+
+- [x] **Phase 2 – Validation & CRUD**  
+      Teach `validationGuards`, `GraphCrud`, and serialization helpers about the new schema pieces.
+  - [x] Update `components/NodeGraph/validationGuards.js` to validate handles, extensions, and groups.
+  - [x] Extend `components/GraphEditor/GraphCrud.js` to read/write the new fields and keep history/export compatible.
+  - [ ] Add/adjust unit tests in `tests/graphCrud.test.js`.
+
+- [x] **Phase 3 – Consumer Updates**  
+      Align UI/components with the new schema.
+  - [x] Refresh `PropertiesPanel`, handlers, and node/edge components to expose new fields safely.
+  - [x] Update plugin onboarding (`.github/Requirements.md`, `GraphAPIdocumentation.md`) with schema expectations.
+  - [ ] Ensure breadboard/plugin efforts use only the documented extensions.
+
+> **Note:** This modernization unblocks the plugin platform and breadboard work by giving third parties a stable, extensible schema surface.
+
+## [ ] Plugin Platform Roadmap
+
+- [x] **Phase 0 – Discovery & Guardrails**  
       Document plugin goals (3rd-party nodes, breadboard demo), threat model, and API boundaries in `.github/Requirements.md` + `components/GraphEditor/GraphAPIdocumentation.md`.
-  - [ ] Define success metrics (external teams can author/render nodes without forking core).
-  - [ ] List supported extension points (node types, panels, RPC hooks) and out-of-scope areas.
-  - [ ] Capture security constraints (origin allowlist, sandbox type, capability-based APIs).
+  - [x] Define success metrics (external teams can author/render nodes without forking core).
+  - [x] List supported extension points (node types, panels, RPC hooks) and out-of-scope areas.
+  - [x] Capture security constraints (origin allowlist, sandbox type, capability-based APIs).
 
 - [ ] **Phase 1 – Manifest & Registry**  
       Ship a manifest schema and runtime registry that discovers, validates, and stores plugin metadata.
@@ -66,7 +88,7 @@
 
 > **Dependency:** Breadboard roadmap remains intact but is blocked on Phases 0–3 of the plugin platform so the breadboard ships as a showcase plugin rather than core-only code.
 
-## Polish & Developer Experience
+## [ ] Polish & Developer Experience
 
 - [x] **Alignment Tools**  
       Pair snap-to-grid with align/distribute actions (`components/GraphEditor/GraphEditor.js:516`, `components/GraphEditor/components/Toolbar.js:822`).
@@ -110,7 +132,7 @@
       - [ ] Implement `fitNodesToViewport` helper for mobile-first auto-framing on load (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/hooks/useGraphEditorSetup.js`).
       - [x] Update modal/dialog flows to use full-screen mobile variants (`components/GraphEditor/components/DocumentPropertiesDialog.js`, `components/Browser/ThemeDrawer.js`).
 
-## VR Integration TODO
+## [ ] VR Integration TODO
 
 - [ ] **Phase 0 – Baseline Cleanup**
   - [ ] Extract reusable Three.js helpers and lifecycle hooks (`components/GraphEditor/Nodes/ThreeDNode.js:2`).
@@ -141,7 +163,7 @@
   - [ ] Connect VR rooms to gallery/template pipeline (`components/Browser/Browser.js:54`).
   - [ ] Expose WebXR session data to scripting (`components/GraphEditor/Scripting/ScriptPanel.js:1`).
 
-## Breadboard Roadmap
+## [ ] Breadboard Roadmap
 
 - [ ] **Phase 1 – Discovery & Requirements**  
       Capture personas/use-cases, map current nodes/handles to breadboard concepts, and record UX storyboards + requirements in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/feature_roadmap.md` for alignment.

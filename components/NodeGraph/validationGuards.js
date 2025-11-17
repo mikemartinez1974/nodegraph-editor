@@ -211,6 +211,102 @@ export class ValidationGuard {
         }
       }
 
+      if (sanitized.handles !== undefined) {
+        if (!Array.isArray(sanitized.handles)) {
+          result.errors.push({
+            type: VALIDATION_ERRORS.INVALID_DATA,
+            message: 'Handles must be an array',
+            field: 'handles'
+          });
+        } else {
+          const handleIds = new Set();
+          sanitized.handles = sanitized.handles
+            .map((handle, index) => {
+              if (!handle) return null;
+              if (typeof handle === 'string') {
+                return {
+                  id: handle,
+                  label: handle,
+                  direction: 'output',
+                  dataType: 'value'
+                };
+              }
+              if (typeof handle !== 'object') return null;
+              const id = handle.id || handle.key || `handle-${index}`;
+              if (!id) return null;
+              if (handleIds.has(id)) {
+                result.errors.push({
+                  type: VALIDATION_ERRORS.DUPLICATE_ID,
+                  message: `Duplicate handle id '${id}'`,
+                  field: 'handles'
+                });
+                return null;
+              }
+              handleIds.add(id);
+              return {
+                id,
+                label: handle.label || id,
+                direction: handle.direction || (handle.type === 'input' ? 'input' : handle.type === 'output' ? 'output' : 'output'),
+                dataType: handle.dataType || handle.type || 'value',
+                allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
+                position: handle.position ? { ...handle.position } : undefined,
+                metadata: handle.metadata ? { ...handle.metadata } : undefined
+              };
+            })
+            .filter(Boolean);
+        }
+      }
+
+      const deriveLegacyHandles = (direction) => {
+        const source = Array.isArray(sanitized.handles) ? sanitized.handles : [];
+        return source
+          .filter(handle => {
+            const dir = handle.direction || 'output';
+            if (direction === 'input') {
+              return dir === 'input' || dir === 'bidirectional';
+            }
+            return dir === 'output' || dir === 'bidirectional' || !dir;
+          })
+          .map(handle => ({
+            key: handle.id,
+            label: handle.label || handle.id,
+            type: handle.dataType || 'value'
+          }));
+      };
+
+      if (!Array.isArray(sanitized.inputs) || sanitized.inputs.length === 0) {
+        const derivedInputs = deriveLegacyHandles('input');
+        if (derivedInputs.length > 0) {
+          sanitized.inputs = derivedInputs;
+        }
+      }
+      if (!Array.isArray(sanitized.outputs) || sanitized.outputs.length === 0) {
+        const derivedOutputs = deriveLegacyHandles('output');
+        if (derivedOutputs.length > 0) {
+          sanitized.outputs = derivedOutputs;
+        }
+      }
+
+      if (sanitized.state && typeof sanitized.state !== 'object') {
+        sanitized.state = undefined;
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Removed invalid node state (must be object)',
+          field: 'state',
+          autoFixed: true
+        });
+      }
+
+      if (sanitized.extensions && typeof sanitized.extensions !== 'object') {
+        sanitized.extensions = undefined;
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Removed invalid node extensions (must be object)',
+          field: 'extensions',
+          autoFixed: true
+        });
+      }
+
       result.sanitized = sanitized;
       result.isValid = result.errors.length === 0;
 
@@ -322,6 +418,24 @@ export class ValidationGuard {
             field: 'target'
           });
         }
+      }
+
+      if (sanitized.state && typeof sanitized.state !== 'object') {
+        sanitized.state = undefined;
+      }
+
+      if (sanitized.logic && typeof sanitized.logic !== 'object') {
+        sanitized.logic = undefined;
+      }
+
+      if (sanitized.routing && typeof sanitized.routing !== 'object') {
+        sanitized.routing = undefined;
+      } else if (sanitized.routing?.points && !Array.isArray(sanitized.routing.points)) {
+        sanitized.routing.points = undefined;
+      }
+
+      if (sanitized.extensions && typeof sanitized.extensions !== 'object') {
+        sanitized.extensions = undefined;
       }
 
       result.sanitized = sanitized;

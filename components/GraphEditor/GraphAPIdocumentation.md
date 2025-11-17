@@ -20,15 +20,29 @@ All functions return an object with this structure:
 
 ### Create Node
 
-```javascript
 window.graphAPI.createNode({
   id: "optional-custom-id",  // Auto-generated if omitted
-  type: "default",            // "default" | "display" | "list"
+  type: "default",            // Node type id
   label: "My Node",
   position: { x: 100, y: 100 },
+  width: 200,
+  height: 120,
+  handles: [ // Optional explicit handle definitions
+    { id: "out", direction: "output", dataType: "boolean" },
+    { id: "in", direction: "input", dataType: "boolean" }
+  ],
+  state: { locked: false, collapsed: false },
   data: {
     memo: "Some notes",
     link: "https://example.com"
+  },
+  style: {
+    backgroundColor: "#1e1e1e",
+    borderColor: "#333",
+    textColor: "#fff"
+  },
+  extensions: {
+    "example.plugin": { customField: true }
   }
 })
 // Returns: { success: true, data: <node object> }
@@ -52,7 +66,14 @@ window.graphAPI.readNode("node-id")
 window.graphAPI.updateNode("node-id", {
   label: "Updated Label",
   position: { x: 200, y: 300 },
-  data: { memo: "Updated memo" }
+  state: { locked: true },
+  handles: [
+    { id: "out", direction: "output", dataType: "number" }
+  ],
+  data: { memo: "Updated memo" },
+  extensions: {
+    "example.plugin": { customField: false }
+  }
 })
 // Returns: { success: true, data: <updated node> }
 ```
@@ -78,13 +99,24 @@ window.graphAPI.createEdge({
   target: "target-node-id",
   sourceHandle: "output-handle-key",
   targetHandle: "input-handle-key",
-  type: "child",              // "child" | "peer" | custom
+  type: "child",              // Edge type id
   label: "Edge Label",
+  state: { enabled: true, locked: false },
+  logic: {
+    condition: "payload > 0",
+    delayMs: 50
+  },
+  routing: {
+    points: [{ x: 100, y: 120 }]
+  },
   style: {
     width: 2,
     dash: [],                 // [5, 5] for dashed
     curved: true,
     color: "#1976d2"
+  },
+  extensions: {
+    "example.plugin": { channel: "A" }
   }
 })
 // Returns: { success: true, data: <edge object> }
@@ -114,6 +146,11 @@ window.graphAPI.updateEdge("edge-id", {
   style: {
     width: 4,
     curved: false
+  },
+  state: { enabled: false },
+  logic: { condition: "payload === true" },
+  extensions: {
+    "example.plugin": { channel: "B" }
   }
 })
 // Returns: { success: true, data: <updated edge> }
@@ -157,6 +194,19 @@ window.graphAPI.createEdges([
 window.graphAPI.clearGraph()
 // Returns: { success: true, data: { message: "Graph cleared" } }
 ```
+
+### Graph Structure & Metadata
+
+Graph exports now include:
+
+- `nodes`: each node may contain `handles`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
+- `edges`: edges contain `state`, `logic`, `routing`, `style`, and `extensions`.
+- `groups`: array of `{ id, label, nodeIds, bounds, style, collapsed, visible, extensions }`.
+- `options`: graph-level settings such as `gridSize`, `snapToGrid`, `theme`, and `validationMode`.
+- `metadata`: title/description/author/timestamps.
+- `extensions`: top-level plugin-specific data (namespaced).
+
+When importing/exporting graphs manually, preserve unknown `extensions` blocks so plugin data survives round-trips. Plugin authors should use reverse-DNS style keys (e.g., `"example.widgets.breadboard"`) within `extensions` objects to avoid collisions.
 
 ---
 

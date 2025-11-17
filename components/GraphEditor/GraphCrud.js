@@ -12,36 +12,148 @@ const hasContent = (value) => typeof value === 'string' && value.trim().length >
 
 const toLower = (value) => (value ?? '').toString().toLowerCase();
 
-const DEFAULT_INPUT_HANDLE = Object.freeze({ key: 'in', label: 'In', type: 'trigger' });
-const DEFAULT_OUTPUT_HANDLE = Object.freeze({ key: 'out', label: 'Out', type: 'trigger' });
+const DEFAULT_INPUT_HANDLE = Object.freeze({ key: 'in', label: 'In', type: 'trigger', direction: 'input' });
+const DEFAULT_OUTPUT_HANDLE = Object.freeze({ key: 'out', label: 'Out', type: 'trigger', direction: 'output' });
 
-const cloneHandleDescriptor = (handle) => ({
+const legacyHandleFromNormalized = (handle) => ({
+  key: handle.id,
+  label: handle.label || handle.id,
+  type: handle.dataType || handle.type || 'value'
+});
+
+const toHandleDescriptor = (handle, fallbackDirection, index = 0) => {
+  if (!handle) return null;
+  if (typeof handle === 'string') {
+    return { key: handle, label: handle, type: 'value', direction: fallbackDirection };
+  }
+  if (typeof handle !== 'object') return null;
+  const key = handle.key || handle.id || handle.name || `handle-${index}`;
+  if (!key) return null;
+  return {
+    key,
+    label: handle.label || handle.name || key,
+    type: handle.type || handle.dataType || 'value',
+    direction: handle.direction || fallbackDirection || 'output',
+    allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined
+  };
+};
+
+const extractHandlesFromUnified = (node, targetDirection) => {
+  if (!node || !Array.isArray(node.handles) || node.handles.length === 0) return [];
+  const allowed = targetDirection === 'outputs'
+    ? ['output', 'bidirectional', undefined]
+    : ['input', 'bidirectional', undefined];
+  return node.handles
+    .map((handle, index) => {
+      const descriptor = toHandleDescriptor(handle, targetDirection === 'outputs' ? 'output' : 'input', index);
+      if (!descriptor) return null;
+      if (!allowed.includes(descriptor.direction)) return null;
+      return descriptor;
+    })
+    .filter(Boolean);
+};
+
+const cloneHandleDescriptor = (handle, directionOverride) => ({
   key: handle.key,
   label: handle.label || handle.key,
-  type: handle.type || handle.dataType || 'value'
+  type: handle.type || handle.dataType || 'value',
+  direction: directionOverride || handle.direction || 'output',
+  allowedEdgeTypes: handle.allowedEdgeTypes ? [...handle.allowedEdgeTypes] : undefined
 });
 
 const getHandleList = (node, field, fallback) => {
   if (!node) return [cloneHandleDescriptor(fallback)];
+  const unified = extractHandlesFromUnified(node, field);
+  if (unified.length > 0) {
+    return unified.map(handle => cloneHandleDescriptor(handle));
+  }
   const handles = Array.isArray(node[field]) ? node[field].filter(Boolean) : [];
   if (handles.length === 0) {
     return [cloneHandleDescriptor(fallback)];
   }
   return handles
-    .map((handle, index) => {
-      if (typeof handle === 'string') {
-        return { key: handle, label: handle, type: 'value' };
-      }
-      if (typeof handle !== 'object') return null;
-      const key = handle.key || handle.id || handle.name || `handle-${index}`;
-      if (!key) return null;
-      return {
-        key,
-        label: handle.label || handle.name || key,
-        type: handle.type || handle.dataType || 'value'
-      };
-    })
+    .map((handle, index) => toHandleDescriptor(handle, field === 'outputs' ? 'output' : 'input', index))
     .filter(Boolean);
+};
+
+const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
+  const normalizedInputs = Array.isArray(inputs) ? inputs.map(handle => ({ ...handle })) : [];
+  const normalizedOutputs = Array.isArray(outputs) ? outputs.map(handle => ({ ...handle })) : [];
+
+  if (Array.isArray(handles) && handles.length > 0) {
+    const normalizedHandles = handles
+      .map((handle, index) => {
+        if (!handle) return null;
+        const id = handle.id || handle.key || handle.name || `handle-${index}`;
+        if (!id) return null;
+        const direction = handle.direction
+          ? handle.direction
+          : handle.handleDirection
+          ? handle.handleDirection
+          : handle.type === 'input'
+          ? 'input'
+          : handle.type === 'output'
+          ? 'output'
+          : 'output';
+        return {
+          id,
+          label: handle.label || handle.name || id,
+          direction,
+          dataType: handle.dataType || handle.handleType || handle.type || 'value',
+          allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
+          position: handle.position ? { ...handle.position } : undefined,
+          metadata: handle.metadata ? { ...handle.metadata } : undefined
+        };
+      })
+      .filter(Boolean);
+    const derivedInputs =
+      normalizedInputs.length > 0
+        ? normalizedInputs
+        : normalizedHandles
+            .filter(h => h.direction === 'input' || h.direction === 'bidirectional')
+            .map(legacyHandleFromNormalized);
+    const derivedOutputs =
+      normalizedOutputs.length > 0
+        ? normalizedOutputs
+        : normalizedHandles
+            .filter(h => h.direction === 'output' || h.direction === 'bidirectional' || !h.direction)
+            .map(legacyHandleFromNormalized);
+    return {
+      handles: normalizedHandles,
+      inputs: derivedInputs,
+      outputs: derivedOutputs
+    };
+  }
+
+  const derivedHandles = [];
+  normalizedInputs.forEach((handle, index) => {
+    const descriptor = toHandleDescriptor(handle, 'input', index);
+    if (descriptor) {
+      derivedHandles.push({
+        id: descriptor.key,
+        label: descriptor.label,
+        direction: 'input',
+        dataType: descriptor.type
+      });
+    }
+  });
+  normalizedOutputs.forEach((handle, index) => {
+    const descriptor = toHandleDescriptor(handle, 'output', index);
+    if (descriptor) {
+      derivedHandles.push({
+        id: descriptor.key,
+        label: descriptor.label,
+        direction: 'output',
+        dataType: descriptor.type
+      });
+    }
+  });
+
+  return {
+    handles: derivedHandles,
+    inputs: normalizedInputs,
+    outputs: normalizedOutputs
+  };
 };
 
 const normalizeEndpoint = (endpoint, explicitHandleKey) => {
@@ -167,7 +279,11 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
       curved: style.curved !== undefined ? style.curved : true,
       color: style.color
     },
-    handleMeta: handleValidation.meta
+    handleMeta: handleValidation.meta,
+    state: edgeInput.state ? { ...edgeInput.state } : undefined,
+    logic: edgeInput.logic ? { ...edgeInput.logic } : undefined,
+    routing: edgeInput.routing ? { ...edgeInput.routing } : undefined,
+    extensions: edgeInput.extensions ? { ...edgeInput.extensions } : undefined
   };
 
   return { edge: sanitizedEdge };
@@ -217,7 +333,12 @@ export default class GraphCRUD {
     width,
     height,
     inputs,
-    outputs
+    outputs,
+    handles,
+    state,
+    style,
+    visible = true,
+    extensions
   } = {}) {
     try {
       const currentNodes = this.getNodes();
@@ -225,6 +346,11 @@ export default class GraphCRUD {
       do {
         nodeId = id || this._generateId();
       } while (currentNodes.some(n => n.id === nodeId));
+
+      const normalizedHandles = normalizeHandleDefinitions({ handles, inputs, outputs });
+      const sanitizedState = state ? { ...state } : undefined;
+      const sanitizedStyle = style ? { ...style } : undefined;
+      const sanitizedExtensions = extensions ? { ...extensions } : undefined;
       const newNode = {
         id: nodeId,
         type,
@@ -236,8 +362,13 @@ export default class GraphCRUD {
           memo: data.memo || '',
           link: data.link || ''
         },
-        inputs: Array.isArray(inputs) ? inputs.map(handle => ({ ...handle })) : [],
-        outputs: Array.isArray(outputs) ? outputs.map(handle => ({ ...handle })) : [],
+        inputs: normalizedHandles.inputs,
+        outputs: normalizedHandles.outputs,
+        handles: normalizedHandles.handles,
+        visible,
+        state: sanitizedState,
+        style: sanitizedStyle,
+        extensions: sanitizedExtensions,
         resizable: true,
         handlePosition: 'center',
         showLabel: true
@@ -290,11 +421,37 @@ export default class GraphCRUD {
 
       const updatedNodes = currentNodes.map(node => {
         if (node.id === id) {
+          const nextInputs = updates.inputs
+            ? updates.inputs.map(handle => ({ ...handle }))
+            : node.inputs;
+          const nextOutputs = updates.outputs
+            ? updates.outputs.map(handle => ({ ...handle }))
+            : node.outputs;
+          let nextHandles = node.handles;
+          if (updates.handles) {
+            nextHandles = normalizeHandleDefinitions({
+              handles: updates.handles,
+              inputs: nextInputs,
+              outputs: nextOutputs
+            }).handles;
+          } else if (updates.inputs || updates.outputs) {
+            nextHandles = normalizeHandleDefinitions({
+              handles: node.handles,
+              inputs: nextInputs,
+              outputs: nextOutputs
+            }).handles;
+          }
           return {
             ...node,
             ...updates,
+            inputs: nextInputs,
+            outputs: nextOutputs,
+            handles: nextHandles,
             data: updates.data ? { ...node.data, ...updates.data } : node.data,
-            position: updates.position ? { ...node.position, ...updates.position } : node.position
+            position: updates.position ? { ...node.position, ...updates.position } : node.position,
+            state: updates.state ? { ...node.state, ...updates.state } : node.state,
+            style: updates.style ? { ...node.style, ...updates.style } : node.style,
+            extensions: updates.extensions ? { ...node.extensions, ...updates.extensions } : node.extensions
           };
         }
         return node;
@@ -431,7 +588,11 @@ export default class GraphCRUD {
       const mergedEdge = {
         ...existingEdge,
         ...updates,
-        style: updates.style ? { ...existingEdge.style, ...updates.style } : existingEdge.style
+        style: updates.style ? { ...existingEdge.style, ...updates.style } : existingEdge.style,
+        state: updates.state ? { ...existingEdge.state, ...updates.state } : existingEdge.state,
+        logic: updates.logic ? { ...existingEdge.logic, ...updates.logic } : existingEdge.logic,
+        routing: updates.routing ? { ...existingEdge.routing, ...updates.routing } : existingEdge.routing,
+        extensions: updates.extensions ? { ...existingEdge.extensions, ...updates.extensions } : existingEdge.extensions
       };
       if (updates.data) {
         mergedEdge.data = { ...existingEdge.data, ...updates.data };
@@ -515,6 +676,12 @@ export default class GraphCRUD {
             nodeId = opts.id || this._generateId();
           } while (currentNodes.some(n => n.id === nodeId) || createdNodes.some(n => n.id === nodeId));
 
+          const normalizedHandles = normalizeHandleDefinitions({
+            handles: opts.handles,
+            inputs: opts.inputs,
+            outputs: opts.outputs
+          });
+
           const newNode = {
             id: nodeId,
             type: opts.type || 'default',
@@ -523,6 +690,7 @@ export default class GraphCRUD {
             width: opts.width !== undefined ? opts.width : 160,
             height: opts.height !== undefined ? opts.height : 80,
             color: opts.color,
+            visible: opts.visible !== undefined ? opts.visible : true,
             data: {
               memo: opts.data?.memo || '',
               link: opts.data?.link || '',
@@ -530,6 +698,12 @@ export default class GraphCRUD {
               svg: opts.data?.svg || '',
               ...opts.data
             },
+            inputs: normalizedHandles.inputs,
+            outputs: normalizedHandles.outputs,
+            handles: normalizedHandles.handles,
+            state: opts.state ? { ...opts.state } : undefined,
+            style: opts.style ? { ...opts.style } : undefined,
+            extensions: opts.extensions ? { ...opts.extensions } : undefined,
             resizable: opts.resizable !== undefined ? opts.resizable : true,
             handlePosition: opts.handlePosition || 'center',
             showLabel: opts.showLabel !== undefined ? opts.showLabel : true

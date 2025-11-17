@@ -631,9 +631,12 @@ const Toolbar = ({
 
   const handleCopyGraph = () => {
     const graphData = {
-      nodes: nodes,
-      edges: edges,
-      groups: groups || []
+      nodes,
+      edges,
+      groups: groups || [],
+      options: documentSettings || {},
+      metadata: {},
+      extensions: {}
     };
     
     const jsonString = JSON.stringify(graphData, null, 2);

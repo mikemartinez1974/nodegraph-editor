@@ -33,7 +33,7 @@ export function createGraphEditorHandlers({
   
   const { saveToHistory } = historyHook;
   
-  const normalizeEdgeSchema = (edge) => {
+  const normalizeEdgeSchema = (edge, defaultDirection = 'output') => {
     if (!edge || typeof edge !== 'object') return edge;
     const normalized = { ...edge };
     if (normalized.source && typeof normalized.source === 'object') {
@@ -46,7 +46,74 @@ export function createGraphEditorHandlers({
       normalized.targetHandle = normalized.targetHandle || targetObj.handleKey;
       normalized.target = targetObj.nodeId ?? targetObj.id ?? normalized.target;
     }
+    normalized.state = normalized.state && typeof normalized.state === 'object' ? { ...normalized.state } : undefined;
+    normalized.logic = normalized.logic && typeof normalized.logic === 'object' ? { ...normalized.logic } : undefined;
+    normalized.routing = normalized.routing && typeof normalized.routing === 'object' ? { ...normalized.routing } : undefined;
+    normalized.extensions = normalized.extensions && typeof normalized.extensions === 'object' ? { ...normalized.extensions } : undefined;
     return normalized;
+  };
+
+  const ensureUnifiedHandles = (node) => {
+    if (!node || typeof node !== 'object') return node;
+    const hydrateHandlesFromLegacy = () => {
+      const unified = [];
+      if (Array.isArray(node.inputs)) {
+        node.inputs.forEach((handle, index) => {
+          if (!handle) return;
+          const id = handle.id || handle.key || handle.name || `input-${index}`;
+          unified.push({
+            id,
+            label: handle.label || id,
+            direction: 'input',
+            dataType: handle.dataType || handle.type || 'value'
+          });
+        });
+      }
+      if (Array.isArray(node.outputs)) {
+        node.outputs.forEach((handle, index) => {
+          if (!handle) return;
+          const id = handle.id || handle.key || handle.name || `output-${index}`;
+          unified.push({
+            id,
+            label: handle.label || id,
+            direction: 'output',
+            dataType: handle.dataType || handle.type || 'value'
+          });
+        });
+      }
+      return unified;
+    };
+
+    const handles =
+      Array.isArray(node.handles) && node.handles.length > 0
+        ? node.handles
+        : hydrateHandlesFromLegacy();
+
+    const normalizedHandles = handles.map((handle, index) => {
+      if (!handle) return null;
+      const id = handle.id || handle.key || handle.name || `handle-${index}`;
+      if (!id) return null;
+      return {
+        id,
+        label: handle.label || id,
+        direction:
+          handle.direction ||
+          (handle.type === 'input' ? 'input' : handle.type === 'output' ? 'output' : 'output'),
+        dataType: handle.dataType || handle.type || 'value',
+        allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
+        position: handle.position ? { ...handle.position } : undefined,
+        metadata: handle.metadata ? { ...handle.metadata } : undefined
+      };
+    }).filter(Boolean);
+
+    return {
+      ...node,
+      handles: normalizedHandles,
+      state: node.state && typeof node.state === 'object' ? { ...node.state } : undefined,
+      extensions: node.extensions && typeof node.extensions === 'object' ? { ...node.extensions } : undefined,
+      style: node.style && typeof node.style === 'object' ? { ...node.style } : undefined,
+      data: node.data && typeof node.data === 'object' ? { ...node.data } : {}
+    };
   };
   
   // ===== NODE HANDLERS =====
@@ -410,14 +477,20 @@ export function createGraphEditorHandlers({
       const sanitizeGroups = (groupsArray, availableNodeIdSet) => {
         return groupsArray.map(g => {
           const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => availableNodeIdSet.has(id)) : [];
-          return { ...g, nodeIds };
+          return {
+            ...g,
+            nodeIds,
+            bounds: g.bounds && typeof g.bounds === 'object' ? { ...g.bounds } : { x: 0, y: 0, width: 0, height: 0 },
+            style: g.style && typeof g.style === 'object' ? { ...g.style } : {},
+            extensions: g.extensions && typeof g.extensions === 'object' ? { ...g.extensions } : undefined
+          };
         }).filter(g => g.nodeIds?.length >= 2);
       };
 
       const nodeValidation = validateNodes(pastedNodes);
       const edgeValidation = validateEdges(pastedEdges);
       const groupValidation = validateGroups(pastedGroups);
-      pastedNodes = nodeValidation.valid;
+      pastedNodes = nodeValidation.valid.map(ensureUnifiedHandles);
       pastedEdges = edgeValidation.valid.map(normalizeEdgeSchema);
       pastedGroups = groupValidation.valid;
       const validationErrors = [...nodeValidation.errors, ...edgeValidation.errors, ...groupValidation.errors];

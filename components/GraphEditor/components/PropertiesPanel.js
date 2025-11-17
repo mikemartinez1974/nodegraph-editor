@@ -5,7 +5,7 @@ import {
   Select, MenuItem, FormControlLabel, Switch, Slider, Typography, 
   Box, ToggleButton, ToggleButtonGroup, Accordion, AccordionSummary,
   AccordionDetails, List, ListItem, ListItemText, ListItemSecondaryAction,
-  Button, Tooltip, Chip
+  Button, Tooltip, Chip, Stack
 } from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import {
@@ -77,6 +77,58 @@ const buildUpdatesFromDiff = (original = {}, updated = {}) => {
   }, {});
 };
 
+const deriveHandlesFromNode = (node, kind) => {
+  if (!node) return [];
+  if (Array.isArray(node.handles) && node.handles.length > 0) {
+    return node.handles
+      .filter(Boolean)
+      .filter(handle => {
+        const direction = handle.direction || (handle.type === 'input' ? 'input' : 'output');
+        if (kind === 'inputs') {
+          return direction === 'input' || direction === 'bidirectional';
+        }
+        return direction === 'output' || direction === 'bidirectional' || !direction;
+      })
+      .map(handle => ({
+        id: handle.id || handle.key || handle.name || `${kind === 'inputs' ? 'in' : 'out'}-0`,
+        label: handle.label || handle.id || handle.key || '',
+        direction: handle.direction || (kind === 'inputs' ? 'input' : 'output'),
+        dataType: handle.dataType || handle.type || 'value',
+        allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
+        position: handle.position ? { ...handle.position } : undefined,
+        metadata: handle.metadata ? { ...handle.metadata } : undefined
+      }));
+  }
+
+  const legacyList = Array.isArray(node[kind]) ? node[kind] : [];
+  return legacyList.map((handle, index) => {
+    if (!handle) return null;
+    if (typeof handle === 'string') {
+      return {
+        id: handle,
+        label: handle,
+        direction: kind === 'inputs' ? 'input' : 'output',
+        dataType: 'value'
+      };
+    }
+    if (typeof handle !== 'object') return null;
+    const id = handle.id || handle.key || `${kind === 'inputs' ? 'in' : 'out'}-${index}`;
+    return {
+      id,
+      label: handle.label || id,
+      direction: kind === 'inputs' ? 'input' : 'output',
+      dataType: handle.dataType || handle.type || 'value'
+    };
+  }).filter(Boolean);
+};
+
+const DEFAULT_HANDLE = (direction = 'output') => ({
+  id: `handle_${Date.now()}`,
+  label: direction === 'input' ? 'Input' : 'Output',
+  direction,
+  dataType: 'value'
+});
+
 export default function ConsolidatedPropertiesPanel({ 
   selectedNode,
   selectedEdge,
@@ -124,6 +176,8 @@ export default function ConsolidatedPropertiesPanel({
   const [nodeType, setNodeType] = useState('');
   const [nodePosition, setNodePosition] = useState({ x: 0, y: 0 });
   const [nodeSize, setNodeSize] = useState({ width: 200, height: 120 });
+  const [nodeHandles, setNodeHandles] = useState([]);
+  const [nodeStateFields, setNodeStateFields] = useState({ locked: false, collapsed: false, hidden: false });
   
   // Edge-specific states
   const [edgeType, setEdgeType] = useState('');
@@ -141,6 +195,13 @@ export default function ConsolidatedPropertiesPanel({
   const [gradientStart, setGradientStart] = useState('#2196f3');
   const [gradientEnd, setGradientEnd] = useState('#03a9f4');
   const [curveDirection, setCurveDirection] = useState('auto');
+  const [edgeStateFields, setEdgeStateFields] = useState({ enabled: true, locked: false });
+  const [edgeLogicFields, setEdgeLogicFields] = useState({
+    condition: '',
+    transform: '',
+    delayMs: '',
+    throttleMs: ''
+  });
   
   // Group-specific states
   const [backgroundColor, setBackgroundColor] = useState('rgba(25, 118, 210, 0.1)');
@@ -243,6 +304,18 @@ export default function ConsolidatedPropertiesPanel({
       setNodeType(selectedNode.type || 'default');
       setNodePosition(selectedNode.position || { x: 0, y: 0 });
       setNodeSize({ width: selectedNode.width || 200, height: selectedNode.height || 120 });
+      const derivedInputHandles = deriveHandlesFromNode(selectedNode, 'inputs');
+      const derivedOutputHandles = deriveHandlesFromNode(selectedNode, 'outputs');
+      const unifiedHandles =
+        Array.isArray(selectedNode.handles) && selectedNode.handles.length > 0
+          ? selectedNode.handles
+          : [...derivedInputHandles, ...derivedOutputHandles];
+      setNodeHandles(unifiedHandles);
+      setNodeStateFields({
+        locked: selectedNode.state?.locked ?? false,
+        collapsed: selectedNode.state?.collapsed ?? false,
+        hidden: selectedNode.state?.hidden ?? false
+      });
     } else if (selectedEdge) {
       const edge = selectedEdge;
       const typeDef = edgeTypes[edge.type] || {};
@@ -273,14 +346,29 @@ export default function ConsolidatedPropertiesPanel({
         setGradientStart(hasGradient.start || '#2196f3');
         setGradientEnd(hasGradient.end || '#03a9f4');
       }
+      setEdgeStateFields({
+        enabled: edge.state?.enabled !== false,
+        locked: !!edge.state?.locked
+      });
+      setEdgeLogicFields({
+        condition: edge.logic?.condition || '',
+        transform: edge.logic?.transform || '',
+        delayMs: typeof edge.logic?.delayMs === 'number' ? String(edge.logic.delayMs) : '',
+        throttleMs: typeof edge.logic?.throttleMs === 'number' ? String(edge.logic.throttleMs) : ''
+      });
     } else if (selectedGroup) {
       setLabel(selectedGroup.label || '');
       setBackgroundColor(selectedGroup.style?.backgroundColor || 'rgba(25, 118, 210, 0.1)');
       setBorderColor(selectedGroup.style?.borderColor || '#1976d2');
       setBorderWidth(selectedGroup.style?.borderWidth || 2);
       setVisible(selectedGroup.visible !== false);
+    } else {
+      setNodeHandles([]);
+      setNodeStateFields({ locked: false, collapsed: false, hidden: false });
+      setEdgeStateFields({ enabled: true, locked: false });
+      setEdgeLogicFields({ condition: '', transform: '', delayMs: '', throttleMs: '' });
     }
-  }, [entityId, defaultNodeColor, defaultEdgeColor]);
+  }, [entityId, defaultNodeColor, defaultEdgeColor, selectedNode, selectedEdge, selectedGroup]);
 
   useEffect(() => {
     if (selectedNode) {
@@ -343,6 +431,42 @@ export default function ConsolidatedPropertiesPanel({
     onUpdateEdge(entityId, {
       style: { ...currentStyle, ...updates }
     });
+  };
+
+  const handleHandlesChange = (nextHandles) => {
+    setNodeHandles(nextHandles);
+    if (onUpdateNode) {
+      onUpdateNode(entityId, { handles: nextHandles });
+    }
+  };
+
+  const handleNodeStateChange = (field, value) => {
+    const next = { ...nodeStateFields, [field]: value };
+    setNodeStateFields(next);
+    if (onUpdateNode) {
+      onUpdateNode(entityId, { state: next });
+    }
+  };
+
+  const handleEdgeStateChange = (field, value) => {
+    const next = { ...edgeStateFields, [field]: value };
+    setEdgeStateFields(next);
+    if (onUpdateEdge) {
+      onUpdateEdge(entityId, { state: next });
+    }
+  };
+
+  const handleEdgeLogicChange = (field, value) => {
+    const next = { ...edgeLogicFields, [field]: value };
+    setEdgeLogicFields(next);
+    if (onUpdateEdge) {
+      const transformed = {
+        ...next,
+        delayMs: next.delayMs === '' ? undefined : Number(next.delayMs) || 0,
+        throttleMs: next.throttleMs === '' ? undefined : Number(next.throttleMs) || 0
+      };
+      onUpdateEdge(entityId, { logic: transformed });
+    }
   };
 
   const handleApplyNodeJson = () => {
@@ -821,6 +945,154 @@ export default function ConsolidatedPropertiesPanel({
               </AccordionDetails>
             </Accordion>
 
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">Handles</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={1.5}>
+                  {nodeHandles.length === 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                      No handles defined for this node.
+                    </Typography>
+                  )}
+                  {nodeHandles.map((handle, index) => (
+                    <Box
+                      key={handle.id || index}
+                      sx={{
+                        border: `1px solid ${theme?.palette?.divider}`,
+                        borderRadius: 1,
+                        p: 1.5
+                      }}
+                    >
+                      <Stack spacing={1}>
+                        <TextField
+                          label="ID"
+                          size="small"
+                          value={handle.id}
+                          disabled={isLocked}
+                          onChange={(e) => {
+                            const next = [...nodeHandles];
+                            next[index] = { ...next[index], id: e.target.value };
+                            handleHandlesChange(next);
+                          }}
+                        />
+                        <TextField
+                          label="Label"
+                          size="small"
+                          value={handle.label || ''}
+                          disabled={isLocked}
+                          onChange={(e) => {
+                            const next = [...nodeHandles];
+                            next[index] = { ...next[index], label: e.target.value };
+                            handleHandlesChange(next);
+                          }}
+                        />
+                        <FormControl fullWidth size="small" disabled={isLocked}>
+                          <InputLabel>Direction</InputLabel>
+                          <Select
+                            label="Direction"
+                            value={handle.direction || 'output'}
+                            onChange={(e) => {
+                              const next = [...nodeHandles];
+                              next[index] = { ...next[index], direction: e.target.value };
+                              handleHandlesChange(next);
+                            }}
+                          >
+                            <MenuItem value="input">Input</MenuItem>
+                            <MenuItem value="output">Output</MenuItem>
+                            <MenuItem value="bidirectional">Bidirectional</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          label="Data Type"
+                          size="small"
+                          value={handle.dataType || ''}
+                          disabled={isLocked}
+                          onChange={(e) => {
+                            const next = [...nodeHandles];
+                            next[index] = { ...next[index], dataType: e.target.value };
+                            handleHandlesChange(next);
+                          }}
+                        />
+                        <Stack direction="row" spacing={1}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              const next = nodeHandles.filter((_, i) => i !== index);
+                              handleHandlesChange(next);
+                            }}
+                            disabled={isLocked}
+                          >
+                            Remove
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  ))}
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<AddIcon />}
+                      disabled={isLocked}
+                      onClick={() => handleHandlesChange([...nodeHandles, DEFAULT_HANDLE('input')])}
+                    >
+                      Add Input
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<AddIcon />}
+                      disabled={isLocked}
+                      onClick={() => handleHandlesChange([...nodeHandles, DEFAULT_HANDLE('output')])}
+                    >
+                      Add Output
+                    </Button>
+                  </Stack>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">State</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={nodeStateFields.locked}
+                      disabled={isLocked}
+                      onChange={(e) => handleNodeStateChange('locked', e.target.checked)}
+                    />
+                  }
+                  label="Locked"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={nodeStateFields.collapsed}
+                      disabled={isLocked}
+                      onChange={(e) => handleNodeStateChange('collapsed', e.target.checked)}
+                    />
+                  }
+                  label="Collapsed"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={nodeStateFields.hidden}
+                      disabled={isLocked}
+                      onChange={(e) => handleNodeStateChange('hidden', e.target.checked)}
+                    />
+                  }
+                  label="Hidden"
+                />
+              </AccordionDetails>
+            </Accordion>
+
 
           </>
         )}
@@ -1122,6 +1394,71 @@ export default function ConsolidatedPropertiesPanel({
                 </Button>
               </AccordionDetails>
             </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">State & Logic</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={edgeStateFields.enabled}
+                      onChange={(e) => handleEdgeStateChange('enabled', e.target.checked)}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Enabled"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={edgeStateFields.locked}
+                      onChange={(e) => handleEdgeStateChange('locked', e.target.checked)}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Locked"
+                />
+                <TextField
+                  label="Condition"
+                  value={edgeLogicFields.condition}
+                  onChange={(e) => handleEdgeLogicChange('condition', e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={{ mt: 2 }}
+                  disabled={isLocked}
+                />
+                <TextField
+                  label="Transform"
+                  value={edgeLogicFields.transform}
+                  onChange={(e) => handleEdgeLogicChange('transform', e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={{ mt: 2 }}
+                  helperText="Expression executed when edge fires"
+                  disabled={isLocked}
+                />
+                <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                  <TextField
+                    label="Delay (ms)"
+                    type="number"
+                    value={edgeLogicFields.delayMs}
+                    onChange={(e) => handleEdgeLogicChange('delayMs', e.target.value)}
+                    size="small"
+                    disabled={isLocked}
+                  />
+                  <TextField
+                    label="Throttle (ms)"
+                    type="number"
+                    value={edgeLogicFields.throttleMs}
+                    onChange={(e) => handleEdgeLogicChange('throttleMs', e.target.value)}
+                    size="small"
+                    disabled={isLocked}
+                  />
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
           </>
         )}
 
@@ -1200,6 +1537,18 @@ export default function ConsolidatedPropertiesPanel({
                     />
                   }
                   label="Visible"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={selectedGroup.collapsed === true}
+                      onChange={(e) => {
+                        scheduleGroupUpdate({ collapsed: e.target.checked });
+                      }}
+                      disabled={isLocked}
+                    />
+                  }
+                  label="Collapsed"
                 />
               </AccordionDetails>
             </Accordion>
