@@ -144,7 +144,11 @@ export function createGraphEditorHandlers({
               id: meta.pluginId,
               nodeType: meta.pluginNodeType,
               manifestUrl: meta.pluginManifestUrl,
-              entry: meta.entry || meta.runtimeDefinition?.entry || undefined
+              entry: meta.entry || meta.runtimeDefinition?.entry || undefined,
+              rendererEntry:
+                meta.rendererEntry ||
+                meta.runtimeDefinition?.renderer?.entry ||
+                undefined
             }
           }
         : undefined;

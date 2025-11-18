@@ -31,3 +31,7 @@ runtime.registerMethod('plugin:getInfo', async () => {
 It also keeps the `plugin:listNodes` method for backwards-compatible discovery and leaves `plugin:ping` in place for diagnostics.
 
 The bundle requests `graph.read` + `selection.read` so it can query the current selection metadata when responding to RPC calls.
+
+## Renderer bundle
+
+`helloRenderer.js` runs inside each node’s sandboxed iframe via `NodeGraphPluginRenderer.createRenderer`. It receives `{ data, nodeId }` props from the host and renders a simple heading/tagline. Because the iframe is sandboxed, UI bugs or crashes never impact the main editor—falling back to the placeholder if the renderer reports an error.

@@ -50,6 +50,13 @@ const normalizeRuntimeNodeDefinition = (pluginId, definition, manifestNode) => {
     ensureString(manifestFallback.description) ||
     '';
 
+  const rendererEntry =
+    ensureString(definition.renderer?.entry) ||
+    ensureString(manifestFallback.renderer?.entry) ||
+    ensureString(definition.entry) ||
+    ensureString(manifestFallback.entry) ||
+    null;
+
   return {
     pluginType,
     type: `${pluginId}:${pluginType}`,
@@ -73,10 +80,8 @@ const normalizeRuntimeNodeDefinition = (pluginId, definition, manifestNode) => {
       normalizeHandleList(definition.handles?.outputs),
     state: cloneObject(definition.state),
     extensions: cloneObject(definition.extensions),
-    entry:
-      ensureString(definition.entry) ||
-      ensureString(definition.renderer) ||
-      ensureString(manifestFallback.entry)
+    entry: ensureString(definition.entry) || ensureString(manifestFallback.entry),
+    renderer: rendererEntry ? { entry: rendererEntry } : undefined
   };
 };
 

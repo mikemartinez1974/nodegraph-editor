@@ -281,6 +281,7 @@ Inside each `nodes[]` entry, add the optional `definition` block:
 | `properties[]` | Generates form controls inside the Properties Panel. Supported `type` values: `text`, `textarea`, `number`, `select`, `toggle`, `color`, and `json`. `options[]` is required for select fields. Use `default`, `min`, `max`, `step`, `placeholder`, and `helperText` as needed. |
 | `display.variant` | Controls the placeholder rendering inside the canvas. Options: `card`, `stat`, `list`. |
 | `display.primaryField`, `secondaryField`, `badgeField`, `listField`, `footerField`, `emptyState` | Map fields in `node.data` to card sections/badges/list rows. |
+| `renderer.entry` | Optional URL/relative path to a renderer bundle that will be sandboxed inside the node and given live props. |
 | `metadata.changelog` (top-level `changelog` in manifest) | Optional release notes shown during the permission prompt when installing/updating a plugin. |
 
 When the manifest is installed, these descriptors are copied into the runtime registry. The editor automatically:
@@ -330,6 +331,23 @@ This copies the template in `templates/plugin-starter` into `public/plugins/<slu
 3. Use the Add Node menu to drop the generated node and iterate on `plugin.js` or `manifest.json`.
 
 The CLI is additive and never overwrites existing folders, so delete/rename a scaffold before regenerating if you need to start over.
+
+### Renderer Bridge
+
+If a node declares `renderer.entry`, the host spins up a sandboxed iframe inside the node and loads two scripts in order: the shared renderer SDK (`/plugins/sdk/nodeRenderer.js`) and the plugin’s renderer entry module. The SDK exposes `window.NodeGraphPluginRenderer.createRenderer({ render })`. The `render` callback receives `{ nodeId, data, state, label }` whenever the node changes, and you can update the DOM however you like. Example:
+
+```js
+const { createRenderer } = window.NodeGraphPluginRenderer;
+
+createRenderer({
+  autoHeight: true,
+  render({ data }) {
+    document.body.innerText = data.title || 'Hello world';
+  }
+});
+```
+
+The iframe is sandboxed (`allow-scripts` only). Communicate with the host via the helper’s `emitEvent` (fires `renderer:event` back to React) and the automatic height observer. Errors thrown inside `render` are relayed to the host so it can fall back to the placeholder UI.
 
 - `nodes`: each node may contain `handles`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
 - `edges`: edges contain `state`, `logic`, `routing`, `style`, and `extensions`.

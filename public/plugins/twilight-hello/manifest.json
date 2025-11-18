@@ -87,6 +87,9 @@
           "footerField": "lastRun",
           "emptyState": "Use the Properties Panel to configure this node."
         }
+      },
+      "renderer": {
+        "entry": "/plugins/twilight-hello/helloRenderer.js"
       }
     }
   ],

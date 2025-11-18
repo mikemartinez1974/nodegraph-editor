@@ -22,7 +22,7 @@ const extractPluginInfo = (data, type) => {
   return { pluginId: null, pluginNodeType: null };
 };
 
-export default function PluginNodePlaceholder({ data = {}, label, type }) {
+export default function PluginNodePlaceholder({ data = {}, label, type, statusMessage }) {
   const { pluginId, pluginNodeType } = useMemo(() => extractPluginInfo(data, type), [data, type]);
   const [runtimeState, setRuntimeState] = useState({ status: 'idle', error: null });
   const [definition, setDefinition] = useState(() =>
@@ -78,7 +78,7 @@ export default function PluginNodePlaceholder({ data = {}, label, type }) {
   const listValues = ensureArray(displayConfig.listField ? data[displayConfig.listField] : undefined);
   const emptyStateMessage = displayConfig.emptyState || 'Plugin node placeholder — waiting for plugin data.';
 
-  let statusLabel = 'Runtime not started';
+  let statusLabel = statusMessage || 'Runtime not started';
   if (runtimeState.error) {
     statusLabel = `Runtime error: ${runtimeState.error}`;
   } else if (runtimeState.status === 'ready') {

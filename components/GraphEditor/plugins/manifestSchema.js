@@ -156,6 +156,25 @@ const normalizeDisplayDefinition = (display, nodeIndex, errors) => {
   };
 };
 
+const normalizeRendererDefinition = (renderer, nodeIndex) => {
+  if (!renderer) return { errors: [], value: undefined };
+  if (typeof renderer !== 'object') {
+    return { errors: [`nodes[${nodeIndex}].renderer must be an object if provided`], value: undefined };
+  }
+  const entry = ensureUrl(renderer.entry) || ensureUrl(renderer.url) || ensureString(renderer.entry);
+  if (!entry) {
+    return { errors: [`nodes[${nodeIndex}].renderer.entry must be a valid URL or path`], value: undefined };
+  }
+  return {
+    errors: [],
+    value: {
+      entry,
+      integrity: ensureString(renderer.integrity) || undefined,
+      sandbox: ensureString(renderer.sandbox) || undefined
+    }
+  };
+};
+
 const normalizeNodeDefinition = (definition, nodeIndex) => {
   if (definition === undefined) {
     return { errors: [], value: undefined };
@@ -221,6 +240,10 @@ const normalizeNodeEntry = (node, index) => {
   if (definitionErrors.length) {
     errors.push(...definitionErrors);
   }
+  const { errors: rendererErrors, value: renderer } = normalizeRendererDefinition(node.renderer, index);
+  if (rendererErrors.length) {
+    errors.push(...rendererErrors);
+  }
   return {
     errors,
     value: {
@@ -239,7 +262,8 @@ const normalizeNodeEntry = (node, index) => {
           ? node.defaultHeight
           : undefined,
       defaultData,
-      definition
+      definition,
+      renderer
     }
   };
 };

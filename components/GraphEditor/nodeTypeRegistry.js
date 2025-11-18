@@ -16,7 +16,7 @@ import ScriptNode from './Nodes/ScriptNode';
 import ThreeDNode from './Nodes/ThreeDNode';
 import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
 import ValueTriggerNode from './Nodes/ValueTriggerNode';
-import PluginNodePlaceholder from './Nodes/PluginNodePlaceholder';
+import PluginNodeRenderer from './Nodes/PluginNodeRenderer';
 import { getInstalledPlugins } from './plugins/pluginRegistry';
 
 // Registry structure: each entry has the component and display metadata
@@ -284,7 +284,7 @@ const getPluginNodeEntries = () => {
           const sizeFromDefinition = definition?.size || {};
           const key = `${plugin.id}:${nodeType}`;
           entries[key] = {
-            component: PluginNodePlaceholder,
+            component: PluginNodeRenderer,
             label:
               runtimeMeta?.label ||
               manifestMeta.label ||
@@ -315,6 +315,12 @@ const getPluginNodeEntries = () => {
             extensions: runtimeMeta?.extensions,
             runtimeDefinition: runtimeMeta || null,
             entry: runtimeMeta?.entry || manifestMeta.entry || null,
+            rendererEntry:
+              runtimeMeta?.renderer?.entry ||
+              manifestMeta.renderer?.entry ||
+              runtimeMeta?.entry ||
+              manifestMeta.entry ||
+              null,
             definition
           };
         });
@@ -350,6 +356,7 @@ const buildNodeTypeMetadataList = () => {
     extensions: meta.extensions,
     runtimeDefinition: meta.runtimeDefinition,
     entry: meta.entry,
+    rendererEntry: meta.rendererEntry,
     definition: meta.definition
   }));
   return [...nodeTypeMetadata, ...pluginEntries];
