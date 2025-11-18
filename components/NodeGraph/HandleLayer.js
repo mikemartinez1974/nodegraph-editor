@@ -8,6 +8,7 @@ import { getEdgeHandlePosition } from './utils';
 const handleRadius = 8;
 const handleExtension = 12; // was 20, now closer to node
 const nodeHoverMargin = 24; // px, for easier node hover
+const SNAP_DISTANCE = 28;
 
 // --- NEW: Get handles from node schema ---
 function getHandlePositions(node) {
@@ -72,6 +73,7 @@ const HandleLayer = forwardRef(({
   const [previewLine, setPreviewLine] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [dragTargetNodeId, setDragTargetNodeId] = useState(null);
+  const [snapHandle, setSnapHandle] = useState(null);
   const [handleTooltip, setHandleTooltip] = useState(null);
   const animationFrameRef = useRef(null);
   const handleHoverRef = useRef(false);
@@ -403,12 +405,10 @@ const HandleLayer = forwardRef(({
   const handleMouseMove = useCallback((e) => {
     if (draggingHandle) {
       const rect = canvasRef.current.getBoundingClientRect();
-      setPreviewLine({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-      const graphX = (e.clientX - rect.left - pan.x) / zoom;
-      const graphY = (e.clientY - rect.top - pan.y) / zoom;
+      const canvasX = e.clientX - rect.left;
+      const canvasY = e.clientY - rect.top;
+      const graphX = (canvasX - pan.x) / zoom;
+      const graphY = (canvasY - pan.y) / zoom;
       let hoveredNode = null;
       for (const node of nodes) {
         if (node.visible === false) continue;
@@ -432,6 +432,45 @@ const HandleLayer = forwardRef(({
         setHoveredNodeId(hoveredNode.id);
       } else if (dragTargetNodeId) {
         setHoveredNodeId(null);
+      }
+
+      let snappedHandle = null;
+      if (hoveredNode) {
+        const candidateHandles = getHandlePositions(hoveredNode).filter((h) => {
+          if (!draggingHandle) return true;
+          if (draggingHandle.type === 'output') {
+            return h.type === 'input';
+          }
+          if (draggingHandle.type === 'input') {
+            return h.type === 'output';
+          }
+          return true;
+        });
+        let bestDist = SNAP_DISTANCE;
+        candidateHandles.forEach((handle) => {
+          const handleCanvasX = handle.position.x * zoom + pan.x;
+          const handleCanvasY = handle.position.y * zoom + pan.y;
+          const dist = Math.hypot(handleCanvasX - canvasX, handleCanvasY - canvasY);
+          if (dist <= bestDist) {
+            bestDist = dist;
+            snappedHandle = handle;
+          }
+        });
+      }
+      setSnapHandle(snappedHandle);
+      if (snappedHandle) {
+        setPreviewLine({
+          x: snappedHandle.position.x * zoom + pan.x,
+          y: snappedHandle.position.y * zoom + pan.y
+        });
+      } else {
+        if (snapHandle) {
+          setSnapHandle(null);
+        }
+        setPreviewLine({
+          x: canvasX,
+          y: canvasY
+        });
       }
       scheduleRender();
       return;
@@ -457,22 +496,25 @@ const HandleLayer = forwardRef(({
     const graphX = (e.clientX - rect.left - pan.x) / zoom;
     const graphY = (e.clientY - rect.top - pan.y) / zoom;
     // Find target handle (not just node)
-    let targetHandle = null;
+    let targetHandle = snapHandle || null;
     let targetNode = null;
-    for (const node of nodes) {
-      if (node.id === draggingHandle.nodeId) continue;
-      const handles = getHandlePositions(node);
-      for (const h of handles) {
-        const screenX = h.position.x * zoom + pan.x;
-        const screenY = h.position.y * zoom + pan.y;
-        const dist = Math.sqrt(Math.pow(e.clientX - rect.left - screenX, 2) + Math.pow(e.clientY - rect.top - screenY, 2));
-        if (dist <= handleRadius * 2) {
-          targetHandle = h;
-          targetNode = node;
-          break;
+    if (!targetHandle) {
+      for (const node of nodes) {
+        const handles = getHandlePositions(node);
+        for (const h of handles) {
+          const screenX = h.position.x * zoom + pan.x;
+          const screenY = h.position.y * zoom + pan.y;
+          const dist = Math.sqrt(Math.pow(e.clientX - rect.left - screenX, 2) + Math.pow(e.clientY - rect.top - screenY, 2));
+          if (dist <= handleRadius * 2) {
+            targetHandle = h;
+            targetNode = node;
+            break;
+          }
         }
+        if (targetHandle) break;
       }
-      if (targetHandle) break;
+    } else {
+      targetNode = nodes.find((node) => node.id === targetHandle.nodeId) || null;
     }
     const dropEvent = {
       graph: { x: graphX, y: graphY },
@@ -509,9 +551,10 @@ const HandleLayer = forwardRef(({
     setDraggingHandle(null);
     setDragTargetNodeId(null);
     hideTooltip();
+    setSnapHandle(null);
     setPreviewLine(null);
     scheduleRender();
-  }, [draggingHandle, nodes, pan, zoom, scheduleRender, hideTooltip]);
+  }, [draggingHandle, nodes, pan, zoom, scheduleRender, hideTooltip, snapHandle]);
 
   useEffect(() => {
     const updateCanvasSize = () => {

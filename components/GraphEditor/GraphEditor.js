@@ -1731,12 +1731,18 @@ useEffect(() => {
       return false;
     };
 
-    const handleHandleDrop = ({ graph, sourceNode, targetNode, edgeType, direction, targetHandle, validation, handle }) => {
+    const handleHandleDrop = ({
+      graph,
+      sourceNode,
+      targetNode,
+      edgeType,
+      direction,
+      targetHandle,
+      validation,
+      handle
+    }) => {
       try {
         if (validation && validation.ok === false) {
-          return;
-        }
-        if (targetHandle) {
           return;
         }
         const api = graphAPI?.current;
@@ -1756,23 +1762,32 @@ useEffect(() => {
             setSnackbar({ open: true, message: 'Target node not found', severity: 'error' });
             return;
           }
-          const counterpartHandle = direction === 'source'
+          const fallbackHandle = direction === 'source'
             ? pickHandle(targetNodeObj, 'inputs', startHandleType)
             : pickHandle(targetNodeObj, 'outputs', startHandleType);
+          const counterpartHandleKey = targetHandle?.key || fallbackHandle?.key;
+          if (!counterpartHandleKey) {
+            setSnackbar({
+              open: true,
+              message: 'No compatible handle found on target node',
+              severity: 'error'
+            });
+            return;
+          }
 
           const edgePayload = direction === 'source'
             ? {
                 source: sourceNode,
                 target: targetNode,
                 sourceHandle: startHandleKey,
-                targetHandle: counterpartHandle.key,
+                targetHandle: counterpartHandleKey,
                 type: resolvedEdgeType,
                 style: edgeStyle
               }
             : {
                 source: targetNode,
                 target: sourceNode,
-                sourceHandle: counterpartHandle.key,
+                sourceHandle: counterpartHandleKey,
                 targetHandle: startHandleKey,
                 type: resolvedEdgeType,
                 style: edgeStyle
