@@ -68,11 +68,11 @@
   - [x] Whitelist APIs (GraphCRUD, eventBus, selection) and proxy events/messages through typed bridges.
   - [x] Add crash isolation + telemetry so faulty plugins fail gracefully.
 
-- [ ] **Phase 3 – Node Definition APIs**  
+- [x] **Phase 3 – Node Definition APIs**  
       Give plugin authors declarative ways to define nodes, handles, and panels that render inside NodeGraph.
-  - [ ] Publish node definition contract (props, data schema, handles, property panel hooks).
-  - [ ] Provide helper SDK (React hooks + TypeScript types) so developers can register custom node components.
-  - [ ] Support plugin-provided styles/assets while enforcing theming + sanitization rules.
+  - [x] Publish node definition contract (props, data schema, handles, property panel hooks).
+  - [x] Provide helper SDK (React hooks + TypeScript types) so developers can register custom node components.
+  - [x] Support plugin-provided styles/assets while enforcing theming + sanitization rules.
 
 - [ ] **Phase 4 – Tooling & Distribution**  
       Deliver authoring tooling and UX for discovering/installing plugins.

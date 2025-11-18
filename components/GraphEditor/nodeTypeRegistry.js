@@ -171,6 +171,60 @@ export const nodeTypeMetadata = [
   // Add more node types here as needed
 ];
 
+const buildHandlesFromDefinition = (definition) => {
+  if (!definition || !definition.handles) return undefined;
+  const handles = [];
+  const inputs = Array.isArray(definition.handles.inputs) ? definition.handles.inputs : [];
+  const outputs = Array.isArray(definition.handles.outputs) ? definition.handles.outputs : [];
+  inputs.forEach((handle) => {
+    if (!handle?.id) return;
+    handles.push({
+      id: handle.id,
+      label: handle.label || handle.id,
+      direction: 'input',
+      dataType: handle.dataType || 'value'
+    });
+  });
+  outputs.forEach((handle) => {
+    if (!handle?.id) return;
+    handles.push({
+      id: handle.id,
+      label: handle.label || handle.id,
+      direction: 'output',
+      dataType: handle.dataType || 'value'
+    });
+  });
+  return handles.length > 0 ? handles : undefined;
+};
+
+const buildLegacyHandleLists = (handles, direction) => {
+  if (!Array.isArray(handles) || handles.length === 0) return undefined;
+  return handles
+    .filter((handle) => handle.direction === direction)
+    .map((handle) => ({
+      key: handle.id,
+      label: handle.label || handle.id,
+      type: handle.dataType || 'value'
+    }));
+};
+
+const deriveDefaultDataFromDefinition = (definition) => {
+  if (!definition || !Array.isArray(definition.properties)) return {};
+  return definition.properties.reduce((acc, field) => {
+    if (!field?.key) return acc;
+    if (field.defaultValue !== undefined) {
+      acc[field.key] = field.defaultValue;
+    } else if (field.type === 'toggle') {
+      acc[field.key] = false;
+    } else if (field.type === 'number') {
+      acc[field.key] = 0;
+    } else {
+      acc[field.key] = '';
+    }
+    return acc;
+  }, {});
+};
+
 // Plugin helpers
 const getPluginNodeEntries = () => {
   const entries = {};
@@ -202,6 +256,32 @@ const getPluginNodeEntries = () => {
           if (!nodeType) return;
           const manifestMeta = manifestMap[nodeType] || {};
           const runtimeMeta = runtimeNodes[nodeType];
+          const definition = manifestMeta.definition || runtimeMeta?.definition;
+          const handlesFromDefinition = buildHandlesFromDefinition(definition);
+          const handles = runtimeMeta?.handles || handlesFromDefinition || manifestMeta.handles;
+          const inputsList =
+            runtimeMeta?.inputs ||
+            buildLegacyHandleLists(handles, 'input') ||
+            manifestMeta.inputs;
+          const outputsList =
+            runtimeMeta?.outputs ||
+            buildLegacyHandleLists(handles, 'output') ||
+            manifestMeta.outputs;
+          const definitionDefaults = deriveDefaultDataFromDefinition(definition);
+          const manifestDefaults =
+            manifestMeta.defaultData && typeof manifestMeta.defaultData === 'object'
+              ? manifestMeta.defaultData
+              : {};
+          const runtimeDefaults =
+            runtimeMeta?.defaultData && typeof runtimeMeta.defaultData === 'object'
+              ? runtimeMeta.defaultData
+              : {};
+          const mergedDefaults = {
+            ...definitionDefaults,
+            ...manifestDefaults,
+            ...runtimeDefaults
+          };
+          const sizeFromDefinition = definition?.size || {};
           const key = `${plugin.id}:${nodeType}`;
           entries[key] = {
             component: PluginNodePlaceholder,
@@ -220,17 +300,22 @@ const getPluginNodeEntries = () => {
             pluginNodeType: nodeType,
             pluginManifestUrl: plugin.manifestUrl,
             defaultWidth:
-              runtimeMeta?.defaultWidth ?? manifestMeta.defaultWidth,
+              runtimeMeta?.defaultWidth ??
+              manifestMeta.defaultWidth ??
+              sizeFromDefinition.width,
             defaultHeight:
-              runtimeMeta?.defaultHeight ?? manifestMeta.defaultHeight,
-            defaultData: runtimeMeta?.defaultData,
-            handles: runtimeMeta?.handles,
-            inputs: runtimeMeta?.inputs,
-            outputs: runtimeMeta?.outputs,
+              runtimeMeta?.defaultHeight ??
+              manifestMeta.defaultHeight ??
+              sizeFromDefinition.height,
+            defaultData: mergedDefaults,
+            handles,
+            inputs: inputsList,
+            outputs: outputsList,
             state: runtimeMeta?.state,
             extensions: runtimeMeta?.extensions,
             runtimeDefinition: runtimeMeta || null,
-            entry: runtimeMeta?.entry || manifestMeta.entry || null
+            entry: runtimeMeta?.entry || manifestMeta.entry || null,
+            definition
           };
         });
       });
@@ -264,7 +349,8 @@ const buildNodeTypeMetadataList = () => {
     state: meta.state,
     extensions: meta.extensions,
     runtimeDefinition: meta.runtimeDefinition,
-    entry: meta.entry
+    entry: meta.entry,
+    definition: meta.definition
   }));
   return [...nodeTypeMetadata, ...pluginEntries];
 };

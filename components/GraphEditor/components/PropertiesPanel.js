@@ -30,7 +30,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { getNodeTypeList } from '../nodeTypeRegistry';
 import edgeTypesMap from '../edgeTypes'; // Correct import syntax
-import { subscribe as subscribeToPluginRegistry } from '../plugins/pluginRegistry';
+import { subscribe as subscribeToPluginRegistry, getPluginNodeDefinition } from '../plugins/pluginRegistry';
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
@@ -130,6 +130,21 @@ const DEFAULT_HANDLE = (direction = 'output') => ({
   dataType: 'value'
 });
 
+const extractPluginMetaFromNode = (node) => {
+  if (!node) return null;
+  if (node.extensions?.plugin) {
+    return {
+      pluginId: node.extensions.plugin.id,
+      pluginNodeType: node.extensions.plugin.nodeType
+    };
+  }
+  if (typeof node.type === 'string' && node.type.includes(':')) {
+    const [pluginId, pluginNodeType] = node.type.split(':');
+    return { pluginId, pluginNodeType };
+  }
+  return null;
+};
+
 export default function ConsolidatedPropertiesPanel({ 
   selectedNode,
   selectedEdge,
@@ -180,6 +195,8 @@ export default function ConsolidatedPropertiesPanel({
   const [nodeHandles, setNodeHandles] = useState([]);
   const [nodeStateFields, setNodeStateFields] = useState({ locked: false, collapsed: false, hidden: false });
   const [nodeTypeOptions, setNodeTypeOptions] = useState(() => getNodeTypeList());
+  const [pluginDefinition, setPluginDefinition] = useState(null);
+  const [pluginFormState, setPluginFormState] = useState({});
   const nodeTypeMap = useMemo(() => {
     const map = {};
     nodeTypeOptions.forEach(entry => {
@@ -250,17 +267,59 @@ export default function ConsolidatedPropertiesPanel({
   const isLocked = entityType === 'node' ? lockedNodes.has(entityId) :
                    entityType === 'edge' ? lockedEdges.has(entityId) :
                    entityType === 'group' ? lockedGroups.has(entityId) : false;
+  const selectedNodePluginMeta = useMemo(() => extractPluginMetaFromNode(selectedNode), [selectedNode]);
+  const isPluginNode = Boolean(selectedNodePluginMeta?.pluginId && selectedNodePluginMeta?.pluginNodeType);
 
   useEffect(() => {
-    const unsubscribe = subscribeToPluginRegistry(() => {
+    if (!selectedNodePluginMeta?.pluginId || !selectedNodePluginMeta?.pluginNodeType) {
+      setPluginDefinition(null);
+      setPluginFormState({});
+      return;
+    }
+    const nextDefinition = getPluginNodeDefinition(
+      selectedNodePluginMeta.pluginId,
+      selectedNodePluginMeta.pluginNodeType
+    );
+    setPluginDefinition(nextDefinition || null);
+    if (!nextDefinition || !Array.isArray(nextDefinition.properties) || !selectedNode) {
+      setPluginFormState({});
+      return;
+    }
+    const nextState = nextDefinition.properties.reduce((acc, field) => {
+      if (!field?.key) return acc;
+      const currentValue = selectedNode.data?.[field.key];
+      if (currentValue !== undefined) {
+        acc[field.key] = currentValue;
+      } else if (field.defaultValue !== undefined) {
+        acc[field.key] = field.defaultValue;
+      } else if (field.type === 'toggle') {
+        acc[field.key] = false;
+      } else if (field.type === 'number') {
+        acc[field.key] = 0;
+      } else {
+        acc[field.key] = '';
+      }
+      return acc;
+    }, {});
+    setPluginFormState(nextState);
+  }, [selectedNode, selectedNodePluginMeta]);
+
+  useEffect(() => {
+    const handleRegistryUpdate = () => {
       setNodeTypeOptions(getNodeTypeList());
-    });
+      if (selectedNodePluginMeta?.pluginId && selectedNodePluginMeta?.pluginNodeType) {
+        setPluginDefinition(
+          getPluginNodeDefinition(selectedNodePluginMeta.pluginId, selectedNodePluginMeta.pluginNodeType)
+        );
+      }
+    };
+    const unsubscribe = subscribeToPluginRegistry(handleRegistryUpdate);
     return () => {
       if (typeof unsubscribe === 'function') {
         unsubscribe();
       }
     };
-  }, []);
+  }, [selectedNodePluginMeta]);
 
   useEffect(() => {
     setCurrentAnchor(anchor);
@@ -445,6 +504,12 @@ export default function ConsolidatedPropertiesPanel({
     if (onUpdateNode) onUpdateNode(entityId, { color });
   };
 
+  const handlePluginFieldChange = (field, nextValue) => {
+    if (!selectedNode || !onUpdateNode || isLocked || !field?.key) return;
+    setPluginFormState(prev => ({ ...prev, [field.key]: nextValue }));
+    onUpdateNode(selectedNode.id, { data: { [field.key]: nextValue } }, true);
+  };
+
   const handleEdgeStyleUpdate = (updates) => {
     if (!entityId || isLocked) return;
     const currentStyle = selectedEdge?.style || {};
@@ -458,6 +523,131 @@ export default function ConsolidatedPropertiesPanel({
     if (onUpdateNode) {
       onUpdateNode(entityId, { handles: nextHandles });
     }
+  };
+
+  const renderPluginFieldControl = (field) => {
+    if (!field?.key) return null;
+    const currentValue = pluginFormState[field.key];
+    const helperText = field.helperText || '';
+    const placeholder = field.placeholder || '';
+    const commonProps = {
+      fullWidth: true,
+      disabled: isLocked,
+      label: field.label || field.key,
+      required: Boolean(field.required),
+      value:
+        currentValue !== undefined
+          ? currentValue
+          : field.defaultValue !== undefined
+          ? field.defaultValue
+          : field.type === 'toggle'
+          ? false
+          : '',
+      onChange: (event) => handlePluginFieldChange(field, event.target.value),
+      helperText
+    };
+
+    if (field.type === 'textarea' || field.type === 'json') {
+      return (
+        <TextField
+          key={field.key}
+          {...commonProps}
+          multiline
+          minRows={field.type === 'json' ? 4 : 3}
+          placeholder={placeholder}
+        />
+      );
+    }
+
+    if (field.type === 'number') {
+      return (
+        <TextField
+          key={field.key}
+          {...commonProps}
+          type="number"
+          placeholder={placeholder}
+          onChange={(event) => {
+            const raw = event.target.value;
+            if (raw === '') {
+              handlePluginFieldChange(field, '');
+              return;
+            }
+            const numericValue = Number(raw);
+            handlePluginFieldChange(field, Number.isNaN(numericValue) ? '' : numericValue);
+          }}
+          inputProps={{
+            min: field.min,
+            max: field.max,
+            step: field.step
+          }}
+        />
+      );
+    }
+
+    if (field.type === 'select') {
+      return (
+        <FormControl key={field.key} fullWidth size="small" disabled={isLocked}>
+          <InputLabel>{field.label || field.key}</InputLabel>
+          <Select
+            value={currentValue ?? field.defaultValue ?? ''}
+            label={field.label || field.key}
+            onChange={(event) => handlePluginFieldChange(field, event.target.value)}
+          >
+            {(field.options || []).map((option) => (
+              <MenuItem key={`${field.key}-${option.value}`} value={option.value}>
+                {option.label || String(option.value)}
+              </MenuItem>
+            ))}
+          </Select>
+          {helperText && (
+            <Typography variant="caption" color="text.secondary">
+              {helperText}
+            </Typography>
+          )}
+        </FormControl>
+      );
+    }
+
+    if (field.type === 'toggle') {
+      return (
+        <Box key={field.key} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={Boolean(currentValue ?? field.defaultValue ?? false)}
+                onChange={(event) => handlePluginFieldChange(field, event.target.checked)}
+                disabled={isLocked}
+              />
+            }
+            label={field.label || field.key}
+          />
+          {helperText && (
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+              {helperText}
+            </Typography>
+          )}
+        </Box>
+      );
+    }
+
+    if (field.type === 'color') {
+      return (
+        <TextField
+          key={field.key}
+          {...commonProps}
+          type="color"
+          inputProps={{ style: { padding: 0, height: 36 } }}
+        />
+      );
+    }
+
+    return (
+      <TextField
+        key={field.key}
+        {...commonProps}
+        placeholder={placeholder}
+      />
+    );
   };
 
   const handleNodeStateChange = (field, value) => {
@@ -863,8 +1053,23 @@ export default function ConsolidatedPropertiesPanel({
                     label="Node Color"
                   />
                 )}
-              </AccordionDetails>
-            </Accordion>
+                </AccordionDetails>
+              </Accordion>
+
+            {isPluginNode && pluginDefinition?.properties?.length > 0 && (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2">Plugin Fields</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Stack spacing={2}>
+                    {pluginDefinition.properties.map((field) => (
+                      <React.Fragment key={field.key}>{renderPluginFieldControl(field)}</React.Fragment>
+                    ))}
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+            )}
 
             {/* Position */}
             <Accordion>

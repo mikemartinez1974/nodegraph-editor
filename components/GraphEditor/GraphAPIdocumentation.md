@@ -199,6 +199,121 @@ window.graphAPI.clearGraph()
 
 Graph exports now include:
 
+## Plugin Node Definition Contract
+
+Plugins can now describe their nodes declaratively inside the manifest so the editor can render property panels, node chrome, and handles without loading arbitrary React components.
+
+### Manifest fields
+
+Inside each `nodes[]` entry, add the optional `definition` block:
+
+```jsonc
+{
+  "type": "example-node",
+  "label": "Example Node",
+  "defaultData": {
+    "title": "Untitled",
+    "count": 0,
+    "enabled": true
+  },
+  "definition": {
+    "size": { "width": 240, "height": 160 },
+    "handles": {
+      "inputs": [
+        { "id": "trigger", "label": "Trigger", "dataType": "trigger" }
+      ],
+      "outputs": [
+        { "id": "result", "label": "Result", "dataType": "value" }
+      ]
+    },
+    "properties": [
+      {
+        "key": "title",
+        "label": "Title",
+        "type": "text",
+        "placeholder": "Enter a friendly title",
+        "default": "Untitled"
+      },
+      {
+        "key": "count",
+        "label": "Count",
+        "type": "number",
+        "min": 0,
+        "step": 1,
+        "default": 0
+      },
+      {
+        "key": "kind",
+        "label": "Kind",
+        "type": "select",
+        "default": "primary",
+        "options": [
+          { "label": "Primary", "value": "primary" },
+          { "label": "Secondary", "value": "secondary" }
+        ]
+      },
+      {
+        "key": "enabled",
+        "label": "Enabled",
+        "type": "toggle",
+        "default": true,
+        "helperText": "Disable to pause runtime execution"
+      }
+    ],
+    "display": {
+      "variant": "card",
+      "primaryField": "title",
+      "secondaryField": "kind",
+      "badgeField": "enabled",
+      "footerField": "lastRun",
+      "emptyState": "Configure the node in the Properties Panel."
+    }
+  }
+}
+```
+
+**Field reference**
+
+| Field | Description |
+| --- | --- |
+| `size.width` / `size.height` | Suggested default node size. |
+| `handles.inputs[]` / `handles.outputs[]` | Declarative handle descriptors used when a node is created. Each entry supports `id`, `label`, and `dataType` (value, trigger, etc.). |
+| `properties[]` | Generates form controls inside the Properties Panel. Supported `type` values: `text`, `textarea`, `number`, `select`, `toggle`, `color`, and `json`. `options[]` is required for select fields. Use `default`, `min`, `max`, `step`, `placeholder`, and `helperText` as needed. |
+| `display.variant` | Controls the placeholder rendering inside the canvas. Options: `card`, `stat`, `list`. |
+| `display.primaryField`, `secondaryField`, `badgeField`, `listField`, `footerField`, `emptyState` | Map fields in `node.data` to card sections/badges/list rows. |
+
+When the manifest is installed, these descriptors are copied into the runtime registry. The editor automatically:
+
+- Applies the handle schema when creating nodes via the Add Node menu.
+- Seeds node `data` with each property’s `default` value.
+- Renders the node body using the `display` configuration.
+- Pipes the property descriptors into the consolidated Properties Panel so authors can edit plugin data without custom React components.
+
+### Runtime SDK
+
+Sandboxed bundles can still expose imperative functionality (RPC methods, telemetry, etc.) without touching window APIs. Load the helper that is injected into every sandbox (`/plugins/sdk/runtime.js`) and register your methods:
+
+```js
+const sdk = window.NodeGraphPluginSDK;
+const runtime = sdk.createPluginRuntime({
+  capabilities: {
+    runtime: 'example-plugin',
+    version: '0.1.0'
+  }
+});
+
+runtime.registerMethod('plugin:getInfo', async () => {
+  const selection = await runtime.callHost('selection:get');
+  return { selection };
+});
+
+runtime.registerMethod('plugin:listNodes', () => [
+  { type: 'example-node', label: 'Example Node' }
+]);
+```
+
+Use `runtime.callHost(method, args)` to invoke the whitelisted Graph API surface (e.g. `graph:getNodes`, `selection:get`, `events:emit`). The SDK automatically handles the handshake protocol, request IDs, and timeouts for both iframe and worker sandboxes.
+
 - `nodes`: each node may contain `handles`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
 - `edges`: edges contain `state`, `logic`, `routing`, `style`, and `extensions`.
 - `groups`: array of `{ id, label, nodeIds, bounds, style, collapsed, visible, extensions }`.

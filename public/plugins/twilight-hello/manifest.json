@@ -17,8 +17,77 @@
       "category": "demo",
       "icon": "WavingHand",
       "entry": "/plugins/twilight-hello/helloPlugin.js#TwilightHelloNode",
-      "defaultWidth": 220,
-      "defaultHeight": 160
+      "defaultWidth": 240,
+      "defaultHeight": 160,
+      "defaultData": {
+        "greeting": "Hello, from the Twilight Zone!",
+        "tagline": "Friendly signal from another dimension",
+        "mood": "calm",
+        "emphasis": false
+      },
+      "definition": {
+        "size": {
+          "width": 240,
+          "height": 160
+        },
+        "handles": {
+          "inputs": [
+            {
+              "id": "trigger",
+              "label": "Trigger",
+              "dataType": "trigger"
+            }
+          ],
+          "outputs": [
+            {
+              "id": "greeting",
+              "label": "Greeting",
+              "dataType": "value"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "key": "greeting",
+            "label": "Greeting",
+            "type": "textarea",
+            "default": "Hello, from the Twilight Zone!",
+            "helperText": "Shown inside the node body"
+          },
+          {
+            "key": "tagline",
+            "label": "Tagline",
+            "type": "text",
+            "placeholder": "Optional subtitle"
+          },
+          {
+            "key": "mood",
+            "label": "Mood",
+            "type": "select",
+            "default": "calm",
+            "options": [
+              { "label": "Calm", "value": "calm" },
+              { "label": "Excited", "value": "excited" },
+              { "label": "Spooky", "value": "spooky" }
+            ]
+          },
+          {
+            "key": "emphasis",
+            "label": "Emphasis",
+            "type": "toggle",
+            "default": false,
+            "helperText": "Bold the primary greeting"
+          }
+        ],
+        "display": {
+          "variant": "card",
+          "primaryField": "greeting",
+          "secondaryField": "tagline",
+          "badgeField": "mood",
+          "footerField": "lastRun",
+          "emptyState": "Use the Properties Panel to configure this node."
+        }
+      }
     }
   ],
   "panels": [],

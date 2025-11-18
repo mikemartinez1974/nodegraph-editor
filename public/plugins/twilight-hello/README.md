@@ -1,13 +1,33 @@
 # Hello from the Twilight Zone Plugin
 
-This folder contains a minimal plugin that can be loaded with the plugin manager. The manifest lives at `/plugins/twilight-hello/manifest.json`, so in development you can install it by pasting `http://localhost:3000/plugins/twilight-hello/manifest.json` into the Plugin Manager panel.
+This folder contains a minimal plugin that exercises the Plugin Platform Phase 3 contract. Load it through the Plugin Manager by pasting `http://localhost:3000/plugins/twilight-hello/manifest.json` while running the dev server.
 
-The bundle (`helloPlugin.js`) now runs inside the hardened sandbox loader, participates in the `handshake:probe`/`rpc:request` protocol, and demonstrates how to call back into the host through the `host:rpc` bridge. It requests the `graph.read` and `selection.read` permissions so it can ask the host for the current selection metadata.
+## Manifest definition
 
-### RPC methods exposed to the host
+The manifest describes the node declaratively:
 
-- `plugin:getInfo` – returns plugin id/version plus the current host selection snapshot (via `selection:get`).
-- `plugin:listNodes` – returns metadata for the sample `twilight-hello` node.
-- `plugin:ping` – diagnostic ping/pong.
+- `definition.handles` seeds the node with an input trigger and greeting output.
+- `definition.properties` lists the editable fields that appear inside the Properties Panel (greeting, tagline, mood select, emphasis toggle).
+- `definition.display` controls how the placeholder renders on the canvas (card variant with badges + footer).
 
-With the runtime loader enabled the host can call `plugin:listNodes` to register the custom node and later stream in rendered output from the plugin runtime.
+Because of this schema the editor can render the node UI and property controls with zero custom React code.
+
+## Runtime bundle
+
+`helloPlugin.js` uses the injected `NodeGraphPluginSDK` (`/plugins/sdk/runtime.js`) to participate in the sandbox handshake. The runtime:
+
+```js
+const sdk = window.NodeGraphPluginSDK;
+const runtime = sdk.createPluginRuntime({
+  capabilities: { runtime: 'twilight-hello', version: '0.1.0' }
+});
+
+runtime.registerMethod('plugin:getInfo', async () => {
+  const selection = await runtime.callHost('selection:get');
+  return { id: 'com.twilight.hello', selection };
+});
+```
+
+It also keeps the `plugin:listNodes` method for backwards-compatible discovery and leaves `plugin:ping` in place for diagnostics.
+
+The bundle requests `graph.read` + `selection.read` so it can query the current selection metadata when responding to RPC calls.

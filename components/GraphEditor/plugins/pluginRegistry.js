@@ -209,6 +209,18 @@ export function clearPluginRuntimeData(pluginId) {
   notifyListeners();
 }
 
+export function findPluginNodeMeta(pluginId, nodeType) {
+  if (!pluginId || !nodeType) return null;
+  const plugin = getPluginById(pluginId);
+  if (!plugin) return null;
+  return (plugin.nodes || []).find(node => node && node.type === nodeType) || null;
+}
+
+export function getPluginNodeDefinition(pluginId, nodeType) {
+  const meta = findPluginNodeMeta(pluginId, nodeType);
+  return meta?.definition || null;
+}
+
 export default {
   installPluginFromUrl,
   installManifestObject,
@@ -219,5 +231,7 @@ export default {
   clearRegistry,
   subscribe,
   setPluginRuntimeData,
-  clearPluginRuntimeData
+  clearPluginRuntimeData,
+  findPluginNodeMeta,
+  getPluginNodeDefinition
 };

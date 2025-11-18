@@ -11,6 +11,7 @@
 const DEFAULT_HANDSHAKE_TIMEOUT = 8000;
 const DEFAULT_RPC_TIMEOUT = 6000;
 const DEFAULT_LOG_PREFIX = '[PluginRuntimeHost]';
+const DEFAULT_PLUGIN_SDK_SRC = '/plugins/sdk/runtime.js';
 
 const noop = () => {};
 
@@ -166,7 +167,8 @@ export default class PluginRuntimeHost {
       emitEvent: options.emitEvent,
       onStatusChange: options.onStatusChange || noop,
       onTelemetry: options.onTelemetry || noop,
-      hostMethods: options.hostMethods
+      hostMethods: options.hostMethods,
+      sdkUrl: options.sdkUrl || DEFAULT_PLUGIN_SDK_SRC
     };
 
     this.status = 'idle';
@@ -342,10 +344,13 @@ export default class PluginRuntimeHost {
       }
     })();
 
+    const sdkTag = this.options.sdkUrl
+      ? `<script src="${this.options.sdkUrl}"></script>`
+      : '';
     const scriptTag = `<script src="${url}"${
       integrity ? ` integrity="${integrity}" crossorigin="anonymous"` : ''
     }></script>`;
-    const html = `<!DOCTYPE html><html><head><base href="${baseHref}" /></head><body>${scriptTag}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><base href="${baseHref}" /></head><body>${sdkTag}${scriptTag}</body></html>`;
     this.iframe.srcdoc = html;
     window.addEventListener('message', this._handleWindowMessage);
     document.body.appendChild(this.iframe);

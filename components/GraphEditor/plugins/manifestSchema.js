@@ -33,6 +33,172 @@ const normalizePermissions = (value) => {
     .map((perm) => perm.toLowerCase());
 };
 
+const VALID_PROPERTY_TYPES = new Set(['text', 'textarea', 'number', 'select', 'toggle', 'color', 'json']);
+const VALID_DISPLAY_VARIANTS = new Set(['card', 'stat', 'list']);
+
+const normalizeHandleList = (handles, direction, errors, nodeIndex) => {
+  if (!Array.isArray(handles) || handles.length === 0) return [];
+  return handles
+    .map((handle, handleIndex) => {
+      if (!handle || typeof handle !== 'object') {
+        errors.push(`nodes[${nodeIndex}].definition.handles.${direction}[${handleIndex}] must be an object`);
+        return null;
+      }
+      const id =
+        ensureString(handle.id) ||
+        ensureString(handle.key) ||
+        ensureString(handle.name) ||
+        `${direction}-${handleIndex}`;
+      if (!id) {
+        errors.push(`nodes[${nodeIndex}].definition.handles.${direction}[${handleIndex}] is missing an id/key`);
+        return null;
+      }
+      return {
+        id,
+        label: ensureString(handle.label) || id,
+        direction,
+        dataType: ensureString(handle.dataType) || ensureString(handle.type) || 'value',
+        description: ensureString(handle.description) || undefined
+      };
+    })
+    .filter(Boolean);
+};
+
+const normalizePropertyField = (field, fieldIndex, nodeIndex, errors) => {
+  if (!field || typeof field !== 'object') {
+    errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}] must be an object`);
+    return null;
+  }
+  const key = ensureString(field.key);
+  if (!key) {
+    errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}].key is required`);
+    return null;
+  }
+  const type = ensureString(field.type) || 'text';
+  if (!VALID_PROPERTY_TYPES.has(type)) {
+    errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}].type must be one of ${Array.from(VALID_PROPERTY_TYPES).join(', ')}`);
+  }
+  let options;
+  if (type === 'select') {
+    if (!Array.isArray(field.options) || field.options.length === 0) {
+      errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}].options must be a non-empty array for select fields`);
+    } else {
+      options = field.options
+        .map((option, optionIndex) => {
+          if (!option || typeof option !== 'object') {
+            errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}].options[${optionIndex}] must be an object`);
+            return null;
+          }
+          const value = option.value !== undefined ? option.value : ensureString(option.id);
+          const label = ensureString(option.label) || ensureString(option.name) || value;
+          if (value === null || value === undefined) {
+            errors.push(`nodes[${nodeIndex}].definition.properties[${fieldIndex}].options[${optionIndex}].value is required`);
+            return null;
+          }
+          return {
+            label: label || String(value),
+            value
+          };
+        })
+        .filter(Boolean);
+    }
+  }
+  return {
+    key,
+    label: ensureString(field.label) || key,
+    type,
+    helperText: ensureString(field.helperText) || undefined,
+    placeholder: ensureString(field.placeholder) || undefined,
+    required: Boolean(field.required),
+    min:
+      typeof field.min === 'number' && Number.isFinite(field.min)
+        ? field.min
+        : undefined,
+    max:
+      typeof field.max === 'number' && Number.isFinite(field.max)
+        ? field.max
+        : undefined,
+    step:
+      typeof field.step === 'number' && Number.isFinite(field.step)
+        ? field.step
+        : undefined,
+    defaultValue:
+      field.defaultValue !== undefined
+        ? field.defaultValue
+        : field.default !== undefined
+        ? field.default
+        : undefined,
+    options,
+    multiline: type === 'textarea' ? true : undefined
+  };
+};
+
+const normalizeDisplayDefinition = (display, nodeIndex, errors) => {
+  if (!display) return undefined;
+  if (typeof display !== 'object') {
+    errors.push(`nodes[${nodeIndex}].definition.display must be an object`);
+    return undefined;
+  }
+  const variant = ensureString(display.variant) || 'card';
+  if (!VALID_DISPLAY_VARIANTS.has(variant)) {
+    errors.push(
+      `nodes[${nodeIndex}].definition.display.variant must be one of ${Array.from(VALID_DISPLAY_VARIANTS).join(', ')}`
+    );
+  }
+  return {
+    variant,
+    primaryField: ensureString(display.primaryField) || undefined,
+    secondaryField: ensureString(display.secondaryField) || undefined,
+    badgeField: ensureString(display.badgeField) || undefined,
+    listField: ensureString(display.listField) || undefined,
+    footerField: ensureString(display.footerField) || undefined,
+    emptyState: ensureString(display.emptyState) || undefined
+  };
+};
+
+const normalizeNodeDefinition = (definition, nodeIndex) => {
+  if (definition === undefined) {
+    return { errors: [], value: undefined };
+  }
+  if (!definition || typeof definition !== 'object') {
+    return { errors: [`nodes[${nodeIndex}].definition must be an object`], value: undefined };
+  }
+  const errors = [];
+  const size =
+    definition.size && typeof definition.size === 'object'
+      ? {
+          width:
+            typeof definition.size.width === 'number' && definition.size.width > 0
+              ? definition.size.width
+              : undefined,
+          height:
+            typeof definition.size.height === 'number' && definition.size.height > 0
+              ? definition.size.height
+              : undefined
+        }
+      : undefined;
+  const inputHandles = normalizeHandleList(definition.handles?.inputs, 'input', errors, nodeIndex);
+  const outputHandles = normalizeHandleList(definition.handles?.outputs, 'output', errors, nodeIndex);
+  const properties = Array.isArray(definition.properties)
+    ? definition.properties
+        .map((field, fieldIndex) => normalizePropertyField(field, fieldIndex, nodeIndex, errors))
+        .filter(Boolean)
+    : [];
+  const display = normalizeDisplayDefinition(definition.display, nodeIndex, errors);
+  return {
+    errors,
+    value: {
+      size,
+      handles: {
+        inputs: inputHandles,
+        outputs: outputHandles
+      },
+      properties,
+      display
+    }
+  };
+};
+
 const normalizeNodeEntry = (node, index) => {
   if (!node || typeof node !== 'object') {
     return { errors: [`nodes[${index}] must be an object`] };
@@ -43,6 +209,18 @@ const normalizeNodeEntry = (node, index) => {
   const errors = [];
   if (!type) errors.push(`nodes[${index}].type is required`);
   if (!entry) errors.push(`nodes[${index}].entry is required`);
+  let defaultData = undefined;
+  if (node.defaultData !== undefined) {
+    if (node.defaultData && typeof node.defaultData === 'object' && !Array.isArray(node.defaultData)) {
+      defaultData = { ...node.defaultData };
+    } else {
+      errors.push(`nodes[${index}].defaultData must be an object when provided`);
+    }
+  }
+  const { errors: definitionErrors, value: definition } = normalizeNodeDefinition(node.definition, index);
+  if (definitionErrors.length) {
+    errors.push(...definitionErrors);
+  }
   return {
     errors,
     value: {
@@ -59,7 +237,9 @@ const normalizeNodeEntry = (node, index) => {
       defaultHeight:
         typeof node.defaultHeight === 'number' && node.defaultHeight > 0
           ? node.defaultHeight
-          : undefined
+          : undefined,
+      defaultData,
+      definition
     }
   };
 };
