@@ -52,12 +52,13 @@ const AddNodeMenu = ({ anchorEl, open, onClose }) => {
     );
     
     // Add node type items
-    nodes.forEach(({ type, label, description, icon }) => {
+    nodes.forEach((nodeMeta) => {
+      const { type, label, description, icon } = nodeMeta;
       menuItems.push(
         <MenuItem
           key={type}
           onClick={() => {
-            eventBus.emit('addNode', { type });
+            eventBus.emit('addNode', { type, meta: nodeMeta });
             onClose();
           }}
           sx={{ pl: 3 }}

@@ -3,7 +3,7 @@
 // All handler functions consolidated
 // ============================================
 import eventBus from '../../NodeGraph/eventBus';
-import { generateUUID } from '../utils/idUtils';
+import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils';
 import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation';
 
 // Debounce guard for delete operations (must be outside function to persist)
@@ -119,7 +119,7 @@ export function createGraphEditorHandlers({
   // ===== NODE HANDLERS =====
   const handleAddNode = (type = 'default', options = {}) => {
     console.log('[handleAddNode] Called with type:', type, 'options:', options);
-    const { width = 200, height = 120 } = options;
+    const { width = 200, height = 120, meta } = options;
     console.log('[handleAddNode] Using width:', width, 'height:', height);
     
     const centerX = (window.innerWidth / 2 - pan.x) / zoom;
@@ -129,16 +129,57 @@ export function createGraphEditorHandlers({
       console.error('graphAPI is not available or createNode is not a function');
       return;
     }
-    const result = api.createNode({
-      type: type, // Use the passed type
-      label: 'New Node',
-      data: { memo: '', link: '' },
+    const defaultData =
+      meta && meta.defaultData && typeof meta.defaultData === 'object'
+        ? { ...meta.defaultData }
+        : {};
+    const extensionsFromMeta =
+      meta && meta.extensions && typeof meta.extensions === 'object'
+        ? { ...meta.extensions }
+        : undefined;
+    const pluginExtension =
+      meta && meta.pluginId
+        ? {
+            plugin: {
+              id: meta.pluginId,
+              nodeType: meta.pluginNodeType,
+              manifestUrl: meta.pluginManifestUrl,
+              entry: meta.entry || meta.runtimeDefinition?.entry || undefined
+            }
+          }
+        : undefined;
+    const mergedExtensions =
+      extensionsFromMeta || pluginExtension
+        ? { ...(extensionsFromMeta || {}), ...(pluginExtension || {}) }
+        : undefined;
+    const payload = {
+      type: type,
+      label:
+        typeof meta?.label === 'string' && meta.label.trim().length > 0
+          ? meta.label
+          : 'New Node',
+      data: {
+        memo: '',
+        link: '',
+        ...defaultData
+      },
       position: { x: centerX, y: centerY },
       width: width,
       height: height,
       resizable: true,
       handlePosition: 'center',
-      showLabel: true
+      showLabel: true,
+      inputs: Array.isArray(meta?.inputs) ? meta.inputs : undefined,
+      outputs: Array.isArray(meta?.outputs) ? meta.outputs : undefined,
+      handles: Array.isArray(meta?.handles) ? meta.handles : undefined,
+      state:
+        meta && meta.state && typeof meta.state === 'object'
+          ? { ...meta.state }
+          : undefined,
+      extensions: mergedExtensions
+    };
+    const result = api.createNode({
+      ...payload
     });
 
     if (result.success) {

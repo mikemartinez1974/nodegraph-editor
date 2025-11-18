@@ -62,11 +62,11 @@
   - [x] Add registry persistence + CRUD (install, update, disable) in `components/GraphEditor/nodeTypeRegistry.js`.
   - [ ] Build validation + signature checks before loading remote bundles.
 
-- [ ] **Phase 2 – Sandbox & Runtime Loader**  
+- [x] **Phase 2 – Sandbox & Runtime Loader**  
       Create a hardened loader (iframe/worker) that evaluates plugin bundles and exposes a minimal Graph API surface.
-  - [ ] Implement loader host (BackgroundFrame or new worker) with handshake, capability negotiation, and timeout enforcement.
-  - [ ] Whitelist APIs (GraphCRUD, eventBus, selection) and proxy events/messages through typed bridges.
-  - [ ] Add crash isolation + telemetry so faulty plugins fail gracefully.
+  - [x] Implement loader host (BackgroundFrame or new worker) with handshake, capability negotiation, and timeout enforcement.
+  - [x] Whitelist APIs (GraphCRUD, eventBus, selection) and proxy events/messages through typed bridges.
+  - [x] Add crash isolation + telemetry so faulty plugins fail gracefully.
 
 - [ ] **Phase 3 – Node Definition APIs**  
       Give plugin authors declarative ways to define nodes, handles, and panels that render inside NodeGraph.

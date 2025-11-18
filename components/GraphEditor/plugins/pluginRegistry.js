@@ -5,6 +5,11 @@ import validatePluginManifest from './manifestSchema';
 
 const STORAGE_KEY = 'nodegraph.plugins.registry';
 
+// Ephemeral runtime state cache (node definitions, telemetry, etc.).
+// This never hits localStorage; it's populated by the sandbox hosts while
+// plugins are running in the current session.
+const runtimeCache = new Map();
+
 const nowIso = () => new Date().toISOString();
 
 const safeParse = (value, fallback) => {
@@ -34,8 +39,22 @@ const writeRegistry = (entries) => {
 
 const listeners = new Set();
 
+const mergeRuntimeData = (entry) => {
+  if (!entry || typeof entry !== 'object') return entry;
+  const runtime = runtimeCache.get(entry.id);
+  if (!runtime) {
+    return { ...entry };
+  }
+  return { ...entry, runtime: { ...runtime } };
+};
+
+const getRegistrySnapshot = () => {
+  const entries = readRegistry();
+  return entries.map((entry) => mergeRuntimeData(entry));
+};
+
 const notifyListeners = () => {
-  const snapshot = readRegistry();
+  const snapshot = getRegistrySnapshot();
   listeners.forEach(listener => {
     try {
       listener(snapshot);
@@ -85,11 +104,11 @@ export async function fetchManifest(manifestUrl) {
 }
 
 export function getInstalledPlugins() {
-  return readRegistry();
+  return getRegistrySnapshot();
 }
 
 export function getPluginById(pluginId) {
-  const entries = readRegistry();
+  const entries = getRegistrySnapshot();
   return entries.find((entry) => entry.id === pluginId) || null;
 }
 
@@ -101,6 +120,9 @@ export function setPluginEnabled(pluginId, enabled) {
   }
   entries[idx] = { ...entries[idx], enabled: Boolean(enabled), updatedAt: nowIso() };
   writeRegistry(entries);
+  if (enabled === false) {
+    runtimeCache.delete(pluginId);
+  }
   notifyListeners();
   return { success: true, data: entries[idx] };
 }
@@ -112,6 +134,7 @@ export function uninstallPlugin(pluginId) {
     return { success: false, error: 'Plugin not found' };
   }
   writeRegistry(next);
+  runtimeCache.delete(pluginId);
   notifyListeners();
   return { success: true };
 }
@@ -159,14 +182,31 @@ export function installManifestObject(manifest, manifestUrl = '') {
 
 export function clearRegistry() {
   writeRegistry([]);
+  runtimeCache.clear();
   notifyListeners();
 }
 
 export function subscribe(callback) {
   if (typeof callback !== 'function') return () => {};
   listeners.add(callback);
-  callback(readRegistry());
+  callback(getRegistrySnapshot());
   return () => listeners.delete(callback);
+}
+
+export function setPluginRuntimeData(pluginId, runtimeData = {}) {
+  if (!pluginId) return;
+  const previous = runtimeCache.get(pluginId) || {};
+  runtimeCache.set(pluginId, { ...previous, ...runtimeData });
+  notifyListeners();
+}
+
+export function clearPluginRuntimeData(pluginId) {
+  if (pluginId) {
+    runtimeCache.delete(pluginId);
+  } else {
+    runtimeCache.clear();
+  }
+  notifyListeners();
 }
 
 export default {
@@ -177,5 +217,7 @@ export default {
   setPluginEnabled,
   uninstallPlugin,
   clearRegistry,
-  subscribe
+  subscribe,
+  setPluginRuntimeData,
+  clearPluginRuntimeData
 };

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "name": "Hello from the Twilight Zone",
   "description": "Demo plugin that exposes a single node which shows a friendly greeting.",
-  "permissions": ["graph.read"],
+  "permissions": ["graph.read", "selection.read"],
   "bundle": {
     "url": "/plugins/twilight-hello/helloPlugin.js",
     "sandbox": "iframe",

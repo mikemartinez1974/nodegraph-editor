@@ -177,21 +177,57 @@ const getPluginNodeEntries = () => {
   try {
     const plugins = getInstalledPlugins() || [];
     plugins
-      .filter(plugin => plugin && plugin.enabled !== false)
-      .forEach(plugin => {
-        (plugin.nodes || []).forEach(node => {
-          const key = `${plugin.id}:${node.type}`;
+      .filter((plugin) => plugin && plugin.enabled !== false)
+      .forEach((plugin) => {
+        const manifestNodes = Array.isArray(plugin.nodes) ? plugin.nodes : [];
+        const runtimeNodes =
+          plugin.runtime && typeof plugin.runtime === 'object'
+            ? plugin.runtime.nodesByType || {}
+            : {};
+        const manifestMap = manifestNodes.reduce((acc, node) => {
+          if (node && node.type) {
+            acc[node.type] = node;
+          }
+          return acc;
+        }, {});
+        const runtimeTypes = Object.keys(runtimeNodes);
+        const allTypes = new Set([
+          ...manifestNodes.map((node) => node?.type).filter(Boolean),
+          ...runtimeTypes
+        ]);
+        allTypes.forEach((nodeType) => {
+          if (!nodeType) return;
+          const manifestMeta = manifestMap[nodeType] || {};
+          const runtimeMeta = runtimeNodes[nodeType];
+          const key = `${plugin.id}:${nodeType}`;
           entries[key] = {
             component: PluginNodePlaceholder,
-            label: node.label || node.type,
-            description: node.description || `Plugin node from ${plugin.name || plugin.id}`,
-            icon: node.icon || 'Extension',
-            category: node.category || 'plugin',
+            label:
+              runtimeMeta?.label ||
+              manifestMeta.label ||
+              runtimeMeta?.pluginType ||
+              nodeType,
+            description:
+              runtimeMeta?.description ||
+              manifestMeta.description ||
+              `Plugin node from ${plugin.name || plugin.id}`,
+            icon: runtimeMeta?.icon || manifestMeta.icon || 'Extension',
+            category: runtimeMeta?.category || manifestMeta.category || 'plugin',
             pluginId: plugin.id,
-            pluginNodeType: node.type,
+            pluginNodeType: nodeType,
             pluginManifestUrl: plugin.manifestUrl,
-            defaultWidth: node.defaultWidth,
-            defaultHeight: node.defaultHeight
+            defaultWidth:
+              runtimeMeta?.defaultWidth ?? manifestMeta.defaultWidth,
+            defaultHeight:
+              runtimeMeta?.defaultHeight ?? manifestMeta.defaultHeight,
+            defaultData: runtimeMeta?.defaultData,
+            handles: runtimeMeta?.handles,
+            inputs: runtimeMeta?.inputs,
+            outputs: runtimeMeta?.outputs,
+            state: runtimeMeta?.state,
+            extensions: runtimeMeta?.extensions,
+            runtimeDefinition: runtimeMeta || null,
+            entry: runtimeMeta?.entry || manifestMeta.entry || null
           };
         });
       });
@@ -214,7 +250,18 @@ const buildNodeTypeMetadataList = () => {
     icon: meta.icon || 'Extension',
     category: meta.category || 'plugin',
     defaultWidth: meta.defaultWidth,
-    defaultHeight: meta.defaultHeight
+    defaultHeight: meta.defaultHeight,
+    pluginId: meta.pluginId,
+    pluginNodeType: meta.pluginNodeType,
+    pluginManifestUrl: meta.pluginManifestUrl,
+    defaultData: meta.defaultData,
+    handles: meta.handles,
+    inputs: meta.inputs,
+    outputs: meta.outputs,
+    state: meta.state,
+    extensions: meta.extensions,
+    runtimeDefinition: meta.runtimeDefinition,
+    entry: meta.entry
   }));
   return [...nodeTypeMetadata, ...pluginEntries];
 };

@@ -7,7 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from '../NodeGraph/eventBus';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
 import { generateUUID } from './utils/idUtils';
-import { getNodeTypes, nodeTypeMetadata } from './nodeTypeRegistry';
+import { getNodeTypes, getAllNodeTypeMetadata } from './nodeTypeRegistry';
 import EdgeTypes from './edgeTypes';
 import { useGraphEditorState } from './hooks/useGraphEditorState';
 import { createGraphEditorHandlers, handleUpdateNodeData } from './handlers/graphEditorHandlers';
@@ -17,6 +17,8 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
+import usePluginRuntimeManager from './hooks/usePluginRuntimeManager';
+import usePluginRegistry from './hooks/usePluginRegistry';
 import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { themeConfigFromMuiTheme } from './utils/themeUtils';
@@ -77,10 +79,14 @@ const createDefaultProjectMeta = () => {
   };
 };
 
-const nodeTypes = getNodeTypes();
-
 export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const theme = useTheme(); // Browser theme
+  const { plugins } = usePluginRegistry();
+  const nodeTypes = useMemo(() => getNodeTypes(), [plugins]);
+  const nodeTypeMetadataList = useMemo(
+    () => getAllNodeTypeMetadata(),
+    [plugins]
+  );
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
@@ -150,6 +156,20 @@ const {
     defaultNodeColor, defaultEdgeColor,
     groupManager
   } = state || {};
+
+  const selectionSnapshotRef = useRef({
+    nodeIds: Array.isArray(selectedNodeIds) ? [...selectedNodeIds] : [],
+    edgeIds: Array.isArray(selectedEdgeIds) ? [...selectedEdgeIds] : [],
+    groupIds: Array.isArray(selectedGroupIds) ? [...selectedGroupIds] : []
+  });
+
+  useEffect(() => {
+    selectionSnapshotRef.current = {
+      nodeIds: Array.isArray(selectedNodeIds) ? [...selectedNodeIds] : [],
+      edgeIds: Array.isArray(selectedEdgeIds) ? [...selectedEdgeIds] : [],
+      groupIds: Array.isArray(selectedGroupIds) ? [...selectedGroupIds] : []
+    };
+  }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
 
   // NEW: document (background page) state (no localStorage)
   const [backgroundUrl, setBackgroundUrl] = useState('');
@@ -540,6 +560,11 @@ useEffect(() => {
   });
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
+
+  usePluginRuntimeManager({
+    graphApiRef: graphAPI,
+    selectionRef: selectionSnapshotRef
+  });
 
   const handleOpenMobileAddNode = useCallback(() => {
     setMobileAddNodeOpen(true);
@@ -2076,14 +2101,16 @@ useEffect(() => {
   // Listen for addNode events from toolbar
   useEffect(() => {
     // console.log('[GraphEditor] Registering addNode event listener');
-    const handleAddNodeEvent = ({ type }) => {
-      // console.log('[GraphEditor] Received addNode event for type:', type);
-      const meta = nodeTypeMetadata.find(m => m.type === type);
-      const width = meta?.defaultWidth || 200;
-      const height = meta?.defaultHeight || 120;
-      // console.log('[GraphEditor] addNode event - type:', type, 'width:', width, 'height:', height, 'meta:', meta);
+    const handleAddNodeEvent = ({ type, meta: incomingMeta }) => {
+      if (!type) return;
+      const fallbackMeta = nodeTypeMetadataList.find((m) => m.type === type);
+      const meta = incomingMeta || fallbackMeta;
+      const width =
+        typeof meta?.defaultWidth === 'number' ? meta.defaultWidth : 200;
+      const height =
+        typeof meta?.defaultHeight === 'number' ? meta.defaultHeight : 120;
       if (handlers && handlers.handleAddNode) {
-        handlers.handleAddNode(type, { width, height });
+        handlers.handleAddNode(type, { width, height, meta });
       } else {
         console.error('[GraphEditor] handlers.handleAddNode is not available');
       }
@@ -2094,7 +2121,7 @@ useEffect(() => {
       // console.log('[GraphEditor] Unregistering addNode event listener');
       eventBus.off('addNode', handleAddNodeEvent);
     };
-  }, [handlers]);
+  }, [handlers, nodeTypeMetadataList]);
 
   const rpcContextValue = useMemo(() => ({
     bgRef,
@@ -2247,7 +2274,7 @@ useEffect(() => {
     groupManagerHook,
     modesHook,
     nodeTypes,
-    nodeTypeMetadata,
+    nodeTypeMetadata: nodeTypeMetadataList,
     handleScriptRequest
   }), [
     handlers,
@@ -2261,7 +2288,7 @@ useEffect(() => {
     groupManagerHook,
     modesHook,
     nodeTypes,
-    nodeTypeMetadata,
+    nodeTypeMetadataList,
     handleScriptRequest
   ]);
 

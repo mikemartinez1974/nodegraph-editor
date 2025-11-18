@@ -164,10 +164,21 @@ Each group can be styled, labeled, and edited just like a node.
 
 ## 🛠️ Troubleshooting Tips
 
-- **Graph doesn’t show?** Zoom out or click "Auto-Layout."  
-- **Paste not working?** Check if JSON copied fully.  
-- **Overlaps?** Ask AI: "spread out the layout more."  
+- **Graph doesn’t show?** Zoom out or click "Auto-Layout."
+- **Paste not working?** Check if JSON copied fully.
+- **Overlaps?** Ask AI: "spread out the layout more."
 - **Errors?** Validate JSON before pasting.
+
+### 🔍 Validation Warnings & How To Fix Them
+
+When pasting malformed JSON, the editor now skips only the broken records and shows a warning like `Skipped 2 invalid items. node index 0: missing string "id" | edge e-1: missing string "target"`.
+
+- **Missing node ids** – Ask your AI to set a stable `id` for every node. Example prompt tweak: "Include an `id` field for each node using a slug of the label."
+- **Missing positions** – Remind the AI to provide `position: {"x":0,"y":0}` for every node or add a `layout` step to your workflow.
+- **Edge handle errors** – Ensure each edge has both `sourceHandle` and `targetHandle` values that match the node’s handle schema. Add "Include handle keys for all edges" to your AI instructions.
+- **Empty groups** – Request that `groups` list at least one node id (ideally two) so they survive validation. Try "Create groups with `nodeIds` populated by the nodes they contain."
+
+If you see additional warning text, copy it back into your AI prompt so it can adjust the JSON shape for the next attempt.
 
 ---
 

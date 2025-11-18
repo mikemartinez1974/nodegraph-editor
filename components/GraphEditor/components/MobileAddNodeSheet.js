@@ -118,25 +118,28 @@ export default function MobileAddNodeSheet({ open, onClose, search, onSearchChan
                   {categoryLabels[category] || category}
                 </ListSubheader>
                 <Divider />
-                {nodes.map(({ type, label, description, icon }) => (
-                  <ListItemButton
-                    key={type}
-                    onClick={() => {
-                      eventBus.emit('addNode', { type });
-                      onClose?.();
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 42 }}>
-                      {getIcon(icon)}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={label}
-                      secondary={description}
-                      primaryTypographyProps={{ variant: 'subtitle1' }}
-                      secondaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
-                    />
-                  </ListItemButton>
-                ))}
+                {nodes.map((nodeMeta) => {
+                  const { type, label, description, icon } = nodeMeta;
+                  return (
+                    <ListItemButton
+                      key={type}
+                      onClick={() => {
+                        eventBus.emit('addNode', { type, meta: nodeMeta });
+                        onClose?.();
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 42 }}>
+                        {getIcon(icon)}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={label}
+                        secondary={description}
+                        primaryTypographyProps={{ variant: 'subtitle1' }}
+                        secondaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+                      />
+                    </ListItemButton>
+                  );
+                })}
               </ul>
             </li>
           );
