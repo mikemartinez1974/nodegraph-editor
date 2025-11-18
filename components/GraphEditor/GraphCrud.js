@@ -156,6 +156,26 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
   };
 };
 
+const sanitizeNodeData = (rawData) => {
+  const data =
+    rawData && typeof rawData === 'object' && !Array.isArray(rawData)
+      ? { ...rawData }
+      : {};
+  if (data.memo === undefined || data.memo === null) {
+    data.memo = '';
+  }
+  if (data.link === undefined || data.link === null) {
+    data.link = '';
+  }
+  if (data.html === undefined || data.html === null) {
+    data.html = '';
+  }
+  if (data.svg === undefined || data.svg === null) {
+    data.svg = '';
+  }
+  return data;
+};
+
 const normalizeEndpoint = (endpoint, explicitHandleKey) => {
   if (typeof endpoint === 'string') {
     return { nodeId: endpoint, handleKey: explicitHandleKey || null };
@@ -351,6 +371,7 @@ export default class GraphCRUD {
       const sanitizedState = state ? { ...state } : undefined;
       const sanitizedStyle = style ? { ...style } : undefined;
       const sanitizedExtensions = extensions ? { ...extensions } : undefined;
+      const sanitizedData = sanitizeNodeData(data);
       const newNode = {
         id: nodeId,
         type,
@@ -358,10 +379,7 @@ export default class GraphCRUD {
         position,
         width: width !== undefined ? width : 80,
         height: height !== undefined ? height : 48,
-        data: {
-          memo: data.memo || '',
-          link: data.link || ''
-        },
+        data: sanitizedData,
         inputs: normalizedHandles.inputs,
         outputs: normalizedHandles.outputs,
         handles: normalizedHandles.handles,
@@ -681,6 +699,7 @@ export default class GraphCRUD {
             inputs: opts.inputs,
             outputs: opts.outputs
           });
+          const sanitizedData = sanitizeNodeData(opts.data);
 
           const newNode = {
             id: nodeId,
@@ -691,13 +710,7 @@ export default class GraphCRUD {
             height: opts.height !== undefined ? opts.height : 80,
             color: opts.color,
             visible: opts.visible !== undefined ? opts.visible : true,
-            data: {
-              memo: opts.data?.memo || '',
-              link: opts.data?.link || '',
-              html: opts.data?.html || '',
-              svg: opts.data?.svg || '',
-              ...opts.data
-            },
+            data: sanitizedData,
             inputs: normalizedHandles.inputs,
             outputs: normalizedHandles.outputs,
             handles: normalizedHandles.handles,

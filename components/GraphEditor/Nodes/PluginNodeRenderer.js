@@ -2,10 +2,15 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PluginNodePlaceholder from './PluginNodePlaceholder';
-
-const SDK_URL = '/plugins/sdk/nodeRenderer.js';
+import { getNodeTypeMetadata } from '../nodeTypeRegistry';
+import { NODE_RENDERER_SDK_SOURCE } from '../plugins/sdkSource';
+import FixedNode from './FixedNode';
+import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
 
 const generateToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+const DEFAULT_INPUTS = [{ key: 'in', label: 'In', type: 'trigger' }];
+const DEFAULT_OUTPUTS = [{ key: 'out', label: 'Out', type: 'trigger' }];
 
 const resolveUrl = (entry) => {
   if (!entry) return null;
@@ -27,10 +32,32 @@ const resolveUrl = (entry) => {
 
 export default function PluginNodeRenderer(props) {
   const { node, type } = props;
+  const nodeWithHandles = useNodeHandleSchema(node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const nodeTypeKey =
+    typeof nodeWithHandles?.type === 'string'
+      ? nodeWithHandles.type
+      : typeof type === 'string'
+      ? type
+      : null;
+  const nodeTypeMeta = useMemo(
+    () => (nodeTypeKey ? getNodeTypeMetadata(nodeTypeKey) : null),
+    [nodeTypeKey]
+  );
   const pluginInfo = node?.extensions?.plugin || {};
-  const pluginId = pluginInfo.id || (typeof type === 'string' && type.includes(':') ? type.split(':')[0] : null);
-  const pluginNodeType = pluginInfo.nodeType || (typeof type === 'string' && type.includes(':') ? type.split(':')[1] : null);
-  const rendererEntry = pluginInfo.rendererEntry || props.rendererEntry || props.entry;
+  const pluginId =
+    pluginInfo.id ||
+    nodeTypeMeta?.pluginId ||
+    (typeof nodeTypeKey === 'string' && nodeTypeKey.includes(':') ? nodeTypeKey.split(':')[0] : null);
+  const pluginNodeType =
+    pluginInfo.nodeType ||
+    nodeTypeMeta?.pluginNodeType ||
+    (typeof nodeTypeKey === 'string' && nodeTypeKey.includes(':') ? nodeTypeKey.split(':')[1] : null);
+  const rendererEntry =
+    pluginInfo.rendererEntry ||
+    nodeTypeMeta?.rendererEntry ||
+    nodeTypeMeta?.entry ||
+    props.rendererEntry ||
+    props.entry;
   const resolvedRendererUrl = resolveUrl(rendererEntry);
   const iframeRef = useRef(null);
   const tokenRef = useRef(generateToken());
@@ -41,16 +68,16 @@ export default function PluginNodeRenderer(props) {
 
   const payload = useMemo(
     () => ({
-      nodeId: node?.id,
+      nodeId: nodeWithHandles?.id,
       pluginId,
       pluginNodeType,
-      label: node?.label,
-      data: node?.data,
-      state: node?.state,
-      width: node?.width,
-      height: node?.height
+      label: nodeWithHandles?.label,
+      data: nodeWithHandles?.data,
+      state: nodeWithHandles?.state,
+      width: nodeWithHandles?.width,
+      height: nodeWithHandles?.height
     }),
-    [node, pluginId, pluginNodeType]
+    [nodeWithHandles, pluginId, pluginNodeType]
   );
 
   const postMessage = useCallback(
@@ -113,6 +140,7 @@ export default function PluginNodeRenderer(props) {
         return resolvedRendererUrl;
       }
     })();
+    const inlineSdk = `<script>${NODE_RENDERER_SDK_SOURCE}</script>`;
     return `<!DOCTYPE html>
 <html>
   <head>
@@ -123,7 +151,7 @@ export default function PluginNodeRenderer(props) {
   </head>
   <body>
     <div id="plugin-node-root"></div>
-    <script src="${SDK_URL}"></script>
+    ${inlineSdk}
     <script type="module" src="${resolvedRendererUrl}"></script>
   </body>
 </html>`;
@@ -134,41 +162,74 @@ export default function PluginNodeRenderer(props) {
     postMessage({ type: 'node:init', payload });
   }, [payload, postMessage, frameKey]);
 
-  if (!resolvedRendererUrl || error) {
-    return <PluginNodePlaceholder {...props} statusMessage={error || 'Plugin renderer unavailable'} />;
-  }
+  const renderContent = () => {
+    if (!resolvedRendererUrl || error) {
+      return (
+        <PluginNodePlaceholder
+          {...props}
+          data={nodeWithHandles?.data}
+          label={nodeWithHandles?.label}
+          type={nodeTypeKey}
+          statusMessage={error || 'Plugin renderer unavailable'}
+        />
+      );
+    }
+    return (
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <iframe
+          key={frameKey}
+          ref={iframeRef}
+          title={`plugin-node-${nodeWithHandles?.id}`}
+          srcDoc={iframeHtml || ''}
+          onLoad={handleFrameLoad}
+          sandbox="allow-scripts allow-same-origin"
+          style={{
+            border: 'none',
+            width: '100%',
+            height: dynamicHeight ? `${dynamicHeight}px` : '100%'
+          }}
+        />
+        {!ready && !error && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(255,255,255,0.6)',
+              color: '#555',
+              fontSize: 12
+            }}
+          >
+            Loading plugin…
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <iframe
-        key={frameKey}
-        ref={iframeRef}
-        title={`plugin-node-${node?.id}`}
-        srcDoc={iframeHtml || ''}
-        onLoad={handleFrameLoad}
-        sandbox="allow-scripts allow-same-origin"
+    <FixedNode
+      {...props}
+      node={nodeWithHandles}
+      hideDefaultContent
+    >
+      <div
         style={{
-          border: 'none',
-          width: '100%',
-          height: dynamicHeight ? `${dynamicHeight}px` : '100%'
+          position: 'absolute',
+          top: 8,
+          left: 8,
+          right: 8,
+          bottom: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          pointerEvents: 'auto'
         }}
-      />
-      {!ready && !error && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(255,255,255,0.6)',
-            color: '#555',
-            fontSize: 12
-          }}
-        >
-          Loading plugin…
-        </div>
-      )}
-    </div>
+      >
+        {renderContent()}
+      </div>
+    </FixedNode>
   );
 }

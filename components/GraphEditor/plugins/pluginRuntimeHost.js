@@ -1,5 +1,7 @@
 "use client";
 
+import { PLUGIN_RUNTIME_SDK_SOURCE } from './sdkSource';
+
 /**
  * PluginRuntimeHost
  * -----------------
@@ -11,7 +13,6 @@
 const DEFAULT_HANDSHAKE_TIMEOUT = 8000;
 const DEFAULT_RPC_TIMEOUT = 6000;
 const DEFAULT_LOG_PREFIX = '[PluginRuntimeHost]';
-const DEFAULT_PLUGIN_SDK_SRC = '/plugins/sdk/runtime.js';
 
 const noop = () => {};
 
@@ -168,7 +169,7 @@ export default class PluginRuntimeHost {
       onStatusChange: options.onStatusChange || noop,
       onTelemetry: options.onTelemetry || noop,
       hostMethods: options.hostMethods,
-      sdkUrl: options.sdkUrl || DEFAULT_PLUGIN_SDK_SRC
+      sdkSource: options.sdkSource || PLUGIN_RUNTIME_SDK_SOURCE
     };
 
     this.status = 'idle';
@@ -344,9 +345,7 @@ export default class PluginRuntimeHost {
       }
     })();
 
-    const sdkTag = this.options.sdkUrl
-      ? `<script src="${this.options.sdkUrl}"></script>`
-      : '';
+    const sdkTag = `<script>${this.options.sdkSource}</script>`;
     const scriptTag = `<script src="${url}"${
       integrity ? ` integrity="${integrity}" crossorigin="anonymous"` : ''
     }></script>`;
