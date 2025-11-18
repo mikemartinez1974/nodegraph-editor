@@ -281,6 +281,7 @@ Inside each `nodes[]` entry, add the optional `definition` block:
 | `properties[]` | Generates form controls inside the Properties Panel. Supported `type` values: `text`, `textarea`, `number`, `select`, `toggle`, `color`, and `json`. `options[]` is required for select fields. Use `default`, `min`, `max`, `step`, `placeholder`, and `helperText` as needed. |
 | `display.variant` | Controls the placeholder rendering inside the canvas. Options: `card`, `stat`, `list`. |
 | `display.primaryField`, `secondaryField`, `badgeField`, `listField`, `footerField`, `emptyState` | Map fields in `node.data` to card sections/badges/list rows. |
+| `metadata.changelog` (top-level `changelog` in manifest) | Optional release notes shown during the permission prompt when installing/updating a plugin. |
 
 When the manifest is installed, these descriptors are copied into the runtime registry. The editor automatically:
 
@@ -313,6 +314,22 @@ runtime.registerMethod('plugin:listNodes', () => [
 ```
 
 Use `runtime.callHost(method, args)` to invoke the whitelisted Graph API surface (e.g. `graph:getNodes`, `selection:get`, `events:emit`). The SDK automatically handles the handshake protocol, request IDs, and timeouts for both iframe and worker sandboxes.
+
+### Plugin Starter CLI
+
+To scaffold a new plugin folder with a manifest, runtime bundle, and README, run:
+
+```bash
+npm run create-plugin -- --id com.example.demo --name "Example Plugin"
+```
+
+This copies the template in `templates/plugin-starter` into `public/plugins/<slug>`, replacing placeholders with the ID/Name you provide. After scaffolding:
+
+1. Start `npm run dev`.
+2. Open the Plugin Manager and install `http://localhost:3000/plugins/<slug>/manifest.json`.
+3. Use the Add Node menu to drop the generated node and iterate on `plugin.js` or `manifest.json`.
+
+The CLI is additive and never overwrites existing folders, so delete/rename a scaffold before regenerating if you need to start over.
 
 - `nodes`: each node may contain `handles`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
 - `edges`: edges contain `state`, `logic`, `routing`, `style`, and `extensions`.

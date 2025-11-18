@@ -74,11 +74,11 @@
   - [x] Provide helper SDK (React hooks + TypeScript types) so developers can register custom node components.
   - [x] Support plugin-provided styles/assets while enforcing theming + sanitization rules.
 
-- [ ] **Phase 4 – Tooling & Distribution**  
+- [x] **Phase 4 – Tooling & Distribution**  
       Deliver authoring tooling and UX for discovering/installing plugins.
-  - [ ] Release a starter template/CLI to scaffold plugin projects with lint/tests.
-  - [ ] Build Plugin Manager UI (install from URL, browse gallery) integrated into Toolbar/AddNodeMenu.
-  - [ ] Surface permission prompts, changelog notices, and version pinning.
+  - [x] Release a starter template/CLI to scaffold plugin projects with lint/tests.
+  - [x] Build Plugin Manager UI (install from URL, browse gallery) integrated into Toolbar/AddNodeMenu.
+  - [x] Surface permission prompts, changelog notices, and version pinning.
 
 - [ ] **Phase 5 – QA, Docs, Rollout**  
       Validate the platform and prep public launch.

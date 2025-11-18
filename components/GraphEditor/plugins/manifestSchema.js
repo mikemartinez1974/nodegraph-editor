@@ -311,6 +311,7 @@ export function validatePluginManifest(manifest) {
   const metadata = {
     homepage: ensureString(manifest.homepage) || undefined,
     license: ensureString(manifest.license) || undefined,
+    changelog: ensureString(manifest.changelog) || undefined,
     author:
       manifest.author && typeof manifest.author === 'object'
         ? {

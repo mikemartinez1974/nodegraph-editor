@@ -94,6 +94,7 @@
   "metadata": {
     "homepage": "https://example.com/twilight",
     "license": "MIT",
+    "changelog": "0.1.0 – Initial sample plugin shipped with the host",
     "author": {
       "name": "Twilight Lab"
     }

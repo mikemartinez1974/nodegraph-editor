@@ -71,6 +71,8 @@ const sanitizeRecord = (manifest, manifestUrl) => ({
   updatedAt: nowIso(),
   enabled: true,
   version: manifest.version,
+  pinnedVersion: null,
+  pinnedIntegrity: null,
   permissions: manifest.permissions || [],
   bundle: manifest.bundle,
   nodes: manifest.nodes || [],
@@ -171,13 +173,36 @@ export function installManifestObject(manifest, manifestUrl = '') {
   const record = sanitizeRecord(normalized, manifestUrl);
   const existingIndex = entries.findIndex((entry) => entry.id === normalized.id);
   if (existingIndex >= 0) {
-    entries[existingIndex] = { ...entries[existingIndex], ...record };
+    const prev = entries[existingIndex];
+    entries[existingIndex] = {
+      ...prev,
+      ...record,
+      pinnedVersion: prev.pinnedVersion || null,
+      pinnedIntegrity: prev.pinnedIntegrity || null
+    };
   } else {
     entries.push(record);
   }
   writeRegistry(entries);
   notifyListeners();
   return { success: true, data: record };
+}
+
+export function setPluginPinnedVersion(pluginId, version = null) {
+  const entries = readRegistry();
+  const idx = entries.findIndex((entry) => entry.id === pluginId);
+  if (idx === -1) {
+    return { success: false, error: 'Plugin not found' };
+  }
+  entries[idx] = {
+    ...entries[idx],
+    pinnedVersion: version,
+    pinnedIntegrity: version ? entries[idx].bundle?.integrity || null : null,
+    updatedAt: nowIso()
+  };
+  writeRegistry(entries);
+  notifyListeners();
+  return { success: true, data: entries[idx] };
 }
 
 export function clearRegistry() {
@@ -232,6 +257,7 @@ export default {
   subscribe,
   setPluginRuntimeData,
   clearPluginRuntimeData,
+  setPluginPinnedVersion,
   findPluginNodeMeta,
   getPluginNodeDefinition
 };

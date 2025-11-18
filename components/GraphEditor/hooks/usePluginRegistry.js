@@ -7,7 +7,8 @@ import {
   getInstalledPlugins,
   setPluginEnabled,
   uninstallPlugin,
-  subscribe
+  subscribe,
+  setPluginPinnedVersion
 } from '../plugins/pluginRegistry';
 
 export function usePluginRegistry() {
@@ -61,6 +62,14 @@ export function usePluginRegistry() {
     return result;
   }, [refresh]);
 
+  const pinPlugin = useCallback((pluginId, pinnedVersion = null) => {
+    const result = setPluginPinnedVersion(pluginId, pinnedVersion);
+    if (result.success) {
+      refresh();
+    }
+    return result;
+  }, [refresh]);
+
   const state = useMemo(() => ({ installing: status.installing, error: status.error }), [status]);
 
   return {
@@ -70,6 +79,7 @@ export function usePluginRegistry() {
     installManifest,
     togglePlugin,
     removePlugin,
+    pinPlugin,
     refresh
   };
 }

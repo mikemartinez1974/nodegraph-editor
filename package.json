@@ -11,7 +11,8 @@
     "start": "next start",
     "export": "next export",
     "lint": "eslint",
-    "test": "node --test tests/graphCrud.test.js"
+    "test": "node --test tests/graphCrud.test.js",
+    "create-plugin": "node scripts/create-plugin.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
