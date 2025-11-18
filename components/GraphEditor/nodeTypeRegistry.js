@@ -191,10 +191,13 @@ const getPluginNodeEntries = () => {
           return acc;
         }, {});
         const runtimeTypes = Object.keys(runtimeNodes);
-        const allTypes = new Set([
-          ...manifestNodes.map((node) => node?.type).filter(Boolean),
-          ...runtimeTypes
-        ]);
+        const allTypes = new Set();
+        for (const node of manifestNodes) {
+          if (node && node.type) allTypes.add(node.type);
+        }
+        for (const type of runtimeTypes) {
+          if (type) allTypes.add(type);
+        }
         allTypes.forEach((nodeType) => {
           if (!nodeType) return;
           const manifestMeta = manifestMap[nodeType] || {};

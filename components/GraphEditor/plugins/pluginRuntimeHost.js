@@ -27,8 +27,12 @@ const cloneForRpc = (value) => {
   }
   try {
     return JSON.parse(JSON.stringify(value));
-  } catch {
-    return value;
+  } catch (err) {
+    throw new Error(
+      'cloneForRpc: Failed to clone value for RPC. Value is not serializable via structuredClone or JSON. ' +
+      'This may allow shared mutable references to cross the RPC boundary. ' +
+      'Original error: ' + (err && err.message ? err.message : err)
+    );
   }
 };
 
@@ -61,7 +65,10 @@ const buildDefaultHostMethods = (plugin, options = {}) => {
 
   const methods = {
     'graph:getNodes': () => {
-      requirePermission('graph.read');
+        throw new Error(
+          result?.error ||
+            `Failed to read nodes in plugin "${plugin.id || plugin.name || 'unknown'}" (method: graph:getNodes)`
+        );
       const api = ensureGraphApi(getGraphApi);
       const result = api.readNode?.();
       if (!result?.success) {

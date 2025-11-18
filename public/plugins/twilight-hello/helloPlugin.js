@@ -24,7 +24,22 @@
 
   const postToHost = (payload, targetOrigin) => {
     if (!hostWindow) return;
-    const origin = targetOrigin || (hostOrigin === 'null' ? '*' : hostOrigin || '*');
+    let origin = targetOrigin;
+    if (!origin) {
+      // Only allow sending if hostOrigin is a valid, specific origin
+      if (
+        !hostOrigin ||
+        hostOrigin === '*' ||
+        hostOrigin === 'null'
+      ) {
+        console.warn(
+          '[twilight-hello] Refusing to postMessage: hostOrigin is not set to a specific origin.',
+          { payload, hostOrigin }
+        );
+        return;
+      }
+      origin = hostOrigin;
+    }
     hostWindow.postMessage({ ...payload, token: sessionToken }, origin);
   };
 
