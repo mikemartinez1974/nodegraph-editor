@@ -1,8 +1,8 @@
 {
   "id": "com.twilight.hello",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "name": "Hello from the Twilight Zone",
-  "description": "Demo plugin that exposes a single node which shows a friendly greeting.",
+  "description": "Demo plugin that exposes sample nodes, including a custom canvas renderer.",
   "permissions": ["graph.read", "selection.read"],
   "bundle": {
     "url": "/plugins/twilight-hello/helloPlugin.js",
@@ -90,6 +90,84 @@
       },
       "renderer": {
         "entry": "/plugins/twilight-hello/helloRenderer.js"
+      }
+    },
+    {
+      "type": "twilight-canvas",
+      "label": "Twilight Canvas",
+      "description": "Canvas-rendered node that mimics the native canvas node entirely inside the plugin iframe.",
+      "category": "advanced",
+      "icon": "Gesture",
+      "entry": "/plugins/twilight-hello/helloPlugin.js#TwilightCanvasNode",
+      "defaultWidth": 220,
+      "defaultHeight": 140,
+      "defaultData": {
+        "style": "wave",
+        "caption": "Renderer Canvas Node",
+        "palette": ["#6C63FF", "#2CB67D", "#FFB020", "#FF5C8D"]
+      },
+      "definition": {
+        "size": {
+          "width": 220,
+          "height": 140
+        },
+        "handles": {
+          "inputs": [
+            {
+              "id": "signal",
+              "label": "Signal",
+              "dataType": "value"
+            }
+          ],
+          "outputs": [
+            {
+              "id": "out",
+              "label": "Out",
+              "dataType": "value"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "key": "caption",
+            "label": "Caption",
+            "type": "text",
+            "placeholder": "Canvas label"
+          },
+          {
+            "key": "style",
+            "label": "Style",
+            "type": "select",
+            "default": "wave",
+            "options": [
+              { "label": "Wave", "value": "wave" },
+              { "label": "Bars", "value": "bars" }
+            ]
+          },
+          {
+            "key": "samples",
+            "label": "Samples",
+            "type": "json",
+            "placeholder": "[0.1, 0.4, 0.2]"
+          },
+          {
+            "key": "values",
+            "label": "Bar Values",
+            "type": "json",
+            "placeholder": "[0.2, 0.7, 0.5]"
+          }
+        ]
+      },
+      "renderer": {
+        "entry": "/plugins/twilight-hello/canvasRenderer.js"
+      },
+      "extensions": {
+        "layout": {
+          "handleExtension": 4,
+          "hideChrome": true,
+          "padding": 0,
+          "paddingBottom": 0
+        }
       }
     }
   ],

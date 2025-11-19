@@ -162,6 +162,25 @@ export default function PluginNodeRenderer(props) {
     postMessage({ type: 'node:init', payload });
   }, [payload, postMessage, frameKey]);
 
+  const layoutOptions = useMemo(() => {
+    const layout =
+      nodeWithHandles?.extensions?.layout ||
+      nodeTypeMeta?.extensions?.layout ||
+      {};
+    const toNumber = (value, fallback) =>
+      typeof value === 'number' ? value : fallback;
+    const padding = toNumber(layout.padding, 8);
+    return {
+      hideChrome: Boolean(layout.hideChrome),
+      inset: {
+        top: toNumber(layout.paddingTop, padding),
+        right: toNumber(layout.paddingRight, padding),
+        bottom: toNumber(layout.paddingBottom, toNumber(layout.padding, 24)),
+        left: toNumber(layout.paddingLeft, padding)
+      }
+    };
+  }, [nodeWithHandles?.extensions?.layout, nodeTypeMeta?.extensions?.layout]);
+
   const renderContent = () => {
     if (!resolvedRendererUrl || error) {
       return (
@@ -214,14 +233,25 @@ export default function PluginNodeRenderer(props) {
       {...props}
       node={nodeWithHandles}
       hideDefaultContent
+      style={
+        layoutOptions.hideChrome
+          ? {
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              padding: 0,
+              borderRadius: 0
+            }
+          : undefined
+      }
     >
       <div
         style={{
           position: 'absolute',
-          top: 8,
-          left: 8,
-          right: 8,
-          bottom: 24,
+          top: layoutOptions.inset.top,
+          left: layoutOptions.inset.left,
+          right: layoutOptions.inset.right,
+          bottom: layoutOptions.inset.bottom,
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',

@@ -34,4 +34,8 @@ The bundle requests `graph.read` + `selection.read` so it can query the current 
 
 ## Renderer bundle
 
-`helloRenderer.js` runs inside each node’s sandboxed iframe via `NodeGraphPluginRenderer.createRenderer`. It receives `{ data, nodeId }` props from the host and renders a simple heading/tagline. Because the iframe is sandboxed, UI bugs or crashes never impact the main editor—falling back to the placeholder if the renderer reports an error.
+`helloRenderer.js` runs inside each node’s sandboxed iframe via `NodeGraphPluginRenderer.createRenderer`. It receives `{ data, nodeId }` props from the host and renders a simple heading/tagline.
+
+`canvasRenderer.js` shows how to render a fully custom canvas UI inside the sandbox. It draws a waveform/barchart directly on a `<canvas>` element so the plugin node looks identical to the native `CanvasNode` (no default chrome, handles pinned close to the content).
+
+Because the iframe is sandboxed, UI bugs or crashes never impact the main editor—falling back to the placeholder if the renderer reports an error.

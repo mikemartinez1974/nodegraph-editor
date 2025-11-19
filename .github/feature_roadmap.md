@@ -14,7 +14,7 @@
 - [ ] **Automation Platform**  
       Extend ScriptPanel/ScriptNode with scheduling, parameters, and logging (`components/GraphEditor/Scripting/ScriptPanel.js:1`, `components/GraphEditor/Nodes/ScriptNode.js:5`).
 
-- [ ] **Plugin Node Registry**  
+- [x] **Plugin Node Registry**  
       Turn `nodeTypeRegistry` into an extensible plugin API with validation and lazy loading (`components/GraphEditor/nodeTypeRegistry.js:19`).
       - [ ] Publish plugin API contract (manifest schema, exports, lifecycle hooks).
       - [ ] Build secure loader with origin allow-list and bundle validation.

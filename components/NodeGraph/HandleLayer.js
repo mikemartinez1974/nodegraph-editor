@@ -8,6 +8,10 @@ import { getEdgeHandlePosition } from './utils';
 const handleRadius = 8;
 const handleExtension = 12; // was 20, now closer to node
 const nodeHoverMargin = 24; // px, for easier node hover
+const getNodeHandleExtension = (node) => {
+  const value = node?.extensions?.layout?.handleExtension;
+  return typeof value === 'number' ? value : handleExtension;
+};
 const SNAP_DISTANCE = 28;
 
 // --- NEW: Get handles from node schema ---
@@ -16,6 +20,7 @@ function getHandlePositions(node) {
   const y = node.position?.y ?? node.y ?? 0;
   const width = node.width || 60;
   const height = node.height || 60;
+  const extension = getNodeHandleExtension(node);
   const handles = [];
   // Inputs (left)
   if (Array.isArray(node.inputs)) {
@@ -29,7 +34,7 @@ function getHandlePositions(node) {
         label: h.label,
         handleType: h.type,
         position: {
-          x: x - width / 2 - handleExtension,
+          x: x - width / 2 - extension,
           y: y - height / 2 + ((i + 1) / (node.inputs.length + 1)) * height
         },
         color: '#0288d1',
@@ -48,7 +53,7 @@ function getHandlePositions(node) {
         label: h.label,
         handleType: h.type,
         position: {
-          x: x + width / 2 + handleExtension,
+          x: x + width / 2 + extension,
           y: y - height / 2 + ((i + 1) / (node.outputs.length + 1)) * height
         },
         color: '#43a047',
@@ -416,7 +421,8 @@ const HandleLayer = forwardRef(({
         const nodeY = node.position?.y ?? node.y ?? 0;
         const width = node.width || 60;
         const height = node.height || 60;
-        const extendedX = handleExtension + handleRadius * 2;
+        const extension = getNodeHandleExtension(node);
+        const extendedX = extension + handleRadius * 2;
         const extendedY = handleRadius * 2;
         const left = nodeX - width / 2 - extendedX;
         const right = nodeX + width / 2 + extendedX;

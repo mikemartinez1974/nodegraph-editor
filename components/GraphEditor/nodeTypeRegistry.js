@@ -17,6 +17,7 @@ import ThreeDNode from './Nodes/ThreeDNode';
 import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
 import ValueTriggerNode from './Nodes/ValueTriggerNode';
 import PluginNodeRenderer from './Nodes/PluginNodeRenderer';
+import CanvasNode from './Nodes/CanvasNode';
 import { getInstalledPlugins } from './plugins/pluginRegistry';
 
 // Registry structure: each entry has the component and display metadata
@@ -119,6 +120,24 @@ const baseNodeTypeRegistry = {
     icon: 'Lan',
     category: 'integration'
   },
+  canvas: {
+    component: CanvasNode,
+    label: 'Canvas Node',
+    description: 'Native node rendered directly on the canvas',
+    icon: 'Gesture',
+    category: 'advanced',
+    defaultWidth: 220,
+    defaultHeight: 140,
+    extensions: {
+      layout: {
+        handleExtension: 4
+      }
+    },
+    defaultData: {
+      style: 'wave',
+      caption: 'Native Canvas Node'
+    }
+  },
   '3d': {
     component: ThreeDNode,
     label: '3D View',
@@ -149,6 +168,24 @@ export const nodeTypeMetadata = [
     category: 'media',
     defaultWidth: 300,
     defaultHeight: 300
+  },
+  {
+    type: 'canvas',
+    label: 'Canvas Node',
+    description: 'Native node drawn using the canvas API',
+    icon: 'Gesture',
+    category: 'advanced',
+    defaultWidth: 220,
+    defaultHeight: 140,
+    extensions: {
+      layout: {
+        handleExtension: 4
+      }
+    },
+    defaultData: {
+      style: 'wave',
+      caption: 'Native Canvas Node'
+    }
   },
   {
     type: 'backgroundRpc',
