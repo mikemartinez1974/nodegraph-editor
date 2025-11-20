@@ -362,8 +362,35 @@ When importing/exporting graphs manually, preserve unknown `extensions` blocks s
 
 - Breadboard components are just nodes with `extensions.breadboard`. Each component declares a `footprint` name plus `pins[] = [{ id, row, column, polarity }]`, where rows/columns follow the standard A–J / numeric grid. The renderer and validators read those coordinates to snap pins to the virtual sockets.
 - Rails/power metadata lives in `graph.extensions.breadboard.rails[]` (e.g., `{ id: 'vcc-top-a', label: 'VCC1', voltage: 5 }`). A power node can update those entries at runtime.
+- Every node stores its current placement in `node.data.pins[]` plus optional `node.data.footprint` dimensions (`rows`, `columns`, `width`, `height`, `rowPitch`, `columnPitch`). This keeps serializer-aware metadata (history, undo, plugins) in sync even if the renderer introduces new pin shapes later.
+- Board-level presets live in `graph.extensions.breadboard.presets[]`, and `activePresetId` selects which preset the canvas should render. Each preset bundles its own `grid` and `rails`, so exporting/importing a `.node` file captures the entire board definition without relying on implicit defaults.
+- The `graph.metadata.breadboard` block is reserved for runtime state (active preset, simulation timestamps, etc.). Treat it as opaque when writing import/export tools so future metadata can be added without breaking older templates.
 - Validators should treat collisions/shorts as warnings rather than hard failures: e.g., if two pins reference the same socket, surface a snackbar and highlight the offending nodes, but still serialize the graph so users can fix it later.
 - Logic simulation communicates through existing ScriptNode/background RPC channels. For V1 we propagate HIGH/LOW states only; future analog simulators can add `pin.voltage`/`pin.current` fields without altering the base schema.
+
+### Socket/Rail Node Taxonomy (Phase 3)
+
+To keep the breadboard “substrate” inside the normal NodeGraph abstractions, the board itself is modeled as nodes and edges:
+
+- **`breadboard-socket` node**  
+  - Represents one column segment (e.g., A1–E1) or a single hole depending on density needs.  
+  - `data` fields: `row`, `column`, `segment` (top/bottom), `railId` (optional), `occupiedBy` (computed at runtime).  
+  - Handles: expose one output (`socket`) so components can connect via edges.  
+  - These nodes are locked/hidden in templates so end-users don’t accidentally move them.
+
+- **`breadboard-rail` node**  
+  - Models the power rails as a chain of sockets.  
+  - `data`: `{ id, label, polarity, segmentColumns: [{ start, end }] }`.  
+  - Links to the relevant `breadboard-socket` nodes via edges so GraphCRUD already “knows” the rail wiring.
+
+- **`breadboard-skin` node**  
+  - Optional canvas/background node that draws the classic breadboard art.  
+  - Lives at the bottom z-index and is purely visual (no handles).
+
+- **Component nodes** (resistor, jumper, DIP) simply connect their pin handles to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
+
+**Template generation:**  
+Ship a starter `.node` file that instantiates ~800 socket nodes (grouped per column so we do not exceed performance budgets), the rail nodes, and a locked skin node. Components dropped into the template automatically snap because the global grid size equals the socket pitch (0.1" increments). Scripts/validators can resolve connectivity by traversing `breadboard-socket → breadboard-rail` edges instead of consulting a bespoke data structure.
 
 ---
 

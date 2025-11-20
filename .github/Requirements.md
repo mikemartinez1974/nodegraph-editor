@@ -71,48 +71,65 @@ Use these prompts to capture answers during Phase 1 discovery for both the plugi
    - What metadata (pins, spacing, ratings) does each require?
    - Will users add custom components, and how?
 
-   Launch with the “student lab” essentials so the demo feels real: jumpers (single wires), resistors, LEDs, push buttons, DIP‑8 shells (for simple ICs), rail power sources, and measurement helpers (logic probe/indicator LED). Each component publishes `extensions.breadboard` metadata describing its footprint (pin offsets measured in row/column coordinates), pin polarity (e.g., LED anode/cathode), and optional value fields (resistance, voltage). Additional components can be shipped as native nodes or plugins by following the same contract—nothing in core changes.
+   I'm aiming for a basic breadboard because this is really just a demo.  A small handful of components will be adequate, and the ability to add custom components seems like an obvious thing to add.  
 
 3. **Rails & Power Semantics**
    - How many rails/buses do we support and how are they labeled?
    - What voltage/logic level presets or constraints apply?
    - How do users configure power sources and grounding?
 
-   Use a classic full-size board: dual power rails on top and bottom, each split into two halves (default labels `VCC1/GND1` and `VCC2/GND2`). A power node lets users set the voltage per rail (defaults 5 V on top, 3.3 V on bottom) and tie halves together if desired. Socket rows follow the standard A–E / F–J columns with the center trench isolated for DIP packages. Rail metadata lives in `graph.extensions.breadboard.rails[]` so it travels with the `.node` file.
+   Well, how many are on a real breadboard?  Our breadboard should look and behave like any other.  A power source is a component or a node.  I'm not an engineer, and have not much experience with breadboards, but if grounding or not grounding is a variable, it seems like a toggle on the power supply should suffice.
 
 4. **Interaction Model**
    - How does a user enter/exit breadboard mode?
    - What does placement, snapping, rotation, and wiring feel like?
    - How do palettes/toolbars differ from the free-form editor?
 
-   The breadboard is “just another graph” — opening the starter `.node` file loads the board overlay and opens the new Node Palette drawer filtered to Breadboard components. Dropping a component places it with default spacing; dragging the body moves it and snaps both pins to the socket grid. Users can grab a specific pin handle to stretch the component so it spans any two sockets (rows need not be adjacent). Wiring uses the existing handle-drag flow: start on a pin, move across the board, snap to a target socket/rail. The palette replaces the old menu, offering search, tags, and drag placement so students feel like they’re picking parts from a bin.
+   Since the breadboard is an app/page/graph on the web, the user enters "breadboard mode" by navigating to it.  
+
+   Treat every component as a regular node with adjustable width/height; dragging handles or using a simple resize affordance lets the user stretch a resistor/LED footprint so its pins drop into any two sockets. That keeps placement predictable and leverages the resizing logic you already have.
+
+   For easier placement, let the first click drop the component at a default size, then provide a “pin grab” affordance: click on pin A to anchor it to a socket, then drag pin B to the desired socket (the node stretches as needed). Under the hood you’re just updating node width + handle offsets.
+
+   To make it friendlier, snap pins to sockets via handle snapping (similar to what you built for edges). When the user drags a pin handle near a socket, highlight and snap so they know the lead is seated correctly. The component box resizes automatically to keep both pins aligned with their sockets.
+
+   add numeric inputs in the Properties Panel (“Pin A column”, “Pin B column”) so users can type coordinates; the node updates its position/size accordingly. This complements the visual drag/resize flow and makes it easy to span non-adjacent rows precisely.
 
 5. **Schema & Validation Impact**
    - What additions are needed for nodes/edges/groups (pins, footprints, board metadata)?
    - How do we enforce socket occupancy, collision rules, and rail constraints?
    - How does breadboard state integrate with GraphCRUD/history?
 
-   Components store everything in existing fields: `node.extensions.breadboard = { footprint: 'resistor', pins: [{ id, row, column, polarity }] }`. Board-level metadata (grid spacing, rail info) lives in `graph.extensions.breadboard`. GraphCRUD/history already preserves `extensions`, so undo/redo works automatically. Validation simply reads that metadata: warn if two pins try to occupy the same socket, if a pin references an invalid row/column, or if a polarized pin is wired to the wrong rail. These checks surface as non-blocking warnings/snackbars so the user can fix issues without corrupting the graph.
+   Breadboard nodes use extensions.breadboard for pin footprints and graph.extensions.breadboard for board metadata. Validation hooks read that data to warn about collisions/socket conflicts, but no new history plumbing is required—GraphCRUD already captures undo/redo because everything is standard node data.
 
 6. **Simulation & Measurement**
    - What fidelity do we target (logic only vs. analog)?
    - Where does the simulation run (ScriptNode, background worker, external service)?
    - What telemetry (voltages, logic states, warnings) does the UI need?
 
-   Phase 1 ships with logic-only simulation: components expose HIGH/LOW/high-Z states and the evaluator propagates booleans through edges. The simulator runs inside an existing ScriptNode or plugin worker so it can read the graph via the SDK without freezing the UI. Measurement nodes (logic probe, status LED) subscribe to those updates and display the current state. Analog/SPICE-level simulation is deferred; the schema leaves room (e.g., optional `pin.voltage`) so a future WASM/worker engine can slot in later.
+   Fidelity: Phase 1 targets logic-only (digital) simulation so we can ship quickly. Components expose HIGH/LOW states, and edges propagate boolean signals. Analog (voltage/current) simulation is deferred to Phase 2 once the breadboard UX and plug-in flow are proven, but the schema should leave room for voltage/current metadata so we can swap in an analog engine later.
+
+   Execution: The logic simulator runs inside the existing graph runtime (ScriptNode or a dedicated background worker plugin) so it can read the graph via the plugin SDK and emit updates without blocking the UI. When/if we add analog, it will likely run in a WASM worker or external service, but the bridge/telemetry API remains the same.
+
+   Telemetry: For logic sim we surface node/rail states (HIGH/LOW, high-Z) and timing (basic waveforms, event logs). Measurement nodes (logic probe, simple LED indicators) consume that state. When analog arrives, we extend the same channel with voltages/currents and richer measurement nodes (multimeter, oscilloscope).
 
 7. **Onboarding & Documentation**
    - What tutorials, tooltips, or guided flows are required?
    - How do we surface troubleshooting (short detection, measurement tools)?
 
-   Include a “Breadboard Starter” file with a 3-step overlay the first time it opens (place resistor → wire LED → run logic sim). Tooltips on breadboard nodes explain pin polarity/rail usage, and the Properties Panel exposes row/column inputs for precise placement. A troubleshooting sidebar lists validation warnings (shorts, duplicate sockets) and houses measurement tools; users can drop a logic probe node from the palette to inspect any pin. Documentation/User Manual gets a Breadboard chapter covering placement, wiring, running the sim, and interpreting probe output.
+   Ship a “Breadboard Starter” template with an inline walkthrough: when the board loads, highlight the palette, wiring interaction, and measurement nodes in a 3-step overlay (place component → wire pins → run logic sim). Keep it lightweight but make sure first‑time users see how to drop a resistor and hook up rails.
+
+   Add contextual tooltips on breadboard-specific nodes (e.g., rails, probe) explaining pin semantics (anode/cathode, power rails) and what metadata fields do. These can appear when the node is selected or from a help icon in the Properties Panel.
+   Include a troubleshooting sidebar (or measurement panel) that surfaces validation warnings: “Pin A and Pin B share the same rail,” “Short detected between 5V and GND,” etc. The same panel hosts measurement tools (logic probe, LED indicator) so users can drop them onto nodes to inspect states without hunting for hidden diagnostics.
+
+   Update the docs/User Manual with a breadboard chapter that covers: loading the template, using the palette, wiring conventions, available components, running the logic sim, and interpreting measurement readings. Provide a couple of guided exercises (e.g., build an AND gate, detect a short) to reinforce the workflow.
 
 8. **Constraints & Risks**
    - Performance limits (node count, rendering load) we must plan for?
    - Compatibility concerns with existing graphs/projects?
    - Rollout strategy (feature flag, beta cohort) and success metrics?
 
-   Breadboard graphs are standard `.node` documents, so no migration tricks are needed; older editors simply render the nodes with default chrome. For V1 we target ~200 components / 1 000 edges until we’ve profiled larger boards; the board overlay uses the same NodeGraph layers, so we’ll instrument frame time if performance dips. Rollout is just publishing the template and docs (no feature flag required). Success is demonstrating that a full app experience—palette, snapping, logic sim—can be built entirely on the core graph + plugin primitives without touching editor internals.
+   Breadboard graphs don’t need to open in older builds, but they should remain valid .node files that the current editor understands. We’ll set a soft cap (≈200 components / 1,000 edges) until we’ve profiled larger boards; if performance dips we’ll instrument the node/edge layers before GA. Since the breadboard ships as a standalone graph template, rollout is simply publishing the file (and docs) once it’s ready—no feature flag required. Success for this demo is proving an app-level experience can be built entirely from our graph + plugin primitives (custom nodes, renderer hints, runtime sim) without touching core code.
 
 ## Core Schema Modernization
 

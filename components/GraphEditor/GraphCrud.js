@@ -12,13 +12,75 @@ const hasContent = (value) => typeof value === 'string' && value.trim().length >
 
 const toLower = (value) => (value ?? '').toString().toLowerCase();
 
+const isPlainObject = (value) =>
+  value !== null &&
+  typeof value === 'object' &&
+  Object.prototype.toString.call(value) === '[object Object]';
+
+const cloneValue = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(item => cloneValue(item));
+  }
+  if (isPlainObject(value)) {
+    const cloned = {};
+    Object.keys(value).forEach(key => {
+      cloned[key] = cloneValue(value[key]);
+    });
+    return cloned;
+  }
+  return value;
+};
+
+const cloneExtensions = (extensions) => {
+  if (!extensions) return extensions;
+  if (!isPlainObject(extensions)) {
+    return cloneValue(extensions);
+  }
+  const cloned = {};
+  Object.keys(extensions).forEach(key => {
+    cloned[key] = cloneValue(extensions[key]);
+  });
+  return cloned;
+};
+
+const mergeExtensionValues = (existing, incoming) => {
+  if (incoming === undefined) {
+    return existing;
+  }
+  if (Array.isArray(incoming)) {
+    return incoming.map(item => cloneValue(item));
+  }
+  if (isPlainObject(incoming)) {
+    const base = isPlainObject(existing) ? { ...existing } : {};
+    Object.keys(incoming).forEach(key => {
+      base[key] = mergeExtensionValues(existing ? existing[key] : undefined, incoming[key]);
+    });
+    return base;
+  }
+  return cloneValue(incoming);
+};
+
+const mergeExtensions = (existing, updates) => {
+  if (updates === null) return null;
+  if (!updates) return existing;
+  if (!isPlainObject(updates)) {
+    return cloneValue(updates);
+  }
+  const base = existing && isPlainObject(existing) ? cloneExtensions(existing) : {};
+  Object.keys(updates).forEach(key => {
+    base[key] = mergeExtensionValues(existing ? existing[key] : undefined, updates[key]);
+  });
+  return base;
+};
+
 const DEFAULT_INPUT_HANDLE = Object.freeze({ key: 'in', label: 'In', type: 'trigger', direction: 'input' });
 const DEFAULT_OUTPUT_HANDLE = Object.freeze({ key: 'out', label: 'Out', type: 'trigger', direction: 'output' });
 
 const legacyHandleFromNormalized = (handle) => ({
   key: handle.id,
   label: handle.label || handle.id,
-  type: handle.dataType || handle.type || 'value'
+  type: handle.dataType || handle.type || 'value',
+  metadata: handle.metadata ? cloneValue(handle.metadata) : undefined
 });
 
 const toHandleDescriptor = (handle, fallbackDirection, index = 0) => {
@@ -34,7 +96,9 @@ const toHandleDescriptor = (handle, fallbackDirection, index = 0) => {
     label: handle.label || handle.name || key,
     type: handle.type || handle.dataType || 'value',
     direction: handle.direction || fallbackDirection || 'output',
-    allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined
+    allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
+    metadata: handle.metadata ? cloneValue(handle.metadata) : undefined,
+    position: handle.position ? { ...handle.position } : undefined
   };
 };
 
@@ -58,7 +122,19 @@ const cloneHandleDescriptor = (handle, directionOverride) => ({
   label: handle.label || handle.key,
   type: handle.type || handle.dataType || 'value',
   direction: directionOverride || handle.direction || 'output',
-  allowedEdgeTypes: handle.allowedEdgeTypes ? [...handle.allowedEdgeTypes] : undefined
+  allowedEdgeTypes: handle.allowedEdgeTypes ? [...handle.allowedEdgeTypes] : undefined,
+  metadata: handle.metadata ? cloneValue(handle.metadata) : undefined,
+  position: handle.position ? { ...handle.position } : undefined
+});
+
+const toHandleMeta = (handle) => ({
+  key: handle.key,
+  label: handle.label || handle.key,
+  type: handle.type || handle.dataType || 'value',
+  direction: handle.direction || 'output',
+  allowedEdgeTypes: handle.allowedEdgeTypes ? [...handle.allowedEdgeTypes] : undefined,
+  metadata: handle.metadata ? cloneValue(handle.metadata) : undefined,
+  position: handle.position ? { ...handle.position } : undefined
 });
 
 const getHandleList = (node, field, fallback) => {
@@ -102,7 +178,7 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
           dataType: handle.dataType || handle.handleType || handle.type || 'value',
           allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
           position: handle.position ? { ...handle.position } : undefined,
-          metadata: handle.metadata ? { ...handle.metadata } : undefined
+          metadata: handle.metadata ? cloneValue(handle.metadata) : undefined
         };
       })
       .filter(Boolean);
@@ -133,7 +209,10 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
         id: descriptor.key,
         label: descriptor.label,
         direction: 'input',
-        dataType: descriptor.type
+        dataType: descriptor.type,
+        allowedEdgeTypes: descriptor.allowedEdgeTypes ? [...descriptor.allowedEdgeTypes] : undefined,
+        metadata: descriptor.metadata ? cloneValue(descriptor.metadata) : undefined,
+        position: descriptor.position ? { ...descriptor.position } : undefined
       });
     }
   });
@@ -144,7 +223,10 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
         id: descriptor.key,
         label: descriptor.label,
         direction: 'output',
-        dataType: descriptor.type
+        dataType: descriptor.type,
+        allowedEdgeTypes: descriptor.allowedEdgeTypes ? [...descriptor.allowedEdgeTypes] : undefined,
+        metadata: descriptor.metadata ? cloneValue(descriptor.metadata) : undefined,
+        position: descriptor.position ? { ...descriptor.position } : undefined
       });
     }
   });
@@ -159,7 +241,7 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
 const sanitizeNodeData = (rawData) => {
   const data =
     rawData && typeof rawData === 'object' && !Array.isArray(rawData)
-      ? { ...rawData }
+      ? cloneValue(rawData)
       : {};
   if (data.memo === undefined || data.memo === null) {
     data.memo = '';
@@ -229,8 +311,8 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
 
   return {
     meta: {
-      source: { key: sourceHandle.key, label: sourceHandle.label, type: sourceHandle.type },
-      target: { key: targetHandle.key, label: targetHandle.label, type: targetHandle.type }
+      source: toHandleMeta(sourceHandle),
+      target: toHandleMeta(targetHandle)
     }
   };
 };
@@ -292,7 +374,10 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
     color: edgeInput.color,
     visible: edgeInput.visible !== false,
     showLabel: edgeInput.showLabel === true,
-    data: edgeInput.data || {},
+    data:
+      edgeInput.data && typeof edgeInput.data === 'object'
+        ? cloneValue(edgeInput.data)
+        : {},
     style: {
       width: style.width || 2,
       dash: style.dash || [],
@@ -300,10 +385,10 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
       color: style.color
     },
     handleMeta: handleValidation.meta,
-    state: edgeInput.state ? { ...edgeInput.state } : undefined,
-    logic: edgeInput.logic ? { ...edgeInput.logic } : undefined,
-    routing: edgeInput.routing ? { ...edgeInput.routing } : undefined,
-    extensions: edgeInput.extensions ? { ...edgeInput.extensions } : undefined
+    state: edgeInput.state ? cloneValue(edgeInput.state) : undefined,
+    logic: edgeInput.logic ? cloneValue(edgeInput.logic) : undefined,
+    routing: edgeInput.routing ? cloneValue(edgeInput.routing) : undefined,
+    extensions: cloneExtensions(edgeInput.extensions)
   };
 
   return { edge: sanitizedEdge };
@@ -368,9 +453,9 @@ export default class GraphCRUD {
       } while (currentNodes.some(n => n.id === nodeId));
 
       const normalizedHandles = normalizeHandleDefinitions({ handles, inputs, outputs });
-      const sanitizedState = state ? { ...state } : undefined;
-      const sanitizedStyle = style ? { ...style } : undefined;
-      const sanitizedExtensions = extensions ? { ...extensions } : undefined;
+      const sanitizedState = state ? cloneValue(state) : undefined;
+      const sanitizedStyle = style ? cloneValue(style) : undefined;
+      const sanitizedExtensions = cloneExtensions(extensions);
       const sanitizedData = sanitizeNodeData(data);
       const newNode = {
         id: nodeId,
@@ -469,7 +554,10 @@ export default class GraphCRUD {
             position: updates.position ? { ...node.position, ...updates.position } : node.position,
             state: updates.state ? { ...node.state, ...updates.state } : node.state,
             style: updates.style ? { ...node.style, ...updates.style } : node.style,
-            extensions: updates.extensions ? { ...node.extensions, ...updates.extensions } : node.extensions
+            extensions:
+              updates.extensions === undefined
+                ? node.extensions
+                : mergeExtensions(node.extensions, updates.extensions)
           };
         }
         return node;
@@ -610,7 +698,10 @@ export default class GraphCRUD {
         state: updates.state ? { ...existingEdge.state, ...updates.state } : existingEdge.state,
         logic: updates.logic ? { ...existingEdge.logic, ...updates.logic } : existingEdge.logic,
         routing: updates.routing ? { ...existingEdge.routing, ...updates.routing } : existingEdge.routing,
-        extensions: updates.extensions ? { ...existingEdge.extensions, ...updates.extensions } : existingEdge.extensions
+        extensions:
+          updates.extensions === undefined
+            ? existingEdge.extensions
+            : mergeExtensions(existingEdge.extensions, updates.extensions)
       };
       if (updates.data) {
         mergedEdge.data = { ...existingEdge.data, ...updates.data };
@@ -714,9 +805,9 @@ export default class GraphCRUD {
             inputs: normalizedHandles.inputs,
             outputs: normalizedHandles.outputs,
             handles: normalizedHandles.handles,
-            state: opts.state ? { ...opts.state } : undefined,
-            style: opts.style ? { ...opts.style } : undefined,
-            extensions: opts.extensions ? { ...opts.extensions } : undefined,
+            state: opts.state ? cloneValue(opts.state) : undefined,
+            style: opts.style ? cloneValue(opts.style) : undefined,
+            extensions: cloneExtensions(opts.extensions),
             resizable: opts.resizable !== undefined ? opts.resizable : true,
             handlePosition: opts.handlePosition || 'center',
             showLabel: opts.showLabel !== undefined ? opts.showLabel : true

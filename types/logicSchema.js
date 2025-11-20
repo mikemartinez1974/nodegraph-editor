@@ -10,13 +10,40 @@
  */
 
 /**
+ * Breadboard pin metadata
+ * @typedef {Object} BreadboardPin
+ * @property {string} id
+ * @property {string} row
+ * @property {number} column
+ * @property {string=} polarity
+ * @property {string=} rail
+ */
+
+/**
+ * Footprint dimensions for breadboard-aware nodes
+ * @typedef {Object} BreadboardFootprint
+ * @property {number} rows
+ * @property {number} columns
+ * @property {number} width
+ * @property {number} height
+ * @property {number=} rowPitch
+ * @property {number=} columnPitch
+ */
+
+/**
  * Node definition
  * @typedef {Object} Node
  * @property {string} id
  * @property {string} type
  * @property {string} label
  * @property {{x:number, y:number}} position
- * @property {Object} data
+ * @property {{
+ *   memo?: string,
+ *   link?: string,
+ *   pins?: BreadboardPin[],
+ *   footprint?: BreadboardFootprint,
+ *   metadata?: Object
+ * }} data
  * @property {NodeHandle[]} inputs
  * @property {NodeHandle[]} outputs
  */

@@ -18,6 +18,7 @@ import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
 import ValueTriggerNode from './Nodes/ValueTriggerNode';
 import PluginNodeRenderer from './Nodes/PluginNodeRenderer';
 import CanvasNode from './Nodes/CanvasNode';
+import BreadboardSocketNode from './Nodes/BreadboardSocketNode';
 import { getInstalledPlugins } from './plugins/pluginRegistry';
 
 // Registry structure: each entry has the component and display metadata
@@ -138,6 +139,21 @@ const baseNodeTypeRegistry = {
       caption: 'Native Canvas Node'
     }
   },
+  breadboardSocket: {
+    component: BreadboardSocketNode,
+    label: 'Breadboard Socket',
+    description: 'Represents a column of breadboard holes',
+    icon: 'FiberManualRecord',
+    category: 'breadboard',
+    defaultWidth: 18,
+    defaultHeight: 18,
+    state: {
+      locked: true
+    },
+    style: {
+      borderRadius: 999
+    }
+  },
   '3d': {
     component: ThreeDNode,
     label: '3D View',
@@ -204,6 +220,23 @@ export const nodeTypeMetadata = [
     category: 'logic',
     defaultWidth: 240,
     defaultHeight: 180
+  },
+  {
+    type: 'breadboardSocket',
+    label: 'Breadboard Socket',
+    description: 'Locked socket column used to build breadboard templates',
+    icon: 'FiberManualRecord',
+    category: 'breadboard',
+    defaultWidth: 18,
+    defaultHeight: 18,
+    state: {
+      locked: true
+    },
+    defaultData: {
+      rows: ['A', 'B', 'C', 'D', 'E'],
+      column: 1,
+      segment: 'top'
+    }
   }
   // Add more node types here as needed
 ];

@@ -1,4 +1,5 @@
 // Data validation guards for nodes and edges
+import { useRef } from 'react';
 import { validateNode, validateEdge, validateGraph } from './schema';
 
 // Validation error types
@@ -13,6 +14,148 @@ export const VALIDATION_ERRORS = {
   CIRCULAR_REFERENCE: 'CIRCULAR_REFERENCE',
   INVALID_TYPE: 'INVALID_TYPE',
   INVALID_DATA: 'INVALID_DATA'
+};
+
+const BREADBOARD_ROWS = ['A','B','C','D','E','F','G','H','I','J'];
+
+const sanitizeBreadboardPinsArray = (pins, { allowAutoFix, result, fieldBase, gridColumns }) => {
+  if (pins === undefined) return undefined;
+  if (!Array.isArray(pins)) {
+    if (allowAutoFix) {
+      result.warnings.push({
+        type: VALIDATION_ERRORS.INVALID_DATA,
+        message: `Reset breadboard pins (expected array)`,
+        field: fieldBase,
+        autoFixed: true
+      });
+      return [];
+    }
+    result.errors.push({
+      type: VALIDATION_ERRORS.INVALID_DATA,
+      message: `Breadboard pins must be an array`,
+      field: fieldBase
+    });
+    return undefined;
+  }
+
+  const occupied = new Set();
+  return pins.map((pin, index) => {
+    if (!pin || typeof pin !== 'object') return pin;
+    const sanitizedPin = { ...pin };
+    if (!sanitizedPin.id || typeof sanitizedPin.id !== 'string') {
+      if (allowAutoFix) {
+        sanitizedPin.id = `pin-${index}`;
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_ID,
+          message: `Generated breadboard pin id at index ${index}`,
+          field: fieldBase,
+          autoFixed: true
+        });
+      } else {
+        result.errors.push({
+          type: VALIDATION_ERRORS.INVALID_ID,
+          message: 'Breadboard pins require string ids',
+          field: fieldBase
+        });
+      }
+    }
+
+    if (sanitizedPin.row) {
+      const normRow = String(sanitizedPin.row).trim().toUpperCase();
+      if (BREADBOARD_ROWS.includes(normRow)) {
+        sanitizedPin.row = normRow;
+      } else {
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: `Pin '${sanitizedPin.id}' references invalid row '${sanitizedPin.row}'`,
+          field: fieldBase
+        });
+      }
+    }
+
+    if (sanitizedPin.column !== undefined) {
+      const numericCol = Number(sanitizedPin.column);
+      if (Number.isFinite(numericCol) && numericCol >= 1) {
+        sanitizedPin.column = Math.floor(numericCol);
+        if (gridColumns && numericCol > gridColumns) {
+          result.warnings.push({
+            type: VALIDATION_ERRORS.INVALID_DATA,
+            message: `Pin '${sanitizedPin.id}' column ${numericCol} exceeds board columns (${gridColumns})`,
+            field: fieldBase
+          });
+        }
+      } else {
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: `Pin '${sanitizedPin.id}' has invalid column '${sanitizedPin.column}'`,
+          field: fieldBase
+        });
+      }
+    }
+
+    if (sanitizedPin.row && sanitizedPin.column !== undefined) {
+      const key = `${sanitizedPin.row}:${sanitizedPin.column}`;
+      if (occupied.has(key)) {
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: `Multiple pins assigned to socket ${key}`,
+          field: fieldBase
+        });
+      } else {
+        occupied.add(key);
+      }
+    }
+
+    return sanitizedPin;
+  });
+};
+
+const sanitizeFootprintDimensions = (footprint, { allowAutoFix, result, fieldBase }) => {
+  if (footprint === undefined) return undefined;
+  if (!footprint || typeof footprint !== 'object' || Array.isArray(footprint)) {
+    if (allowAutoFix) {
+      result.warnings.push({
+        type: VALIDATION_ERRORS.INVALID_DATA,
+        message: `Removed invalid footprint metadata`,
+        field: fieldBase,
+        autoFixed: true
+      });
+      return undefined;
+    }
+    result.errors.push({
+      type: VALIDATION_ERRORS.INVALID_DATA,
+      message: 'Footprint metadata must be an object',
+      field: fieldBase
+    });
+    return undefined;
+  }
+
+  const sanitized = { ...footprint };
+  ['rows', 'columns', 'width', 'height', 'rowPitch', 'columnPitch'].forEach(key => {
+    if (sanitized[key] === undefined) return;
+    const numericValue = Number(sanitized[key]);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      if (allowAutoFix) {
+        delete sanitized[key];
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: `Removed invalid ${key} from footprint`,
+          field: fieldBase,
+          autoFixed: true
+        });
+      } else {
+        result.errors.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: `Footprint ${key} must be a positive number`,
+          field: fieldBase
+        });
+      }
+    } else {
+      sanitized[key] = numericValue;
+    }
+  });
+
+  return sanitized;
 };
 
 export class ValidationGuard {
@@ -211,6 +354,29 @@ export class ValidationGuard {
         }
       }
 
+      if (!sanitized.data) {
+        sanitized.data = {};
+      } else {
+        const dataPins = sanitizeBreadboardPinsArray(sanitized.data.pins, {
+          allowAutoFix: this.options.allowAutoFix,
+          result,
+          fieldBase: 'data.pins',
+          gridColumns: sanitized.data?.footprint?.columns
+        });
+        if (dataPins !== undefined) {
+          sanitized.data.pins = dataPins;
+        }
+
+        const footprint = sanitizeFootprintDimensions(sanitized.data.footprint, {
+          allowAutoFix: this.options.allowAutoFix,
+          result,
+          fieldBase: 'data.footprint'
+        });
+        if (footprint !== undefined) {
+          sanitized.data.footprint = footprint;
+        }
+      }
+
       if (sanitized.handles !== undefined) {
         if (!Array.isArray(sanitized.handles)) {
           result.errors.push({
@@ -256,6 +422,8 @@ export class ValidationGuard {
             .filter(Boolean);
         }
       }
+
+      sanitized = this.applyBreadboardExtensionValidation(sanitized, result);
 
       const deriveLegacyHandles = (direction) => {
         const source = Array.isArray(sanitized.handles) ? sanitized.handles : [];
@@ -454,7 +622,7 @@ export class ValidationGuard {
   }
 
   // Validate entire graph structure
-  validateGraphStructure(nodes, edges) {
+  validateGraphStructure(nodes, edges, graphExtensions = null) {
     const result = {
       isValid: true,
       errors: [],
@@ -539,8 +707,83 @@ export class ValidationGuard {
       });
     }
 
+    if (graphExtensions?.breadboard) {
+      this.validateBreadboardGraphExtensions(graphExtensions.breadboard, result);
+    }
+
     result.isValid = result.errors.length === 0;
     return result;
+  }
+
+  applyBreadboardExtensionValidation(node, result) {
+    if (!node.extensions || !node.extensions.breadboard) {
+      return node;
+    }
+    const ext = { ...node.extensions.breadboard };
+
+    if (ext.orientation && !['horizontal', 'vertical'].includes(ext.orientation)) {
+      if (this.options.allowAutoFix) {
+        delete ext.orientation;
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Removed invalid breadboard orientation',
+          field: 'extensions.breadboard.orientation',
+          autoFixed: true
+        });
+      } else {
+        result.errors.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Breadboard orientation must be horizontal or vertical',
+          field: 'extensions.breadboard.orientation'
+        });
+      }
+    }
+
+    if (ext.allowStacking !== undefined && typeof ext.allowStacking !== 'boolean') {
+      if (this.options.allowAutoFix) {
+        ext.allowStacking = Boolean(ext.allowStacking);
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Coerced allowStacking to boolean',
+          field: 'extensions.breadboard.allowStacking',
+          autoFixed: true
+        });
+      } else {
+        result.errors.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'allowStacking must be boolean',
+          field: 'extensions.breadboard.allowStacking'
+        });
+      }
+    }
+
+    if (ext.pins !== undefined) {
+      const pins = sanitizeBreadboardPinsArray(ext.pins, {
+        allowAutoFix: this.options.allowAutoFix,
+        result,
+        fieldBase: 'extensions.breadboard.pins'
+      });
+      if (pins !== undefined) {
+        ext.pins = pins;
+      }
+    }
+
+    const dataPins = node.data?.pins || node.data?.breadboard?.pins;
+    if (Array.isArray(ext.pins) && Array.isArray(dataPins) && ext.pins.length !== dataPins.length) {
+      result.warnings.push({
+        type: VALIDATION_ERRORS.INVALID_DATA,
+        message: `extensions.breadboard.pins (${ext.pins.length}) does not match data pins (${dataPins.length})`,
+        field: 'data.pins'
+      });
+    }
+
+    return {
+      ...node,
+      extensions: {
+        ...node.extensions,
+        breadboard: ext
+      }
+    };
   }
 
   // Generate unique node ID
@@ -583,6 +826,119 @@ export class ValidationGuard {
     }
     
     return id;
+  }
+
+  validateBreadboardGraphExtensions(extension, result) {
+    const addWarning = (message, field = 'extensions.breadboard') => {
+      result.warnings.push({
+        type: VALIDATION_ERRORS.INVALID_DATA,
+        message,
+        field
+      });
+    };
+
+    const validateGrid = (grid, field = 'extensions.breadboard.grid') => {
+      if (!grid || typeof grid !== 'object') {
+        addWarning('Breadboard grid must be an object', field);
+        return null;
+      }
+      if (grid.rows !== undefined && (!Number.isFinite(grid.rows) || grid.rows <= 0)) {
+        addWarning('Breadboard grid rows must be a positive number', `${field}.rows`);
+      }
+      if (grid.columns !== undefined && (!Number.isFinite(grid.columns) || grid.columns <= 0)) {
+        addWarning('Breadboard grid columns must be a positive number', `${field}.columns`);
+      }
+      if (grid.rowSpacing !== undefined && (!Number.isFinite(grid.rowSpacing) || grid.rowSpacing <= 0)) {
+        addWarning('Breadboard rowSpacing must be > 0', `${field}.rowSpacing`);
+      }
+      if (grid.columnSpacing !== undefined && (!Number.isFinite(grid.columnSpacing) || grid.columnSpacing <= 0)) {
+        addWarning('Breadboard columnSpacing must be > 0', `${field}.columnSpacing`);
+      }
+      return grid;
+    };
+
+    const validateRails = (rails, field = 'extensions.breadboard.rails', columnLimit = null) => {
+      if (rails === undefined) return;
+      if (!Array.isArray(rails)) {
+        addWarning('Breadboard rails must be an array', field);
+        return;
+      }
+      rails.forEach((rail, index) => {
+        if (!rail || typeof rail !== 'object') {
+          addWarning(`Rail entry ${index} must be an object`, field);
+          return;
+        }
+        if (!rail.id || typeof rail.id !== 'string') {
+          addWarning(`Rail entry ${index} missing string id`, field);
+        }
+        if (rail.voltage !== undefined && !Number.isFinite(rail.voltage)) {
+          addWarning(`Rail '${rail.id || index}' has invalid voltage`, field);
+        }
+        if (rail.polarity && !['positive', 'negative', 'neutral'].includes(rail.polarity)) {
+          addWarning(`Rail '${rail.id || index}' polarity should be positive/negative/neutral`, field);
+        }
+        if (rail.segments !== undefined) {
+          if (!Array.isArray(rail.segments)) {
+            addWarning(`Rail '${rail.id || index}' segments must be an array`, field);
+          } else {
+            rail.segments.forEach((segment) => {
+              if (!segment || typeof segment !== 'object') {
+                addWarning(`Rail '${rail.id || index}' segment must be an object`, field);
+                return;
+              }
+              const { startColumn, endColumn } = segment;
+              if (!Number.isFinite(startColumn) || !Number.isFinite(endColumn)) {
+                addWarning(`Rail '${rail.id || index}' segment columns must be numbers`, field);
+              } else if (startColumn > endColumn) {
+                addWarning(`Rail '${rail.id || index}' segment startColumn must be <= endColumn`, field);
+              } else if (columnLimit && endColumn > columnLimit) {
+                addWarning(`Rail '${rail.id || index}' segment exceeds grid column count (${columnLimit})`, field);
+              }
+            });
+          }
+        }
+      });
+    };
+
+    const grid = validateGrid(extension.grid);
+    const gridColumns =
+      grid && Number.isFinite(grid.columns) && grid.columns > 0 ? grid.columns : null;
+
+    validateRails(extension.rails, 'extensions.breadboard.rails', gridColumns);
+
+    if (extension.presets !== undefined) {
+      if (!Array.isArray(extension.presets)) {
+        addWarning('Breadboard presets must be an array', 'extensions.breadboard.presets');
+      } else {
+        const presetIds = new Set();
+        extension.presets.forEach((preset, index) => {
+          if (!preset || typeof preset !== 'object') {
+            addWarning(`Preset ${index} must be an object`, 'extensions.breadboard.presets');
+            return;
+          }
+          if (!preset.id || typeof preset.id !== 'string') {
+            addWarning(`Preset ${index} missing string id`, 'extensions.breadboard.presets');
+          } else if (presetIds.has(preset.id)) {
+            addWarning(`Duplicate preset id '${preset.id}'`, 'extensions.breadboard.presets');
+          } else {
+            presetIds.add(preset.id);
+          }
+          const presetField = `extensions.breadboard.presets[${index}]`;
+          const presetGrid = validateGrid(preset.grid, `${presetField}.grid`);
+          validateRails(
+            preset.rails,
+            `${presetField}.rails`,
+            presetGrid?.columns || gridColumns
+          );
+        });
+        if (extension.activePresetId && !presetIds.has(extension.activePresetId)) {
+          addWarning(
+            `activePresetId '${extension.activePresetId}' not found in presets`,
+            'extensions.breadboard.activePresetId'
+          );
+        }
+      }
+    }
   }
 }
 

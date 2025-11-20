@@ -213,17 +213,18 @@
 
       Simulation: user clicks “Run Logic” in the toolbar; logic states appear on rails/pins, measurement nodes (logic probes) show HIGH/LOW, and warnings (short circuits) surface in the troubleshooting sidebar.
 
-- [ ] **Phase 2 – Data & Schema Layer**  
+- [x] **Phase 2 – Data & Schema Layer**  
       Extend node/group schema plus validation so footprints/pins/board metadata round-trip through GraphCRUD/history.
-  - [ ] Add `data.pins[]`, footprint dimensions, and board metadata to schema definitions (`components/NodeGraph/schema.js`, `types/logicSchema.js`).
-  - [ ] Teach `GraphCrud` and `validationGuards` to enforce pin counts, rail constraints, and placement rules; add unit tests in `tests/graphCrud.test.js`.
-  - [ ] Decide storage for breadboard-level state (board presets, import/export) and document API contracts.
+  - [x] Add `data.pins[]`, footprint dimensions, and board metadata to schema definitions (`components/NodeGraph/schema.js`, `types/logicSchema.js`).
+  - [x] Teach `GraphCrud` and `validationGuards` to enforce pin counts, rail constraints, and placement rules; add unit tests in `tests/graphCrud.test.js`.
+  - [x] Decide storage for breadboard-level state (board presets, import/export) and document API contracts.
 
 - [ ] **Phase 3 – Canvas & Interaction Layer**  
-      Build the board surface, snapping, and component footprints within the existing NodeGraph renderer.
-  - [ ] Implement `BreadboardLayer` for rails/sockets/grid visuals inside `components/NodeGraph/` with snap-to-hole drag helpers.
-  - [ ] Create breadboard-aware node components/footprints (e.g., resistors, ICs) and register via `components/GraphEditor/nodeTypeRegistry.js`.
-  - [ ] Update `handleDrop` and selection/drag handlers to respect socket occupancy and highlight valid targets (`components/NodeGraph/HandleLayer.js`, `components/GraphEditor/GraphEditor.js`). 
+      Represent the entire breadboard (sockets, rails, background skin) using standard nodes and edges so scale/perf can be validated on a production-sized graph.
+  - [ ] Define socket/rail node types (or grouped “column” nodes) that encode their row/column metadata, are locked in place, and ship inside the template as the physical board substrate (`components/GraphEditor/nodeTypeRegistry.js`, template JSON).
+  - [ ] Author breadboard component nodes (jumpers, resistors, DIP packages) whose handles snap to nearby socket nodes using the existing grid spacing/selection hooks, emitting warnings when sockets are occupied or rail polarity mismatches occur.
+  - [ ] Update drag/selection/handle handlers plus GraphCRUD glue so moving or wiring a component simply reassigns edges between component handles and socket nodes, keeping history/undo intact (`components/GraphEditor/handlers/graphEditorHandlers.js`, `components/NodeGraph/HandleLayer.js`).
+  - [ ] Add optional “board skin” nodes (canvas node or locked background image) for visuals without introducing custom rendering layers; confirm the graph still performs with ~800 socket nodes + rails.
 
 - [ ] **Phase 4 – Simulation & Tooling**  
       Provide inspection + simulation workflows leveraging ScriptNode/Background RPC.

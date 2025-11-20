@@ -284,6 +284,103 @@ describe('GraphCRUD core CRUD flows', () => {
     assert.equal(typeMismatch.success, false);
     assert.match(typeMismatch.error, /Handle types do not match/i);
   });
+
+  it('merges breadboard extensions without dropping metadata', () => {
+    const fixture = createCrudFixture({
+      nodes: [
+        {
+          id: 'bb-node',
+          type: 'default',
+          label: 'Breadboard Component',
+          data: {},
+          extensions: {
+            breadboard: {
+              footprint: 'dip8',
+              orientation: 'horizontal',
+              pins: [
+                { id: 'pin-1', row: 'A', column: 1, polarity: 'positive' },
+                { id: 'pin-2', row: 'B', column: 1, polarity: 'negative' }
+              ],
+              metadata: {
+                color: 'green',
+                rails: { top: 'vcc' }
+              }
+            }
+          }
+        }
+      ]
+    });
+
+    const result = fixture.crud.updateNode('bb-node', {
+      extensions: {
+        breadboard: {
+          pins: [
+            { id: 'pin-1', row: 'C', column: 3, polarity: 'positive' }
+          ],
+          metadata: {
+            rails: { top: 'vcc', bottom: 'gnd' }
+          }
+        }
+      }
+    });
+
+    assert.equal(result.success, true);
+    const ext = fixture.nodes[0].extensions.breadboard;
+    assert.equal(ext.footprint, 'dip8');
+    assert.equal(ext.orientation, 'horizontal');
+    assert.deepEqual(ext.pins, [
+      { id: 'pin-1', row: 'C', column: 3, polarity: 'positive' }
+    ]);
+    assert.deepEqual(ext.metadata, {
+      color: 'green',
+      rails: { top: 'vcc', bottom: 'gnd' }
+    });
+  });
+
+  it('captures handle metadata when creating edges', () => {
+    const fixture = createCrudFixture({
+      nodes: [
+        {
+          id: 'src',
+          label: 'Source',
+          data: {},
+          outputs: [
+            {
+              key: 'pinA',
+              label: 'Pin A',
+              type: 'value',
+              metadata: { pinId: 'A1', row: 'A', column: 1 }
+            }
+          ]
+        },
+        {
+          id: 'dst',
+          label: 'Target',
+          data: {},
+          inputs: [
+            {
+              key: 'pinB',
+              label: 'Pin B',
+              type: 'value',
+              metadata: { pinId: 'B1', rail: 'vcc' }
+            }
+          ]
+        }
+      ]
+    });
+
+    const created = fixture.crud.createEdge({
+      source: 'src',
+      target: 'dst',
+      sourceHandle: 'pinA',
+      targetHandle: 'pinB'
+    });
+    assert.equal(created.success, true);
+    const stored = fixture.edges[0];
+    assert.ok(stored.handleMeta);
+    assert.deepEqual(stored.handleMeta.source.metadata, { pinId: 'A1', row: 'A', column: 1 });
+    assert.deepEqual(stored.handleMeta.target.metadata, { pinId: 'B1', rail: 'vcc' });
+  });
 });
 
 describe('GraphCRUD search helpers', () => {

@@ -28,6 +28,105 @@ export const NodeStateSchema = {
   hidden: "boolean"
 };
 
+export const BreadboardPinSchema = {
+  id: "string",
+  row: "string", // A-J
+  column: "number", // 1-63 etc.
+  polarity: "string", // e.g., anode/cathode/positive/negative
+  rail: "string", // Optional rail id this pin prefers
+  metadata: "object"
+};
+
+export const BreadboardFootprintSchema = {
+  width: "number", // physical width in px or board units
+  height: "number", // physical height
+  rows: "number",
+  columns: "number",
+  rowPitch: "number", // spacing between rows (A/B, etc.)
+  columnPitch: "number", // spacing between columns
+  metadata: "object"
+};
+
+export const BreadboardNodeExtensionSchema = {
+  footprint: "string",
+  orientation: "'horizontal'|'vertical'",
+  pins: [BreadboardPinSchema],
+  allowStacking: "boolean",
+  metadata: "object"
+};
+
+export const BreadboardNodeDataSchema = {
+  pins: [BreadboardPinSchema],
+  footprint: BreadboardFootprintSchema,
+  metadata: "object"
+};
+
+export const NodeDataSchema = {
+  memo: "string",
+  link: "string",
+  html: "string",
+  svg: "string",
+  width: "number",
+  height: "number",
+  pins: [BreadboardPinSchema],
+  footprint: BreadboardFootprintSchema,
+  breadboard: BreadboardNodeDataSchema,
+  metadata: "object"
+};
+
+export const BreadboardRailSchema = {
+  id: "string",
+  label: "string",
+  voltage: "number",
+  polarity: "'positive'|'negative'|'neutral'",
+  segments: [
+    {
+      startColumn: "number",
+      endColumn: "number"
+    }
+  ],
+  metadata: "object"
+};
+
+export const BreadboardPresetSchema = {
+  id: "string",
+  label: "string",
+  grid: {
+    rows: "number",
+    columns: "number",
+    rowSpacing: "number",
+    columnSpacing: "number"
+  },
+  rails: [BreadboardRailSchema],
+  metadata: "object"
+};
+
+export const BreadboardGraphExtensionSchema = {
+  grid: {
+    rows: "number",
+    columns: "number",
+    rowSpacing: "number",
+    columnSpacing: "number"
+  },
+  rails: [BreadboardRailSchema],
+  presets: [BreadboardPresetSchema],
+  activePresetId: "string",
+  metadata: "object"
+};
+
+export const GraphMetadataSchema = {
+  title: "string",
+  description: "string",
+  created: "string",
+  modified: "string",
+  author: "string",
+  breadboard: {
+    presetId: "string",
+    lastSimulated: "string",
+    metadata: "object"
+  }
+};
+
 // Node schema
 export const NodeSchema = {
   id: "string",
@@ -39,12 +138,14 @@ export const NodeSchema = {
   },
   width: "number",
   height: "number",
-  data: "object",
+  data: NodeDataSchema,
   visible: "boolean",
   style: "object",
   handles: [NodeHandleSchema], // Optional explicit handle definitions
   state: NodeStateSchema, // Optional persisted UI/interaction state
-  extensions: "object" // Reserved for plugin namespaces
+  extensions: {
+    breadboard: BreadboardNodeExtensionSchema
+  } // Additional plugin namespaces may be added
 };
 
 export const EdgeStateSchema = {
@@ -120,14 +221,10 @@ export const GraphSchema = {
   edges: [EdgeSchema],
   groups: [GroupSchema],
   options: GraphOptionsSchema,
-  metadata: {
-    title: "string",
-    description: "string",
-    created: "string",
-    modified: "string",
-    author: "string"
-  },
-  extensions: "object"
+  metadata: GraphMetadataSchema,
+  extensions: {
+    breadboard: BreadboardGraphExtensionSchema
+  }
 };
 
 // Validation functions
