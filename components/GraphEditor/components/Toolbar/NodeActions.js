@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { IconButton, Tooltip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DrawIcon from '@mui/icons-material/Draw';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import AddNodeMenu from '../AddNodeMenu';
 
 export default function NodeActions({ 
-  onAddNode,
+  onTogglePalette,
   onDeleteSelected,
   onCopySelected,
   onPaste,
@@ -19,13 +17,11 @@ export default function NodeActions({
   selectedEdgeId,
   isMobile 
 }) {
-  const [addMenuAnchor, setAddMenuAnchor] = useState(null);
-
   return (
     <>
-      <Tooltip title="Add Node (Ctrl+N)">
+      <Tooltip title="Open node palette (Ctrl+N)">
         <IconButton 
-          onClick={(e) => setAddMenuAnchor(e.currentTarget)}
+          onClick={() => onTogglePalette?.()}
           color="inherit"
           size="small"
         >
@@ -82,13 +78,6 @@ export default function NodeActions({
           </IconButton>
         </span>
       </Tooltip>
-
-      <AddNodeMenu
-        anchorEl={addMenuAnchor}
-        open={Boolean(addMenuAnchor)}
-        onClose={() => setAddMenuAnchor(null)}
-        onAddNode={onAddNode}
-      />
     </>
   );
 }

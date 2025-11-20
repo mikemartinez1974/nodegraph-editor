@@ -26,6 +26,9 @@
 - [ ] **Operational Dashboards**  
       Use graph stats to build health dashboards and alerts (`components/GraphEditor/GraphCrud.js:637`).
 
+- [x] **Node/Component Palette**  
+      Replace the dropdown Add Node menu with a docked palette that supports search, tags, favorites, and drag-placement for hundreds of node types (breadboard components, plugins, core nodes). Acts as the “asset browser” for future apps and plugin packs.
+
 ## [x] Core Schema Modernization
 
 - [x] **Phase 1 – Specification**  
@@ -165,11 +168,50 @@
 
 ## [ ] Breadboard Roadmap
 
-- [ ] **Phase 1 – Discovery & Requirements**  
+- [x] **Phase 1 – Discovery & Requirements**  
       Capture personas/use-cases, map current nodes/handles to breadboard concepts, and record UX storyboards + requirements in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/feature_roadmap.md` for alignment.
-  - [ ] Define breadboard component catalog, rails/power semantics, and interaction goals.
-  - [ ] Audit existing validators/CRUD flows for compatibility with breadboard constraints and log deltas.
-  - [ ] Storyboard breadboard mode entry/exit, palettes, and simulation touchpoints in `components/GraphEditor/README.md`.
+  - [x] Define breadboard component catalog, rails/power semantics, and interaction goals.
+  - [x] Audit existing validators/CRUD flows for compatibility with breadboard constraints and log deltas.
+  - [x] Storyboard breadboard mode entry/exit, palettes, and simulation touchpoints in `components/GraphEditor/README.md`.
+
+  Component catalog & rails
+
+      Rails: classic dual power rails (top/bottom) split into two halves each. Default labels VCC1/GND1 on top, VCC2/GND2 on bottom, with configurable voltages (defaults 5 V & 3.3 V). Users can relabel rails or tie them together with jumper wires.
+      Socket grid: standard 5-hole columns (A‑E and F‑J), center trench for DIP ICs. Metadata should record row/column indices (A1..J63) so any node can specify which sockets its pins occupy.
+
+      Starter component set:
+      Jumpers (single-wire connections spanning any two sockets)
+      Resistor (2 pins, optional color bands/value)
+      LED (anode/cathode pins with polarity, long/short lead metadata)
+      Push button (4 pins bridging center trench)
+      DIP‑8 package (template for logic ICs)
+      Power source node (ties rails to voltage)
+      Logic probe / indicator LED (measurement nodes)
+      Components declare extensions.breadboard.footprint with pin offsets and polarity so the renderer and validator know spacing.
+      Interaction goals
+
+      Placement: drag components from the palette; they drop at default size with pins aligned to grid. Users can reposition either by dragging the body (snaps so both pins stay in sockets) or grabbing an individual pin handle and dragging to a new socket (node stretches as needed). For precise placement, the properties panel exposes numeric row/column fields per pin.
+
+      Wiring: jumpers are just edges/“wire nodes”; start a wire from any pin handle, move the cursor near another socket, and snap to it (reusing the snapping logic already implemented). Hover highlights show valid targets; invalid ones (occupied socket, rail conflict) flash red with a snackbar warning.
+
+      Measurement/simulation touchpoints: measurement nodes (logic probe, LED indicator) can connect to any pin to display state. A “Run Logic Sim” button toggles evaluation so students see HIGH/LOW badges on rails/pins.
+
+      Validators & CRUD
+
+      Nodes store extensions.breadboard.pins[] = [{ id, row, column, polarity, railLabel }] so GraphCRUD/history already persist placement. Validators check:
+            No two pins occupy the same socket unless explicitly allowed (e.g., jumper stacking)
+            Pins align to valid row/column coordinates
+            Rail connections respect polarity (i.e., LED cathode not tied to VCC)
+
+      These validators run as part of existing validationGuards and surface warnings (not hard failures) in the UI so the user can fix issues.
+
+      Storyboard / flow
+
+      User opens the breadboard template (just a .node file). The Node Palette drawer opens automatically with the “Breadboard” tab selected, guiding them to drag a resistor.
+      They drop the resistor; handles appear on each pin. Dragging a handle near a socket snaps it into place; snackbar confirms e.g. “Resistor pins inserted at A5 / F5”.
+      To wire, they click a resistor pin handle, drag across the board, and release over another socket or rail; the wire snaps and highlights. If a socket is already occupied, the validator warns “Socket A5 already used by LED”.
+
+      Simulation: user clicks “Run Logic” in the toolbar; logic states appear on rails/pins, measurement nodes (logic probes) show HIGH/LOW, and warnings (short circuits) surface in the troubleshooting sidebar.
 
 - [ ] **Phase 2 – Data & Schema Layer**  
       Extend node/group schema plus validation so footprints/pins/board metadata round-trip through GraphCRUD/history.

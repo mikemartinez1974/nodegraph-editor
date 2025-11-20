@@ -95,6 +95,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [lockedEdges, setLockedEdges] = useState(new Set());
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
+  const [showNodePalette, setShowNodePalette] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
   const [mobileAddNodeOpen, setMobileAddNodeOpen] = useState(false);
   const [mobileAddNodeSearch, setMobileAddNodeSearch] = useState('');
@@ -586,6 +587,10 @@ useEffect(() => {
   const toggleGroupList = useCallback(() => {
     setShowGroupList(prev => !prev);
   }, [setShowGroupList]);
+
+  const toggleNodePalette = useCallback(() => {
+    setShowNodePalette(prev => !prev);
+  }, []);
 
   const handlePropertiesPanelAnchorChange = useCallback((nextAnchor) => {
     setNodePanelAnchor(nextAnchor);
@@ -2188,6 +2193,8 @@ useEffect(() => {
     setBackgroundInteractive,
     showDocumentPropertiesDialog,
     setShowDocumentPropertiesDialog,
+    showNodePalette,
+    setShowNodePalette,
     showNodeList,
     setShowNodeList,
     showGroupList,
@@ -2198,6 +2205,7 @@ useEffect(() => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
     handlePropertiesPanelAnchorChange,
@@ -2252,6 +2260,8 @@ useEffect(() => {
     setBackgroundInteractive,
     showDocumentPropertiesDialog,
     setShowDocumentPropertiesDialog,
+    showNodePalette,
+    setShowNodePalette,
     showNodeList,
     setShowNodeList,
     showGroupList,
@@ -2262,6 +2272,7 @@ useEffect(() => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
     handlePropertiesPanelAnchorChange,

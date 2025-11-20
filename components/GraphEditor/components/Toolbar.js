@@ -84,7 +84,6 @@ const Toolbar = ({
   edges = [], 
   groups = [],
   onLoadGraph, 
-  onAddNode, 
   onDeleteSelected, 
   onClearGraph,
   onUndo,
@@ -98,6 +97,7 @@ const Toolbar = ({
   showNodeList = true,
   onToggleGroupList,
   showGroupList = true,
+  onToggleNodePalette,
   mode,
   autoLayoutType,
   onModeChange,
@@ -777,7 +777,7 @@ const Toolbar = ({
         {/* Node Actions Section */}
         <ButtonGroup variant="contained" size="small">
           <NodeActions 
-            onAddNode={onAddNode}
+            onTogglePalette={onToggleNodePalette}
             onDeleteSelected={onDeleteSelected}
             onCopySelected={handleCopySelected}
             onPaste={handlePasteUniversal}

@@ -64,6 +64,13 @@ For user scripts that operate on graphs, prefer a sandboxed runner (iframe or we
 - If links or HTML render as plain text, confirm the node type and that content is stored in `node.data.html` or `node.data.memo`.
 - If sanitization strips needed attributes, extend the sanitize schema in the node component carefully.
 
+## Breadboard experience (preview)
+
+- Breadboard projects are ordinary `.node` files that load the board overlay plus a curated Node Palette tab. Opening the starter template automatically opens the palette so users can drag resistors, LEDs, DIP shells, jumpers, and measurement probes onto the board.
+- Placement/snapping: component nodes define pin coordinates in `extensions.breadboard`. Dragging the body moves the component and snaps its pins to the nearest socket; grabbing an individual pin handle stretches the node so it spans any two sockets (A–E or across the trench). The new palette replaces the old menu, so adding components feels like browsing a hardware bin.
+- Wiring: start a wire from any pin handle, move near a socket or rail, and it snaps/hilights when valid. Validation warnings surface via snackbar (“Socket A5 already occupied”) but do not block serialization.
+- Simulation touchpoints: logic probes/indicator nodes subscribe to the logic-only simulator (ScriptNode/worker) to display HIGH/LOW states. A toolbar button toggles the sim so instructors can demonstrate simple logic circuits inside the same graph editor.
+
 ## License & Contributing
 
 This project follows the repository's standard license. Contributions are welcome — open issues for feature requests or submit PRs for bug fixes and new node types.

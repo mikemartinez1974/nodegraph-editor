@@ -9,6 +9,7 @@ import MobileFabToolbar from './components/MobileFabToolbar';
 import MobileAddNodeSheet from './components/MobileAddNodeSheet';
 import PropertiesPanel from './components/PropertiesPanel';
 import NodeListPanel from './components/NodeListPanel';
+import NodePalettePanel from './components/NodePalettePanel';
 import GroupListPanel from './components/GroupListPanel';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import NewTabPage from './components/NewTabPage';
@@ -91,6 +92,8 @@ const GraphEditorContent = () => {
     backgroundInteractive,
     showDocumentPropertiesDialog,
     setShowDocumentPropertiesDialog,
+    showNodePalette,
+    setShowNodePalette,
     showNodeList,
     setShowNodeList,
     showGroupList,
@@ -99,6 +102,7 @@ const GraphEditorContent = () => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
     handlePropertiesPanelAnchorChange,
@@ -235,6 +239,7 @@ const GraphEditorContent = () => {
           showNodeList={showNodeList}
           onToggleGroupList={toggleGroupList}
           showGroupList={showGroupList}
+          onToggleNodePalette={toggleNodePalette}
           nodes={nodes}
           edges={edges}
           groups={groups}
@@ -362,6 +367,11 @@ const GraphEditorContent = () => {
           memoAutoExpandToken={memoAutoExpandToken}
         />
       )}
+
+      <NodePalettePanel
+        open={showNodePalette}
+        onClose={() => setShowNodePalette(false)}
+      />
 
       <NodeListPanel
         nodes={nodes}

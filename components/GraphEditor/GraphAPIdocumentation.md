@@ -358,6 +358,13 @@ The iframe is sandboxed (`allow-scripts` only). Communicate with the host via th
 
 When importing/exporting graphs manually, preserve unknown `extensions` blocks so plugin data survives round-trips. Plugin authors should use reverse-DNS style keys (e.g., `"example.widgets.breadboard"`) within `extensions` objects to avoid collisions.
 
+### Breadboard templates (preview)
+
+- Breadboard components are just nodes with `extensions.breadboard`. Each component declares a `footprint` name plus `pins[] = [{ id, row, column, polarity }]`, where rows/columns follow the standard A–J / numeric grid. The renderer and validators read those coordinates to snap pins to the virtual sockets.
+- Rails/power metadata lives in `graph.extensions.breadboard.rails[]` (e.g., `{ id: 'vcc-top-a', label: 'VCC1', voltage: 5 }`). A power node can update those entries at runtime.
+- Validators should treat collisions/shorts as warnings rather than hard failures: e.g., if two pins reference the same socket, surface a snackbar and highlight the offending nodes, but still serialize the graph so users can fix it later.
+- Logic simulation communicates through existing ScriptNode/background RPC channels. For V1 we propagate HIGH/LOW states only; future analog simulators can add `pin.voltage`/`pin.current` fields without altering the base schema.
+
 ---
 
 ## Query Operations
