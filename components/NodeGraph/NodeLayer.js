@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DefaultNode from '../GraphEditor/Nodes/DefaultNode';
+import PluginNodeRenderer from '../GraphEditor/Nodes/PluginNodeRenderer';
 import eventBus from './eventBus';
 
 function deduplicateNodes(nodes) {
@@ -69,7 +70,14 @@ const NodeLayer = ({
     return (
         <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, zIndex: 30 }}>
             {uniqueNodes.map(node => {
-                const NodeComponent = nodeTypes[node.type] || DefaultNode;
+                let NodeComponent = nodeTypes[node.type];
+                if (!NodeComponent) {
+                  if (typeof node?.type === 'string' && node.type.includes(':')) {
+                    NodeComponent = PluginNodeRenderer;
+                  } else {
+                    NodeComponent = DefaultNode;
+                  }
+                }
                 const isSelected = selectedNodeIds.includes(node.id);
                 const isMultiSelect = selectedNodeIds.length > 1;
 
@@ -134,6 +142,7 @@ const NodeLayer = ({
                         }}
                         onMouseLeave={() => eventBus.emit('nodeUnhover', { id: node.id })}
                         nodeRefs={nodeRefs}
+                        type={node?.type}
                       />
                     </div>
                  );

@@ -3,16 +3,26 @@
   "nodes": [
     {
       "id": "socket-top-1",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E1",
       "position": {
         "x": -464.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -43,16 +53,26 @@
     },
     {
       "id": "socket-bottom-1",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J1",
       "position": {
         "x": -464.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -83,16 +103,26 @@
     },
     {
       "id": "socket-top-2",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E2",
       "position": {
         "x": -432.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -123,16 +153,26 @@
     },
     {
       "id": "socket-bottom-2",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J2",
       "position": {
         "x": -432.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -163,16 +203,26 @@
     },
     {
       "id": "socket-top-3",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E3",
       "position": {
         "x": -400.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -203,16 +253,26 @@
     },
     {
       "id": "socket-bottom-3",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J3",
       "position": {
         "x": -400.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -243,16 +303,26 @@
     },
     {
       "id": "socket-top-4",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E4",
       "position": {
         "x": -368.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -283,16 +353,26 @@
     },
     {
       "id": "socket-bottom-4",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J4",
       "position": {
         "x": -368.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -323,16 +403,26 @@
     },
     {
       "id": "socket-top-5",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E5",
       "position": {
         "x": -336.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -363,16 +453,26 @@
     },
     {
       "id": "socket-bottom-5",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J5",
       "position": {
         "x": -336.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -403,16 +503,26 @@
     },
     {
       "id": "socket-top-6",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E6",
       "position": {
         "x": -304.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -443,16 +553,26 @@
     },
     {
       "id": "socket-bottom-6",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J6",
       "position": {
         "x": -304.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -483,16 +603,26 @@
     },
     {
       "id": "socket-top-7",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E7",
       "position": {
         "x": -272.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -523,16 +653,26 @@
     },
     {
       "id": "socket-bottom-7",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J7",
       "position": {
         "x": -272.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -563,16 +703,26 @@
     },
     {
       "id": "socket-top-8",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E8",
       "position": {
         "x": -240.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -603,16 +753,26 @@
     },
     {
       "id": "socket-bottom-8",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J8",
       "position": {
         "x": -240.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -643,16 +803,26 @@
     },
     {
       "id": "socket-top-9",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E9",
       "position": {
         "x": -208.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -683,16 +853,26 @@
     },
     {
       "id": "socket-bottom-9",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J9",
       "position": {
         "x": -208.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -723,16 +903,26 @@
     },
     {
       "id": "socket-top-10",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E10",
       "position": {
         "x": -176.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -763,16 +953,26 @@
     },
     {
       "id": "socket-bottom-10",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J10",
       "position": {
         "x": -176.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -803,16 +1003,26 @@
     },
     {
       "id": "socket-top-11",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E11",
       "position": {
         "x": -144.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -843,16 +1053,26 @@
     },
     {
       "id": "socket-bottom-11",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J11",
       "position": {
         "x": -144.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -883,16 +1103,26 @@
     },
     {
       "id": "socket-top-12",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E12",
       "position": {
         "x": -112.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -923,16 +1153,26 @@
     },
     {
       "id": "socket-bottom-12",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J12",
       "position": {
         "x": -112.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -963,16 +1203,26 @@
     },
     {
       "id": "socket-top-13",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E13",
       "position": {
         "x": -80.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1003,16 +1253,26 @@
     },
     {
       "id": "socket-bottom-13",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J13",
       "position": {
         "x": -80.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1043,16 +1303,26 @@
     },
     {
       "id": "socket-top-14",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E14",
       "position": {
         "x": -48.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1083,16 +1353,26 @@
     },
     {
       "id": "socket-bottom-14",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J14",
       "position": {
         "x": -48.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1123,16 +1403,26 @@
     },
     {
       "id": "socket-top-15",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E15",
       "position": {
         "x": -16.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1163,16 +1453,26 @@
     },
     {
       "id": "socket-bottom-15",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J15",
       "position": {
         "x": -16.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1203,16 +1503,26 @@
     },
     {
       "id": "socket-top-16",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E16",
       "position": {
         "x": 16.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1243,16 +1553,26 @@
     },
     {
       "id": "socket-bottom-16",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J16",
       "position": {
         "x": 16.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1283,16 +1603,26 @@
     },
     {
       "id": "socket-top-17",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E17",
       "position": {
         "x": 48.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1323,16 +1653,26 @@
     },
     {
       "id": "socket-bottom-17",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J17",
       "position": {
         "x": 48.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1363,16 +1703,26 @@
     },
     {
       "id": "socket-top-18",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E18",
       "position": {
         "x": 80.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1403,16 +1753,26 @@
     },
     {
       "id": "socket-bottom-18",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J18",
       "position": {
         "x": 80.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1443,16 +1803,26 @@
     },
     {
       "id": "socket-top-19",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E19",
       "position": {
         "x": 112.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1483,16 +1853,26 @@
     },
     {
       "id": "socket-bottom-19",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J19",
       "position": {
         "x": 112.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1523,16 +1903,26 @@
     },
     {
       "id": "socket-top-20",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E20",
       "position": {
         "x": 144.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1563,16 +1953,26 @@
     },
     {
       "id": "socket-bottom-20",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J20",
       "position": {
         "x": 144.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1603,16 +2003,26 @@
     },
     {
       "id": "socket-top-21",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E21",
       "position": {
         "x": 176.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1643,16 +2053,26 @@
     },
     {
       "id": "socket-bottom-21",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J21",
       "position": {
         "x": 176.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1683,16 +2103,26 @@
     },
     {
       "id": "socket-top-22",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E22",
       "position": {
         "x": 208.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1723,16 +2153,26 @@
     },
     {
       "id": "socket-bottom-22",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J22",
       "position": {
         "x": 208.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1763,16 +2203,26 @@
     },
     {
       "id": "socket-top-23",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E23",
       "position": {
         "x": 240.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1803,16 +2253,26 @@
     },
     {
       "id": "socket-bottom-23",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J23",
       "position": {
         "x": 240.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1843,16 +2303,26 @@
     },
     {
       "id": "socket-top-24",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E24",
       "position": {
         "x": 272.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1883,16 +2353,26 @@
     },
     {
       "id": "socket-bottom-24",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J24",
       "position": {
         "x": 272.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1923,16 +2403,26 @@
     },
     {
       "id": "socket-top-25",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E25",
       "position": {
         "x": 304.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -1963,16 +2453,26 @@
     },
     {
       "id": "socket-bottom-25",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J25",
       "position": {
         "x": 304.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2003,16 +2503,26 @@
     },
     {
       "id": "socket-top-26",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E26",
       "position": {
         "x": 336.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2043,16 +2553,26 @@
     },
     {
       "id": "socket-bottom-26",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J26",
       "position": {
         "x": 336.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2083,16 +2603,26 @@
     },
     {
       "id": "socket-top-27",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E27",
       "position": {
         "x": 368.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2123,16 +2653,26 @@
     },
     {
       "id": "socket-bottom-27",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J27",
       "position": {
         "x": 368.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2163,16 +2703,26 @@
     },
     {
       "id": "socket-top-28",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E28",
       "position": {
         "x": 400.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2203,16 +2753,26 @@
     },
     {
       "id": "socket-bottom-28",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J28",
       "position": {
         "x": 400.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2243,16 +2803,26 @@
     },
     {
       "id": "socket-top-29",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E29",
       "position": {
         "x": 432.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2283,16 +2853,26 @@
     },
     {
       "id": "socket-bottom-29",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J29",
       "position": {
         "x": 432.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2323,16 +2903,26 @@
     },
     {
       "id": "socket-top-30",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "A-E30",
       "position": {
         "x": 464.0,
         "y": -60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2363,16 +2953,26 @@
     },
     {
       "id": "socket-bottom-30",
-      "type": "breadboardSocket",
+      "type": "io.breadboard.sockets:socket",
       "label": "F-J30",
       "position": {
         "x": 464.0,
         "y": 60
       },
-      "width": 18,
+      "width": 10,
       "height": 18,
       "state": {
         "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
       },
       "data": {
         "rows": [
@@ -2413,8 +3013,8 @@
   "metadata": {
     "title": "Breadboard Socket Template",
     "description": "Pre-generated board substrate composed of socket nodes",
-    "created": "2025-11-20T19:30:23.265767",
-    "modified": "2025-11-20T19:30:23.265767",
+    "created": "2025-11-20T21:46:54.317075",
+    "modified": "2025-11-20T21:46:54.317075",
     "author": "generator"
   },
   "extensions": {

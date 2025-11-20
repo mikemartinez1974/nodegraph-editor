@@ -11,8 +11,9 @@ const AddNodeMenu = ({ anchorEl, open, onClose }) => {
   const nodesByCategory = React.useMemo(() => getNodeTypesByCategory(), [plugins]);
   
   // Category display order and labels
-  const categoryOrder = ['basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
+  const categoryOrder = ['breadboard', 'basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
   const categoryLabels = {
+    breadboard: 'Breadboard',
     basic: 'Basic Nodes',
     utility: 'Utility Nodes',
     logic: 'Logic Nodes',

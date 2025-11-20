@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const COLUMN_COUNT = Number(process.env.BREADBOARD_COLUMNS) || 30;
 const COLUMN_SPACING = Number(process.env.BREADBOARD_COLUMN_SPACING) || 32;
 const ROW_OFFSET = Number(process.env.BREADBOARD_ROW_OFFSET) || 60;
+const SOCKET_WIDTH = Number(process.env.BREADBOARD_SOCKET_WIDTH) || 10;
+const SOCKET_HEIGHT = Number(process.env.BREADBOARD_SOCKET_HEIGHT) || 18;
 
 const now = new Date().toISOString();
 
@@ -18,12 +20,22 @@ const buildSocketNode = ({ column, segment, rows }) => {
   const positionY = isTop ? -ROW_OFFSET : ROW_OFFSET;
   return {
     id: `socket-${segment}-${column}`,
-    type: 'breadboardSocket',
+    type: 'io.breadboard.sockets:socket',
     label: `${rows[0]}-${rows[rows.length - 1]}${column}`,
     position: { x: positionX, y: positionY },
-    width: 18,
-    height: 18,
+    width: SOCKET_WIDTH,
+    height: SOCKET_HEIGHT,
     state: { locked: true },
+    extensions: {
+      layout: {
+        hideChrome: true,
+        padding: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      }
+    },
     data: {
       rows,
       column,

@@ -233,6 +233,7 @@ export default function PluginNodeRenderer(props) {
       {...props}
       node={nodeWithHandles}
       hideDefaultContent
+      disableChrome={layoutOptions.hideChrome}
       style={
         layoutOptions.hideChrome
           ? {

@@ -2,6 +2,7 @@
 // Lightweight plugin registry (Phase 1) - manages manifest installation/persistence.
 
 import validatePluginManifest from './manifestSchema';
+import { BUILTIN_PLUGIN_MANIFESTS } from './builtinManifests';
 
 const STORAGE_KEY = 'nodegraph.plugins.registry';
 
@@ -20,13 +21,15 @@ const safeParse = (value, fallback) => {
   }
 };
 
-const readRegistry = () => {
+const readRegistryRaw = () => {
   if (typeof window === 'undefined' || !window.localStorage) return [];
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (!raw) return [];
   const parsed = safeParse(raw, []);
   return Array.isArray(parsed) ? parsed : [];
 };
+
+const readRegistry = () => readRegistryRaw();
 
 const writeRegistry = (entries) => {
   if (typeof window === 'undefined' || !window.localStorage) return;
@@ -49,6 +52,11 @@ const mergeRuntimeData = (entry) => {
 };
 
 const getRegistrySnapshot = () => {
+  if (typeof window === 'undefined') {
+    return BUILTIN_PLUGIN_MANIFESTS.map((manifest) =>
+      mergeRuntimeData(sanitizeRecord(manifest, manifest.bundle?.url || ''))
+    );
+  }
   const entries = readRegistry();
   return entries.map((entry) => mergeRuntimeData(entry));
 };

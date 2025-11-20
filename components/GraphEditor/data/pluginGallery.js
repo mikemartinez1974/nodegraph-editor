@@ -12,28 +12,16 @@ export const pluginGallery = [
     homepage: 'https://example.com/twilight'
   },
   {
-    id: 'com.example.signal',
-    name: 'Signal Inspector',
-    description: 'Visualize trigger frequencies, latencies, and recent payloads for any edge to help debug complex graphs.',
-    manifestUrl: 'https://plugins.example.com/signal-inspector/manifest.json',
-    version: '1.2.3',
-    tags: ['observability', 'monitoring'],
-    maintainer: 'Example Labs',
-    permissions: ['graph.read', 'selection.read', 'events.emit'],
+    id: 'io.breadboard.sockets',
+    name: 'Breadboard Socket Toolkit',
+    description: 'Provides the socket nodes and renderer used by the breadboard template so anyone can build their own board.',
+    manifestUrl: '/plugins/breadboard-sockets/manifest.json',
+    version: '0.1.0',
+    tags: ['breadboard', 'hardware'],
+    maintainer: 'NodeGraph',
+    permissions: [],
     status: 'stable',
-    homepage: 'https://plugins.example.com/signal-inspector'
-  },
-  {
-    id: 'com.example.automation',
-    name: 'Automation Toolkit',
-    description: 'Adds cron-style schedulers, HTTP webhooks, and templated notifications as drop-in plugin nodes.',
-    manifestUrl: 'https://plugins.example.com/automation/manifest.json',
-    version: '0.9.0',
-    tags: ['automation', 'trigger'],
-    maintainer: 'Example Labs',
-    permissions: ['graph.read', 'graph.write'],
-    status: 'alpha',
-    homepage: 'https://plugins.example.com/automation'
+    homepage: 'https://example.com/breadboard'
   }
 ];
 

@@ -24,20 +24,21 @@ const DEFAULT_OUTPUTS = [
   { key: 'value', label: 'Value', type: 'value' }
 ];
 
-const FixedNode = ({ 
-  node: rawNode, 
-  pan = { x: 0, y: 0 }, 
-  zoom = 1, 
-  style = {}, 
-  isSelected, 
+const FixedNode = ({
+  node: rawNode,
+  pan = { x: 0, y: 0 },
+  zoom = 1,
+  style = {},
+  isSelected,
   onMouseDown,
   onTouchStart,
-  onClick, 
-  onDoubleClick, 
-  children, 
+  onClick,
+  onDoubleClick,
+  children,
   draggingHandle,
   nodeRefs,
-  hideDefaultContent = false  // Allow children to hide default content
+  hideDefaultContent = false,
+  disableChrome = false // Allow callers to completely opt out of gradients/borders
 }) => {
   const node = useNodeHandleSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
@@ -188,34 +189,52 @@ const FixedNode = ({
     }
   };
   
+  const computedStyle = {
+    position: 'absolute',
+    left: baseLeft,
+    top: baseTop,
+    width,
+    height,
+    cursor: isRotating ? 'grabbing' : (draggingHandle ? 'grabbing' : 'grab'),
+    border: disableChrome
+      ? 'none'
+      : isSelected
+      ? `2px solid ${theme.palette.secondary.main}`
+      : `1px solid ${theme.palette.primary.main}`,
+    background: disableChrome
+      ? 'transparent'
+      : isSelected
+      ? selected_gradient
+      : unselected_gradient,
+    borderRadius: disableChrome ? 0 : 8,
+    boxShadow: disableChrome
+      ? 'none'
+      : isSelected
+      ? `0 0 8px ${theme.palette.primary.main}`
+      : '0 1px 4px #aaa',
+    color: disableChrome
+      ? theme.palette.text.primary
+      : isSelected
+      ? `${theme.textColors?.dark || '#000'}`
+      : `${theme.textColors?.light || '#fff'}`,
+    zIndex: 100,
+    pointerEvents: 'auto',
+    display: hideDefaultContent ? 'block' : 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: `rotate(${rotation}deg)`,
+    transformOrigin: 'center center',
+    transition: (isRotating || isDragging || draggingHandle) ? 'none' : 'transform 0.1s ease-out',
+    ...style
+  };
+
   return (
     <div
       ref={nodeRef}
       data-node-draggable="true"
       className="node-or-handle"
-      style={{
-        position: 'absolute',
-        left: baseLeft,
-        top: baseTop,
-        width,
-        height,
-        cursor: isRotating ? 'grabbing' : (draggingHandle ? 'grabbing' : 'grab'),
-        border: isSelected ? `2px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.primary.main}`,
-        background: isSelected ? selected_gradient : unselected_gradient,
-        borderRadius: 8,
-        boxShadow: isSelected ? `0 0 8px ${theme.palette.primary.main}` : '0 1px 4px #aaa',
-        color: isSelected ? `${theme.textColors?.dark || '#000'}` : `${theme.textColors?.light || '#fff'}`,
-        zIndex: 100,
-        pointerEvents: 'auto',
-        display: hideDefaultContent ? 'block' : 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transform: `rotate(${rotation}deg)`,
-        transformOrigin: 'center center',
-        transition: (isRotating || isDragging || draggingHandle) ? 'none' : 'transform 0.1s ease-out',
-        ...style
-      }}
+      style={computedStyle}
       tabIndex={0}
       onMouseDown={e => {
         // Allow embedded HTML or links to handle the event without triggering node drag/selection

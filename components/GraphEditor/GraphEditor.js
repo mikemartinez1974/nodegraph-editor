@@ -36,6 +36,7 @@ const ensureNumber = (value, fallback) => {
 const MAX_SCRIPT_RPC_CALLS = 200;
 const MAX_SCRIPT_MUTATIONS = 100;
 const MUTATION_METHODS = new Set(['createNode', 'updateNode', 'deleteNode', 'createEdge', 'deleteEdge']);
+const BREADBOARD_SOCKET_NODE_TYPE = 'io.breadboard.sockets:socket';
 const getNodeMetrics = (node) => {
   const position = node?.position || {};
   const x = ensureNumber(position.x, 0);
@@ -90,6 +91,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
+  const autoSnapInitializedRef = useRef(false);
   const [showGrid, setShowGrid] = useState(false);
   const [lockedNodes, setLockedNodes] = useState(new Set());
   const [lockedEdges, setLockedEdges] = useState(new Set());
@@ -136,7 +138,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
 const state = useGraphEditorState();
 
 // Destructure editor state immediately so variables like `pan` are available for subsequent effects
-const {
+  const {
   nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
     groups, setGroups,
@@ -172,6 +174,18 @@ const {
     };
   }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
 
+  useEffect(() => {
+    if (autoSnapInitializedRef.current) return;
+    if (
+      !snapToGrid &&
+      Array.isArray(nodes) &&
+      nodes.some(node => node?.type === BREADBOARD_SOCKET_NODE_TYPE)
+    ) {
+      setSnapToGrid(true);
+      autoSnapInitializedRef.current = true;
+    }
+  }, [nodes, snapToGrid, setSnapToGrid]);
+
   // NEW: document (background page) state (no localStorage)
   const [backgroundUrl, setBackgroundUrl] = useState('');
   const [backgroundInteractive, setBackgroundInteractive] = useState(false);
@@ -179,6 +193,7 @@ const [showDocumentPropertiesDialog, setShowDocumentPropertiesDialog] = useState
 const handleOpenDocumentProperties = useCallback(() => {
   setShowDocumentPropertiesDialog(true);
 }, [setShowDocumentPropertiesDialog]);
+
 
 // Route node outputs through connected edges to target node inputs
 useEffect(() => {
@@ -627,6 +642,7 @@ useEffect(() => {
       }
     }
   }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
+
 
   useEffect(() => {
     const handleRpcCallEvent = async ({ nodeId, method, args = {}, timeout = 10000 } = {}) => {
@@ -2036,17 +2052,6 @@ useEffect(() => {
 
     eventBus.on('updateDocumentTheme', handleUpdateDocumentTheme);
     return () => eventBus.off('updateDocumentTheme', handleUpdateDocumentTheme);
-  }, []);
-
-  // Listen for node drag end events
-  useEffect(() => {
-    const handleNodeDragEnd = ({ nodeIds }) => {
-      // Handle node drag end - could trigger any post-drag logic
-      // console.log('Node drag ended for nodes:', nodeIds);
-    };
-
-    eventBus.on('nodeDragEnd', handleNodeDragEnd);
-    return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
   }, []);
 
   // Register single handleClick event handler

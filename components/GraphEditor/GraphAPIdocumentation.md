@@ -389,8 +389,19 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
 
 - **Component nodes** (resistor, jumper, DIP) simply connect their pin handles to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
 
+> **Plugin source:** The socket nodes ship via the built-in plugin `io.breadboard.sockets`. In templates/code you will see the node type string `io.breadboard.sockets:socket`. Because it’s just a plugin entry, users can inspect/extend it like any other plugin without editing the host.
+
 **Template generation:**  
 Ship a starter `.node` file that instantiates ~800 socket nodes (grouped per column so we do not exceed performance budgets), the rail nodes, and a locked skin node. Components dropped into the template automatically snap because the global grid size equals the socket pitch (0.1" increments). Scripts/validators can resolve connectivity by traversing `breadboard-socket → breadboard-rail` edges instead of consulting a bespoke data structure.
+
+**Optional auto‑wire helper:**  
+The repository includes a reference script at `/data/breadboard/autoWire.js`. It subscribes to `window.eventBus` and uses `window.graphAPI` to update edges whenever nodes move. Drop it into any page or `ScriptNode` with:
+
+```html
+<script src="/data/breadboard/autoWire.js" defer></script>
+```
+
+or paste the contents into your own plugin/script. This demonstrates how end users can build advanced behaviour purely with the public Graph API surface—no internal editor changes required.
 
 ---
 

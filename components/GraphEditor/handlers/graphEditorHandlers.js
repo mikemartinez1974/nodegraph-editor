@@ -120,7 +120,15 @@ export function createGraphEditorHandlers({
   const handleAddNode = (type = 'default', options = {}) => {
     console.log('[handleAddNode] Called with type:', type, 'options:', options);
     const { width = 200, height = 120, meta } = options;
-    console.log('[handleAddNode] Using width:', width, 'height:', height);
+    const resolvedWidth =
+      typeof meta?.defaultWidth === 'number' && !Number.isNaN(meta.defaultWidth)
+        ? meta.defaultWidth
+        : width;
+    const resolvedHeight =
+      typeof meta?.defaultHeight === 'number' && !Number.isNaN(meta.defaultHeight)
+        ? meta.defaultHeight
+        : height;
+    console.log('[handleAddNode] Using width:', resolvedWidth, 'height:', resolvedHeight);
     
     const centerX = (window.innerWidth / 2 - pan.x) / zoom;
     const centerY = (window.innerHeight / 2 - pan.y) / zoom;
@@ -168,8 +176,8 @@ export function createGraphEditorHandlers({
         ...defaultData
       },
       position: { x: centerX, y: centerY },
-      width: width,
-      height: height,
+      width: resolvedWidth,
+      height: resolvedHeight,
       resizable: true,
       handlePosition: 'center',
       showLabel: true,

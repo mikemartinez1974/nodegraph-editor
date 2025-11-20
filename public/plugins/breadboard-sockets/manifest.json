@@ -1,0 +1,58 @@
+{
+  "id": "io.breadboard.sockets",
+  "version": "0.1.2",
+  "name": "Breadboard Socket Toolkit",
+  "description": "Built-in plugin that exposes breadboard socket nodes for templates.",
+  "permissions": [],
+  "bundle": {
+    "url": "/plugins/breadboard-sockets/socketPlugin.js",
+    "sandbox": "iframe",
+    "integrity": ""
+  },
+  "nodes": [
+    {
+      "type": "socket",
+      "label": "Breadboard Socket",
+      "description": "Locked column of breadboard holes used in the board substrate.",
+      "category": "breadboard",
+      "icon": "FiberManualRecord",
+      "entry": "/plugins/breadboard-sockets/socketPlugin.js#SocketNode",
+      "defaultWidth": 10,
+      "defaultHeight": 18,
+      "defaultData": {
+        "rows": ["A", "B", "C", "D", "E"],
+        "column": 1,
+        "segment": "top"
+      },
+      "handles": {
+        "outputs": [
+          {
+            "id": "socket",
+            "label": "Socket",
+            "dataType": "value"
+          }
+        ]
+      },
+      "renderer": {
+        "entry": "/plugins/breadboard-sockets/socketRenderer.js"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "author": {
+      "name": "NodeGraph"
+    },
+    "homepage": "https://example.com/breadboard",
+    "license": "MIT"
+  }
+}

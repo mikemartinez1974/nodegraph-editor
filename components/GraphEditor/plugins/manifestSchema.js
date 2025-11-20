@@ -236,6 +236,14 @@ const normalizeNodeEntry = (node, index) => {
       errors.push(`nodes[${index}].defaultData must be an object when provided`);
     }
   }
+  let extensions = undefined;
+  if (node.extensions !== undefined) {
+    if (node.extensions && typeof node.extensions === 'object' && !Array.isArray(node.extensions)) {
+      extensions = { ...node.extensions };
+    } else {
+      errors.push(`nodes[${index}].extensions must be an object when provided`);
+    }
+  }
   const { errors: definitionErrors, value: definition } = normalizeNodeDefinition(node.definition, index);
   if (definitionErrors.length) {
     errors.push(...definitionErrors);
@@ -262,6 +270,7 @@ const normalizeNodeEntry = (node, index) => {
           ? node.defaultHeight
           : undefined,
       defaultData,
+      extensions,
       definition,
       renderer
     }

@@ -25,9 +25,10 @@ import usePluginRegistry from '../hooks/usePluginRegistry';
 
 const FAVORITES_KEY = 'nodegraph-editor:palette:favorites';
 
-const categoryOrder = ['favorites', 'basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
+const BASE_CATEGORY_ORDER = ['favorites', 'breadboard', 'basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
 const categoryLabels = {
   favorites: 'Favorites',
+  breadboard: 'Breadboard',
   basic: 'Basic Nodes',
   utility: 'Utility Nodes',
   logic: 'Logic Nodes',
@@ -128,6 +129,12 @@ export default function NodePalettePanel({
 }) {
   const { plugins } = usePluginRegistry();
   const nodesByCategory = useMemo(() => getNodeTypesByCategory(), [plugins]);
+  const orderedCategories = useMemo(() => {
+    const extraCategories = Object.keys(nodesByCategory || {})
+      .filter((category) => category && category !== 'favorites' && !BASE_CATEGORY_ORDER.includes(category))
+      .sort();
+    return [...BASE_CATEGORY_ORDER, ...extraCategories];
+  }, [nodesByCategory]);
   const [search, setSearch] = useState('');
   const [favorites, setFavorites] = useState(() => {
     if (typeof window === 'undefined') return new Set();
@@ -193,7 +200,7 @@ export default function NodePalettePanel({
       });
     }
 
-    categoryOrder.forEach((category) => {
+    orderedCategories.forEach((category) => {
       if (category === 'favorites') return;
       const nodes = (nodesByCategory[category] || []).filter((meta) => matchesQuery(meta, query));
       if (nodes.length > 0) {
