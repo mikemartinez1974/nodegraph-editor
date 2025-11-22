@@ -18,8 +18,8 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
         category: 'breadboard',
         icon: 'FiberManualRecord',
         entry: '/plugins/breadboard-sockets/socketPlugin.js#SocketNode',
-        defaultWidth: 10,
-        defaultHeight: 18,
+        defaultWidth: 24,
+        defaultHeight: 54,
         defaultData: {
           rows: ['A', 'B', 'C', 'D', 'E'],
           column: 1,
@@ -32,6 +32,36 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
         },
         renderer: {
           entry: '/plugins/breadboard-sockets/socketRenderer.js'
+        },
+        extensions: {
+          layout: { hideChrome: true }
+        }
+      },
+      {
+        type: 'railSocket',
+        label: 'Rail Socket',
+        description: 'Single column of power-rail sockets (two connected holes).',
+        category: 'breadboard',
+        icon: 'FlashOn',
+        entry: '/plugins/breadboard-sockets/socketPlugin.js#RailSocketNode',
+        defaultWidth: 24,
+        defaultHeight: 44,
+        defaultData: {
+          channel: 'top',
+          column: 1,
+          rails: [
+            { railId: 'rail-top-negative', polarity: 'negative', label: 'GND', slot: 0 },
+            { railId: 'rail-top-positive', polarity: 'positive', label: 'V+', slot: 1 }
+          ]
+        },
+        handles: {
+          outputs: [
+            { id: 'positive', label: 'V+', dataType: 'value' },
+            { id: 'negative', label: 'GND', dataType: 'value' }
+          ]
+        },
+        renderer: {
+          entry: '/plugins/breadboard-sockets/railSocketRenderer.js'
         },
         extensions: {
           layout: { hideChrome: true }

@@ -52,8 +52,8 @@
   document.body.appendChild(mount);
   const ctx = mount.getContext('2d');
 
-  const MIN_WIDTH = 20;
-  const MIN_HEIGHT = 48;
+  const MIN_WIDTH = 32;
+  const MIN_HEIGHT = 64;
 
   const drawSockets = ({ data = {}, width = MIN_WIDTH, height = MIN_HEIGHT }) => {
     const segment = (data.segment || 'top').toLowerCase();
@@ -70,12 +70,14 @@
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, renderWidth, renderHeight);
 
-    const insetX = Math.max(2, renderWidth * 0.15);
-    const insetY = Math.max(2, renderHeight * 0.08);
+    const insetX = Math.max(4, renderWidth * 0.18);
+    const topLabelSpace = Math.max(8, renderHeight * 0.22);
+    const bottomLabelSpace = Math.max(8, renderHeight * 0.22);
+    const bodyTop = topLabelSpace;
+    const bodyHeight = Math.max(8, renderHeight - topLabelSpace - bottomLabelSpace);
     const bodyWidth = renderWidth - insetX * 2;
-    const bodyHeight = renderHeight - insetY * 2;
 
-    drawRoundedRect(ctx, insetX, insetY, bodyWidth, bodyHeight, bodyWidth * 0.25);
+    drawRoundedRect(ctx, insetX, bodyTop, bodyWidth, bodyHeight, bodyWidth * 0.25);
     ctx.fillStyle = colors.body;
     ctx.fill();
     ctx.lineWidth = 1;
@@ -83,10 +85,10 @@
     ctx.stroke();
 
     ctx.fillStyle = colors.accent;
-    ctx.fillRect(insetX + bodyWidth * 0.1, insetY, bodyWidth * 0.8, Math.max(2, bodyHeight * 0.06));
+    ctx.fillRect(insetX + bodyWidth * 0.1, bodyTop, bodyWidth * 0.8, Math.max(2, bodyHeight * 0.06));
     ctx.fillRect(
       insetX + bodyWidth * 0.1,
-      insetY + bodyHeight - Math.max(2, bodyHeight * 0.08),
+      bodyTop + bodyHeight - Math.max(2, bodyHeight * 0.08),
       bodyWidth * 0.8,
       Math.max(2, bodyHeight * 0.08)
     );
@@ -95,7 +97,7 @@
     const holeCount = Math.max(1, rows.length);
     const columnCenterX = renderWidth / 2;
     const availableHeight = bodyHeight - bodyHeight * 0.2;
-    const topOffset = insetY + bodyHeight * 0.1;
+    const topOffset = bodyTop + bodyHeight * 0.1;
     const spacing = availableHeight / Math.max(holeCount - 1, 1);
     const holeRadius = Math.max(2, Math.min(bodyWidth * 0.18, spacing * 0.3));
 
@@ -121,25 +123,27 @@
     if (occupied) {
       ctx.strokeStyle = '#ffb74d';
       ctx.lineWidth = 2;
-      drawRoundedRect(ctx, insetX - 1, insetY - 1, bodyWidth + 2, bodyHeight + 2, bodyWidth * 0.3);
+      drawRoundedRect(ctx, insetX - 1, bodyTop - 1, bodyWidth + 2, bodyHeight + 2, bodyWidth * 0.3);
       ctx.stroke();
     }
 
     const columnLabel = data.column ? `${data.column}` : '';
     if (columnLabel) {
       ctx.fillStyle = colors.text;
-      ctx.font = `600 ${Math.max(8, bodyWidth * 0.4)}px Inter, system-ui, sans-serif`;
+      ctx.font = `600 ${Math.max(8, bodyWidth * 0.45)}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(columnLabel, columnCenterX, insetY - Math.max(8, bodyWidth * 0.35));
+      const labelY = Math.max(0, topLabelSpace * 0.25);
+      ctx.fillText(columnLabel, columnCenterX, labelY);
     }
 
     const segmentLabel = segment === 'bottom' ? 'F-J' : 'A-E';
     ctx.fillStyle = 'rgba(15,23,42,0.55)';
-    ctx.font = `500 ${Math.max(6, bodyWidth * 0.28)}px Inter, system-ui, sans-serif`;
+    ctx.font = `500 ${Math.max(6, bodyWidth * 0.32)}px Inter, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(segmentLabel, columnCenterX, insetY + bodyHeight + Math.max(6, bodyWidth * 0.3));
+    const segmentBaseline = renderHeight - Math.max(2, bottomLabelSpace * 0.2);
+    ctx.fillText(segmentLabel, columnCenterX, segmentBaseline);
   };
 
   let lastPayload = { data: {}, width: MIN_WIDTH, height: MIN_HEIGHT };

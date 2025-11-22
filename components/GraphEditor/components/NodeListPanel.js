@@ -35,8 +35,6 @@ import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import { createPortal } from 'react-dom';
 import { filterNodesForPanel } from '../utils/nodeFilters';
 
-const { FixedSizeList } = ReactWindow;
-
 export default function NodeListPanel({ 
   nodes = [], 
   selectedNodeId = null,
@@ -384,7 +382,9 @@ export default function NodeListPanel({
     </Box>
   ) : null;
 
-  const listSection = useVirtualization ? (
+const { FixedSizeList } = ReactWindow;
+
+const listSection = useVirtualization && FixedSizeList ? (
     <Box sx={{ flex: 1, overflow: 'hidden' }}>
       <FixedSizeList
         height={typeof window !== 'undefined' ? window.innerHeight - 200 : 400}
