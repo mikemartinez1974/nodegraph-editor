@@ -221,7 +221,7 @@
 
 - [ ] **Phase 3 – Canvas & Interaction Layer**  
       Represent the entire breadboard (sockets, rails, background skin) using standard nodes and edges so scale/perf can be validated on a production-sized graph.
-  - [ ] Define socket/rail node types (or grouped “column” nodes) that encode their row/column metadata, are locked in place, and ship inside the template as the physical board substrate (`components/GraphEditor/nodeTypeRegistry.js`, template JSON).
+  - [x] Define socket/rail node types (or grouped “column” nodes) that encode their row/column metadata, are locked in place, and ship inside the template as the physical board substrate (`components/GraphEditor/nodeTypeRegistry.js`, template JSON).
   - [ ] Author breadboard component nodes (jumpers, resistors, DIP packages) whose handles snap to nearby socket nodes using the existing grid spacing/selection hooks, emitting warnings when sockets are occupied or rail polarity mismatches occur.
   - [ ] Update drag/selection/handle handlers plus GraphCRUD glue so moving or wiring a component simply reassigns edges between component handles and socket nodes, keeping history/undo intact (`components/GraphEditor/handlers/graphEditorHandlers.js`, `components/NodeGraph/HandleLayer.js`).
   - [ ] Add optional “board skin” nodes (canvas node or locked background image) for visuals without introducing custom rendering layers; confirm the graph still performs with ~800 socket nodes + rails.

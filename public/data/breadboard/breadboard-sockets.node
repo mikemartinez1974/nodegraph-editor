@@ -2,6 +2,181 @@
   "version": "1.0.0",
   "nodes": [
     {
+      "id": "bus-top-positive",
+      "type": "io.breadboard.bus",
+      "label": "TOP V+",
+      "position": {
+        "x": 0,
+        "y": -120
+      },
+      "width": 28,
+      "height": 20,
+      "state": {
+        "locked": true
+      },
+      "outputs": [
+        {
+          "key": "positive",
+          "label": "V+",
+          "type": "value"
+        }
+      ],
+      "data": {
+        "channel": "top",
+        "polarity": "positive"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "id": "bus-top-negative",
+      "type": "io.breadboard.bus",
+      "label": "TOP GND",
+      "position": {
+        "x": 0,
+        "y": -98
+      },
+      "width": 28,
+      "height": 20,
+      "state": {
+        "locked": true
+      },
+      "outputs": [
+        {
+          "key": "negative",
+          "label": "GND",
+          "type": "value"
+        }
+      ],
+      "data": {
+        "channel": "top",
+        "polarity": "negative"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "id": "bus-bottom-positive",
+      "type": "io.breadboard.bus",
+      "label": "BOTTOM V+",
+      "position": {
+        "x": 0,
+        "y": 70
+      },
+      "width": 28,
+      "height": 20,
+      "state": {
+        "locked": true
+      },
+      "outputs": [
+        {
+          "key": "positive",
+          "label": "V+",
+          "type": "value"
+        }
+      ],
+      "data": {
+        "channel": "bottom",
+        "polarity": "positive"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "id": "bus-bottom-negative",
+      "type": "io.breadboard.bus",
+      "label": "BOTTOM GND",
+      "position": {
+        "x": 0,
+        "y": 92
+      },
+      "width": 28,
+      "height": 20,
+      "state": {
+        "locked": true
+      },
+      "outputs": [
+        {
+          "key": "negative",
+          "label": "GND",
+          "type": "value"
+        }
+      ],
+      "data": {
+        "channel": "bottom",
+        "polarity": "negative"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "id": "breadboard-skin",
+      "type": "io.breadboard.sockets:skin",
+      "label": "Breadboard Skin",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 784,
+      "height": 280,
+      "state": {
+        "locked": true
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      },
+      "data": {
+        "rows": 10,
+        "columns": 30,
+        "rowPitch": 1,
+        "columnPitch": 1,
+        "railInset": 32,
+        "railThickness": 24,
+        "gapHeight": 96
+      },
+      "inputs": [],
+      "outputs": []
+    },
+    {
       "id": "socket-top-1",
       "type": "io.breadboard.sockets:socket",
       "label": "A-E1",
@@ -9414,90 +9589,6 @@
           "label": "V+",
           "type": "value"
         },
-        {
-          "key": "negative",
-          "label": "GND",
-          "type": "value"
-        }
-      ]
-    },
-    {
-      "id": "bus-top-positive",
-      "type": "io.breadboard.bus",
-      "label": "TOP V+",
-      "position": {
-        "x": 0,
-        "y": -120
-      },
-      "width": 28,
-      "height": 20,
-      "state": {
-        "locked": true
-      },
-      "outputs": [
-        {
-          "key": "positive",
-          "label": "V+",
-          "type": "value"
-        }
-      ]
-    },
-    {
-      "id": "bus-top-negative",
-      "type": "io.breadboard.bus",
-      "label": "TOP GND",
-      "position": {
-        "x": 0,
-        "y": -98
-      },
-      "width": 28,
-      "height": 20,
-      "state": {
-        "locked": true
-      },
-      "outputs": [
-        {
-          "key": "negative",
-          "label": "GND",
-          "type": "value"
-        }
-      ]
-    },
-    {
-      "id": "bus-bottom-positive",
-      "type": "io.breadboard.bus",
-      "label": "BOTTOM V+",
-      "position": {
-        "x": 0,
-        "y": 120
-      },
-      "width": 28,
-      "height": 20,
-      "state": {
-        "locked": true
-      },
-      "outputs": [
-        {
-          "key": "positive",
-          "label": "V+",
-          "type": "value"
-        }
-      ]
-    },
-    {
-      "id": "bus-bottom-negative",
-      "type": "io.breadboard.bus",
-      "label": "BOTTOM GND",
-      "position": {
-        "x": 0,
-        "y": 142
-      },
-      "width": 28,
-      "height": 20,
-      "state": {
-        "locked": true
-      },
-      "outputs": [
         {
           "key": "negative",
           "label": "GND",

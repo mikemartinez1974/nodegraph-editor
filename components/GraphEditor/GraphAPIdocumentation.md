@@ -384,8 +384,14 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
   - Links to the relevant `breadboard-socket` nodes via edges so GraphCRUD already “knows” the rail wiring.
 
 - **`breadboard-skin` node**  
-  - Optional canvas/background node that draws the classic breadboard art.  
-  - Lives at the bottom z-index and is purely visual (no handles).
+  - Node type `io.breadboard.sockets:skin` renders the baseplate art (see `public/plugins/breadboard-sockets/skinRenderer.js`).  
+  - `data` fields mirror the board layout (`rows`, `columns`, `rowPitch`, `columnPitch`) plus styling knobs (`railInset`, `railThickness`, `gapHeight`) so templates can align the canvas to the socket grid.  
+  - Locked/pinned at the bottom z-index; purely visual with no handles so the substrate stays painted while other nodes sit on top.
+
+- **`breadboard-bus` node**  
+  - Node type `io.breadboard.bus` captures the four continuous rail nets (top/bottom × V+/GND) and emits only the relevant rail handle via its `outputs[]` array.  
+  - Hidden/locked renderer keeps it invisible (`public/plugins/breadboard-sockets/busRenderer.js`), but the node remains in the graph so GraphCRUD can trace edges from the bus to each `breadboard-rail` column.  
+  - Position this node beneath the skin so it stays in the background without competing for handle space; the template ships them at the very start of the nodes array so nothing renders on top of them.
 
 - **Component nodes** (resistor, jumper, DIP) simply connect their pin handles to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
 

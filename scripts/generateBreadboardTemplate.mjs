@@ -21,6 +21,15 @@ const RAIL_SOCKET_HEIGHT =
 const RAIL_GAP = Number(process.env.BREADBOARD_RAIL_GAP) || 0; // No gap - rails abut the breadboard exactly
 const RAIL_LAYER_SPACING =
   Number(process.env.BREADBOARD_RAIL_LAYER_SPACING) || 4;
+const SKIN_MARGIN = 32;
+const SKIN_RAIL_INSET = Number(process.env.BREADBOARD_SKIN_RAIL_INSET) || 32;
+const SKIN_RAIL_THICKNESS = Number(process.env.BREADBOARD_SKIN_RAIL_THICKNESS) || 24;
+const SKIN_GAP_HEIGHT = Number(process.env.BREADBOARD_SKIN_GAP_HEIGHT) || 96;
+const SKIN_WIDTH = Math.max(360, COLUMN_SPACING * COLUMN_COUNT + SKIN_MARGIN * 2);
+const SKIN_HEIGHT = Math.max(
+  280,
+  ROW_OFFSET * 2 + SOCKET_HEIGHT + RAIL_GAP + RAIL_SOCKET_HEIGHT * 2 + SKIN_MARGIN * 2
+);
 
 const now = new Date().toISOString();
 
@@ -178,6 +187,17 @@ const busNodes = [
     width: 28,
     height: 20,
     state: { locked: true },
+    extensions: {
+      layout: {
+        hideChrome: true,
+        padding: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      }
+    },
+    data: { channel: 'top', polarity: 'positive' },
     outputs: [{ key: 'positive', label: 'V+', type: 'value' }]
   },
   {
@@ -188,29 +208,93 @@ const busNodes = [
     width: 28,
     height: 20,
     state: { locked: true },
+    extensions: {
+      layout: {
+        hideChrome: true,
+        padding: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      }
+    },
+    data: { channel: 'top', polarity: 'negative' },
     outputs: [{ key: 'negative', label: 'GND', type: 'value' }]
   },
   {
     id: 'bus-bottom-positive',
     type: 'io.breadboard.bus',
     label: 'BOTTOM V+',
-    position: { x: 0, y: getRailCenterOffset() + RAIL_SOCKET_HEIGHT },
+    position: { x: 0, y: getRailCenterOffset() + RAIL_SOCKET_HEIGHT - 50 },
     width: 28,
     height: 20,
     state: { locked: true },
+    extensions: {
+      layout: {
+        hideChrome: true,
+        padding: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      }
+    },
+    data: { channel: 'bottom', polarity: 'positive' },
     outputs: [{ key: 'positive', label: 'V+', type: 'value' }]
   },
   {
     id: 'bus-bottom-negative',
     type: 'io.breadboard.bus',
     label: 'BOTTOM GND',
-    position: { x: 0, y: getRailCenterOffset() + RAIL_SOCKET_HEIGHT + 22 },
+    position: { x: 0, y: getRailCenterOffset() + RAIL_SOCKET_HEIGHT + 22 - 50 },
     width: 28,
     height: 20,
     state: { locked: true },
+    extensions: {
+      layout: {
+        hideChrome: true,
+        padding: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      }
+    },
+    data: { channel: 'bottom', polarity: 'negative' },
     outputs: [{ key: 'negative', label: 'GND', type: 'value' }]
   }
 ];
+
+const skinNode = {
+  id: 'breadboard-skin',
+  type: 'io.breadboard.sockets:skin',
+  label: 'Breadboard Skin',
+  position: { x: 0, y: 0 },
+  width: SKIN_WIDTH,
+  height: SKIN_HEIGHT,
+  state: { locked: true },
+  extensions: {
+    layout: {
+      hideChrome: true,
+      padding: 0,
+      paddingTop: 0,
+      paddingRight: 0,
+      paddingBottom: 0,
+      paddingLeft: 0
+    }
+  },
+  data: {
+    rows: 10,
+    columns: COLUMN_COUNT,
+    rowPitch: 1,
+    columnPitch: 1,
+    railInset: SKIN_RAIL_INSET,
+    railThickness: SKIN_RAIL_THICKNESS,
+    gapHeight: SKIN_GAP_HEIGHT
+  },
+  inputs: [],
+  outputs: []
+};
 
 // prepare edges from buses -> each rail node (so rails behave as visual/rendering elements while buses represent the continuous nets)
 const edgesFromBus = [];
@@ -278,7 +362,7 @@ if (typeof edgesFromBus !== 'undefined' && Array.isArray(edgesFromBus)) {
 
 const graph = {
   version: '1.0.0',
-  nodes: [...sockets, ...railNodes, ...busNodes],
+  nodes: [...busNodes, skinNode, ...sockets, ...railNodes],
   edges,
   groups: [],
   options: {
