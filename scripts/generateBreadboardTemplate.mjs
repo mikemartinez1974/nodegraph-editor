@@ -63,10 +63,11 @@ const buildSocketNode = ({ column, segment, rows }) => {
     },
     // keep legacy "handles" for plugin renderer compatibility
     handles: [
-      { id: 'socket', label: 'Socket', type: 'value', direction: 'output' }
+      { id: 'socket', label: 'Socket', type: 'value', direction: 'bidirectional' }
     ],
     // Structured ports for unified handle system
     inputs: [
+      { key: 'socket', label: 'Socket', type: 'value' },
       { key: 'vplus', label: 'V+', type: 'value' },
       { key: 'gnd', label: 'GND', type: 'value' }
     ],
@@ -363,7 +364,7 @@ if (typeof edgesFromBus !== 'undefined' && Array.isArray(edgesFromBus)) {
 const graph = {
   version: '1.0.0',
   nodes: [...busNodes, skinNode, ...sockets, ...railNodes],
-  edges,
+  edges: [...edges],
   groups: [],
   options: {
     gridSize: 16,

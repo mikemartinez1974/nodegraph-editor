@@ -150,6 +150,7 @@ export default function ConsolidatedPropertiesPanel({
   selectedEdge,
   selectedGroup,
   nodes = [],
+  edges = [],
   edgeTypes = {},
   nodeTypes = {},
   onUpdateNode,
@@ -204,6 +205,10 @@ export default function ConsolidatedPropertiesPanel({
     });
     return map;
   }, [nodeTypeOptions]);
+  const connectedEdges = useMemo(() => {
+    if (!selectedNode || !Array.isArray(edges)) return [];
+    return edges.filter(edge => edge.source === selectedNode.id || edge.target === selectedNode.id);
+  }, [edges, selectedNode]);
   
   // Edge-specific states
   const [edgeType, setEdgeType] = useState('');
@@ -893,6 +898,32 @@ export default function ConsolidatedPropertiesPanel({
                 ))}
               </Select>
             </FormControl>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2">
+                  Connected Edges ({connectedEdges.length})
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <List dense sx={{ py: 0 }}>
+                  {connectedEdges.length === 0 ? (
+                    <ListItem dense>
+                      <ListItemText primary="No connected edges" secondary="Drag parts to wire them up" />
+                    </ListItem>
+                  ) : (
+                    connectedEdges.map(edge => (
+                      <ListItem key={edge.id} dense>
+                        <ListItemText
+                          primary={`${edge.sourceHandle || 'out'} → ${edge.targetHandle || 'in'}`}
+                          secondary={`${edge.id}: ${edge.source} → ${edge.target}`}
+                        />
+                        <Chip label={edge.type || 'edge'} size="small" variant="outlined" sx={{ ml: 1 }} />
+                      </ListItem>
+                    ))
+                  )}
+                </List>
+              </AccordionDetails>
+            </Accordion>
             {/* Memo */}
             <Accordion
               expanded={memoExpanded}

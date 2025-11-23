@@ -177,7 +177,7 @@ export default function TemplateGallery({ open, onClose, onSelect }) {
               {filteredTemplates.map((template) => {
                 const secure = template.href && template.href.startsWith('https://');
                 return (
-                  <Grid item xs={12} sm={6} md={4} key={template.id}>
+                  <Grid xs={12} sm={6} md={4} key={template.id}>
                     <Card
                       elevation={3}
                       sx={{

@@ -393,6 +393,11 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
   - Hidden/locked renderer keeps it invisible (`public/plugins/breadboard-sockets/busRenderer.js`), but the node remains in the graph so GraphCRUD can trace edges from the bus to each `breadboard-rail` column.  
   - Position this node beneath the skin so it stays in the background without competing for handle space; the template ships them at the very start of the nodes array so nothing renders on top of them.
 
+- **Breadboard component plugin**  
+  - `io.breadboard.components` ships resistor, LED, and jumper nodes; each definition includes `pins`, `footprint`, and `handles` so GraphCRUD and validators can align wiring automatically (`public/plugins/breadboard-components/manifest.json`).  
+  - These plugin nodes reuse the native layout system via simple renderer canvases (`/plugins/breadboard-components/*Renderer.js`) that stay locked-by-default, making them feel like first-party assets without polluting the host registry.  
+  - The starter template instantiates `component-resistor-1`, `component-led-1`, and `component-jumper-1` with edges already attached to sockets so you can start wiring a basic circuit immediately.
+
 - **Component nodes** (resistor, jumper, DIP) simply connect their pin handles to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
 
 > **Plugin source:** The socket nodes ship via the built-in plugin `io.breadboard.sockets`. In templates/code you will see the node type string `io.breadboard.sockets:socket`. Because it’s just a plugin entry, users can inspect/extend it like any other plugin without editing the host.

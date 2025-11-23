@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
@@ -38,6 +38,8 @@ export default function ScriptNode({
   const [lastResult, setLastResult] = useState(node?.data?.lastResult || null);
   const [lastRunAt, setLastRunAt] = useState(node?.data?.lastRunAt || null);
   const [showResult, setShowResult] = useState(false);
+  const autoRunTriggered = useRef(false);
+  const scriptSource = useMemo(() => node?.data?.script || node?.data?.source || '', [node?.data]);
 
   useEffect(() => {
     if (nodeRef.current && nodeRefs) {
@@ -72,10 +74,19 @@ export default function ScriptNode({
 
   // run the selected script
   const runScript = async (meta = {}) => {
-    const script = getSelectedScript();
+    const script = scriptSource ? { source: scriptSource, name: node?.data?.name || 'Script' } : getSelectedScript();
     if (!script) {
       setLastResult({ success: false, error: 'No script selected' });
       return;
+    }
+
+    if (typeof window !== 'undefined' && window.parent) {
+      window.parent.postMessage(
+        { type: 'breadboard:autoWire', script: script.source || '', nodeId: node.id },
+        '*'
+      );
+    } else {
+      eventBus.emit('breadboard:autoWire', { script: script.source || '', nodeId: node.id });
     }
 
     if (typeof window === 'undefined' || !window.__scriptRunner) {
@@ -128,7 +139,22 @@ export default function ScriptNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [selectedScriptId, scriptLibrary, allowMutations, dryRun]);
+  }, [selectedScriptId, scriptLibrary, allowMutations, dryRun, scriptSource]);
+
+  useEffect(() => {
+    if (node?.data?.autoRun && !autoRunTriggered.current && scriptSource) {
+      autoRunTriggered.current = true;
+      runScript();
+      if (typeof window !== 'undefined' && window.parent) {
+        window.parent.postMessage(
+          { type: 'breadboard:autoWire', script: scriptSource, nodeId: node.id },
+          '*'
+        );
+      } else {
+        eventBus.emit('breadboard:autoWire', { script: scriptSource, nodeId: node.id });
+      }
+    }
+  }, [node?.data?.autoRun, runScript, scriptSource, node.id]);
 
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;

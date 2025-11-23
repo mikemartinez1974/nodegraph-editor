@@ -5,6 +5,7 @@
 import eventBus from '../../NodeGraph/eventBus';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils';
 import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation';
+import { convertHandlesObjectToArray } from '../nodeTypeRegistry';
 
 // Debounce guard for delete operations (must be outside function to persist)
 let deleteInProgress = false;
@@ -120,6 +121,16 @@ export function createGraphEditorHandlers({
   const handleAddNode = (type = 'default', options = {}) => {
     console.log('[handleAddNode] Called with type:', type, 'options:', options);
     const { width = 200, height = 120, meta } = options;
+    console.log('[handleAddNode] Raw meta payload:', meta);
+    if (meta) {
+      console.log('[handleAddNode] Meta handles snapshot:', {
+        handles: meta.handles,
+        inputs: meta.inputs,
+        outputs: meta.outputs
+      });
+    } else {
+      console.log('[handleAddNode] Meta handles snapshot: none provided');
+    }
     const resolvedWidth =
       typeof meta?.defaultWidth === 'number' && !Number.isNaN(meta.defaultWidth)
         ? meta.defaultWidth
@@ -164,6 +175,47 @@ export function createGraphEditorHandlers({
       extensionsFromMeta || pluginExtension
         ? { ...(extensionsFromMeta || {}), ...(pluginExtension || {}) }
         : undefined;
+    const derivedHandlesFromPins = Array.isArray(meta?.defaultData?.pins)
+      ? meta.defaultData.pins
+          .map((pin, index) => {
+            if (!pin) return null;
+            const id = pin.id || pin.key || pin.handleKey || pin.label || `pin-${index}`;
+            if (!id) return null;
+            return {
+              id,
+              label: pin.label || id,
+              direction: 'output',
+              dataType: 'value'
+            };
+          })
+          .filter(Boolean)
+      : undefined;
+
+    const normalizedHandles =
+      Array.isArray(meta?.handles)
+        ? meta.handles
+        : convertHandlesObjectToArray(meta?.handles) || derivedHandlesFromPins;
+
+    const normalizedOutputs =
+      Array.isArray(meta?.outputs)
+        ? meta.outputs
+        : Array.isArray(meta?.handles?.outputs)
+        ? meta.handles.outputs
+        : derivedHandlesFromPins
+        ? derivedHandlesFromPins.map(handle => ({
+            key: handle.id,
+            label: handle.label || handle.id,
+            type: handle.dataType || 'value'
+          }))
+        : undefined;
+
+    const normalizedInputs =
+      Array.isArray(meta?.inputs)
+        ? meta.inputs
+        : Array.isArray(meta?.handles?.inputs)
+        ? meta.handles.inputs
+        : undefined;
+
     const payload = {
       type: type,
       label:
@@ -181,9 +233,9 @@ export function createGraphEditorHandlers({
       resizable: true,
       handlePosition: 'center',
       showLabel: true,
-      inputs: Array.isArray(meta?.inputs) ? meta.inputs : undefined,
-      outputs: Array.isArray(meta?.outputs) ? meta.outputs : undefined,
-      handles: Array.isArray(meta?.handles) ? meta.handles : undefined,
+      inputs: normalizedInputs,
+      outputs: normalizedOutputs,
+      handles: normalizedHandles,
       state:
         meta && meta.state && typeof meta.state === 'object'
           ? { ...meta.state }

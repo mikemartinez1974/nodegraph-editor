@@ -14,17 +14,6 @@
       "state": {
         "locked": true
       },
-      "outputs": [
-        {
-          "key": "positive",
-          "label": "V+",
-          "type": "value"
-        }
-      ],
-      "data": {
-        "channel": "top",
-        "polarity": "positive"
-      },
       "extensions": {
         "layout": {
           "hideChrome": true,
@@ -34,7 +23,54 @@
           "paddingBottom": 0,
           "paddingLeft": 0
         }
-      }
+      },
+      "data": {
+        "channel": "top",
+        "polarity": "positive"
+      },
+      "outputs": [
+        {
+          "key": "positive",
+          "label": "V+",
+          "type": "value"
+        }
+      ]
+    },
+    {
+      "id": "node-breadboard-autowire-script",
+      "type": "script",
+      "label": "Autowire Helper",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 220,
+      "height": 80,
+      "state": {
+        "locked": true,
+        "hidden": true
+      },
+      "data": {
+        "scriptId": null,
+        "allowMutations": true,
+        "dryRun": false,
+        "script": "(function () {\n  if (typeof window === 'undefined' || typeof document === 'undefined') return;\n\n  const inject = () => {\n    if (window.__breadboardAutoWireInjected) return;\n    const existing = document.querySelector('script[data-breadboard-autowire=\"true\"]');\n    if (existing) {\n      window.__breadboardAutoWireInjected = true;\n      return;\n    }\n    const target = document.head || document.body || document.documentElement;\n    if (!target) return;\n    const script = document.createElement('script');\n    script.src = '/data/breadboard/autoWire.js';\n    script.defer = true;\n    script.dataset.breadboardAutowire = 'true';\n    script.addEventListener('error', () => {\n      window.__breadboardAutoWireInjected = false;\n    });\n    window.__breadboardAutoWireInjected = true;\n    target.appendChild(script);\n    console.info('[BreadboardAutoWire] Requested external helper script.');\n  };\n\n  if (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', inject, { once: true });\n  } else {\n    inject();\n  }\n})();\n",
+        "autoRun": true
+      },
+      "inputs": [
+        {
+          "key": "trigger",
+          "label": "Trigger",
+          "type": "trigger"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "result",
+          "label": "Result",
+          "type": "value"
+        }
+      ]
     },
     {
       "id": "bus-top-negative",
@@ -49,17 +85,6 @@
       "state": {
         "locked": true
       },
-      "outputs": [
-        {
-          "key": "negative",
-          "label": "GND",
-          "type": "value"
-        }
-      ],
-      "data": {
-        "channel": "top",
-        "polarity": "negative"
-      },
       "extensions": {
         "layout": {
           "hideChrome": true,
@@ -69,7 +94,18 @@
           "paddingBottom": 0,
           "paddingLeft": 0
         }
-      }
+      },
+      "data": {
+        "channel": "top",
+        "polarity": "negative"
+      },
+      "outputs": [
+        {
+          "key": "negative",
+          "label": "GND",
+          "type": "value"
+        }
+      ]
     },
     {
       "id": "bus-bottom-positive",
@@ -84,17 +120,6 @@
       "state": {
         "locked": true
       },
-      "outputs": [
-        {
-          "key": "positive",
-          "label": "V+",
-          "type": "value"
-        }
-      ],
-      "data": {
-        "channel": "bottom",
-        "polarity": "positive"
-      },
       "extensions": {
         "layout": {
           "hideChrome": true,
@@ -104,7 +129,18 @@
           "paddingBottom": 0,
           "paddingLeft": 0
         }
-      }
+      },
+      "data": {
+        "channel": "bottom",
+        "polarity": "positive"
+      },
+      "outputs": [
+        {
+          "key": "positive",
+          "label": "V+",
+          "type": "value"
+        }
+      ]
     },
     {
       "id": "bus-bottom-negative",
@@ -119,17 +155,6 @@
       "state": {
         "locked": true
       },
-      "outputs": [
-        {
-          "key": "negative",
-          "label": "GND",
-          "type": "value"
-        }
-      ],
-      "data": {
-        "channel": "bottom",
-        "polarity": "negative"
-      },
       "extensions": {
         "layout": {
           "hideChrome": true,
@@ -139,7 +164,18 @@
           "paddingBottom": 0,
           "paddingLeft": 0
         }
-      }
+      },
+      "data": {
+        "channel": "bottom",
+        "polarity": "negative"
+      },
+      "outputs": [
+        {
+          "key": "negative",
+          "label": "GND",
+          "type": "value"
+        }
+      ]
     },
     {
       "id": "breadboard-skin",
@@ -222,10 +258,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -291,10 +332,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -360,10 +406,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -429,10 +480,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -498,10 +554,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -567,10 +628,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -636,10 +702,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -705,10 +776,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -774,10 +850,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -843,10 +924,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -912,10 +998,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -981,10 +1072,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1050,10 +1146,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1119,10 +1220,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1188,10 +1294,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1257,10 +1368,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1326,10 +1442,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1395,10 +1516,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1464,10 +1590,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1533,10 +1664,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1602,10 +1738,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1671,10 +1812,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1740,10 +1886,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1809,10 +1960,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1878,10 +2034,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -1947,10 +2108,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2016,10 +2182,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2085,10 +2256,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2154,10 +2330,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2223,10 +2404,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2292,10 +2478,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2361,10 +2552,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2430,10 +2626,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2499,10 +2700,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2568,10 +2774,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2637,10 +2848,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2706,10 +2922,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2775,10 +2996,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2844,10 +3070,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2913,10 +3144,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -2982,10 +3218,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3051,10 +3292,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3120,10 +3366,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3189,10 +3440,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3258,10 +3514,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3327,10 +3588,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3396,10 +3662,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3465,10 +3736,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3534,10 +3810,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3603,10 +3884,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3672,10 +3958,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3741,10 +4032,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3810,10 +4106,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3879,10 +4180,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -3948,10 +4254,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -4017,10 +4328,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -4086,10 +4402,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -4155,10 +4476,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -4224,10 +4550,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -4293,10 +4624,15 @@
           "id": "socket",
           "label": "Socket",
           "type": "value",
-          "direction": "output"
+          "direction": "bidirectional"
         }
       ],
       "inputs": [
+        {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value"
+        },
         {
           "key": "vplus",
           "label": "V+",
@@ -9599,6 +9935,72 @@
   ],
   "edges": [
     {
+      "id": "edge-resistor-1-pinA-to-socket-top-9",
+      "source": {
+        "nodeId": "component-resistor-1",
+        "handleKey": "pinA"
+      },
+      "target": {
+        "nodeId": "socket-top-9",
+        "handleKey": "socket"
+      }
+    },
+    {
+      "id": "edge-resistor-1-pinB-to-socket-top-10",
+      "source": {
+        "nodeId": "component-resistor-1",
+        "handleKey": "pinB"
+      },
+      "target": {
+        "nodeId": "socket-top-10",
+        "handleKey": "socket"
+      }
+    },
+    {
+      "id": "edge-led-1-anode-to-socket-top-18",
+      "source": {
+        "nodeId": "component-led-1",
+        "handleKey": "anode"
+      },
+      "target": {
+        "nodeId": "socket-top-18",
+        "handleKey": "socket"
+      }
+    },
+    {
+      "id": "edge-led-1-cathode-to-socket-bottom-18",
+      "source": {
+        "nodeId": "component-led-1",
+        "handleKey": "cathode"
+      },
+      "target": {
+        "nodeId": "socket-bottom-18",
+        "handleKey": "socket"
+      }
+    },
+    {
+      "id": "edge-jumper-1-wireA-to-socket-top-4",
+      "source": {
+        "nodeId": "component-jumper-1",
+        "handleKey": "wireA"
+      },
+      "target": {
+        "nodeId": "socket-top-4",
+        "handleKey": "socket"
+      }
+    },
+    {
+      "id": "edge-jumper-1-wireB-to-socket-bottom-6",
+      "source": {
+        "nodeId": "component-jumper-1",
+        "handleKey": "wireB"
+      },
+      "target": {
+        "nodeId": "socket-bottom-6",
+        "handleKey": "socket"
+      }
+    },
+    {
       "id": "edge-rail-top-1-V+-to-socket-top-1",
       "source": {
         "nodeId": "rail-top-1",
@@ -12249,8 +12651,8 @@
   "metadata": {
     "title": "Breadboard Socket Template",
     "description": "Pre-generated board substrate composed of socket nodes",
-    "created": "2025-11-21T19:50:51.171Z",
-    "modified": "2025-11-21T19:50:51.171Z",
+    "created": "2025-11-22T04:14:21.530Z",
+    "modified": "2025-11-22T04:14:21.530Z",
     "author": "generator"
   },
   "extensions": {

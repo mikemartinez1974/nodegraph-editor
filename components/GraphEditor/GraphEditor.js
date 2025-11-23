@@ -165,6 +165,7 @@ const state = useGraphEditorState();
     edgeIds: Array.isArray(selectedEdgeIds) ? [...selectedEdgeIds] : [],
     groupIds: Array.isArray(selectedGroupIds) ? [...selectedGroupIds] : []
   });
+  const lastLoggedNodeIdRef = useRef(null);
 
   useEffect(() => {
     selectionSnapshotRef.current = {
@@ -173,6 +174,20 @@ const state = useGraphEditorState();
       groupIds: Array.isArray(selectedGroupIds) ? [...selectedGroupIds] : []
     };
   }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
+
+  useEffect(() => {
+    if (!Array.isArray(selectedNodeIds) || selectedNodeIds.length !== 1) {
+      lastLoggedNodeIdRef.current = null;
+      return;
+    }
+    const currentId = selectedNodeIds[0];
+    if (lastLoggedNodeIdRef.current === currentId) return;
+    lastLoggedNodeIdRef.current = currentId;
+    const node = Array.isArray(nodes) ? nodes.find((n) => n.id === currentId) : null;
+    if (node) {
+      console.info('[GraphEditor] Selected node snapshot:', node);
+    }
+  }, [selectedNodeIds, nodes]);
 
   useEffect(() => {
     if (autoSnapInitializedRef.current) return;
@@ -348,9 +363,9 @@ useEffect(() => {
       setBackgroundInteractive(Boolean(interactive));
     };
 
-    const handleSetBackgroundImage = ({ backgroundImage }) => {
-      setDocumentBackgroundImage(backgroundImage || '');
-    };
+  const handleSetBackgroundImage = ({ backgroundImage }) => {
+    setDocumentBackgroundImage(backgroundImage || '');
+  };
 
     // Test RPC call handler
     const handleTestBackgroundRpc = async ({ method, args }) => {
@@ -423,6 +438,65 @@ useEffect(() => {
       eventBus.off('testBackgroundRpc', handleTestBackgroundRpc);
     };
   }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady]);
+
+  useEffect(() => {
+    const handleAutoWire = (event) => {
+      const payload = event?.data;
+      if (!payload || payload.type === undefined) return;
+      if (payload.type === 'breadboard:autoWire') {
+        const script = payload.script;
+        if (typeof script !== 'string' || script.trim().length === 0) return;
+        try {
+          const fn = new Function(script);
+          fn.call(window);
+          console.info('[GraphEditor] Executed breadboard auto-wire helper');
+        } catch (err) {
+          console.error('[GraphEditor] Failed to execute auto-wire helper', err);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleAutoWire);
+    return () => window.removeEventListener('message', handleAutoWire);
+  }, []);
+
+  useEffect(() => {
+    const relay = (eventName) => (payload = {}) => {
+      const details = { nodeIds: Array.isArray(payload?.nodeIds) ? payload.nodeIds : [] };
+      window.postMessage(
+        {
+          type: 'breadboard:relayNodeDrag',
+          eventName,
+          details
+        },
+        '*'
+      );
+    };
+    const handleStart = relay('nodeDragStart');
+    const handleEnd = relay('nodeDragEnd');
+    eventBus.on('nodeDragStart', handleStart);
+    eventBus.on('nodeDragEnd', handleEnd);
+    return () => {
+      eventBus.off('nodeDragStart', handleStart);
+      eventBus.off('nodeDragEnd', handleEnd);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleAutoWire = ({ script } = {}) => {
+      if (!script) return;
+      const el = document.createElement('script');
+      el.type = 'text/javascript';
+      el.textContent = script;
+      document.body.appendChild(el);
+      document.body.removeChild(el);
+      console.info('[GraphEditor] Executed breadboard auto-wire helper');
+    };
+    eventBus.on('breadboard:autoWire', handleAutoWire);
+    return () => {
+      eventBus.off('breadboard:autoWire', handleAutoWire);
+    };
+  }, []);
 
   // Determine if user is free (replace with real logic)
   const isFreeUser = localStorage.getItem('isFreeUser') === 'true';

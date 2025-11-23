@@ -23,6 +23,19 @@ export const pluginGallery = [
     status: 'stable',
     homepage: 'https://example.com/breadboard'
   }
+  ,
+  {
+    id: 'io.breadboard.components',
+    name: 'Breadboard Component Pack',
+    description: 'Contains resistor, LED, and jumper nodes for building the starter circuit.',
+    manifestUrl: '/plugins/breadboard-components/manifest.json',
+    version: '0.1.0',
+    tags: ['breadboard', 'components'],
+    maintainer: 'NodeGraph',
+    permissions: [],
+    status: 'beta',
+    homepage: 'https://example.com/breadboard'
+  }
 ];
 
 export default pluginGallery;

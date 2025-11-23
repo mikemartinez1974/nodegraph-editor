@@ -206,6 +206,8 @@ export default function PluginNodeRenderer(props) {
             border: 'none',
             width: '100%',
             height: dynamicHeight ? `${dynamicHeight}px` : '100%'
+            ,
+            pointerEvents: 'none'
           }}
         />
         {!ready && !error && (

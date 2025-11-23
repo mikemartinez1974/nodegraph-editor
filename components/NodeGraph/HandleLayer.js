@@ -26,7 +26,7 @@ function getHandlePositions(node) {
   if (Array.isArray(node.inputs)) {
     node.inputs.forEach((h, i) => {
       handles.push({
-        id: `${node.id}-${h.key}`,
+        id: `${node.id}-input-${h.key}`,
         nodeId: node.id,
         type: 'input',
         direction: 'target',
@@ -45,7 +45,7 @@ function getHandlePositions(node) {
   if (Array.isArray(node.outputs)) {
     node.outputs.forEach((h, i) => {
       handles.push({
-        id: `${node.id}-${h.key}`,
+        id: `${node.id}-output-${h.key}`,
         nodeId: node.id,
         type: 'output',
         direction: 'source',

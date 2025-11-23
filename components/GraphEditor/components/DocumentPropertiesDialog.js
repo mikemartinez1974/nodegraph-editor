@@ -16,7 +16,6 @@ import {
   Tab,
   Chip,
   Stack,
-  Grid,
   Paper,
   List,
   ListItem,
@@ -27,6 +26,7 @@ import {
   Avatar,
   InputAdornment
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -336,7 +336,7 @@ export default function DocumentPropertiesDialog({
                 At a Glance
               </Typography>
               <Grid container spacing={2}>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                   <Stack spacing={0.5}>
                     <Typography variant="caption" color="text.secondary">
                       Nodes
@@ -344,7 +344,7 @@ export default function DocumentPropertiesDialog({
                     <Typography variant="h6">{safeStats.nodeCount}</Typography>
                   </Stack>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                   <Stack spacing={0.5}>
                     <Typography variant="caption" color="text.secondary">
                       Edges
@@ -352,7 +352,7 @@ export default function DocumentPropertiesDialog({
                     <Typography variant="h6">{safeStats.edgeCount}</Typography>
                   </Stack>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                   <Stack spacing={0.5}>
                     <Typography variant="caption" color="text.secondary">
                       Groups
@@ -360,7 +360,7 @@ export default function DocumentPropertiesDialog({
                     <Typography variant="h6">{safeStats.groupCount}</Typography>
                   </Stack>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                   <Stack spacing={0.5}>
                     <Typography variant="caption" color="text.secondary">
                       Snapshots
@@ -370,13 +370,13 @@ export default function DocumentPropertiesDialog({
                 </Grid>
               </Grid>
               <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Typography variant="caption" color="text.secondary">
                     Created
                   </Typography>
                   <Typography variant="body2">{formatTimestamp(meta.createdAt)}</Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Typography variant="caption" color="text.secondary">
                     Last modified
                   </Typography>

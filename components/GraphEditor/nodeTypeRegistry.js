@@ -208,30 +208,31 @@ export const nodeTypeMetadata = [
   // Add more node types here as needed
 ];
 
+export const convertHandlesObjectToArray = (handleConfig) => {
+  if (!handleConfig || typeof handleConfig !== 'object') return undefined;
+  const handles = [];
+  const pushHandles = (entries, direction) => {
+    if (!Array.isArray(entries)) return;
+    entries.forEach((handle) => {
+      if (!handle) return;
+      const id = handle.id || handle.key || handle.name;
+      if (!id) return;
+      handles.push({
+        id,
+        label: handle.label || handle.name || id,
+        direction,
+        dataType: handle.dataType || handle.handleType || handle.type || 'value'
+      });
+    });
+  };
+  pushHandles(handleConfig.inputs, 'input');
+  pushHandles(handleConfig.outputs, 'output');
+  return handles.length > 0 ? handles : undefined;
+};
+
 const buildHandlesFromDefinition = (definition) => {
   if (!definition || !definition.handles) return undefined;
-  const handles = [];
-  const inputs = Array.isArray(definition.handles.inputs) ? definition.handles.inputs : [];
-  const outputs = Array.isArray(definition.handles.outputs) ? definition.handles.outputs : [];
-  inputs.forEach((handle) => {
-    if (!handle?.id) return;
-    handles.push({
-      id: handle.id,
-      label: handle.label || handle.id,
-      direction: 'input',
-      dataType: handle.dataType || 'value'
-    });
-  });
-  outputs.forEach((handle) => {
-    if (!handle?.id) return;
-    handles.push({
-      id: handle.id,
-      label: handle.label || handle.id,
-      direction: 'output',
-      dataType: handle.dataType || 'value'
-    });
-  });
-  return handles.length > 0 ? handles : undefined;
+  return convertHandlesObjectToArray(definition.handles);
 };
 
 const buildLegacyHandleLists = (handles, direction) => {
@@ -295,7 +296,11 @@ const getPluginNodeEntries = () => {
           const runtimeMeta = runtimeNodes[nodeType];
           const definition = manifestMeta.definition || runtimeMeta?.definition;
           const handlesFromDefinition = buildHandlesFromDefinition(definition);
-          const handles = runtimeMeta?.handles || handlesFromDefinition || manifestMeta.handles;
+          const runtimeHandles = Array.isArray(runtimeMeta?.handles)
+            ? runtimeMeta.handles
+            : convertHandlesObjectToArray(runtimeMeta?.handles);
+          const manifestHandles = convertHandlesObjectToArray(manifestMeta.handles);
+          const handles = runtimeHandles || handlesFromDefinition || manifestHandles;
           const inputsList =
             runtimeMeta?.inputs ||
             buildLegacyHandleLists(handles, 'input') ||

@@ -140,6 +140,113 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
       license: 'MIT'
     }
   }
+  ,
+  {
+    id: 'io.breadboard.components',
+    version: '0.1.0',
+    name: 'Breadboard Component Pack',
+    description: 'Provides resistor, LED, and jumper nodes tailored for the breadboard template.',
+    permissions: [],
+    bundle: {
+      url: '/plugins/breadboard-components/componentPlugin.js',
+      sandbox: 'iframe',
+      integrity: ''
+    },
+    nodes: [
+      {
+        type: 'resistor',
+        label: 'Resistor',
+        description: 'Simple two-pin resistor node with breadboard pin metadata.',
+        category: 'breadboard',
+        icon: 'SettingsEthernet',
+        entry: '/plugins/breadboard-components/componentPlugin.js#ResistorNode',
+        defaultWidth: 160,
+        defaultHeight: 60,
+        defaultData: {
+          pins: [
+            { id: 'pinA', row: 'A', column: 1, polarity: 'neutral' },
+            { id: 'pinB', row: 'A', column: 2, polarity: 'neutral' }
+          ],
+          footprint: { rows: 1, columns: 2, rowPitch: 1, columnPitch: 1, width: 2, height: 1 }
+        },
+        handles: {
+          outputs: [
+            { id: 'pinA', label: 'Pin A', dataType: 'value' },
+            { id: 'pinB', label: 'Pin B', dataType: 'value' }
+          ]
+        },
+        renderer: {
+          entry: '/plugins/breadboard-components/resistorRenderer.js'
+        },
+        extensions: {
+          layout: { hideChrome: true, padding: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 }
+        }
+      },
+      {
+        type: 'led',
+        label: 'LED',
+        description: 'Polarized LED node with anode/cathode handles.',
+        category: 'breadboard',
+        icon: 'LightMode',
+        entry: '/plugins/breadboard-components/componentPlugin.js#LEDNode',
+        defaultWidth: 140,
+        defaultHeight: 60,
+        defaultData: {
+          pins: [
+            { id: 'anode', row: 'A', column: 1, polarity: 'anode' },
+            { id: 'cathode', row: 'F', column: 1, polarity: 'cathode' }
+          ],
+          footprint: { rows: 2, columns: 1, rowPitch: 1, columnPitch: 1, width: 1, height: 2 }
+        },
+        handles: {
+          outputs: [
+            { id: 'anode', label: 'Anode', dataType: 'value' },
+            { id: 'cathode', label: 'Cathode', dataType: 'value' }
+          ]
+        },
+        renderer: {
+          entry: '/plugins/breadboard-components/ledRenderer.js'
+        },
+        extensions: {
+          layout: { hideChrome: true, padding: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 }
+        }
+      },
+      {
+        type: 'jumper',
+        label: 'Jumper Wire',
+        description: 'Flexible jumper that connects two sockets or rails.',
+        category: 'breadboard',
+        icon: 'CallSplit',
+        entry: '/plugins/breadboard-components/componentPlugin.js#JumperNode',
+        defaultWidth: 120,
+        defaultHeight: 48,
+        defaultData: {
+          pins: [
+            { id: 'wireA', row: 'E', column: 1, polarity: 'neutral' },
+            { id: 'wireB', row: 'G', column: 1, polarity: 'neutral' }
+          ],
+          footprint: { rows: 1, columns: 2, rowPitch: 1, columnPitch: 1, width: 2, height: 1 }
+        },
+        handles: {
+          outputs: [
+            { id: 'wireA', label: 'Wire A', dataType: 'value' },
+            { id: 'wireB', label: 'Wire B', dataType: 'value' }
+          ]
+        },
+        renderer: {
+          entry: '/plugins/breadboard-components/jumperRenderer.js'
+        },
+        extensions: {
+          layout: { hideChrome: true, padding: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 }
+        }
+      }
+    ],
+    metadata: {
+      author: { name: 'NodeGraph' },
+      homepage: 'https://example.com/breadboard',
+      license: 'MIT'
+    }
+  }
 ];
 
 export default BUILTIN_PLUGIN_MANIFESTS;
