@@ -109,6 +109,14 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
         readyRef.current = true;
         waitersRef.current.forEach(fn => fn());
         waitersRef.current = [];
+        if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+          try {
+            window.dispatchEvent(new CustomEvent('scriptRunnerReady'));
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.warn('[ScriptRunner] Failed to dispatch readiness event:', err);
+          }
+        }
         return;
       }
 

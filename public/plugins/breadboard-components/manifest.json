@@ -17,14 +17,35 @@
       "category": "breadboard",
       "icon": "SettingsEthernet",
       "entry": "/plugins/breadboard-components/componentPlugin.js#ResistorNode",
-      "defaultWidth": 56,
-      "defaultHeight": 32,
+      "defaultWidth": 32,
+      "defaultHeight": 18,
       "defaultData": {
         "pins": [
-          { "id": "pinA", "row": "A", "column": 1, "polarity": "neutral" },
-          { "id": "pinB", "row": "A", "column": 2, "polarity": "neutral" }
+          {
+            "id": "pinA",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top"
+          },
+          {
+            "id": "pinB",
+            "row": "F",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "bottom"
+          }
         ],
-        "footprint": { "rows": 1, "columns": 2, "rowPitch": 1, "columnPitch": 1, "width": 2, "height": 1 }
+        "footprint": {
+          "rows": 2,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 2
+        }
       },
       "handles": {
         "outputs": [
@@ -57,15 +78,29 @@
       "defaultHeight": 54,
       "defaultData": {
         "pins": [
-          { "id": "anode", "row": "A", "column": 1, "polarity": "anode" },
-          { "id": "cathode", "row": "F", "column": 1, "polarity": "cathode" }
+          {
+            "id": "anode",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "anode",
+            "segmentPreference": "top"
+          },
+          {
+            "id": "cathode",
+            "row": "F",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "cathode",
+            "segmentPreference": "bottom"
+          }
         ],
         "footprint": { "rows": 2, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 2 }
       },
       "handles": {
         "outputs": [
-          { "id": "anode", "label": "Anode", "dataType": "value" },
-          { "id": "cathode", "label": "Cathode", "dataType": "value" }
+          { "id": "anode", "label": "Anode", "dataType": "value", "position": { "x": 0.5, "y": 0 } },
+          { "id": "cathode", "label": "Cathode", "dataType": "value", "position": { "x": 0.5, "y": 1 } }
         ]
       },
       "renderer": {
@@ -89,14 +124,28 @@
       "category": "breadboard",
       "icon": "CallSplit",
       "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
-      "defaultWidth": 56,
+      "defaultWidth": 72,
       "defaultHeight": 24,
       "defaultData": {
         "pins": [
-          { "id": "wireA", "row": "E", "column": 1, "polarity": "neutral" },
-          { "id": "wireB", "row": "G", "column": 1, "polarity": "neutral" }
+          {
+            "id": "wireA",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "same"
+          },
+          {
+            "id": "wireB",
+            "row": "A",
+            "column": 4,
+            "columnOffset": 3,
+            "polarity": "neutral",
+            "segmentPreference": "same"
+          }
         ],
-        "footprint": { "rows": 1, "columns": 2, "rowPitch": 1, "columnPitch": 1, "width": 2, "height": 1 }
+        "footprint": { "rows": 1, "columns": 4, "rowPitch": 1, "columnPitch": 1, "width": 4, "height": 1 }
       },
       "handles": {
         "outputs": [
@@ -106,6 +155,106 @@
       },
       "renderer": {
         "entry": "/plugins/breadboard-components/jumperRenderer.js"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "type": "railTapPositive",
+      "label": "Rail Tap (+)",
+      "description": "Connects the positive rail to a socket column.",
+      "category": "breadboard",
+      "icon": "ElectricBolt",
+      "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
+      "defaultWidth": 16,
+      "defaultHeight": 40,
+      "defaultData": {
+        "pins": [
+          {
+            "id": "rail",
+            "row": "V+",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "positive",
+            "segmentPreference": "rail-top-positive"
+          },
+          {
+            "id": "tap",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top"
+          }
+        ],
+        "footprint": { "rows": 1, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 1 }
+      },
+      "handles": {
+        "outputs": [
+          { "id": "rail", "label": "Rail", "dataType": "value" },
+          { "id": "tap", "label": "Tap", "dataType": "value" }
+        ]
+      },
+      "renderer": {
+        "entry": "/plugins/breadboard-components/railTapRenderer.js"
+      },
+      "extensions": {
+        "layout": {
+          "hideChrome": true,
+          "padding": 0,
+          "paddingTop": 0,
+          "paddingRight": 0,
+          "paddingBottom": 0,
+          "paddingLeft": 0
+        }
+      }
+    },
+    {
+      "type": "railTapNegative",
+      "label": "Rail Tap (-)",
+      "description": "Connects the ground rail to a socket column.",
+      "category": "breadboard",
+      "icon": "HorizontalRule",
+      "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
+      "defaultWidth": 16,
+      "defaultHeight": 40,
+      "defaultData": {
+        "pins": [
+          {
+            "id": "rail",
+            "row": "GND",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "negative",
+            "segmentPreference": "rail-bottom-negative"
+          },
+          {
+            "id": "tap",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top"
+          }
+        ],
+        "footprint": { "rows": 1, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 1 }
+      },
+      "handles": {
+        "outputs": [
+          { "id": "rail", "label": "Rail", "dataType": "value" },
+          { "id": "tap", "label": "Tap", "dataType": "value" }
+        ]
+      },
+      "renderer": {
+        "entry": "/plugins/breadboard-components/railTapRenderer.js"
       },
       "extensions": {
         "layout": {

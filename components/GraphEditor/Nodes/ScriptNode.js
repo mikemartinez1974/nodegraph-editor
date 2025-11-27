@@ -11,6 +11,38 @@ const SCRIPT_OUTPUTS = [
   { key: 'result', label: 'Result', type: 'value' }
 ];
 
+const waitForScriptRunnerReady = () => {
+  if (typeof window === 'undefined') {
+    return Promise.resolve(false);
+  }
+  if (window.__scriptRunner) {
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve(false);
+      return;
+    }
+    let timeoutId = null;
+    const handleReady = () => {
+      cleanup();
+      resolve(true);
+    };
+    const cleanup = () => {
+      window.removeEventListener('scriptRunnerReady', handleReady);
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
+    window.addEventListener('scriptRunnerReady', handleReady, { once: true });
+    timeoutId = window.setTimeout(() => {
+      cleanup();
+      resolve(Boolean(window.__scriptRunner));
+    }, 3000);
+  });
+};
+
 export default function ScriptNode({
   node: origNode,
   pan = { x: 0, y: 0 },
@@ -76,8 +108,9 @@ export default function ScriptNode({
   const runScript = async (meta = {}) => {
     const script = scriptSource ? { source: scriptSource, name: node?.data?.name || 'Script' } : getSelectedScript();
     if (!script) {
-      setLastResult({ success: false, error: 'No script selected' });
-      return;
+      const result = { success: false, error: 'No script selected' };
+      setLastResult(result);
+      return result;
     }
 
     if (typeof window !== 'undefined' && window.parent) {
@@ -89,21 +122,32 @@ export default function ScriptNode({
       eventBus.emit('breadboard:autoWire', { script: script.source || '', nodeId: node.id });
     }
 
-    if (typeof window === 'undefined' || !window.__scriptRunner) {
-      setLastResult({ success: false, error: 'Script runner not available' });
-      return;
+    if (typeof window === 'undefined') {
+      const result = { success: false, error: 'Script runner not available' };
+      setLastResult(result);
+      return result;
+    }
+
+    if (!window.__scriptRunner) {
+      const ready = await waitForScriptRunnerReady();
+      if (!ready || !window.__scriptRunner) {
+        const result = { success: false, error: 'Script runner not initialized' };
+        setLastResult(result);
+        return result;
+      }
     }
 
     const token = ++runTokenRef.current;
     setRunning(true);
     setLastResult(null);
+    const runner = window.__scriptRunner;
 
     try {
       const runMeta = { dry: dryRun || meta.dry, allowMutations: allowMutations || meta.allowMutations };
-      const res = await window.__scriptRunner.run(script.source || script, runMeta);
+      const res = await runner.run(script.source || script, runMeta);
 
       // ignore stale runs
-      if (token !== runTokenRef.current) return;
+      if (token !== runTokenRef.current) return res;
 
       setLastResult(res);
       const now = Date.now();
@@ -120,9 +164,12 @@ export default function ScriptNode({
         try { eventBus.emit('applyScriptProposals', { proposals: Array.isArray(proposals) ? proposals : [proposals], sourceId: selectedScriptId }); } catch (e) {}
       }
 
+      return res;
     } catch (err) {
-      setLastResult({ success: false, error: String(err) });
-      try { eventBus.emit('nodeOutput', { nodeId: node.id, outputName: 'result', value: { success: false, error: String(err) } }); } catch (e) {}
+      const errorResult = { success: false, error: String(err) };
+      setLastResult(errorResult);
+      try { eventBus.emit('nodeOutput', { nodeId: node.id, outputName: 'result', value: errorResult }); } catch (e) {}
+      return errorResult;
     } finally {
       if (token === runTokenRef.current) setRunning(false);
     }

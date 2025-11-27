@@ -1,111 +1,375 @@
-(function () {
+
+import {
+  isPlainObject,
+  normalizeRowName,
+  normalizeSegmentName,
+  normalizeSegmentPreference,
+  resolveSegmentPreference,
+  isRailSegment,
+  getRailRowLabel,
+  getSocketPosition,
+  quantizeValue,
+  makeSegmentColumnKey,
+  clampColumn,
+  findNearestColumn
+} from './utils.js';
+
+import {
+  buildLayoutFromSchema,
+  buildSocketLayout,
+  buildRowPositionMap
+} from './layout.js';
+
+import {
+  computeConnectionsForComponent,
+  buildEdgeCommands
+} from './connectivity.js';
+
+import {
+  computeSnappedPosition,
+  applySnappedPosition
+} from './placement.js';
+
+import {
+  rebuildEdgesForComponent
+} from './edges.js';
+
+
+
+
+(async function () {
   if (typeof window === 'undefined') return;
 
-  if (typeof window.__breadboardAutoWireCleanup === 'function') {
+  console.log('[BreadboardAutoWire] script loaded');
+
+  // NOTE: use a script-specific cleanup hook so we don't fight with any
+  // other BreadboardAutoWire helper in the host app.
+  if (typeof window.__breadboardScriptAutoWireCleanup === 'function') {
     try {
-      window.__breadboardAutoWireCleanup();
+      window.__breadboardScriptAutoWireCleanup();
     } catch (err) {
-      console.warn('[BreadboardAutoWire] Failed to clean up previous instance:', err);
+      console.warn('[BreadboardAutoWire] Failed to clean up previous script instance:', err);
     }
   }
-  window.__breadboardAutoWireCleanup = null;
+  window.__breadboardScriptAutoWireCleanup = null;
 
-  const isPlainObject = (value) =>
-    value !== null &&
-    typeof value === 'object' &&
-    Object.prototype.toString.call(value) === '[object Object]';
-
-  const pinOffsetCache = new Map();
-
-  const BREADBOARD_ROWS = ['A','B','C','D','E','F','G','H','I','J'];
-  const rowToIndex = (row) => {
-    if (!row) return null;
-    const normalized = String(row).trim().toUpperCase();
-    const idx = BREADBOARD_ROWS.indexOf(normalized);
-    return idx === -1 ? null : idx;
+  const ROW_SEGMENT_TOP = 'top';
+  const ROW_SEGMENT_BOTTOM = 'bottom';
+  const SEGMENT_ROW_FALLBACK = {
+    [ROW_SEGMENT_TOP]: 'A',
+    [ROW_SEGMENT_BOTTOM]: 'F'
   };
-  const indexToRow = (idx) => {
-    if (typeof idx !== 'number' || Number.isNaN(idx)) return null;
-    const clamped = Math.max(0, Math.min(BREADBOARD_ROWS.length - 1, Math.round(idx)));
-    return BREADBOARD_ROWS[clamped];
-  };
+  const MIN_BODY_WIDTH = 16;
+  const MIN_BODY_HEIGHT = 24;
+  const BODY_MARGIN = 12;
 
-  const normalizeSocketKey = (value) => {
-    if (!value) return null;
-    if (typeof value === 'string') return value.trim().toUpperCase();
-    if (typeof value === 'number') return String(value);
-    return null;
+  const SNAP_OFFSET_X = 0;
+  const DEFAULT_INPUT_HANDLE_KEY = 'in';
+  const makeHandleNodeId = (nodeId, handleKey) => `handle:${nodeId}:${handleKey || DEFAULT_INPUT_HANDLE_KEY}`;
+  const CONDUCTIVE_COMPONENTS = {
+    'io.breadboard.components:resistor': [['pinA', 'pinB']],
+    'io.breadboard.components:railTapPositive': [['rail', 'tap']],
+    'io.breadboard.components:railTapNegative': [['rail', 'tap']],
+    'io.breadboard.components:jumper': [['wireA', 'wireB']],
+    'io.breadboard.sockets:railSocket': [
+      ['vplus', 'positive'],
+      ['gnd', 'negative']
+    ]
   };
 
-  const buildSocketRowColumnKey = (row, column) => {
-    if (row === undefined || row === null) return null;
-    const normalizedRow = typeof row === 'string' ? row.trim().toUpperCase() : String(row).toUpperCase();
-    const numericColumn = Number(column);
-    if (!Number.isFinite(numericColumn)) return null;
-    return `${normalizedRow}${numericColumn}`;
+  const resolvePinSegment = (node, pinInfo, baseSegment) => {
+    const handleKey = pinInfo?.handleKey || pinInfo?.originalPin?.id;
+    if (node?.type === 'io.breadboard.components:railTapNegative') {
+      if (handleKey === 'tap') {
+        return ROW_SEGMENT_BOTTOM;
+      }
+      if (handleKey === 'rail') {
+        return 'rail-bottom-negative';
+      }
+    }
+    if (node?.type === 'io.breadboard.components:railTapPositive') {
+      if (handleKey === 'tap') {
+        return ROW_SEGMENT_TOP;
+      }
+      if (handleKey === 'rail') {
+        return 'rail-top-positive';
+      }
+    }
+    return resolveSegmentPreference(pinInfo?.segmentPreference, baseSegment);
+  };
+
+  const coerceRailTarget = (currentEntry, currentSegment, column, node, handleKey, layout) => {
+    if (!node || handleKey !== 'rail') {
+      return { entry: currentEntry, segment: currentSegment };
+    }
+    const type = node.type || '';
+    let fallbackSegment = null;
+    if (type === 'io.breadboard.components:railTapNegative') {
+      fallbackSegment = 'rail-bottom-negative';
+    } else if (type === 'io.breadboard.components:railTapPositive') {
+      fallbackSegment = 'rail-top-positive';
+    }
+    if (!fallbackSegment) {
+      return { entry: currentEntry, segment: currentSegment };
+    }
+    if (
+      currentEntry &&
+      currentEntry.segmentType === 'rail' &&
+      currentEntry.railInfo &&
+      ((fallbackSegment.includes('negative') && currentEntry.railInfo.polarity === 'negative') ||
+        (fallbackSegment.includes('positive') && currentEntry.railInfo.polarity === 'positive'))
+    ) {
+      return { entry: currentEntry, segment: currentSegment };
+    }
+    const fallbackKey = makeSegmentColumnKey(fallbackSegment, column);
+    const fallbackEntry = layout?.targetsBySegmentColumn?.get(fallbackKey);
+    if (fallbackEntry) {
+      return { entry: fallbackEntry, segment: fallbackSegment };
+    }
+    return { entry: currentEntry, segment: currentSegment };
+  };
+ 
+  
+
+  const determineAnchor = (node, layout) => {
+    const fallback = {
+      segment: ROW_SEGMENT_TOP,
+      column: layout?.minColumn || 1
+    };
+    if (!node || !layout) return fallback;
+    const pos = node.position || {};
+    const x = typeof pos.x === 'number' ? pos.x : null;
+    const y = typeof pos.y === 'number' ? pos.y : null;
+
+    const anchorColumn = clampColumn(
+      Number.isFinite(x) ? findNearestColumn(x, layout.columnCenters) ?? fallback.column : fallback.column,
+      layout.minColumn,
+      layout.maxColumn
+    );
+
+    let anchorSegment = ROW_SEGMENT_TOP;
+    if (Number.isFinite(y)) {
+      const topSocketEntry = layout.targetsBySegmentColumn.get(makeSegmentColumnKey(ROW_SEGMENT_TOP, anchorColumn));
+      const bottomSocketEntry = layout.targetsBySegmentColumn.get(makeSegmentColumnKey(ROW_SEGMENT_BOTTOM, anchorColumn));
+      const topSocket = topSocketEntry?.node;
+      const bottomSocket = bottomSocketEntry?.node;
+      const topY = topSocket ? getSocketPosition(topSocket).y : null;
+      const bottomY = bottomSocket ? getSocketPosition(bottomSocket).y : null;
+      if (topY !== null && bottomY !== null) {
+        const distTop = Math.abs(y - topY);
+        const distBottom = Math.abs(y - bottomY);
+        anchorSegment = distBottom < distTop ? ROW_SEGMENT_BOTTOM : ROW_SEGMENT_TOP;
+      } else if (topY !== null) {
+        anchorSegment = y >= topY ? ROW_SEGMENT_BOTTOM : ROW_SEGMENT_TOP;
+      } else if (bottomY !== null) {
+        anchorSegment = y >= bottomY ? ROW_SEGMENT_BOTTOM : ROW_SEGMENT_TOP;
+      } else if (Number.isFinite(layout.boardMidY)) {
+        anchorSegment = y >= layout.boardMidY ? ROW_SEGMENT_BOTTOM : ROW_SEGMENT_TOP;
+      }
+    }
+
+    return {
+      segment: anchorSegment,
+      column: anchorColumn
+    };
+  };
+
+  const normalizePinsForNode = (pins = []) => {
+    if (!Array.isArray(pins) || pins.length === 0) return [];
+    let baseColumn = null;
+    pins.forEach(pin => {
+      if (baseColumn !== null) return;
+      const col = Number(pin?.column);
+      if (Number.isFinite(col)) baseColumn = col;
+    });
+    if (baseColumn === null) baseColumn = 1;
+
+    return pins.map((pin, index) => {
+      const columnOffset = Number.isFinite(pin?.columnOffset)
+        ? Number(pin.columnOffset)
+        : Number.isFinite(pin?.column)
+        ? Number(pin.column) - baseColumn
+        : index;
+      const preferenceSource =
+        pin?.segmentPreference !== undefined
+          ? pin.segmentPreference
+          : pin?.segment !== undefined
+          ? pin.segment
+          : null;
+      const segmentPreference = normalizeSegmentPreference(preferenceSource || 'same');
+      const handleKey = pin?.handleKey || pin?.key || pin?.id || pin?.label;
+      return {
+        columnOffset,
+        segmentPreference,
+        handleKey,
+        originalPin: pin || {},
+        index
+      };
+    });
   };
 
   const deriveSocketKey = (socket, rowHint) => {
     if (!socket) return null;
     const column = socket?.data?.column;
-    let row = rowHint ? String(rowHint).trim().toUpperCase() : null;
-    const rows = Array.isArray(socket?.data?.rows) ? socket.data.rows : null;
-    if (!row && rows && rows.length > 0) {
-      row = rows[0];
+    const rows = Array.isArray(socket?.data?.rows) ? socket.data.rows : [];
+    const row = rowHint || rows[0];
+    if (row && Number.isFinite(column)) {
+      return `${String(row).trim().toUpperCase()}${column}`;
     }
-    if (row && column !== undefined) {
-      return `${row}${column}`;
-    }
-    return socket?.id || null;
+    return socket.id || null;
   };
 
-  const getSocketPosition = (socket) => {
-    const pos = socket?.position || {};
+  const chooseSocketRow = (socket, segment, rowPositions, preferredRow) => {
+    if (isRailSegment(segment)) {
+      const normalizedPreferred = normalizeRowName(preferredRow);
+      if (normalizedPreferred) return normalizedPreferred;
+      return getRailRowLabel(segment) || SEGMENT_ROW_FALLBACK[ROW_SEGMENT_TOP];
+    }
+    const normalizedPreferred = normalizeRowName(preferredRow);
+    if (normalizedPreferred) {
+      if (rowPositions?.has(normalizedPreferred)) {
+        return normalizedPreferred;
+      }
+      const availableRows = Array.isArray(socket?.data?.rows)
+        ? socket.data.rows.map(normalizeRowName)
+        : [];
+      if (availableRows.includes(normalizedPreferred)) {
+        return normalizedPreferred;
+      }
+    }
+    if (rowPositions && rowPositions.size > 0) {
+      const iterator = rowPositions.keys().next();
+      if (!iterator.done) return iterator.value;
+    }
+    const rows = Array.isArray(socket?.data?.rows) ? socket.data.rows : [];
+    if (rows.length > 0) return normalizeRowName(rows[0]) || rows[0];
+    return SEGMENT_ROW_FALLBACK[segment] || SEGMENT_ROW_FALLBACK[ROW_SEGMENT_TOP];
+  };
+
+  const normalizeHandleEntry = (handle) => {
+    if (!handle) return null;
+    if (typeof handle === 'string') {
+      return { id: handle, key: handle, label: handle };
+    }
+    if (typeof handle !== 'object') return null;
+    const id = handle.id || handle.key || handle.name || handle.handleKey;
+    if (!id) return null;
     return {
-      x: typeof pos.x === 'number' ? pos.x : 0,
-      y: typeof pos.y === 'number' ? pos.y : 0
+      id,
+      key: handle.key || id,
+      label: handle.label || handle.name || id,
+      type: handle.type || handle.dataType || handle.handleType || 'value'
     };
   };
 
-  const findNearestSocketForPin = ({ targetX, targetY, rowHint, directoryEntries }) => {
-    if (!Array.isArray(directoryEntries) || directoryEntries.length === 0) return null;
-    let best = null;
-    let bestDist = Infinity;
-    const normalizedRow = rowHint ? String(rowHint).trim().toUpperCase() : null;
-    for (const [key, socket] of directoryEntries) {
-      const rows = Array.isArray(socket?.data?.rows) ? socket.data.rows : null;
-      if (normalizedRow && rows && !rows.includes(normalizedRow)) continue;
-      const pos = getSocketPosition(socket);
-      const dx = pos.x - targetX;
-      const dy = pos.y - targetY;
-      const dist = dx * dx + dy * dy;
-      if (dist < bestDist) {
-        best = { key, socket };
-        bestDist = dist;
+  const hasHandleOnNode = (node, handleKey) => {
+    if (!node || !handleKey) return null;
+    const sources = [node.handles, node.outputs, node.inputs, node.data?.handles];
+    const normalized = [];
+    sources.forEach(list => {
+      if (!Array.isArray(list)) return;
+      list.forEach(entry => {
+        const normalizedEntry = normalizeHandleEntry(entry);
+        if (normalizedEntry) normalized.push(normalizedEntry);
+      });
+    });
+    return normalized.find(handle => handle.id === handleKey || handle.key === handleKey) || null;
+  };
+
+  const pickInputHandleKey = (node, preferredKeys = []) => {
+    if (!node) return null;
+    const collected = [];
+    const seen = new Set();
+
+    const addEntries = (entries, forceInput = false) => {
+      if (!Array.isArray(entries)) return;
+      entries.forEach(entry => {
+        if (!entry) return;
+        const normalized = normalizeHandleEntry(entry);
+        if (!normalized) return;
+        const rawDirection = (entry.direction || entry.handleDirection || entry.type || '').toString().toLowerCase();
+        const isInputLike =
+          forceInput ||
+          !rawDirection ||
+          rawDirection === 'input' ||
+          rawDirection === 'bidirectional';
+        if (!isInputLike) return;
+        const key = normalized.key || normalized.id;
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        collected.push(key);
+      });
+    };
+
+    addEntries(node.inputs, true);
+    addEntries(node.handles, false);
+    if (node.data && Array.isArray(node.data.handles)) {
+      addEntries(node.data.handles, false);
+    }
+
+    for (const preferred of preferredKeys) {
+      if (!preferred) continue;
+      const exact = collected.find(key => key === preferred);
+      if (exact) return exact;
+      const caseInsensitive = collected.find(key => key.toLowerCase() === String(preferred).toLowerCase());
+      if (caseInsensitive) return caseInsensitive;
+    }
+
+    if (collected.length > 0) {
+      return collected[0];
+    }
+
+    return DEFAULT_INPUT_HANDLE_KEY;
+  };
+
+  const extractNodeIds = (payload) => {
+    if (!payload || typeof payload !== 'object') return [];
+    const arraysToCheck = [payload.nodeIds, payload.nodes, payload.details && payload.details.nodeIds];
+    for (const arr of arraysToCheck) {
+      if (Array.isArray(arr)) {
+        return arr
+          .map(item => {
+            if (typeof item === 'string' || typeof item === 'number') return String(item);
+            if (item && typeof item === 'object' && (item.id || item.nodeId)) {
+              return String(item.id || item.nodeId);
+            }
+            return null;
+          })
+          .filter(Boolean);
       }
     }
-    return best;
+    const candidates = [payload.nodeId, payload.id, payload.details && payload.details.nodeId, payload.node && payload.node.id];
+    return candidates
+      .filter(value => typeof value === 'string' || typeof value === 'number')
+      .map(value => String(value));
   };
 
-  const findNearestAvailableSocket = (params = {}, usedSocketIds) => {
-    const entries = Array.isArray(params.directoryEntries) ? params.directoryEntries : [];
-    const filteredEntries =
-      usedSocketIds && usedSocketIds.size > 0
-        ? entries.filter(([, socket]) => socket && !usedSocketIds.has(socket.id))
-        : entries;
-    if (filteredEntries.length === 0) return null;
-    return findNearestSocketForPin({ ...params, directoryEntries: filteredEntries });
-  };
-
-  const chooseSocketRow = (socket, preferredRow) => {
-    const rows = Array.isArray(socket?.data?.rows)
-      ? socket.data.rows.map(row => String(row).trim().toUpperCase())
-      : [];
-    if (preferredRow) {
-      const normalized = String(preferredRow).trim().toUpperCase();
-      if (rows.includes(normalized)) return normalized;
+  const pendingDragEndNodeIds = new Set();
+  let dragEndProcessingScheduled = false;
+  const scheduleDragEndProcessing = (processFn) => {
+    if (dragEndProcessingScheduled) return;
+    dragEndProcessingScheduled = true;
+    const flush = () => {
+      dragEndProcessingScheduled = false;
+      if (pendingDragEndNodeIds.size === 0) return;
+      const ids = Array.from(pendingDragEndNodeIds);
+      pendingDragEndNodeIds.clear();
+      try {
+        const maybePromise = processFn(ids);
+        if (maybePromise && typeof maybePromise.then === 'function') {
+          maybePromise.catch(err => console.error('[BreadboardAutoWire] Failed to process drag end queue:', err));
+        }
+      } catch (err) {
+        console.error('[BreadboardAutoWire] Failed to process drag end queue:', err);
+      }
+    };
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(flush);
+      });
+    } else {
+      setTimeout(flush, 0);
     }
-    return rows[0] || (preferredRow ? String(preferredRow).trim().toUpperCase() : null);
   };
 
   const readInitialDebugPreference = () => {
@@ -120,13 +384,12 @@
       if (stored === 'true') return true;
       if (stored === 'false') return false;
     } catch (err) {
-      // Ignore storage access issues (e.g., sandboxed iframes).
+      /* ignore */
     }
     return false;
   };
 
   const initialDebugPreference = readInitialDebugPreference();
-
   const isDebugEnabled = () => {
     if (typeof window.__breadboardAutoWireDebug === 'boolean') {
       return window.__breadboardAutoWireDebug;
@@ -142,72 +405,13 @@
     console.info('[BreadboardAutoWire]', ...args);
   };
 
-  const registerPinOffset = (nodeType, handleKey, offset) => {
-    if (!nodeType || !handleKey || !offset) return;
-    const entry = pinOffsetCache.get(nodeType) || {};
-    const existing = entry[handleKey];
-    if (existing) {
-      entry[handleKey] = {
-        x: (existing.x + offset.x) / 2,
-        y: (existing.y + offset.y) / 2
-      };
-    } else {
-      entry[handleKey] = { x: offset.x, y: offset.y };
-    }
-    pinOffsetCache.set(nodeType, entry);
-  };
-
-  const isComponentNode = (node) =>
-    typeof node?.type === 'string' && node.type.startsWith('io.breadboard.components:');
-
-  const bootstrapPinOffsets = (nodes = [], edges = [], socketsById = new Map()) => {
-    if (!Array.isArray(nodes) || !Array.isArray(edges) || socketsById.size === 0) return;
-    const nodesById = new Map(nodes.map(node => [node.id, node]));
-    edges.forEach(edge => {
-      if (!edge) return;
-      const sourceNode = nodesById.get(edge.source);
-      const targetNode = nodesById.get(edge.target);
-      if (!sourceNode || !targetNode) return;
-      const sourceIsSocket = socketsById.has(sourceNode.id);
-      const targetIsSocket = socketsById.has(targetNode.id);
-
-      if (isComponentNode(sourceNode) && targetIsSocket) {
-        const socket = socketsById.get(targetNode.id);
-        const socketPos = getSocketPosition(socket);
-        const nodePos = sourceNode.position || {};
-        const offset = {
-          x: socketPos.x - (typeof nodePos.x === 'number' ? nodePos.x : 0),
-          y: socketPos.y - (typeof nodePos.y === 'number' ? nodePos.y : 0)
-        };
-        const handleKey =
-          edge.sourceHandle || edge.handleMeta?.source?.key || edge.handleMeta?.source?.id;
-        if (handleKey) {
-          registerPinOffset(sourceNode.type, handleKey, offset);
-        }
-      } else if (isComponentNode(targetNode) && sourceIsSocket) {
-        const socket = socketsById.get(sourceNode.id);
-        const socketPos = getSocketPosition(socket);
-        const nodePos = targetNode.position || {};
-        const offset = {
-          x: socketPos.x - (typeof nodePos.x === 'number' ? nodePos.x : 0),
-          y: socketPos.y - (typeof nodePos.y === 'number' ? nodePos.y : 0)
-        };
-        const handleKey =
-          edge.targetHandle || edge.handleMeta?.target?.key || edge.handleMeta?.target?.id;
-        if (handleKey) {
-          registerPinOffset(targetNode.type, handleKey, offset);
-        }
-      }
-    });
-  };
-
   const setDebugPreference = (value) => {
     const normalized = Boolean(value);
     window.__breadboardAutoWireDebug = normalized;
     try {
       window.localStorage?.setItem('breadboardAutoWireDebug', normalized ? 'true' : 'false');
     } catch (err) {
-      // Ignore storage access issues (e.g., sandboxed iframes).
+      /* ignore */
     }
     console.info('[BreadboardAutoWire]', `Debug logging ${normalized ? 'enabled' : 'disabled'}`);
   };
@@ -217,563 +421,258 @@
     window.breadboardAutoWire.setDebug = setDebugPreference;
   }
 
-  const normalizeHandleEntry = (handle) => {
-    if (!handle) return null;
-    if (typeof handle === 'string') {
-      return { id: handle, key: handle, label: handle };
-    }
-    if (typeof handle !== 'object') return null;
-    const id = handle.id || handle.key || handle.name || handle.handleKey;
-    if (!id) return null;
-    return {
-      id,
-      key: handle.key || id,
-      label: handle.label || handle.name || id,
-      type: handle.type || handle.dataType || handle.handleType || 'value',
-      source: handle.__source || 'unknown'
-    };
+  const connectAdjacency = (adjacency, a, b) => {
+    if (!a || !b) return;
+    if (!adjacency.has(a)) adjacency.set(a, new Set());
+    adjacency.get(a).add(b);
   };
 
-  const hasHandleOnNode = (node, handleKey) => {
-    if (!node || !handleKey) return false;
-    const sources = [
-      { list: node.handles, name: 'handles' },
-      { list: node.outputs, name: 'outputs' },
-      { list: node.inputs, name: 'inputs' },
-      { list: node.data?.handles, name: 'data.handles' }
-    ];
-    const normalized = [];
-    for (const { list, name } of sources) {
-      if (!Array.isArray(list)) continue;
-      list.forEach(entry => {
-        const normalizedEntry = normalizeHandleEntry(entry);
-        if (normalizedEntry) {
-          normalizedEntry.__source = name;
-          normalized.push(normalizedEntry);
-        }
+  const solveConnectivity = (nodes = [], edges = []) => {
+    const adjacency = new Map();
+
+    edges.forEach(edge => {
+      if (!edge || !edge.source || !edge.target) return;
+      const sourceHandle = edge.sourceHandle || DEFAULT_INPUT_HANDLE_KEY;
+      const sourceId = makeHandleNodeId(edge.source, sourceHandle);
+      const targetId =
+        edge.targetHandle && edge.targetHandle !== 'socket'
+          ? makeHandleNodeId(edge.target, edge.targetHandle)
+          : edge.target;
+      connectAdjacency(adjacency, sourceId, targetId);
+      connectAdjacency(adjacency, targetId, sourceId);
+    });
+
+    nodes.forEach(node => {
+      const pairs = CONDUCTIVE_COMPONENTS[node?.type];
+      if (!node || !Array.isArray(pairs)) return;
+      pairs.forEach(pair => {
+        if (!Array.isArray(pair) || pair.length < 2) return;
+        const [fromKey, toKey] = pair;
+        const fromId = makeHandleNodeId(node.id, fromKey);
+        const toId = makeHandleNodeId(node.id, toKey);
+        connectAdjacency(adjacency, fromId, toId);
+        connectAdjacency(adjacency, toId, fromId);
       });
-    }
-    const match = normalized.find(handle => handle.id === handleKey || handle.key === handleKey);
-    return match ? { match, normalized } : null;
-  };
+    });
 
-  const extractNodeIds = (payload) => {
-    if (!payload || typeof payload !== 'object') return [];
-    const arraysToCheck = [
-      payload.nodeIds,
-      payload.nodes,
-      payload.details && payload.details.nodeIds
-    ];
-    for (const arr of arraysToCheck) {
-      if (Array.isArray(arr)) {
-        return arr
-          .map(item => {
-            if (typeof item === 'string' || typeof item === 'number') return String(item);
-            if (item && typeof item === 'object' && (item.id || item.nodeId)) {
-              return String(item.id || item.nodeId);
-            }
-            return null;
-          })
-          .filter(Boolean);
+    const nodeFlags = new Map();
+    const markReachable = (startId, flagKey) => {
+      if (!startId) return;
+      const visited = new Set();
+      const queue = [startId];
+      visited.add(startId);
+      while (queue.length > 0) {
+        const current = queue.shift();
+        if (!nodeFlags.has(current)) nodeFlags.set(current, {});
+        nodeFlags.get(current)[flagKey] = true;
+        const neighbors = adjacency.get(current);
+        if (!neighbors) continue;
+        neighbors.forEach(nextId => {
+          if (visited.has(nextId)) return;
+          visited.add(nextId);
+          queue.push(nextId);
+        });
       }
-    }
-    const candidates = [
-      payload.nodeId,
-      payload.id,
-      payload.details && payload.details.nodeId,
-      payload.node && payload.node.id
-    ];
-    return candidates
-      .filter(value => typeof value === 'string' || typeof value === 'number')
-      .map(value => String(value));
+    };
+
+    nodes.forEach(node => {
+      if (!node || node.type !== 'io.breadboard.bus') return;
+      const positiveId = makeHandleNodeId(node.id, 'positive');
+      const negativeId = makeHandleNodeId(node.id, 'negative');
+      markReachable(positiveId, 'touchesVPlus');
+      markReachable(negativeId, 'touchesGnd');
+    });
+
+    return nodeFlags;
   };
 
-  const pendingDragEndNodeIds = new Set();
-  let dragEndProcessingScheduled = false;
+  const waitForGraphSettled = () =>
+    new Promise(resolve => {
+      if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => window.requestAnimationFrame(resolve));
+      } else {
+        setTimeout(resolve, 16);
+      }
+    });
 
-  const scheduleDragEndProcessing = (processFn) => {
-    if (dragEndProcessingScheduled) return;
-    dragEndProcessingScheduled = true;
-    const flush = () => {
-      dragEndProcessingScheduled = false;
-      if (pendingDragEndNodeIds.size === 0) return;
-      const ids = Array.from(pendingDragEndNodeIds);
-      pendingDragEndNodeIds.clear();
-      processFn(ids);
-    };
-    if (typeof window?.requestAnimationFrame === 'function') {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(flush);
-      });
-    } else {
-      setTimeout(flush, 0);
+  const toPromise = (value) => {
+    if (value && typeof value.then === 'function') {
+      return value;
     }
+    return Promise.resolve(value);
+  };
+
+  const readGraphSnapshot = (api) => {
+    const nodesResult = api.readNode?.();
+    const edgesResult = api.readEdge?.();
+    return {
+      nodes: Array.isArray(nodesResult?.data) ? nodesResult.data : [],
+      edges: Array.isArray(edgesResult?.data) ? edgesResult.data : []
+    };
+  };
+
+  const readBoardSchemaFromNodes = (nodes = []) => {
+    if (typeof window !== 'undefined' && isPlainObject(window.__breadboardSchema)) {
+      return window.__breadboardSchema;
+    }
+    if (!Array.isArray(nodes)) return null;
+    const skinNode = nodes.find(node => node?.type === 'io.breadboard.sockets:skin');
+    const schema =
+      (skinNode?.data && skinNode.data.schema) ||
+      (skinNode?.data?.breadboard && skinNode.data.breadboard.schema);
+    if (isPlainObject(schema)) {
+      if (typeof window !== 'undefined') {
+        window.__breadboardSchema = schema;
+      }
+      return schema;
+    }
+    return null;
   };
 
   const attemptAttach = () => {
+    console.log('[BreadboardAutoWire] attemptAttach called');
+
     const eventBus = window.eventBus;
     const api = window.graphAPI;
-    if (!eventBus || !api || typeof api.readNode !== 'function') {
+
+    if (!eventBus || !api || typeof api.readNode !== 'function' || typeof api.updateNode !== 'function') {
+      console.log('[BreadboardAutoWire] eventBus or graphAPI not ready yet, retrying in 500ms');
       setTimeout(attemptAttach, 500);
       return;
     }
-    if (attemptAttach._attached) return;
+
+    if (attemptAttach._attached) {
+      console.log('[BreadboardAutoWire] already attached, skipping');
+      return;
+    }
+
+    console.log('[BreadboardAutoWire] found eventBus + graphAPI, attaching listeners');
     attemptAttach._attached = true;
 
     const cleanupCallbacks = [];
     const registerCleanup = (fn) => {
-      if (typeof fn === 'function') {
-        cleanupCallbacks.push(fn);
+      if (typeof fn === 'function') cleanupCallbacks.push(fn);
+    };
+
+    const collectHandleKeys = (node) => {
+      const keys = new Set();
+      if (Array.isArray(node?.handles)) {
+        node.handles.forEach(handle => {
+          if (handle?.id) keys.add(handle.id);
+        });
+      }
+      if (Array.isArray(node?.outputs)) {
+        node.outputs.forEach(handle => {
+          if (handle?.key) keys.add(handle.key);
+        });
+      }
+      if (Array.isArray(node?.inputs)) {
+        node.inputs.forEach(handle => {
+          if (handle?.key) keys.add(handle.key);
+        });
+      }
+      if (Array.isArray(node?.data?.pins)) {
+        node.data.pins.forEach(pin => {
+          if (pin?.id) keys.add(pin.id);
+        });
+      }
+      return Array.from(keys);
+    };
+
+    const updateConnectivityStates = async () => {
+      const snapshot = readGraphSnapshot(api);
+      if (!snapshot) return;
+      const handleFlags = solveConnectivity(snapshot.nodes, snapshot.edges);
+      for (const node of snapshot.nodes) {
+        const existingPinState = isPlainObject(node.data?.breadboard?.pinState)
+          ? node.data.breadboard.pinState
+          : {};
+        let changed = false;
+        const nextPinState = { ...existingPinState };
+        const pinKeys = collectHandleKeys(node);
+        pinKeys.forEach(handleKey => {
+          if (!handleKey) return;
+          const currentState = nextPinState[handleKey] || {};
+          const flagEntry = handleFlags.get(makeHandleNodeId(node.id, handleKey)) || {};
+          const touchesVPlus = Boolean(flagEntry.touchesVPlus);
+          const touchesGnd = Boolean(flagEntry.touchesGnd);
+          nextPinState[handleKey] = {
+            ...currentState,
+            touchesVPlus,
+            touchesGnd
+          };
+          if ((currentState.touchesVPlus || false) !== touchesVPlus || (currentState.touchesGnd || false) !== touchesGnd) {
+            changed = true;
+          }
+        });
+        if (!changed) continue;
+        const payload = {
+          data: {
+            ...node.data,
+            breadboard: {
+              ...(isPlainObject(node.data?.breadboard) ? node.data.breadboard : {}),
+              pinState: nextPinState
+            }
+          }
+        };
+        try {
+          await toPromise(api.updateNode(node.id, payload));
+          if (eventBus && typeof eventBus.emit === 'function') {
+            eventBus.emit('breadboard.pinStateChanged', {
+              nodeId: node.id,
+              pinState: nextPinState,
+              source: 'breadboard-auto-wire'
+            });
+          }
+        } catch (err) {
+          console.warn('[BreadboardAutoWire]', 'Failed to update node with connectivity state:', node.id, err);
+        }
       }
     };
 
-    const hasDirectEventAccess = Boolean(eventBus?.on);
-    const shouldHandleRelayMessages = !hasDirectEventAccess;
+    const handleNodeDragStart = () => {};
 
-    const dragStartEventNames = ['nodeDragStart', 'node:dragstart'];
-    const dragEndEventNames = ['nodeDragEnd', 'node:dragend'];
-    const normalizedDragStartNames = new Set(dragStartEventNames.map(name => String(name || '').toLowerCase()));
-    const normalizedDragEndNames = new Set(dragEndEventNames.map(name => String(name || '').toLowerCase()));
-    const normalizeEventName = (name) => (typeof name === 'string' ? name.toLowerCase() : '');
-
-    const handleNodeDragStart = (payload = {}) => {
-      const nodeIds = extractNodeIds(payload);
-      debugLog('handleNodeDragStart resolved nodeIds:', nodeIds, 'from payload:', payload);
-      if (!Array.isArray(nodeIds) || nodeIds.length === 0) return;
-
-      const nodesResult = api.readNode?.();
-      const edgesResult = api.readEdge?.();
-      const allNodes = Array.isArray(nodesResult?.data) ? nodesResult.data : [];
-      const allEdges = Array.isArray(edgesResult?.data) ? edgesResult.data : [];
-      const socketNodes = allNodes.filter(node => node?.type === 'io.breadboard.sockets:socket');
-      const socketNodeIds = new Set(socketNodes.map(socket => socket.id).filter(Boolean));
-      nodeIds.forEach(nodeId => {
-        const node = allNodes.find(n => n.id === nodeId);
-        if (!node) return;
-        const relevantEdges = allEdges.filter(edge => {
-          if (!edge) return false;
-          const isSource = edge.source === node.id && socketNodeIds.has(edge.target);
-          const isTarget = edge.target === node.id && socketNodeIds.has(edge.source);
-          return isSource || isTarget;
-        });
-        const deleted = [];
-        relevantEdges.forEach(edge => {
-          if (!edge || !edge.id) return;
-          if (typeof api.deleteEdge === 'function') {
-            const result = api.deleteEdge(edge.id);
-            if (result?.success) {
-              deleted.push(edge.id);
-            }
-          }
-        });
-        if (deleted.length > 0) {
-          debugLog(`Deleted ${deleted.length} edge(s) for node ${node.id}:`, deleted);
-        }
-      });
-    };
-
-    const processNodeDragEnd = (queuedNodeIds = []) => {
+    const processNodeDragEnd = async (queuedNodeIds = []) => {
       if (!Array.isArray(queuedNodeIds) || queuedNodeIds.length === 0) return;
 
-      const nodesResult = api.readNode?.();
-      const edgesResult = api.readEdge?.();
-      const allNodes = Array.isArray(nodesResult?.data) ? nodesResult.data : [];
-      const allEdges = Array.isArray(edgesResult?.data) ? edgesResult.data : [];
+      const { nodes, edges: edgesSnapshot } = readGraphSnapshot(api);
+      const socketNodes = nodes.filter(node => node?.type === 'io.breadboard.sockets:socket');
+      const railNodes = nodes.filter(node => node?.type === 'io.breadboard.sockets:railSocket');
+      if (socketNodes.length === 0 && railNodes.length === 0) return;
 
-      const socketNodes = allNodes.filter(node => node?.type === 'io.breadboard.sockets:socket');
-      debugLog('Found socket nodes:', socketNodes.length);
-      if (socketNodes.length === 0) return;
+      const boardSchema = readBoardSchemaFromNodes(nodes);
+      const layout = buildSocketLayout(socketNodes, railNodes, boardSchema);
+      if (!layout) return;
 
-      const socketNodeIds = new Set();
-      const directory = new Map();
-      const socketById = new Map();
-      socketNodes.forEach(socket => {
-        if (!socket?.id) return;
-        socketNodeIds.add(socket.id);
-        socketById.set(socket.id, socket);
-        const data = socket.data || {};
-        if (Array.isArray(data.sockets)) {
-          data.sockets.forEach(label => {
-            const key = normalizeSocketKey(label);
-            if (key) directory.set(key, socket);
-          });
+      componentsToAttach.forEach(componentNode => {
+        // compute where each pin should go
+        const connections = computeConnectionsForComponent(componentNode, layout);
+        if (!connections || connections.length === 0) return;
+      
+        // placement
+        const snapped = computeSnappedPosition(componentNode, connections);
+        if (snapped) {
+          applySnappedPosition(api, componentNode, snapped);
         }
-        if (Array.isArray(data.rows) && data.column !== undefined) {
-          data.rows.forEach(row => {
-            const key = buildSocketRowColumnKey(row, data.column);
-            if (key) directory.set(key, socket);
-          });
-        }
+
+        // 3. convert to edges (still produces lightweight specs)
+        const edges = buildEdgeCommands(componentNode, connections);
+
+        // 4. rebuild edges (remove old + add new)
+        const cmds = rebuildEdgesForComponent(componentNode.id, edgesSnapshot, edges);
+
+        // 5. queue them
+        pendingEdgeAdds.push(...cmds);
+
       });
-      debugLog('Directory keys:', Array.from(directory.keys()));
-      if (directory.size === 0) return;
-      const directoryEntries = Array.from(directory.entries());
 
-      const workingEdges = [...allEdges];
-      bootstrapPinOffsets(allNodes, allEdges, socketById);
-
-      queuedNodeIds.forEach(nodeId => {
-        const node = allNodes.find(n => n.id === nodeId);
-        if (!node || node.type === 'io.breadboard.sockets:socket') return;
-
-        const pins = Array.isArray(node.data?.pins) ? node.data.pins.map(pin => ({ ...pin })) : [];
-        const dropLabel = node.label || node.id;
-        debugLog('Node', nodeId, 'pins:', pins);
-        if (pins.length === 0) return;
-
-        const resolvedPins = [];
-        const pinState =
-          (node.data?.breadboard && isPlainObject(node.data.breadboard.pinState)
-            ? node.data.breadboard.pinState
-            : {}) || {};
-        const nextPinState = { ...pinState };
-        const usedSocketIds = new Set();
-        const defaultRowIndices = pins.map(pin => rowToIndex(pin.row));
-        let rowShift = null;
-        const basePinDefaultIndex = defaultRowIndices.find(index => index !== null);
-        if (basePinDefaultIndex !== null) {
-          const baseCandidate = findNearestSocketForPin({
-            targetX: node.position?.x || 0,
-            targetY: node.position?.y || 0,
-            directoryEntries
-          });
-          if (baseCandidate?.socket) {
-            const baseRowLabel = chooseSocketRow(baseCandidate.socket, pins[0]?.row);
-            const actualIndex = rowToIndex(baseRowLabel);
-            if (actualIndex !== null) {
-              rowShift = actualIndex - basePinDefaultIndex;
-            }
-          }
-        }
-
-        const segmentAlignment = new Map();
-
-        pins.forEach((pin, index) => {
-          const handleKey = pin.handleKey || pin.key || pin.id || pin.label;
-          if (!handleKey) return;
-          const handleInfo = hasHandleOnNode(node, handleKey);
-          if (!handleInfo) {
-            console.warn(
-              '[BreadboardAutoWire]',
-              `Handle "${handleKey}" not found on node ${dropLabel}.`,
-              {
-                handles: node.handles,
-                outputs: node.outputs,
-                inputs: node.inputs
-              }
-            );
-            return;
-          }
-
-          const savedState = pinState[handleInfo.match.key || handleKey];
-          let socket = null;
-          let socketKey = null;
-
-          let rowHintForDrop = savedState ? (pin.row || null) : null;
-          if (!savedState) {
-            const defaultIndex = defaultRowIndices[index];
-            if (defaultIndex !== null) {
-              const targetIndex =
-                rowShift !== null ? defaultIndex + rowShift : defaultIndex;
-              rowHintForDrop = indexToRow(targetIndex);
-            }
-          }
-
-          if (savedState?.offset && node.position) {
-            const targetX = node.position.x + savedState.offset.x;
-            const targetY = node.position.y + savedState.offset.y;
-            const candidate = findNearestAvailableSocket({
-              targetX,
-              targetY,
-              rowHint: rowHintForDrop,
-              directoryEntries
-            }, usedSocketIds);
-            if (candidate) {
-              socket = candidate.socket;
-              socketKey = candidate.key;
-            }
-          }
-
-          if (!socket && savedState?.socketId) {
-            const candidate = socketById.get(savedState.socketId);
-            if (candidate && !usedSocketIds.has(candidate.id)) {
-              socket = candidate;
-              socketKey = savedState.socketKey || deriveSocketKey(socket, pin.row);
-            }
-          }
-
-          const segmentKey = deriveRowKey(pin, handleInfo.match?.key);
-          const existingAlignment = segmentAlignment.get(segmentKey);
-          if (!socket && existingAlignment && typeof existingAlignment.assignedColumn === 'number') {
-            const originalColumn =
-              typeof existingAlignment.originalColumn === 'number'
-                ? existingAlignment.originalColumn
-                : existingAlignment.assignedColumn;
-            if (typeof pin.column === 'number') {
-              const desiredColumn = existingAlignment.assignedColumn + (pin.column - originalColumn);
-              const key = buildSocketRowColumnKey(pin.row || existingAlignment.rowHint, desiredColumn);
-              if (key) {
-                const candidate = directory.get(key);
-                if (candidate && !usedSocketIds.has(candidate.id)) {
-                  socket = candidate;
-                  socketKey = key;
-                }
-              }
-            }
-          }
-
-          if (!socket && node.position) {
-            const candidate = findNearestAvailableSocket({
-              targetX: node.position.x,
-              targetY: node.position.y,
-              rowHint: rowHintForDrop,
-              directoryEntries
-            }, usedSocketIds);
-            if (candidate) {
-              socket = candidate.socket;
-              socketKey = candidate.key;
-            }
-          }
-
-          if (!socket) {
-            const desiredRowForMetadata = rowHintForDrop || pin.row;
-            let key = null;
-            if (pin?.socketId) {
-              key = normalizeSocketKey(pin.socketId);
-            } else if (pin?.socket) {
-              key = normalizeSocketKey(pin.socket);
-            } else if (desiredRowForMetadata !== undefined && pin?.column !== undefined) {
-              key = buildSocketRowColumnKey(desiredRowForMetadata, pin.column);
-            }
-            if (key) {
-              const candidate = directory.get(key);
-              if (candidate && !usedSocketIds.has(candidate.id)) {
-                socket = candidate;
-                socketKey = key;
-              }
-            }
-          }
-
-          if (!socket) return;
-          socketKey = socketKey || deriveSocketKey(socket, pin.row);
-          usedSocketIds.add(socket.id);
-          if (rowShift === null) {
-            const actualRowLabel = chooseSocketRow(socket, pin.row);
-            const actualRowIndex = rowToIndex(actualRowLabel);
-            const defaultIndex = defaultRowIndices[index];
-            if (actualRowIndex !== null && defaultIndex !== null) {
-              rowShift = actualRowIndex - defaultIndex;
-            }
-          }
-          if (!segmentAlignment.has(segmentKey) && typeof socket.data?.column === 'number') {
-            segmentAlignment.set(segmentKey, {
-              assignedColumn: socket.data.column,
-              originalColumn: typeof pin.column === 'number' ? pin.column : socket.data.column,
-              rowHint: pin.row
-            });
-          }
-
-          resolvedPins.push({
-            handle: handleInfo.match.key || handleKey,
-            socketId: socket.id,
-            socketKey,
-            pinIndex: index
-          });
-
-          const existingEdge = workingEdges.find(edge =>
-            edge.source === node.id &&
-            edge.sourceHandle === (handleInfo.match.key || handleKey) &&
-            edge.target === socket.id
-          );
-          if (existingEdge) {
-            debugLog('Edge already exists:', existingEdge.id);
-            return;
-          }
-
-          const conflictingEdges = workingEdges.filter(edge =>
-            edge.source === node.id &&
-            edge.sourceHandle === handleKey &&
-            socketNodeIds.has(edge.target)
-          );
-          debugLog('Conflicting edges:', conflictingEdges.length);
-
-          conflictingEdges.forEach(edge => {
-            if (edge.target === socket.id) return;
-            if (typeof api.deleteEdge === 'function') {
-              api.deleteEdge(edge.id);
-            }
-            const idx = workingEdges.findIndex(e => e.id === edge.id);
-            if (idx !== -1) {
-              workingEdges.splice(idx, 1);
-            }
-          });
-
-          const payload = {
-            source: node.id,
-            sourceHandle: handleInfo.match.key || handleKey,
-            target: socket.id,
-            targetHandle: 'socket',
-            type: 'default'
-          };
-          const result = api.createEdge(payload);
-          if (result?.success && result.data) {
-            workingEdges.push(result.data);
-            debugLog(`Created edge ${result.data.id} (${node.id}.${handleKey} → ${socket.id})`);
-          } else if (!result?.success) {
-            const reason = result?.error || 'Unknown error';
-            console.warn(
-              '[BreadboardAutoWire]',
-              `Failed to create edge for ${node.id}.${handleKey} → ${socket.id}: ${reason}`,
-              { payload, result }
-            );
-          }
-        });
-
-        if (resolvedPins.length > 0) {
-          const summary = resolvedPins.map(entry => `${entry.handle}→${entry.socketKey || entry.socketId}`).join(', ');
-          console.info(`[BreadboardAutoWire] Drop processed for ${dropLabel}: ${resolvedPins.length} pin(s) connected (${summary}).`);
-        } else {
-          console.info(`[BreadboardAutoWire] Drop processed for ${dropLabel}: no matching pins found.`);
-        }
-
-        let pinsChanged = false;
-        resolvedPins.forEach((entry, idx) => {
-          const pin = pins[idx];
-          const socket = socketById.get(entry.socketId);
-          if (!pin || !socket) return;
-          const socketData = socket.data || {};
-          const column = socketData.column;
-          const row = pin.row || (Array.isArray(socketData.rows) ? socketData.rows[0] : null);
-          if (entry.socketKey && pin.socket !== entry.socketKey) {
-            pin.socket = entry.socketKey;
-            pinsChanged = true;
-          }
-          if (column !== undefined && pin.column !== column) {
-            pin.column = column;
-            pinsChanged = true;
-          }
-          if (row && pin.row !== row) {
-            pin.row = row;
-            pinsChanged = true;
-          }
-          const socketPos = getSocketPosition(socket);
-          nextPinState[entry.handle] = {
-            offset: {
-              x: socketPos.x - (node.position?.x || 0),
-              y: socketPos.y - (node.position?.y || 0)
-            },
-            socketId: entry.socketId,
-            socketKey: entry.socketKey
-          };
-        });
-
-        const currentPosition = {
-          x: typeof node.position?.x === 'number' ? node.position.x : 0,
-          y: typeof node.position?.y === 'number' ? node.position.y : 0
-        };
-
-        let snapTargetPosition = null;
-        const cachedOffsets = pinOffsetCache.get(node.type);
-        if (cachedOffsets) {
-          const desiredPositions = [];
-          resolvedPins.forEach(entry => {
-            const cached = cachedOffsets[entry.handle];
-            if (!cached) return;
-            const socket = socketById.get(entry.socketId);
-            if (!socket) return;
-            const socketPos = getSocketPosition(socket);
-            desiredPositions.push({
-              x: socketPos.x - cached.x,
-              y: socketPos.y - cached.y
-            });
-          });
-          if (desiredPositions.length > 0) {
-            const avg = desiredPositions.reduce(
-              (acc, curr) => ({ x: acc.x + curr.x, y: acc.y + curr.y }),
-              { x: 0, y: 0 }
-            );
-            avg.x /= desiredPositions.length;
-            avg.y /= desiredPositions.length;
-            avg.x += 1;
-            snapTargetPosition = avg;
-          }
-        }
-
-        if (!snapTargetPosition && resolvedPins.length > 0) {
-          const targetPositions = resolvedPins
-            .map(entry => socketById.get(entry.socketId))
-            .filter(Boolean)
-            .map(socket => getSocketPosition(socket));
-          if (targetPositions.length > 0) {
-            const avg = targetPositions.reduce(
-              (acc, curr) => ({ x: acc.x + curr.x, y: acc.y + curr.y }),
-              { x: 0, y: 0 }
-            );
-            avg.x /= targetPositions.length;
-            avg.y /= targetPositions.length;
-            avg.x += 1;
-            snapTargetPosition = avg;
-          }
-        }
-
-        const snapDelta = snapTargetPosition
-          ? {
-              x: snapTargetPosition.x - currentPosition.x,
-              y: snapTargetPosition.y - currentPosition.y
-            }
-          : null;
-
-        const nextPosition = snapTargetPosition ? { ...snapTargetPosition } : null;
-
-        if (nextPosition) {
-          resolvedPins.forEach(entry => {
-            const socket = socketById.get(entry.socketId);
-            if (!socket) return;
-            const socketPos = getSocketPosition(socket);
-            const offset = {
-              x: socketPos.x - nextPosition.x,
-              y: socketPos.y - nextPosition.y
-            };
-            nextPinState[entry.handle] = {
-              ...(nextPinState[entry.handle] || {}),
-              offset,
-              socketId: entry.socketId,
-              socketKey: entry.socketKey
-            };
-            registerPinOffset(node.type, entry.handle, offset);
-          });
-        } else {
-          resolvedPins.forEach(entry => {
-            const state = nextPinState[entry.handle];
-            if (state?.offset) {
-              registerPinOffset(node.type, entry.handle, { ...state.offset });
-            }
-          });
-        }
-
-        const needsDataUpdate =
-          pinsChanged ||
-          JSON.stringify(nextPinState) !== JSON.stringify(pinState) ||
-          Boolean(snapDelta);
-
-        if ((needsDataUpdate || nextPosition) && typeof api.updateNode === 'function') {
-          const existingBreadboard = isPlainObject(node.data?.breadboard) ? node.data.breadboard : {};
-          const payload = {};
-          if (needsDataUpdate) {
-            payload.data = {
-              pins,
-              breadboard: {
-                ...existingBreadboard,
-                pinState: nextPinState
-              }
-            };
-          }
-          if (nextPosition) {
-            payload.position = nextPosition;
-          }
-          api.updateNode(node.id, payload);
-        }
+      await legacyHandleNodeDrop({
+        queuedNodeIds,
+        nodes,
+        layout,
+        api
       });
+      
     };
 
     const handleNodeDragEnd = (payload = {}) => {
@@ -783,6 +682,12 @@
       nodeIds.forEach(id => pendingDragEndNodeIds.add(id));
       scheduleDragEndProcessing(processNodeDragEnd);
     };
+
+    const dragStartEventNames = ['nodeDragStart', 'node:dragstart'];
+    const dragEndEventNames = ['nodeDragEnd', 'node:dragend'];
+    const normalizedDragStartNames = new Set(dragStartEventNames.map(name => String(name || '').toLowerCase()));
+    const normalizedDragEndNames = new Set(dragEndEventNames.map(name => String(name || '').toLowerCase()));
+    const normalizeEventName = (name) => (typeof name === 'string' ? name.toLowerCase() : '');
 
     const subscribeEvents = (eventNames, handler) => {
       if (!eventBus?.on || !Array.isArray(eventNames)) return;
@@ -796,23 +701,11 @@
 
     subscribeEvents(dragStartEventNames, handleNodeDragStart);
     subscribeEvents(dragEndEventNames, handleNodeDragEnd);
-    console.info(
-      '[BreadboardAutoWire] Registered drag handlers for events:',
-      dragStartEventNames.concat(dragEndEventNames)
-    );
+    console.info('[BreadboardAutoWire] Registered drag handlers for events:', dragStartEventNames.concat(dragEndEventNames));
 
-    // Debug: log all events
-    const wildcardListener = (event, data) => {
-      debugLog('Event fired:', event, data);
-    };
-    if (eventBus?.on) {
-      eventBus.on('*', wildcardListener);
-      registerCleanup(() => eventBus.off('*', wildcardListener));
-    }
-
+    const shouldHandleRelayMessages = !eventBus?.on;
     const relayListener = (event) => {
       if (!shouldHandleRelayMessages) return;
-      debugLog('Relay message received:', event.data);
       const payload = event?.data;
       if (!payload || payload.type !== 'breadboard:relayNodeDrag') return;
       const { eventName, details } = payload;
@@ -841,16 +734,24 @@
       cleanupCallbacks.length = 0;
       attemptAttach._attached = false;
     };
-    window.__breadboardAutoWireCleanup = detach;
+
+    const primeAutoWire = () => {
+      const snapshot = readGraphSnapshot(api);
+      if (!snapshot?.nodes) return;
+      snapshot.nodes.forEach(node => {
+        if (!node?.id) return;
+        pendingDragEndNodeIds.add(node.id);
+      });
+      scheduleDragEndProcessing(processNodeDragEnd);
+    };
+
+    primeAutoWire();
+
+    // IMPORTANT: use a script-specific global so we don't clobber any
+    // host-level helper that also uses __breadboardAutoWireCleanup.
+    window.__breadboardScriptAutoWireCleanup = detach;
     return detach;
   };
 
   attemptAttach();
 })();
-  const deriveRowKey = (pin, fallback) => {
-    if (typeof pin?.row === 'string' && pin.row.trim()) {
-      return pin.row.trim().toUpperCase();
-    }
-    if (fallback) return fallback;
-    return `pin:${pin?.id || pin?.handleKey || pin?.key || 'unknown'}`;
-  };

@@ -17,9 +17,9 @@
   document.body.appendChild(mount);
   const ctx = mount.getContext('2d');
 
-  const draw = ({ width = 56, height = 24 }) => {
+  const draw = ({ width = 72, height = 24 }) => {
     const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(width, 56);
+    const w = Math.max(width, 72);
     const h = Math.max(height, 24);
     mount.width = w * dpr;
     mount.height = h * dpr;
@@ -51,7 +51,7 @@
     ctx.stroke();
   };
 
-  let lastPayload = { width: 120, height: 48 };
+  let lastPayload = { width: 72, height: 24 };
   window.addEventListener('resize', () => draw(lastPayload));
 
   sdk.createRenderer({
