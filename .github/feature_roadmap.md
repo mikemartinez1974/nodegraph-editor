@@ -91,6 +91,40 @@
 
 > **Dependency:** Breadboard roadmap remains intact but is blocked on Phases 0–3 of the plugin platform so the breadboard ships as a showcase plugin rather than core-only code.
 
+## Engineering Backlog (Plugin Platform)
+
+A focused engineering backlog to harden and ship the plugin platform. Items are prioritized and include a short effort estimate.
+
+- [ ] Fix critical host-method bug in PluginRuntimeHost (graph:getNodes) — Effort: small
+  - Correct the thrown error and ensure host methods consistently call a normalized GraphAPI adapter.
+
+- [ ] Add GraphAPI adapter/wrapper — Effort: small → medium
+  - Provide a single place that normalizes readNode/readEdge/create/update/delete return shapes and errors for both host and plugin runtimes.
+
+- [ ] Harden manifest validation & sandbox checks — Effort: small
+  - Enforce allowed sandbox values ("iframe" | "worker"), validate renderer.entry URLs, and provide clearer error messages.
+
+- [ ] Manifest ↔ bundle consistency validation — Effort: medium
+  - Validate manifest node.entry fragments (#Symbol) match exported/plugin-provided entries or relax manifest expectations.
+
+- [ ] Consolidate renderer boilerplate into helper module — Effort: medium
+  - Centralize canvas mounting, DPR handling, resize/cleanup helpers and refactor renderers to use it.
+
+- [ ] Standardize SDK/permission surface & docs — Effort: medium
+  - Publish expected Graph API shapes, host-method contracts, permission model, and lifecycle examples for plugin authors.
+
+- [ ] Choose canonical autowire runtime and remove legacy copies — Effort: medium
+  - Consolidate duplicate autowire scripts, update generator to inject canonical runtime, and archive legacy files.
+
+- [ ] Add automated tests & CI checks for plugins — Effort: medium → large
+  - Manifest validation tests, sandbox handshake/handshake-failure tests, and renderer smoke tests. Lint rule to disallow global document mutations in renderers.
+
+- [ ] Integrate telemetry & graceful crash handling — Effort: medium
+  - Surface plugin load/handshake errors in diagnostics and fail plugins without impacting host UI.
+
+- [ ] UX: Plugin Manager + permission prompts — Effort: medium
+  - Install UI, permission prompts, version pinning, and changelog display.
+
 ## [ ] Polish & Developer Experience
 
 - [x] **Alignment Tools**  

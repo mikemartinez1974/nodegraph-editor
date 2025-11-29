@@ -292,17 +292,8 @@ function buildRailSocketNodes() {
 // ---------------------------------------------------------------------------
 
 function buildScriptNode() {
-  // Default fallback in case autoWire.js can't be read
-  let code =
-    'console.warn("[BreadboardAutoWire] autoWire.js not found; script node has no logic.");';
-
-  try {
-    // autoWire.js is expected to live in the same folder as this generator
-    const scriptPath = path.join(__dirname, "autoWire.js");
-    code = fs.readFileSync(scriptPath, "utf-8");
-  } catch (err) {
-    console.warn("[generateBreadboardTemplate] Failed to load autoWire.js:", err);
-  }
+  const autowirePath = path.join(__dirname, "autowire-runtime.js");
+  const rawCode = fs.readFileSync(autowirePath, "utf8");
 
   return {
     id: "breadboard-autowire-script",
@@ -310,15 +301,17 @@ function buildScriptNode() {
     label: "Breadboard AutoWire",
     position: { x: 0, y: skinHeight / 2 + 40 },
     width: 320,
-    height: 200,
+    height: 400,
     data: {
       language: "javascript",
-      code
+      autoRun: true,
+      dryRun: false,
+      allowMutations: true,
+      scriptId: "breadboard-autowire-runtime",
+      script: rawCode
     }
   };
 }
-
-
 
 // ---------------------------------------------------------------------------
 // Power bus node (V+ / GND source for the solver)

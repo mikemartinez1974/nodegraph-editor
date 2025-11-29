@@ -5,35 +5,12 @@
     return;
   }
 
-  const COLORS = {
-    positive: {
-      body: '#fee2e2',
-      socket: '#dc2626',
-      text: '#b91c1c'
-    },
-    negative: {
-      body: '#dbeafe',
-      socket: '#2563eb',
-      text: '#1d4ed8'
-    }
-  };
-
   const mount = document.createElement('canvas');
   mount.style.width = '100%';
   mount.style.height = '100%';
   mount.style.display = 'block';
   mount.style.pointerEvents = 'none';
-  document.documentElement.style.margin = '0';
-  document.documentElement.style.padding = '0';
-  document.documentElement.style.width = '100%';
-  document.documentElement.style.height = '100%';
-  document.documentElement.style.overflow = 'hidden';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.width = '100%';
-  document.body.style.height = '100%';
-  document.body.style.background = 'transparent';
-  document.body.style.overflow = 'hidden';
+  // Avoid mutating global document styles
   document.body.appendChild(mount);
   const ctx = mount.getContext('2d');
 
@@ -73,7 +50,10 @@
     const socketRadius = Math.min(renderWidth * 0.25, rowHeight * 0.25);
 
     rails.forEach((rail, index) => {
-      const colors = COLORS[rail.polarity] || COLORS.positive;
+      const colors = {
+        positive: { body: '#fee2e2', socket: '#dc2626', text: '#b91c1c' },
+        negative: { body: '#dbeafe', socket: '#2563eb', text: '#1d4ed8' }
+      }[rail.polarity] || { body: '#fee2e2', socket: '#dc2626', text: '#b91c1c' };
       const rowTop = paddingY + index * rowHeight;
       const rowBottom = rowTop + rowHeight;
       const centerY = (rowTop + rowBottom) / 2;

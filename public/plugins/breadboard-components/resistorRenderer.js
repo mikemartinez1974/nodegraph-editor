@@ -10,10 +10,7 @@
   mount.style.height = '100%';
   mount.style.display = 'block';
   mount.style.pointerEvents = 'none';
-  document.documentElement.style.pointerEvents = 'none';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.background = 'transparent';
+  // Avoid changing global document styles
   document.body.appendChild(mount);
   const ctx = mount.getContext('2d');
 

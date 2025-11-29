@@ -8,7 +8,7 @@
   }
 
   const PLUGIN_ID = 'io.breadboard.sockets';
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.4';
 
   const runtime = sdk.createPluginRuntime({
     capabilities: {

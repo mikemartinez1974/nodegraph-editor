@@ -38,17 +38,7 @@
   mount.style.height = '100%';
   mount.style.display = 'block';
   mount.style.pointerEvents = 'none';
-  document.documentElement.style.margin = '0';
-  document.documentElement.style.padding = '0';
-  document.documentElement.style.width = '100%';
-  document.documentElement.style.height = '100%';
-  document.documentElement.style.overflow = 'hidden';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.width = '100%';
-  document.body.style.height = '100%';
-  document.body.style.background = 'transparent';
-  document.body.style.overflow = 'hidden';
+  // Avoid changing global styles
   document.body.appendChild(mount);
   const ctx = mount.getContext('2d');
 

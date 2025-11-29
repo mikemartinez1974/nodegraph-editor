@@ -108,7 +108,10 @@
   // ------------------------------------------------------------
 
   const readGraphSnapshot = () => {
-    const api = window.graphAPI;
+    const api =
+    window.graphAPI ||
+    window.parent?.graphAPI ||
+    window.top?.graphAPI;
     if (!api) return { nodes: [], edges: [] };
 
     const nodesResult =
@@ -758,7 +761,11 @@
   // ------------------------------------------------------------
 
   const processNode = async (nodeId) => {
-    const api = window.graphAPI;
+    const api =
+    window.graphAPI ||
+    window.parent?.graphAPI ||
+    window.top?.graphAPI;
+
     if (!api) return;
 
     const snapshot = readGraphSnapshot();
@@ -854,17 +861,23 @@
   };
 
   // ------------------------------------------------------------
-  // EVENT WIRING + BOOTSTRAP
+  // EVENT WIRING + BOOTSTRAP (RETRY UNTIL graphAPI IS READY)
   // ------------------------------------------------------------
 
   const startAutoWire = () => {
-    const api = window.graphAPI;
+    const api =
+    window.graphAPI ||
+    window.parent?.graphAPI ||
+    window.top?.graphAPI;
+
+
     if (!api) {
-      console.warn('[BreadboardAutoWire] graphAPI not available yet');
+      console.warn("[BreadboardAutoWire] graphAPI not ready, retrying…");
+      setTimeout(startAutoWire, 50); // retry until graphAPI attaches
       return;
     }
 
-    console.log('[BreadboardAutoWire] Initializing (plugin script node)');
+    console.log("[BreadboardAutoWire] Initializing (plugin script node)");
 
     // handy for manual debugging
     window.__breadboardAutoWireProcessNode = processNode;
@@ -879,33 +892,34 @@
 
     const cleanups = [];
     const events = api.events;
-    if (events && typeof events.on === 'function') {
+
+    if (events && typeof events.on === "function") {
       const makeHandler = (label) => (evt) => {
         const id = evt?.nodeId || evt?.id || evt?.node?.id;
         if (!id) return;
-        console.log('[BreadboardAutoWire] Event', label, '-> rewire node', id);
+        console.log("[BreadboardAutoWire] Event", label, "-> rewire node", id);
         processNode(id);
       };
 
       const offDrag =
-        events.on('nodeDragEnd', makeHandler('nodeDragEnd')) || (() => {});
+        events.on("nodeDragEnd", makeHandler("nodeDragEnd")) || (() => {});
       const offAdd =
-        events.on('nodeAdded', makeHandler('nodeAdded')) || (() => {});
+        events.on("nodeAdded", makeHandler("nodeAdded")) || (() => {});
       const offChange =
-        events.on('nodeDataChanged', makeHandler('nodeDataChanged')) ||
+        events.on("nodeDataChanged", makeHandler("nodeDataChanged")) ||
         (() => {});
 
       cleanups.push(offDrag, offAdd, offChange);
     }
 
     window.__breadboardAutoWireCleanup = () => {
-      console.log('[BreadboardAutoWire] Cleaning up listeners (plugin)');
+      console.log("[BreadboardAutoWire] Cleaning up listeners (plugin)");
       cleanups.forEach((off) => {
         try {
           off();
         } catch (err) {
           console.warn(
-            '[BreadboardAutoWire] Failed to cleanup listener',
+            "[BreadboardAutoWire] Failed to cleanup listener",
             err
           );
         }
@@ -913,11 +927,12 @@
     };
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startAutoWire, {
-      once: true
-    });
+  // Retry bootstrap until both DOM and graphAPI are ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(startAutoWire, 50);
+    }, { once: true });
   } else {
-    startAutoWire();
+    setTimeout(startAutoWire, 50);
   }
 })();
