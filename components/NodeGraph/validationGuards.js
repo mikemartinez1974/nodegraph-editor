@@ -1,6 +1,6 @@
 // Data validation guards for nodes and edges
 import { useRef } from 'react';
-import { validateNode, validateEdge, validateGraph } from './schema';
+import { validateNode, validateEdge, validateGraph } from './schema.js';
 
 // Validation error types
 export const VALIDATION_ERRORS = {

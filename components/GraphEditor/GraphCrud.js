@@ -302,9 +302,7 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
   if (
     sourceHandle.type &&
     targetHandle.type &&
-    sourceHandle.type !== targetHandle.type &&
-    sourceHandle.type !== 'trigger' &&
-    targetHandle.type !== 'trigger'
+    sourceHandle.type !== targetHandle.type
   ) {
     return { error: `Handle types do not match: ${sourceHandle.type} → ${targetHandle.type}` };
   }
@@ -447,10 +445,10 @@ export default class GraphCRUD {
   } = {}) {
     try {
       const currentNodes = this.getNodes();
-      let nodeId;
-      do {
-        nodeId = id || this._generateId();
-      } while (currentNodes.some(n => n.id === nodeId));
+      let nodeId = id || this._generateId();
+      while (currentNodes.some(n => n.id === nodeId)) {
+        nodeId = this._generateId();
+      }
 
       const normalizedHandles = normalizeHandleDefinitions({ handles, inputs, outputs });
       const sanitizedState = state ? cloneValue(state) : undefined;
@@ -780,10 +778,13 @@ export default class GraphCRUD {
       // Create all nodes without calling setNodes/saveToHistory for each
       for (const opts of nodesArray) {
         try {
-          let nodeId;
-          do {
-            nodeId = opts.id || this._generateId();
-          } while (currentNodes.some(n => n.id === nodeId) || createdNodes.some(n => n.id === nodeId));
+          let nodeId = opts.id || this._generateId();
+          while (
+            currentNodes.some(n => n.id === nodeId) ||
+            createdNodes.some(n => n.id === nodeId)
+          ) {
+            nodeId = this._generateId();
+          }
 
           const normalizedHandles = normalizeHandleDefinitions({
             handles: opts.handles,

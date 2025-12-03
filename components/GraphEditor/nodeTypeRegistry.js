@@ -1,24 +1,25 @@
 // components/GraphEditor/nodeTypeRegistry.js
 // Central registry for all node types with metadata
 
-import DefaultNode from './Nodes/DefaultNode';
-import FixedNode from './Nodes/FixedNode';
-import MarkdownNode from './Nodes/MarkdownNode';
-import SvgNode from './Nodes/SvgNode';
-import DivNode from './Nodes/DivNode';
-import TimerNode from './Nodes/TimerNode';
-import ToggleNode from './Nodes/ToggleNode';
-import CounterNode from './Nodes/CounterNode';
-import GateNode from './Nodes/GateNode';
-import DelayNode from './Nodes/DelayNode';
-import APINode from './Nodes/APINode';
-import ScriptNode from './Nodes/ScriptNode';
-import ThreeDNode from './Nodes/ThreeDNode';
-import BackgroundRpcNode from './Nodes/BackgroundRpcNode';
-import ValueTriggerNode from './Nodes/ValueTriggerNode';
-import PluginNodeRenderer from './Nodes/PluginNodeRenderer';
-import CanvasNode from './Nodes/CanvasNode';
-import { getInstalledPlugins } from './plugins/pluginRegistry';
+import DefaultNode from './Nodes/DefaultNode.js';
+import FixedNode from './Nodes/FixedNode.js';
+import MarkdownNode from './Nodes/MarkdownNode.js';
+import SvgNode from './Nodes/SvgNode.js';
+import DivNode from './Nodes/DivNode.js';
+import TimerNode from './Nodes/TimerNode.js';
+import ToggleNode from './Nodes/ToggleNode.js';
+import CounterNode from './Nodes/CounterNode.js';
+import GateNode from './Nodes/GateNode.js';
+import DelayNode from './Nodes/DelayNode.js';
+import APINode from './Nodes/APINode.js';
+import ScriptNode from './Nodes/ScriptNode.js';
+import ThreeDNode from './Nodes/ThreeDNode.js';
+import BackgroundRpcNode from './Nodes/BackgroundRpcNode.js';
+import ValueTriggerNode from './Nodes/ValueTriggerNode.js';
+import PluginNodeRenderer from './Nodes/PluginNodeRenderer.js';
+import CanvasNode from './Nodes/CanvasNode.js';
+import { getInstalledPlugins } from './plugins/pluginRegistry.js';
+import { convertHandlesObjectToArray } from './utils/handleUtils.js';
 
 // Registry structure: each entry has the component and display metadata
 const baseNodeTypeRegistry = {
@@ -207,28 +208,6 @@ export const nodeTypeMetadata = [
   }
   // Add more node types here as needed
 ];
-
-export const convertHandlesObjectToArray = (handleConfig) => {
-  if (!handleConfig || typeof handleConfig !== 'object') return undefined;
-  const handles = [];
-  const pushHandles = (entries, direction) => {
-    if (!Array.isArray(entries)) return;
-    entries.forEach((handle) => {
-      if (!handle) return;
-      const id = handle.id || handle.key || handle.name;
-      if (!id) return;
-      handles.push({
-        id,
-        label: handle.label || handle.name || id,
-        direction,
-        dataType: handle.dataType || handle.handleType || handle.type || 'value'
-      });
-    });
-  };
-  pushHandles(handleConfig.inputs, 'input');
-  pushHandles(handleConfig.outputs, 'output');
-  return handles.length > 0 ? handles : undefined;
-};
 
 const buildHandlesFromDefinition = (definition) => {
   if (!definition || !definition.handles) return undefined;

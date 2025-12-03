@@ -2,10 +2,10 @@
 // 2. GraphEditor/graphEditorHandlers.js
 // All handler functions consolidated
 // ============================================
-import eventBus from '../../NodeGraph/eventBus';
-import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils';
-import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation';
-import { convertHandlesObjectToArray } from '../nodeTypeRegistry';
+import eventBus from '../../NodeGraph/eventBus.js';
+import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils.js';
+import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation.js';
+import { convertHandlesObjectToArray } from '../utils/handleUtils.js';
 
 // Debounce guard for delete operations (must be outside function to persist)
 let deleteInProgress = false;
@@ -794,5 +794,3 @@ export function handlePasteGraph({ nodesRef, setNodes, pastedNodes = [] }) {
   });
 }
 
-// Keep previous export if present; ensure nothing else is broken
-export { handleUpdateNodeData };

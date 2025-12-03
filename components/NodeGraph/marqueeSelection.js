@@ -107,6 +107,16 @@ export function useMarqueeSelection({ nodes, pan, zoom, setSelectedNodeIds, setS
   const [selectionRect, setSelectionRect] = useState(null);
   const marqueeStartRef = useRef(null);
   const marqueeEndRef = useRef(null);
+  const marqueeStartGraphRef = useRef(null);
+  const marqueeEndGraphRef = useRef(null);
+
+  const toGraphPoint = useCallback((clientX, clientY, rect) => {
+    if (!rect || zoom === 0) return { x: NaN, y: NaN };
+    return {
+      x: (clientX - rect.left - pan.x) / zoom,
+      y: (clientY - rect.top - pan.y) / zoom
+    };
+  }, [pan.x, pan.y, zoom]);
 
   const startSelection = useCallback((e) => {
     if (!e.shiftKey) return false;
@@ -114,63 +124,79 @@ export function useMarqueeSelection({ nodes, pan, zoom, setSelectedNodeIds, setS
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return false;
 
-    const startX = e.clientX - rect.left;
-    const startY = e.clientY - rect.top;
+    const clientPoint = getEventPoint(e);
+    const startX = clientPoint.x - rect.left;
+    const startY = clientPoint.y - rect.top;
 
     marqueeStartRef.current = { x: startX, y: startY };
     marqueeEndRef.current = { x: startX, y: startY };
+    marqueeStartGraphRef.current = toGraphPoint(clientPoint.x, clientPoint.y, rect);
+    marqueeEndGraphRef.current = marqueeStartGraphRef.current;
     setIsSelecting(true);
+    setSelectionRect({ x: startX, y: startY, width: 0, height: 0 });
 
-    console.log('startSelection: Selection started at', { x: startX, y: startY }); // Debug log
-
+    console.log('startSelection: Selection started at', { x: startX, y: startY });
     return true;
-  }, [containerRef]);
+  }, [containerRef, toGraphPoint]);
 
   const updateSelection = useCallback((e) => {
     if (!isSelecting) return;
 
-    console.log('updateSelection: Mouse moved, updating selection rectangle'); // Debug log
+    console.log('updateSelection: Mouse moved, updating selection rectangle');
 
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) {
-        console.log('updateSelection: Container rect not found'); // Debug log
-        return;
+      console.log('updateSelection: Container rect not found');
+      return;
     }
 
-    const endX = e.clientX - rect.left;
-    const endY = e.clientY - rect.top;
+    const clientPoint = getEventPoint(e);
+    const endX = clientPoint.x - rect.left;
+    const endY = clientPoint.y - rect.top;
 
     marqueeEndRef.current = { x: endX, y: endY };
+    marqueeEndGraphRef.current = toGraphPoint(clientPoint.x, clientPoint.y, rect);
 
-    const minX = Math.min(marqueeStartRef.current.x, endX);
-    const minY = Math.min(marqueeStartRef.current.y, endY);
-    const width = Math.abs(endX - marqueeStartRef.current.x);
-    const height = Math.abs(endY - marqueeStartRef.current.y);
+    const minX = Math.min(marqueeStartRef.current?.x ?? endX, endX);
+    const minY = Math.min(marqueeStartRef.current?.y ?? endY, endY);
+    const width = Math.abs(endX - (marqueeStartRef.current?.x ?? endX));
+    const height = Math.abs(endY - (marqueeStartRef.current?.y ?? endY));
 
     setSelectionRect({ x: minX, y: minY, width, height });
 
-    console.log('updateSelection: Updated selection rectangle to', { x: minX, y: minY, width, height }); // Debug log
-  }, [isSelecting, containerRef]);
+    console.log('updateSelection: Updated selection rectangle to', { x: minX, y: minY, width, height });
+  }, [isSelecting, containerRef, toGraphPoint]);
 
   const endSelection = useCallback((e) => {
     if (!isSelecting) return;
 
-    console.log('endSelection: Ending selection process'); // Debug log
+    console.log('endSelection: Ending selection process');
 
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) {
-        console.log('endSelection: Container rect not found'); // Debug log
-        return;
+      console.log('endSelection: Container rect not found');
+      return;
+    }
+
+    if (!marqueeStartGraphRef.current || !marqueeEndGraphRef.current) {
+      setIsSelecting(false);
+      setSelectionRect(null);
+      marqueeStartRef.current = null;
+      marqueeEndRef.current = null;
+      marqueeStartGraphRef.current = null;
+      marqueeEndGraphRef.current = null;
+      console.log('endSelection: Selection process completed');
+      return;
     }
 
     const bounds = {
-      x: (Math.min(marqueeStartRef.current.x, marqueeEndRef.current.x) - pan.x) / zoom,
-      y: (Math.min(marqueeStartRef.current.y, marqueeEndRef.current.y) - pan.y) / zoom,
-      width: Math.abs(marqueeEndRef.current.x - marqueeStartRef.current.x) / zoom,
-      height: Math.abs(marqueeEndRef.current.y - marqueeStartRef.current.y) / zoom
+      x: Math.min(marqueeStartGraphRef.current.x, marqueeEndGraphRef.current.x),
+      y: Math.min(marqueeStartGraphRef.current.y, marqueeEndGraphRef.current.y),
+      width: Math.abs(marqueeEndGraphRef.current.x - marqueeStartGraphRef.current.x),
+      height: Math.abs(marqueeEndGraphRef.current.y - marqueeStartGraphRef.current.y)
     };
 
-    console.log('endSelection: Calculated bounds', bounds); // Debug log
+    console.log('endSelection: Calculated bounds', bounds);
 
     const selectedNodes = nodes.filter(node => {
       const nodeX = node.position.x;
@@ -190,32 +216,43 @@ export function useMarqueeSelection({ nodes, pan, zoom, setSelectedNodeIds, setS
       setSelectedNodeIds(selectedNodes.map(node => node.id));
       if (setSelectedEdgeIds) setSelectedEdgeIds([]);
 
-      console.log('endSelection: Selected nodes:', selectedNodes.map(node => node.id)); // Debug log
+      console.log('endSelection: Selected nodes:', selectedNodes.map(node => node.id));
 
       if (onNodeClick && selectedNodes.length === 1) {
         onNodeClick(selectedNodes[0].id, e);
       }
     } else {
-      console.log('endSelection: No nodes selected'); // Debug log
+      console.log('endSelection: No nodes selected');
     }
 
     setIsSelecting(false);
     marqueeStartRef.current = null;
     marqueeEndRef.current = null;
+    marqueeStartGraphRef.current = null;
+    marqueeEndGraphRef.current = null;
     setSelectionRect(null);
 
-    console.log('endSelection: Selection process completed'); // Debug log
-  }, [isSelecting, pan, nodes, zoom, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, containerRef]);
+    console.log('endSelection: Selection process completed');
+  }, [isSelecting, nodes, setSelectedNodeIds, setSelectedEdgeIds, onNodeClick, containerRef, toGraphPoint]);
+
+  const cancelSelection = useCallback(() => {
+    setIsSelecting(false);
+    setSelectionRect(null);
+    marqueeStartRef.current = null;
+    marqueeEndRef.current = null;
+    marqueeStartGraphRef.current = null;
+    marqueeEndGraphRef.current = null;
+  }, []);
 
   return {
     isSelecting,
     selectionRect,
     startSelection,
     updateSelection,
-    endSelection
+    endSelection,
+    cancelSelection
   };
 }
-
 // Utility function to get point from mouse/touch event
 function getEventPoint(event) {
   // Handle both mouse and touch events

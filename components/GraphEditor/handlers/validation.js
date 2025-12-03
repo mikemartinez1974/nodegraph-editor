@@ -1,4 +1,4 @@
-import { ValidationGuard } from '../../NodeGraph/validationGuards';
+import { ValidationGuard } from '../../NodeGraph/validationGuards.js';
 
 const DEFAULT_GUARD_OPTIONS = {
   allowAutoFix: true

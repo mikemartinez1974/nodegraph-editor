@@ -89,8 +89,6 @@
   - [ ] Document plugin author guide + API reference in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/CONTRIBUTING.md`.
   - [ ] Ship behind feature flag, onboard pilot partners, collect feedback before GA.
 
-> **Dependency:** Breadboard roadmap remains intact but is blocked on Phases 0–3 of the plugin platform so the breadboard ships as a showcase plugin rather than core-only code.
-
 ## Engineering Backlog (Plugin Platform)
 
 A focused engineering backlog to harden and ship the plugin platform. Items are prioritized and include a short effort estimate.
@@ -228,7 +226,7 @@ A focused engineering backlog to harden and ship the plugin platform. Items are 
   
   - [ ] Profile loops and surface quality settings (`components/GraphEditor/components/PropertiesPanel.js:400`).
 
-## [ ] Graph Editor Slice Plan
+## [x] Graph Editor Slice Plan
 
 - [x] Extract document/metadata providers (`theme`, `project meta`, `grid/pan settings`) from `components/GraphEditor/GraphEditor.js` into standalone hooks so the root component becomes declarative.
 

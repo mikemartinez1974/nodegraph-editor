@@ -432,7 +432,7 @@ describe('GraphCRUD search helpers', () => {
       data: { memo: 'Secret', link: '' },
       visible: false,
       width: 60,
-      height: 40,
+      height: 120,
     },
   ];
 
