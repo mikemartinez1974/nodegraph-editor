@@ -71,6 +71,7 @@ export default function ScriptNode({
   const [lastRunAt, setLastRunAt] = useState(node?.data?.lastRunAt || null);
   const [showResult, setShowResult] = useState(false);
   const autoRunTriggered = useRef(false);
+  const autoRunTimerRef = useRef(null);
   const scriptSource = useMemo(() => node?.data?.script || node?.data?.source || '', [node?.data]);
 
   useEffect(() => {
@@ -94,7 +95,20 @@ export default function ScriptNode({
   // persist node settings when changed
   useEffect(() => {
     try {
-      eventBus.emit('nodeUpdate', { id: node.id, updates: { data: { ...node.data, scriptId: selectedScriptId, allowMutations, dryRun, lastResult, lastRunAt } } });
+      eventBus.emit('nodeUpdate', {
+        id: node.id,
+        updates: {
+          data: {
+            ...node.data,
+            scriptId: selectedScriptId,
+            allowMutations,
+            dryRun,
+            lastResult,
+            lastRunAt
+          }
+        },
+        source: 'script-node'
+      });
     } catch (err) {}
   }, [selectedScriptId, allowMutations, dryRun, lastResult, lastRunAt]);
 
@@ -106,20 +120,12 @@ export default function ScriptNode({
 
   // run the selected script
   const runScript = async (meta = {}) => {
+    console.log('[ScriptNode] runScript invoked', node.id, meta);
     const script = scriptSource ? { source: scriptSource, name: node?.data?.name || 'Script' } : getSelectedScript();
     if (!script) {
       const result = { success: false, error: 'No script selected' };
       setLastResult(result);
       return result;
-    }
-
-    if (typeof window !== 'undefined' && window.parent) {
-      window.parent.postMessage(
-        { type: 'breadboard:autoWire', script: script.source || '', nodeId: node.id },
-        '*'
-      );
-    } else {
-      eventBus.emit('breadboard:autoWire', { script: script.source || '', nodeId: node.id });
     }
 
     if (typeof window === 'undefined') {
@@ -145,6 +151,7 @@ export default function ScriptNode({
     try {
       const runMeta = { dry: dryRun || meta.dry, allowMutations: allowMutations || meta.allowMutations };
       const res = await runner.run(script.source || script, runMeta);
+      console.log('[ScriptNode] runScript complete', node.id, res);
 
       // ignore stale runs
       if (token !== runTokenRef.current) return res;
@@ -174,6 +181,10 @@ export default function ScriptNode({
       if (token === runTokenRef.current) setRunning(false);
     }
   };
+  const runScriptRef = useRef(runScript);
+  useEffect(() => {
+    runScriptRef.current = runScript;
+  }, [runScript]);
 
   // external trigger handler
   useEffect(() => {
@@ -181,7 +192,7 @@ export default function ScriptNode({
       if (targetNodeId !== node.id) return;
       // allow passing meta via value
       const meta = (value && typeof value === 'object') ? value : {};
-      runScript(meta);
+      runScriptRef.current?.(meta);
     };
 
     eventBus.on('nodeInput', handler);
@@ -190,18 +201,108 @@ export default function ScriptNode({
 
   useEffect(() => {
     if (node?.data?.autoRun && !autoRunTriggered.current && scriptSource) {
+      console.log('[ScriptNode] initial autoRun trigger', node.id);
       autoRunTriggered.current = true;
-      runScript();
-      if (typeof window !== 'undefined' && window.parent) {
-        window.parent.postMessage(
-          { type: 'breadboard:autoWire', script: scriptSource, nodeId: node.id },
-          '*'
-        );
-      } else {
-        eventBus.emit('breadboard:autoWire', { script: scriptSource, nodeId: node.id });
-      }
+      runScriptRef.current?.();
     }
-  }, [node?.data?.autoRun, runScript, scriptSource, node.id]);
+  }, [node?.data?.autoRun, scriptSource, node.id]);
+
+  useEffect(() => {
+    const shouldAutoRun =
+      !!scriptSource &&
+      !!node?.data?.autoRun &&
+      node?.data?.scriptId === 'breadboard-autowire-runtime';
+    if (!shouldAutoRun) return undefined;
+
+    const scheduleRun = (eventName, payload = {}) => {
+      if (payload?.source === 'script-node') return;
+      console.log('[ScriptNode] schedule auto-run', node.id, eventName, payload);
+      if (autoRunTimerRef.current) {
+        clearTimeout(autoRunTimerRef.current);
+      }
+      autoRunTimerRef.current = setTimeout(() => {
+        autoRunTimerRef.current = null;
+        console.log('[ScriptNode] auto-run timer firing', node.id);
+        runScriptRef.current?.();
+      }, 50);
+    };
+
+    const fetchGraphNodes = () => {
+      if (typeof window === 'undefined') return [];
+      const api = window.graphAPI;
+      if (!api) return [];
+      try {
+        if (typeof api.getNodes === 'function') {
+          const result = api.getNodes();
+          if (Array.isArray(result?.data)) return result.data;
+          if (Array.isArray(result)) return result;
+        }
+      } catch (err) {
+        // ignore fetch errors
+      }
+      return [];
+    };
+
+    const isComponentNode = (entry) =>
+      entry &&
+      typeof entry.type === 'string' &&
+      entry.type.startsWith('io.breadboard.components:');
+
+    const getPendingComponentIdsFromNodes = (nodes = []) =>
+      nodes
+        .filter(
+          (node) =>
+            isComponentNode(node) &&
+            node?.data?.breadboard?.pendingPlacement !== false
+        )
+        .map((node) => node.id)
+        .filter(Boolean);
+
+    const handleNodeDragEnd = (payload = {}) => {
+      const eventNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
+      const pendingFromEvent = getPendingComponentIdsFromNodes(eventNodes);
+      if (pendingFromEvent.length) {
+        scheduleRun('nodeDragEnd', {
+          ...payload,
+          nodeIds: pendingFromEvent,
+          nodes: eventNodes.filter((node) =>
+            pendingFromEvent.includes(node.id)
+          )
+        });
+        return;
+      }
+
+      const ids = Array.isArray(payload.nodeIds) ? payload.nodeIds : [];
+      if (!ids.length) return;
+
+      const graphNodes = fetchGraphNodes();
+      if (!graphNodes.length) return;
+
+      const pendingIds = ids.filter((id) => {
+        if (!id) return false;
+        const node = graphNodes.find((entry) => entry && entry.id === id);
+        if (!node) return false;
+        if (!isComponentNode(node)) return false;
+        return node?.data?.breadboard?.pendingPlacement !== false;
+      });
+
+      if (!pendingIds.length) return;
+      scheduleRun('nodeDragEnd', {
+        ...payload,
+        nodeIds: pendingIds
+      });
+    };
+
+    const offDrag = eventBus.on('nodeDragEnd', handleNodeDragEnd);
+
+    return () => {
+      if (autoRunTimerRef.current) {
+        clearTimeout(autoRunTimerRef.current);
+        autoRunTimerRef.current = null;
+      }
+      if (typeof offDrag === 'function') offDrag();
+    };
+  }, [node?.data?.autoRun, node?.data?.scriptId, scriptSource, node.id]);
 
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;

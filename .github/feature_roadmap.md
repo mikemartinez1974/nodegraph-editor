@@ -102,28 +102,36 @@ A focused engineering backlog to harden and ship the plugin platform. Items are 
   - Provide a single place that normalizes readNode/readEdge/create/update/delete return shapes and errors for both host and plugin runtimes.
 
 - [ ] Harden manifest validation & sandbox checks — Effort: small
+
   - Enforce allowed sandbox values ("iframe" | "worker"), validate renderer.entry URLs, and provide clearer error messages.
 
 - [ ] Manifest ↔ bundle consistency validation — Effort: medium
-  - Validate manifest node.entry fragments (#Symbol) match exported/plugin-provided entries or relax manifest expectations.
+
+  - Validate manifest node.entry fragments (#Symbol) match exported plugin-provided entries or relax manifest expectations.
 
 - [ ] Consolidate renderer boilerplate into helper module — Effort: medium
-  - Centralize canvas mounting, DPR handling, resize/cleanup helpers and refactor renderers to use it.
+
+      - Centralize canvas mounting, DPR handling, resize/cleanup helpers and refactor   renderers to use it.
 
 - [ ] Standardize SDK/permission surface & docs — Effort: medium
-  - Publish expected Graph API shapes, host-method contracts, permission model, and lifecycle examples for plugin authors.
+
+  - Publish expected Graph API shapes, host-method contracts, permission model and lifecycle examples for plugin authors.
 
 - [ ] Choose canonical autowire runtime and remove legacy copies — Effort: medium
+
   - Consolidate duplicate autowire scripts, update generator to inject canonical runtime, and archive legacy files.
 
 - [ ] Add automated tests & CI checks for plugins — Effort: medium → large
+
   - Manifest validation tests, sandbox handshake/handshake-failure tests, and renderer smoke tests. Lint rule to disallow global document mutations in renderers.
 
 - [ ] Integrate telemetry & graceful crash handling — Effort: medium
+
   - Surface plugin load/handshake errors in diagnostics and fail plugins without impacting host UI.
 
 - [ ] UX: Plugin Manager + permission prompts — Effort: medium
-  - Install UI, permission prompts, version pinning, and changelog display.
+
+      - Install UI, permission prompts, version pinning, and changelog display.
 
 ## [ ] Polish & Developer Experience
 
@@ -140,72 +148,115 @@ A focused engineering backlog to harden and ship the plugin platform. Items are 
       Add a visible timeline with diff previews and checkpoints (`components/GraphEditor/hooks/useGraphHistory.js:3`, `components/GraphEditor/components/Toolbar.js:690`).
 
 - [ ] **Engineering Backlog**
+
   - [x] **GraphEditor Decomposition**  
         Break `GraphEditor.js` into focused providers for state, history, RPC, and layout so the main component stops acting as a god object (`components/GraphEditor/GraphEditor.js`).
+
   - [x] **Safe Event Bus Hooks**  
         Wrap `eventBus` subscriptions in a cleanup-aware hook to prevent leaked listeners when panels mount/unmount (`components/NodeGraph/eventBus.js`, `components/GraphEditor/components/*`).
+  
   - [x] **Automated CRUD/Search Tests**  
         Cover `GraphCRUD` create/update/find flows plus the advanced NodeList filters with unit + integration tests (`components/GraphEditor/GraphCrud.js`, `components/GraphEditor/components/NodeListPanel.js`).
+  
   - [x] **Accessibility Audit**  
         Add aria labels, keyboard focus management, and screen reader hints across drawers, panels, and icon-only controls (`components/GraphEditor/components/PropertiesPanel.js`, `components/GraphEditor/components/NodeListPanel.js`).
+  
   - [ ] **Performance Profiling**  
         Benchmark large graphs, memoise expensive selectors, and investigate worker offloading for heavy search/layout tasks (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/components/NodeListPanel.js`).
+  
   - [x] **Handle-Aware GraphCRUD**  
         Teach Edge CRUD helpers to require `sourceHandle`/`targetHandle`, validate them against node schemas, and persist handle metadata so downstream nodes receive the right inputs (`components/GraphEditor/GraphCrud.js`, `components/GraphEditor/handlers/pasteHandler.js`, `types/logicSchema.js`).
+  
   - [x] **Retire Legacy Handle UI**  
         Delete the unused canvas handle components/utilities that predate the unified schema so nobody accidentally revives the wrong API (`components/NodeGraph/Handle.js`, `components/NodeGraph/utils/handleUtils.js`, `components/NodeGraph/portUtils.js`).
+  
   - [x] **Edge Creation Parity**  
         Update the GraphEditor `handleDrop` flow to rely solely on resolved handles and route everything through GraphCRUD so auto-created nodes/edges also get proper handle keys (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/handlers/graphEditorHandlers.js`).
+  
   - [ ] **Unified Handle Docs & Tests**  
         Expand the GraphCRUD tests plus contributor docs to cover handle-aware edges and keep plugin authors aligned with the new contract (`tests/graphCrud.test.js`, `components/GraphEditor/GraphAPIdocumentation.md`, `.github/NodeLogicSystem.md`).
+  
   - [x] **Script & Plugin Hardening**  
         Enforce origin allowlists, timeouts, and sandboxing for background RPC and script execution before shipping user plugins (`components/GraphEditor/components/BackgroundFrame.js`, `components/GraphEditor/Scripting/ScriptRunner.js`).
 
-- [x] **Responsive Layout**  
+- [x] **Responsive Layout**
       Use media-query flags for condensed mobile/tablet UI (`app/page.js:22`, `components/GraphEditor/GraphEditor.js:42`).
-      - [x] Ship mobile FAB toolbar variant and migrate primary actions into its menu (`components/GraphEditor/components/Toolbar.js`, `components/GraphEditor/GraphEditor.js`).
-      - [x] Convert Node/Properties panels into swipeable bottom sheets with touch friendly controls (`components/GraphEditor/components/PropertiesPanel.js`).
-      - [x] Add touch gesture hook to block native pinch zoom and prep custom zoom handling (`components/NodeGraph/eventHandlers.js`, `components/NodeGraph/NodeGraph.js`).
-      - [ ] Implement `fitNodesToViewport` helper for mobile-first auto-framing on load (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/hooks/useGraphEditorSetup.js`).
-      - [x] Update modal/dialog flows to use full-screen mobile variants (`components/GraphEditor/components/DocumentPropertiesDialog.js`, `components/Browser/ThemeDrawer.js`).
 
+      - [x] Ship mobile FAB toolbar variant and migrate primary actions into its menu (`components/GraphEditor/components/Toolbar.js`, `components/GraphEditor/GraphEditor.js`).
+      
+      - [x] Convert Node/Properties panels into swipeable bottom sheets with touch friendly controls (`components/GraphEditor/components/PropertiesPanel.js`).
+      
+      - [x] Add touch gesture hook to block native pinch zoom and prep custom zoom handling (`components/NodeGraph/eventHandlers.js`, `components/NodeGraph/NodeGraph.js`).
+      
+      - [ ] Implement `fitNodesToViewport` helper for mobile-first auto-framing on load (`components/GraphEditor/GraphEditor.js`, `components/GraphEditor/hooks/useGraphEditorSetup.js`).
+      
+      - [x] Update modal/dialog flows to use full-screen mobile variants (`components/GraphEditor/components/DocumentPropertiesDialog.js`, `components/Browser/ThemeDrawer.js`).
+      
 ## [ ] VR Integration TODO
 
 - [ ] **Phase 0 – Baseline Cleanup**
+  
   - [ ] Extract reusable Three.js helpers and lifecycle hooks (`components/GraphEditor/Nodes/ThreeDNode.js:2`).
+  
   - [ ] Formalize event payloads for resize/focus/VR on the event bus (`components/NodeGraph/eventBus.js:6`).
 
 - [ ] **Phase 1 – Room Scene Foundation**
+  
   - [ ] Replace cube with configurable room scene and scene-config data model (`components/GraphEditor/Nodes/ThreeDNode.js:24`).
+  
   - [ ] Add room presets to Properties Panel (`components/GraphEditor/components/PropertiesPanel.js:1`).
 
 - [ ] **Phase 2 – WebXR Enablement**
+  
   - [ ] Integrate WebXR helpers/VRButton with an “Enter VR” control.
+  
   - [ ] Manage XR lifecycle with OrbitControls fallback (`components/GraphEditor/Nodes/ThreeDNode.js:52`).
 
 - [ ] **Phase 3 – VR Node Type**
+  
   - [ ] Register `vr-room` node type for XR-ready scene (`components/GraphEditor/nodeTypeRegistry.js:19`).
+  
   - [ ] Expose graph events for asset loading/teleport (`components/GraphEditor/GraphEditor.js:106`).
 
 - [ ] **Phase 4 – Interaction Bridge**
+  
   - [ ] Emit controller/hand events via event bus (`components/NodeGraph/eventBus.js:6`).
+  
   - [ ] Build VR affordances that translate controller input into graph actions.
 
 - [ ] **Phase 5 – Performance & QA**
+  
   - [ ] Profile loops and surface quality settings (`components/GraphEditor/components/PropertiesPanel.js:400`).
+
+## [ ] Graph Editor Slice Plan
+
+- [x] Extract document/metadata providers (`theme`, `project meta`, `grid/pan settings`) from `components/GraphEditor/GraphEditor.js` into standalone hooks so the root component becomes declarative.
+
+- [x] Move pan/zoom, selection, marquee, and drag controller state into a `useGraphInteractions` hook/context and pass only intents to `NodeGraph`.
+
+- [x] Introduce `usePluginRuntime` to encapsulate GraphCRUD limits, background RPC integration, and plugin registry wiring; expose it via `GraphEditorContext`.
+
+- [x] Add unit/smoke coverage for each extracted hook and document the resulting architecture here so it’s clear how the editor refactor ties into the broader plugin/breadboard effort.
+  
   - [ ] Add smoke tests for VR node (non-XR + mocked WebXR).
 
 - [ ] **Phase 6 – Expansion Paths**
+  
   - [ ] Plan multi-user VR leveraging realtime collaboration.
+  
   - [ ] Connect VR rooms to gallery/template pipeline (`components/Browser/Browser.js:54`).
+  
   - [ ] Expose WebXR session data to scripting (`components/GraphEditor/Scripting/ScriptPanel.js:1`).
 
 ## [ ] Breadboard Roadmap
 
 - [x] **Phase 1 – Discovery & Requirements**  
       Capture personas/use-cases, map current nodes/handles to breadboard concepts, and record UX storyboards + requirements in `components/GraphEditor/GraphAPIdocumentation.md` and `.github/feature_roadmap.md` for alignment.
+  
   - [x] Define breadboard component catalog, rails/power semantics, and interaction goals.
+  
   - [x] Audit existing validators/CRUD flows for compatibility with breadboard constraints and log deltas.
+  
   - [x] Storyboard breadboard mode entry/exit, palettes, and simulation touchpoints in `components/GraphEditor/README.md`.
 
   Component catalog & rails
@@ -255,19 +306,29 @@ A focused engineering backlog to harden and ship the plugin platform. Items are 
 
 - [ ] **Phase 3 – Canvas & Interaction Layer**  
       Represent the entire breadboard (sockets, rails, background skin) using standard nodes and edges so scale/perf can be validated on a production-sized graph.
+  
   - [x] Define socket/rail node types (or grouped “column” nodes) that encode their row/column metadata, are locked in place, and ship inside the template as the physical board substrate (`components/GraphEditor/nodeTypeRegistry.js`, template JSON).
+  
   - [x] Author breadboard component nodes (jumpers, resistors, DIP packages) whose handles snap to nearby socket nodes using the existing grid spacing/selection hooks, emitting warnings when sockets are occupied or rail polarity mismatches occur; delivered via the new `io.breadboard.components` plugin (Components: `public/plugins/breadboard-components`).
+  
   - [ ] Update drag/selection/handle handlers plus GraphCRUD glue so moving or wiring a component simply reassigns edges between component handles and socket nodes, keeping history/undo intact (`components/GraphEditor/handlers/graphEditorHandlers.js`, `components/NodeGraph/HandleLayer.js`).
+  
   - [ ] Add optional “board skin” nodes (canvas node or locked background image) for visuals without introducing custom rendering layers; confirm the graph still performs with ~800 socket nodes + rails.
 
 - [ ] **Phase 4 – Simulation & Tooling**  
       Provide inspection + simulation workflows leveraging ScriptNode/Background RPC.
+  
   - [ ] Define simulation API (voltage/logic updates, measurement events) and wire to `components/GraphEditor/components/BackgroundFrame.js` or ScriptNode.
+  
   - [ ] Add measurement tool nodes/panels (virtual multimeter, logic analyzer) and hook toolbar controls into board context.
+  
   - [ ] Document and implement safety checks (power toggles, shorts detection) surfaced via snackbar/dialog flows.
 
 - [ ] **Phase 5 – Testing, Docs, Rollout**  
       Harden the experience and prepare public launch materials.
+  
   - [ ] Add integration tests for board creation, validation errors, and simulation results.
+  
   - [ ] Update `README.md`, `public/data/UserManual.md`, and onboarding docs with breadboard tutorials and warnings.
+  
   - [ ] Ship behind a feature flag or beta toggle, gather feedback, then graduate to default mode.

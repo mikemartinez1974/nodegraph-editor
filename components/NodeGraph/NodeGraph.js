@@ -544,7 +544,10 @@ export default function NodeGraph({
       });
       
       // Only emit nodeDragEnd if we actually dragged
-      eventBus.emit('nodeDragEnd', { nodeIds: draggingNodeIdRef.current });
+      eventBus.emit('nodeDragEnd', {
+        nodeIds: draggingNodeIdRef.current,
+        nodes: getNodeSnapshotsByIds(draggingNodeIdRef.current)
+      });
     }
 
     setDraggingNodeId(null);
@@ -796,6 +799,22 @@ export default function NodeGraph({
   useEffect(() => { edgesRef.current = edges; }, [edges]);
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+
+  const getNodeSnapshotsByIds = useCallback((ids = []) => {
+    const source = nodesRef.current || nodes || [];
+    return ids
+      .map((id) => {
+        if (!id) return null;
+        const node = source.find((entry) => entry && entry.id === id);
+        if (!node) return null;
+        try {
+          return JSON.parse(JSON.stringify(node));
+        } catch (err) {
+          return { ...node };
+        }
+      })
+      .filter(Boolean);
+  }, [nodes]);
 
   useTouchGestures(containerRef, {
     onPinchStart: ({ center, distance }) => {

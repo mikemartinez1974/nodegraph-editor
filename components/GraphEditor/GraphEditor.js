@@ -17,14 +17,14 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
-import usePluginRuntimeManager from './hooks/usePluginRuntimeManager';
 import usePluginRegistry from './hooks/usePluginRegistry';
-import GraphCRUD from './GraphCrud';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
-import { themeConfigFromMuiTheme } from './utils/themeUtils';
-import { useBackgroundRpc } from './hooks/useBackgroundRpc';
 import { GraphEditorContextProvider } from './providers/GraphEditorContext';
 import GraphEditorContent from './GraphEditorContent';
+import useDocumentMetadata from './hooks/useDocumentMetadata';
+import useProjectMetadata from './hooks/useProjectMetadata';
+import useGraphInteractions from './hooks/useGraphInteractions';
+import usePluginRuntime from './hooks/usePluginRuntime';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -33,9 +33,6 @@ const ensureNumber = (value, fallback) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
 };
-const MAX_SCRIPT_RPC_CALLS = 200;
-const MAX_SCRIPT_MUTATIONS = 100;
-const MUTATION_METHODS = new Set(['createNode', 'updateNode', 'deleteNode', 'createEdge', 'deleteEdge']);
 const BREADBOARD_SOCKET_NODE_TYPE = 'io.breadboard.sockets:socket';
 const getNodeMetrics = (node) => {
   const position = node?.position || {};
@@ -63,23 +60,6 @@ const getNodeMetrics = (node) => {
   };
 };
 
-const createDefaultProjectMeta = () => {
-  const iso = new Date().toISOString();
-  return {
-    title: 'Untitled Project',
-    description: '',
-    tags: [],
-    shareLink: '',
-    allowComments: true,
-    allowEdits: true,
-    collaborators: [
-      { id: 'owner', name: 'You', email: 'you@example.com', role: 'Owner' }
-    ],
-    createdAt: iso,
-    lastModified: iso
-  };
-};
-
 export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const theme = useTheme(); // Browser theme
   const { plugins } = usePluginRegistry();
@@ -104,38 +84,28 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [memoAutoExpandToken, setMemoAutoExpandToken] = useState(0);
   const firstGraphLoadHandledRef = useRef(false);
 
-  // Document settings state (not localStorage) - consolidated into one object
-  const [documentSettings, setDocumentSettings] = useState(() => {
-    // Initialize with browser theme on mount (new document)
-    const initial = themeConfigFromMuiTheme(theme);
-    
-    return {
-      url: '',
-      backgroundImage: '',
-      gridSize: 20, // Default grid size
-      theme: initial
-    };
-  });
-  const [projectMeta, setProjectMeta] = useState(() => createDefaultProjectMeta());
-  const projectActivityInitializedRef = useRef(false);
+  const {
+    documentSettings,
+    documentUrl,
+    documentBackgroundImage,
+    documentTheme,
+    setDocumentSettings,
+    setDocumentUrl,
+    setDocumentBackgroundImage,
+    setDocumentTheme
+  } = useDocumentMetadata();
+  const {
+    projectMeta,
+    setProjectMeta,
+    updateProjectMeta,
+    resetProjectMeta,
+    projectActivityInitializedRef
+  } = useProjectMetadata();
+  
+  const backgroundRpcRef = useRef(() => Promise.reject(new Error('Background RPC not ready')));
+  const backgroundRpcReadyRef = useRef(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    setProjectMeta((prev) => {
-      if (prev.shareLink) return prev;
-      return { ...prev, shareLink: window.location.href };
-    });
-  }, []);
-  
-  // Convenience accessors
-  const documentUrl = documentSettings.url;
-  const setDocumentUrl = (url) => setDocumentSettings(prev => ({ ...prev, url }));
-  const documentBackgroundImage = documentSettings.backgroundImage;
-  const setDocumentBackgroundImage = (backgroundImage) => setDocumentSettings(prev => ({ ...prev, backgroundImage }));
-  const documentTheme = documentSettings.theme;
-  const setDocumentTheme = (theme) => setDocumentSettings(prev => ({ ...prev, theme }));
-  
-const state = useGraphEditorState();
+  const state = useGraphEditorState();
 
 // Destructure editor state immediately so variables like `pan` are available for subsequent effects
   const {
@@ -271,195 +241,7 @@ useEffect(() => {
   const lastNodeTapRef = useRef({ id: null, time: 0 });
   const lastEdgeTapRef = useRef({ id: null, time: 0 });
   const lastGroupTapRef = useRef({ id: null, time: 0 });
-  const scriptRunStatsRef = useRef(new Map());
   
-  // BackgroundFrame RPC hook
-  const { bgRef, rpc: backgroundRpc, postEvent: backgroundPostEvent, isReady: backgroundRpcReady, methods: backgroundRpcMethods, handleHandshakeComplete } = useBackgroundRpc();
-
-  useEffect(() => {
-    eventBus.emit('backgroundRpc:methods', {
-      ready: backgroundRpcReady,
-      methods: backgroundRpcMethods || []
-    });
-  }, [backgroundRpcReady, backgroundRpcMethods]);
-
-  useEffect(() => {
-    if (!backgroundUrl) {
-      eventBus.emit('backgroundRpc:methods', { ready: false, methods: [] });
-    }
-  }, [backgroundUrl]);
-
-  useEffect(() => {
-    if (backgroundUrl) {
-      let frame = 0;
-      const animate = () => {
-        if (frame < 3) {
-          setPan(prev => ({ x: prev.x, y: prev.y })); // Force update with new reference
-          frame++;
-          requestAnimationFrame(animate);
-        }
-      };
-      
-      const timer = setTimeout(() => {
-        requestAnimationFrame(animate);
-      }, 200);
-  
-      return () => clearTimeout(timer);
-    }
-  }, [backgroundUrl, setPan]);
-
-  useEffect(() => {
-    if (backgroundUrl) {
-      // Wait for iframe to load and render, then force redraw
-      const timers = [100, 300, 500].map(delay => 
-        setTimeout(() => {
-          eventBus.emit('forceRedraw');
-        }, delay)
-      );
-      
-      return () => timers.forEach(clearTimeout);
-    }
-  }, [backgroundUrl]);
-
-  useEffect(() => {
-    if (backgroundUrl) {
-      const timer = setTimeout(() => {
-        // Make an imperceptible change to pan to force all layers to redraw
-        setPan(prev => ({ 
-          x: prev.x + 0.001, 
-          y: prev.y + 0.001 
-        }));
-        
-        // Reset after next frame
-        requestAnimationFrame(() => {
-          setPan(prev => ({ 
-            x: prev.x - 0.001, 
-            y: prev.y - 0.001 
-          }));
-        });
-      }, 200);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [backgroundUrl, setPan]);
-  
-  // Respond to events emitted from NodeGraph (iframe error) or BackgroundControls
-  useEffect(() => {
-    const handleBackgroundLoadFailed = ({ url } = {}) => {
-      setSnackbar({ open: true, message: `Document failed to load: ${url || ''}`, severity: 'warning' });
-    };
-
-    const handleClearBackground = () => {
-      setBackgroundUrl('');
-      setBackgroundInteractive(false);
-      setSnackbar({ open: true, message: 'Document cleared', severity: 'info' });
-    };
-
-    const handleSetBackgroundUrl = ({ url }) => {
-      setBackgroundUrl(url || '');
-    };
-
-    const handleSetBackgroundInteractive = ({ interactive }) => {
-      setBackgroundInteractive(Boolean(interactive));
-    };
-
-  const handleSetBackgroundImage = ({ backgroundImage }) => {
-    setDocumentBackgroundImage(backgroundImage || '');
-  };
-
-    // Test RPC call handler
-    const handleTestBackgroundRpc = async ({ method, args }) => {
-      try {
-        if (!backgroundRpcReady) {
-          setSnackbar({ open: true, message: 'Background RPC not ready. Wait for handshake.', severity: 'warning' });
-          return;
-        }
-        
-        const result = await backgroundRpc(method || 'echo', args || { message: 'Hello from host!' });
-        console.log('[GraphEditor] RPC result:', result);
-        setSnackbar({ open: true, message: `RPC success: ${JSON.stringify(result)}`, severity: 'success' });
-      } catch (err) {
-        console.error('[GraphEditor] RPC error:', err);
-        setSnackbar({ open: true, message: `RPC error: ${err.message}`, severity: 'error' });
-      }
-    };
-
-    const handleExportGraph = async () => {
-      try {
-        const data = {
-          nodes: nodesRef.current || nodes,
-          edges: edgesRef.current || edges,
-          groups: groups || [],
-          // include settings with document
-          settings: {
-            defaultNodeColor,
-            defaultEdgeColor,
-            gridSize: documentSettings.gridSize,
-            document: backgroundUrl ? { url: backgroundUrl } : null,
-            theme: null
-          },
-          // save scripts at top-level
-          scripts: (function(){ try { const raw = localStorage.getItem('scripts'); return raw ? JSON.parse(raw) : []; } catch { return []; } })(),
-          viewport: { pan, zoom }
-        };
-
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `graph_${Date.now()}.node`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        setSnackbar({ open: true, message: 'Graph exported', severity: 'success' });
-      } catch (err) {
-        console.error('Failed to export graph', err);
-        setSnackbar({ open: true, message: 'Failed to export graph', severity: 'error' });
-      }
-    };
-
-    eventBus.on('backgroundLoadFailed', handleBackgroundLoadFailed);
-    eventBus.on('clearBackgroundUrl', handleClearBackground);
-    eventBus.on('setBackgroundUrl', handleSetBackgroundUrl);
-    eventBus.on('setBackgroundInteractive', handleSetBackgroundInteractive);
-    eventBus.on('setBackgroundImage', handleSetBackgroundImage);
-    eventBus.on('exportGraph', handleExportGraph);
-    eventBus.on('testBackgroundRpc', handleTestBackgroundRpc);
-
-    return () => {
-      eventBus.off('backgroundLoadFailed', handleBackgroundLoadFailed);
-      eventBus.off('clearBackgroundUrl', handleClearBackground);
-      eventBus.off('setBackgroundUrl', handleSetBackgroundUrl);
-      eventBus.off('setBackgroundInteractive', handleSetBackgroundInteractive);
-      eventBus.off('setBackgroundImage', handleSetBackgroundImage);
-      eventBus.off('exportGraph', handleExportGraph);
-      eventBus.off('testBackgroundRpc', handleTestBackgroundRpc);
-    };
-  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady]);
-
-  useEffect(() => {
-    const handleAutoWire = (event) => {
-      const payload = event?.data;
-      if (!payload || payload.type === undefined) return;
-      if (payload.type === 'breadboard:autoWire') {
-        const script = payload.script;
-        if (typeof script !== 'string' || script.trim().length === 0) return;
-        try {
-          const fn = new Function(script);
-          fn.call(window);
-          console.info('[GraphEditor] Executed breadboard auto-wire helper');
-        } catch (err) {
-          console.error('[GraphEditor] Failed to execute auto-wire helper', err);
-        }
-      }
-    };
-
-    window.addEventListener('message', handleAutoWire);
-    return () => window.removeEventListener('message', handleAutoWire);
-  }, []);
-
   useEffect(() => {
     const relay = (eventName) => (payload = {}) => {
       const details = { nodeIds: Array.isArray(payload?.nodeIds) ? payload.nodeIds : [] };
@@ -482,22 +264,6 @@ useEffect(() => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleAutoWire = ({ script } = {}) => {
-      if (!script) return;
-      const el = document.createElement('script');
-      el.type = 'text/javascript';
-      el.textContent = script;
-      document.body.appendChild(el);
-      document.body.removeChild(el);
-      console.info('[GraphEditor] Executed breadboard auto-wire helper');
-    };
-    eventBus.on('breadboard:autoWire', handleAutoWire);
-    return () => {
-      eventBus.off('breadboard:autoWire', handleAutoWire);
-    };
-  }, []);
-
   // Determine if user is free (replace with real logic)
   const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
 
@@ -507,53 +273,30 @@ useEffect(() => {
   }, []);
 
   // Load saved document from settings when loading a file
-  useEffect(() => {
-    function handleLoadSaveFile(payload = {}) {
-      const { settings = {}, viewport = {}, scripts: topLevelScripts } = payload || {};
-      try {
-        if (viewport.pan) setPan(viewport.pan);
-        if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
-        if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
-        if (settings.document && settings.document.url) {
-          setDocumentUrl(settings.document.url);
-          setBackgroundUrl(settings.document.url); // Also set backgroundUrl to display iframe
-        } else {
-          setDocumentUrl(''); // Clear if not present
-          setBackgroundUrl(''); // Also clear backgroundUrl
-        }
-        if (settings.backgroundImage) {
-          setDocumentBackgroundImage(settings.backgroundImage);
-        } else {
-          setDocumentBackgroundImage(''); // Clear if not present
-        }
-        // Load gridSize if present
-        if (settings.gridSize && settings.gridSize >= 5 && settings.gridSize <= 100) {
-          setDocumentSettings(prev => ({ ...prev, gridSize: settings.gridSize }));
-        }
-        // Prefer top-level scripts, fallback to settings.scripts
-        try {
-          const scriptsToLoad = Array.isArray(topLevelScripts) ? topLevelScripts : (Array.isArray(settings.scripts) ? settings.scripts : null);
-          if (scriptsToLoad) {
-            localStorage.setItem('scripts', JSON.stringify(scriptsToLoad));
-          }
-        } catch (err) { }
-        // Load document theme if present (don't apply to browser)
-        if (settings.theme) {
-          setDocumentTheme(settings.theme);
-        }
-      } catch (err) {
-        console.warn('Failed to apply loaded save settings:', err);
-      }
-    }
-
-    eventBus.on('loadSaveFile', handleLoadSaveFile);
-    return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
-  }, [setPan, setZoom, state]);
-  
   const selectionHook = useSelection({
     setSelectedNodeIds,
     setSelectedEdgeIds,
     setSelectedGroupIds
+  });
+  
+  useGraphInteractions({
+    backgroundUrl,
+    setPan,
+    setZoom,
+    nodes,
+    setNodes,
+    state,
+    setDocumentUrl,
+    setDocumentBackgroundImage,
+    setDocumentSettings,
+    setDocumentTheme,
+    setBackgroundUrl,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    setHoveredEdgeId,
+    setHoveredNodeId,
+    setShowEdgePanel,
+    selectionHook
   });
   
   const historyHook = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
@@ -563,8 +306,8 @@ useEffect(() => {
       projectActivityInitializedRef.current = true;
       return;
     }
-    setProjectMeta(prev => ({ ...prev, lastModified: new Date().toISOString() }));
-  }, [historyHook.historyIndex]);
+    updateProjectMeta({ lastModified: new Date().toISOString() });
+  }, [historyHook.historyIndex, projectActivityInitializedRef, updateProjectMeta]);
 
   useEffect(() => {
     if (memoAutoExpandToken > 0) {
@@ -604,20 +347,15 @@ useEffect(() => {
     }));
   }, [historyHook.history]);
 
-  const handleUpdateProjectMeta = useCallback((updates) => {
-    setProjectMeta(prev => ({ ...prev, ...updates }));
-  }, []);
+  const handleUpdateProjectMeta = useCallback(
+    (updates) => updateProjectMeta(updates),
+    [updateProjectMeta]
+  );
 
-  const handleResetProjectMeta = useCallback(() => {
-    setProjectMeta(prev => {
-      const defaults = createDefaultProjectMeta();
-      return {
-        ...defaults,
-        shareLink: prev.shareLink || defaults.shareLink,
-        createdAt: prev.createdAt || defaults.createdAt
-      };
-    });
-  }, []);
+  const handleResetProjectMeta = useCallback(
+    () => resetProjectMeta(),
+    [resetProjectMeta]
+  );
   
   const modesHook = useGraphModes({
     nodes,
@@ -645,16 +383,151 @@ useEffect(() => {
     groupManagerHook,
     selectionHook,
     modesHook,
-    backgroundRpc,
-    backgroundRpcReady
+    backgroundRpc: (method, args) => backgroundRpcRef.current?.(method, args),
+    backgroundRpcReady: () => backgroundRpcReadyRef.current
   });
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
 
-  usePluginRuntimeManager({
-    graphApiRef: graphAPI,
-    selectionRef: selectionSnapshotRef
+  const pluginRuntime = usePluginRuntime({
+    state,
+    historyHook,
+    graphAPI,
+    selectionSnapshotRef,
+    setSnackbar
   });
+
+  const {
+    graphCRUD,
+    handleScriptRequest,
+    backgroundRpc,
+    backgroundRpcReady,
+    backgroundPostEvent,
+    backgroundRpcMethods,
+    bgRef,
+    handleHandshakeComplete,
+    pluginRuntime: pluginRuntimeInfo
+  } = pluginRuntime;
+
+  useEffect(() => {
+    backgroundRpcRef.current =
+      typeof backgroundRpc === 'function'
+        ? backgroundRpc
+        : () => Promise.reject(new Error('Background RPC not ready'));
+    backgroundRpcReadyRef.current = Boolean(backgroundRpcReady);
+  }, [backgroundRpc, backgroundRpcReady]);
+
+  useEffect(() => {
+    eventBus.emit('backgroundRpc:methods', {
+      ready: backgroundRpcReady,
+      methods: backgroundRpcMethods || []
+    });
+  }, [backgroundRpcReady, backgroundRpcMethods]);
+
+  useEffect(() => {
+    if (!backgroundUrl) {
+      eventBus.emit('backgroundRpc:methods', { ready: false, methods: [] });
+    }
+  }, [backgroundUrl]);
+
+  useEffect(() => {
+    const handleBackgroundLoadFailed = ({ url } = {}) => {
+      setSnackbar({ open: true, message: `Document failed to load: ${url || ''}`, severity: 'warning' });
+    };
+
+    const handleClearBackground = () => {
+      setBackgroundUrl('');
+      setBackgroundInteractive(false);
+      setSnackbar({ open: true, message: 'Document cleared', severity: 'info' });
+    };
+
+    const handleSetBackgroundUrl = ({ url }) => {
+      setBackgroundUrl(url || '');
+    };
+
+    const handleSetBackgroundInteractive = ({ interactive }) => {
+      setBackgroundInteractive(Boolean(interactive));
+    };
+
+    const handleSetBackgroundImage = ({ backgroundImage }) => {
+      setDocumentBackgroundImage(backgroundImage || '');
+    };
+
+    const handleTestBackgroundRpc = async ({ method, args }) => {
+      try {
+        if (!backgroundRpcReady) {
+          setSnackbar({ open: true, message: 'Background RPC not ready. Wait for handshake.', severity: 'warning' });
+          return;
+        }
+
+        const result = await backgroundRpc(method || 'echo', args || { message: 'Hello from host!' });
+        console.log('[GraphEditor] RPC result:', result);
+        setSnackbar({ open: true, message: `RPC success: ${JSON.stringify(result)}`, severity: 'success' });
+      } catch (err) {
+        console.error('[GraphEditor] RPC error:', err);
+        setSnackbar({ open: true, message: `RPC error: ${err.message}`, severity: 'error' });
+      }
+    };
+
+    const handleExportGraph = async () => {
+      try {
+        const data = {
+          nodes: nodesRef.current || nodes,
+          edges: edgesRef.current || edges,
+          groups: groups || [],
+          settings: {
+            defaultNodeColor,
+            defaultEdgeColor,
+            gridSize: documentSettings.gridSize,
+            document: backgroundUrl ? { url: backgroundUrl } : null,
+            theme: null
+          },
+          scripts: (function () {
+            try {
+              const raw = localStorage.getItem('scripts');
+              return raw ? JSON.parse(raw) : [];
+            } catch {
+              return [];
+            }
+          })(),
+          viewport: { pan, zoom }
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `graph_${Date.now()}.node`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setSnackbar({ open: true, message: 'Graph exported', severity: 'success' });
+      } catch (err) {
+        console.error('Failed to export graph', err);
+        setSnackbar({ open: true, message: 'Failed to export graph', severity: 'error' });
+      }
+    };
+
+    eventBus.on('backgroundLoadFailed', handleBackgroundLoadFailed);
+    eventBus.on('clearBackgroundUrl', handleClearBackground);
+    eventBus.on('setBackgroundUrl', handleSetBackgroundUrl);
+    eventBus.on('setBackgroundInteractive', handleSetBackgroundInteractive);
+    eventBus.on('setBackgroundImage', handleSetBackgroundImage);
+    eventBus.on('exportGraph', handleExportGraph);
+    eventBus.on('testBackgroundRpc', handleTestBackgroundRpc);
+
+    return () => {
+      eventBus.off('backgroundLoadFailed', handleBackgroundLoadFailed);
+      eventBus.off('clearBackgroundUrl', handleClearBackground);
+      eventBus.off('setBackgroundUrl', handleSetBackgroundUrl);
+      eventBus.off('setBackgroundInteractive', handleSetBackgroundInteractive);
+      eventBus.off('setBackgroundImage', handleSetBackgroundImage);
+      eventBus.off('exportGraph', handleExportGraph);
+      eventBus.off('testBackgroundRpc', handleTestBackgroundRpc);
+    };
+  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady]);
 
   const handleOpenMobileAddNode = useCallback(() => {
     setMobileAddNodeOpen(true);
@@ -945,24 +818,6 @@ useEffect(() => {
 
   // Update handlers with graphAPI reference
   handlers.graphAPI = graphAPI;
-
-  // Create GraphCRUD instance (stable - don't recreate on every render)
-  const graphCRUD = useMemo(() => {
-    return new GraphCRUD(
-      () => nodesRef.current || [],
-      setNodes,
-      () => edgesRef.current || [],
-      setEdges,
-      historyHook.saveToHistory,
-      nodesRef,
-      edgesRef,
-      // provide group handlers so GraphCRUD.createGroups is available
-      () => groups || [],
-      setGroups,
-      // groupsRef may not exist in older state implementations; pass undefined if not present
-      undefined
-    );
-  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups]);
 
   // Wire up paste event listener
   useEffect(() => {
@@ -1521,250 +1376,56 @@ useEffect(() => {
     }
   }, [isMobile, selectedGroupIds, setShowPropertiesPanel]);
   
-  // Host RPC handler used by ScriptRunner iframe
-  const safeClone = (value) => {
-    try {
-      return JSON.parse(JSON.stringify(value));
-    } catch (err) {
-      throw new Error('Unable to serialize script payload');
-    }
-  };
-
-  const handleScriptRequest = async (method, args = [], meta = {}) => {
-    try {
-      const isDry = meta && meta.dry === true;
-      const allowMutations = meta && meta.allowMutations === true;
-      const runId = meta && meta.runId ? String(meta.runId) : null;
-
-      if (runId) {
-        const current = scriptRunStatsRef.current.get(runId) || { calls: 0, mutations: 0 };
-        current.calls += 1;
-        if (current.calls > MAX_SCRIPT_RPC_CALLS) {
-          scriptRunStatsRef.current.delete(runId);
-          throw new Error('Script exceeded RPC call budget');
-        }
-        if (MUTATION_METHODS.has(method)) {
-          current.mutations += 1;
-          if (current.mutations > MAX_SCRIPT_MUTATIONS) {
-            scriptRunStatsRef.current.delete(runId);
-            throw new Error('Script exceeded mutation allowance');
-          }
-        }
-        scriptRunStatsRef.current.set(runId, current);
-      }
-
-      switch (method) {
-        case 'getNodes':
-          return safeClone(nodesRef.current || nodes);
-        case 'getNode': {
-          const [id] = args;
-          const node = (nodesRef.current || nodes).find(n => n.id === id) || null;
-          return node ? safeClone(node) : null;
-        }
-        case 'getEdges':
-          return safeClone(edgesRef.current || edges);
-        case 'createNode': {
-          const [nodeData] = args || [{}];
-          if (!nodeData || typeof nodeData !== 'object') {
-            throw new Error('createNode expects a node object');
-          }
-          const newNode = {
-            id: typeof nodeData.id === 'string' && nodeData.id.trim() ? nodeData.id.trim() : `node_${Date.now()}`,
-            type: typeof nodeData.type === 'string' ? nodeData.type : 'default',
-            label: typeof nodeData.label === 'string' ? nodeData.label : 'New Node',
-            position: nodeData.position && typeof nodeData.position === 'object'
-              ? { x: Number(nodeData.position.x) || 0, y: Number(nodeData.position.y) || 0 }
-              : { x: 0, y: 0 },
-            width: Number(nodeData.width) || 200,
-            height: Number(nodeData.height) || 120,
-            data: nodeData.data && typeof nodeData.data === 'object' ? safeClone(nodeData.data) : {}
-          };
-
-          if (!allowMutations || isDry) {
-            // Return proposed mutation instead of applying
-            return { proposed: { action: 'createNode', node: newNode }, applied: false };
-          }
-
-          // emit event for existing handlers to pick up
-          try { eventBus.emit('nodeAdded', { node: newNode }); } catch (err) {}
-          // optimistic local update
-          setNodes(prev => { const next = [...prev, newNode]; nodesRef.current = next; return next; });
-          return { applied: true, node: safeClone(newNode) };
-        }
-        case 'updateNode': {
-          const [id, patch] = args;
-          const nodeId = typeof id === 'string' ? id.trim() : '';
-          if (!nodeId) throw new Error('updateNode requires an id');
-          if (!patch || typeof patch !== 'object') throw new Error('updateNode requires a patch object');
-          const sanitizedPatch = safeClone(patch);
-          if (!allowMutations || isDry) {
-            return { proposed: { action: 'updateNode', id: nodeId, patch: sanitizedPatch }, applied: false };
-          }
-          try { eventBus.emit('nodeUpdated', { id: nodeId, patch: sanitizedPatch, source: 'script' }); } catch (err) {}
-          setNodes(prev => {
-            const next = prev.map(n => n.id === nodeId
-              ? {
-                  ...n,
-                  ...sanitizedPatch,
-                  data: sanitizedPatch && sanitizedPatch.data
-                    ? { ...n.data, ...sanitizedPatch.data }
-                    : n.data
-                }
-              : n);
-            nodesRef.current = next;
-            return next;
+  useEffect(() => {
+    const handleBreadboardPlacement = ({ nodeIds } = {}) => {
+      const ids = Array.isArray(nodeIds) ? nodeIds : [];
+      if (!ids.length || !graphAPI?.current) return;
+      ids.forEach((id) => {
+        if (!id) return;
+        const node =
+          (nodesRef.current || []).find((n) => n.id === id) || null;
+        if (!node || !node.data?.breadboard) return;
+        if (!node.data.breadboard.pendingPlacement) return;
+        const nextBreadboard = {
+          ...node.data.breadboard,
+          pendingPlacement: false
+        };
+        // Optimistically update local state so downstream listeners see the change immediately.
+        setNodes((prev) => {
+          const next = prev.map((n) => {
+            if (n.id !== id) return n;
+            const updatedData = {
+              ...(n.data || {}),
+              breadboard: nextBreadboard
+            };
+            return {
+              ...n,
+              data: updatedData
+            };
           });
-          return { applied: true, id: nodeId, patch: sanitizedPatch };
-        }
-        case 'deleteNode': {
-          const [id] = args;
-          const nodeId = typeof id === 'string' ? id.trim() : '';
-          if (!nodeId) throw new Error('deleteNode requires an id');
-          if (!allowMutations || isDry) {
-            return { proposed: { action: 'deleteNode', id: nodeId }, applied: false };
-          }
-          try { eventBus.emit('nodeDeleted', { id: nodeId, source: 'script' }); } catch (err) {}
-          setNodes(prev => { const next = prev.filter(n => n.id !== nodeId); nodesRef.current = next; return next; });
-          return { applied: true, id: nodeId };
-        }
-        case 'createEdge': {
-          const [edgeData] = args || [{}];
-          if (!edgeData || typeof edgeData !== 'object') throw new Error('createEdge expects an edge object');
-          const source = String(edgeData.source || '').trim();
-          const target = String(edgeData.target || '').trim();
-          if (!source || !target) throw new Error('createEdge requires source and target');
-          const newEdge = {
-            id: typeof edgeData.id === 'string' && edgeData.id.trim() ? edgeData.id.trim() : `edge_${Date.now()}`,
-            source,
-            target,
-            type: typeof edgeData.type === 'string' ? edgeData.type : 'child',
-            label: typeof edgeData.label === 'string' ? edgeData.label : '',
-            style: edgeData.style && typeof edgeData.style === 'object' ? safeClone(edgeData.style) : {}
-          };
-          if (!allowMutations || isDry) {
-            return { proposed: { action: 'createEdge', edge: newEdge }, applied: false };
-          }
-          try { eventBus.emit('edgeAdded', { edge: newEdge }); } catch (err) {}
-          setEdges(prev => { const next = [...prev, newEdge]; edgesRef.current = next; return next; });
-          return { applied: true, edge: safeClone(newEdge) };
-        }
-        case 'deleteEdge': {
-          const [id] = args;
-          const edgeId = typeof id === 'string' ? id.trim() : '';
-          if (!edgeId) throw new Error('deleteEdge requires an id');
-          if (!allowMutations || isDry) {
-            return { proposed: { action: 'deleteEdge', id: edgeId }, applied: false };
-          }
-          try { eventBus.emit('edgeDeleted', { id: edgeId, source: 'script' }); } catch (err) {}
-          setEdges(prev => { const next = prev.filter(e => e.id !== edgeId); edgesRef.current = next; return next; });
-          return { applied: true, id: edgeId };
-        }
-        case 'log': {
-          const [level, message] = args;
-          const normalizedLevel = ['info', 'warn', 'error'].includes(level) ? level : 'info';
-          const serializedMessage = typeof message === 'object' ? JSON.stringify(message).slice(0, 2000) : String(message).slice(0, 2000);
-          // eslint-disable-next-line no-console
-          console[normalizedLevel === 'error' ? 'error' : normalizedLevel === 'warn' ? 'warn' : 'info']('[script]', serializedMessage);
-          return true;
-        }
-        default:
-          throw new Error('Unknown method: ' + method);
-    }
-    } catch (err) {
-      console.error('Script RPC error', method, err);
-      throw err;
-    }
-  };
-
-  useEffect(() => {
-    const handleScriptResult = (event) => {
-      const detail = event.detail || event;
-      if (!detail || detail.type !== 'scriptResult') return;
-
-      if (detail.runId) {
-        scriptRunStatsRef.current.delete(String(detail.runId));
-      } else {
-        scriptRunStatsRef.current.clear();
-      }
-
-      if (detail.success) {
-        setSnackbar({ open: true, message: 'Script executed successfully', severity: 'success' });
-      } else if (detail.success === false) {
-        setSnackbar({ open: true, message: detail.error || 'Script execution failed', severity: 'error' });
-      }
-    };
-
-    window.addEventListener('scriptRunnerResult', handleScriptResult);
-    return () => window.removeEventListener('scriptRunnerResult', handleScriptResult);
-  }, [setSnackbar]);
-
-  // Listen for external apply proposals from ScriptPanel
-  useEffect(() => {
-    const handleApplyProposals = ({ proposals = [], sourceId } = {}) => {
-      if (!proposals || !proposals.length) return;
-      try {
-        // Apply proposals sequentially
-        proposals.forEach(p => {
-          try {
-            const action = p.action || (p.proposal && p.proposal.action) || (p.type) || null;
-            if (!action) return;
-            switch (action) {
-              case 'createNode': {
-                const node = p.node || p.payload || p.proposal?.node;
-                if (!node) break;
-                setNodes(prev => { const next = [...prev, node]; nodesRef.current = next; return next; });
-                try { eventBus.emit('nodeAdded', { node }); } catch (e) {}
-                break;
-              }
-              case 'updateNode': {
-                const id = p.id || p.nodeId || p.proposal?.id;
-                const patch = p.patch || p.changes || p.proposal?.patch;
-                if (!id || !patch) break;
-                setNodes(prev => { const next = prev.map(n => n.id === id ? { ...n, ...patch, data: patch && patch.data ? { ...n.data, ...patch.data } : n.data } : n); nodesRef.current = next; return next; });
-                try { eventBus.emit('nodeUpdated', { id, patch, source: 'script-apply' }); } catch (e) {}
-                break;
-              }
-              case 'deleteNode': {
-                const id = p.id || p.nodeId || p.proposal?.id;
-                if (!id) break;
-                setNodes(prev => { const next = prev.filter(n => n.id !== id); nodesRef.current = next; return next; });
-                try { eventBus.emit('nodeDeleted', { id, source: 'script-apply' }); } catch (e) {}
-                break;
-              }
-              case 'createEdge': {
-                const edge = p.edge || p.payload || p.proposal?.edge;
-                if (!edge) break;
-                setEdges(prev => { const next = [...prev, edge]; edgesRef.current = next; return next; });
-                try { eventBus.emit('edgeAdded', { edge }); } catch (e) {}
-                break;
-              }
-              case 'deleteEdge': {
-                const id = p.id || p.edgeId || p.proposal?.id;
-                if (!id) break;
-                setEdges(prev => { const next = prev.filter(e => e.id !== id); edgesRef.current = next; return next; });
-                try { eventBus.emit('edgeDeleted', { id, source: 'script-apply' }); } catch (e) {}
-                break;
-              }
-              default:
-                console.warn('Unknown proposal action:', action);
-            }
-          } catch (err) {
-            console.warn('Failed to apply proposal item', err);
-          }
+          nodesRef.current = next;
+          return next;
         });
-
-        // Save history after applying all proposals
-        try { historyHook.saveToHistory(nodesRef.current, edgesRef.current); } catch (e) {}
-        setSnackbar({ open: true, message: 'Script changes applied', severity: 'success' });
-      } catch (err) {
-        console.error('Failed to apply script proposals', err);
-        setSnackbar({ open: true, message: 'Failed to apply script proposals', severity: 'error' });
-      }
+        try {
+          graphAPI.current.updateNode(id, {
+            data: {
+              ...(node.data || {}),
+              breadboard: nextBreadboard
+            }
+          });
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            '[GraphEditor] Failed to clear breadboard pendingPlacement',
+            id,
+            err
+          );
+        }
+      });
     };
-
-    eventBus.on('applyScriptProposals', handleApplyProposals);
-    return () => eventBus.off('applyScriptProposals', handleApplyProposals);
-  }, [historyHook, setSnackbar]);
+    eventBus.on('nodeDragEnd', handleBreadboardPlacement);
+    return () => eventBus.off('nodeDragEnd', handleBreadboardPlacement);
+  }, [graphAPI, setNodes, nodesRef]);
 
   // Add this useEffect to your GraphEditor.js file
   // Place it with the other event listener useEffects
@@ -2030,92 +1691,6 @@ useEffect(() => {
     };
   }, [setNodes, nodesRef, edgesRef, historyHook]);
 
-  // Listen for node update events from custom components
-  useEffect(() => {
-    const handleNodeUpdate = ({ id, updates }) => {
-      // Use the existing update function
-      const node = nodes.find(n => n.id === id);
-      if (node) {
-        setNodes(prev => prev.map(n => 
-          n.id === id ? { ...n, ...updates, data: { ...n.data, ...updates.data } } : n
-        ));
-      }
-    };
-
-    eventBus.on('nodeUpdate', handleNodeUpdate);
-    return () => eventBus.off('nodeUpdate', handleNodeUpdate);
-  }, [nodes, setNodes]);
-
-  // Listen for node move events
-  useEffect(() => {
-    const handleNodeMove = ({ id, position }) => {
-      setNodes(prev => prev.map(node => 
-        node.id === id ? { ...node, position } : node
-      ));
-    };
-
-    eventBus.on('nodeMove', handleNodeMove);
-    return () => eventBus.off('nodeMove', handleNodeMove);
-  }, [setNodes]);
-
-  // Listen for edge click events
-  useEffect(() => {
-    const handleEdgeClick = ({ id, event }) => {
-      const isMultiSelect = event?.ctrlKey || event?.metaKey;
-      const edgeId = id;
-
-      if (isMultiSelect) {
-        // Handle multi-select
-        setSelectedEdgeIds(prev => {
-          if (prev.includes(edgeId)) {
-            return prev.filter(eid => eid !== edgeId);
-          } else {
-            return [...prev, edgeId];
-          }
-        });
-        return;
-      }
-
-      // Handle single selection
-      setSelectedEdgeIds(prev => {
-        const already = prev.includes(edgeId);
-        if (already) {
-          // Toggle the edge panel when clicking the already-selected edge
-          setShowEdgePanel(s => !s);
-          return prev; // keep selection
-        } else {
-          // Select the new edge and open the panel
-          setShowEdgePanel(true);
-          return [edgeId];
-        }
-      });
-      setSelectedNodeIds([]); // Clear node selection
-    };
-
-    eventBus.on('edgeClick', handleEdgeClick);
-    return () => eventBus.off('edgeClick', handleEdgeClick);
-  }, [setSelectedEdgeIds, setSelectedNodeIds, setShowEdgePanel, selectionHook]);
-
-  // Listen for edge hover events
-  useEffect(() => {
-    const handleEdgeHover = ({ edgeId }) => {
-      setHoveredEdgeId(edgeId);
-    };
-
-    eventBus.on('edgeHover', handleEdgeHover);
-    return () => eventBus.off('edgeHover', handleEdgeHover);
-  }, [setHoveredEdgeId]);
-
-  // Listen for node hover events
-  useEffect(() => {
-    const handleNodeHover = ({ id }) => {
-      setHoveredNodeId(id);
-    };
-
-    eventBus.on('nodeHover', handleNodeHover);
-    return () => eventBus.off('nodeHover', handleNodeHover);
-  }, [setHoveredNodeId]);
-
   // Listen for document theme updates from PreferencesDialog
   useEffect(() => {
     const handleUpdateDocumentTheme = (themeConfig) => {
@@ -2380,7 +1955,8 @@ useEffect(() => {
     modesHook,
     nodeTypes,
     nodeTypeMetadata: nodeTypeMetadataList,
-    handleScriptRequest
+    handleScriptRequest,
+    pluginRuntime: pluginRuntimeInfo
   }), [
     handlers,
     graphAPI,
@@ -2394,7 +1970,8 @@ useEffect(() => {
     modesHook,
     nodeTypes,
     nodeTypeMetadataList,
-    handleScriptRequest
+    handleScriptRequest,
+    pluginRuntimeInfo
   ]);
 
   return (

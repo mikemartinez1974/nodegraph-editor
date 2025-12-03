@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const DEFAULT_TIMEOUT = 8000;
 const MAX_CALLS_PER_RUN = 200;
@@ -9,6 +9,8 @@ const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta chars
   let seq = 1;
   const SESSION_TOKEN = "${token}";
   window.__runMeta = null;
+  const eventHandlers = new Map();
+  const subscriptionCounts = new Map();
 
   function post(msg) {
     try {
@@ -26,6 +28,41 @@ const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta chars
     });
   }
 
+  function dispatchHostEvent(eventName, payload) {
+    if (!eventName) return;
+    const handlers = eventHandlers.get(eventName);
+    if (!handlers || handlers.size === 0) return;
+    handlers.forEach((handler) => {
+      try {
+        handler(payload);
+      } catch (err) {
+        console.error('[ScriptRunner] Event handler error for', eventName, err);
+      }
+    });
+  }
+
+  function requestSubscribe(eventName) {
+    if (!eventName) return;
+    const count = subscriptionCounts.get(eventName) || 0;
+    if (count === 0) {
+      hostCall('bridge:subscribeEvent', [eventName]).catch((err) => {
+        console.warn('[ScriptRunner] Failed to subscribe to event', eventName, err);
+      });
+    }
+    subscriptionCounts.set(eventName, count + 1);
+  }
+
+  function requestUnsubscribe(eventName) {
+    if (!eventName) return;
+    const count = subscriptionCounts.get(eventName) || 0;
+    if (count <= 1) {
+      subscriptionCounts.delete(eventName);
+      hostCall('bridge:unsubscribeEvent', [eventName]).catch(() => {});
+    } else {
+      subscriptionCounts.set(eventName, count - 1);
+    }
+  }
+
   window.addEventListener('message', (ev) => {
     try {
       if (ev.source !== parent) return;
@@ -39,10 +76,39 @@ const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta chars
         if (msg.error) p.reject(msg.error); else p.resolve(msg.result);
       }
 
+      if (msg.type === 'hostEvent' && typeof msg.event === 'string') {
+        dispatchHostEvent(msg.event, msg.payload);
+      }
+
       if (msg.type === 'runScript') {
         (async () => {
           window.__runMeta = msg.meta || null;
           const scriptText = msg.script || '';
+          const eventApi = {
+            on: (eventName, handler) => {
+              if (!eventName || typeof handler !== 'function') return () => {};
+              const name = String(eventName);
+              let handlers = eventHandlers.get(name);
+              if (!handlers) {
+                handlers = new Set();
+                eventHandlers.set(name, handlers);
+              }
+              handlers.add(handler);
+              requestSubscribe(name);
+              return () => eventApi.off(name, handler);
+            },
+            off: (eventName, handler) => {
+              if (!eventName || typeof handler !== 'function') return;
+              const name = String(eventName);
+              const handlers = eventHandlers.get(name);
+              if (!handlers) return;
+              if (handlers.delete(handler) && handlers.size === 0) {
+                eventHandlers.delete(name);
+                requestUnsubscribe(name);
+              }
+            }
+          };
+
           const api = {
             getNodes: (...a)=>hostCall('getNodes', a),
             getNode: (...a)=>hostCall('getNode', a),
@@ -52,7 +118,9 @@ const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta chars
             deleteNode: (...a)=>hostCall('deleteNode', a),
             createEdge: (...a)=>hostCall('createEdge', a),
             deleteEdge: (...a)=>hostCall('deleteEdge', a),
-            log: (...a)=>hostCall('log', a)
+            log: (...a)=>hostCall('log', a),
+            events: eventApi,
+            runtimeBus: eventApi
           };
 
           try {
@@ -101,7 +169,34 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
 
   useEffect(() => {
     function handleMessage(ev) {
+      // Ensure message originates from our iframe window reference
       if (ev.source !== iframeRef.current?.contentWindow) return;
+
+      // Origin validation: derive allowed origin for this iframe (accept 'null' for srcdoc/blob/data)
+      try {
+        const iframe = iframeRef.current;
+        let allowedOrigin = null;
+        if (iframe) {
+          try {
+            const src = iframe.src;
+            if (!src || src === 'about:blank' || src.startsWith('data:') || src.startsWith('blob:')) {
+              allowedOrigin = 'null';
+            } else {
+              allowedOrigin = new URL(src, window.location.href).origin;
+            }
+          } catch (err) {
+            allowedOrigin = 'null';
+          }
+        }
+        if (ev.origin && allowedOrigin && ev.origin !== allowedOrigin && ev.origin !== 'null') {
+          // untrusted origin for this iframe, ignore
+          return;
+        }
+      } catch (e) {
+        // if anything goes wrong in origin checks, defensively ignore the message
+        return;
+      }
+
       const msg = ev.data;
       if (!msg || typeof msg !== 'object' || msg.token !== sessionToken) return;
 
@@ -163,6 +258,18 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
     return () => window.removeEventListener('message', handleMessage);
   }, [onRequest, sessionToken]);
 
+  const emitHostEvent = useCallback((eventName, payload) => {
+    if (!eventName || !iframeRef.current?.contentWindow) return;
+    try {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'hostEvent', event: eventName, payload, token: sessionToken },
+        '*'
+      );
+    } catch (err) {
+      console.warn('[ScriptRunner] Failed to emit event to runtime', eventName, err);
+    }
+  }, [sessionToken]);
+
   const ensureReady = () => {
     if (readyRef.current) return Promise.resolve();
     return new Promise(resolve => waitersRef.current.push(resolve));
@@ -179,6 +286,7 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
     }
     setRunnerKey(key => key + 1);
     window.dispatchEvent(new CustomEvent('scriptRunnerResult', { detail: { type: 'scriptResult', success: false, error: reason || 'Script runner reset', runId: null } }));
+    window.dispatchEvent(new CustomEvent('scriptRunnerReset'));
   };
 
   async function runScript(scriptText = '', meta = {}) {
@@ -215,9 +323,16 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
   }
 
   useEffect(() => {
-    window.__scriptRunner = { run: runScript, reset: resetRunner, lastResult };
-    return () => { if (window.__scriptRunner) delete window.__scriptRunner; };
-  }, [lastResult, sessionToken]);
+    window.__scriptRunner = {
+      run: runScript,
+      reset: resetRunner,
+      lastResult,
+      emitEvent: emitHostEvent
+    };
+    return () => {
+      if (window.__scriptRunner) delete window.__scriptRunner;
+    };
+  }, [emitHostEvent, lastResult, sessionToken]);
 
   return (
     <iframe

@@ -23,6 +23,7 @@ The scripting system lets you write, run, and manage custom JavaScript scripts t
 ## Script API
 
 Scripts receive an `api` object with the following methods:
+
 - `api.getNodes()` — Returns an array of all nodes.
 - `api.getNode(id)` — Returns a node by ID.
 - `api.getEdges()` — Returns an array of all edges.

@@ -17,8 +17,8 @@ export function createGraphEditorHandlers({
   groupManagerHook,
   selectionHook,
   modesHook,
-  backgroundRpc, // NEW: RPC function for calling iframe methods
-  backgroundRpcReady // NEW: boolean indicating if RPC is ready
+  backgroundRpc, // RPC function for calling iframe methods
+  backgroundRpcReady // boolean or function returning boolean indicating RPC readiness
 }) {
   const {
     nodes, setNodes, nodesRef,
@@ -152,6 +152,20 @@ export function createGraphEditorHandlers({
       meta && meta.defaultData && typeof meta.defaultData === 'object'
         ? { ...meta.defaultData }
         : {};
+
+    const isBreadboardComponent =
+      typeof type === 'string' && type.startsWith('io.breadboard.components:');
+    const initialData = {
+      memo: '',
+      link: '',
+      ...defaultData
+    };
+    if (isBreadboardComponent) {
+      initialData.breadboard = {
+        ...(defaultData?.breadboard || {}),
+        pendingPlacement: true
+      };
+    }
     const extensionsFromMeta =
       meta && meta.extensions && typeof meta.extensions === 'object'
         ? { ...meta.extensions }
@@ -222,11 +236,7 @@ export function createGraphEditorHandlers({
         typeof meta?.label === 'string' && meta.label.trim().length > 0
           ? meta.label
           : 'New Node',
-      data: {
-        memo: '',
-        link: '',
-        ...defaultData
-      },
+      data: initialData,
       position: { x: centerX, y: centerY },
       width: resolvedWidth,
       height: resolvedHeight,
@@ -677,14 +687,18 @@ export function createGraphEditorHandlers({
   
   // Example: Add a handler that can call iframe RPC
   const handleCallBackgroundMethod = async (method, args) => {
-    if (!backgroundRpcReady) {
+    const ready =
+      typeof backgroundRpcReady === 'function'
+        ? backgroundRpcReady()
+        : Boolean(backgroundRpcReady);
+    if (!ready) {
       console.warn('[Handlers] Background RPC not ready');
       setSnackbar?.({ open: true, message: 'Background not ready', severity: 'warning' });
       return { success: false, error: 'RPC not ready' };
     }
     
     try {
-      const result = await backgroundRpc(method, args);
+      const result = await backgroundRpc?.(method, args);
       return { success: true, result };
     } catch (err) {
       console.error('[Handlers] RPC error:', err);

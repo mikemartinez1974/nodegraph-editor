@@ -1,41 +1,52 @@
-(function () {
-  if (typeof window === 'undefined') return;
+(function (runtimeApi) {
+  if (!runtimeApi) {
+    console.warn('[BreadboardAutoWire] runtime API unavailable; aborting bootstrap');
+    return;
+  }
 
-  const ROW_GROUPS = {
-    top: ['A', 'B', 'C', 'D', 'E'],
-    bottom: ['F', 'G', 'H', 'I', 'J']
-  };
+  console.log('[BreadboardAutoWire] build marker 2025-03-05');
 
-  const DEFAULT_MIN_WIDTH = 18;
-  const DEFAULT_MIN_HEIGHT = 24;
-  const BODY_MARGIN = 14;
-  const DEFAULT_INPUT_HANDLE_KEY = 'in';
+  const SCRIPT_RUNTIME_API = runtimeApi && typeof runtimeApi === 'object' ? runtimeApi : null;
+  const FALLBACK_POLL_INTERVAL = 750;
 
-  const PIN_PRESETS = {
-    'io.breadboard.components:railTapPositive': {
-      rail: { segmentPreference: 'rail-top-positive' },
-      tap: { row: 'A', segment: 'top' }
+  const FALLBACK_METADATA = {
+    rowGroups: {
+      top: ['A', 'B', 'C', 'D', 'E'],
+      bottom: ['F', 'G', 'H', 'I', 'J']
     },
-    'io.breadboard.components:railTapNegative': {
-      rail: { segmentPreference: 'rail-bottom-negative' },
-      tap: { row: 'J', segment: 'bottom' }
+    pinPresets: {
+      'io.breadboard.components:railTapPositive': {
+        rail: { segmentPreference: 'rail-top-positive' },
+        tap: { row: 'A', segment: 'top' }
+      },
+      'io.breadboard.components:railTapNegative': {
+        rail: { segmentPreference: 'rail-bottom-negative' },
+        tap: { row: 'J', segment: 'bottom' }
+      },
+      'io.breadboard.components:led': {
+        anode: { row: 'E', segment: 'top' },
+        cathode: { row: 'F', segment: 'bottom' }
+      }
     },
-    'io.breadboard.components:led': {
-      anode: { row: 'E', segment: 'top' },
-      cathode: { row: 'F', segment: 'bottom' }
+    conductiveComponents: {
+      'io.breadboard.components:resistor': [['pinA', 'pinB']],
+      'io.breadboard.components:railTapPositive': [['rail', 'tap']],
+      'io.breadboard.components:railTapNegative': [['rail', 'tap']],
+      'io.breadboard.components:jumper': [['wireA', 'wireB']],
+      'io.breadboard.sockets:railSocket': [
+        ['vplus', 'positive'],
+        ['gnd', 'negative']
+      ]
+    },
+    defaults: {
+      minWidth: 18,
+      minHeight: 24,
+      bodyMargin: 14,
+      inputHandleKey: 'in'
     }
   };
 
-  const CONDUCTIVE_COMPONENTS = {
-    'io.breadboard.components:resistor': [['pinA', 'pinB']],
-    'io.breadboard.components:railTapPositive': [['rail', 'tap']],
-    'io.breadboard.components:railTapNegative': [['rail', 'tap']],
-    'io.breadboard.components:jumper': [['wireA', 'wireB']],
-    'io.breadboard.sockets:railSocket': [
-      ['vplus', 'positive'],
-      ['gnd', 'negative']
-    ]
-  };
+  let runtimeMetadata = null;
 
   // ------------------------------------------------------------
   // BASIC HELPERS
@@ -45,6 +56,130 @@
     value !== null &&
     typeof value === 'object' &&
     Object.prototype.toString.call(value) === '[object Object]';
+
+  const normalizeMetadata = (metadata) => {
+    const source = isPlainObject(metadata) ? metadata : {};
+    const mergeRows = (key) => {
+      const rows = Array.isArray(source?.rowGroups?.[key])
+        ? source.rowGroups[key]
+        : null;
+      const fallbackRows = FALLBACK_METADATA.rowGroups[key];
+      return (rows && rows.length ? rows : fallbackRows).map((row) =>
+        String(row || '').toUpperCase()
+      );
+    };
+
+    const buildPinPresets = () => {
+      const merged = { ...FALLBACK_METADATA.pinPresets };
+      if (isPlainObject(source.pinPresets)) {
+        Object.entries(source.pinPresets).forEach(([key, value]) => {
+          if (isPlainObject(value)) {
+            merged[key] = { ...value };
+          }
+        });
+      }
+      return merged;
+    };
+
+    const buildConductiveMap = () => {
+      const merged = {
+        ...FALLBACK_METADATA.conductiveComponents,
+        ...(isPlainObject(source.conductiveComponents)
+          ? source.conductiveComponents
+          : {})
+      };
+      const normalized = {};
+      Object.entries(merged).forEach(([key, pairs]) => {
+        if (!Array.isArray(pairs)) return;
+        const cleaned = pairs
+          .map((pair) =>
+            Array.isArray(pair) && pair.length >= 2
+              ? [pair[0], pair[1]]
+              : null
+          )
+          .filter(Boolean);
+        if (cleaned.length) {
+          normalized[key] = cleaned;
+        }
+      });
+      return normalized;
+    };
+
+    const defaultsSource = isPlainObject(source.defaults)
+      ? source.defaults
+      : {};
+
+    return {
+      rowGroups: {
+        top: mergeRows('top'),
+        bottom: mergeRows('bottom')
+      },
+      pinPresets: buildPinPresets(),
+      conductiveComponents: buildConductiveMap(),
+      defaults: {
+        minWidth:
+          Number(defaultsSource.minWidth) ||
+          FALLBACK_METADATA.defaults.minWidth,
+        minHeight:
+          Number(defaultsSource.minHeight) ||
+          FALLBACK_METADATA.defaults.minHeight,
+        bodyMargin:
+          Number(defaultsSource.bodyMargin) ||
+          FALLBACK_METADATA.defaults.bodyMargin,
+        inputHandleKey:
+          defaultsSource.inputHandleKey ||
+          FALLBACK_METADATA.defaults.inputHandleKey
+      }
+    };
+  };
+
+  const ensureMetadata = () => {
+    if (!runtimeMetadata) {
+      runtimeMetadata = normalizeMetadata(FALLBACK_METADATA);
+    }
+    return runtimeMetadata;
+  };
+
+  const updateRuntimeMetadata = (metadata) => {
+    runtimeMetadata = normalizeMetadata(metadata || FALLBACK_METADATA);
+  };
+
+  const getRowGroupForSegment = (segment = 'top') => {
+    const meta = ensureMetadata();
+    const top = meta.rowGroups.top;
+    const bottom = meta.rowGroups.bottom;
+    return segment === 'bottom' ? bottom : top;
+  };
+
+  const getDefaultTopRow = () => {
+    const meta = ensureMetadata();
+    return (
+      meta.rowGroups.top[0] ||
+      meta.rowGroups.bottom[0] ||
+      'A'
+    );
+  };
+
+  const getDefaultRowForSegment = (segment = 'top') => {
+    const group = getRowGroupForSegment(segment);
+    return group[0] || getDefaultTopRow();
+  };
+
+  const getDefaults = () => ensureMetadata().defaults;
+  const getDefaultHandleKey = () =>
+    getDefaults().inputHandleKey || 'in';
+  const getDefaultMinWidth = () =>
+    Number(getDefaults().minWidth) || 18;
+  const getDefaultMinHeight = () =>
+    Number(getDefaults().minHeight) || 24;
+  const getBodyMargin = () =>
+    Number(getDefaults().bodyMargin) || 14;
+
+  const getPinPresetMap = () => ensureMetadata().pinPresets;
+  const getConductiveMap = () =>
+    ensureMetadata().conductiveComponents;
+
+  updateRuntimeMetadata(FALLBACK_METADATA);
 
   const normalizeRow = (value, fallback) => {
     if (typeof value === 'string' && value.trim()) {
@@ -85,7 +220,8 @@
 
   const isComponentNode = (node) => {
     if (!node || !node.type) return false;
-    if (CONDUCTIVE_COMPONENTS[node.type]) return true;
+    const conductive = getConductiveMap();
+    if (conductive[node.type]) return true;
     const t = String(node.type).toLowerCase();
     return (
       t.includes('resistor') ||
@@ -96,7 +232,7 @@
   };
 
   const makeHandleNodeId = (nodeId, handleKey) =>
-    `handle:${nodeId}:${handleKey || DEFAULT_INPUT_HANDLE_KEY}`;
+    `handle:${nodeId}:${handleKey || getDefaultHandleKey()}`;
 
   const toPromise = (value) => {
     if (value && typeof value.then === 'function') return value;
@@ -107,37 +243,74 @@
   // GRAPH SNAPSHOT
   // ------------------------------------------------------------
 
-  const readGraphSnapshot = () => {
-    const api =
-    window.graphAPI ||
-    window.parent?.graphAPI ||
-    window.top?.graphAPI;
+  const getGraphAPI = () => SCRIPT_RUNTIME_API || null;
+
+  const readGraphSnapshot = async () => {
+    const api = getGraphAPI();
     if (!api) return { nodes: [], edges: [] };
 
-    const nodesResult =
-      (typeof api.readNode === 'function' && api.readNode()) ||
-      (typeof api.getNodes === 'function' && { data: api.getNodes() }) ||
-      null;
-
-    const edgesResult =
-      (typeof api.readEdge === 'function' && api.readEdge()) ||
-      (typeof api.getEdges === 'function' && { data: api.getEdges() }) ||
-      null;
-
-    return {
-      nodes: Array.isArray(nodesResult?.data) ? nodesResult.data : [],
-      edges: Array.isArray(edgesResult?.data) ? edgesResult.data : []
+    const resolveNodes = async () => {
+      if (typeof api.readNode === 'function') {
+        const result = await toPromise(api.readNode());
+        if (Array.isArray(result?.data)) return result.data;
+        if (Array.isArray(result)) return result;
+      }
+      if (typeof api.getNodes === 'function') {
+        const result = await toPromise(api.getNodes());
+        if (Array.isArray(result?.data)) return result.data;
+        if (Array.isArray(result)) return result;
+      }
+      return [];
     };
+
+    const resolveEdges = async () => {
+      if (typeof api.readEdge === 'function') {
+        const result = await toPromise(api.readEdge());
+        if (Array.isArray(result?.data)) return result.data;
+        if (Array.isArray(result)) return result;
+      }
+      if (typeof api.getEdges === 'function') {
+        const result = await toPromise(api.getEdges());
+        if (Array.isArray(result?.data)) return result.data;
+        if (Array.isArray(result)) return result;
+      }
+      return [];
+    };
+
+    const [nodes, edges] = await Promise.all([resolveNodes(), resolveEdges()]);
+
+    return { nodes, edges };
   };
 
+  const buildSnapshotContext = async () => {
+    const snapshot = await readGraphSnapshot();
+    const layout = buildBoardLayout(snapshot.nodes);
+    if (!layout) return null;
+    const metadata = findSkinMetadata(snapshot.nodes);
+    updateRuntimeMetadata(metadata);
+    return { snapshot, layout, metadata: ensureMetadata() };
+  };
+
+  const findSkinNode = (nodes) =>
+    nodes.find((n) => n?.type === 'io.breadboard.sockets:skin') ||
+    null;
+
   const findSkinSchema = (nodes) => {
-    const skin = nodes.find(
-      (n) => n?.type === 'io.breadboard.sockets:skin'
-    );
+    const skin = findSkinNode(nodes);
     if (!skin) return null;
     return (
       skin.data?.breadboard?.schema ||
       skin.data?.schema ||
+      null
+    );
+  };
+
+  const findSkinMetadata = (nodes) => {
+    const skin = findSkinNode(nodes);
+    if (!skin) return null;
+    return (
+      skin.data?.breadboard?.metadata ||
+      skin.data?.metadata ||
       null
     );
   };
@@ -305,8 +478,8 @@
   }
 
   const findClosestRow = (y, segment, layout) => {
-    const group = segment === 'bottom' ? ROW_GROUPS.bottom : ROW_GROUPS.top;
-    let bestRow = group[0];
+    const group = getRowGroupForSegment(segment);
+    let bestRow = group[0] || getDefaultTopRow();
     let bestDist = Infinity;
     group.forEach((row) => {
       const rowY =
@@ -367,6 +540,57 @@
     return { column, segment };
   };
 
+  const getAnchorColumn = (anchor, layout) => {
+    if (!layout) return 0;
+    return clamp(
+      anchor?.column,
+      layout.minColumn,
+      layout.maxColumn
+    );
+  };
+
+  const getPinColumnValue = (pin, layout) => {
+    if (!pin || !layout) return null;
+    const explicit = Number(pin.column);
+    if (Number.isFinite(explicit)) {
+      return clamp(explicit, layout.minColumn, layout.maxColumn);
+    }
+    const offset = Number(pin.columnOffset);
+    if (Number.isFinite(offset)) {
+      return clamp(
+        layout.minColumn + offset,
+        layout.minColumn,
+        layout.maxColumn
+      );
+    }
+    return null;
+  };
+
+  const alignPinsToAnchor = (pins, anchor, layout) => {
+    if (!Array.isArray(pins) || !pins.length || !layout) {
+      return pins;
+    }
+    const anchorColumn = getAnchorColumn(anchor, layout);
+    const derivedColumns = pins.map((pin) =>
+      getPinColumnValue(pin, layout)
+    );
+    const finiteColumns = derivedColumns.filter((col) =>
+      Number.isFinite(col)
+    );
+    if (!finiteColumns.length) return pins;
+    const baseColumn = Math.min(...finiteColumns);
+    const delta = anchorColumn - baseColumn;
+    if (delta === 0) return pins;
+    return pins.map((pin, index) => {
+      const col = derivedColumns[index];
+      if (!Number.isFinite(col)) return pin;
+      return {
+        ...pin,
+        column: clamp(col + delta, layout.minColumn, layout.maxColumn)
+      };
+    });
+  };
+
   // ------------------------------------------------------------
   // PINS / PRESETS / ASSIGNMENTS
   // ------------------------------------------------------------
@@ -374,8 +598,9 @@
   const applyPinPresets = (node, pins) => {
     if (!node || !pins) return pins;
     const variants = getTypeVariants(node.type);
+    const presetMap = getPinPresetMap();
     const preset =
-      variants.map((v) => PIN_PRESETS[v]).find(Boolean) || null;
+      variants.map((v) => presetMap[v]).find(Boolean) || null;
     if (!preset) return pins;
 
     return pins.map((pin) => {
@@ -395,9 +620,12 @@
     });
   };
 
-  const buildAssignmentsFromPins = (pins, layout) => {
+  const buildAssignmentsFromPins = (pins, layout, anchorColumn) => {
     const assignments = [];
     if (!Array.isArray(pins) || !layout) return assignments;
+    const fallbackColumn = Number.isFinite(anchorColumn)
+      ? clamp(anchorColumn, layout.minColumn, layout.maxColumn)
+      : layout.minColumn;
 
     pins.forEach((pin) => {
       if (!pin) return;
@@ -409,7 +637,7 @@
       if (!Number.isFinite(column)) {
         const offset = Number(pin.columnOffset) || 0;
         column = clamp(
-          layout.minColumn + offset,
+          fallbackColumn + offset,
           layout.minColumn,
           layout.maxColumn
         );
@@ -443,7 +671,7 @@
         rawPref === 'bottom' ? 'bottom' : 'top';
       const row = normalizeRow(
         pin.row,
-        segment === 'bottom' ? ROW_GROUPS.bottom[0] : ROW_GROUPS.top[0]
+        getDefaultRowForSegment(segment)
       );
       const key = toRowKey(row, column);
       const socketTarget = layout.holeMap.get(key);
@@ -481,7 +709,7 @@
         pin.id || pin.handleKey || pin.key || pin.label;
       if (!handle || !map.has(handle)) return pin;
       const target = map.get(handle);
-      const row = target.row || pin.row || ROW_GROUPS.top[0];
+      const row = target.row || pin.row || getDefaultTopRow();
       const isRail =
         typeof target.segment === 'string' &&
         target.segment.startsWith('rail-');
@@ -510,13 +738,14 @@
     const maxX = Math.max(...xs);
     const minY = Math.min(...ys);
     const maxY = Math.max(...ys);
+    const margin = getBodyMargin();
     const width = Math.max(
-      DEFAULT_MIN_WIDTH,
-      maxX - minX + BODY_MARGIN
+      getDefaultMinWidth(),
+      maxX - minX + margin
     );
     const height = Math.max(
-      DEFAULT_MIN_HEIGHT,
-      maxY - minY + BODY_MARGIN
+      getDefaultMinHeight(),
+      maxY - minY + margin
     );
     const position = {
       x: (minX + maxX) / 2,
@@ -558,7 +787,7 @@
       if (!src || !tgt) return;
 
       const sourceHandle =
-        edge.sourceHandle || edge.fromHandle || DEFAULT_INPUT_HANDLE_KEY;
+        edge.sourceHandle || edge.fromHandle || getDefaultHandleKey();
       const targetHandle =
         edge.targetHandle || edge.toHandle || null;
 
@@ -572,8 +801,9 @@
       connectAdjacency(adjacency, targetId, sourceId);
     });
 
+    const conductive = getConductiveMap();
     nodes.forEach((node) => {
-      const pairs = CONDUCTIVE_COMPONENTS[node?.type];
+      const pairs = conductive[node?.type];
       if (!node || !Array.isArray(pairs)) return;
       pairs.forEach((pair) => {
         if (!Array.isArray(pair) || pair.length < 2) return;
@@ -760,28 +990,91 @@
   // MAIN PER-NODE AUTOWIRE
   // ------------------------------------------------------------
 
-  const processNode = async (nodeId) => {
-    const api =
-    window.graphAPI ||
-    window.parent?.graphAPI ||
-    window.top?.graphAPI;
+  const processNode = async (nodeId, context = {}) => {
+    const api = getGraphAPI();
 
-    if (!api) return;
+    if (!api) {
+      console.log('[BreadboardAutoWire] processNode skipped, no api', nodeId);
+      return;
+    }
 
-    const snapshot = readGraphSnapshot();
-    const layout = buildBoardLayout(snapshot.nodes);
-    if (!layout) return;
+    const {
+      snapshot: providedSnapshot,
+      layout: providedLayout,
+      nodeOverride,
+      allowPending
+    } = context || {};
 
-    const node = snapshot.nodes.find((n) => n && n.id === nodeId);
+    let snapshot = providedSnapshot;
+    let layout = providedLayout;
+    if (!snapshot || !layout) {
+      const freshContext = await buildSnapshotContext();
+      if (!freshContext) {
+        console.log('[BreadboardAutoWire] processNode no snapshot/layout', nodeId);
+        return;
+      }
+      snapshot = freshContext.snapshot;
+      layout = freshContext.layout;
+    }
+    if (!layout) {
+      console.log('[BreadboardAutoWire] processNode layout missing', nodeId);
+      return;
+    }
+
+    let nodeIndex = snapshot.nodes.findIndex((n) => n && n.id === nodeId);
+    let node = nodeIndex >= 0 ? snapshot.nodes[nodeIndex] : null;
+
+    if (nodeOverride && nodeOverride.id === nodeId) {
+      const merged = {
+        ...(node || {}),
+        ...nodeOverride,
+        data: {
+          ...(node?.data || {}),
+          ...(nodeOverride.data || {}),
+          breadboard: {
+            ...(node?.data?.breadboard || {}),
+            ...(nodeOverride.data?.breadboard || {})
+          }
+        },
+        position: {
+          ...(node?.position || {}),
+          ...(nodeOverride.position || {})
+        }
+      };
+      node = merged;
+      if (nodeIndex >= 0) {
+        snapshot.nodes[nodeIndex] = merged;
+      } else {
+        snapshot.nodes.push(merged);
+        nodeIndex = snapshot.nodes.length - 1;
+      }
+    }
+
+    console.log('[BreadboardAutoWire] processNode snapshot lookup', nodeId, !!node);
     if (!node || !node.data) return;
+
+    if (node.data?.breadboard?.pendingPlacement && allowPending !== true) {
+      console.log('[BreadboardAutoWire] Node still pending placement, skipping', nodeId);
+      return;
+    }
     if (isSocketNode(node) || isRailNode(node)) return;
     if (!isComponentNode(node)) return;
+
+    console.log('[BreadboardAutoWire] start wiring', nodeId, {
+      position: node.position,
+      pins: node.data?.pins,
+      layoutBounds: {
+        minColumn: layout.minColumn,
+        maxColumn: layout.maxColumn
+      }
+    });
 
     const anchor = resolveAnchor(node, layout);
     const basePins = Array.isArray(node.data.pins)
       ? node.data.pins.map((p) => ({ ...p }))
       : [];
     let pins = applyPinPresets(node, basePins);
+    pins = alignPinsToAnchor(pins, anchor, layout);
     if (!pins.length) return;
 
     // If no explicit column on pins, build offsets from anchor
@@ -794,7 +1087,12 @@
       return pin;
     });
 
-    let assignments = buildAssignmentsFromPins(pins, layout);
+    let assignments = buildAssignmentsFromPins(
+      pins,
+      layout,
+      getAnchorColumn(anchor, layout)
+    );
+    console.log('[BreadboardAutoWire] assignments from pins', nodeId, assignments);
     if (!assignments.length) {
       // fallback: put two pins on same row, adjacent columns
       const center = getNodeCenter(node);
@@ -822,7 +1120,10 @@
       }
     }
 
-    if (!assignments.length) return;
+    if (!assignments.length) {
+      console.log('[BreadboardAutoWire] no assignments computed', nodeId);
+      return;
+    }
 
     // update pins with final assignment positions
     pins = applyAssignmentsToPins(pins, assignments, anchor.segment);
@@ -838,10 +1139,12 @@
         breadboard: {
           ...(node.data?.breadboard || {}),
           anchor,
-          pinState
+          pinState,
+          pendingPlacement: false
         }
       }
     };
+    console.log('[BreadboardAutoWire] final payload', nodeId, payload);
 
     if (body) {
       payload.position = body.position;
@@ -853,10 +1156,25 @@
       await toPromise(api.updateNode(node.id, payload));
       await rebuildEdges(api, node.id, assignments, snapshot);
       // after wiring edges, recompute connectivity
-      const fresh = readGraphSnapshot();
+      const fresh = await readGraphSnapshot();
       await updateConnectivityStates(api, fresh.nodes, fresh.edges);
     } catch (err) {
       console.warn('[BreadboardAutoWire] Failed to process node', node.id, err);
+    }
+  };
+
+  const processAllComponentNodes = async () => {
+    const context = await buildSnapshotContext();
+    if (!context) return;
+    for (const node of context.snapshot.nodes) {
+      if (!node || !node.id) continue;
+      if (isSocketNode(node) || isRailNode(node)) continue;
+      if (!isComponentNode(node)) continue;
+      try {
+        await processNode(node.id, context);
+      } catch (err) {
+        console.warn('[BreadboardAutoWire] Failed to process node during full sweep', node.id, err);
+      }
     }
   };
 
@@ -864,75 +1182,168 @@
   // EVENT WIRING + BOOTSTRAP (RETRY UNTIL graphAPI IS READY)
   // ------------------------------------------------------------
 
-  const startAutoWire = () => {
-    const api =
-    window.graphAPI ||
-    window.parent?.graphAPI ||
-    window.top?.graphAPI;
-
+  const startAutoWire = async () => {
+    const api = getGraphAPI();
 
     if (!api) {
-      console.warn("[BreadboardAutoWire] graphAPI not ready, retrying…");
-      setTimeout(startAutoWire, 50); // retry until graphAPI attaches
+      console.warn('[BreadboardAutoWire] runtime API not ready; aborting');
       return;
     }
 
-    console.log("[BreadboardAutoWire] Initializing (plugin script node)");
+    console.log('[BreadboardAutoWire] Initializing (plugin script node)');
 
-    // handy for manual debugging
-    window.__breadboardAutoWireProcessNode = processNode;
-
-    const snapshot = readGraphSnapshot();
-    snapshot.nodes.forEach((node) => {
-      if (!node || !node.id) return;
-      if (isSocketNode(node) || isRailNode(node)) return;
-      if (!isComponentNode(node)) return;
-      processNode(node.id);
-    });
+    await processAllComponentNodes();
 
     const cleanups = [];
     const events = api.events;
 
-    if (events && typeof events.on === "function") {
-      const makeHandler = (label) => (evt) => {
-        const id = evt?.nodeId || evt?.id || evt?.node?.id;
-        if (!id) return;
-        console.log("[BreadboardAutoWire] Event", label, "-> rewire node", id);
-        processNode(id);
+    const getNodesArray = async () => {
+      if (!api) return [];
+      const methods = ['getNodes', 'readNode'];
+      for (const method of methods) {
+        if (typeof api[method] === 'function') {
+          try {
+            const result = await toPromise(api[method]());
+            if (Array.isArray(result?.data)) return result.data;
+            if (Array.isArray(result)) return result;
+          } catch (err) {
+            /* ignore */
+          }
+        }
+      }
+      return [];
+    };
+
+    const getNodeById = async (nodeId) => {
+      if (!nodeId) return null;
+      const methods = ['getNode', 'readNode'];
+      for (const method of methods) {
+        if (typeof api[method] === 'function') {
+          try {
+            const result = await toPromise(api[method](nodeId));
+            if (result?.success && result.data) return result.data;
+            if (result && typeof result === 'object' && result.id) return result;
+          } catch (err) {
+            /* ignore */
+          }
+        }
+      }
+      const nodes = await getNodesArray();
+      return nodes.find((node) => node && node.id === nodeId) || null;
+    };
+
+    const shouldProcessSnapshot = (node, options = {}) => {
+      if (!node || !node.id) return false;
+      if (!isComponentNode(node)) return false;
+      if (node.data?.breadboard?.pendingPlacement && options.allowPending !== true) {
+        return false;
+      }
+      return true;
+    };
+
+    const processNodeSnapshot = async (node, label = 'event', options = {}) => {
+      const pending = node?.data?.breadboard?.pendingPlacement === true;
+      const allowPending = options.allowPending === true || (pending && label === 'nodeDragEnd');
+      if (!shouldProcessSnapshot(node, { allowPending })) return;
+      try {
+        await processNode(node.id, {
+          nodeOverride: node,
+          allowPending
+        });
+      } catch (err) {
+        console.warn(
+          '[BreadboardAutoWire] Failed to process node from',
+          label,
+          node.id,
+          err
+        );
+      }
+    };
+
+    const processById = async (id, label, options = {}) => {
+      if (!id) return;
+      const node = await getNodeById(id);
+      if (node) {
+        await processNodeSnapshot(node, label, options);
+      }
+    };
+
+    const extractEventNodes = (evt = {}) => {
+      if (!evt || typeof evt !== 'object') return [];
+      const rawNodes = Array.isArray(evt.nodes) ? evt.nodes : [];
+      return rawNodes
+        .map((node) => (node && typeof node === 'object' ? node : null))
+        .filter((node) => node && node.id);
+    };
+
+    const handleNodeAdded = async (evt = {}) => {
+      if (evt?.node) {
+        await processNodeSnapshot(evt.node, 'nodeAdded');
+        return;
+      }
+      const id = evt?.nodeId || evt?.id;
+      if (id) {
+        await processById(id, 'nodeAdded');
+      }
+    };
+
+    const handleNodeDragEnd = async (evt = {}) => {
+      const eventNodes = extractEventNodes(evt);
+      if (eventNodes.length) {
+        await Promise.all(
+          eventNodes.map((node) => processNodeSnapshot(node, 'nodeDragEnd', { allowPending: true }))
+        );
+        return;
+      }
+      const ids = Array.isArray(evt?.nodeIds) ? evt.nodeIds : [];
+      await Promise.all(ids.map((id) => processById(id, 'nodeDragEnd', { allowPending: true })));
+    };
+
+    const handleNodeDataChanged = async (evt = {}) => {
+      if (evt?.node) {
+        await processNodeSnapshot(evt.node, 'nodeDataChanged');
+        return;
+      }
+      const id = evt?.nodeId || evt?.id;
+      if (id) {
+        await processById(id, 'nodeDataChanged');
+      }
+    };
+
+    if (events && typeof events.on === 'function') {
+      const wrapAsyncHandler = (fn, label) => (payload) => {
+        Promise.resolve(fn(payload)).catch((err) => {
+          console.warn(`[BreadboardAutoWire] ${label} handler failed`, err);
+        });
       };
 
-      const offDrag =
-        events.on("nodeDragEnd", makeHandler("nodeDragEnd")) || (() => {});
-      const offAdd =
-        events.on("nodeAdded", makeHandler("nodeAdded")) || (() => {});
-      const offChange =
-        events.on("nodeDataChanged", makeHandler("nodeDataChanged")) ||
-        (() => {});
+      const makeCleanup = (eventName, handler, label) => {
+        const wrapped = wrapAsyncHandler(handler, label);
+        const off = events.on(eventName, wrapped);
+        if (typeof off === 'function') {
+          return off;
+        }
+        return () => {
+          if (typeof events.off === 'function') {
+            events.off(eventName, wrapped);
+          }
+        };
+      };
 
-      cleanups.push(offDrag, offAdd, offChange);
+      cleanups.push(
+        makeCleanup('nodeAdded', handleNodeAdded, 'nodeAdded'),
+        makeCleanup('nodeDragEnd', handleNodeDragEnd, 'nodeDragEnd'),
+        makeCleanup('nodeDataChanged', handleNodeDataChanged, 'nodeDataChanged')
+      );
+    } else {
+      console.warn(
+        '[BreadboardAutoWire] runtime API has no event bus; auto-wire will not react to interactive placement'
+      );
     }
 
-    window.__breadboardAutoWireCleanup = () => {
-      console.log("[BreadboardAutoWire] Cleaning up listeners (plugin)");
-      cleanups.forEach((off) => {
-        try {
-          off();
-        } catch (err) {
-          console.warn(
-            "[BreadboardAutoWire] Failed to cleanup listener",
-            err
-          );
-        }
-      });
-    };
   };
 
-  // Retry bootstrap until both DOM and graphAPI are ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(startAutoWire, 50);
-    }, { once: true });
-  } else {
-    setTimeout(startAutoWire, 50);
-  }
-})();
+  startAutoWire().catch((err) => {
+    console.error('[BreadboardAutoWire] Failed to initialize runtime', err);
+  });
+})(typeof api !== 'undefined' ? api : undefined);

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2025-11-29T01:14:12.963Z",
-    "modified": "2025-11-29T01:14:12.963Z",
+    "created": "2025-11-30T19:31:49.721Z",
+    "modified": "2025-11-30T19:31:49.721Z",
     "author": "",
     "tags": []
   },
@@ -42,10 +42,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 567.1600478032286,
-      "y": 315.9290892422488
+      "x": 680,
+      "y": 316.5
     },
-    "zoom": 1.2009732517244214
+    "zoom": 1
   },
   "document": {
     "url": "/tlz/background.html"
@@ -7857,7 +7857,15 @@
             "polarity": "negative",
             "railId": "rail-bottom-negative"
           }
-        ]
+        ],
+        "breadboard": {
+          "pinState": {
+            "negative": {
+              "touchesVPlus": false,
+              "touchesGnd": true
+            }
+          }
+        }
       }
     },
     {
@@ -7879,7 +7887,15 @@
             "polarity": "positive",
             "railId": "rail-top-positive"
           }
-        ]
+        ],
+        "breadboard": {
+          "pinState": {
+            "positive": {
+              "touchesVPlus": true,
+              "touchesGnd": false
+            }
+          }
+        }
       }
     },
     {
@@ -7901,7 +7917,15 @@
             "polarity": "negative",
             "railId": "rail-bottom-negative"
           }
-        ]
+        ],
+        "breadboard": {
+          "pinState": {
+            "negative": {
+              "touchesVPlus": false,
+              "touchesGnd": true
+            }
+          }
+        }
       }
     },
     {
@@ -7909,8 +7933,8 @@
       "type": "script",
       "label": "Breadboard AutoWire",
       "position": {
-        "x": 40,
-        "y": 140
+        "x": 0,
+        "y": 230
       },
       "width": 320,
       "height": 400,
@@ -7922,14 +7946,9 @@
         "dryRun": false,
         "allowMutations": true,
         "scriptId": "breadboard-autowire-runtime",
-        "script": "(function () {\n  if (typeof window === 'undefined') return;\n\n  const ROW_GROUPS = {\n    top: ['A', 'B', 'C', 'D', 'E'],\n    bottom: ['F', 'G', 'H', 'I', 'J']\n  };\n\n  const DEFAULT_MIN_WIDTH = 18;\n  const DEFAULT_MIN_HEIGHT = 24;\n  const BODY_MARGIN = 14;\n  const DEFAULT_INPUT_HANDLE_KEY = 'in';\n\n  const PIN_PRESETS = {\n    'io.breadboard.components:railTapPositive': {\n      rail: { segmentPreference: 'rail-top-positive' },\n      tap: { row: 'A', segment: 'top' }\n    },\n    'io.breadboard.components:railTapNegative': {\n      rail: { segmentPreference: 'rail-bottom-negative' },\n      tap: { row: 'J', segment: 'bottom' }\n    },\n    'io.breadboard.components:led': {\n      anode: { row: 'E', segment: 'top' },\n      cathode: { row: 'F', segment: 'bottom' }\n    }\n  };\n\n  const CONDUCTIVE_COMPONENTS = {\n    'io.breadboard.components:resistor': [['pinA', 'pinB']],\n    'io.breadboard.components:railTapPositive': [['rail', 'tap']],\n    'io.breadboard.components:railTapNegative': [['rail', 'tap']],\n    'io.breadboard.components:jumper': [['wireA', 'wireB']],\n    'io.breadboard.sockets:railSocket': [\n      ['vplus', 'positive'],\n      ['gnd', 'negative']\n    ]\n  };\n\n  // ------------------------------------------------------------\n  // BASIC HELPERS\n  // ------------------------------------------------------------\n\n  const isPlainObject = (value) =>\n    value !== null &&\n    typeof value === 'object' &&\n    Object.prototype.toString.call(value) === '[object Object]';\n\n  const normalizeRow = (value, fallback) => {\n    if (typeof value === 'string' && value.trim()) {\n      return value.trim().toUpperCase();\n    }\n    return fallback || null;\n  };\n\n  const clamp = (value, min, max) => {\n    const num = Number(value);\n    if (!Number.isFinite(num)) return min;\n    return Math.max(min, Math.min(max, Math.round(num)));\n  };\n\n  const toRowKey = (row, column) => `${row}${column}`;\n\n  const getSocketPosition = (node) => {\n    const pos = node?.position || {};\n    return {\n      x: Number(pos.x) || 0,\n      y: Number(pos.y) || 0\n    };\n  };\n\n  const getTypeVariants = (type) => {\n    if (!type || typeof type !== 'string') return [];\n    const trimmed = type.trim();\n    if (!trimmed) return [];\n    const namespace = 'io.breadboard.components';\n    const short = trimmed.includes(':') ? trimmed.split(':').pop() : trimmed;\n    const namespaced = `${namespace}:${short}`;\n    return Array.from(new Set([trimmed, short, namespaced]));\n  };\n\n  const isSocketNode = (node) => node?.type === 'io.breadboard.sockets:socket';\n  const isRailNode = (node) => node?.type === 'io.breadboard.sockets:railSocket';\n  const isBusNode = (node) => node?.type === 'io.breadboard.bus';\n\n  const isComponentNode = (node) => {\n    if (!node || !node.type) return false;\n    if (CONDUCTIVE_COMPONENTS[node.type]) return true;\n    const t = String(node.type).toLowerCase();\n    return (\n      t.includes('resistor') ||\n      t.includes('led') ||\n      t.includes('tap') ||\n      t.includes('jumper')\n    );\n  };\n\n  const makeHandleNodeId = (nodeId, handleKey) =>\n    `handle:${nodeId}:${handleKey || DEFAULT_INPUT_HANDLE_KEY}`;\n\n  const toPromise = (value) => {\n    if (value && typeof value.then === 'function') return value;\n    return Promise.resolve(value);\n  };\n\n  // ------------------------------------------------------------\n  // GRAPH SNAPSHOT\n  // ------------------------------------------------------------\n\n  const readGraphSnapshot = () => {\n    const api =\n    window.graphAPI ||\n    window.parent?.graphAPI ||\n    window.top?.graphAPI;\n    if (!api) return { nodes: [], edges: [] };\n\n    const nodesResult =\n      (typeof api.readNode === 'function' && api.readNode()) ||\n      (typeof api.getNodes === 'function' && { data: api.getNodes() }) ||\n      null;\n\n    const edgesResult =\n      (typeof api.readEdge === 'function' && api.readEdge()) ||\n      (typeof api.getEdges === 'function' && { data: api.getEdges() }) ||\n      null;\n\n    return {\n      nodes: Array.isArray(nodesResult?.data) ? nodesResult.data : [],\n      edges: Array.isArray(edgesResult?.data) ? edgesResult.data : []\n    };\n  };\n\n  const findSkinSchema = (nodes) => {\n    const skin = nodes.find(\n      (n) => n?.type === 'io.breadboard.sockets:skin'\n    );\n    if (!skin) return null;\n    return (\n      skin.data?.breadboard?.schema ||\n      skin.data?.schema ||\n      null\n    );\n  };\n\n  // ------------------------------------------------------------\n  // BOARD LAYOUT (HOLES + RAILS + ROW POSITIONS)\n  // ------------------------------------------------------------\n\n  function buildBoardLayout(nodes) {\n    const schema = findSkinSchema(nodes);\n    if (!schema || typeof schema !== 'object') return null;\n\n    const socketNodeById = new Map();\n    const railNodeById = new Map();\n\n    nodes.forEach((node) => {\n      if (isSocketNode(node)) {\n        socketNodeById.set(node.id, node);\n      } else if (isRailNode(node)) {\n        railNodeById.set(node.id, node);\n      }\n    });\n\n    const holeMap = new Map(); // \"A1\" -> { row, column, nodeId, x, y }\n    const railMap = new Map(); // \"rail-top-positive::1\" -> { nodeId, column, polarity, x, y, handle }\n\n    const rowPositions = new Map(); // \"A\" -> avg y\n    const columnCenters = new Map(); // col -> avg x\n\n    let minColumn = Infinity;\n    let maxColumn = -Infinity;\n\n    // holes (schema.sockets)\n    if (Array.isArray(schema.sockets)) {\n      schema.sockets.forEach((hole) => {\n        if (!hole) return;\n        const row = normalizeRow(hole.row, null);\n        const column = Number(hole.column);\n        if (!row || !Number.isFinite(column)) return;\n\n        const pos = hole.position || {};\n        const x = Number(pos.x) || 0;\n        const y = Number(pos.y) || 0;\n\n        const idKey = `${row}${column}`;\n        holeMap.set(idKey, {\n          row,\n          column,\n          x,\n          y,\n          nodeId: null, // filled later when binding to socket nodes\n          targetHandle: 'socket'\n        });\n\n        // row positions\n        const stats = rowPositions.get(row) || { total: 0, count: 0 };\n        stats.total += y;\n        stats.count += 1;\n        rowPositions.set(row, stats);\n\n        // column centers (approx)\n        const colStats = columnCenters.get(column) || { total: 0, count: 0 };\n        colStats.total += x;\n        colStats.count += 1;\n        columnCenters.set(column, colStats);\n\n        minColumn = Math.min(minColumn, column);\n        maxColumn = Math.max(maxColumn, column);\n      });\n    }\n\n    // finalize row + column averages\n    const avgRowPositions = new Map();\n    rowPositions.forEach((stats, row) => {\n      if (stats.count > 0) {\n        avgRowPositions.set(row, stats.total / stats.count);\n      }\n    });\n\n    const avgColumnCenters = new Map();\n    columnCenters.forEach((stats, col) => {\n      if (stats.count > 0) {\n        avgColumnCenters.set(col, stats.total / stats.count);\n      }\n    });\n\n    // rails\n    if (Array.isArray(schema.rails)) {\n      schema.rails.forEach((rail) => {\n        const polarity =\n          rail.polarity === 'negative' ? 'negative' : 'positive';\n        const handle = polarity === 'negative' ? 'negative' : 'positive';\n        const chan = rail.channel || 'bus';\n        const segId = `rail-${chan}-${polarity}`;\n\n        const segments = Array.isArray(rail.segments)\n          ? rail.segments\n          : [];\n\n        segments.forEach((seg) => {\n          const column = Number(seg.column);\n          if (!Number.isFinite(column)) return;\n\n          const railNode = railNodeById.get(seg.nodeId);\n          if (!railNode) return;\n\n          const pos = seg.position || {};\n          const x =\n            Number(pos.x) ||\n            getSocketPosition(railNode).x;\n          const y =\n            Number(pos.y) ||\n            getSocketPosition(railNode).y;\n\n          const key = `${segId}::${column}`;\n          railMap.set(key, {\n            nodeId: railNode.id,\n            column,\n            polarity,\n            x,\n            y,\n            handle\n          });\n\n          minColumn = Math.min(minColumn, column);\n          maxColumn = Math.max(maxColumn, column);\n\n          const colStats = avgColumnCenters.get(column) || null;\n          if (!colStats) {\n            avgColumnCenters.set(column, x);\n          }\n        });\n      });\n    }\n\n    if (!Number.isFinite(minColumn) || !Number.isFinite(maxColumn)) {\n      return null;\n    }\n\n    // bind holes to nearest socket node by column\n    socketNodeById.forEach((socketNode) => {\n      const col = Number(socketNode.data?.column);\n      if (!Number.isFinite(col)) return;\n      const rows = Array.isArray(socketNode.data?.rows)\n        ? socketNode.data.rows\n        : [];\n      rows.forEach((row) => {\n        const r = normalizeRow(row, null);\n        if (!r) return;\n        const key = `${r}${col}`;\n        const entry = holeMap.get(key);\n        if (!entry) return;\n        entry.nodeId = socketNode.id;\n      });\n    });\n\n    return {\n      holeMap,\n      railMap,\n      rowPositions: avgRowPositions,\n      columnCenters: avgColumnCenters,\n      minColumn,\n      maxColumn\n    };\n  }\n\n  const findClosestRow = (y, segment, layout) => {\n    const group = segment === 'bottom' ? ROW_GROUPS.bottom : ROW_GROUPS.top;\n    let bestRow = group[0];\n    let bestDist = Infinity;\n    group.forEach((row) => {\n      const rowY =\n        layout.rowPositions.get(row) ||\n        layout.rowPositions.get(row.toUpperCase());\n      if (!Number.isFinite(rowY)) return;\n      const dist = Math.abs(y - rowY);\n      if (dist < bestDist) {\n        bestDist = dist;\n        bestRow = row;\n      }\n    });\n    return bestRow.toUpperCase();\n  };\n\n  const findNearestColumn = (x, columnCenters, minColumn, maxColumn) => {\n    if (!(columnCenters instanceof Map)) return minColumn;\n    let bestColumn = minColumn;\n    let bestDist = Infinity;\n    columnCenters.forEach((cx, col) => {\n      const dist = Math.abs(cx - x);\n      if (dist < bestDist) {\n        bestDist = dist;\n        bestColumn = col;\n      }\n    });\n    return clamp(bestColumn, minColumn, maxColumn);\n  };\n\n  const getNodeCenter = (node) => {\n    const pos = node?.position || {};\n    return {\n      x: Number(pos.x) || 0,\n      y: Number(pos.y) || 0\n    };\n  };\n\n  const resolveAnchor = (node, layout) => {\n    const center = getNodeCenter(node);\n    const y = center.y;\n\n    let segment = 'top';\n    const topRowY = layout.rowPositions.get('B');\n    const bottomRowY = layout.rowPositions.get('H');\n\n    if (Number.isFinite(topRowY) && Number.isFinite(bottomRowY)) {\n      const mid = (topRowY + bottomRowY) / 2;\n      segment = y >= mid ? 'bottom' : 'top';\n    }\n\n    const column = findNearestColumn(\n      center.x,\n      layout.columnCenters,\n      layout.minColumn,\n      layout.maxColumn\n    );\n\n    return { column, segment };\n  };\n\n  // ------------------------------------------------------------\n  // PINS / PRESETS / ASSIGNMENTS\n  // ------------------------------------------------------------\n\n  const applyPinPresets = (node, pins) => {\n    if (!node || !pins) return pins;\n    const variants = getTypeVariants(node.type);\n    const preset =\n      variants.map((v) => PIN_PRESETS[v]).find(Boolean) || null;\n    if (!preset) return pins;\n\n    return pins.map((pin) => {\n      if (!pin) return pin;\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle || !preset[handle]) return pin;\n      const overrides = preset[handle];\n      return {\n        ...pin,\n        ...(overrides.row ? { row: overrides.row } : {}),\n        ...(overrides.segment ? { segment: overrides.segment } : {}),\n        ...(overrides.segmentPreference\n          ? { segmentPreference: overrides.segmentPreference }\n          : {})\n      };\n    });\n  };\n\n  const buildAssignmentsFromPins = (pins, layout) => {\n    const assignments = [];\n    if (!Array.isArray(pins) || !layout) return assignments;\n\n    pins.forEach((pin) => {\n      if (!pin) return;\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle) return;\n\n      let column = Number(pin.column);\n      if (!Number.isFinite(column)) {\n        const offset = Number(pin.columnOffset) || 0;\n        column = clamp(\n          layout.minColumn + offset,\n          layout.minColumn,\n          layout.maxColumn\n        );\n      } else {\n        column = clamp(column, layout.minColumn, layout.maxColumn);\n      }\n\n      const rawPref = (pin.segmentPreference || pin.segment || '')\n        .toString()\n        .toLowerCase();\n\n      // Rail pin\n      if (rawPref.startsWith('rail-')) {\n        const key = `${rawPref}::${column}`;\n        const railTarget = layout.railMap.get(key);\n        if (!railTarget) return;\n        assignments.push({\n          handle,\n          target: {\n            ...railTarget,\n            column,\n            row: railTarget.row || railTarget.polarity || 'V+',\n            targetHandle: railTarget.handle\n          }\n        });\n        return;\n      }\n\n      // Socket pin\n      const segment =\n        rawPref === 'bottom' ? 'bottom' : 'top';\n      const row = normalizeRow(\n        pin.row,\n        segment === 'bottom' ? ROW_GROUPS.bottom[0] : ROW_GROUPS.top[0]\n      );\n      const key = toRowKey(row, column);\n      const socketTarget = layout.holeMap.get(key);\n      if (!socketTarget) return;\n\n      assignments.push({\n        handle,\n        target: {\n          ...socketTarget,\n          targetHandle: 'socket'\n        }\n      });\n    });\n\n    // de-dupe by handle\n    const byHandle = new Map();\n    assignments.forEach((a) => {\n      if (!a || !a.handle) return;\n      if (!byHandle.has(a.handle)) {\n        byHandle.set(a.handle, a);\n      }\n    });\n    return Array.from(byHandle.values());\n  };\n\n  const applyAssignmentsToPins = (pins, assignments, fallbackSegment) => {\n    const map = new Map();\n    assignments.forEach((entry) => {\n      if (!entry || !entry.handle || !entry.target) return;\n      map.set(entry.handle, entry.target);\n    });\n\n    return pins.map((pin) => {\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle || !map.has(handle)) return pin;\n      const target = map.get(handle);\n      const row = target.row || pin.row || ROW_GROUPS.top[0];\n      const isRail =\n        typeof target.segment === 'string' &&\n        target.segment.startsWith('rail-');\n      const segmentPref = isRail\n        ? (target.segment ||\n            target.segmentPreference ||\n            pin.segmentPreference ||\n            fallbackSegment)\n        : fallbackSegment;\n\n      return {\n        ...pin,\n        column: target.column,\n        row,\n        segment: segmentPref,\n        segmentPreference: segmentPref\n      };\n    });\n  };\n\n  const computeBounds = (assignments) => {\n    if (!assignments.length) return null;\n    const xs = assignments.map((a) => a.target.x);\n    const ys = assignments.map((a) => a.target.y);\n    const minX = Math.min(...xs);\n    const maxX = Math.max(...xs);\n    const minY = Math.min(...ys);\n    const maxY = Math.max(...ys);\n    const width = Math.max(\n      DEFAULT_MIN_WIDTH,\n      maxX - minX + BODY_MARGIN\n    );\n    const height = Math.max(\n      DEFAULT_MIN_HEIGHT,\n      maxY - minY + BODY_MARGIN\n    );\n    const position = {\n      x: (minX + maxX) / 2,\n      y: (minY + maxY) / 2\n    };\n    return { position, width, height };\n  };\n\n  const buildPinState = (assignments) => {\n    const state = {};\n    assignments.forEach((assignment) => {\n      state[assignment.handle] = {\n        row: assignment.target.row,\n        column: assignment.target.column,\n        nodeId: assignment.target.nodeId,\n        targetHandle: assignment.target.targetHandle\n      };\n    });\n    return state;\n  };\n\n  // ------------------------------------------------------------\n  // CONNECTIVITY SOLVER (BUS → RAIL → COMPONENTS)\n  // ------------------------------------------------------------\n\n  const connectAdjacency = (adjacency, a, b) => {\n    if (!a || !b) return;\n    if (!adjacency.has(a)) adjacency.set(a, new Set());\n    adjacency.get(a).add(b);\n  };\n\n  const solveConnectivity = (nodes = [], edges = []) => {\n    const adjacency = new Map();\n\n    edges.forEach((edge) => {\n      if (!edge) return;\n      const src = edge.source || edge.fromNodeId;\n      const tgt = edge.target || edge.toNodeId;\n      if (!src || !tgt) return;\n\n      const sourceHandle =\n        edge.sourceHandle || edge.fromHandle || DEFAULT_INPUT_HANDLE_KEY;\n      const targetHandle =\n        edge.targetHandle || edge.toHandle || null;\n\n      const sourceId = makeHandleNodeId(src, sourceHandle);\n      const targetId =\n        targetHandle && targetHandle !== 'socket'\n          ? makeHandleNodeId(tgt, targetHandle)\n          : tgt;\n\n      connectAdjacency(adjacency, sourceId, targetId);\n      connectAdjacency(adjacency, targetId, sourceId);\n    });\n\n    nodes.forEach((node) => {\n      const pairs = CONDUCTIVE_COMPONENTS[node?.type];\n      if (!node || !Array.isArray(pairs)) return;\n      pairs.forEach((pair) => {\n        if (!Array.isArray(pair) || pair.length < 2) return;\n        const [fromKey, toKey] = pair;\n        const fromId = makeHandleNodeId(node.id, fromKey);\n        const toId = makeHandleNodeId(node.id, toKey);\n        connectAdjacency(adjacency, fromId, toId);\n        connectAdjacency(adjacency, toId, fromId);\n      });\n    });\n\n    const nodeFlags = new Map();\n    const markReachable = (startId, flagKey) => {\n      if (!startId) return;\n      const visited = new Set();\n      const queue = [startId];\n      visited.add(startId);\n      while (queue.length > 0) {\n        const current = queue.shift();\n        if (!nodeFlags.has(current)) nodeFlags.set(current, {});\n        nodeFlags.get(current)[flagKey] = true;\n        const neighbors = adjacency.get(current);\n        if (!neighbors) continue;\n        neighbors.forEach((nextId) => {\n          if (visited.has(nextId)) return;\n          visited.add(nextId);\n          queue.push(nextId);\n        });\n      }\n    };\n\n    nodes.forEach((node) => {\n      if (!isBusNode(node)) return;\n      const positiveId = makeHandleNodeId(node.id, 'positive');\n      const negativeId = makeHandleNodeId(node.id, 'negative');\n      markReachable(positiveId, 'touchesVPlus');\n      markReachable(negativeId, 'touchesGnd');\n    });\n\n    return nodeFlags;\n  };\n\n  const normalizeHandleEntry = (handle) => {\n    if (!handle) return null;\n    if (typeof handle === 'string') {\n      return { id: handle, key: handle, label: handle };\n    }\n    if (typeof handle !== 'object') return null;\n    const id = handle.id || handle.key || handle.name || handle.handleKey;\n    if (!id) return null;\n    return {\n      id,\n      key: handle.key || id,\n      label: handle.label || handle.name || id\n    };\n  };\n\n  const collectHandleKeys = (node) => {\n    const keys = new Set();\n    const sources = [\n      node?.handles,\n      node?.outputs,\n      node?.inputs,\n      node?.data?.handles,\n      node?.data?.pins\n    ];\n    sources.forEach((list) => {\n      if (!Array.isArray(list)) return;\n      list.forEach((entry) => {\n        const normalized = normalizeHandleEntry(entry);\n        if (!normalized) return;\n        if (normalized.id) keys.add(normalized.id);\n        if (normalized.key) keys.add(normalized.key);\n      });\n    });\n    return Array.from(keys);\n  };\n\n  const updateConnectivityStates = async (api, nodes, edges) => {\n    const handleFlags = solveConnectivity(nodes, edges);\n\n    for (const node of nodes) {\n      if (!node || !node.id) continue;\n\n      const existingPinState = isPlainObject(node.data?.breadboard?.pinState)\n        ? node.data.breadboard.pinState\n        : {};\n      let changed = false;\n      const nextPinState = { ...existingPinState };\n      const pinKeys = collectHandleKeys(node);\n\n      pinKeys.forEach((handleKey) => {\n        if (!handleKey) return;\n        const currentState = nextPinState[handleKey] || {};\n        const flagEntry = handleFlags.get(\n          makeHandleNodeId(node.id, handleKey)\n        ) || {};\n        const touchesVPlus = !!flagEntry.touchesVPlus;\n        const touchesGnd = !!flagEntry.touchesGnd;\n        nextPinState[handleKey] = {\n          ...currentState,\n          touchesVPlus,\n          touchesGnd\n        };\n        if (\n          (currentState.touchesVPlus || false) !== touchesVPlus ||\n          (currentState.touchesGnd || false) !== touchesGnd\n        ) {\n          changed = true;\n        }\n      });\n\n      if (!changed) continue;\n\n      const payload = {\n        data: {\n          ...(node.data || {}),\n          breadboard: {\n            ...(isPlainObject(node.data?.breadboard)\n              ? node.data.breadboard\n              : {}),\n            pinState: nextPinState\n          }\n        }\n      };\n\n      try {\n        await toPromise(api.updateNode(node.id, payload));\n      } catch (err) {\n        console.warn(\n          '[BreadboardAutoWire] Failed to update node pinState',\n          node.id,\n          err\n        );\n      }\n    }\n  };\n\n  // ------------------------------------------------------------\n  // REBUILD EDGES\n  // ------------------------------------------------------------\n\n  const rebuildEdges = async (api, nodeId, assignments, snapshot) => {\n    if (!api) return;\n\n    const existing = snapshot.edges.filter(\n      (edge) => edge && (edge.source === nodeId || edge.fromNodeId === nodeId)\n    );\n\n    // delete existing\n    await Promise.all(\n      existing.map((edge) => {\n        if (typeof api.deleteEdge === 'function') {\n          return toPromise(api.deleteEdge(edge.id));\n        }\n        return Promise.resolve();\n      })\n    );\n\n    // recreate\n    for (const assignment of assignments) {\n      const payload = {\n        source: nodeId,\n        sourceHandle: assignment.handle,\n        target: assignment.target.nodeId,\n        targetHandle: assignment.target.targetHandle,\n        type: 'default'\n      };\n      if (typeof api.createEdge === 'function') {\n        try {\n          await toPromise(api.createEdge(payload));\n        } catch (err) {\n          console.warn(\n            '[BreadboardAutoWire] Failed to create edge',\n            payload,\n            err\n          );\n        }\n      }\n    }\n  };\n\n  // ------------------------------------------------------------\n  // MAIN PER-NODE AUTOWIRE\n  // ------------------------------------------------------------\n\n  const processNode = async (nodeId) => {\n    const api =\n    window.graphAPI ||\n    window.parent?.graphAPI ||\n    window.top?.graphAPI;\n\n    if (!api) return;\n\n    const snapshot = readGraphSnapshot();\n    const layout = buildBoardLayout(snapshot.nodes);\n    if (!layout) return;\n\n    const node = snapshot.nodes.find((n) => n && n.id === nodeId);\n    if (!node || !node.data) return;\n    if (isSocketNode(node) || isRailNode(node)) return;\n    if (!isComponentNode(node)) return;\n\n    const anchor = resolveAnchor(node, layout);\n    const basePins = Array.isArray(node.data.pins)\n      ? node.data.pins.map((p) => ({ ...p }))\n      : [];\n    let pins = applyPinPresets(node, basePins);\n    if (!pins.length) return;\n\n    // If no explicit column on pins, build offsets from anchor\n    pins = pins.map((pin, index) => {\n      if (!Number.isFinite(Number(pin.column))) {\n        pin.columnOffset =\n          Number(pin.columnOffset) ??\n          (Number.isFinite(pin.column) ? Number(pin.column) - layout.minColumn : index);\n      }\n      return pin;\n    });\n\n    let assignments = buildAssignmentsFromPins(pins, layout);\n    if (!assignments.length) {\n      // fallback: put two pins on same row, adjacent columns\n      const center = getNodeCenter(node);\n      const row = findClosestRow(center.y, anchor.segment, layout);\n      const colA = clamp(anchor.column, layout.minColumn, layout.maxColumn - 1);\n      const colB = clamp(colA + 1, layout.minColumn, layout.maxColumn);\n      const keyA = toRowKey(row, colA);\n      const keyB = toRowKey(row, colB);\n      const left = layout.holeMap.get(keyA);\n      const right = layout.holeMap.get(keyB);\n      const handles = pins\n        .map((p) => p.id || p.handleKey || p.key || p.label)\n        .filter(Boolean);\n      if (left && right && handles.length >= 2) {\n        assignments = [\n          {\n            handle: handles[0],\n            target: { ...left, targetHandle: 'socket' }\n          },\n          {\n            handle: handles[1],\n            target: { ...right, targetHandle: 'socket' }\n          }\n        ];\n      }\n    }\n\n    if (!assignments.length) return;\n\n    // update pins with final assignment positions\n    pins = applyAssignmentsToPins(pins, assignments, anchor.segment);\n\n    // snap body bounds\n    const body = computeBounds(assignments);\n    const pinState = buildPinState(assignments);\n\n    const payload = {\n      data: {\n        ...(node.data || {}),\n        pins,\n        breadboard: {\n          ...(node.data?.breadboard || {}),\n          anchor,\n          pinState\n        }\n      }\n    };\n\n    if (body) {\n      payload.position = body.position;\n      payload.width = body.width;\n      payload.height = body.height;\n    }\n\n    try {\n      await toPromise(api.updateNode(node.id, payload));\n      await rebuildEdges(api, node.id, assignments, snapshot);\n      // after wiring edges, recompute connectivity\n      const fresh = readGraphSnapshot();\n      await updateConnectivityStates(api, fresh.nodes, fresh.edges);\n    } catch (err) {\n      console.warn('[BreadboardAutoWire] Failed to process node', node.id, err);\n    }\n  };\n\n  // ------------------------------------------------------------\n  // EVENT WIRING + BOOTSTRAP (RETRY UNTIL graphAPI IS READY)\n  // ------------------------------------------------------------\n\n  const startAutoWire = () => {\n    const api =\n    window.graphAPI ||\n    window.parent?.graphAPI ||\n    window.top?.graphAPI;\n\n\n    if (!api) {\n      console.warn(\"[BreadboardAutoWire] graphAPI not ready, retrying…\");\n      setTimeout(startAutoWire, 50); // retry until graphAPI attaches\n      return;\n    }\n\n    console.log(\"[BreadboardAutoWire] Initializing (plugin script node)\");\n\n    // handy for manual debugging\n    window.__breadboardAutoWireProcessNode = processNode;\n\n    const snapshot = readGraphSnapshot();\n    snapshot.nodes.forEach((node) => {\n      if (!node || !node.id) return;\n      if (isSocketNode(node) || isRailNode(node)) return;\n      if (!isComponentNode(node)) return;\n      processNode(node.id);\n    });\n\n    const cleanups = [];\n    const events = api.events;\n\n    if (events && typeof events.on === \"function\") {\n      const makeHandler = (label) => (evt) => {\n        const id = evt?.nodeId || evt?.id || evt?.node?.id;\n        if (!id) return;\n        console.log(\"[BreadboardAutoWire] Event\", label, \"-> rewire node\", id);\n        processNode(id);\n      };\n\n      const offDrag =\n        events.on(\"nodeDragEnd\", makeHandler(\"nodeDragEnd\")) || (() => {});\n      const offAdd =\n        events.on(\"nodeAdded\", makeHandler(\"nodeAdded\")) || (() => {});\n      const offChange =\n        events.on(\"nodeDataChanged\", makeHandler(\"nodeDataChanged\")) ||\n        (() => {});\n\n      cleanups.push(offDrag, offAdd, offChange);\n    }\n\n    window.__breadboardAutoWireCleanup = () => {\n      console.log(\"[BreadboardAutoWire] Cleaning up listeners (plugin)\");\n      cleanups.forEach((off) => {\n        try {\n          off();\n        } catch (err) {\n          console.warn(\n            \"[BreadboardAutoWire] Failed to cleanup listener\",\n            err\n          );\n        }\n      });\n    };\n  };\n\n  // Retry bootstrap until both DOM and graphAPI are ready\n  if (document.readyState === \"loading\") {\n    document.addEventListener(\"DOMContentLoaded\", () => {\n      setTimeout(startAutoWire, 50);\n    }, { once: true });\n  } else {\n    setTimeout(startAutoWire, 50);\n  }\n})();\n",
-        "lastResult": {
-          "type": "scriptResult",
-          "success": true,
-          "runId": "1764378707409_ezalyxs7pq",
-          "token": "3kp7y9im9pymijlhzp6"
-        },
-        "lastRunAt": 1764378708920
+        "script": "(function (runtimeApi) {\n  if (typeof window === 'undefined' && !runtimeApi) return;\n\n  const SCRIPT_RUNTIME_API = runtimeApi && typeof runtimeApi === 'object' ? runtimeApi : null;\n\n  const ROW_GROUPS = {\n    top: ['A', 'B', 'C', 'D', 'E'],\n    bottom: ['F', 'G', 'H', 'I', 'J']\n  };\n\n  const DEFAULT_MIN_WIDTH = 18;\n  const DEFAULT_MIN_HEIGHT = 24;\n  const BODY_MARGIN = 14;\n  const DEFAULT_INPUT_HANDLE_KEY = 'in';\n\n  const PIN_PRESETS = {\n    'io.breadboard.components:railTapPositive': {\n      rail: { segmentPreference: 'rail-top-positive' },\n      tap: { row: 'A', segment: 'top' }\n    },\n    'io.breadboard.components:railTapNegative': {\n      rail: { segmentPreference: 'rail-bottom-negative' },\n      tap: { row: 'J', segment: 'bottom' }\n    },\n    'io.breadboard.components:led': {\n      anode: { row: 'E', segment: 'top' },\n      cathode: { row: 'F', segment: 'bottom' }\n    }\n  };\n\n  const CONDUCTIVE_COMPONENTS = {\n    'io.breadboard.components:resistor': [['pinA', 'pinB']],\n    'io.breadboard.components:railTapPositive': [['rail', 'tap']],\n    'io.breadboard.components:railTapNegative': [['rail', 'tap']],\n    'io.breadboard.components:jumper': [['wireA', 'wireB']],\n    'io.breadboard.sockets:railSocket': [\n      ['vplus', 'positive'],\n      ['gnd', 'negative']\n    ]\n  };\n\n  // ------------------------------------------------------------\n  // BASIC HELPERS\n  // ------------------------------------------------------------\n\n  const isPlainObject = (value) =>\n    value !== null &&\n    typeof value === 'object' &&\n    Object.prototype.toString.call(value) === '[object Object]';\n\n  const normalizeRow = (value, fallback) => {\n    if (typeof value === 'string' && value.trim()) {\n      return value.trim().toUpperCase();\n    }\n    return fallback || null;\n  };\n\n  const clamp = (value, min, max) => {\n    const num = Number(value);\n    if (!Number.isFinite(num)) return min;\n    return Math.max(min, Math.min(max, Math.round(num)));\n  };\n\n  const toRowKey = (row, column) => `${row}${column}`;\n\n  const getSocketPosition = (node) => {\n    const pos = node?.position || {};\n    return {\n      x: Number(pos.x) || 0,\n      y: Number(pos.y) || 0\n    };\n  };\n\n  const getTypeVariants = (type) => {\n    if (!type || typeof type !== 'string') return [];\n    const trimmed = type.trim();\n    if (!trimmed) return [];\n    const namespace = 'io.breadboard.components';\n    const short = trimmed.includes(':') ? trimmed.split(':').pop() : trimmed;\n    const namespaced = `${namespace}:${short}`;\n    return Array.from(new Set([trimmed, short, namespaced]));\n  };\n\n  const isSocketNode = (node) => node?.type === 'io.breadboard.sockets:socket';\n  const isRailNode = (node) => node?.type === 'io.breadboard.sockets:railSocket';\n  const isBusNode = (node) => node?.type === 'io.breadboard.bus';\n\n  const isComponentNode = (node) => {\n    if (!node || !node.type) return false;\n    if (CONDUCTIVE_COMPONENTS[node.type]) return true;\n    const t = String(node.type).toLowerCase();\n    return (\n      t.includes('resistor') ||\n      t.includes('led') ||\n      t.includes('tap') ||\n      t.includes('jumper')\n    );\n  };\n\n  const makeHandleNodeId = (nodeId, handleKey) =>\n    `handle:${nodeId}:${handleKey || DEFAULT_INPUT_HANDLE_KEY}`;\n\n  const toPromise = (value) => {\n    if (value && typeof value.then === 'function') return value;\n    return Promise.resolve(value);\n  };\n\n  // ------------------------------------------------------------\n  // GRAPH SNAPSHOT\n  // ------------------------------------------------------------\n\n  const getGraphAPI = () => {\n    if (SCRIPT_RUNTIME_API) return SCRIPT_RUNTIME_API;\n    const sources = [\n      () => window.graphAPI,\n      () => {\n        if (!window.parent || window.parent === window) return null;\n        return window.parent.graphAPI;\n      },\n      () => {\n        if (!window.top || window.top === window) return null;\n        return window.top.graphAPI;\n      }\n    ];\n\n    for (const read of sources) {\n      try {\n        const api = read();\n        if (api) return api;\n      } catch (err) {\n        // Ignore cross-origin access errors and continue trying the next source.\n      }\n    }\n    return null;\n  };\n\n  const readGraphSnapshot = async () => {\n    const api = getGraphAPI();\n    if (!api) return { nodes: [], edges: [] };\n\n    const resolveNodes = async () => {\n      if (typeof api.readNode === 'function') {\n        const result = await toPromise(api.readNode());\n        if (Array.isArray(result?.data)) return result.data;\n        if (Array.isArray(result)) return result;\n      }\n      if (typeof api.getNodes === 'function') {\n        const result = await toPromise(api.getNodes());\n        if (Array.isArray(result?.data)) return result.data;\n        if (Array.isArray(result)) return result;\n      }\n      return [];\n    };\n\n    const resolveEdges = async () => {\n      if (typeof api.readEdge === 'function') {\n        const result = await toPromise(api.readEdge());\n        if (Array.isArray(result?.data)) return result.data;\n        if (Array.isArray(result)) return result;\n      }\n      if (typeof api.getEdges === 'function') {\n        const result = await toPromise(api.getEdges());\n        if (Array.isArray(result?.data)) return result.data;\n        if (Array.isArray(result)) return result;\n      }\n      return [];\n    };\n\n    const [nodes, edges] = await Promise.all([resolveNodes(), resolveEdges()]);\n\n    return { nodes, edges };\n  };\n\n  const findSkinSchema = (nodes) => {\n    const skin = nodes.find(\n      (n) => n?.type === 'io.breadboard.sockets:skin'\n    );\n    if (!skin) return null;\n    return (\n      skin.data?.breadboard?.schema ||\n      skin.data?.schema ||\n      null\n    );\n  };\n\n  // ------------------------------------------------------------\n  // BOARD LAYOUT (HOLES + RAILS + ROW POSITIONS)\n  // ------------------------------------------------------------\n\n  function buildBoardLayout(nodes) {\n    const schema = findSkinSchema(nodes);\n    if (!schema || typeof schema !== 'object') return null;\n\n    const socketNodeById = new Map();\n    const railNodeById = new Map();\n\n    nodes.forEach((node) => {\n      if (isSocketNode(node)) {\n        socketNodeById.set(node.id, node);\n      } else if (isRailNode(node)) {\n        railNodeById.set(node.id, node);\n      }\n    });\n\n    const holeMap = new Map(); // \"A1\" -> { row, column, nodeId, x, y }\n    const railMap = new Map(); // \"rail-top-positive::1\" -> { nodeId, column, polarity, x, y, handle }\n\n    const rowPositions = new Map(); // \"A\" -> avg y\n    const columnCenters = new Map(); // col -> avg x\n\n    let minColumn = Infinity;\n    let maxColumn = -Infinity;\n\n    // holes (schema.sockets)\n    if (Array.isArray(schema.sockets)) {\n      schema.sockets.forEach((hole) => {\n        if (!hole) return;\n        const row = normalizeRow(hole.row, null);\n        const column = Number(hole.column);\n        if (!row || !Number.isFinite(column)) return;\n\n        const pos = hole.position || {};\n        const x = Number(pos.x) || 0;\n        const y = Number(pos.y) || 0;\n\n        const idKey = `${row}${column}`;\n        holeMap.set(idKey, {\n          row,\n          column,\n          x,\n          y,\n          nodeId: null, // filled later when binding to socket nodes\n          targetHandle: 'socket'\n        });\n\n        // row positions\n        const stats = rowPositions.get(row) || { total: 0, count: 0 };\n        stats.total += y;\n        stats.count += 1;\n        rowPositions.set(row, stats);\n\n        // column centers (approx)\n        const colStats = columnCenters.get(column) || { total: 0, count: 0 };\n        colStats.total += x;\n        colStats.count += 1;\n        columnCenters.set(column, colStats);\n\n        minColumn = Math.min(minColumn, column);\n        maxColumn = Math.max(maxColumn, column);\n      });\n    }\n\n    // finalize row + column averages\n    const avgRowPositions = new Map();\n    rowPositions.forEach((stats, row) => {\n      if (stats.count > 0) {\n        avgRowPositions.set(row, stats.total / stats.count);\n      }\n    });\n\n    const avgColumnCenters = new Map();\n    columnCenters.forEach((stats, col) => {\n      if (stats.count > 0) {\n        avgColumnCenters.set(col, stats.total / stats.count);\n      }\n    });\n\n    // rails\n    if (Array.isArray(schema.rails)) {\n      schema.rails.forEach((rail) => {\n        const polarity =\n          rail.polarity === 'negative' ? 'negative' : 'positive';\n        const handle = polarity === 'negative' ? 'negative' : 'positive';\n        const chan = rail.channel || 'bus';\n        const segId = `rail-${chan}-${polarity}`;\n\n        const segments = Array.isArray(rail.segments)\n          ? rail.segments\n          : [];\n\n        segments.forEach((seg) => {\n          const column = Number(seg.column);\n          if (!Number.isFinite(column)) return;\n\n          const railNode = railNodeById.get(seg.nodeId);\n          if (!railNode) return;\n\n          const pos = seg.position || {};\n          const x =\n            Number(pos.x) ||\n            getSocketPosition(railNode).x;\n          const y =\n            Number(pos.y) ||\n            getSocketPosition(railNode).y;\n\n          const key = `${segId}::${column}`;\n          railMap.set(key, {\n            nodeId: railNode.id,\n            column,\n            polarity,\n            x,\n            y,\n            handle\n          });\n\n          minColumn = Math.min(minColumn, column);\n          maxColumn = Math.max(maxColumn, column);\n\n          const colStats = avgColumnCenters.get(column) || null;\n          if (!colStats) {\n            avgColumnCenters.set(column, x);\n          }\n        });\n      });\n    }\n\n    if (!Number.isFinite(minColumn) || !Number.isFinite(maxColumn)) {\n      return null;\n    }\n\n    // bind holes to nearest socket node by column\n    socketNodeById.forEach((socketNode) => {\n      const col = Number(socketNode.data?.column);\n      if (!Number.isFinite(col)) return;\n      const rows = Array.isArray(socketNode.data?.rows)\n        ? socketNode.data.rows\n        : [];\n      rows.forEach((row) => {\n        const r = normalizeRow(row, null);\n        if (!r) return;\n        const key = `${r}${col}`;\n        const entry = holeMap.get(key);\n        if (!entry) return;\n        entry.nodeId = socketNode.id;\n      });\n    });\n\n    return {\n      holeMap,\n      railMap,\n      rowPositions: avgRowPositions,\n      columnCenters: avgColumnCenters,\n      minColumn,\n      maxColumn\n    };\n  }\n\n  const findClosestRow = (y, segment, layout) => {\n    const group = segment === 'bottom' ? ROW_GROUPS.bottom : ROW_GROUPS.top;\n    let bestRow = group[0];\n    let bestDist = Infinity;\n    group.forEach((row) => {\n      const rowY =\n        layout.rowPositions.get(row) ||\n        layout.rowPositions.get(row.toUpperCase());\n      if (!Number.isFinite(rowY)) return;\n      const dist = Math.abs(y - rowY);\n      if (dist < bestDist) {\n        bestDist = dist;\n        bestRow = row;\n      }\n    });\n    return bestRow.toUpperCase();\n  };\n\n  const findNearestColumn = (x, columnCenters, minColumn, maxColumn) => {\n    if (!(columnCenters instanceof Map)) return minColumn;\n    let bestColumn = minColumn;\n    let bestDist = Infinity;\n    columnCenters.forEach((cx, col) => {\n      const dist = Math.abs(cx - x);\n      if (dist < bestDist) {\n        bestDist = dist;\n        bestColumn = col;\n      }\n    });\n    return clamp(bestColumn, minColumn, maxColumn);\n  };\n\n  const getNodeCenter = (node) => {\n    const pos = node?.position || {};\n    return {\n      x: Number(pos.x) || 0,\n      y: Number(pos.y) || 0\n    };\n  };\n\n  const resolveAnchor = (node, layout) => {\n    const center = getNodeCenter(node);\n    const y = center.y;\n\n    let segment = 'top';\n    const topRowY = layout.rowPositions.get('B');\n    const bottomRowY = layout.rowPositions.get('H');\n\n    if (Number.isFinite(topRowY) && Number.isFinite(bottomRowY)) {\n      const mid = (topRowY + bottomRowY) / 2;\n      segment = y >= mid ? 'bottom' : 'top';\n    }\n\n    const column = findNearestColumn(\n      center.x,\n      layout.columnCenters,\n      layout.minColumn,\n      layout.maxColumn\n    );\n\n    return { column, segment };\n  };\n\n  // ------------------------------------------------------------\n  // PINS / PRESETS / ASSIGNMENTS\n  // ------------------------------------------------------------\n\n  const applyPinPresets = (node, pins) => {\n    if (!node || !pins) return pins;\n    const variants = getTypeVariants(node.type);\n    const preset =\n      variants.map((v) => PIN_PRESETS[v]).find(Boolean) || null;\n    if (!preset) return pins;\n\n    return pins.map((pin) => {\n      if (!pin) return pin;\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle || !preset[handle]) return pin;\n      const overrides = preset[handle];\n      return {\n        ...pin,\n        ...(overrides.row ? { row: overrides.row } : {}),\n        ...(overrides.segment ? { segment: overrides.segment } : {}),\n        ...(overrides.segmentPreference\n          ? { segmentPreference: overrides.segmentPreference }\n          : {})\n      };\n    });\n  };\n\n  const buildAssignmentsFromPins = (pins, layout) => {\n    const assignments = [];\n    if (!Array.isArray(pins) || !layout) return assignments;\n\n    pins.forEach((pin) => {\n      if (!pin) return;\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle) return;\n\n      let column = Number(pin.column);\n      if (!Number.isFinite(column)) {\n        const offset = Number(pin.columnOffset) || 0;\n        column = clamp(\n          layout.minColumn + offset,\n          layout.minColumn,\n          layout.maxColumn\n        );\n      } else {\n        column = clamp(column, layout.minColumn, layout.maxColumn);\n      }\n\n      const rawPref = (pin.segmentPreference || pin.segment || '')\n        .toString()\n        .toLowerCase();\n\n      // Rail pin\n      if (rawPref.startsWith('rail-')) {\n        const key = `${rawPref}::${column}`;\n        const railTarget = layout.railMap.get(key);\n        if (!railTarget) return;\n        assignments.push({\n          handle,\n          target: {\n            ...railTarget,\n            column,\n            row: railTarget.row || railTarget.polarity || 'V+',\n            targetHandle: railTarget.handle\n          }\n        });\n        return;\n      }\n\n      // Socket pin\n      const segment =\n        rawPref === 'bottom' ? 'bottom' : 'top';\n      const row = normalizeRow(\n        pin.row,\n        segment === 'bottom' ? ROW_GROUPS.bottom[0] : ROW_GROUPS.top[0]\n      );\n      const key = toRowKey(row, column);\n      const socketTarget = layout.holeMap.get(key);\n      if (!socketTarget) return;\n\n      assignments.push({\n        handle,\n        target: {\n          ...socketTarget,\n          targetHandle: 'socket'\n        }\n      });\n    });\n\n    // de-dupe by handle\n    const byHandle = new Map();\n    assignments.forEach((a) => {\n      if (!a || !a.handle) return;\n      if (!byHandle.has(a.handle)) {\n        byHandle.set(a.handle, a);\n      }\n    });\n    return Array.from(byHandle.values());\n  };\n\n  const applyAssignmentsToPins = (pins, assignments, fallbackSegment) => {\n    const map = new Map();\n    assignments.forEach((entry) => {\n      if (!entry || !entry.handle || !entry.target) return;\n      map.set(entry.handle, entry.target);\n    });\n\n    return pins.map((pin) => {\n      const handle =\n        pin.id || pin.handleKey || pin.key || pin.label;\n      if (!handle || !map.has(handle)) return pin;\n      const target = map.get(handle);\n      const row = target.row || pin.row || ROW_GROUPS.top[0];\n      const isRail =\n        typeof target.segment === 'string' &&\n        target.segment.startsWith('rail-');\n      const segmentPref = isRail\n        ? (target.segment ||\n            target.segmentPreference ||\n            pin.segmentPreference ||\n            fallbackSegment)\n        : fallbackSegment;\n\n      return {\n        ...pin,\n        column: target.column,\n        row,\n        segment: segmentPref,\n        segmentPreference: segmentPref\n      };\n    });\n  };\n\n  const computeBounds = (assignments) => {\n    if (!assignments.length) return null;\n    const xs = assignments.map((a) => a.target.x);\n    const ys = assignments.map((a) => a.target.y);\n    const minX = Math.min(...xs);\n    const maxX = Math.max(...xs);\n    const minY = Math.min(...ys);\n    const maxY = Math.max(...ys);\n    const width = Math.max(\n      DEFAULT_MIN_WIDTH,\n      maxX - minX + BODY_MARGIN\n    );\n    const height = Math.max(\n      DEFAULT_MIN_HEIGHT,\n      maxY - minY + BODY_MARGIN\n    );\n    const position = {\n      x: (minX + maxX) / 2,\n      y: (minY + maxY) / 2\n    };\n    return { position, width, height };\n  };\n\n  const buildPinState = (assignments) => {\n    const state = {};\n    assignments.forEach((assignment) => {\n      state[assignment.handle] = {\n        row: assignment.target.row,\n        column: assignment.target.column,\n        nodeId: assignment.target.nodeId,\n        targetHandle: assignment.target.targetHandle\n      };\n    });\n    return state;\n  };\n\n  // ------------------------------------------------------------\n  // CONNECTIVITY SOLVER (BUS → RAIL → COMPONENTS)\n  // ------------------------------------------------------------\n\n  const connectAdjacency = (adjacency, a, b) => {\n    if (!a || !b) return;\n    if (!adjacency.has(a)) adjacency.set(a, new Set());\n    adjacency.get(a).add(b);\n  };\n\n  const solveConnectivity = (nodes = [], edges = []) => {\n    const adjacency = new Map();\n\n    edges.forEach((edge) => {\n      if (!edge) return;\n      const src = edge.source || edge.fromNodeId;\n      const tgt = edge.target || edge.toNodeId;\n      if (!src || !tgt) return;\n\n      const sourceHandle =\n        edge.sourceHandle || edge.fromHandle || DEFAULT_INPUT_HANDLE_KEY;\n      const targetHandle =\n        edge.targetHandle || edge.toHandle || null;\n\n      const sourceId = makeHandleNodeId(src, sourceHandle);\n      const targetId =\n        targetHandle && targetHandle !== 'socket'\n          ? makeHandleNodeId(tgt, targetHandle)\n          : tgt;\n\n      connectAdjacency(adjacency, sourceId, targetId);\n      connectAdjacency(adjacency, targetId, sourceId);\n    });\n\n    nodes.forEach((node) => {\n      const pairs = CONDUCTIVE_COMPONENTS[node?.type];\n      if (!node || !Array.isArray(pairs)) return;\n      pairs.forEach((pair) => {\n        if (!Array.isArray(pair) || pair.length < 2) return;\n        const [fromKey, toKey] = pair;\n        const fromId = makeHandleNodeId(node.id, fromKey);\n        const toId = makeHandleNodeId(node.id, toKey);\n        connectAdjacency(adjacency, fromId, toId);\n        connectAdjacency(adjacency, toId, fromId);\n      });\n    });\n\n    const nodeFlags = new Map();\n    const markReachable = (startId, flagKey) => {\n      if (!startId) return;\n      const visited = new Set();\n      const queue = [startId];\n      visited.add(startId);\n      while (queue.length > 0) {\n        const current = queue.shift();\n        if (!nodeFlags.has(current)) nodeFlags.set(current, {});\n        nodeFlags.get(current)[flagKey] = true;\n        const neighbors = adjacency.get(current);\n        if (!neighbors) continue;\n        neighbors.forEach((nextId) => {\n          if (visited.has(nextId)) return;\n          visited.add(nextId);\n          queue.push(nextId);\n        });\n      }\n    };\n\n    nodes.forEach((node) => {\n      if (!isBusNode(node)) return;\n      const positiveId = makeHandleNodeId(node.id, 'positive');\n      const negativeId = makeHandleNodeId(node.id, 'negative');\n      markReachable(positiveId, 'touchesVPlus');\n      markReachable(negativeId, 'touchesGnd');\n    });\n\n    return nodeFlags;\n  };\n\n  const normalizeHandleEntry = (handle) => {\n    if (!handle) return null;\n    if (typeof handle === 'string') {\n      return { id: handle, key: handle, label: handle };\n    }\n    if (typeof handle !== 'object') return null;\n    const id = handle.id || handle.key || handle.name || handle.handleKey;\n    if (!id) return null;\n    return {\n      id,\n      key: handle.key || id,\n      label: handle.label || handle.name || id\n    };\n  };\n\n  const collectHandleKeys = (node) => {\n    const keys = new Set();\n    const sources = [\n      node?.handles,\n      node?.outputs,\n      node?.inputs,\n      node?.data?.handles,\n      node?.data?.pins\n    ];\n    sources.forEach((list) => {\n      if (!Array.isArray(list)) return;\n      list.forEach((entry) => {\n        const normalized = normalizeHandleEntry(entry);\n        if (!normalized) return;\n        if (normalized.id) keys.add(normalized.id);\n        if (normalized.key) keys.add(normalized.key);\n      });\n    });\n    return Array.from(keys);\n  };\n\n  const updateConnectivityStates = async (api, nodes, edges) => {\n    const handleFlags = solveConnectivity(nodes, edges);\n\n    for (const node of nodes) {\n      if (!node || !node.id) continue;\n\n      const existingPinState = isPlainObject(node.data?.breadboard?.pinState)\n        ? node.data.breadboard.pinState\n        : {};\n      let changed = false;\n      const nextPinState = { ...existingPinState };\n      const pinKeys = collectHandleKeys(node);\n\n      pinKeys.forEach((handleKey) => {\n        if (!handleKey) return;\n        const currentState = nextPinState[handleKey] || {};\n        const flagEntry = handleFlags.get(\n          makeHandleNodeId(node.id, handleKey)\n        ) || {};\n        const touchesVPlus = !!flagEntry.touchesVPlus;\n        const touchesGnd = !!flagEntry.touchesGnd;\n        nextPinState[handleKey] = {\n          ...currentState,\n          touchesVPlus,\n          touchesGnd\n        };\n        if (\n          (currentState.touchesVPlus || false) !== touchesVPlus ||\n          (currentState.touchesGnd || false) !== touchesGnd\n        ) {\n          changed = true;\n        }\n      });\n\n      if (!changed) continue;\n\n      const payload = {\n        data: {\n          ...(node.data || {}),\n          breadboard: {\n            ...(isPlainObject(node.data?.breadboard)\n              ? node.data.breadboard\n              : {}),\n            pinState: nextPinState\n          }\n        }\n      };\n\n      try {\n        await toPromise(api.updateNode(node.id, payload));\n      } catch (err) {\n        console.warn(\n          '[BreadboardAutoWire] Failed to update node pinState',\n          node.id,\n          err\n        );\n      }\n    }\n  };\n\n  // ------------------------------------------------------------\n  // REBUILD EDGES\n  // ------------------------------------------------------------\n\n  const rebuildEdges = async (api, nodeId, assignments, snapshot) => {\n    if (!api) return;\n\n    const existing = snapshot.edges.filter(\n      (edge) => edge && (edge.source === nodeId || edge.fromNodeId === nodeId)\n    );\n\n    // delete existing\n    await Promise.all(\n      existing.map((edge) => {\n        if (typeof api.deleteEdge === 'function') {\n          return toPromise(api.deleteEdge(edge.id));\n        }\n        return Promise.resolve();\n      })\n    );\n\n    // recreate\n    for (const assignment of assignments) {\n      const payload = {\n        source: nodeId,\n        sourceHandle: assignment.handle,\n        target: assignment.target.nodeId,\n        targetHandle: assignment.target.targetHandle,\n        type: 'default'\n      };\n      if (typeof api.createEdge === 'function') {\n        try {\n          await toPromise(api.createEdge(payload));\n        } catch (err) {\n          console.warn(\n            '[BreadboardAutoWire] Failed to create edge',\n            payload,\n            err\n          );\n        }\n      }\n    }\n  };\n\n  // ------------------------------------------------------------\n  // MAIN PER-NODE AUTOWIRE\n  // ------------------------------------------------------------\n\n  const processNode = async (nodeId) => {\n    const api = getGraphAPI();\n\n    if (!api) return;\n\n    const snapshot = await readGraphSnapshot();\n    const layout = buildBoardLayout(snapshot.nodes);\n    if (!layout) return;\n\n    const node = snapshot.nodes.find((n) => n && n.id === nodeId);\n    if (!node || !node.data) return;\n    if (isSocketNode(node) || isRailNode(node)) return;\n    if (!isComponentNode(node)) return;\n\n    const anchor = resolveAnchor(node, layout);\n    const basePins = Array.isArray(node.data.pins)\n      ? node.data.pins.map((p) => ({ ...p }))\n      : [];\n    let pins = applyPinPresets(node, basePins);\n    if (!pins.length) return;\n\n    // If no explicit column on pins, build offsets from anchor\n    pins = pins.map((pin, index) => {\n      if (!Number.isFinite(Number(pin.column))) {\n        pin.columnOffset =\n          Number(pin.columnOffset) ??\n          (Number.isFinite(pin.column) ? Number(pin.column) - layout.minColumn : index);\n      }\n      return pin;\n    });\n\n    let assignments = buildAssignmentsFromPins(pins, layout);\n    if (!assignments.length) {\n      // fallback: put two pins on same row, adjacent columns\n      const center = getNodeCenter(node);\n      const row = findClosestRow(center.y, anchor.segment, layout);\n      const colA = clamp(anchor.column, layout.minColumn, layout.maxColumn - 1);\n      const colB = clamp(colA + 1, layout.minColumn, layout.maxColumn);\n      const keyA = toRowKey(row, colA);\n      const keyB = toRowKey(row, colB);\n      const left = layout.holeMap.get(keyA);\n      const right = layout.holeMap.get(keyB);\n      const handles = pins\n        .map((p) => p.id || p.handleKey || p.key || p.label)\n        .filter(Boolean);\n      if (left && right && handles.length >= 2) {\n        assignments = [\n          {\n            handle: handles[0],\n            target: { ...left, targetHandle: 'socket' }\n          },\n          {\n            handle: handles[1],\n            target: { ...right, targetHandle: 'socket' }\n          }\n        ];\n      }\n    }\n\n    if (!assignments.length) return;\n\n    // update pins with final assignment positions\n    pins = applyAssignmentsToPins(pins, assignments, anchor.segment);\n\n    // snap body bounds\n    const body = computeBounds(assignments);\n    const pinState = buildPinState(assignments);\n\n    const payload = {\n      data: {\n        ...(node.data || {}),\n        pins,\n        breadboard: {\n          ...(node.data?.breadboard || {}),\n          anchor,\n          pinState\n        }\n      }\n    };\n\n    if (body) {\n      payload.position = body.position;\n      payload.width = body.width;\n      payload.height = body.height;\n    }\n\n    try {\n      await toPromise(api.updateNode(node.id, payload));\n      await rebuildEdges(api, node.id, assignments, snapshot);\n      // after wiring edges, recompute connectivity\n      const fresh = await readGraphSnapshot();\n      await updateConnectivityStates(api, fresh.nodes, fresh.edges);\n    } catch (err) {\n      console.warn('[BreadboardAutoWire] Failed to process node', node.id, err);\n    }\n  };\n\n  // ------------------------------------------------------------\n  // EVENT WIRING + BOOTSTRAP (RETRY UNTIL graphAPI IS READY)\n  // ------------------------------------------------------------\n\n  const startAutoWire = async () => {\n    const api = getGraphAPI();\n\n\n    if (!api) {\n      console.warn(\"[BreadboardAutoWire] graphAPI not ready, retrying…\");\n      setTimeout(startAutoWire, 50); // retry until graphAPI attaches\n      return;\n    }\n\n    console.log(\"[BreadboardAutoWire] Initializing (plugin script node)\");\n\n    // handy for manual debugging\n    window.__breadboardAutoWireProcessNode = processNode;\n\n    const snapshot = await readGraphSnapshot();\n    snapshot.nodes.forEach((node) => {\n      if (!node || !node.id) return;\n      if (isSocketNode(node) || isRailNode(node)) return;\n      if (!isComponentNode(node)) return;\n      processNode(node.id);\n    });\n\n    const cleanups = [];\n    const events = api.events;\n\n    if (events && typeof events.on === \"function\") {\n      const makeHandler = (label) => (evt) => {\n        const id = evt?.nodeId || evt?.id || evt?.node?.id;\n        if (!id) return;\n        console.log(\"[BreadboardAutoWire] Event\", label, \"-> rewire node\", id);\n        processNode(id);\n      };\n\n      const offDrag =\n        events.on(\"nodeDragEnd\", makeHandler(\"nodeDragEnd\")) || (() => {});\n      const offAdd =\n        events.on(\"nodeAdded\", makeHandler(\"nodeAdded\")) || (() => {});\n      const offChange =\n        events.on(\"nodeDataChanged\", makeHandler(\"nodeDataChanged\")) ||\n        (() => {});\n\n      cleanups.push(offDrag, offAdd, offChange);\n    }\n\n    window.__breadboardAutoWireCleanup = () => {\n      console.log(\"[BreadboardAutoWire] Cleaning up listeners (plugin)\");\n      cleanups.forEach((off) => {\n        try {\n          off();\n        } catch (err) {\n          console.warn(\n            \"[BreadboardAutoWire] Failed to cleanup listener\",\n            err\n          );\n        }\n      });\n    };\n  };\n\n  // Retry bootstrap until both DOM and graphAPI are ready\n  if (document.readyState === \"loading\") {\n    document.addEventListener(\"DOMContentLoaded\", () => {\n      setTimeout(startAutoWire, 50);\n    }, { once: true });\n  } else {\n    setTimeout(startAutoWire, 50);\n  }\n})(typeof api !== 'undefined' ? api : undefined);\n",
+        "lastResult": null,
+        "lastRunAt": 1764531095698
       }
     },
     {
@@ -7944,14 +7963,95 @@
       "height": 80,
       "visible": true,
       "showLabel": true,
-      "data": {}
+      "data": {
+        "breadboard": {
+          "pinState": {
+            "positive": {
+              "touchesVPlus": true,
+              "touchesGnd": false
+            },
+            "negative": {
+              "touchesVPlus": false,
+              "touchesGnd": true
+            }
+          }
+        }
+      }
     },
     {
-      "id": "d00196ed-75d2-48f6-86bb-9718c2843231",
+      "id": "efc79eb2-e05a-4413-b8e3-d1d083069ef9",
       "type": "io.breadboard.components:resistor",
       "label": "Resistor",
       "position": {
-        "x": 360,
+        "x": -377,
+        "y": -22.400000000000002
+      },
+      "width": 18,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "pins": [
+          {
+            "id": "pinA",
+            "row": "A",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top",
+            "segment": "top"
+          },
+          {
+            "id": "pinB",
+            "row": "F",
+            "column": 1,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top",
+            "segment": "top"
+          }
+        ],
+        "footprint": {
+          "rows": 2,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 2
+        },
+        "breadboard": {
+          "pendingPlacement": true,
+          "anchor": {
+            "column": 1,
+            "segment": "top"
+          },
+          "pinState": {
+            "pinA": {
+              "row": "A",
+              "column": 1,
+              "nodeId": "socket-top-1",
+              "targetHandle": "socket"
+            },
+            "pinB": {
+              "row": "F",
+              "column": 1,
+              "nodeId": "socket-bottom-1",
+              "targetHandle": "socket"
+            }
+          }
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "5946d23a-36f8-4414-adbb-1acde7e3873c",
+      "type": "io.breadboard.components:resistor",
+      "label": "Resistor",
+      "position": {
+        "x": -160,
         "y": -80
       },
       "width": 32,
@@ -7968,59 +8068,14 @@
             "column": 1,
             "columnOffset": 0,
             "polarity": "neutral",
-            "segmentPreference": "same"
+            "segmentPreference": "top"
           },
           {
             "id": "pinB",
-            "row": "A",
-            "column": 2,
-            "columnOffset": 1,
-            "polarity": "neutral",
-            "segmentPreference": "same"
-          }
-        ],
-        "footprint": {
-          "rows": 1,
-          "columns": 2,
-          "rowPitch": 1,
-          "columnPitch": 1,
-          "width": 2,
-          "height": 1
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "2e297af8-1d04-490a-8e5e-781ecec1a435",
-      "type": "io.breadboard.components:led",
-      "label": "LED",
-      "position": {
-        "x": 260,
-        "y": 0
-      },
-      "width": 24,
-      "height": 54,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "",
-        "link": "",
-        "pins": [
-          {
-            "id": "anode",
-            "row": "A",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "anode",
-            "segmentPreference": "top"
-          },
-          {
-            "id": "cathode",
             "row": "F",
             "column": 1,
             "columnOffset": 0,
-            "polarity": "cathode",
+            "polarity": "neutral",
             "segmentPreference": "bottom"
           }
         ],
@@ -8032,140 +8087,8 @@
           "width": 1,
           "height": 2
         },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "1523828e-7c3e-4ba0-b159-13f18fd73df7",
-      "type": "io.breadboard.components:led",
-      "label": "LED",
-      "position": {
-        "x": 360,
-        "y": 0
-      },
-      "width": 24,
-      "height": 54,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "",
-        "link": "",
-        "pins": [
-          {
-            "id": "anode",
-            "row": "A",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "anode",
-            "segmentPreference": "top"
-          },
-          {
-            "id": "cathode",
-            "row": "F",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "cathode",
-            "segmentPreference": "bottom"
-          }
-        ],
-        "footprint": {
-          "rows": 2,
-          "columns": 1,
-          "rowPitch": 1,
-          "columnPitch": 1,
-          "width": 1,
-          "height": 2
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "6d37185f-9430-4045-94a8-4c2cab2d1c46",
-      "type": "io.breadboard.components:railTapPositive",
-      "label": "Rail Tap (+)",
-      "position": {
-        "x": 380,
-        "y": -100
-      },
-      "width": 16,
-      "height": 40,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "",
-        "link": "",
-        "pins": [
-          {
-            "id": "rail",
-            "row": "V+",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "positive",
-            "segmentPreference": "rail-top-positive"
-          },
-          {
-            "id": "tap",
-            "row": "A",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "neutral",
-            "segmentPreference": "top"
-          }
-        ],
-        "footprint": {
-          "rows": 1,
-          "columns": 1,
-          "rowPitch": 1,
-          "columnPitch": 1,
-          "width": 1,
-          "height": 1
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "1b1b1e2b-a7a1-456d-849c-2185b7e0a1c9",
-      "type": "io.breadboard.components:railTapNegative",
-      "label": "Rail Tap (-)",
-      "position": {
-        "x": 360,
-        "y": 100
-      },
-      "width": 16,
-      "height": 40,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "",
-        "link": "",
-        "pins": [
-          {
-            "id": "rail",
-            "row": "GND",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "negative",
-            "segmentPreference": "rail-bottom-negative"
-          },
-          {
-            "id": "tap",
-            "row": "A",
-            "column": 1,
-            "columnOffset": 0,
-            "polarity": "neutral",
-            "segmentPreference": "top"
-          }
-        ],
-        "footprint": {
-          "rows": 1,
-          "columns": 1,
-          "rowPitch": 1,
-          "columnPitch": 1,
-          "width": 1,
-          "height": 1
+        "breadboard": {
+          "pendingPlacement": false
         },
         "html": "",
         "svg": ""
@@ -8831,6 +8754,122 @@
       "targetHandle": "negative",
       "label": "",
       "style": {},
+      "data": {}
+    },
+    {
+      "id": "85b68ac3-d132-4773-858a-0cc423d18170",
+      "type": "default",
+      "source": "efc79eb2-e05a-4413-b8e3-d1d083069ef9",
+      "target": "socket-bottom-1",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinB",
+          "label": "pinB",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "051ac862-2aa0-4b28-beec-3153fc5d4f76",
+      "type": "default",
+      "source": "efc79eb2-e05a-4413-b8e3-d1d083069ef9",
+      "target": "socket-bottom-1",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinB",
+          "label": "pinB",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "2978c319-0999-43ff-88c8-f5ef9beeb8b8",
+      "type": "default",
+      "source": "efc79eb2-e05a-4413-b8e3-d1d083069ef9",
+      "target": "socket-bottom-1",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinB",
+          "label": "pinB",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "d4e9ad88-cfdb-4957-8e04-0f7abb3dccd9",
+      "type": "default",
+      "source": "efc79eb2-e05a-4413-b8e3-d1d083069ef9",
+      "target": "socket-bottom-1",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinB",
+          "label": "pinB",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     }
   ],

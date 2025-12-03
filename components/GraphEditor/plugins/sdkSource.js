@@ -180,6 +180,28 @@ export const PLUGIN_RUNTIME_SDK_SOURCE = `(function initNodeGraphPluginSDK(globa
       });
     };
 
+    // compatibility proxy: expose a lightweight window.graphAPI in the sandbox
+    // so legacy code that expects window.graphAPI can operate via secure RPC.
+    const setupGraphApiProxy = () => {
+      try {
+        const graphApiProxy = {
+          getNodes: (...args) => callHost('graph:getNodes', { args }),
+          getNode: (...args) => callHost('graph:getNode', { args }),
+          getEdges: (...args) => callHost('graph:getEdges', { args }),
+          getEdge: (...args) => callHost('graph:getEdge', { args }),
+          createNode: (...args) => callHost('graph:createNode', { args }),
+          updateNode: (...args) => callHost('graph:updateNode', { args }),
+          deleteNode: (...args) => callHost('graph:deleteNode', { args }),
+          createEdge: (...args) => callHost('graph:createEdge', { args }),
+          deleteEdge: (...args) => callHost('graph:deleteEdge', { args })
+        };
+        // expose as root.graphAPI to mimic older integrations
+        try { root.graphAPI = graphApiProxy; } catch (e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
+    };
+
     const handleMessage = (event) => {
       if (allowedOrigins && allowedOrigins.length > 0) {
         const origin = event.origin || (event.target && event.target.origin);
@@ -208,6 +230,8 @@ export const PLUGIN_RUNTIME_SDK_SOURCE = `(function initNodeGraphPluginSDK(globa
             /* ignore */
           }
         }
+        // expose compatibility proxy once handshake establishes channel
+        setupGraphApiProxy();
         postToHost({
           type: 'handshake',
           methods: Object.keys(methods),
@@ -305,3 +329,5 @@ export const PLUGIN_RUNTIME_SDK_SOURCE = `(function initNodeGraphPluginSDK(globa
     createPluginRuntime
   };
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : undefined);`;
+
+export default PLUGIN_RUNTIME_SDK_SOURCE;

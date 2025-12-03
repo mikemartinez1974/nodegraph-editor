@@ -67,14 +67,14 @@ const buildDefaultHostMethods = (plugin, options = {}) => {
 
   const methods = {
     'graph:getNodes': () => {
+      requirePermission('graph.read');
+      const api = ensureGraphApi(getGraphApi);
+      const result = api.readNode?.();
+      if (!result?.success) {
         throw new Error(
           result?.error ||
             `Failed to read nodes in plugin "${plugin.id || plugin.name || 'unknown'}" (method: graph:getNodes)`
         );
-      const api = ensureGraphApi(getGraphApi);
-      const result = api.readNode?.();
-      if (!result?.success) {
-        throw new Error(result?.error || 'Failed to read nodes');
       }
       return cloneForRpc(result.data || []);
     },
@@ -191,6 +191,9 @@ export default class PluginRuntimeHost {
 
     this._handleWindowMessage = this._handleWindowMessage.bind(this);
     this._handleWorkerMessage = this._handleWorkerMessage.bind(this);
+
+    // expected origins set (populated when sandbox starts)
+    this._expectedOrigins = new Set();
   }
 
   ensureReady() {
@@ -345,6 +348,22 @@ export default class PluginRuntimeHost {
       }
     })();
 
+    // compute expected origins set for this iframe (allow 'null' for srcdoc/blob/data)
+    try {
+      const origins = new Set();
+      try {
+        const parsed = new URL(url, window.location.origin);
+        origins.add(parsed.origin);
+      } catch {
+        // ignore
+      }
+      origins.add(window.location.origin);
+      origins.add('null');
+      this._expectedOrigins = origins;
+    } catch (e) {
+      this._expectedOrigins = new Set([window.location.origin, 'null']);
+    }
+
     const sdkTag = `<script>${this.options.sdkSource}</script>`;
     const scriptTag = `<script src="${url}"${
       integrity ? ` integrity="${integrity}" crossorigin="anonymous"` : ''
@@ -397,7 +416,16 @@ export default class PluginRuntimeHost {
   }
 
   _handleWindowMessage(event) {
+    // Ensure message is from our iframe window reference
     if (event.source !== this.iframe?.contentWindow) return;
+
+    // Basic origin check: if origin present and not expected, ignore message
+    const origin = event.origin;
+    if (origin && this._expectedOrigins && !this._expectedOrigins.has(origin)) {
+      // ignore unexpected origin
+      return;
+    }
+
     const data = event.data;
     if (!data || typeof data !== 'object' || data.token !== this.sessionToken) {
       return;

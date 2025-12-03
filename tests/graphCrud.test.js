@@ -205,6 +205,30 @@ describe('GraphCRUD core CRUD flows', () => {
     assert.equal(fixture.history.length, 1);
   });
 
+  it('records history entries when edges are created', () => {
+    const fixture = createCrudFixture({
+      nodes: [
+        { id: 'a', label: 'A', outputs: [{ key: 'a-out', label: 'Out', type: 'trigger' }] },
+        { id: 'b', label: 'B', inputs: [{ key: 'b-in', label: 'In', type: 'trigger' }] },
+      ],
+    });
+
+    const before = fixture.history.length;
+    const result = fixture.crud.createEdge({
+      source: 'a',
+      target: 'b',
+      sourceHandle: 'a-out',
+      targetHandle: 'b-in',
+      label: 'SyncEdge'
+    });
+
+    assert.equal(result.success, true);
+    assert.equal(fixture.history.length, before + 1);
+    const lastSnapshot = fixture.history[fixture.history.length - 1];
+    assert.equal(lastSnapshot.edges.length, 1);
+    assert.equal(lastSnapshot.edges[0].label, 'SyncEdge');
+  });
+
   it('bulk creates handle-aware edges and surfaces invalid entries', () => {
     const fixture = createCrudFixture({
       nodes: [

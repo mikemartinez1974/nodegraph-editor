@@ -46,6 +46,47 @@ const COL_SPACING = 26;
 // Bus node id  👇 (this is the missing piece)
 const BUS_NODE_ID = "breadboard-bus";
 
+// ---------------------------------------------------------------------------
+// Runtime metadata that used to live inside autowire-runtime.js.
+// Embedding it into the node payload lets the runtime stay lean.
+// ---------------------------------------------------------------------------
+
+const RUNTIME_METADATA = {
+  rowGroups: {
+    top: ["A", "B", "C", "D", "E"],
+    bottom: ["F", "G", "H", "I", "J"]
+  },
+  pinPresets: {
+    "io.breadboard.components:railTapPositive": {
+      rail: { segmentPreference: "rail-top-positive" },
+      tap: { row: "A", segment: "top" }
+    },
+    "io.breadboard.components:railTapNegative": {
+      rail: { segmentPreference: "rail-bottom-negative" },
+      tap: { row: "J", segment: "bottom" }
+    },
+    "io.breadboard.components:led": {
+      anode: { row: "E", segment: "top" },
+      cathode: { row: "F", segment: "bottom" }
+    }
+  },
+  conductiveComponents: {
+    "io.breadboard.components:resistor": [["pinA", "pinB"]],
+    "io.breadboard.components:railTapPositive": [["rail", "tap"]],
+    "io.breadboard.components:railTapNegative": [["rail", "tap"]],
+    "io.breadboard.components:jumper": [["wireA", "wireB"]],
+    "io.breadboard.sockets:railSocket": [
+      ["vplus", "positive"],
+      ["gnd", "negative"]
+    ]
+  },
+  defaults: {
+    minWidth: 18,
+    minHeight: 24,
+    bodyMargin: 14,
+    inputHandleKey: "in"
+  }
+};
 
 
 // ---------------------------------------------------------------------------
@@ -220,7 +261,8 @@ function buildSkinNode(socketNodes) {
     state: { locked: true },
     data: {
       breadboard: {
-        schema
+        schema,
+        metadata: JSON.parse(JSON.stringify(RUNTIME_METADATA))
       }
     },
     extensions: {
