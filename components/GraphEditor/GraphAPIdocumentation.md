@@ -332,6 +332,14 @@ This copies the template in `templates/plugin-starter` into `public/plugins/<slu
 
 The CLI is additive and never overwrites existing folders, so delete/rename a scaffold before regenerating if you need to start over.
 
+### Plugin manifest & bundle requirements
+
+The Plugin Manager relies on `validatePluginManifest` when installing bundles, so keep the manifest contract stable and document any changes here.
+- `bundle.url` must resolve to an `http:/https:` resource (relative URLs are resolved against the host at install time).
+- `bundle.sandbox` is restricted to either `iframe` or `worker`; the manifest validator rejects any other values.
+- Provide a Subresource Integrity hash (`sha256`, `sha384`, or `sha512`) for remote bundles whenever possible—`bundle.integrity` is optional but must match an SRI pattern when supplied.
+- The repository ships `tests/pluginManifest.test.js` to exercise these rules, and `npm test` runs both the GraphCRUD suite and the manifest validation checks before publishing.
+
 ### Renderer Bridge
 
 If a node declares `renderer.entry`, the host spins up a sandboxed iframe inside the node and loads two scripts in order: the shared renderer SDK (`/plugins/sdk/nodeRenderer.js`) and the plugin’s renderer entry module. The SDK exposes `window.NodeGraphPluginRenderer.createRenderer({ render })`. The `render` callback receives `{ nodeId, data, state, label }` whenever the node changes, and you can update the DOM however you like. Example:

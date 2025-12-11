@@ -72,6 +72,13 @@ export default function ScriptNode({
   const [showResult, setShowResult] = useState(false);
   const autoRunTriggered = useRef(false);
   const autoRunTimerRef = useRef(null);
+  const autoRunInFlightRef = useRef(false);
+  const lastRunSignatureRef = useRef('');
+  const lastRunSignatureTimeRef = useRef(0);
+  const lastRunTimeRef = useRef(0);
+  const pendingNodeIdsRef = useRef(new Set());
+  const lastDragEndRef = useRef(new Map());
+  const runQueuedRef = useRef(false);
   const scriptSource = useMemo(() => node?.data?.script || node?.data?.source || '', [node?.data]);
 
   useEffect(() => {
@@ -216,15 +223,55 @@ export default function ScriptNode({
 
     const scheduleRun = (eventName, payload = {}) => {
       if (payload?.source === 'script-node') return;
-      console.log('[ScriptNode] schedule auto-run', node.id, eventName, payload);
-      if (autoRunTimerRef.current) {
-        clearTimeout(autoRunTimerRef.current);
+
+      // Merge pending node IDs so multiple dragEnd events coalesce into one run.
+      const incomingIds = new Set();
+      if (Array.isArray(payload.nodeIds)) {
+        payload.nodeIds.forEach((id) => id && incomingIds.add(id));
       }
-      autoRunTimerRef.current = setTimeout(() => {
-        autoRunTimerRef.current = null;
-        console.log('[ScriptNode] auto-run timer firing', node.id);
-        runScriptRef.current?.();
-      }, 50);
+      if (Array.isArray(payload.nodes)) {
+        payload.nodes.forEach((n) => n?.id && incomingIds.add(n.id));
+      }
+      incomingIds.forEach((id) => pendingNodeIdsRef.current.add(id));
+
+      if (pendingNodeIdsRef.current.size === 0) return;
+
+      // If a run is already queued or in flight, let it pick up the pending ids.
+      if (autoRunInFlightRef.current || runQueuedRef.current) return;
+
+      const runNow = () => {
+        if (autoRunInFlightRef.current) return;
+        autoRunInFlightRef.current = true;
+        const pendingIds = Array.from(pendingNodeIdsRef.current);
+        pendingNodeIdsRef.current.clear();
+      // Keep this concise; main debug signal for autowire runs.
+      console.info('[ScriptNode] auto-run', node.id, { from: eventName, count: pendingIds.length });
+        Promise.resolve(runScriptRef.current?.())
+          .catch(() => {})
+          .finally(() => {
+            autoRunInFlightRef.current = false;
+            if (pendingNodeIdsRef.current.size > 0) {
+              // schedule another run on the next tick
+              if (!runQueuedRef.current) {
+                runQueuedRef.current = true;
+                setTimeout(() => {
+                  runQueuedRef.current = false;
+                  runNow();
+                }, 0);
+              }
+            }
+          });
+      };
+
+      // If nothing is pending, don't fire (prevents empty runs from mount or unrelated events).
+      if (pendingNodeIdsRef.current.size === 0) return;
+
+      // Queue a single run on the next tick to coalesce multiple rapid events.
+      runQueuedRef.current = true;
+      setTimeout(() => {
+        runQueuedRef.current = false;
+        runNow();
+      }, 0);
     };
 
     const fetchGraphNodes = () => {
@@ -248,48 +295,90 @@ export default function ScriptNode({
       typeof entry.type === 'string' &&
       entry.type.startsWith('io.breadboard.components:');
 
-    const getPendingComponentIdsFromNodes = (nodes = []) =>
+    // Collect component ids from a list of nodes; do not gate on pendingPlacement so we always
+    // wire freshly dropped components even if the flag is already false.
+    const getComponentIdsFromNodes = (nodes = []) =>
       nodes
-        .filter(
-          (node) =>
-            isComponentNode(node) &&
-            node?.data?.breadboard?.pendingPlacement !== false
-        )
+        .filter((node) => isComponentNode(node))
         .map((node) => node.id)
         .filter(Boolean);
 
+    const filterDebouncedIds = (ids) => {
+      const now = Date.now();
+      const out = [];
+      ids.forEach((id) => {
+        const last = lastDragEndRef.current.get(id) || 0;
+        if (now - last < 100) {
+          return;
+        }
+        lastDragEndRef.current.set(id, now);
+        out.push(id);
+      });
+      return out;
+    };
+
+    const readNodeById = (id) => {
+      const api = typeof window !== 'undefined' ? window.graphAPI : null;
+      if (!api) return null;
+      try {
+        if (typeof api.readNode === 'function') {
+          const res = api.readNode(id);
+          if (res && res.data) return res.data;
+          if (res && res.id) return res;
+        }
+      } catch (err) {
+        // ignore
+      }
+      return null;
+    };
+
     const handleNodeDragEnd = (payload = {}) => {
       const eventNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
-      const pendingFromEvent = getPendingComponentIdsFromNodes(eventNodes);
-      if (pendingFromEvent.length) {
+      const idsFromEvent = getComponentIdsFromNodes(eventNodes);
+      const filteredIdsFromEvent = filterDebouncedIds(idsFromEvent);
+      if (filteredIdsFromEvent.length) {
+        // If we have event nodes, prefer their positions but refresh other fields from readNode.
+        const mergedNodes = filteredIdsFromEvent
+          .map((id) => {
+            const eventNode = eventNodes.find((n) => n.id === id);
+            const fresh = readNodeById(id);
+            if (fresh) {
+              return { ...fresh, position: { ...(eventNode?.position || fresh.position || {}) } };
+            }
+            return eventNode;
+          })
+          .filter(Boolean);
         scheduleRun('nodeDragEnd', {
           ...payload,
-          nodeIds: pendingFromEvent,
-          nodes: eventNodes.filter((node) =>
-            pendingFromEvent.includes(node.id)
-          )
+          nodeIds: filteredIdsFromEvent,
+          nodes: mergedNodes
         });
         return;
       }
 
       const ids = Array.isArray(payload.nodeIds) ? payload.nodeIds : [];
+      const filteredIds = filterDebouncedIds(ids);
+      if (!filteredIds.length) return;
+
       if (!ids.length) return;
 
-      const graphNodes = fetchGraphNodes();
-      if (!graphNodes.length) return;
-
-      const pendingIds = ids.filter((id) => {
-        if (!id) return false;
-        const node = graphNodes.find((entry) => entry && entry.id === id);
-        if (!node) return false;
-        if (!isComponentNode(node)) return false;
-        return node?.data?.breadboard?.pendingPlacement !== false;
+      // Re-read each id to get the freshest state.
+      const runIds = [];
+      const nodesForRun = [];
+      filteredIds.forEach((id) => {
+        if (!id) return;
+        const node = readNodeById(id);
+        if (!node) return;
+        if (!isComponentNode(node)) return;
+        runIds.push(id);
+        nodesForRun.push(node);
       });
 
-      if (!pendingIds.length) return;
+      if (!runIds.length) return;
       scheduleRun('nodeDragEnd', {
         ...payload,
-        nodeIds: pendingIds
+        nodeIds: runIds,
+        nodes: nodesForRun
       });
     };
 

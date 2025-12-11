@@ -11,7 +11,7 @@
     "start": "next start",
     "export": "next export",
     "lint": "eslint",
-    "test": "node --test tests/graphCrud.test.js",
+    "test": "node --test tests/*.test.js",
     "create-plugin": "node scripts/create-plugin.mjs"
   },
   "dependencies": {
@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "baseline-browser-mapping": "^2.9.5",
     "eslint": "^9",
     "eslint-config-next": "15.5.4"
   }

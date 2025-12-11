@@ -60,6 +60,97 @@ const getNodeMetrics = (node) => {
   };
 };
 
+const BREADBOARD_TARGET_RADIUS = 38;
+
+const normalizeBoardRow = (value) => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().toUpperCase();
+  return trimmed || null;
+};
+
+const buildBreadboardTargets = (allNodes = []) => {
+  const targets = [];
+  const socketNodes = allNodes.filter((node) => node?.type === 'io.breadboard.sockets:socket');
+  socketNodes.forEach((node) => {
+    const rows = Array.isArray(node?.data?.rows) ? node.data.rows : [];
+    const column = Number(node?.data?.column);
+    if (!Number.isFinite(column)) return;
+    const baseX = Number(node?.position?.x) || 0;
+    const baseY = Number(node?.position?.y) || 0;
+    const height = Number(node?.height) || Number(node?.data?.height) || 0;
+    const spacing = rows.length > 0 && height > 0 ? height / rows.length : 0;
+    rows.forEach((row, index) => {
+      const normalizedRow = normalizeBoardRow(row);
+      if (!normalizedRow) return;
+      const y = spacing
+        ? baseY - height / 2 + spacing / 2 + spacing * index
+        : baseY;
+      targets.push({
+        type: 'socket',
+        row: normalizedRow,
+        column,
+        nodeId: node.id,
+        handle: 'socket',
+        label: `${normalizedRow}${column}`,
+        x: baseX,
+        y
+      });
+    });
+  });
+
+  const railNodes = allNodes.filter((node) => node?.type === 'io.breadboard.sockets:railSocket');
+  railNodes.forEach((node) => {
+    const rails = Array.isArray(node?.data?.rails) ? node.data.rails : [];
+    const column = Number(node?.data?.column);
+    if (!Number.isFinite(column)) return;
+    const baseX = Number(node?.position?.x) || 0;
+    const baseY = Number(node?.position?.y) || 0;
+    const height = Number(node?.height) || Number(node?.data?.height) || 0;
+    const spacing = rails.length > 0 && height > 0 ? height / rails.length : 0;
+    rails.forEach((rail, index) => {
+      const polarity = rail?.polarity === 'negative' ? 'negative' : 'positive';
+      const y = spacing
+        ? baseY - height / 2 + spacing / 2 + spacing * index
+        : baseY;
+      targets.push({
+        type: 'rail',
+        column,
+        nodeId: node.id,
+        handle: polarity === 'negative' ? 'negative' : 'positive',
+        label: rail?.label || (polarity === 'negative' ? 'GND' : 'V+'),
+        x: baseX,
+        y
+      });
+    });
+  });
+
+  return targets;
+};
+
+const findNearestBreadboardTarget = (targets = [], point = {}, radius = BREADBOARD_TARGET_RADIUS) => {
+  if (!Array.isArray(targets) || !targets.length) return null;
+  const x = Number(point?.x);
+  const y = Number(point?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const maxDist = radius * radius;
+  let best = null;
+  let bestDist = Infinity;
+  targets.forEach((target) => {
+    if (!target) return;
+    const dx = target.x - x;
+    const dy = target.y - y;
+    const dist = dx * dx + dy * dy;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = target;
+    }
+  });
+  if (bestDist <= maxDist) {
+    return best;
+  }
+  return null;
+};
+
 export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const theme = useTheme(); // Browser theme
   const { plugins } = usePluginRegistry();
@@ -135,6 +226,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     edgeIds: Array.isArray(selectedEdgeIds) ? [...selectedEdgeIds] : [],
     groupIds: Array.isArray(selectedGroupIds) ? [...selectedGroupIds] : []
   });
+  const lastPointerRef = useRef({ x: 0, y: 0, inside: false });
   const lastLoggedNodeIdRef = useRef(null);
 
   useEffect(() => {
@@ -158,6 +250,47 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       console.info('[GraphEditor] Selected node snapshot:', node);
     }
   }, [selectedNodeIds, nodes]);
+
+  // Track latest pointer (graph coords) from NodeGraph for smarter node placement.
+  useEffect(() => {
+    const handlePointerMove = (payload = {}) => {
+      if (payload?.inside && payload.graph) {
+        lastPointerRef.current = {
+          x: Number(payload.graph.x) || 0,
+          y: Number(payload.graph.y) || 0,
+          inside: true,
+          ts: Date.now()
+        };
+      } else {
+        lastPointerRef.current = { x: 0, y: 0, inside: false, ts: Date.now() };
+      }
+    };
+    eventBus.on('pointerMove', handlePointerMove);
+    return () => eventBus.off('pointerMove', handlePointerMove);
+  }, []);
+
+  // Global mouse move fallback (ensures pointer stays fresh even when leaving the canvas briefly)
+  useEffect(() => {
+    const handleWindowMove = (e) => {
+      const el = document.getElementById('graph-canvas');
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const graphX = (e.clientX - rect.left - (pan?.x || 0)) / (zoom || 1);
+      const graphY = (e.clientY - rect.top - (pan?.y || 0)) / (zoom || 1);
+      lastPointerRef.current = {
+        x: graphX,
+        y: graphY,
+        inside:
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom,
+        ts: Date.now()
+      };
+    };
+    window.addEventListener('mousemove', handleWindowMove);
+    return () => window.removeEventListener('mousemove', handleWindowMove);
+  }, [pan, zoom]);
 
   useEffect(() => {
     if (autoSnapInitializedRef.current) return;
@@ -285,6 +418,7 @@ useEffect(() => {
     setZoom,
     nodes,
     setNodes,
+    nodesRef,
     state,
     setDocumentUrl,
     setDocumentBackgroundImage,
@@ -376,16 +510,30 @@ useEffect(() => {
     saveToHistory: historyHook.saveToHistory
   });
   
-  const handlers = createGraphEditorHandlers({
-    graphAPI: null, // Will be set by setup
-    state,
-    historyHook,
-    groupManagerHook,
-    selectionHook,
-    modesHook,
-    backgroundRpc: (method, args) => backgroundRpcRef.current?.(method, args),
-    backgroundRpcReady: () => backgroundRpcReadyRef.current
-  });
+  const breadboardTargets = useMemo(() => buildBreadboardTargets(nodes), [nodes]);
+  const breadboardLayout = useMemo(() => ({ targets: breadboardTargets }), [breadboardTargets]);
+
+  // Handlers are created after breadboardTargets to avoid referencing before init
+  const handlers = useMemo(() => createGraphEditorHandlers({
+      graphAPI: null, // Will be set by setup
+      state,
+      historyHook,
+      groupManagerHook,
+      selectionHook,
+      modesHook,
+      lastPointerRef,
+      breadboardTargets,
+      backgroundRpc: (method, args) => backgroundRpcRef.current?.(method, args),
+      backgroundRpcReady: () => backgroundRpcReadyRef.current
+    }), [
+      state,
+      historyHook,
+      groupManagerHook,
+      selectionHook,
+      modesHook,
+      lastPointerRef,
+      breadboardTargets
+    ]);
   
   const graphAPI = useGraphEditorSetup(state, handlers, historyHook);
 
@@ -1427,6 +1575,29 @@ useEffect(() => {
     return () => eventBus.off('nodeDragEnd', handleBreadboardPlacement);
   }, [graphAPI, setNodes, nodesRef]);
 
+  useEffect(() => {
+    eventBus.emit('breadboard:layoutUpdated', { layout: breadboardLayout });
+  }, [breadboardLayout]);
+
+  const pinStateSnapshotRef = useRef(new Map());
+  useEffect(() => {
+    const nextSummary = new Map();
+    nodes.forEach((node) => {
+      if (!node || !node.id) return;
+      const pinState = node?.data?.breadboard?.pinState || null;
+      const summary = pinState ? JSON.stringify(pinState) : '';
+      const previous = pinStateSnapshotRef.current.get(node.id);
+      if (summary !== previous) {
+        eventBus.emit('breadboard.pinStateChanged', {
+          nodeId: node.id,
+          pinState: pinState || {}
+        });
+      }
+      nextSummary.set(node.id, summary);
+    });
+    pinStateSnapshotRef.current = nextSummary;
+  }, [nodes]);
+
   // Add this useEffect to your GraphEditor.js file
   // Place it with the other event listener useEffects
   useEffect(() => {
@@ -1498,9 +1669,9 @@ useEffect(() => {
       handle
     }) => {
       try {
-        if (validation && validation.ok === false) {
-          return;
-        }
+        let resolvedValidation = validation;
+        let resolvedTargetNodeId = targetNode;
+        let resolvedTargetHandle = targetHandle;
         const api = graphAPI?.current;
         if (!api || typeof api.createEdge !== 'function') {
           console.warn('Graph API not ready; ignoring handle drop.');
@@ -1511,9 +1682,34 @@ useEffect(() => {
         const startHandleType = handle?.handleType || 'trigger';
         const resolvedEdgeType = edgeType || 'default';
         const edgeStyle = EdgeTypes[resolvedEdgeType]?.style || {};
+        const sourceNodeObj = getNodeById(sourceNode);
+        const isBreadboardComponent =
+          !!sourceNodeObj && typeof sourceNodeObj.type === 'string' && sourceNodeObj.type.startsWith('io.breadboard.components:');
 
-        if (targetNode) {
-          const targetNodeObj = getNodeById(targetNode);
+        if (!resolvedTargetNodeId && isBreadboardComponent) {
+          const boardTarget = findNearestBreadboardTarget(breadboardTargets, graph || {});
+          if (boardTarget) {
+            resolvedTargetNodeId = boardTarget.nodeId;
+            resolvedTargetHandle = {
+              nodeId: boardTarget.nodeId,
+              key: boardTarget.handle,
+              label: boardTarget.label || boardTarget.handle,
+              type: 'input',
+              handleType: 'value'
+            };
+            resolvedValidation = { ok: true };
+          }
+        }
+
+        if (resolvedValidation && resolvedValidation.ok === false) {
+          if (setSnackbar && resolvedValidation.message) {
+            setSnackbar({ open: true, message: resolvedValidation.message, severity: 'warning' });
+          }
+          return;
+        }
+
+        if (resolvedTargetNodeId) {
+          const targetNodeObj = getNodeById(resolvedTargetNodeId);
           if (!targetNodeObj) {
             setSnackbar({ open: true, message: 'Target node not found', severity: 'error' });
             return;
@@ -1521,7 +1717,7 @@ useEffect(() => {
           const fallbackHandle = direction === 'source'
             ? pickHandle(targetNodeObj, 'inputs', startHandleType)
             : pickHandle(targetNodeObj, 'outputs', startHandleType);
-          const counterpartHandleKey = targetHandle?.key || fallbackHandle?.key;
+          const counterpartHandleKey = resolvedTargetHandle?.key || fallbackHandle?.key;
           if (!counterpartHandleKey) {
             setSnackbar({
               open: true,
@@ -1534,14 +1730,14 @@ useEffect(() => {
           const edgePayload = direction === 'source'
             ? {
                 source: sourceNode,
-                target: targetNode,
+                target: resolvedTargetNodeId,
                 sourceHandle: startHandleKey,
                 targetHandle: counterpartHandleKey,
                 type: resolvedEdgeType,
                 style: edgeStyle
               }
             : {
-                source: targetNode,
+                source: resolvedTargetNodeId,
                 target: sourceNode,
                 sourceHandle: counterpartHandleKey,
                 targetHandle: startHandleKey,
@@ -1621,7 +1817,7 @@ useEffect(() => {
 
     eventBus.on('handleDrop', handleHandleDrop);
     return () => eventBus.off('handleDrop', handleHandleDrop);
-  }, [graphAPI, nodesRef, setSnackbar]);
+  }, [graphAPI, nodesRef, setSnackbar, breadboardTargets]);
 
   // NEW: Listen for toggleMinimap event to sync minimap visibility with toolbar button
   useEffect(() => {

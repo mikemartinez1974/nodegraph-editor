@@ -160,12 +160,12 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
         category: 'breadboard',
         icon: 'SettingsEthernet',
         entry: '/plugins/breadboard-components/componentPlugin.js#ResistorNode',
-        defaultWidth: 160,
-        defaultHeight: 60,
+        defaultWidth: 32,
+        defaultHeight: 18,
         defaultData: {
           pins: [
-            { id: 'pinA', row: 'A', column: 1, polarity: 'neutral' },
-            { id: 'pinB', row: 'A', column: 2, polarity: 'neutral' }
+            { id: 'pinA', row: 'A', column: null, polarity: 'neutral', columnOffset: 0 },
+            { id: 'pinB', row: 'A', column: null, polarity: 'neutral', columnOffset: 1 }
           ],
           footprint: { rows: 1, columns: 2, rowPitch: 1, columnPitch: 1, width: 2, height: 1 }
         },
@@ -193,8 +193,8 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
         defaultHeight: 60,
         defaultData: {
           pins: [
-            { id: 'anode', row: 'A', column: 1, polarity: 'anode' },
-            { id: 'cathode', row: 'F', column: 1, polarity: 'cathode' }
+            { id: 'anode', row: 'A', column: null, columnOffset: 0, polarity: 'anode', segmentPreference: 'top' },
+            { id: 'cathode', row: 'F', column: null, columnOffset: 0, polarity: 'cathode', segmentPreference: 'bottom' }
           ],
           footprint: { rows: 2, columns: 1, rowPitch: 1, columnPitch: 1, width: 1, height: 2 }
         },

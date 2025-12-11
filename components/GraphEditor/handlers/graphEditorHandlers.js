@@ -17,6 +17,8 @@ export function createGraphEditorHandlers({
   groupManagerHook,
   selectionHook,
   modesHook,
+  lastPointerRef,
+  breadboardTargets = [],
   backgroundRpc, // RPC function for calling iframe methods
   backgroundRpcReady // boolean or function returning boolean indicating RPC readiness
 }) {
@@ -119,18 +121,7 @@ export function createGraphEditorHandlers({
   
   // ===== NODE HANDLERS =====
   const handleAddNode = (type = 'default', options = {}) => {
-    console.log('[handleAddNode] Called with type:', type, 'options:', options);
     const { width = 200, height = 120, meta } = options;
-    console.log('[handleAddNode] Raw meta payload:', meta);
-    if (meta) {
-      console.log('[handleAddNode] Meta handles snapshot:', {
-        handles: meta.handles,
-        inputs: meta.inputs,
-        outputs: meta.outputs
-      });
-    } else {
-      console.log('[handleAddNode] Meta handles snapshot: none provided');
-    }
     const resolvedWidth =
       typeof meta?.defaultWidth === 'number' && !Number.isNaN(meta.defaultWidth)
         ? meta.defaultWidth
@@ -139,10 +130,70 @@ export function createGraphEditorHandlers({
       typeof meta?.defaultHeight === 'number' && !Number.isNaN(meta.defaultHeight)
         ? meta.defaultHeight
         : height;
-    console.log('[handleAddNode] Using width:', resolvedWidth, 'height:', resolvedHeight);
     
-    const centerX = (window.innerWidth / 2 - pan.x) / zoom;
-    const centerY = (window.innerHeight / 2 - pan.y) / zoom;
+    const pointer = lastPointerRef && lastPointerRef.current;
+    const now = Date.now();
+    const POINTER_MAX_AGE_MS = 5000;
+    const pointerIsFresh = pointer && (now - (pointer.ts || 0) <= POINTER_MAX_AGE_MS);
+    const hasPointer =
+      pointerIsFresh &&
+      pointer?.inside === true &&
+      Number.isFinite(pointer.x) &&
+      Number.isFinite(pointer.y);
+
+    const fallbackX = (window.innerWidth / 2 - pan.x) / zoom;
+    const fallbackY = (window.innerHeight / 2 - pan.y) / zoom;
+
+    const boardCenter = (() => {
+      if (!Array.isArray(breadboardTargets) || breadboardTargets.length === 0) {
+        return null;
+      }
+      let sumX = 0;
+      let sumY = 0;
+      breadboardTargets.forEach((t) => {
+        sumX += Number(t.x) || 0;
+        sumY += Number(t.y) || 0;
+      });
+      const count = breadboardTargets.length;
+      return { x: sumX / count, y: sumY / count };
+    })();
+
+    // If we have breadboard targets pick the nearest to pointer (or viewport center) so placement stays on the board.
+    const pickFromTargets = (pt) => {
+      if (!Array.isArray(breadboardTargets) || breadboardTargets.length === 0) return pt;
+      let best = null;
+      let bestDist = Infinity;
+      breadboardTargets.forEach((target) => {
+        if (!target) return;
+        const dx = (target.x || 0) - pt.x;
+        const dy = (target.y || 0) - pt.y;
+        const dist = dx * dx + dy * dy;
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = target;
+        }
+      });
+      if (best) return { x: best.x, y: best.y };
+      return pt;
+    };
+
+    const isBreadboardComponent =
+      typeof type === 'string' && type.startsWith('io.breadboard.components:');
+
+    // For breadboard components, always seed from board center (then snap to nearest target)
+    let basePoint;
+    if (isBreadboardComponent && boardCenter) {
+      basePoint = { ...boardCenter };
+    } else if (hasPointer) {
+      basePoint = { x: pointer.x, y: pointer.y };
+    } else {
+      basePoint = boardCenter || { x: fallbackX, y: fallbackY };
+    }
+    basePoint = pickFromTargets(basePoint);
+
+    const centerX = basePoint.x;
+    const centerY = basePoint.y;
+    // console.log('[handleAddNode] placement debug', { hasPointer, pointer, fallbackX, fallbackY, basePoint });
     let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
     if (!api || typeof api.createNode !== 'function') {
       console.error('graphAPI is not available or createNode is not a function');
@@ -153,8 +204,21 @@ export function createGraphEditorHandlers({
         ? { ...meta.defaultData }
         : {};
 
-    const isBreadboardComponent =
-      typeof type === 'string' && type.startsWith('io.breadboard.components:');
+    // Normalize breadboard pins to be relative so placement can snap on drop
+    if (isBreadboardComponent && Array.isArray(defaultData.pins)) {
+      defaultData.pins = defaultData.pins.map((pin, index) => {
+        if (!pin || typeof pin !== 'object') return pin;
+        const columnOffset =
+          Number.isFinite(pin.columnOffset) ? pin.columnOffset : index;
+        return {
+          ...pin,
+          column: null,
+          columnOffset
+        };
+      });
+    }
+
+    // pendingPlacement stays true until drag/drop autowire clears it
     const initialData = {
       memo: '',
       link: '',
@@ -252,16 +316,28 @@ export function createGraphEditorHandlers({
           : undefined,
       extensions: mergedExtensions
     };
-    const result = api.createNode({
-      ...payload
-    });
+    const result = api.createNode({ ...payload });
 
-    if (result.success) {
-      // Remove direct setNodes calls from handleAddNode
-      // Only use GraphCRUD API for node addition
-    } else {
+    if (result && result.success === false) {
       console.error('Failed to create node:', result.error);
+      return;
     }
+
+    const newId =
+      result?.id ||
+      result?.nodeId ||
+      result?.data?.id ||
+      payload?.id ||
+      '(unknown)';
+
+    console.info(
+      '[Breadboard] created',
+      type,
+      'id:',
+      newId,
+      'at',
+      `(${centerX.toFixed(1)}, ${centerY.toFixed(1)})`
+    );
   };
   
   // Simplified update handler: directly call graphAPI when available, otherwise fail fast.

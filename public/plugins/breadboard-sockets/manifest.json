@@ -1,6 +1,6 @@
 {
   "id": "io.breadboard.sockets",
-  "version": "0.1.4",
+  "version": "0.1.41",
   "name": "Breadboard Socket Toolkit",
   "description": "Built-in plugin that exposes breadboard socket nodes for templates.",
   "permissions": [],
@@ -18,7 +18,7 @@
       "icon": "FiberManualRecord",
       "entry": "/plugins/breadboard-sockets/socketPlugin.js#SocketNode",
       "defaultWidth": 24,
-      "defaultHeight": 54,
+      "defaultHeight": 63,
       "defaultData": {
         "rows": ["A", "B", "C", "D", "E"],
         "column": 1,
@@ -55,7 +55,7 @@
       "icon": "FlashOn",
       "entry": "/plugins/breadboard-sockets/socketPlugin.js#RailSocketNode",
       "defaultWidth": 24,
-      "defaultHeight": 44,
+      "defaultHeight": 54,
       "defaultData": {
         "channel": "top",
         "column": 1,

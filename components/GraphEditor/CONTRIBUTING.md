@@ -26,6 +26,13 @@ Thanks for helping improve the GraphEditor. This document describes how to contr
 
 - Add unit tests for parsing/utility functions under `components/NodeGraph/utils` or hooks.
 - For component changes, add minimal integration tests where feasible.
+- Update `tests/pluginManifest.test.js` whenever you modify the plugin manifest contract so `npm test` keeps the validator hardening covered.
+
+## Plugin manifest QA
+
+- Respect the manifest schema: `bundle.sandbox` must be `iframe` or `worker`, `bundle.url` must resolve to `http`/`https`, and `bundle.integrity` (when provided) must be a valid SRI hash (`sha256`, `sha384`, or `sha512`).
+- Document schema expectations in `components/GraphEditor/GraphAPIdocumentation.md` so new authors know the required fields, and mention any additional rollout notes in the Plugin Manager docs.
+- `npm test` now runs both GraphCRUD and plugin manifest validation suites (`tests/*.test.js`), so add coverage when introducing runtime/validation adjustments and keep the CLI docs and QA steps up to date.
 
 ## Pull request checklist
 

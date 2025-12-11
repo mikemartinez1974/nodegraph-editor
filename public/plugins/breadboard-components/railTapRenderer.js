@@ -5,6 +5,16 @@
     return;
   }
 
+  // Ensure the iframe body doesn’t create scrollbars
+  if (document?.body) {
+    document.body.style.margin = '0';
+    document.body.style.overflow = 'hidden';
+  }
+  if (document?.documentElement) {
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
   const mount = document.createElement('canvas');
   mount.style.width = '100%';
   mount.style.height = '100%';
@@ -15,9 +25,9 @@
   const ctx = mount.getContext('2d');
 
   const draw = (payload = {}) => {
-    const { width = 16, height = 40, type, label, data } = payload;
+    const { width = 16, height = 50, type, label, data } = payload;
     const w = Math.max(width, 12);
-    const h = Math.max(height, 32);
+    const h = Math.max(height, 50);
     const dpr = window.devicePixelRatio || 1;
     mount.width = w * dpr;
     mount.height = h * dpr;
@@ -32,11 +42,14 @@
     const accentColor = isNegative ? '#bae6fd' : '#fed7aa';
 
     const centerX = w / 2;
-    const topPad = 4;
-    const bottomPad = 4;
-    const leadRadius = Math.max(3, w * 0.25);
+    const topPad = 1;
+    const bottomPad = 1;
+    const leadRadius = Math.max(5, w * 0.3);
     const stemTop = topPad + leadRadius;
     const stemBottom = h - bottomPad - leadRadius;
+
+    ctx.save();
+    // No vertical shift: use the full available canvas height so the tap renders a touch taller.
 
     ctx.lineCap = 'round';
     ctx.lineWidth = Math.max(3, w * 0.35);
@@ -63,6 +76,7 @@
     ctx.stroke();
 
     ctx.shadowBlur = 0;
+    ctx.restore();
   };
 
   let lastPayload = {};

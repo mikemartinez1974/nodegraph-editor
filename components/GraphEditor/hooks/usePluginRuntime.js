@@ -244,6 +244,23 @@ export default function usePluginRuntime({
           historyHook.saveToHistory(nodesRef.current, edgesRef.current);
           return { id };
         }
+        case 'updateNode': {
+          if (isDry && !allowMutations) {
+            return { simulated: true };
+          }
+          const [id, updates = {}] = args;
+          if (!id) {
+            throw new Error('updateNode requires an id');
+          }
+          if (!updates || typeof updates !== 'object') {
+            throw new Error('updateNode requires an updates object');
+          }
+          const result = graphCRUD.updateNode(id, updates);
+          if (!result?.success) {
+            throw new Error(result?.error || 'Failed to update node');
+          }
+          return safeClone(result.data || {});
+        }
         case 'deleteEdge': {
           if (isDry && !allowMutations) {
             return { simulated: true };

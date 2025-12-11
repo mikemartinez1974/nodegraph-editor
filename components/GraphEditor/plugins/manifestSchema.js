@@ -35,6 +35,27 @@ const normalizePermissions = (value) => {
 
 const VALID_PROPERTY_TYPES = new Set(['text', 'textarea', 'number', 'select', 'toggle', 'color', 'json']);
 const VALID_DISPLAY_VARIANTS = new Set(['card', 'stat', 'list']);
+const VALID_SANDBOX_TYPES = new Set(['iframe', 'worker']);
+
+const ensureSandboxType = (value) => {
+  const candidate = ensureString(value);
+  if (!candidate) return null;
+  const normalized = candidate.toLowerCase();
+  return VALID_SANDBOX_TYPES.has(normalized) ? normalized : null;
+};
+
+const ensureIntegrity = (value) => {
+  const candidate = ensureString(value);
+  if (!candidate) return null;
+  const fragments = candidate.split(/\s+/);
+  const sriPattern = /^(sha256|sha384|sha512)-[A-Za-z0-9+/=]+$/;
+  for (const fragment of fragments) {
+    if (sriPattern.test(fragment)) {
+      return fragment;
+    }
+  }
+  return null;
+};
 
 const normalizeHandleList = (handles, direction, errors, nodeIndex) => {
   if (!Array.isArray(handles) || handles.length === 0) return [];
@@ -296,9 +317,13 @@ export function validatePluginManifest(manifest) {
     errors.push('Manifest bundle is required');
   }
   const bundleUrl = bundle ? ensureUrl(bundle.url) : null;
-  const sandbox = bundle ? ensureString(bundle.sandbox) : null;
+  const sandbox = bundle ? ensureSandboxType(bundle.sandbox) : null;
+  const integrity = bundle ? ensureIntegrity(bundle.integrity) : null;
   if (!bundleUrl) errors.push('Manifest bundle.url must be a valid URL');
-  if (!sandbox) errors.push('Manifest bundle.sandbox must indicate "iframe" or "worker"');
+  if (!sandbox) errors.push('Manifest bundle.sandbox must be either "iframe" or "worker"');
+  if (bundle?.integrity && !integrity) {
+    errors.push('Manifest bundle.integrity must be a valid SRI hash (sha256/384/512)');
+  }
 
   const permissions = normalizePermissions(manifest.permissions);
 
@@ -369,7 +394,7 @@ export function validatePluginManifest(manifest) {
       bundle: {
         url: bundleUrl,
         sandbox,
-        integrity: ensureString(bundle.integrity) || undefined
+        integrity: integrity || undefined
       },
       nodes: normalizedNodes,
       panels,

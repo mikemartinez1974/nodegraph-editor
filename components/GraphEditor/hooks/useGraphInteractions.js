@@ -8,6 +8,7 @@ export default function useGraphInteractions({
   setZoom,
   nodes,
   setNodes,
+  nodesRef,
   state,
   setDocumentUrl,
   setDocumentBackgroundImage,
@@ -147,16 +148,19 @@ export default function useGraphInteractions({
 
   useEffect(() => {
     const handleNodeMove = ({ id, position }) => {
-      setNodes((prev) =>
-        prev.map((node) =>
+      setNodes((prev) => {
+        const next = prev.map((node) =>
           node.id === id ? { ...node, position } : node
-        )
-      );
+        );
+        // Keep the ref in sync so consumers like window.graphAPI see live positions
+        if (nodesRef) nodesRef.current = next;
+        return next;
+      });
     };
 
     eventBus.on('nodeMove', handleNodeMove);
     return () => eventBus.off('nodeMove', handleNodeMove);
-  }, [setNodes]);
+  }, [setNodes, nodesRef]);
 
   useEffect(() => {
     const handleEdgeClick = ({ id, event }) => {

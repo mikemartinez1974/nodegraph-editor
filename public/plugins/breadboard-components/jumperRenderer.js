@@ -5,6 +5,15 @@
     return;
   }
 
+  if (document?.body) {
+    document.body.style.margin = '0';
+    document.body.style.overflow = 'hidden';
+  }
+  if (document?.documentElement) {
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
   const mount = document.createElement('canvas');
   mount.style.width = '100%';
   mount.style.height = '100%';

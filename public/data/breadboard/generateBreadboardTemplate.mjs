@@ -20,14 +20,14 @@ import { fileURLToPath } from "url";
 const COLS = 30;
 
 const SOCKET_WIDTH = 18;
-const SOCKET_HEIGHT = 56;
+const SOCKET_HEIGHT = 68;
 
 // Original socket band centers
 const TOP_BLOCK_Y = -68;
 const BOTTOM_BLOCK_Y = 68;
 
 // Distance from socket centers to rail centers
-const RAIL_OFFSET = 52;
+const RAIL_OFFSET = 54;
 
 // Rail centers
 const TOP_RAIL_Y = TOP_BLOCK_Y - RAIL_OFFSET;      // -120
@@ -82,7 +82,7 @@ const RUNTIME_METADATA = {
   },
   defaults: {
     minWidth: 18,
-    minHeight: 24,
+    minHeight: 30,
     bodyMargin: 14,
     inputHandleKey: "in"
   }
@@ -217,7 +217,7 @@ function buildSkinNode(socketNodes) {
     });
   }
 
-  // Use original rail Y positions
+  // Rails: two physical rows (top / bottom), each carries positive & negative
   const rails = [
     {
       id: "rail-top-positive",
@@ -226,9 +226,37 @@ function buildSkinNode(socketNodes) {
       segments: Array.from({ length: COLS }, (_, i) => {
         const col = i + 1;
         return {
-          nodeId: `rail-positive-${col}`,
+          nodeId: `rail-top-${col}`,
           column: col,
           position: { x: socketX(col), y: TOP_RAIL_Y },
+          handle: "positive"
+        };
+      })
+    },
+    {
+      id: "rail-top-negative",
+      channel: "bus",
+      polarity: "negative",
+      segments: Array.from({ length: COLS }, (_, i) => {
+        const col = i + 1;
+        return {
+          nodeId: `rail-top-${col}`,
+          column: col,
+          position: { x: socketX(col), y: TOP_RAIL_Y },
+          handle: "negative"
+        };
+      })
+    },
+    {
+      id: "rail-bottom-positive",
+      channel: "bus",
+      polarity: "positive",
+      segments: Array.from({ length: COLS }, (_, i) => {
+        const col = i + 1;
+        return {
+          nodeId: `rail-bottom-${col}`,
+          column: col,
+          position: { x: socketX(col), y: BOTTOM_RAIL_Y },
           handle: "positive"
         };
       })
@@ -240,7 +268,7 @@ function buildSkinNode(socketNodes) {
       segments: Array.from({ length: COLS }, (_, i) => {
         const col = i + 1;
         return {
-          nodeId: `rail-negative-${col}`,
+          nodeId: `rail-bottom-${col}`,
           column: col,
           position: { x: socketX(col), y: BOTTOM_RAIL_Y },
           handle: "negative"
@@ -289,38 +317,56 @@ function buildRailSocketNodes() {
   for (let col = 1; col <= COLS; col++) {
     const x = socketX(col);
 
-    // Positive rail socket (top)
+    // Top rail: two pins (red/blue)
     nodes.push({
-      id: `rail-positive-${col}`,
+      id: `rail-top-${col}`,
       type: "io.breadboard.sockets:railSocket",
-      label: `V+${col}`,
+      label: `Top${col}`,
       position: { x, y: TOP_RAIL_Y },
       width: 18,
-      height: 36,
+      height: 41,
       state: { locked: true },
       data: {
         column: col,
-        rails: [{ polarity: "positive", railId: "rail-top-positive" }]
+        rails: [
+          { polarity: "positive", railId: "rail-top-positive" },
+          { polarity: "negative", railId: "rail-top-negative" }
+        ]
       },
-      inputs: [{ key: "positive", label: "V+", type: "value" }],
-      outputs: [{ key: "positive", label: "V+", type: "value" }]
+      inputs: [
+        { key: "positive", label: "V+", type: "value" },
+        { key: "negative", label: "GND", type: "value" }
+      ],
+      outputs: [
+        { key: "positive", label: "V+", type: "value" },
+        { key: "negative", label: "GND", type: "value" }
+      ]
     });
 
-    // Negative rail socket (bottom)
+    // Bottom rail: two pins (red/blue)
     nodes.push({
-      id: `rail-negative-${col}`,
+      id: `rail-bottom-${col}`,
       type: "io.breadboard.sockets:railSocket",
-      label: `GND${col}`,
+      label: `Bot${col}`,
       position: { x, y: BOTTOM_RAIL_Y },
       width: 18,
-      height: 36,
+      height: 41,
       state: { locked: true },
       data: {
         column: col,
-        rails: [{ polarity: "negative", railId: "rail-bottom-negative" }]
+        rails: [
+          { polarity: "positive", railId: "rail-bottom-positive" },
+          { polarity: "negative", railId: "rail-bottom-negative" }
+        ]
       },
-      inputs: [{ key: "negative", label: "GND", type: "value" }],
-      outputs: [{ key: "negative", label: "GND", type: "value" }]
+      inputs: [
+        { key: "positive", label: "V+", type: "value" },
+        { key: "negative", label: "GND", type: "value" }
+      ],
+      outputs: [
+        { key: "positive", label: "V+", type: "value" },
+        { key: "negative", label: "GND", type: "value" }
+      ]
     });
   }
 
@@ -343,7 +389,7 @@ function buildScriptNode() {
     label: "Breadboard AutoWire",
     position: { x: 0, y: skinHeight / 2 + 40 },
     width: 320,
-    height: 400,
+    height: 200,
     data: {
       language: "javascript",
       autoRun: true,
@@ -389,27 +435,29 @@ function buildBusEdges(busNode) {
   const busId = busNode.id;
 
   for (let col = 1; col <= COLS; col++) {
-    const posRailId = `rail-positive-${col}`;
-    const negRailId = `rail-negative-${col}`;
+    const posRails = [`rail-top-${col}`, `rail-bottom-${col}`];
+    const negRails = [`rail-top-${col}`, `rail-bottom-${col}`];
 
-    // Bus positive → V+ rail socket
-    edges.push({
-      id: `edge-bus-pos-${col}`,
-      source: busId,
-      sourceHandle: "positive",
-      target: posRailId,
-      targetHandle: "positive",
-      type: "default"
+    posRails.forEach((targetId, idx) => {
+      edges.push({
+        id: `edge-bus-pos-${col}-${idx}`,
+        source: busId,
+        sourceHandle: "positive",
+        target: targetId,
+        targetHandle: "positive",
+        type: "default"
+      });
     });
 
-    // Bus negative → GND rail socket
-    edges.push({
-      id: `edge-bus-neg-${col}`,
-      source: busId,
-      sourceHandle: "negative",
-      target: negRailId,
-      targetHandle: "negative",
-      type: "default"
+    negRails.forEach((targetId, idx) => {
+      edges.push({
+        id: `edge-bus-neg-${col}-${idx}`,
+        source: busId,
+        sourceHandle: "negative",
+        target: targetId,
+        targetHandle: "negative",
+        type: "default"
+      });
     });
   }
 

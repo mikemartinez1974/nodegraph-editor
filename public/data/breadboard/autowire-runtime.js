@@ -1,1349 +1,912 @@
-(function (runtimeApi) {
-  if (!runtimeApi) {
-    console.warn('[BreadboardAutoWire] runtime API unavailable; aborting bootstrap');
-    return;
+// public/data/breadboard/autowire-runtime.js
+// Minimal autowire runtime: listen for nodeDragEnd, trust the drop position,
+// snap to targeted sockets, rebuild edges (dedup, max 2), and log placements.
+
+
+(function bootstrap(runtimeApi) {
+  // Avoid multiple copies fighting each other (across iframes) ASAP.
+  if (typeof window !== "undefined") {
+    if (window.__breadboardAutowireActive) {
+      return;
+    }
   }
 
-  console.log('[BreadboardAutoWire] build marker 2025-03-05');
+  const VERSION = "autowire-runtime@v0.5";
 
-  const SCRIPT_RUNTIME_API = runtimeApi && typeof runtimeApi === 'object' ? runtimeApi : null;
-  const FALLBACK_POLL_INTERVAL = 750;
-
-  const FALLBACK_METADATA = {
-    rowGroups: {
-      top: ['A', 'B', 'C', 'D', 'E'],
-      bottom: ['F', 'G', 'H', 'I', 'J']
-    },
-    pinPresets: {
-      'io.breadboard.components:railTapPositive': {
-        rail: { segmentPreference: 'rail-top-positive' },
-        tap: { row: 'A', segment: 'top' }
-      },
-      'io.breadboard.components:railTapNegative': {
-        rail: { segmentPreference: 'rail-bottom-negative' },
-        tap: { row: 'J', segment: 'bottom' }
-      },
-      'io.breadboard.components:led': {
-        anode: { row: 'E', segment: 'top' },
-        cathode: { row: 'F', segment: 'bottom' }
+  const log = (...args) => {
+    try {
+      console.log(...args);
+      if (typeof window !== "undefined" && window.top && window.top !== window) {
+        window.top.console?.log(...args);
       }
-    },
-    conductiveComponents: {
-      'io.breadboard.components:resistor': [['pinA', 'pinB']],
-      'io.breadboard.components:railTapPositive': [['rail', 'tap']],
-      'io.breadboard.components:railTapNegative': [['rail', 'tap']],
-      'io.breadboard.components:jumper': [['wireA', 'wireB']],
-      'io.breadboard.sockets:railSocket': [
-        ['vplus', 'positive'],
-        ['gnd', 'negative']
-      ]
-    },
-    defaults: {
-      minWidth: 18,
-      minHeight: 24,
-      bodyMargin: 14,
-      inputHandleKey: 'in'
+    } catch (_) {
+      /* ignore */
     }
   };
 
-  let runtimeMetadata = null;
-
-  // ------------------------------------------------------------
-  // BASIC HELPERS
-  // ------------------------------------------------------------
-
-  const isPlainObject = (value) =>
-    value !== null &&
-    typeof value === 'object' &&
-    Object.prototype.toString.call(value) === '[object Object]';
-
-  const normalizeMetadata = (metadata) => {
-    const source = isPlainObject(metadata) ? metadata : {};
-    const mergeRows = (key) => {
-      const rows = Array.isArray(source?.rowGroups?.[key])
-        ? source.rowGroups[key]
-        : null;
-      const fallbackRows = FALLBACK_METADATA.rowGroups[key];
-      return (rows && rows.length ? rows : fallbackRows).map((row) =>
-        String(row || '').toUpperCase()
-      );
-    };
-
-    const buildPinPresets = () => {
-      const merged = { ...FALLBACK_METADATA.pinPresets };
-      if (isPlainObject(source.pinPresets)) {
-        Object.entries(source.pinPresets).forEach(([key, value]) => {
-          if (isPlainObject(value)) {
-            merged[key] = { ...value };
-          }
-        });
-      }
-      return merged;
-    };
-
-    const buildConductiveMap = () => {
-      const merged = {
-        ...FALLBACK_METADATA.conductiveComponents,
-        ...(isPlainObject(source.conductiveComponents)
-          ? source.conductiveComponents
-          : {})
-      };
-      const normalized = {};
-      Object.entries(merged).forEach(([key, pairs]) => {
-        if (!Array.isArray(pairs)) return;
-        const cleaned = pairs
-          .map((pair) =>
-            Array.isArray(pair) && pair.length >= 2
-              ? [pair[0], pair[1]]
-              : null
-          )
-          .filter(Boolean);
-        if (cleaned.length) {
-          normalized[key] = cleaned;
-        }
-      });
-      return normalized;
-    };
-
-    const defaultsSource = isPlainObject(source.defaults)
-      ? source.defaults
-      : {};
-
-    return {
-      rowGroups: {
-        top: mergeRows('top'),
-        bottom: mergeRows('bottom')
-      },
-      pinPresets: buildPinPresets(),
-      conductiveComponents: buildConductiveMap(),
-      defaults: {
-        minWidth:
-          Number(defaultsSource.minWidth) ||
-          FALLBACK_METADATA.defaults.minWidth,
-        minHeight:
-          Number(defaultsSource.minHeight) ||
-          FALLBACK_METADATA.defaults.minHeight,
-        bodyMargin:
-          Number(defaultsSource.bodyMargin) ||
-          FALLBACK_METADATA.defaults.bodyMargin,
-        inputHandleKey:
-          defaultsSource.inputHandleKey ||
-          FALLBACK_METADATA.defaults.inputHandleKey
-      }
-    };
-  };
-
-  const ensureMetadata = () => {
-    if (!runtimeMetadata) {
-      runtimeMetadata = normalizeMetadata(FALLBACK_METADATA);
+  const resolveApi = () => {
+    // Prefer injected runtimeApi, then in-frame globals, then parent.
+    const candidates = [
+      runtimeApi,
+      typeof window !== "undefined" ? window.graphAPI : null,
+      typeof window !== "undefined" ? window.runtimeApi : null,
+      typeof window !== "undefined" ? window.breadboardRuntime : null,
+      typeof window !== "undefined" ? window.__breadboardAutowireApi : null
+    ];
+    for (const c of candidates) {
+      if (c) return c;
     }
-    return runtimeMetadata;
-  };
-
-  const updateRuntimeMetadata = (metadata) => {
-    runtimeMetadata = normalizeMetadata(metadata || FALLBACK_METADATA);
-  };
-
-  const getRowGroupForSegment = (segment = 'top') => {
-    const meta = ensureMetadata();
-    const top = meta.rowGroups.top;
-    const bottom = meta.rowGroups.bottom;
-    return segment === 'bottom' ? bottom : top;
-  };
-
-  const getDefaultTopRow = () => {
-    const meta = ensureMetadata();
-    return (
-      meta.rowGroups.top[0] ||
-      meta.rowGroups.bottom[0] ||
-      'A'
-    );
-  };
-
-  const getDefaultRowForSegment = (segment = 'top') => {
-    const group = getRowGroupForSegment(segment);
-    return group[0] || getDefaultTopRow();
-  };
-
-  const getDefaults = () => ensureMetadata().defaults;
-  const getDefaultHandleKey = () =>
-    getDefaults().inputHandleKey || 'in';
-  const getDefaultMinWidth = () =>
-    Number(getDefaults().minWidth) || 18;
-  const getDefaultMinHeight = () =>
-    Number(getDefaults().minHeight) || 24;
-  const getBodyMargin = () =>
-    Number(getDefaults().bodyMargin) || 14;
-
-  const getPinPresetMap = () => ensureMetadata().pinPresets;
-  const getConductiveMap = () =>
-    ensureMetadata().conductiveComponents;
-
-  updateRuntimeMetadata(FALLBACK_METADATA);
-
-  const normalizeRow = (value, fallback) => {
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim().toUpperCase();
-    }
-    return fallback || null;
-  };
-
-  const clamp = (value, min, max) => {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return min;
-    return Math.max(min, Math.min(max, Math.round(num)));
-  };
-
-  const toRowKey = (row, column) => `${row}${column}`;
-
-  const getSocketPosition = (node) => {
-    const pos = node?.position || {};
-    return {
-      x: Number(pos.x) || 0,
-      y: Number(pos.y) || 0
-    };
-  };
-
-  const getTypeVariants = (type) => {
-    if (!type || typeof type !== 'string') return [];
-    const trimmed = type.trim();
-    if (!trimmed) return [];
-    const namespace = 'io.breadboard.components';
-    const short = trimmed.includes(':') ? trimmed.split(':').pop() : trimmed;
-    const namespaced = `${namespace}:${short}`;
-    return Array.from(new Set([trimmed, short, namespaced]));
-  };
-
-  const isSocketNode = (node) => node?.type === 'io.breadboard.sockets:socket';
-  const isRailNode = (node) => node?.type === 'io.breadboard.sockets:railSocket';
-  const isBusNode = (node) => node?.type === 'io.breadboard.bus';
-
-  const isComponentNode = (node) => {
-    if (!node || !node.type) return false;
-    const conductive = getConductiveMap();
-    if (conductive[node.type]) return true;
-    const t = String(node.type).toLowerCase();
-    return (
-      t.includes('resistor') ||
-      t.includes('led') ||
-      t.includes('tap') ||
-      t.includes('jumper')
-    );
-  };
-
-  const makeHandleNodeId = (nodeId, handleKey) =>
-    `handle:${nodeId}:${handleKey || getDefaultHandleKey()}`;
-
-  const toPromise = (value) => {
-    if (value && typeof value.then === 'function') return value;
-    return Promise.resolve(value);
-  };
-
-  // ------------------------------------------------------------
-  // GRAPH SNAPSHOT
-  // ------------------------------------------------------------
-
-  const getGraphAPI = () => SCRIPT_RUNTIME_API || null;
-
-  const readGraphSnapshot = async () => {
-    const api = getGraphAPI();
-    if (!api) return { nodes: [], edges: [] };
-
-    const resolveNodes = async () => {
-      if (typeof api.readNode === 'function') {
-        const result = await toPromise(api.readNode());
-        if (Array.isArray(result?.data)) return result.data;
-        if (Array.isArray(result)) return result;
+    if (typeof window !== "undefined" && window.top && window.top !== window) {
+      try {
+        return (
+          window.top.graphAPI ||
+          window.top.runtimeApi ||
+          window.top.breadboardRuntime ||
+          window.top.__breadboardAutowireApi ||
+          null
+        );
+      } catch {
+        return null;
       }
-      if (typeof api.getNodes === 'function') {
-        const result = await toPromise(api.getNodes());
-        if (Array.isArray(result?.data)) return result.data;
-        if (Array.isArray(result)) return result;
-      }
-      return [];
-    };
-
-    const resolveEdges = async () => {
-      if (typeof api.readEdge === 'function') {
-        const result = await toPromise(api.readEdge());
-        if (Array.isArray(result?.data)) return result.data;
-        if (Array.isArray(result)) return result;
-      }
-      if (typeof api.getEdges === 'function') {
-        const result = await toPromise(api.getEdges());
-        if (Array.isArray(result?.data)) return result.data;
-        if (Array.isArray(result)) return result;
-      }
-      return [];
-    };
-
-    const [nodes, edges] = await Promise.all([resolveNodes(), resolveEdges()]);
-
-    return { nodes, edges };
-  };
-
-  const buildSnapshotContext = async () => {
-    const snapshot = await readGraphSnapshot();
-    const layout = buildBoardLayout(snapshot.nodes);
-    if (!layout) return null;
-    const metadata = findSkinMetadata(snapshot.nodes);
-    updateRuntimeMetadata(metadata);
-    return { snapshot, layout, metadata: ensureMetadata() };
-  };
-
-  const findSkinNode = (nodes) =>
-    nodes.find((n) => n?.type === 'io.breadboard.sockets:skin') ||
-    null;
-
-  const findSkinSchema = (nodes) => {
-    const skin = findSkinNode(nodes);
-    if (!skin) return null;
-    return (
-      skin.data?.breadboard?.schema ||
-      skin.data?.schema ||
-      null
-    );
-  };
-
-  const findSkinMetadata = (nodes) => {
-    const skin = findSkinNode(nodes);
-    if (!skin) return null;
-    return (
-      skin.data?.breadboard?.metadata ||
-      skin.data?.metadata ||
-      null
-    );
-  };
-
-  // ------------------------------------------------------------
-  // BOARD LAYOUT (HOLES + RAILS + ROW POSITIONS)
-  // ------------------------------------------------------------
-
-  function buildBoardLayout(nodes) {
-    const schema = findSkinSchema(nodes);
-    if (!schema || typeof schema !== 'object') return null;
-
-    const socketNodeById = new Map();
-    const railNodeById = new Map();
-
-    nodes.forEach((node) => {
-      if (isSocketNode(node)) {
-        socketNodeById.set(node.id, node);
-      } else if (isRailNode(node)) {
-        railNodeById.set(node.id, node);
-      }
-    });
-
-    const holeMap = new Map(); // "A1" -> { row, column, nodeId, x, y }
-    const railMap = new Map(); // "rail-top-positive::1" -> { nodeId, column, polarity, x, y, handle }
-
-    const rowPositions = new Map(); // "A" -> avg y
-    const columnCenters = new Map(); // col -> avg x
-
-    let minColumn = Infinity;
-    let maxColumn = -Infinity;
-
-    // holes (schema.sockets)
-    if (Array.isArray(schema.sockets)) {
-      schema.sockets.forEach((hole) => {
-        if (!hole) return;
-        const row = normalizeRow(hole.row, null);
-        const column = Number(hole.column);
-        if (!row || !Number.isFinite(column)) return;
-
-        const pos = hole.position || {};
-        const x = Number(pos.x) || 0;
-        const y = Number(pos.y) || 0;
-
-        const idKey = `${row}${column}`;
-        holeMap.set(idKey, {
-          row,
-          column,
-          x,
-          y,
-          nodeId: null, // filled later when binding to socket nodes
-          targetHandle: 'socket'
-        });
-
-        // row positions
-        const stats = rowPositions.get(row) || { total: 0, count: 0 };
-        stats.total += y;
-        stats.count += 1;
-        rowPositions.set(row, stats);
-
-        // column centers (approx)
-        const colStats = columnCenters.get(column) || { total: 0, count: 0 };
-        colStats.total += x;
-        colStats.count += 1;
-        columnCenters.set(column, colStats);
-
-        minColumn = Math.min(minColumn, column);
-        maxColumn = Math.max(maxColumn, column);
-      });
-    }
-
-    // finalize row + column averages
-    const avgRowPositions = new Map();
-    rowPositions.forEach((stats, row) => {
-      if (stats.count > 0) {
-        avgRowPositions.set(row, stats.total / stats.count);
-      }
-    });
-
-    const avgColumnCenters = new Map();
-    columnCenters.forEach((stats, col) => {
-      if (stats.count > 0) {
-        avgColumnCenters.set(col, stats.total / stats.count);
-      }
-    });
-
-    // rails
-    if (Array.isArray(schema.rails)) {
-      schema.rails.forEach((rail) => {
-        const polarity =
-          rail.polarity === 'negative' ? 'negative' : 'positive';
-        const handle = polarity === 'negative' ? 'negative' : 'positive';
-        const chan = rail.channel || 'bus';
-        const segId = `rail-${chan}-${polarity}`;
-
-        const segments = Array.isArray(rail.segments)
-          ? rail.segments
-          : [];
-
-        segments.forEach((seg) => {
-          const column = Number(seg.column);
-          if (!Number.isFinite(column)) return;
-
-          const railNode = railNodeById.get(seg.nodeId);
-          if (!railNode) return;
-
-          const pos = seg.position || {};
-          const x =
-            Number(pos.x) ||
-            getSocketPosition(railNode).x;
-          const y =
-            Number(pos.y) ||
-            getSocketPosition(railNode).y;
-
-          const key = `${segId}::${column}`;
-          railMap.set(key, {
-            nodeId: railNode.id,
-            column,
-            polarity,
-            x,
-            y,
-            handle
-          });
-
-          minColumn = Math.min(minColumn, column);
-          maxColumn = Math.max(maxColumn, column);
-
-          const colStats = avgColumnCenters.get(column) || null;
-          if (!colStats) {
-            avgColumnCenters.set(column, x);
-          }
-        });
-      });
-    }
-
-    if (!Number.isFinite(minColumn) || !Number.isFinite(maxColumn)) {
-      return null;
-    }
-
-    // bind holes to nearest socket node by column
-    socketNodeById.forEach((socketNode) => {
-      const col = Number(socketNode.data?.column);
-      if (!Number.isFinite(col)) return;
-      const rows = Array.isArray(socketNode.data?.rows)
-        ? socketNode.data.rows
-        : [];
-      rows.forEach((row) => {
-        const r = normalizeRow(row, null);
-        if (!r) return;
-        const key = `${r}${col}`;
-        const entry = holeMap.get(key);
-        if (!entry) return;
-        entry.nodeId = socketNode.id;
-      });
-    });
-
-    return {
-      holeMap,
-      railMap,
-      rowPositions: avgRowPositions,
-      columnCenters: avgColumnCenters,
-      minColumn,
-      maxColumn
-    };
-  }
-
-  const findClosestRow = (y, segment, layout) => {
-    const group = getRowGroupForSegment(segment);
-    let bestRow = group[0] || getDefaultTopRow();
-    let bestDist = Infinity;
-    group.forEach((row) => {
-      const rowY =
-        layout.rowPositions.get(row) ||
-        layout.rowPositions.get(row.toUpperCase());
-      if (!Number.isFinite(rowY)) return;
-      const dist = Math.abs(y - rowY);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestRow = row;
-      }
-    });
-    return bestRow.toUpperCase();
-  };
-
-  const findNearestColumn = (x, columnCenters, minColumn, maxColumn) => {
-    if (!(columnCenters instanceof Map)) return minColumn;
-    let bestColumn = minColumn;
-    let bestDist = Infinity;
-    columnCenters.forEach((cx, col) => {
-      const dist = Math.abs(cx - x);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestColumn = col;
-      }
-    });
-    return clamp(bestColumn, minColumn, maxColumn);
-  };
-
-  const getNodeCenter = (node) => {
-    const pos = node?.position || {};
-    return {
-      x: Number(pos.x) || 0,
-      y: Number(pos.y) || 0
-    };
-  };
-
-  const resolveAnchor = (node, layout) => {
-    const center = getNodeCenter(node);
-    const y = center.y;
-
-    let segment = 'top';
-    const topRowY = layout.rowPositions.get('B');
-    const bottomRowY = layout.rowPositions.get('H');
-
-    if (Number.isFinite(topRowY) && Number.isFinite(bottomRowY)) {
-      const mid = (topRowY + bottomRowY) / 2;
-      segment = y >= mid ? 'bottom' : 'top';
-    }
-
-    const column = findNearestColumn(
-      center.x,
-      layout.columnCenters,
-      layout.minColumn,
-      layout.maxColumn
-    );
-
-    return { column, segment };
-  };
-
-  const getAnchorColumn = (anchor, layout) => {
-    if (!layout) return 0;
-    return clamp(
-      anchor?.column,
-      layout.minColumn,
-      layout.maxColumn
-    );
-  };
-
-  const getPinColumnValue = (pin, layout) => {
-    if (!pin || !layout) return null;
-    const explicit = Number(pin.column);
-    if (Number.isFinite(explicit)) {
-      return clamp(explicit, layout.minColumn, layout.maxColumn);
-    }
-    const offset = Number(pin.columnOffset);
-    if (Number.isFinite(offset)) {
-      return clamp(
-        layout.minColumn + offset,
-        layout.minColumn,
-        layout.maxColumn
-      );
     }
     return null;
   };
 
-  const alignPinsToAnchor = (pins, anchor, layout) => {
-    if (!Array.isArray(pins) || !pins.length || !layout) {
-      return pins;
+  const topInfo = (() => {
+    if (typeof window === "undefined") return { hasTop: false, topHasApi: false };
+    let hasTop = false;
+    let topHasApi = false;
+    try {
+      hasTop = !!window.top && window.top !== window;
+      topHasApi = hasTop
+        ? !!(
+            window.top.graphAPI ||
+            window.top.runtimeApi ||
+            window.top.breadboardRuntime ||
+            window.top.__breadboardAutowireApi
+          )
+        : false;
+    } catch {
+      hasTop = false;
+      topHasApi = false;
     }
-    const anchorColumn = getAnchorColumn(anchor, layout);
-    const derivedColumns = pins.map((pin) =>
-      getPinColumnValue(pin, layout)
-    );
-    const finiteColumns = derivedColumns.filter((col) =>
-      Number.isFinite(col)
-    );
-    if (!finiteColumns.length) return pins;
-    const baseColumn = Math.min(...finiteColumns);
-    const delta = anchorColumn - baseColumn;
-    if (delta === 0) return pins;
-    return pins.map((pin, index) => {
-      const col = derivedColumns[index];
-      if (!Number.isFinite(col)) return pin;
-      return {
-        ...pin,
-        column: clamp(col + delta, layout.minColumn, layout.maxColumn)
-      };
+    return { hasTop, topHasApi };
+  })();
+
+  let api = resolveApi();
+  log("[BreadboardAutoWire] init", VERSION, {
+    hasRuntimeApi: !!runtimeApi,
+    resolved: !!api,
+    top: topInfo
+  });
+
+  const exposeApi = (resolvedApi) => {
+    if (typeof window !== "undefined" && resolvedApi && !window.graphAPI) {
+      window.graphAPI = resolvedApi;
+    }
+  };
+  exposeApi(api);
+
+  // If we don't have an API, bail immediately (single runner expected).
+  if (!api) {
+    log("[BreadboardAutoWire] no runtime API available; aborting");
+    return;
+  }
+
+  const toPromise = (v) =>
+    v && typeof v.then === "function" ? v : Promise.resolve(v);
+
+  const mergeUnique = (current = [], extra = []) => {
+    const map = new Map();
+    [...current, ...extra].forEach((n) => {
+      if (n && n.id && !map.has(n.id)) map.set(n.id, n);
     });
+    return Array.from(map.values());
   };
 
-  // ------------------------------------------------------------
-  // PINS / PRESETS / ASSIGNMENTS
-  // ------------------------------------------------------------
-
-  const applyPinPresets = (node, pins) => {
-    if (!node || !pins) return pins;
-    const variants = getTypeVariants(node.type);
-    const presetMap = getPinPresetMap();
-    const preset =
-      variants.map((v) => presetMap[v]).find(Boolean) || null;
-    if (!preset) return pins;
-
-    return pins.map((pin) => {
-      if (!pin) return pin;
-      const handle =
-        pin.id || pin.handleKey || pin.key || pin.label;
-      if (!handle || !preset[handle]) return pin;
-      const overrides = preset[handle];
-      return {
-        ...pin,
-        ...(overrides.row ? { row: overrides.row } : {}),
-        ...(overrides.segment ? { segment: overrides.segment } : {}),
-        ...(overrides.segmentPreference
-          ? { segmentPreference: overrides.segmentPreference }
-          : {})
-      };
-    });
+  const fetchFromApi = async (targetApi) => {
+    if (!targetApi) return { nodes: [], edges: [] };
+    const res = (targetApi.readGraph && (await toPromise(targetApi.readGraph()))) || {};
+    let nodes = res.nodes || [];
+    let edges = res.edges || [];
+    if (!nodes.length && typeof targetApi.getNodes === "function") {
+      nodes = await toPromise(targetApi.getNodes());
+    }
+    if (!edges.length && typeof targetApi.getEdges === "function") {
+      edges = await toPromise(targetApi.getEdges());
+    }
+    return { nodes: nodes || [], edges: edges || [] };
   };
 
-  const buildAssignmentsFromPins = (pins, layout, anchorColumn) => {
-    const assignments = [];
-    if (!Array.isArray(pins) || !layout) return assignments;
-    const fallbackColumn = Number.isFinite(anchorColumn)
-      ? clamp(anchorColumn, layout.minColumn, layout.maxColumn)
-      : layout.minColumn;
+  const hasBoardNodes = (nodes) =>
+    (nodes || []).some((n) => n?.type === "io.breadboard.sockets:socket") &&
+    (nodes || []).some((n) => n?.type === "io.breadboard.sockets:railSocket");
 
-    pins.forEach((pin) => {
-      if (!pin) return;
-      const handle =
-        pin.id || pin.handleKey || pin.key || pin.label;
-      if (!handle) return;
-
-      let column = Number(pin.column);
-      if (!Number.isFinite(column)) {
-        const offset = Number(pin.columnOffset) || 0;
-        column = clamp(
-          fallbackColumn + offset,
-          layout.minColumn,
-          layout.maxColumn
-        );
-      } else {
-        column = clamp(column, layout.minColumn, layout.maxColumn);
+  // Cache a “board-only” snapshot so first-drop never runs without sockets/rails.
+  let cachedBoard = { nodes: [], edges: [] };
+  const ensureBoard = async (force = false) => {
+    if (!force && hasBoardNodes(cachedBoard.nodes)) return cachedBoard;
+    let board = await fetchFromApi(api);
+    if (!hasBoardNodes(board.nodes) && typeof window !== "undefined" && window.top && window.top !== window) {
+      try {
+        const topApi =
+          window.top.graphAPI ||
+          window.top.runtimeApi ||
+          window.top.breadboardRuntime ||
+          window.top.__breadboardAutowireApi;
+        if (topApi) {
+          board = await fetchFromApi(topApi);
+        }
+      } catch {
+        /* ignore */
       }
+    }
+    cachedBoard = board;
+    return cachedBoard;
+  };
 
-      const rawPref = (pin.segmentPreference || pin.segment || '')
-        .toString()
-        .toLowerCase();
+  // Serialize drop handling per node so we don't double-process the same dragEnd.
+  const dropQueue = new Map(); // nodeId -> Promise
+  const lastDrop = new Map(); // nodeId -> { x, y }
 
-      // Rail pin
-      if (rawPref.startsWith('rail-')) {
-        const key = `${rawPref}::${column}`;
-        const railTarget = layout.railMap.get(key);
-        if (!railTarget) return;
-        assignments.push({
-          handle,
-          target: {
-            ...railTarget,
-            column,
-            row: railTarget.row || railTarget.polarity || 'V+',
-            targetHandle: railTarget.handle
-          }
+  const getSnapshot = async () => {
+    const primary = await fetchFromApi(api);
+    const board = await ensureBoard();
+
+    // If we still have no sockets/rails, try the top window graphAPI (if different).
+    let mergedNodes = mergeUnique(primary.nodes || [], board.nodes || []);
+    let mergedEdges = mergeUnique(primary.edges || [], board.edges || []);
+
+    const needsBoard = !hasBoardNodes(mergedNodes);
+
+    if (needsBoard && typeof window !== "undefined" && window.top && window.top !== window) {
+      try {
+        const topApi =
+          window.top.graphAPI ||
+          window.top.runtimeApi ||
+          window.top.breadboardRuntime ||
+          window.top.__breadboardAutowireApi;
+        if (topApi && topApi !== api) {
+          const extra = await fetchFromApi(topApi);
+          mergedNodes = mergeUnique(mergedNodes, extra.nodes);
+          mergedEdges = mergeUnique(mergedEdges, extra.edges);
+        }
+      } catch {
+        /* ignore cross-origin */
+      }
+    }
+
+    return { nodes: mergedNodes || [], edges: mergedEdges || [] };
+  };
+
+  // Map regular sockets by row/column/segment.
+  const buildSocketIndex = (nodes) => {
+    const topRows = new Set(["A", "B", "C", "D", "E"]);
+    const bottomRows = new Set(["F", "G", "H", "I", "J"]);
+    const map = new Map();
+    nodes.forEach((n) => {
+      if (!n || n.type !== "io.breadboard.sockets:socket") return;
+      const col = n.data?.column ?? n.state?.column;
+      const rows = n.data?.rows || [];
+      if (!col || !rows.length) return;
+      rows.forEach((row) => {
+        const upperRow = String(row).toUpperCase();
+        // If the socket didn't specify a segment, infer it from row letter.
+        const inferredSegment = topRows.has(upperRow)
+          ? "top"
+          : bottomRows.has(upperRow)
+          ? "bottom"
+          : "top";
+        const segment =
+          n.data?.segment ||
+          n.state?.segment ||
+          inferredSegment;
+        const key = `${upperRow}:${col}:${segment}`;
+        map.set(key, n.id);
+      });
+    });
+    return map;
+  };
+
+  // Map rail sockets by railId/column for fast lookup.
+  const buildRailIndex = (nodes) => {
+    const map = new Map();
+    nodes.forEach((n) => {
+      if (!n || n.type !== "io.breadboard.sockets:railSocket") return;
+      const col = Number(n.data?.column);
+      if (!Number.isFinite(col)) return;
+      const rails = Array.isArray(n.data?.rails) ? n.data.rails : [];
+      rails.forEach((rail) => {
+        const railId = String(rail.railId || "").toLowerCase();
+        if (!railId) return;
+        const key = `${railId}::${col}`;
+        const polarity = rail.polarity === "negative" ? "negative" : "positive";
+        map.set(key, {
+          nodeId: n.id,
+          column: col,
+          railId,
+          polarity,
+          targetHandle: polarity
         });
+      });
+    });
+    return map;
+  };
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  const findNearestSocket = (nodes, position) => {
+    let best = null;
+    let bestDist = Infinity;
+    nodes.forEach((n) => {
+      if (n.type !== "io.breadboard.sockets:socket") return;
+      const col = Number(n.data?.column ?? n.state?.column);
+      if (!Number.isFinite(col)) return;
+      const dx = (n.position?.x || 0) - (position?.x || 0);
+      const dy = (n.position?.y || 0) - (position?.y || 0);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = n;
+      }
+    });
+    if (!best) return { column: 1, segment: "top" };
+    const col = clamp(Number(best.data?.column ?? best.state?.column) || 1, 1, 30);
+    const rows = best.data?.rows || [];
+    const inferredSegment = rows.some((r) => ["F","G","H","I","J"].includes(String(r).toUpperCase())) ? "bottom" : "top";
+    const segment = best.data?.segment || best.state?.segment || inferredSegment;
+    return { column: col, segment, socket: best, distance: bestDist };
+  };
+
+  const normalizeRow = (row, segmentHint) => {
+    if (!row) return segmentHint === "bottom" ? "J" : "A";
+    const upper = String(row).toUpperCase();
+    if (upper === "GND" || upper === "GROUND") return "J";
+    if (upper === "VCC" || upper === "V+") return "A";
+    return upper;
+  };
+
+  const PIN_PRESETS = {
+    "io.breadboard.components:railTapNegative": {
+      rail: { row: "J", segmentPreference: "rail-bottom-negative", columnOffset: 0 },
+      tap: { row: "J", segmentPreference: "bottom", columnOffset: 0 }
+    },
+    "io.breadboard.components:railTapPositive": {
+      rail: { row: "A", segmentPreference: "rail-top-positive", columnOffset: 0 },
+      tap: { row: "A", segmentPreference: "top", columnOffset: 0 }
+    },
+    "io.breadboard.components:led": {
+      anode: { row: "E", segmentPreference: "top", columnOffset: 0 },
+      cathode: { row: "F", segmentPreference: "bottom", columnOffset: 0 }
+    }
+  };
+
+  const applyPinPresets = (node) => {
+    const preset = PIN_PRESETS[node?.type];
+    const pinsFromNode = Array.isArray(node?.data?.pins) ? node.data.pins : [];
+    // If the node was just created and pins haven't hydrated yet, synthesize
+    // pins from the preset so first-drop can still route correctly.
+    const pins =
+      pinsFromNode.length || !preset
+        ? pinsFromNode
+        : Object.entries(preset).map(([id, meta]) => ({
+            id,
+            ...meta
+          }));
+    if (!preset) return pins;
+    return pins.map((pin) => {
+      const overrides = preset[pin.id] || preset[pin.label] || preset[pin.name];
+      return overrides ? { ...pin, ...overrides } : pin;
+    });
+  };
+
+  const resolveRailTarget = (pref, rails, col, segmentHint) => {
+    if (!pref || !pref.startsWith("rail-") || !Number.isFinite(col)) return null;
+    const polarity = pref.includes("negative") ? "negative" : "positive";
+
+    // 1) Honor drop segment first (if present)
+    const hintedPref =
+      segmentHint === "top" || segmentHint === "bottom"
+        ? `rail-${segmentHint}-${polarity}`
+        : null;
+    if (hintedPref) {
+      const hinted = rails.get(`${hintedPref}::${col}`);
+      if (hinted) return hinted;
+    }
+
+    // 2) Try the declared preference
+    const fromPref = rails.get(`${pref}::${col}`);
+    if (fromPref) return fromPref;
+
+    // 3) Fallback: any rail on this column with matching polarity
+    let fallback = null;
+    rails.forEach((entry) => {
+      if (!fallback && entry.column === col && entry.polarity === polarity) {
+        fallback = entry;
+      }
+    });
+    return fallback;
+  };
+
+  const buildAssignments = (node, sockets, rails, snapshot, anchorCol, segment) => {
+    const pins = applyPinPresets(node);
+    if (!pins.length) return [];
+    const baseCol = clamp(anchorCol, 1, 30);
+    const seg = segment || pins[0]?.segment || "top";
+
+    return pins
+      .map((pin, idx) => {
+        const colOffset = Number.isFinite(pin.columnOffset) ? pin.columnOffset : idx;
+        const col = clamp(baseCol + colOffset, 1, 30);
+        // Let tap pins mirror the drop segment so the body straddles rail+socket correctly.
+        const isTapPin = pin.id === "tap" || pin.name === "tap";
+        const isRailPin = pin.id === "rail" || pin.name === "rail";
+        const dropRowOverride = isTapPin
+          ? seg === "top"
+            ? "A"
+            : seg === "bottom"
+            ? "J"
+            : null
+          : null;
+        const row = normalizeRow(dropRowOverride || pin.row, seg);
+        // Force tap pins to the drop band; force rail pins to the matching rail band.
+        const pref = isTapPin
+          ? seg
+          : isRailPin
+          ? seg === "top"
+            ? "rail-top-negative"
+            : "rail-bottom-negative"
+          : (pin.segmentPreference || pin.segment || "").toLowerCase() ||
+            (row === "J" ? "bottom" : row === "A" ? "top" : seg);
+
+        // Rail pins
+        if (pref.startsWith("rail-")) {
+          // Use row A for top rail, J for bottom rail to mirror real breadboard rails.
+          const railRow =
+            segment === "top" ? "A" : segment === "bottom" ? "J" : row;
+          const railTarget = resolveRailTarget(pref, rails, col, segment);
+          if (railTarget) {
+            return {
+              handle: pin.id || pin.name || `pin${idx}`,
+              target: {
+                nodeId: railTarget.nodeId,
+                targetHandle: railTarget.targetHandle,
+                row: railRow,
+                column: col,
+                segment: pref
+              }
+            };
+          }
+          return null;
+        }
+
+        const pinSegment = pref || seg;
+        const key = `${row}:${col}:${pinSegment}`;
+        const socketId = sockets.get(key);
+        return socketId
+          ? {
+              handle: pin.id || pin.name || `pin${idx}`,
+              target: {
+                nodeId: socketId,
+                targetHandle: "socket",
+                row,
+                column: col,
+                segment: pinSegment
+              }
+            }
+          : null;
+      })
+      .filter(Boolean);
+  };
+
+  const deleteEdgesFor = async (nodeId) => {
+    if (!nodeId) return 0;
+    const snap = await getSnapshot();
+    const toDelete = snap.edges.filter(
+      (e) =>
+        e &&
+        (e.source === nodeId ||
+          e.fromNodeId === nodeId ||
+          e.target === nodeId ||
+          e.toNodeId === nodeId)
+    );
+    await Promise.all(
+      toDelete.map((e) =>
+        toPromise(
+          api.deleteEdge ? api.deleteEdge(e.id) : api.removeEdge?.(e.id)
+        ).catch(() => Promise.resolve())
+      )
+    );
+    return toDelete.length;
+  };
+
+  const createEdges = async (specs) => {
+    for (const s of specs) {
+      if (!s.source || !s.target) continue;
+      await toPromise(
+        api.createEdge
+          ? api.createEdge(s)
+          : api.addEdge?.({
+              fromNodeId: s.source,
+              fromHandle: s.sourceHandle,
+              toNodeId: s.target,
+              toHandle: s.targetHandle,
+              type: s.type || "default"
+            })
+      ).catch(() => Promise.resolve());
+    }
+  };
+
+  const processDrop = async (eventNode, overridePosition) => {
+    if (!eventNode?.id) return;
+
+    // Only trust explicit dropPoint/mouse coordinates; never fall back to old snapshot positions.
+    const drop =
+      (overridePosition &&
+        typeof overridePosition.x === "number" &&
+        typeof overridePosition.y === "number" &&
+        overridePosition) ||
+      (eventNode.dropPoint &&
+        typeof eventNode.dropPoint.x === "number" &&
+        typeof eventNode.dropPoint.y === "number" &&
+        eventNode.dropPoint) ||
+      null;
+    if (!drop) {
+      log("[BreadboardAutoWire] skip: missing dropPoint for", eventNode.id);
+      return;
+    }
+    // Hard reset: start every drop with no existing edges for this node.
+    await deleteEdgesFor(eventNode.id);
+    // Force-refresh the board snapshot before the very first drop to avoid
+    // the “column 1” / missing-rails first-drop issue. This is cheap enough
+    // and dramatically improves first-drop reliability.
+    await ensureBoard(true);
+
+    let { nodes, edges } = await getSnapshot();
+    let sockets = buildSocketIndex(nodes);
+    let rails = buildRailIndex(nodes);
+    if (sockets.size === 0 && rails.size === 0) {
+      // Force-refresh board snapshot once to avoid first-drop “stale” placements.
+      const board = await ensureBoard(true);
+      nodes = mergeUnique(nodes, board.nodes);
+      edges = mergeUnique(edges, board.edges);
+      sockets = buildSocketIndex(nodes);
+      rails = buildRailIndex(nodes);
+      if (sockets.size === 0 && rails.size === 0) {
+        log("[BreadboardAutoWire] abort: no sockets/rails found in snapshot after refresh");
         return;
       }
-
-      // Socket pin
-      const segment =
-        rawPref === 'bottom' ? 'bottom' : 'top';
-      const row = normalizeRow(
-        pin.row,
-        getDefaultRowForSegment(segment)
-      );
-      const key = toRowKey(row, column);
-      const socketTarget = layout.holeMap.get(key);
-      if (!socketTarget) return;
-
-      assignments.push({
-        handle,
-        target: {
-          ...socketTarget,
-          targetHandle: 'socket'
-        }
-      });
-    });
-
-    // de-dupe by handle
-    const byHandle = new Map();
-    assignments.forEach((a) => {
-      if (!a || !a.handle) return;
-      if (!byHandle.has(a.handle)) {
-        byHandle.set(a.handle, a);
-      }
-    });
-    return Array.from(byHandle.values());
-  };
-
-  const applyAssignmentsToPins = (pins, assignments, fallbackSegment) => {
-    const map = new Map();
-    assignments.forEach((entry) => {
-      if (!entry || !entry.handle || !entry.target) return;
-      map.set(entry.handle, entry.target);
-    });
-
-    return pins.map((pin) => {
-      const handle =
-        pin.id || pin.handleKey || pin.key || pin.label;
-      if (!handle || !map.has(handle)) return pin;
-      const target = map.get(handle);
-      const row = target.row || pin.row || getDefaultTopRow();
-      const isRail =
-        typeof target.segment === 'string' &&
-        target.segment.startsWith('rail-');
-      const segmentPref = isRail
-        ? (target.segment ||
-            target.segmentPreference ||
-            pin.segmentPreference ||
-            fallbackSegment)
-        : fallbackSegment;
-
-      return {
-        ...pin,
-        column: target.column,
-        row,
-        segment: segmentPref,
-        segmentPreference: segmentPref
-      };
-    });
-  };
-
-  const computeBounds = (assignments) => {
-    if (!assignments.length) return null;
-    const xs = assignments.map((a) => a.target.x);
-    const ys = assignments.map((a) => a.target.y);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-    const margin = getBodyMargin();
-    const width = Math.max(
-      getDefaultMinWidth(),
-      maxX - minX + margin
-    );
-    const height = Math.max(
-      getDefaultMinHeight(),
-      maxY - minY + margin
-    );
-    const position = {
-      x: (minX + maxX) / 2,
-      y: (minY + maxY) / 2
-    };
-    return { position, width, height };
-  };
-
-  const buildPinState = (assignments) => {
-    const state = {};
-    assignments.forEach((assignment) => {
-      state[assignment.handle] = {
-        row: assignment.target.row,
-        column: assignment.target.column,
-        nodeId: assignment.target.nodeId,
-        targetHandle: assignment.target.targetHandle
-      };
-    });
-    return state;
-  };
-
-  // ------------------------------------------------------------
-  // CONNECTIVITY SOLVER (BUS → RAIL → COMPONENTS)
-  // ------------------------------------------------------------
-
-  const connectAdjacency = (adjacency, a, b) => {
-    if (!a || !b) return;
-    if (!adjacency.has(a)) adjacency.set(a, new Set());
-    adjacency.get(a).add(b);
-  };
-
-  const solveConnectivity = (nodes = [], edges = []) => {
-    const adjacency = new Map();
-
-    edges.forEach((edge) => {
-      if (!edge) return;
-      const src = edge.source || edge.fromNodeId;
-      const tgt = edge.target || edge.toNodeId;
-      if (!src || !tgt) return;
-
-      const sourceHandle =
-        edge.sourceHandle || edge.fromHandle || getDefaultHandleKey();
-      const targetHandle =
-        edge.targetHandle || edge.toHandle || null;
-
-      const sourceId = makeHandleNodeId(src, sourceHandle);
-      const targetId =
-        targetHandle && targetHandle !== 'socket'
-          ? makeHandleNodeId(tgt, targetHandle)
-          : tgt;
-
-      connectAdjacency(adjacency, sourceId, targetId);
-      connectAdjacency(adjacency, targetId, sourceId);
-    });
-
-    const conductive = getConductiveMap();
-    nodes.forEach((node) => {
-      const pairs = conductive[node?.type];
-      if (!node || !Array.isArray(pairs)) return;
-      pairs.forEach((pair) => {
-        if (!Array.isArray(pair) || pair.length < 2) return;
-        const [fromKey, toKey] = pair;
-        const fromId = makeHandleNodeId(node.id, fromKey);
-        const toId = makeHandleNodeId(node.id, toKey);
-        connectAdjacency(adjacency, fromId, toId);
-        connectAdjacency(adjacency, toId, fromId);
-      });
-    });
-
-    const nodeFlags = new Map();
-    const markReachable = (startId, flagKey) => {
-      if (!startId) return;
-      const visited = new Set();
-      const queue = [startId];
-      visited.add(startId);
-      while (queue.length > 0) {
-        const current = queue.shift();
-        if (!nodeFlags.has(current)) nodeFlags.set(current, {});
-        nodeFlags.get(current)[flagKey] = true;
-        const neighbors = adjacency.get(current);
-        if (!neighbors) continue;
-        neighbors.forEach((nextId) => {
-          if (visited.has(nextId)) return;
-          visited.add(nextId);
-          queue.push(nextId);
-        });
-      }
-    };
-
-    nodes.forEach((node) => {
-      if (!isBusNode(node)) return;
-      const positiveId = makeHandleNodeId(node.id, 'positive');
-      const negativeId = makeHandleNodeId(node.id, 'negative');
-      markReachable(positiveId, 'touchesVPlus');
-      markReachable(negativeId, 'touchesGnd');
-    });
-
-    return nodeFlags;
-  };
-
-  const normalizeHandleEntry = (handle) => {
-    if (!handle) return null;
-    if (typeof handle === 'string') {
-      return { id: handle, key: handle, label: handle };
     }
-    if (typeof handle !== 'object') return null;
-    const id = handle.id || handle.key || handle.name || handle.handleKey;
-    if (!id) return null;
-    return {
-      id,
-      key: handle.key || id,
-      label: handle.label || handle.name || id
+    const nodeById = new Map(nodes.map((n) => [n.id, n]));
+
+    const node = { ...(eventNode || {}) };
+    const snapshotNode = nodeById.get(node.id);
+    // Merge snapshot data to ensure pins/metadata are present.
+    node.data = { ...(snapshotNode?.data || {}), ...(node.data || {}) };
+    // Ensure breadboard components keep their intended footprint;
+    // if the node already carries a width/height, keep it as-is.
+    const ensureSize = (targetWidth, targetHeight) => {
+      const w = Number(node.width || snapshotNode?.width);
+      const h = Number(node.height || snapshotNode?.height);
+      const next = {};
+      if (!Number.isFinite(w) || w <= 0) next.width = targetWidth;
+      if (!Number.isFinite(h) || h <= 0) next.height = targetHeight;
+      return next;
     };
-  };
+    if (
+      typeof node.type === "string" &&
+      (node.type.includes("railTapNegative") || node.type.includes("railTapPositive"))
+    ) {
+      const targetWidth =
+        Number(node.width || snapshotNode?.width) || 16;
+      const targetHeight =
+        Number(node.height || snapshotNode?.height) || 50; // align with renderer/manifest defaults
+      const size = ensureSize(targetWidth, targetHeight);
+      if (Object.keys(size).length) {
+        Object.assign(node, size);
+      }
+    }
+    // Lock position to the actual drop point only.
+    node.position = { x: drop.x, y: drop.y };
 
-  const collectHandleKeys = (node) => {
-    const keys = new Set();
-    const sources = [
-      node?.handles,
-      node?.outputs,
-      node?.inputs,
-      node?.data?.handles,
-      node?.data?.pins
-    ];
-    sources.forEach((list) => {
-      if (!Array.isArray(list)) return;
-      list.forEach((entry) => {
-        const normalized = normalizeHandleEntry(entry);
-        if (!normalized) return;
-        if (normalized.id) keys.add(normalized.id);
-        if (normalized.key) keys.add(normalized.key);
+    const pins = Array.isArray(node?.data?.pins) ? node.data.pins : [];
+    const origDrop = { x: drop.x, y: drop.y };
+
+    // Pick the closest socket (column + segment) instead of “column 1” fallback.
+    const pickNearest = async () => {
+      const nearest = findNearestSocket(nodes, node.position);
+      if (nearest?.socket) return nearest;
+      // One refresh retry if snapshot was incomplete.
+      const board = await ensureBoard(true);
+      nodes = mergeUnique(nodes, board.nodes);
+      edges = mergeUnique(edges, board.edges);
+      sockets = buildSocketIndex(nodes);
+      rails = buildRailIndex(nodes);
+      return findNearestSocket(nodes, node.position);
+    };
+
+    let nearest = await pickNearest();
+    if (!nearest || !nearest.socket) {
+      log("[BreadboardAutoWire] abort: no nearby socket for drop", {
+        node: node.id,
+        drop: origDrop
       });
-    });
-    return Array.from(keys);
-  };
+      return;
+    }
 
-  const updateConnectivityStates = async (api, nodes, edges) => {
-    const handleFlags = solveConnectivity(nodes, edges);
+    const nearestCol = nearest.column;
+    const segment =
+      nearest.segment ||
+      node?.data?.breadboard?.anchor?.segment ||
+      (pins.some((p) => normalizeRow(p.row, "top") === "J") ? "bottom" : "top");
 
-    for (const node of nodes) {
-      if (!node || !node.id) continue;
+    log(
+      "[BreadboardAutoWire] placing",
+      node.id,
+      `pos=(${node.position.x?.toFixed ? node.position.x.toFixed(1) : node.position.x},${node.position.y?.toFixed ? node.position.y.toFixed(1) : node.position.y})`,
+      `targetCol=${nearestCol}`,
+      `segment=${segment}`,
+      {
+        dropPoint: origDrop,
+        sockets: sockets.size,
+        rails: rails.size,
+        nearest: {
+          socketId: nearest.socket?.id,
+          col: nearestCol,
+          segment: segment,
+          dist: nearest.distance
+        }
+      }
+    );
 
-      const existingPinState = isPlainObject(node.data?.breadboard?.pinState)
-        ? node.data.breadboard.pinState
-        : {};
-      let changed = false;
-      const nextPinState = { ...existingPinState };
-      const pinKeys = collectHandleKeys(node);
+    const existing = edges.filter(
+      (e) => e && (e.source === node.id || e.fromNodeId === node.id)
+    );
+    if (existing.length > 2) {
+      throw new Error(
+        `[BreadboardAutoWire] abort: node ${node.id} already has ${existing.length} edges`
+      );
+    }
 
-      pinKeys.forEach((handleKey) => {
-        if (!handleKey) return;
-        const currentState = nextPinState[handleKey] || {};
-        const flagEntry = handleFlags.get(
-          makeHandleNodeId(node.id, handleKey)
-        ) || {};
-        const touchesVPlus = !!flagEntry.touchesVPlus;
-        const touchesGnd = !!flagEntry.touchesGnd;
-        nextPinState[handleKey] = {
-          ...currentState,
-          touchesVPlus,
-          touchesGnd
-        };
-        if (
-          (currentState.touchesVPlus || false) !== touchesVPlus ||
-          (currentState.touchesGnd || false) !== touchesGnd
-        ) {
-          changed = true;
+    let assignments = buildAssignments(
+      node,
+      sockets,
+      rails,
+      { nodes, edges },
+      nearestCol,
+      segment
+    );
+    if (!assignments.length) {
+      // One retry with a forced board refresh in case the first snapshot was incomplete.
+      const board = await ensureBoard(true);
+      nodes = mergeUnique(nodes, board.nodes);
+      edges = mergeUnique(edges, board.edges);
+      sockets = buildSocketIndex(nodes);
+      rails = buildRailIndex(nodes);
+      assignments = buildAssignments(
+        node,
+        sockets,
+        rails,
+        { nodes, edges },
+        nearestCol,
+        segment
+      );
+    }
+    if (!assignments.length) {
+      const socketKeys = Array.from(sockets.keys()).slice(0, 12);
+      const railKeys = Array.from(rails.keys()).slice(0, 12);
+      const typeCounts = nodes.reduce((acc, n) => {
+        if (!n?.type) return acc;
+        acc[n.type] = (acc[n.type] || 0) + 1;
+        return acc;
+      }, {});
+      log("[BreadboardAutoWire] no assignments derived", {
+        node: node.id,
+        pins: pins.map((p) => ({
+          id: p.id,
+          row: p.row,
+          segPref: p.segmentPreference,
+          seg: p.segment,
+          colOff: p.columnOffset
+        })),
+        nearestCol,
+        segment,
+        socketKeys,
+        railKeys,
+        typeCounts,
+        drop: origDrop,
+        nearest: {
+          socketId: nearest.socket?.id,
+          col: nearestCol,
+          segment: segment,
+          dist: nearest.distance
         }
       });
+      return;
+    }
 
-      if (!changed) continue;
+    const pinState = {};
+    assignments.forEach((a) => {
+      pinState[a.handle] = {
+        row: a.target.row,
+        column: a.target.column,
+        nodeId: a.target.nodeId,
+        targetHandle: "socket",
+        segment: a.target.segment
+      };
+    });
 
-      const payload = {
-        data: {
-          ...(node.data || {}),
-          breadboard: {
-            ...(isPlainObject(node.data?.breadboard)
-              ? node.data.breadboard
-              : {}),
-            pinState: nextPinState
+    const breadboard = { ...(node.data?.breadboard || {}) };
+    breadboard.anchor = {
+      column: assignments[0]?.target?.column || nearestCol,
+      segment: assignments[0]?.target?.segment || segment
+    };
+    breadboard.pinState = pinState;
+    breadboard.pendingPlacement = false;
+
+    // Snap to the midpoint of the target sockets we just chose.
+    const targetPositions = assignments
+      .map((a) => nodeById.get(a.target.nodeId)?.position)
+      .filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y));
+    if (targetPositions.length > 0) {
+      const avgX =
+        targetPositions.reduce((sum, p) => sum + p.x, 0) / targetPositions.length;
+      const avgY =
+        targetPositions.reduce((sum, p) => sum + p.y, 0) / targetPositions.length;
+      let snappedY = avgY;
+      // If we're snapping to a rail, nudge the body toward the board by half a rail height.
+      const railAssignment = assignments.find((a) => {
+        const target = nodeById.get(a.target.nodeId);
+        return target && target.type === "io.breadboard.sockets:railSocket";
+      });
+      if (railAssignment) {
+        const targetNode = nodeById.get(railAssignment.target.nodeId);
+        const railHeight =
+          Number(targetNode?.height) ||
+          Number(targetNode?.data?.height) ||
+          36; // default rail height
+        const offset = railHeight / 2;
+        snappedY += segment === "top" ? offset : segment === "bottom" ? offset : 0;
+      }
+      node.position = { x: avgX, y: snappedY };
+    }
+
+    // Special-case rail taps: align rail/tap pins with per-band tweaks so the body spans
+    // the correct distance without overshooting the rail hole.
+    if (
+      typeof node.type === "string" &&
+      (node.type.includes("railTapNegative") || node.type.includes("railTapPositive"))
+    ) {
+      const railAssign = assignments.find((a) => a.handle === "rail");
+      const tapAssign = assignments.find((a) => a.handle === "tap");
+      const railPos =
+        railAssign && nodeById.get(railAssign.target.nodeId)?.position;
+      // If tap assignment is missing (first drop quirks), synthesize a tap position
+      // from the anchor column and expected row (A for top rail, J for bottom rail).
+      let tapPos =
+        tapAssign && nodeById.get(tapAssign.target.nodeId)?.position;
+
+      if (railPos && (!tapPos || !Number.isFinite(tapPos.x) || !Number.isFinite(tapPos.y))) {
+        const anchorCol = breadboard.anchor?.column || nearestCol;
+        const isTop = (railAssign?.target?.segment || "").toLowerCase().includes("top") || segment === "top";
+        const key = `${isTop ? "A" : "J"}:${anchorCol}:${isTop ? "top" : "bottom"}`;
+        const socketId = sockets.get(key);
+        if (socketId) {
+          const sPos = nodeById.get(socketId)?.position;
+          if (sPos && Number.isFinite(sPos.x) && Number.isFinite(sPos.y)) {
+            tapPos = sPos;
           }
         }
-      };
+      }
 
-      try {
-        await toPromise(api.updateNode(node.id, payload));
-      } catch (err) {
-        console.warn(
-          '[BreadboardAutoWire] Failed to update node pinState',
-          node.id,
-          err
-        );
+      if (railPos && Number.isFinite(railPos.x) && Number.isFinite(railPos.y)) {
+        const railSegment = (railAssign?.target?.segment || "").toLowerCase();
+        const isTopRail = railSegment.includes("top") || segment === "top";
+
+        const desiredHeight = isTopRail ? 32 : 36;
+        const offset = isTopRail ? 6 : 10;
+
+        // If we have both positions, center between them; otherwise, anchor on the rail.
+        const midX = tapPos && Number.isFinite(tapPos.x) ? (railPos.x + tapPos.x) / 2 : railPos.x;
+        const midY = tapPos && Number.isFinite(tapPos.y) ? (railPos.y + tapPos.y) / 2 : railPos.y;
+
+        node.position = { x: midX, y: midY + offset };
+        node.height = desiredHeight;
       }
     }
-  };
 
-  // ------------------------------------------------------------
-  // REBUILD EDGES
-  // ------------------------------------------------------------
-
-  const rebuildEdges = async (api, nodeId, assignments, snapshot) => {
-    if (!api) return;
-
-    const existing = snapshot.edges.filter(
-      (edge) => edge && (edge.source === nodeId || edge.fromNodeId === nodeId)
-    );
-
-    // delete existing
-    await Promise.all(
-      existing.map((edge) => {
-        if (typeof api.deleteEdge === 'function') {
-          return toPromise(api.deleteEdge(edge.id));
-        }
-        return Promise.resolve();
+    const updatedData = { ...(node.data || {}), breadboard };
+    await toPromise(
+      api.updateNode?.(node.id, {
+        data: updatedData,
+        position: node.position,
+        width: node.width,
+        height: node.height
       })
     );
 
-    // recreate
-    for (const assignment of assignments) {
-      const payload = {
-        source: nodeId,
-        sourceHandle: assignment.handle,
-        target: assignment.target.nodeId,
-        targetHandle: assignment.target.targetHandle,
-        type: 'default'
-      };
-      if (typeof api.createEdge === 'function') {
-        try {
-          await toPromise(api.createEdge(payload));
-        } catch (err) {
-          console.warn(
-            '[BreadboardAutoWire] Failed to create edge',
-            payload,
-            err
-          );
-        }
+    // Hard reset: clear all edges for this node before recreating.
+    const purgeAllEdges = async () => {
+      let attempts = 0;
+      while (attempts < 3) {
+        const removed = await deleteEdgesFor(node.id);
+        const post = await getSnapshot();
+        const still = post.edges.some(
+          (e) => e && (e.source === node.id || e.fromNodeId === node.id)
+        );
+        if (!still || removed === 0) break;
+        attempts += 1;
       }
-    }
-  };
-
-  // ------------------------------------------------------------
-  // MAIN PER-NODE AUTOWIRE
-  // ------------------------------------------------------------
-
-  const processNode = async (nodeId, context = {}) => {
-    const api = getGraphAPI();
-
-    if (!api) {
-      console.log('[BreadboardAutoWire] processNode skipped, no api', nodeId);
-      return;
-    }
-
-    const {
-      snapshot: providedSnapshot,
-      layout: providedLayout,
-      nodeOverride,
-      allowPending
-    } = context || {};
-
-    let snapshot = providedSnapshot;
-    let layout = providedLayout;
-    if (!snapshot || !layout) {
-      const freshContext = await buildSnapshotContext();
-      if (!freshContext) {
-        console.log('[BreadboardAutoWire] processNode no snapshot/layout', nodeId);
-        return;
-      }
-      snapshot = freshContext.snapshot;
-      layout = freshContext.layout;
-    }
-    if (!layout) {
-      console.log('[BreadboardAutoWire] processNode layout missing', nodeId);
-      return;
-    }
-
-    let nodeIndex = snapshot.nodes.findIndex((n) => n && n.id === nodeId);
-    let node = nodeIndex >= 0 ? snapshot.nodes[nodeIndex] : null;
-
-    if (nodeOverride && nodeOverride.id === nodeId) {
-      const merged = {
-        ...(node || {}),
-        ...nodeOverride,
-        data: {
-          ...(node?.data || {}),
-          ...(nodeOverride.data || {}),
-          breadboard: {
-            ...(node?.data?.breadboard || {}),
-            ...(nodeOverride.data?.breadboard || {})
-          }
-        },
-        position: {
-          ...(node?.position || {}),
-          ...(nodeOverride.position || {})
-        }
-      };
-      node = merged;
-      if (nodeIndex >= 0) {
-        snapshot.nodes[nodeIndex] = merged;
-      } else {
-        snapshot.nodes.push(merged);
-        nodeIndex = snapshot.nodes.length - 1;
-      }
-    }
-
-    console.log('[BreadboardAutoWire] processNode snapshot lookup', nodeId, !!node);
-    if (!node || !node.data) return;
-
-    if (node.data?.breadboard?.pendingPlacement && allowPending !== true) {
-      console.log('[BreadboardAutoWire] Node still pending placement, skipping', nodeId);
-      return;
-    }
-    if (isSocketNode(node) || isRailNode(node)) return;
-    if (!isComponentNode(node)) return;
-
-    console.log('[BreadboardAutoWire] start wiring', nodeId, {
-      position: node.position,
-      pins: node.data?.pins,
-      layoutBounds: {
-        minColumn: layout.minColumn,
-        maxColumn: layout.maxColumn
+    };
+    await purgeAllEdges();
+    const dedup = new Map();
+    assignments.forEach((a) => {
+      if (dedup.size >= 4) return;
+      const key = `${a.handle}:${a.target.nodeId}:${a.target.targetHandle}`;
+      if (!dedup.has(key)) {
+        dedup.set(key, {
+          source: node.id,
+          sourceHandle: a.handle,
+          target: a.target.nodeId,
+          targetHandle: a.target.targetHandle || "socket",
+          type: "default"
+        });
       }
     });
+    const intendedEdges = Array.from(dedup.values());
+    await createEdges(intendedEdges);
 
-    const anchor = resolveAnchor(node, layout);
-    const basePins = Array.isArray(node.data.pins)
-      ? node.data.pins.map((p) => ({ ...p }))
-      : [];
-    let pins = applyPinPresets(node, basePins);
-    pins = alignPinsToAnchor(pins, anchor, layout);
-    if (!pins.length) return;
+    const pinSummary = assignments
+      .map((a) => `${a.handle}->${a.target.row}${a.target.column}`)
+      .join(", ");
 
-    // If no explicit column on pins, build offsets from anchor
-    pins = pins.map((pin, index) => {
-      if (!Number.isFinite(Number(pin.column))) {
-        pin.columnOffset =
-          Number(pin.columnOffset) ??
-          (Number.isFinite(pin.column) ? Number(pin.column) - layout.minColumn : index);
+    // After creating, fetch edges and trim any extras to match intended exactly.
+    const reconcileEdges = async () => {
+      const snap = await getSnapshot();
+      const current = snap.edges.filter(
+        (e) => e && (e.source === node.id || e.fromNodeId === node.id)
+      );
+      const keepKeys = new Set(
+        intendedEdges.map(
+          (e) =>
+            `${e.sourceHandle || e.fromHandle || ""}:${
+              e.target || e.toNodeId
+            }:${e.targetHandle || e.toHandle || ""}`
+        )
+      );
+      const seen = new Set();
+      for (const e of current) {
+        const key = `${e.sourceHandle || e.fromHandle || ""}:${
+          e.target || e.toNodeId
+        }:${e.targetHandle || e.toHandle || ""}`;
+        if (!keepKeys.has(key) || seen.has(key)) {
+          await toPromise(
+            api.deleteEdge ? api.deleteEdge(e.id) : api.removeEdge?.(e.id)
+          ).catch(() => Promise.resolve());
+        } else {
+          seen.add(key);
+        }
       }
-      return pin;
-    });
+    };
 
-    let assignments = buildAssignmentsFromPins(
-      pins,
-      layout,
-      getAnchorColumn(anchor, layout)
+    await reconcileEdges();
+    const finalCheck = (await getSnapshot()).edges.filter(
+      (e) => e && (e.source === node.id || e.fromNodeId === node.id)
     );
-    console.log('[BreadboardAutoWire] assignments from pins', nodeId, assignments);
-    if (!assignments.length) {
-      // fallback: put two pins on same row, adjacent columns
-      const center = getNodeCenter(node);
-      const row = findClosestRow(center.y, anchor.segment, layout);
-      const colA = clamp(anchor.column, layout.minColumn, layout.maxColumn - 1);
-      const colB = clamp(colA + 1, layout.minColumn, layout.maxColumn);
-      const keyA = toRowKey(row, colA);
-      const keyB = toRowKey(row, colB);
-      const left = layout.holeMap.get(keyA);
-      const right = layout.holeMap.get(keyB);
-      const handles = pins
-        .map((p) => p.id || p.handleKey || p.key || p.label)
-        .filter(Boolean);
-      if (left && right && handles.length >= 2) {
-        assignments = [
-          {
-            handle: handles[0],
-            target: { ...left, targetHandle: 'socket' }
-          },
-          {
-            handle: handles[1],
-            target: { ...right, targetHandle: 'socket' }
-          }
-        ];
+    const logEdges = finalCheck;
+    log(
+      "[BreadboardAutoWire] placed",
+      node.id,
+      `edges=${logEdges.length}`,
+      `anchor=${breadboard.anchor.column}:${breadboard.anchor.segment}`,
+      `pins=[${pinSummary}]`,
+      {
+        drop: origDrop,
+        snapped: node.position,
+        nearestCol
       }
+    );
+  };
+
+  // Queue drop handling per node to prevent races / duplicate edge creation.
+  const enqueueDrop = (node, overridePos) => {
+    const id = node?.id;
+    if (!id) return Promise.resolve();
+    const dropPos =
+      overridePos && typeof overridePos.x === "number" && typeof overridePos.y === "number"
+        ? { x: overridePos.x, y: overridePos.y }
+        : null;
+    const last = lastDrop.get(id);
+    if (dropPos && last && last.x === dropPos.x && last.y === dropPos.y) {
+      // Same coordinates already processed; skip.
+      return dropQueue.get(id) || Promise.resolve();
     }
 
-    if (!assignments.length) {
-      console.log('[BreadboardAutoWire] no assignments computed', nodeId);
-      return;
-    }
-
-    // update pins with final assignment positions
-    pins = applyAssignmentsToPins(pins, assignments, anchor.segment);
-
-    // snap body bounds
-    const body = computeBounds(assignments);
-    const pinState = buildPinState(assignments);
-
-    const payload = {
-      data: {
-        ...(node.data || {}),
-        pins,
-        breadboard: {
-          ...(node.data?.breadboard || {}),
-          anchor,
-          pinState,
-          pendingPlacement: false
+    const run = async () => {
+      try {
+        await processDrop(node, dropPos);
+        if (dropPos) lastDrop.set(id, dropPos);
+      } finally {
+        if (dropQueue.get(id) === current) {
+          dropQueue.delete(id);
         }
       }
     };
-    console.log('[BreadboardAutoWire] final payload', nodeId, payload);
 
-    if (body) {
-      payload.position = body.position;
-      payload.width = body.width;
-      payload.height = body.height;
-    }
-
-    try {
-      await toPromise(api.updateNode(node.id, payload));
-      await rebuildEdges(api, node.id, assignments, snapshot);
-      // after wiring edges, recompute connectivity
-      const fresh = await readGraphSnapshot();
-      await updateConnectivityStates(api, fresh.nodes, fresh.edges);
-    } catch (err) {
-      console.warn('[BreadboardAutoWire] Failed to process node', node.id, err);
-    }
+    const current = (dropQueue.get(id) || Promise.resolve()).then(run, run);
+    dropQueue.set(id, current);
+    return current;
   };
 
-  const processAllComponentNodes = async () => {
-    const context = await buildSnapshotContext();
-    if (!context) return;
-    for (const node of context.snapshot.nodes) {
-      if (!node || !node.id) continue;
-      if (isSocketNode(node) || isRailNode(node)) continue;
-      if (!isComponentNode(node)) continue;
+  const resolveEventNodes = async (evt = {}) => {
+    if (Array.isArray(evt.nodes) && evt.nodes.length) return evt.nodes.filter(Boolean);
+    const ids = Array.isArray(evt.nodeIds)
+      ? evt.nodeIds
+      : evt.nodeId
+      ? [evt.nodeId]
+      : [];
+    if (!ids.length) return [];
+    const snap = await getSnapshot();
+    return snap.nodes.filter((n) => ids.includes(n.id));
+  };
+
+  const handleNodeDragEnd = async (evt = {}) => {
+    const nodes = await resolveEventNodes(evt);
+    const ids = nodes.map((n) => n?.id).filter(Boolean);
+    log("[BreadboardAutoWire] nodeDragEnd", { count: ids.length, ids });
+    if (!nodes.length) return;
+    const overridePos =
+      evt.dropPoint ||
+      evt.position ||
+      evt.pointer ||
+      (evt.pos && typeof evt.pos === "object" ? evt.pos : null);
+    for (const n of nodes) {
       try {
-        await processNode(node.id, context);
+        await enqueueDrop(n, overridePos);
       } catch (err) {
-        console.warn('[BreadboardAutoWire] Failed to process node during full sweep', node.id, err);
+        log("[BreadboardAutoWire] drop failed", n?.id, err);
       }
     }
   };
 
-  // ------------------------------------------------------------
-  // EVENT WIRING + BOOTSTRAP (RETRY UNTIL graphAPI IS READY)
-  // ------------------------------------------------------------
-
-  const startAutoWire = async () => {
-    const api = getGraphAPI();
-
-    if (!api) {
-      console.warn('[BreadboardAutoWire] runtime API not ready; aborting');
-      return;
-    }
-
-    console.log('[BreadboardAutoWire] Initializing (plugin script node)');
-
-    await processAllComponentNodes();
-
-    const cleanups = [];
-    const events = api.events;
-
-    const getNodesArray = async () => {
-      if (!api) return [];
-      const methods = ['getNodes', 'readNode'];
-      for (const method of methods) {
-        if (typeof api[method] === 'function') {
-          try {
-            const result = await toPromise(api[method]());
-            if (Array.isArray(result?.data)) return result.data;
-            if (Array.isArray(result)) return result;
-          } catch (err) {
-            /* ignore */
-          }
-        }
-      }
-      return [];
-    };
-
-    const getNodeById = async (nodeId) => {
-      if (!nodeId) return null;
-      const methods = ['getNode', 'readNode'];
-      for (const method of methods) {
-        if (typeof api[method] === 'function') {
-          try {
-            const result = await toPromise(api[method](nodeId));
-            if (result?.success && result.data) return result.data;
-            if (result && typeof result === 'object' && result.id) return result;
-          } catch (err) {
-            /* ignore */
-          }
-        }
-      }
-      const nodes = await getNodesArray();
-      return nodes.find((node) => node && node.id === nodeId) || null;
-    };
-
-    const shouldProcessSnapshot = (node, options = {}) => {
-      if (!node || !node.id) return false;
-      if (!isComponentNode(node)) return false;
-      if (node.data?.breadboard?.pendingPlacement && options.allowPending !== true) {
-        return false;
-      }
-      return true;
-    };
-
-    const processNodeSnapshot = async (node, label = 'event', options = {}) => {
-      const pending = node?.data?.breadboard?.pendingPlacement === true;
-      const allowPending = options.allowPending === true || (pending && label === 'nodeDragEnd');
-      if (!shouldProcessSnapshot(node, { allowPending })) return;
-      try {
-        await processNode(node.id, {
-          nodeOverride: node,
-          allowPending
-        });
-      } catch (err) {
-        console.warn(
-          '[BreadboardAutoWire] Failed to process node from',
-          label,
-          node.id,
-          err
-        );
-      }
-    };
-
-    const processById = async (id, label, options = {}) => {
-      if (!id) return;
-      const node = await getNodeById(id);
-      if (node) {
-        await processNodeSnapshot(node, label, options);
-      }
-    };
-
-    const extractEventNodes = (evt = {}) => {
-      if (!evt || typeof evt !== 'object') return [];
-      const rawNodes = Array.isArray(evt.nodes) ? evt.nodes : [];
-      return rawNodes
-        .map((node) => (node && typeof node === 'object' ? node : null))
-        .filter((node) => node && node.id);
-    };
-
-    const handleNodeAdded = async (evt = {}) => {
-      if (evt?.node) {
-        await processNodeSnapshot(evt.node, 'nodeAdded');
-        return;
-      }
-      const id = evt?.nodeId || evt?.id;
-      if (id) {
-        await processById(id, 'nodeAdded');
-      }
-    };
-
-    const handleNodeDragEnd = async (evt = {}) => {
-      const eventNodes = extractEventNodes(evt);
-      if (eventNodes.length) {
-        await Promise.all(
-          eventNodes.map((node) => processNodeSnapshot(node, 'nodeDragEnd', { allowPending: true }))
-        );
-        return;
-      }
-      const ids = Array.isArray(evt?.nodeIds) ? evt.nodeIds : [];
-      await Promise.all(ids.map((id) => processById(id, 'nodeDragEnd', { allowPending: true })));
-    };
-
-    const handleNodeDataChanged = async (evt = {}) => {
-      if (evt?.node) {
-        await processNodeSnapshot(evt.node, 'nodeDataChanged');
-        return;
-      }
-      const id = evt?.nodeId || evt?.id;
-      if (id) {
-        await processById(id, 'nodeDataChanged');
-      }
-    };
-
-    if (events && typeof events.on === 'function') {
-      const wrapAsyncHandler = (fn, label) => (payload) => {
-        Promise.resolve(fn(payload)).catch((err) => {
-          console.warn(`[BreadboardAutoWire] ${label} handler failed`, err);
-        });
-      };
-
-      const makeCleanup = (eventName, handler, label) => {
-        const wrapped = wrapAsyncHandler(handler, label);
-        const off = events.on(eventName, wrapped);
-        if (typeof off === 'function') {
-          return off;
-        }
-        return () => {
-          if (typeof events.off === 'function') {
-            events.off(eventName, wrapped);
-          }
-        };
-      };
-
-      cleanups.push(
-        makeCleanup('nodeAdded', handleNodeAdded, 'nodeAdded'),
-        makeCleanup('nodeDragEnd', handleNodeDragEnd, 'nodeDragEnd'),
-        makeCleanup('nodeDataChanged', handleNodeDataChanged, 'nodeDataChanged')
-      );
+  const subscribe = () => {
+    const subs = [];
+    const listener = (evt) =>
+      handleNodeDragEnd(evt).catch((err) => log("[BreadboardAutoWire] handler error", err));
+    if (api.events && typeof api.events.on === "function") {
+      subs.push(api.events.on("nodeDragEnd", listener));
+      log("[BreadboardAutoWire] subscribed via api.events");
+    } else if (typeof window !== "undefined" && window.eventBus?.on) {
+      subs.push(window.eventBus.on("nodeDragEnd", listener));
+      log("[BreadboardAutoWire] subscribed via window.eventBus");
     } else {
-      console.warn(
-        '[BreadboardAutoWire] runtime API has no event bus; auto-wire will not react to interactive placement'
-      );
+      log("[BreadboardAutoWire] no event bus found; inactive");
     }
-
+    return () => subs.forEach((off) => typeof off === "function" && off());
   };
 
-  startAutoWire().catch((err) => {
-    console.error('[BreadboardAutoWire] Failed to initialize runtime', err);
-  });
-})(typeof api !== 'undefined' ? api : undefined);
+  const start = () => {
+    if (typeof window !== "undefined") {
+      if (window.__breadboardAutowireStarted) {
+        return;
+      }
+      window.__breadboardAutowireStarted = true;
+      window.__breadboardAutowireActive = VERSION;
+    }
+    const off = subscribe();
+    if (typeof window !== "undefined") {
+      window.__breadboardAutowireOff = off;
+      window.addEventListener("beforeunload", () => {
+        if (typeof off === "function") off();
+      });
+    }
+  };
+
+  start();
+})(
+  // Prefer the injected API from ScriptRunner if present.
+  (typeof api !== "undefined" && api) ||
+    window?.graphAPI ||
+    window?.runtimeApi ||
+    window?.breadboardRuntime
+);

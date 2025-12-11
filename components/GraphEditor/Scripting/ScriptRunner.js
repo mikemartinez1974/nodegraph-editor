@@ -156,6 +156,7 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
   const activeRunRef = useRef(null);
   const pendingTimeoutRef = useRef(null);
   const callCountRef = useRef(0);
+  const runQueueRef = useRef(Promise.resolve());
 
   const sessionToken = useMemo(() => generateToken(), [runnerKey]);
   const srcDoc = useMemo(() => createBootstrapSrcDoc(sessionToken), [sessionToken]);
@@ -216,7 +217,8 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
       }
 
       if (msg.type === 'rpcRequest' && typeof onRequest === 'function') {
-        if (activeRunRef.current && msg.meta?.runId !== activeRunRef.current) {
+        const requestRunId = msg.meta?.runId;
+        if (activeRunRef.current && requestRunId && requestRunId !== activeRunRef.current) {
           iframeRef.current?.contentWindow?.postMessage({ type: 'rpcResponse', id: msg.id, error: 'Run aborted', token: sessionToken }, '*');
           return;
         }
@@ -275,21 +277,25 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
     return new Promise(resolve => waitersRef.current.push(resolve));
   };
 
+  const clearPendingTimeout = () => {
+    if (pendingTimeoutRef.current) {
+      clearTimeout(pendingTimeoutRef.current);
+      pendingTimeoutRef.current = null;
+    }
+  };
+
   const resetRunner = (reason) => {
     readyRef.current = false;
     waitersRef.current = [];
     activeRunRef.current = null;
     callCountRef.current = 0;
-    if (pendingTimeoutRef.current) {
-      clearTimeout(pendingTimeoutRef.current);
-      pendingTimeoutRef.current = null;
-    }
+    clearPendingTimeout();
     setRunnerKey(key => key + 1);
     window.dispatchEvent(new CustomEvent('scriptRunnerResult', { detail: { type: 'scriptResult', success: false, error: reason || 'Script runner reset', runId: null } }));
     window.dispatchEvent(new CustomEvent('scriptRunnerReset'));
   };
 
-  async function runScript(scriptText = '', meta = {}) {
+  async function runOnce(scriptText = '', meta = {}) {
     if (!iframeRef.current) {
       await new Promise(r => setTimeout(r, 0));
     }
@@ -306,6 +312,8 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
         if (!msg || msg.type !== 'scriptResult') return;
         if (msg.runId && msg.runId !== runId) return;
         window.removeEventListener('scriptRunnerResult', onResult);
+        clearPendingTimeout();
+        activeRunRef.current = null;
         resolve(msg);
       };
 
@@ -320,6 +328,13 @@ export default function ScriptRunner({ onRequest, timeoutMs = DEFAULT_TIMEOUT })
         }
       }, timeoutMs);
     });
+  }
+
+  async function runScript(scriptText = '', meta = {}) {
+    const next = runQueueRef.current.then(() => runOnce(scriptText, meta));
+    // Prevent the queue from getting stuck on errors
+    runQueueRef.current = next.catch(() => {});
+    return next;
   }
 
   useEffect(() => {

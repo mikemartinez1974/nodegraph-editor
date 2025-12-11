@@ -138,7 +138,8 @@ export default function NodeGraph({
   const lastDragPosition = useRef(null);
   const dragRafRef = useRef(null);
   const groupDragOffsetRef = useRef({ x: 0, y: 0 });
-  const dragThreshold = 5;
+  const lastPointerRef = useRef({ x: 0, y: 0, inside: false, ts: 0 });
+  const dragThreshold = 1; // make pickup as responsive as possible
   const dragStartedRef = useRef(false);
   const suppressClickRef = useRef(false);
   
@@ -173,6 +174,34 @@ export default function NodeGraph({
   const nodeList = useMemo(() => nodes.map(ensureHandles), [nodes]);
 
   const visibleNodeList = useMemo(() => nodeList.filter(n => n.visible !== false), [nodeList]);
+
+  // Track latest pointer in graph coordinates so other components can place new nodes at the cursor.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return undefined;
+    const handleMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      const graphX = (e.clientX - rect.left - (pan?.x || 0)) / (zoom || 1);
+      const graphY = (e.clientY - rect.top - (pan?.y || 0)) / (zoom || 1);
+      lastPointerRef.current = { x: graphX, y: graphY, inside, ts: Date.now() };
+      try {
+        eventBus.emit('pointerMove', {
+          client: { x: e.clientX, y: e.clientY },
+          graph: { x: graphX, y: graphY },
+          inside
+        });
+      } catch (err) {
+        /* ignore */
+      }
+    };
+    el.addEventListener('mousemove', handleMove);
+    return () => el.removeEventListener('mousemove', handleMove);
+  }, [pan, zoom]);
 
   // ============================================
   // Unified Event Handler Setup
@@ -494,9 +523,35 @@ export default function NodeGraph({
       if (node && typeof onNodeClick === 'function') {
         onNodeClick(node.id, {});
       }
+      // Even on a tiny drag (or click), emit nodeDragEnd so downstream code
+      // (autowire) never misses the first drop.
+      const snapshots = getNodeSnapshotsByIds(draggingNodeIdRef.current);
+      const first = snapshots[0];
+      // Use the actual mouse location (graph coords) when available; avoid
+      // falling back to the center position so the very first drop is accurate.
+      const dropPointGraph =
+        point && panRef.current && zoomRef.current
+          ? {
+              x: (point.x - panRef.current.x) / zoomRef.current,
+              y: (point.y - panRef.current.y) / zoomRef.current
+            }
+          : null;
+      let payloadNodes = snapshots;
+      if (dropPointGraph && payloadNodes.length) {
+        payloadNodes = payloadNodes.map((n) => ({
+          ...n,
+          position: { x: dropPointGraph.x, y: dropPointGraph.y }
+        }));
+      }
+      eventBus.emit('nodeDragEnd', {
+        nodeIds: draggingNodeIdRef.current,
+        nodes: payloadNodes,
+        dropPoint: dropPointGraph
+      });
     } else if (draggingInfoRef.current) {
       const offset = draggingInfoRef.current.offset;
       
+      const updatedSnapshots = [];
       draggingNodeIdRef.current.forEach(id => {
         const node = nodes.find(n => n.id === id);
         if (node) {
@@ -511,6 +566,19 @@ export default function NodeGraph({
           
           const newPosition = { x: newX, y: newY };
           eventBus.emit('nodeMove', { id, position: newPosition });
+
+          // Build an updated snapshot for downstream listeners (avoids stale refs)
+          try {
+            updatedSnapshots.push(JSON.parse(JSON.stringify({ ...node, position: newPosition })));
+          } catch (err) {
+            updatedSnapshots.push({ ...node, position: newPosition });
+          }
+          // Also update the live nodesRef so downstream reads during dragEnd see the fresh position.
+          if (nodesRef.current && Array.isArray(nodesRef.current)) {
+            nodesRef.current = nodesRef.current.map((entry) =>
+              entry && entry.id === id ? { ...entry, position: newPosition } : entry
+            );
+          }
         }
 
         const nodeEl = nodeRefs.current.get(id);
@@ -543,10 +611,37 @@ export default function NodeGraph({
         if (handleLayerImperativeRef.current) handleLayerImperativeRef.current.redraw();
       });
       
+      // Compute drop point in graph coords from last mouse position.
+      // We intentionally avoid fallbacks so that downstream logic only ever
+      // acts on real pointer coordinates.
+      const dropPointGraph =
+        lastMousePos.current && panRef.current && zoomRef.current
+          ? {
+              x: (lastMousePos.current.x - panRef.current.x) / zoomRef.current,
+              y: (lastMousePos.current.y - panRef.current.y) / zoomRef.current
+            }
+          : null;
+
+      // Build a payload that always includes node snapshots with the final position.
+      let payloadNodes = updatedSnapshots;
+      if (!payloadNodes.length) {
+        const snapshots = getNodeSnapshotsByIds(draggingNodeIdRef.current);
+        payloadNodes = snapshots;
+      }
+
+      // Ensure every payload node carries the dropPoint position when available.
+      if (payloadNodes.length && dropPointGraph) {
+        payloadNodes = payloadNodes.map((n) => ({
+          ...n,
+          position: { x: dropPointGraph.x, y: dropPointGraph.y }
+        }));
+      }
+
       // Only emit nodeDragEnd if we actually dragged
       eventBus.emit('nodeDragEnd', {
         nodeIds: draggingNodeIdRef.current,
-        nodes: getNodeSnapshotsByIds(draggingNodeIdRef.current)
+        nodes: payloadNodes,
+        dropPoint: dropPointGraph
       });
     }
 

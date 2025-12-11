@@ -108,6 +108,8 @@ const NodeLayer = ({
                           if (e.button !== 0) return;
                           const target = e.target;
                           if (shouldSkipDrag(target)) return;
+                          if (e.preventDefault) e.preventDefault();
+                          if (e.stopPropagation) e.stopPropagation();
                           onNodeDragStart && onNodeDragStart(e.nativeEvent || e, node);
                         }}
                         onTouchStart={(e) => {
@@ -115,6 +117,7 @@ const NodeLayer = ({
                           const target = e.target;
                           if (shouldSkipDrag(target)) return;
                           const native = e.nativeEvent || e;
+                          if (native.preventDefault) native.preventDefault();
                           if (native.stopPropagation) native.stopPropagation();
                           if (native.stopImmediatePropagation) native.stopImmediatePropagation();
                           onNodeDragStart && onNodeDragStart(native, node);

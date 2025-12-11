@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import NodeGraph from '../NodeGraph';
@@ -170,6 +170,40 @@ const GraphEditorContent = () => {
   const showSnackbar = useCallback((message, severity = 'info') => {
     setSnackbar({ open: true, message, severity });
   }, [setSnackbar]);
+
+  // Surface snackbar errors to the console with a trace so we can debug deep render loops.
+  useEffect(() => {
+    if (!snackbar?.open) return;
+    if (snackbar.severity === 'error') {
+      console.error('[Snackbar:error]', snackbar.message);
+      // Trace to reveal the call site that triggered this snackbar.
+      console.trace('[Snackbar:error trace]');
+    }
+  }, [snackbar]);
+
+  // Global safety net: surface uncaught errors/rejections with traces so we can pinpoint drag/drop failures.
+  useEffect(() => {
+    const handleError = (event) => {
+      console.error('[GlobalError]', event.message || event.error || event);
+      if (event?.error?.stack) {
+        console.error(event.error.stack);
+      }
+      console.trace('[GlobalError trace]');
+    };
+    const handleRejection = (event) => {
+      console.error('[UnhandledRejection]', event.reason);
+      if (event?.reason?.stack) {
+        console.error(event.reason.stack);
+      }
+      console.trace('[UnhandledRejection trace]');
+    };
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleRejection);
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleRejection);
+    };
+  }, []);
 
   const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
   const showNewTabPage = !loading && isGraphEmpty;

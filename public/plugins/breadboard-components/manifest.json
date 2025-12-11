@@ -1,6 +1,6 @@
 {
   "id": "io.breadboard.components",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "Breadboard Component Pack",
   "description": "Provides resistor, LED, and jumper nodes tailored for the breadboard template.",
   "permissions": [],
@@ -24,27 +24,26 @@
           {
             "id": "pinA",
             "row": "A",
-            "column": 1,
-            "columnOffset": 0,
+            "column": null,
             "polarity": "neutral",
             "segmentPreference": "top"
           },
           {
             "id": "pinB",
-            "row": "F",
-            "column": 1,
-            "columnOffset": 0,
+            "row": "A",
+            "column": null,
+            "columnOffset": 1,
             "polarity": "neutral",
-            "segmentPreference": "bottom"
+            "segmentPreference": "top"
           }
         ],
         "footprint": {
-          "rows": 2,
-          "columns": 1,
+          "rows": 1,
+          "columns": 2,
           "rowPitch": 1,
           "columnPitch": 1,
-          "width": 1,
-          "height": 2
+          "width": 2,
+          "height": 1
         }
       },
       "handles": {
@@ -81,7 +80,7 @@
           {
             "id": "anode",
             "row": "A",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "anode",
             "segmentPreference": "top"
@@ -89,7 +88,7 @@
           {
             "id": "cathode",
             "row": "F",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "cathode",
             "segmentPreference": "bottom"
@@ -175,13 +174,13 @@
       "icon": "ElectricBolt",
       "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
       "defaultWidth": 16,
-      "defaultHeight": 40,
+      "defaultHeight": 68,
       "defaultData": {
         "pins": [
           {
             "id": "rail",
             "row": "V+",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "positive",
             "segmentPreference": "rail-top-positive"
@@ -189,7 +188,7 @@
           {
             "id": "tap",
             "row": "A",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "neutral",
             "segmentPreference": "top"
@@ -225,13 +224,13 @@
       "icon": "HorizontalRule",
       "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
       "defaultWidth": 16,
-      "defaultHeight": 40,
+      "defaultHeight": 50,
       "defaultData": {
         "pins": [
           {
             "id": "rail",
             "row": "GND",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "negative",
             "segmentPreference": "rail-bottom-negative"
@@ -239,7 +238,7 @@
           {
             "id": "tap",
             "row": "A",
-            "column": 1,
+            "column": null,
             "columnOffset": 0,
             "polarity": "neutral",
             "segmentPreference": "top"

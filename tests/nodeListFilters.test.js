@@ -6,7 +6,7 @@ const sampleNodes = [
   {
     id: 'alpha',
     type: 'default',
-    label: 'Alpha Controller',
+    label: 'Alpha Gamma Controller',
     visible: true,
     width: 140,
     height: 80,
