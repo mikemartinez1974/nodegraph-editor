@@ -96,6 +96,35 @@
   const toPromise = (v) =>
     v && typeof v.then === "function" ? v : Promise.resolve(v);
 
+  const getSize = (node) => {
+    const w = Number(node?.width || node?.data?.width);
+    const h = Number(node?.height || node?.data?.height);
+    return {
+      w: Number.isFinite(w) ? w : 0,
+      h: Number.isFinite(h) ? h : 0
+    };
+  };
+
+  const centerFromNode = (node) => {
+    const pos = node?.position || {};
+    const { w, h } = getSize(node);
+    const mode = node?.data?.breadboard?.positionMode;
+    const x = Number(pos.x) || 0;
+    const y = Number(pos.y) || 0;
+    if (mode === "topleft") {
+      return { x: x + w / 2, y: y + h / 2 };
+    }
+    return { x, y };
+  };
+
+  const topLeftFromCenter = (center, node) => {
+    const { w, h } = getSize(node);
+    return {
+      x: center.x - w / 2,
+      y: center.y - h / 2
+    };
+  };
+
   const mergeUnique = (current = [], extra = []) => {
     const map = new Map();
     [...current, ...extra].forEach((n) => {
@@ -242,8 +271,9 @@
       if (n.type !== "io.breadboard.sockets:socket") return;
       const col = Number(n.data?.column ?? n.state?.column);
       if (!Number.isFinite(col)) return;
-      const dx = (n.position?.x || 0) - (position?.x || 0);
-      const dy = (n.position?.y || 0) - (position?.y || 0);
+      const c = centerFromNode(n);
+      const dx = c.x - (position?.x || 0);
+      const dy = c.y - (position?.y || 0);
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < bestDist) {
         bestDist = dist;
@@ -397,6 +427,46 @@
           : null;
       })
       .filter(Boolean);
+  };
+
+  const getTargetPosition = (assignment, nodeById) => {
+    if (!assignment?.target?.nodeId || !nodeById) return null;
+    const targetNode = nodeById.get(assignment.target.nodeId);
+    if (!targetNode) return null;
+
+    const center = centerFromNode(targetNode);
+    const baseX = Number(center.x);
+    const baseY = Number(center.y);
+    if (!Number.isFinite(baseX) || !Number.isFinite(baseY)) return null;
+
+    if (targetNode.type === "io.breadboard.sockets:socket") {
+      const rows = Array.isArray(targetNode.data?.rows) ? targetNode.data.rows : [];
+      const height = Number(targetNode.height || targetNode.data?.height);
+      if (rows.length && Number.isFinite(height) && height > 0) {
+        const spacing = height / rows.length;
+        const idx = rows.findIndex(
+          (r) => r && r.toUpperCase() === String(assignment.target.row || "").toUpperCase()
+        );
+        if (idx >= 0) {
+          const startY = baseY - height / 2 + spacing / 2;
+          return { x: baseX, y: startY + spacing * idx };
+        }
+      }
+    } else if (targetNode.type === "io.breadboard.sockets:railSocket") {
+      const rails = Array.isArray(targetNode.data?.rails) ? targetNode.data.rails : [];
+      const height = Number(targetNode.height || targetNode.data?.height);
+      if (rails.length && Number.isFinite(height) && height > 0) {
+        const spacing = height / rails.length;
+        const segId = String(assignment.target.segment || "").toLowerCase();
+        const idx = rails.findIndex((r) => (r?.railId || "").toLowerCase() === segId);
+        if (idx >= 0) {
+          const startY = baseY - height / 2 + spacing / 2;
+          return { x: baseX, y: startY + spacing * idx };
+        }
+      }
+    }
+
+    return { x: baseX, y: baseY };
   };
 
   const deleteEdgesFor = async (nodeId) => {
@@ -631,7 +701,7 @@
         row: a.target.row,
         column: a.target.column,
         nodeId: a.target.nodeId,
-        targetHandle: "socket",
+        targetHandle: a.target.targetHandle || "socket",
         segment: a.target.segment
       };
     });
@@ -643,83 +713,62 @@
     };
     breadboard.pinState = pinState;
     breadboard.pendingPlacement = false;
+    breadboard.positionMode = "topleft";
 
     // Snap to the midpoint of the target sockets we just chose.
     const targetPositions = assignments
-      .map((a) => nodeById.get(a.target.nodeId)?.position)
+      .map((a) => getTargetPosition(a, nodeById))
       .filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y));
-    if (targetPositions.length > 0) {
+
+    // Baseline snap: place the component so its top-left aligns with the socket's top-left.
+    // Prefer a socket target (targetHandle === "socket"); fallback to the first assignment.
+    const primaryTarget =
+      assignments.find((a) => (a.target?.targetHandle || a.target?.target) === "socket") ||
+      assignments[0];
+
+    let snapped = false;
+    if (primaryTarget?.target?.nodeId) {
+      const targetNode = nodeById.get(primaryTarget.target.nodeId);
+      if (targetNode && targetNode.type === "io.breadboard.sockets:socket") {
+        const targetCenter = centerFromNode(targetNode);
+        const targetSize = getSize(targetNode);
+        const compSize = getSize(node);
+        if (
+          Number.isFinite(targetCenter.x) &&
+          Number.isFinite(targetCenter.y) &&
+          targetSize.w > 0 &&
+          targetSize.h > 0 &&
+          compSize.w > 0 &&
+          compSize.h > 0
+        ) {
+          const socketTopLeft = {
+            x: targetCenter.x - targetSize.w / 2,
+            y: targetCenter.y - targetSize.h / 2
+          };
+          node.position = {
+            x: socketTopLeft.x + compSize.w / 2,
+            y: socketTopLeft.y + compSize.h / 2
+          };
+          snapped = true;
+        }
+      }
+    }
+
+    // Fallback: average the target positions.
+    if (!snapped && targetPositions.length > 0) {
       const avgX =
         targetPositions.reduce((sum, p) => sum + p.x, 0) / targetPositions.length;
       const avgY =
         targetPositions.reduce((sum, p) => sum + p.y, 0) / targetPositions.length;
-      let snappedY = avgY;
-      // If we're snapping to a rail, nudge the body toward the board by half a rail height.
-      const railAssignment = assignments.find((a) => {
-        const target = nodeById.get(a.target.nodeId);
-        return target && target.type === "io.breadboard.sockets:railSocket";
-      });
-      if (railAssignment) {
-        const targetNode = nodeById.get(railAssignment.target.nodeId);
-        const railHeight =
-          Number(targetNode?.height) ||
-          Number(targetNode?.data?.height) ||
-          36; // default rail height
-        const offset = railHeight / 2;
-        snappedY += segment === "top" ? offset : segment === "bottom" ? offset : 0;
-      }
-      node.position = { x: avgX, y: snappedY };
+      node.position = { x: avgX, y: avgY };
     }
 
-    // Special-case rail taps: align rail/tap pins with per-band tweaks so the body spans
-    // the correct distance without overshooting the rail hole.
-    if (
-      typeof node.type === "string" &&
-      (node.type.includes("railTapNegative") || node.type.includes("railTapPositive"))
-    ) {
-      const railAssign = assignments.find((a) => a.handle === "rail");
-      const tapAssign = assignments.find((a) => a.handle === "tap");
-      const railPos =
-        railAssign && nodeById.get(railAssign.target.nodeId)?.position;
-      // If tap assignment is missing (first drop quirks), synthesize a tap position
-      // from the anchor column and expected row (A for top rail, J for bottom rail).
-      let tapPos =
-        tapAssign && nodeById.get(tapAssign.target.nodeId)?.position;
-
-      if (railPos && (!tapPos || !Number.isFinite(tapPos.x) || !Number.isFinite(tapPos.y))) {
-        const anchorCol = breadboard.anchor?.column || nearestCol;
-        const isTop = (railAssign?.target?.segment || "").toLowerCase().includes("top") || segment === "top";
-        const key = `${isTop ? "A" : "J"}:${anchorCol}:${isTop ? "top" : "bottom"}`;
-        const socketId = sockets.get(key);
-        if (socketId) {
-          const sPos = nodeById.get(socketId)?.position;
-          if (sPos && Number.isFinite(sPos.x) && Number.isFinite(sPos.y)) {
-            tapPos = sPos;
-          }
-        }
-      }
-
-      if (railPos && Number.isFinite(railPos.x) && Number.isFinite(railPos.y)) {
-        const railSegment = (railAssign?.target?.segment || "").toLowerCase();
-        const isTopRail = railSegment.includes("top") || segment === "top";
-
-        const desiredHeight = isTopRail ? 32 : 36;
-        const offset = isTopRail ? 6 : 10;
-
-        // If we have both positions, center between them; otherwise, anchor on the rail.
-        const midX = tapPos && Number.isFinite(tapPos.x) ? (railPos.x + tapPos.x) / 2 : railPos.x;
-        const midY = tapPos && Number.isFinite(tapPos.y) ? (railPos.y + tapPos.y) / 2 : railPos.y;
-
-        node.position = { x: midX, y: midY + offset };
-        node.height = desiredHeight;
-      }
-    }
-
+    const topLeftPos = topLeftFromCenter(node.position, node);
     const updatedData = { ...(node.data || {}), breadboard };
     await toPromise(
       api.updateNode?.(node.id, {
         data: updatedData,
-        position: node.position,
+        position: topLeftPos,
         width: node.width,
         height: node.height
       })

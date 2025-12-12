@@ -61,14 +61,24 @@ function average(arr) {
  */
 export function applySnappedPosition(api, componentNode, snappedPos) {
   if (!snappedPos) return;
+  const w = typeof componentNode?.width === 'number' ? componentNode.width : typeof componentNode?.data?.width === 'number' ? componentNode.data.width : 0;
+  const h = typeof componentNode?.height === 'number' ? componentNode.height : typeof componentNode?.data?.height === 'number' ? componentNode.data.height : 0;
+  const pos = {
+    x: snappedPos.x - w / 2,
+    y: snappedPos.y - h / 2
+  };
 
   api.applyCommands([
     {
       action: "update-node",
       id: componentNode.id,
-      position: {
-        x: snappedPos.x,
-        y: snappedPos.y
+      position: pos,
+      data: {
+        ...(componentNode.data || {}),
+        breadboard: {
+          ...(componentNode.data?.breadboard || {}),
+          positionMode: 'topleft'
+        }
       }
     }
   ]);

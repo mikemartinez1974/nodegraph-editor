@@ -28,6 +28,21 @@
     const { width = 16, height = 50, type, label, data } = payload;
     const w = Math.max(width, 12);
     const h = Math.max(height, 50);
+
+    const typeLabel = String(type || label || '').toLowerCase();
+    const pinMeta = Array.isArray(data?.pins) ? data.pins : [];
+    const segPref = (pinMeta.find(p => (p.id === 'rail' || p.name === 'rail'))?.segmentPreference ||
+      pinMeta[0]?.segmentPreference || '').toLowerCase();
+    const isPositive = typeLabel.includes('positive') || segPref.includes('positive');
+    const isTop = segPref.includes('top');
+
+    let renderH = h;
+    if (isTop) {
+      renderH -= isPositive ? 8 : 10;
+    } else {
+      renderH -= isPositive ? 12 : 6;
+    }
+    renderH = Math.max(renderH, Math.min(h - 4, 40));
     const dpr = window.devicePixelRatio || 1;
     mount.width = w * dpr;
     mount.height = h * dpr;
@@ -35,9 +50,7 @@
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
 
-    const typeLabel = String(type || label || '').toLowerCase();
-    const segmentPref = (data?.pins?.[0]?.segmentPreference || '').toLowerCase();
-    const isNegative = typeLabel.includes('negative') || segmentPref.includes('negative');
+    const isNegative = typeLabel.includes('negative') || segPref.includes('negative');
     const primaryColor = isNegative ? '#0ea5e9' : '#f97316';
     const accentColor = isNegative ? '#bae6fd' : '#fed7aa';
 
@@ -46,7 +59,7 @@
     const bottomPad = 1;
     const leadRadius = Math.max(5, w * 0.3);
     const stemTop = topPad + leadRadius;
-    const stemBottom = h - bottomPad - leadRadius;
+    const stemBottom = renderH - bottomPad - leadRadius;
 
     ctx.save();
     // No vertical shift: use the full available canvas height so the tap renders a touch taller.
@@ -71,7 +84,7 @@
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(centerX, h - bottomPad - leadRadius, leadRadius, 0, Math.PI * 2);
+    ctx.arc(centerX, renderH - bottomPad - leadRadius, leadRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 

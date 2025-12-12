@@ -13,7 +13,8 @@ import {
   resolveSegmentPreference,
   quantizeValue,
   findNearestColumn,
-  clampColumn
+  clampColumn,
+  getNodeCenter
 } from './utils.js';
 
 /**
@@ -229,8 +230,9 @@ export function buildEdgeCommands(componentNode, connectionSpecs) {
  */
 export function getPinPosition(node, pinName) {
   const orientation = determineOrientation(node);
-  const x = node.position.x;
-  const y = node.position.y;
+  const center = getNodeCenter(node);
+  const x = center.x;
+  const y = center.y;
   const w = node.width;
   const h = node.height;
 

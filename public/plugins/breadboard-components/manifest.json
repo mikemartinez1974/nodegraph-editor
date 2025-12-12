@@ -174,7 +174,7 @@
       "icon": "ElectricBolt",
       "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
       "defaultWidth": 16,
-      "defaultHeight": 68,
+      "defaultHeight": 63,
       "defaultData": {
         "pins": [
           {
@@ -224,7 +224,7 @@
       "icon": "HorizontalRule",
       "entry": "/plugins/breadboard-components/componentPlugin.js#JumperNode",
       "defaultWidth": 16,
-      "defaultHeight": 50,
+      "defaultHeight": 63,
       "defaultData": {
         "pins": [
           {
