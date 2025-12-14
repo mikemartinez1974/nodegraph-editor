@@ -765,13 +765,15 @@
 
     const pinState = {};
     assignments.forEach((a) => {
-      pinState[a.handle] = {
+      const entry = {
         row: a.target.row,
         column: a.target.column,
         nodeId: a.target.nodeId,
         targetHandle: a.target.targetHandle || "socket",
-        segment: a.target.segment
+        segment: a.target.segment,
+        socketKey: `${a.target.row}${a.target.column}`
       };
+      pinState[a.handle] = entry;
     });
 
     const breadboard = { ...(node.data?.breadboard || {}) };
@@ -779,7 +781,6 @@
       column: assignments[0]?.target?.column || nearestCol,
       segment: assignments[0]?.target?.segment || segment
     };
-    breadboard.pinState = pinState;
     breadboard.pendingPlacement = false;
     breadboard.positionMode = "topleft";
 
@@ -931,6 +932,10 @@
       }
     });
     const intendedEdges = Array.from(dedup.values());
+    if (node.type === "io.breadboard.components:led") {
+      evaluateLedLighting(node, pinState, nodes, edges, intendedEdges, breadboard);
+    }
+    breadboard.pinState = pinState;
     await createEdges(intendedEdges);
 
     const pinSummary = assignments
@@ -1087,3 +1092,95 @@
     window?.runtimeApi ||
     window?.breadboardRuntime
 );
+  const buildAdjacency = (edgeList = []) => {
+    const adj = new Map();
+    const add = (from, to) => {
+      if (!from || !to) return;
+      if (!adj.has(from)) adj.set(from, new Set());
+      adj.get(from).add(to);
+    };
+    (edgeList || []).forEach((edge) => {
+      if (!edge) return;
+      const source = edge.source || edge.fromNodeId;
+      const target = edge.target || edge.toNodeId;
+      if (!source || !target) return;
+      add(source, target);
+      add(target, source);
+    });
+    return adj;
+  };
+
+  const collectRailTargets = (nodes) => {
+    const positive = new Set();
+    const negative = new Set();
+    (nodes || []).forEach((n) => {
+      if (!n) return;
+      if (n.type === "io.breadboard.sockets:railSocket") {
+        const railsMeta = Array.isArray(n.data?.rails) ? n.data.rails : [];
+        if (railsMeta.some((r) => String(r.polarity || "").toLowerCase() === "positive")) {
+          positive.add(n.id);
+        }
+        if (railsMeta.some((r) => String(r.polarity || "").toLowerCase() === "negative")) {
+          negative.add(n.id);
+        }
+      } else if (n.type === "io.breadboard.bus") {
+        positive.add(n.id);
+        negative.add(n.id);
+      }
+    });
+    return { positive, negative };
+  };
+
+  const hasPathToTargets = (startId, adjacency, targets) => {
+    if (!startId || !adjacency || !targets || targets.size === 0) return false;
+    const visited = new Set([startId]);
+    const queue = [startId];
+    while (queue.length) {
+      const current = queue.shift();
+      if (targets.has(current)) return true;
+      const neighbors = adjacency.get(current);
+      if (!neighbors) continue;
+      neighbors.forEach((next) => {
+        if (next && !visited.has(next)) {
+          visited.add(next);
+          queue.push(next);
+        }
+      });
+    }
+    return false;
+  };
+
+  const evaluateLedLighting = (
+    node,
+    pinState,
+    nodes,
+    existingEdges,
+    extraEdges,
+    breadboard
+  ) => {
+    if (node?.type !== "io.breadboard.components:led") return;
+    const adjacency = buildAdjacency([...(existingEdges || []), ...(extraEdges || [])]);
+    const { positive, negative } = collectRailTargets(nodes);
+    if (pinState.anode?.nodeId) {
+      pinState.anode.hasPeer = hasPathToTargets(pinState.anode.nodeId, adjacency, positive);
+    }
+    if (pinState.cathode?.nodeId) {
+      pinState.cathode.hasPeer = hasPathToTargets(pinState.cathode.nodeId, adjacency, negative);
+    }
+    breadboard.ledLit = Boolean(pinState.anode?.hasPeer && pinState.cathode?.hasPeer);
+    const debugArgs = [
+      "[BreadboardAutoWire] LED continuity",
+      node.id,
+      {
+        column: breadboard.anchor?.column,
+        anodeHasPath: pinState.anode?.hasPeer,
+        cathodeHasPath: pinState.cathode?.hasPeer,
+        lit: breadboard.ledLit
+      }
+    ];
+    if (typeof log === "function") {
+      log(...debugArgs);
+    } else {
+      console.log(...debugArgs);
+    }
+  };

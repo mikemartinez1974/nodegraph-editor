@@ -43,11 +43,13 @@
     const topPad = 1;
     const bottomPad = 1;
 
-    ctx.fillStyle = '#1f2937';
+    const leadColor = isLit ? '#fb923c' : '#1f2937';
+    ctx.fillStyle = leadColor;
     ctx.fillRect(centerX - leadThickness / 2, topPad, leadThickness, bodyTop - topPad);
     ctx.fillRect(centerX - leadThickness / 2, bodyBottom, leadThickness, h - bottomPad - bodyBottom);
 
-    const pinState = (data.breadboard && data.breadboard.pinState) || {};
+    const breadboardState = data?.breadboard || {};
+    const pinState = breadboardState.pinState || {};
     const rowFromSocketKey = (state) => {
       if (!state || !state.socketKey) return null;
       const match = String(state.socketKey).match(/^[A-Za-z]+/);
@@ -72,24 +74,46 @@
     const cathodeLooksGrounded =
       (isBottomRowChar(cathodeRow) || (cathodeSeg && cathodeSeg.includes('negative'))) &&
       hasPeer(pinState.cathode);
-    const isLit =
+    const inferredLit =
       !!pinState.anode &&
       !!pinState.cathode &&
       anodeLooksPowered &&
       cathodeLooksGrounded;
+    const isLit = typeof breadboardState.ledLit === 'boolean' ? breadboardState.ledLit : inferredLit;
 
     const radius = bodyWidth / 2;
     const gradient = ctx.createLinearGradient(centerX, bodyTop, centerX, bodyBottom);
     if (isLit) {
-      gradient.addColorStop(0, '#fff5f5');
-      gradient.addColorStop(0.4, '#fb7185');
-      gradient.addColorStop(1, '#be123c');
+      gradient.addColorStop(0, '#fffdf5');
+      gradient.addColorStop(0.25, '#ffeaa7');
+      gradient.addColorStop(0.65, '#ffbe0b');
+      gradient.addColorStop(1, '#f97316');
     } else {
       gradient.addColorStop(0, '#374151');
       gradient.addColorStop(0.5, '#1f2937');
       gradient.addColorStop(1, '#0f172a');
     }
 
+    if (isLit) {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#ffe066';
+      ctx.beginPath();
+      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.3, bodyHeight, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = '#ffd166';
+      ctx.beginPath();
+      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.6, bodyHeight * 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.6;
+      const radial = ctx.createRadialGradient(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 0.1, centerX, (bodyTop + bodyBottom) / 2, bodyWidth);
+      radial.addColorStop(0, '#fff9c4');
+      radial.addColorStop(1, '#00000000');
+      ctx.fillStyle = radial;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
     ctx.beginPath();
     ctx.moveTo(centerX - radius, bodyTop);
     ctx.lineTo(centerX + radius, bodyTop);
@@ -102,19 +126,19 @@
     ctx.shadowBlur = isLit ? 18 : 3;
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = isLit ? 'rgba(153,27,27,0.7)' : 'rgba(15,23,42,0.8)';
+    ctx.strokeStyle = isLit ? 'rgba(153,27,27,0.4)' : 'rgba(15,23,42,0.8)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.strokeStyle = isLit ? 'rgba(248,250,252,0.9)' : 'rgba(148,163,184,0.5)';
+    ctx.strokeStyle = isLit ? 'rgba(255,255,255,0.9)' : 'rgba(148,163,184,0.5)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(centerX - bodyWidth * 0.2, bodyTop + 4);
     ctx.lineTo(centerX + bodyWidth * 0.2, bodyTop + 4);
     ctx.stroke();
 
-    ctx.fillStyle = isLit ? '#fef2f2' : '#9ca3af';
-    ctx.font = 'bold 8px sans-serif';
+    ctx.fillStyle = isLit ? '#fff7d6' : '#9ca3af';
+    ctx.font = 'bold 8px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('+', centerX, topPad + 8);
     ctx.fillText('-', centerX, h - bottomPad - 2);
