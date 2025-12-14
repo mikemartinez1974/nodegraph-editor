@@ -12,14 +12,21 @@ const getNodeHandleExtension = (node) => {
   const value = node?.extensions?.layout?.handleExtension;
   return typeof value === 'number' ? value : handleExtension;
 };
+
+const getNodeFrame = (node) => {
+  const left = node.position?.x ?? node.x ?? 0;
+  const top = node.position?.y ?? node.y ?? 0;
+  const width = node.width || 60;
+  const height = node.height || 60;
+  const cx = left + width / 2;
+  const cy = top + height / 2;
+  return { left, top, width, height, cx, cy };
+};
 const SNAP_DISTANCE = 28;
 
 // --- NEW: Get handles from node schema ---
 function getHandlePositions(node) {
-  const x = node.position?.x ?? node.x ?? 0;
-  const y = node.position?.y ?? node.y ?? 0;
-  const width = node.width || 60;
-  const height = node.height || 60;
+  const frame = getNodeFrame(node);
   const extension = getNodeHandleExtension(node);
   const handles = [];
   // Inputs (left)
@@ -34,8 +41,8 @@ function getHandlePositions(node) {
         label: h.label,
         handleType: h.type,
         position: {
-          x: x - width / 2 - extension,
-          y: y - height / 2 + ((i + 1) / (node.inputs.length + 1)) * height
+          x: frame.left - extension,
+          y: frame.top + ((i + 1) / (node.inputs.length + 1)) * frame.height
         },
         color: '#0288d1',
       });
@@ -53,8 +60,8 @@ function getHandlePositions(node) {
         label: h.label,
         handleType: h.type,
         position: {
-          x: x + width / 2 + extension,
-          y: y - height / 2 + ((i + 1) / (node.outputs.length + 1)) * height
+          x: frame.left + frame.width + extension,
+          y: frame.top + ((i + 1) / (node.outputs.length + 1)) * frame.height
         },
         color: '#43a047',
       });
@@ -101,14 +108,11 @@ const HandleLayer = forwardRef(({
     if (!lastMouse) return false;
     const graphX = (lastMouse.x - pan.x) / zoom;
     const graphY = (lastMouse.y - pan.y) / zoom;
-    const nodeX = node.position?.x ?? node.x ?? 0;
-    const nodeY = node.position?.y ?? node.y ?? 0;
-    const width = node.width || 60;
-    const height = node.height || 60;
-    const left = nodeX - width / 2;
-    const right = nodeX + width / 2;
-    const top = nodeY - height / 2;
-    const bottom = nodeY + height / 2;
+    const frame = getNodeFrame(node);
+    const left = frame.left;
+    const right = frame.left + frame.width;
+    const top = frame.top;
+    const bottom = frame.top + frame.height;
     return graphX >= left && graphX <= right && graphY >= top && graphY <= bottom;
   }, [pan, zoom]);
 
@@ -155,10 +159,11 @@ const HandleLayer = forwardRef(({
   const getHandleData = useCallback(handleId => handlePositionMap[handleId], [handlePositionMap]);
 
   const getNodeEdgeIntersection = (node, x, y) => {
-    const nodeX = node.position?.x ?? node.x ?? 0;
-    const nodeY = node.position?.y ?? node.y ?? 0;
-    const nodeWidth = node.width || 60;
-    const nodeHeight = node.height || 60;
+    const frame = getNodeFrame(node);
+    const nodeX = frame.cx;
+    const nodeY = frame.cy;
+    const nodeWidth = frame.width;
+    const nodeHeight = frame.height;
     
     const halfWidth = nodeWidth / 2;
     const halfHeight = nodeHeight / 2;
@@ -192,17 +197,21 @@ const HandleLayer = forwardRef(({
     const targetNode = nodes.find(n => n.id === targetId);
     if (sourceNode && targetNode) {
       if (direction === 'source') {
-        return getNodeEdgeIntersection(sourceNode, targetNode.position?.x ?? targetNode.x ?? 0, targetNode.position?.y ?? targetNode.y ?? 0);
+        const tFrame = getNodeFrame(targetNode);
+        return getNodeEdgeIntersection(sourceNode, tFrame.cx, tFrame.cy);
       } else {
-        return getNodeEdgeIntersection(targetNode, sourceNode.position?.x ?? sourceNode.x ?? 0, sourceNode.position?.y ?? sourceNode.y ?? 0);
+        const sFrame = getNodeFrame(sourceNode);
+        return getNodeEdgeIntersection(targetNode, sFrame.cx, sFrame.cy);
       }
     }
-    // Fallback: if only one node exists, use its center
+    // Fallback: if only one node exists, use its center derived from top-left
     if (sourceNode && !targetNode) {
-      return { x: sourceNode.position?.x ?? sourceNode.x ?? 0, y: sourceNode.position?.y ?? sourceNode.y ?? 0 };
+      const sFrame = getNodeFrame(sourceNode);
+      return { x: sFrame.cx, y: sFrame.cy };
     }
     if (!sourceNode && targetNode) {
-      return { x: targetNode.position?.x ?? targetNode.x ?? 0, y: targetNode.position?.y ?? targetNode.y ?? 0 };
+      const tFrame = getNodeFrame(targetNode);
+      return { x: tFrame.cx, y: tFrame.cy };
     }
     // If neither node exists, fallback to origin
     return { x: 0, y: 0 };
@@ -221,14 +230,11 @@ const HandleLayer = forwardRef(({
     // If not dragging, check if mouse is within margin of node bounds
     if (!draggingHandle && hoveredNodeId === targetNodeId && window.__NG_LAST_MOUSE) {
       const { x, y } = window.__NG_LAST_MOUSE;
-      const nodeX = targetNode.position?.x ?? targetNode.x ?? 0;
-      const nodeY = targetNode.position?.y ?? targetNode.y ?? 0;
-      const width = targetNode.width || 60;
-      const height = targetNode.height || 60;
-      const left = nodeX - width / 2 - nodeHoverMargin;
-      const right = nodeX + width / 2 + nodeHoverMargin;
-      const top = nodeY - height / 2 - nodeHoverMargin;
-      const bottom = nodeY + height / 2 + nodeHoverMargin;
+      const frame = getNodeFrame(targetNode);
+      const left = frame.left - nodeHoverMargin;
+      const right = frame.left + frame.width + nodeHoverMargin;
+      const top = frame.top - nodeHoverMargin;
+      const bottom = frame.top + frame.height + nodeHoverMargin;
       // Convert screen to graph coords
       const graphX = (x - pan.x) / zoom;
       const graphY = (y - pan.y) / zoom;
@@ -417,17 +423,14 @@ const HandleLayer = forwardRef(({
       let hoveredNode = null;
       for (const node of nodes) {
         if (node.visible === false) continue;
-        const nodeX = node.position?.x ?? node.x ?? 0;
-        const nodeY = node.position?.y ?? node.y ?? 0;
-        const width = node.width || 60;
-        const height = node.height || 60;
+        const frame = getNodeFrame(node);
         const extension = getNodeHandleExtension(node);
         const extendedX = extension + handleRadius * 2;
         const extendedY = handleRadius * 2;
-        const left = nodeX - width / 2 - extendedX;
-        const right = nodeX + width / 2 + extendedX;
-        const top = nodeY - height / 2 - extendedY;
-        const bottom = nodeY + height / 2 + extendedY;
+        const left = frame.left - extendedX;
+        const right = frame.left + frame.width + extendedX;
+        const top = frame.top - extendedY;
+        const bottom = frame.top + frame.height + extendedY;
         if (graphX >= left && graphX <= right && graphY >= top && graphY <= bottom) {
           hoveredNode = node;
           break;

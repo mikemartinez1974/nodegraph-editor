@@ -30,14 +30,14 @@ const Minimap = ({
     let minY = Infinity, maxY = -Infinity;
 
     nodes.forEach(node => {
-      const x = node.position?.x || node.x || 0;
+      const x = node.position?.x || node.x || 0; // top-left
       const y = node.position?.y || node.y || 0;
-      const w = (node.width || 60) / 2;
-      const h = (node.height || 60) / 2;
+      const w = node.width || 60;
+      const h = node.height || 60;
 
-      minX = Math.min(minX, x - w);
+      minX = Math.min(minX, x);
       maxX = Math.max(maxX, x + w);
-      minY = Math.min(minY, y - h);
+      minY = Math.min(minY, y);
       maxY = Math.max(maxY, y + h);
     });
 
@@ -120,7 +120,7 @@ const Minimap = ({
       const h = ((node.height || 60) * scale);
 
       ctx.fillStyle = node.color || theme.palette.primary.main;
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+      ctx.fillRect(x, y, w, h);
     });
 
     // Draw viewport rectangle

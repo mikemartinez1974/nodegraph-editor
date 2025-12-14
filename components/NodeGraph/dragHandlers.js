@@ -34,6 +34,7 @@ export function onNodeDragStart({ e, node, setDraggingNodeId, draggingNodeIdRef,
   setDraggingNodeId(node.id);
   draggingNodeIdRef.current = node.id;
   dragOffset.current = {
+    // position is top-left; compute offset from that corner
     x: e.clientX - (node.position.x * zoom + pan.x),
     y: e.clientY - (node.position.y * zoom + pan.y)
   };

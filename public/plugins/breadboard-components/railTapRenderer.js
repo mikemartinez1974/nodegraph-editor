@@ -26,8 +26,8 @@
 
   const draw = (payload = {}) => {
     const { width = 16, height = 50, type, label, data } = payload;
-    const w = Math.max(width, 12);
-    const h = Math.max(height, 50);
+    const w = Math.max(Number(width) || 0, 8);
+    const h = Math.max(Number(height) || 0, 8);
 
     const typeLabel = String(type || label || '').toLowerCase();
     const pinMeta = Array.isArray(data?.pins) ? data.pins : [];
@@ -36,13 +36,14 @@
     const isPositive = typeLabel.includes('positive') || segPref.includes('positive');
     const isTop = segPref.includes('top');
 
-    let renderH = h;
-    if (isTop) {
-      renderH -= isPositive ? 8 : 10;
-    } else {
-      renderH -= isPositive ? 12 : 6;
-    }
-    renderH = Math.max(renderH, Math.min(h - 4, 40));
+    const pad = Math.max(1, Math.min(h * 0.08, 6));
+    const usableHeight = Math.max(h - pad * 2, 4);
+    const leadRadius = Math.min(
+      Math.max(w * 0.3, 4),
+      usableHeight / 2
+    );
+    const stemTop = pad + leadRadius;
+    const stemBottom = h - pad - leadRadius;
     const dpr = window.devicePixelRatio || 1;
     mount.width = w * dpr;
     mount.height = h * dpr;
@@ -55,11 +56,6 @@
     const accentColor = isNegative ? '#bae6fd' : '#fed7aa';
 
     const centerX = w / 2;
-    const topPad = 1;
-    const bottomPad = 1;
-    const leadRadius = Math.max(5, w * 0.3);
-    const stemTop = topPad + leadRadius;
-    const stemBottom = renderH - bottomPad - leadRadius;
 
     ctx.save();
     // No vertical shift: use the full available canvas height so the tap renders a touch taller.
@@ -79,12 +75,12 @@
     ctx.lineWidth = 1;
 
     ctx.beginPath();
-    ctx.arc(centerX, topPad + leadRadius, leadRadius, 0, Math.PI * 2);
+    ctx.arc(centerX, pad + leadRadius, leadRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(centerX, renderH - bottomPad - leadRadius, leadRadius, 0, Math.PI * 2);
+    ctx.arc(centerX, h - pad - leadRadius, leadRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 

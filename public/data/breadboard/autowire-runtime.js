@@ -125,6 +125,24 @@
     };
   };
 
+  // Always derive a node's top-left, even if the stored position is a center.
+  const getNodeTopLeft = (node) => {
+    if (!node) return { x: 0, y: 0 };
+    const pos = node.position || {};
+    const mode = node?.data?.breadboard?.positionMode;
+    const size = getSize(node);
+    const x = Number(pos.x);
+    const y = Number(pos.y);
+    if (mode === "topleft" && Number.isFinite(x) && Number.isFinite(y)) {
+      return { x, y };
+    }
+    if (Number.isFinite(x) && Number.isFinite(y) && size.w > 0 && size.h > 0) {
+      return { x: x - size.w / 2, y: y - size.h / 2 };
+    }
+    // Fallback
+    return { x: 0, y: 0 };
+  };
+
   const mergeUnique = (current = [], extra = []) => {
     const map = new Map();
     [...current, ...extra].forEach((n) => {
@@ -308,6 +326,10 @@
     "io.breadboard.components:led": {
       anode: { row: "E", segmentPreference: "top", columnOffset: 0 },
       cathode: { row: "F", segmentPreference: "bottom", columnOffset: 0 }
+    },
+    "io.breadboard.components:resistor": {
+      pinA: { row: "C", segmentPreference: "top", columnOffset: 0 },
+      pinB: { row: "C", segmentPreference: "top", columnOffset: 1 }
     }
   };
 
@@ -328,6 +350,54 @@
       const overrides = preset[pin.id] || preset[pin.label] || preset[pin.name];
       return overrides ? { ...pin, ...overrides } : pin;
     });
+  };
+
+  // Per-component placement nudges (in px) after aligning top-left to socket.
+  // Values are applied to the center-based position that we write back.
+  const POSITION_OFFSETS = {
+    "io.breadboard.components:railTapNegative": {
+      top: { x: 0, y: -20 }, // lift negative tap when dropped on top sockets
+      bottom: { x: 0, y: 45 }
+    },
+    "io.breadboard.components:railTapPositive": {
+      top: { x: 0, y: -40 }, // shift up by rail socket height so the top cap sits above the rail
+      bottom: { x: 0, y: 45 }
+    }
+  };
+
+  // Per-type default sizes (px) to override renderer defaults when missing/oversized.
+  const TYPE_SIZES = {
+    "io.breadboard.components:railTapNegative": { width: 16, height: 35 },
+    "io.breadboard.components:railTapPositive": { width: 16, height: 50 },
+    "io.breadboard.components:led": { width: 16, height: 48 },
+    "io.breadboard.components:resistor": { width: 48, height: 18 }
+  };
+
+  // Segment-specific size overrides applied post-placement (center-based sizing).
+  const SEGMENT_SIZE_OVERRIDES = {
+    "io.breadboard.components:railTapNegative": {
+      top: { width: 16, height: 40 }, // slightly taller for proper coverage after renderer shrink
+      bottom: { width: 16, height: 60 } // reach bottom rail socket
+    },
+    "io.breadboard.components:railTapPositive": {
+      top: { width: 16, height: 60 }, // positive tap spans rail -> row A (longer than negative)
+      bottom: { width: 16, height: 40 } // only halfway down the rail socket
+    }
+  };
+
+  const applySize = (node, width, height) => {
+    const next = {};
+    if (Number.isFinite(width)) {
+      node.width = width;
+      next.width = width;
+    }
+    if (Number.isFinite(height)) {
+      node.height = height;
+      next.height = height;
+    }
+    if (Object.keys(next).length) {
+      node.data = { ...(node.data || {}), ...next };
+    }
   };
 
   const resolveRailTarget = (pref, rails, col, segmentHint) => {
@@ -378,7 +448,12 @@
             ? "J"
             : null
           : null;
-        const row = normalizeRow(dropRowOverride || pin.row, seg);
+        const row =
+          node.type === "io.breadboard.components:resistor"
+            ? seg === "bottom"
+              ? "H"
+              : "C"
+            : normalizeRow(dropRowOverride || pin.row, seg);
         // Force tap pins to the drop band; force rail pins to the matching rail band.
         const pref = isTapPin
           ? seg
@@ -563,17 +638,10 @@
       if (!Number.isFinite(h) || h <= 0) next.height = targetHeight;
       return next;
     };
-    if (
-      typeof node.type === "string" &&
-      (node.type.includes("railTapNegative") || node.type.includes("railTapPositive"))
-    ) {
-      const targetWidth =
-        Number(node.width || snapshotNode?.width) || 16;
-      const targetHeight =
-        Number(node.height || snapshotNode?.height) || 50; // align with renderer/manifest defaults
-      const size = ensureSize(targetWidth, targetHeight);
-      if (Object.keys(size).length) {
-        Object.assign(node, size);
+    if (typeof node.type === "string") {
+      const sizeOverride = TYPE_SIZES[node.type];
+      if (sizeOverride) {
+        applySize(node, sizeOverride.width, sizeOverride.height);
       }
     }
     // Lock position to the actual drop point only.
@@ -720,39 +788,55 @@
       .map((a) => getTargetPosition(a, nodeById))
       .filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y));
 
-    // Baseline snap: place the component so its top-left aligns with the socket's top-left.
-    // Prefer a socket target (targetHandle === "socket"); fallback to the first assignment.
+    // Baseline snap: align component top-left to socket top-left.
+    // Prefer a socket target (targetHandle === "socket"); fallback to the nearest socket node.
     const primaryTarget =
-      assignments.find((a) => (a.target?.targetHandle || a.target?.target) === "socket") ||
-      assignments[0];
+      assignments.find((a) => (a.target?.targetHandle || a.target?.target) === "socket") || assignments[0];
 
     let snapped = false;
-    if (primaryTarget?.target?.nodeId) {
-      const targetNode = nodeById.get(primaryTarget.target.nodeId);
-      if (targetNode && targetNode.type === "io.breadboard.sockets:socket") {
-        const targetCenter = centerFromNode(targetNode);
-        const targetSize = getSize(targetNode);
-        const compSize = getSize(node);
-        if (
-          Number.isFinite(targetCenter.x) &&
-          Number.isFinite(targetCenter.y) &&
-          targetSize.w > 0 &&
-          targetSize.h > 0 &&
-          compSize.w > 0 &&
-          compSize.h > 0
-        ) {
-          const socketTopLeft = {
-            x: targetCenter.x - targetSize.w / 2,
-            y: targetCenter.y - targetSize.h / 2
-          };
-          node.position = {
-            x: socketTopLeft.x + compSize.w / 2,
-            y: socketTopLeft.y + compSize.h / 2
-          };
-          snapped = true;
+    let snapNodeId = primaryTarget?.target?.nodeId;
+    if (!snapNodeId && nearest?.socket?.id) {
+      snapNodeId = nearest.socket.id;
+    }
+      if (snapNodeId) {
+        const targetNode = nodeById.get(snapNodeId);
+        if (targetNode && targetNode.type === "io.breadboard.sockets:socket") {
+          const socketTopLeft = getNodeTopLeft(targetNode);
+          const segmentSizeOverride =
+            SEGMENT_SIZE_OVERRIDES[node.type]?.[segment] ||
+            SEGMENT_SIZE_OVERRIDES[node.type]?.default ||
+            null;
+          if (segmentSizeOverride) {
+            applySize(node, segmentSizeOverride.width, segmentSizeOverride.height);
+          }
+          const compSize = getSize(node);
+          if (
+            Number.isFinite(socketTopLeft.x) &&
+            Number.isFinite(socketTopLeft.y) &&
+            compSize.w > 0 &&
+            compSize.h > 0
+          ) {
+            // Renderer expects centers; set center so that top-left matches socket top-left.
+            node.position = {
+              x: socketTopLeft.x + compSize.w / 2,
+              y: socketTopLeft.y + compSize.h / 2
+            };
+            // Apply per-component placement nudges (center-based) if defined.
+            const typeOffsets = POSITION_OFFSETS[node.type];
+            if (typeOffsets) {
+              const off = typeOffsets[segment] || typeOffsets.default || null;
+              if (off && (off.x || off.y)) {
+                node.position = {
+                  x: node.position.x + (off.x || 0),
+                  y: node.position.y + (off.y || 0)
+                };
+              }
+            }
+            delete breadboard.positionMode;
+            snapped = true;
+          }
         }
       }
-    }
 
     // Fallback: average the target positions.
     if (!snapped && targetPositions.length > 0) {
@@ -761,6 +845,50 @@
       const avgY =
         targetPositions.reduce((sum, p) => sum + p.y, 0) / targetPositions.length;
       node.position = { x: avgX, y: avgY };
+    }
+
+    if (
+      node.type === "io.breadboard.components:led" &&
+      targetPositions.length >= 2
+    ) {
+      const pad = 6;
+      const minY = Math.min(...targetPositions.map((p) => p.y));
+      const maxY = Math.max(...targetPositions.map((p) => p.y));
+      const centerY = (minY + maxY) / 2;
+      const desiredHeight = Math.max(
+        TYPE_SIZES[node.type]?.height || 40,
+        maxY - minY + pad * 2
+      );
+      const avgX =
+        targetPositions.reduce((sum, p) => sum + p.x, 0) /
+        targetPositions.length;
+      const desiredWidth = TYPE_SIZES[node.type]?.width || node.width || 16;
+      applySize(node, desiredWidth, desiredHeight);
+      node.position = { x: avgX, y: centerY };
+      delete breadboard.positionMode;
+      snapped = true;
+    }
+
+    if (
+      node.type === "io.breadboard.components:resistor" &&
+      targetPositions.length >= 2
+    ) {
+      const pad = 6;
+      const minX = Math.min(...targetPositions.map((p) => p.x));
+      const maxX = Math.max(...targetPositions.map((p) => p.x));
+      const centerX = (minX + maxX) / 2;
+      const centerY =
+        targetPositions.reduce((sum, p) => sum + p.y, 0) /
+        targetPositions.length;
+      const desiredWidth = Math.max(
+        TYPE_SIZES[node.type]?.width || 48,
+        maxX - minX + pad * 2
+      );
+      const desiredHeight = TYPE_SIZES[node.type]?.height || 18;
+      applySize(node, desiredWidth, desiredHeight);
+      node.position = { x: centerX, y: centerY };
+      delete breadboard.positionMode;
+      snapped = true;
     }
 
     const topLeftPos = topLeftFromCenter(node.position, node);

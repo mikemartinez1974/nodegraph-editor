@@ -9,18 +9,16 @@ export default HandlePositionContext;
 
 // Utility: Find intersection of line from center to target with node rectangle
 export function getNodeEdgeIntersection(node, targetX, targetY) {
-  const x = node.position?.x ?? node.x ?? 0;
-  const y = node.position?.y ?? node.y ?? 0;
+  const left = node.position?.x ?? node.x ?? 0;
+  const top = node.position?.y ?? node.y ?? 0;
   const width = node.width || 60;
   const height = node.height || 60;
-  const left = x - width / 2;
-  const right = x + width / 2;
-  const top = y - height / 2;
-  const bottom = y + height / 2;
+  const right = left + width;
+  const bottom = top + height;
 
-  // Center of node
-  const cx = x;
-  const cy = y;
+  // Center of node derived from top-left
+  const cx = left + width / 2;
+  const cy = top + height / 2;
 
   // Direction vector
   const dx = targetX - cx;

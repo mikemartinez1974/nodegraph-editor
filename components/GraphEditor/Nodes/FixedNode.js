@@ -168,9 +168,9 @@ const FixedNode = ({
   const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
   const unselected_gradient = nodeColor ? nodeColor : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
-  // Base position for non-dragging state
-  const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x - width / 2;
-  const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y - height / 2;
+  // Base position for non-dragging state (position is treated as top-left)
+  const baseLeft = (typeof node?.position?.x === 'number' ? node.position.x : 0) * zoom + pan.x;
+  const baseTop = (typeof node?.position?.y === 'number' ? node.position.y : 0) * zoom + pan.y;
 
   // Use custom color if provided, otherwise use theme
   const backgroundColor = nodeColor 

@@ -1,9 +1,13 @@
 // Utility functions for NodeGraph
 
 export function getEdgeHandlePosition(node, arg2, progress = 1, offset = { x: 0, y: 0 }, edgeType = 'straight') {
-    // Support both node.x/y and node.position.x/y
-    const x = node.x !== undefined ? node.x : node.position?.x;
-    const y = node.y !== undefined ? node.y : node.position?.y;
+    // Support both node.x/y and node.position.x/y (position is top-left; derive center)
+    const left = node.x !== undefined ? node.x : node.position?.x;
+    const top = node.y !== undefined ? node.y : node.position?.y;
+    const width = node.width || node.data?.width || 60;
+    const height = node.height || node.data?.height || 60;
+    const x = (left || 0) + width / 2;
+    const y = (top || 0) + height / 2;
     // If called with handleType ('source'/'target'), return node center
     if (typeof arg2 === 'string' && (arg2 === 'source' || arg2 === 'target')) {
         return { x, y };

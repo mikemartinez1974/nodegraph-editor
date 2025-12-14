@@ -93,6 +93,11 @@ const RUNTIME_METADATA = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const toTopLeft = ({ x, y }, width, height) => ({
+  x: x - width / 2,
+  y: y - height / 2
+});
+
 // X position of column 1 socket center from original board
 const FIRST_COL_X = -377;
 
@@ -109,7 +114,7 @@ function buildSocketNode({ id, label, col, rows, segment, x, y }) {
     id,
     type: "io.breadboard.sockets:socket",
     label,
-    position: { x, y },
+    position: toTopLeft({ x, y }, SOCKET_WIDTH, SOCKET_HEIGHT),
     width: SOCKET_WIDTH,
     height: SOCKET_HEIGHT,
     state: { locked: true },
@@ -127,7 +132,8 @@ function buildSocketNode({ id, label, col, rows, segment, x, y }) {
       rows,
       column: col,
       segment,
-      sockets: rows.map((r) => `${r}${col}`)
+      sockets: rows.map((r) => `${r}${col}`),
+      breadboard: { positionMode: "topleft" }
     },
     handles: [
       {
@@ -283,7 +289,7 @@ function buildSkinNode(socketNodes) {
     id: "breadboard-skin",
     type: "io.breadboard.sockets:skin",
     label: "Breadboard Skin",
-    position: { x: SKIN_X, y: SKIN_Y },
+    position: toTopLeft({ x: SKIN_X, y: SKIN_Y }, skinWidth, skinHeight),
     width: skinWidth,
     height: skinHeight,
     state: { locked: true },
@@ -322,7 +328,7 @@ function buildRailSocketNodes() {
       id: `rail-top-${col}`,
       type: "io.breadboard.sockets:railSocket",
       label: `Top${col}`,
-      position: { x, y: TOP_RAIL_Y },
+      position: toTopLeft({ x, y: TOP_RAIL_Y }, 18, 41),
       width: 18,
       height: 41,
       state: { locked: true },
@@ -331,7 +337,8 @@ function buildRailSocketNodes() {
         rails: [
           { polarity: "positive", railId: "rail-top-positive" },
           { polarity: "negative", railId: "rail-top-negative" }
-        ]
+        ],
+        breadboard: { positionMode: "topleft" }
       },
       inputs: [
         { key: "positive", label: "V+", type: "value" },
@@ -348,7 +355,7 @@ function buildRailSocketNodes() {
       id: `rail-bottom-${col}`,
       type: "io.breadboard.sockets:railSocket",
       label: `Bot${col}`,
-      position: { x, y: BOTTOM_RAIL_Y },
+      position: toTopLeft({ x, y: BOTTOM_RAIL_Y }, 18, 41),
       width: 18,
       height: 41,
       state: { locked: true },
@@ -357,7 +364,8 @@ function buildRailSocketNodes() {
         rails: [
           { polarity: "positive", railId: "rail-bottom-positive" },
           { polarity: "negative", railId: "rail-bottom-negative" }
-        ]
+        ],
+        breadboard: { positionMode: "topleft" }
       },
       inputs: [
         { key: "positive", label: "V+", type: "value" },
@@ -387,7 +395,7 @@ function buildScriptNode() {
     id: "breadboard-autowire-script",
     type: "script",
     label: "Breadboard AutoWire",
-    position: { x: 0, y: skinHeight / 2 + 40 },
+    position: toTopLeft({ x: 0, y: skinHeight / 2 + 40 }, 320, 200),
     width: 320,
     height: 200,
     data: {
@@ -397,7 +405,9 @@ function buildScriptNode() {
       allowMutations: true,
       scriptId: "breadboard-autowire-runtime",
       script: rawCode
-    }
+    },
+    inputs: [],
+    outputs: []
   };
 }
 
@@ -410,7 +420,7 @@ function buildBusNode() {
     id: BUS_NODE_ID,
     type: "io.breadboard.bus",
     label: "Power Bus",
-    position: { x: 0, y: skinHeight / 2 + 120 },
+    position: toTopLeft({ x: 0, y: skinHeight / 2 + 120 }, 180, 80),
     width: 180,
     height: 80,
     data: {},

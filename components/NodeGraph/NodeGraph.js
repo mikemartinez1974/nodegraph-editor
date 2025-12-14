@@ -80,10 +80,11 @@ export default function NodeGraph({
         height: n.height || 60
       }));
       
-      const minX = Math.min(...positions.map(p => p.x - p.width / 2)) - padding;
-      const maxX = Math.max(...positions.map(p => p.x + p.width / 2)) + padding;
-      const minY = Math.min(...positions.map((p) => p.y - p.height / 2)) - padding;
-      const maxY = Math.max(...positions.map(p => p.y + p.height / 2)) + padding;
+      // Positions are top-left; compute bounds directly
+      const minX = Math.min(...positions.map(p => p.x)) - padding;
+      const maxX = Math.max(...positions.map(p => p.x + p.width)) + padding;
+      const minY = Math.min(...positions.map((p) => p.y)) - padding;
+      const maxY = Math.max(...positions.map(p => p.y + p.height)) + padding;
       
       const newBounds = {
         x: minX,
@@ -125,6 +126,7 @@ export default function NodeGraph({
   const [draggingGroupId, setDraggingGroupId] = useState(null);
   const [iframeError, setIframeError] = useState(false);
   const [handlePreviewLine, setHandlePreviewLine] = useState(null);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   // Drag state
   const draggingNodeIdRef = useRef(null);
@@ -154,6 +156,30 @@ export default function NodeGraph({
   useEffect(() => {
     gridSizeRef.current = gridSize;
   }, [gridSize]);
+
+  // Track the visible viewport size (accounts for side panels/toolbars)
+  useEffect(() => {
+    const measure = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      const width = rect?.width || window.innerWidth;
+      const height = rect?.height || window.innerHeight;
+      setViewportSize({ width, height });
+    };
+    measure();
+    // Prefer ResizeObserver to capture sidebar open/close and other layout shifts.
+    let ro;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(() => measure());
+      ro.observe(containerRef.current);
+    }
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      if (ro) {
+        try { ro.disconnect(); } catch (_) {}
+      }
+    };
+  }, []);
 
   // Create layerRefs object
   const layerRefs = useMemo(() => ({
@@ -1000,10 +1026,10 @@ export default function NodeGraph({
               height: n.height || 60
             }));
 
-            const minX = Math.min(...positions.map(p => p.x - p.width / 2));
-            const maxX = Math.max(...positions.map(p => p.x + p.width / 2));
-            const minY = Math.min(...positions.map(p => p.y - p.height / 2));
-            const maxY = Math.max(...positions.map(p => p.y + p.height / 2));
+            const minX = Math.min(...positions.map(p => p.x));
+            const maxX = Math.max(...positions.map(p => p.x + p.width));
+            const minY = Math.min(...positions.map(p => p.y));
+            const maxY = Math.max(...positions.map(p => p.y + p.height));
 
             const bboxW = Math.max(1, maxX - minX);
             const bboxH = Math.max(1, maxY - minY);
@@ -1254,8 +1280,8 @@ export default function NodeGraph({
           pan={pan}
           zoom={zoom}
           setPan={setPan}
-          containerWidth={window.innerWidth}
-          containerHeight={window.innerHeight}
+          containerWidth={viewportSize.width || window.innerWidth}
+          containerHeight={viewportSize.height || window.innerHeight}
           width={220}
           height={165}
           position="bottom-right"

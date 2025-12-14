@@ -26,8 +26,8 @@
   const draw = (payload = {}) => {
     const { width = 24, height = 54, data = {} } = payload;
     const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(width, 24);
-    const h = Math.max(height, 54);
+    const w = Math.max(Number(width) || 0, 10);
+    const h = Math.max(Number(height) || 0, 10);
     mount.width = w * dpr;
     mount.height = h * dpr;
     ctx.resetTransform();
@@ -35,18 +35,17 @@
     ctx.clearRect(0, 0, w, h);
 
     const centerX = w / 2;
-    const leadThickness = Math.max(2, w * 0.15);
+    const leadThickness = Math.max(2, w * 0.16);
     const bodyHeight = Math.min(h * 0.45, 28);
     const bodyWidth = Math.min(w * 0.75, 18);
     const bodyTop = (h - bodyHeight) / 2;
     const bodyBottom = bodyTop + bodyHeight;
-    const padding = Math.max(2, h * 0.06);
-    const availableLead = Math.max(4, (bodyTop - padding));
-    const leadLength = Math.max(6, availableLead);
+    const topPad = 1;
+    const bottomPad = 1;
 
     ctx.fillStyle = '#1f2937';
-    ctx.fillRect(centerX - leadThickness / 2, padding, leadThickness, leadLength);
-    ctx.fillRect(centerX - leadThickness / 2, h - padding - leadLength, leadThickness, leadLength);
+    ctx.fillRect(centerX - leadThickness / 2, topPad, leadThickness, bodyTop - topPad);
+    ctx.fillRect(centerX - leadThickness / 2, bodyBottom, leadThickness, h - bottomPad - bodyBottom);
 
     const pinState = (data.breadboard && data.breadboard.pinState) || {};
     const rowFromSocketKey = (state) => {
@@ -115,10 +114,10 @@
     ctx.stroke();
 
     ctx.fillStyle = isLit ? '#fef2f2' : '#9ca3af';
-    ctx.font = 'bold 9px sans-serif';
+    ctx.font = 'bold 8px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('+', centerX, padding - 2);
-    ctx.fillText('-', centerX, h - padding + 4);
+    ctx.fillText('+', centerX, topPad + 8);
+    ctx.fillText('-', centerX, h - bottomPad - 2);
   };
 
   let lastPayload = { width: 24, height: 54, data: {} };

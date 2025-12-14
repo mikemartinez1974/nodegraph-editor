@@ -35,10 +35,11 @@ const GroupLayer = forwardRef(({
       height: n.height || 60
     }));
 
-    const minX = Math.min(...positions.map(p => p.x - p.width / 2)) - padding;
-    const maxX = Math.max(...positions.map(p => p.x + p.width / 2)) + padding;
-    const minY = Math.min(...positions.map(p => p.y - p.height / 2)) - padding;
-    const maxY = Math.max(...positions.map(p => p.y + p.height / 2)) + padding;
+    // Positions are top-left; compute bounds directly
+    const minX = Math.min(...positions.map(p => p.x)) - padding;
+    const maxX = Math.max(...positions.map(p => p.x + p.width)) + padding;
+    const minY = Math.min(...positions.map(p => p.y)) - padding;
+    const maxY = Math.max(...positions.map(p => p.y + p.height)) + padding;
 
     return {
       x: minX,

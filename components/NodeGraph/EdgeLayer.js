@@ -119,6 +119,14 @@ const EdgeLayer = forwardRef(({
   const { getHandlePositionForEdge } = useContext(HandlePositionContext);
   const prevHoveredEdgeRef = useRef(null);
   const edgeDataRef = useRef([]);
+  const getNodeCenter = useCallback((node) => {
+    if (!node) return { x: 0, y: 0 };
+    const w = node.width || 60;
+    const h = node.height || 60;
+    const left = node.position?.x ?? node.x ?? 0;
+    const top = node.position?.y ?? node.y ?? 0;
+    return { x: left + w / 2, y: top + h / 2 };
+  }, []);
   
   // Animation refs
   const animationStartTimeRef = useRef(null);
@@ -173,8 +181,8 @@ const EdgeLayer = forwardRef(({
       let sourcePos, targetPos, curveDirectionOverride;
       
       if (typeof getHandlePositionForEdge === 'function') {
-        const sourceResult = getHandlePositionForEdge(edge.source, edge.type, 'source');
-        const targetResult = getHandlePositionForEdge(edge.target, edge.type, 'target');
+        const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source');
+        const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target');
         
         if (sourceResult && typeof sourceResult === 'object') {
           sourcePos = { x: sourceResult.x, y: sourceResult.y };
@@ -193,11 +201,11 @@ const EdgeLayer = forwardRef(({
       
       if (!sourcePos) {
         const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
-        sourcePos = sourceNode ? { x: sourceNode.position.x, y: sourceNode.position.y } : { x: 0, y: 0 };
+        sourcePos = getNodeCenter(sourceNode);
       }
       if (!targetPos) {
         const targetNode = nodeListRef.current.find(n => n.id === edge.target);
-        targetPos = targetNode ? { x: targetNode.position.x, y: targetNode.position.y } : { x: 0, y: 0 };
+        targetPos = getNodeCenter(targetNode);
       }
 
       // Apply dragging offset
