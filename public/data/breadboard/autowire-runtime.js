@@ -893,15 +893,6 @@
     }
 
     const topLeftPos = topLeftFromCenter(node.position, node);
-    const updatedData = { ...(node.data || {}), breadboard };
-    await toPromise(
-      api.updateNode?.(node.id, {
-        data: updatedData,
-        position: topLeftPos,
-        width: node.width,
-        height: node.height
-      })
-    );
 
     // Hard reset: clear all edges for this node before recreating.
     const purgeAllEdges = async () => {
@@ -932,11 +923,20 @@
       }
     });
     const intendedEdges = Array.from(dedup.values());
+    await createEdges(intendedEdges);
     if (node.type === "io.breadboard.components:led") {
       evaluateLedLighting(node, pinState, nodes, edges, intendedEdges, breadboard);
     }
     breadboard.pinState = pinState;
-    await createEdges(intendedEdges);
+    const updatedData = { ...(node.data || {}), breadboard };
+    await toPromise(
+      api.updateNode?.(node.id, {
+        data: updatedData,
+        position: topLeftPos,
+        width: node.width,
+        height: node.height
+      })
+    );
 
     const pinSummary = assignments
       .map((a) => `${a.handle}->${a.target.row}${a.target.column}`)

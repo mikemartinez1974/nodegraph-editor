@@ -26,27 +26,13 @@
   const draw = (payload = {}) => {
     const { width = 24, height = 54, data = {} } = payload;
     const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(Number(width) || 0, 10);
-    const h = Math.max(Number(height) || 0, 10);
+    const w = Math.max(Number(width) || 0, 18);
+    const h = Math.max(Number(height) || 0, 12);
     mount.width = w * dpr;
     mount.height = h * dpr;
     ctx.resetTransform();
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
-
-    const centerX = w / 2;
-    const leadThickness = Math.max(2, w * 0.16);
-    const bodyHeight = Math.min(h * 0.45, 28);
-    const bodyWidth = Math.min(w * 0.75, 18);
-    const bodyTop = (h - bodyHeight) / 2;
-    const bodyBottom = bodyTop + bodyHeight;
-    const topPad = 1;
-    const bottomPad = 1;
-
-    const leadColor = isLit ? '#fb923c' : '#1f2937';
-    ctx.fillStyle = leadColor;
-    ctx.fillRect(centerX - leadThickness / 2, topPad, leadThickness, bodyTop - topPad);
-    ctx.fillRect(centerX - leadThickness / 2, bodyBottom, leadThickness, h - bottomPad - bodyBottom);
 
     const breadboardState = data?.breadboard || {};
     const pinState = breadboardState.pinState || {};
@@ -81,13 +67,28 @@
       cathodeLooksGrounded;
     const isLit = typeof breadboardState.ledLit === 'boolean' ? breadboardState.ledLit : inferredLit;
 
+    const centerX = w / 2;
+    const leadThickness = Math.max(2, w * 0.16);
+    const bodyHeight = Math.min(h * 0.45, 28);
+    const bodyWidth = Math.min(w * 0.75, 18);
+    const bodyTop = (h - bodyHeight) / 2;
+    const bodyBottom = bodyTop + bodyHeight;
+    const topPad = 1;
+    const bottomPad = 1;
+
+    const leadColor = isLit ? '#f97316' : '#1f2937';
+    ctx.fillStyle = leadColor;
+    ctx.fillRect(centerX - leadThickness / 2, topPad, leadThickness, bodyTop - topPad);
+    ctx.fillRect(centerX - leadThickness / 2, bodyBottom, leadThickness, h - bottomPad - bodyBottom);
+
+
     const radius = bodyWidth / 2;
     const gradient = ctx.createLinearGradient(centerX, bodyTop, centerX, bodyBottom);
     if (isLit) {
-      gradient.addColorStop(0, '#fffdf5');
-      gradient.addColorStop(0.25, '#ffeaa7');
-      gradient.addColorStop(0.65, '#ffbe0b');
-      gradient.addColorStop(1, '#f97316');
+      gradient.addColorStop(0, '#fff8d6');
+      gradient.addColorStop(0.25, '#ffe274');
+      gradient.addColorStop(0.55, '#ffb703');
+      gradient.addColorStop(1, '#ff7300');
     } else {
       gradient.addColorStop(0, '#374151');
       gradient.addColorStop(0.5, '#1f2937');
@@ -96,22 +97,22 @@
 
     if (isLit) {
       ctx.save();
-      ctx.globalAlpha = 0.4;
-      ctx.fillStyle = '#ffe066';
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#ffe08a';
       ctx.beginPath();
-      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.3, bodyHeight, 0, 0, Math.PI * 2);
+      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.4, bodyHeight * 1.1, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.25;
       ctx.fillStyle = '#ffd166';
       ctx.beginPath();
-      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.6, bodyHeight * 1.2, 0, 0, Math.PI * 2);
+      ctx.ellipse(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.8, bodyHeight * 1.35, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 0.6;
-      const radial = ctx.createRadialGradient(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 0.1, centerX, (bodyTop + bodyBottom) / 2, bodyWidth);
+      const radial = ctx.createRadialGradient(centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 0.15, centerX, (bodyTop + bodyBottom) / 2, bodyWidth * 1.4);
       radial.addColorStop(0, '#fff9c4');
       radial.addColorStop(1, '#00000000');
       ctx.fillStyle = radial;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(-w, -h, w * 3, h * 3);
       ctx.restore();
     }
     ctx.beginPath();
@@ -126,7 +127,7 @@
     ctx.shadowBlur = isLit ? 18 : 3;
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = isLit ? 'rgba(153,27,27,0.4)' : 'rgba(15,23,42,0.8)';
+    ctx.strokeStyle = isLit ? 'rgba(255,140,66,0.8)' : 'rgba(15,23,42,0.8)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -137,7 +138,7 @@
     ctx.lineTo(centerX + bodyWidth * 0.2, bodyTop + 4);
     ctx.stroke();
 
-    ctx.fillStyle = isLit ? '#fff7d6' : '#9ca3af';
+    ctx.fillStyle = isLit ? '#fff1ba' : '#9ca3af';
     ctx.font = 'bold 8px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('+', centerX, topPad + 8);
@@ -151,9 +152,9 @@
     autoHeight: false,
     render(payload) {
       lastPayload = {
-        width: payload?.width || lastPayload.width,
-        height: payload?.height || lastPayload.height,
-        data: payload?.data || lastPayload.data
+        width: payload?.width ?? lastPayload.width,
+        height: payload?.height ?? lastPayload.height,
+        data: payload?.data ?? lastPayload.data
       };
       draw(lastPayload);
     }
