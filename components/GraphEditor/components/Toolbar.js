@@ -42,7 +42,6 @@ import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   Refresh as RefreshIcon,
-  Home as HomeIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Map as MapIcon,  // NEW: Import minimap icon
@@ -656,18 +655,6 @@ const Toolbar = ({
       });
   };
 
-  const handleHome = () => {
-    if (onClearGraph) {
-      const confirmed = window.confirm('Navigate to home? This will clear the current graph.');
-      if (confirmed) {
-        onClearGraph();
-        setBrowserHistory(['']);
-        setHistoryIndex(0);
-        eventBus.emit('setAddress', { url: '' });
-      }
-    }
-  };
-
   const handleToggleBookmark = () => {
     if (!currentUrl) return;
     
@@ -752,7 +739,6 @@ const Toolbar = ({
           <FileActions 
             onSave={handleSaveToFile}
             onLoad={handleLoadFile}
-            onExport={() => eventBus.emit('exportGraph')}
             onNewFile={handleNewFile}
             isMobile={false}
             isFreeUser={isFreeUser}

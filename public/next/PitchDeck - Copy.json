@@ -1,0 +1,526 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-16T02:59:16.564Z",
+    "modified": "2025-12-16T02:59:16.564Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -807.222935680953,
+      "y": -1471.4466956055353
+    },
+    "zoom": 1.1465687296950362
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
+      "type": "markdown",
+      "label": "Pitch Goal",
+      "position": {
+        "x": -69.2736868665969,
+        "y": -133.15927590327084
+      },
+      "width": 758.9796732379713,
+      "height": 276.7560880405609,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Pitch Goal\n\n**Question:**\nWhat should the audience *understand, believe, or want* by the end of this pitch?\n\n**Answer:**\n\nI think, since the audience is investors. I want them to understand what we have and why it's powerful. We've got a new abstraction of web content that is easily ingestible, extendable, and executable by both humans and AI. What I want them to believe is that this is inevitably next, and what I want them to want is to finance it (of course!) I don't know if I want to use those words, but there's a lot of capability packed into that.\n",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Pitch Goal\n\n**Question:**\nWhat should the audience *understand, believe, or want* by the end of this pitch?\n\n**Answer:**\n\nI think, since the audience is investors. I want them to understand what we have and why it's powerful. We've got a new abstraction of web content that is easily ingestible, extendable, and executable by both humans and AI. What I want them to believe is that this is inevitably next, and what I want them to want is to finance it (of course!) I don't know if I want to use those words, but there's a lot of capability packed into that.\n"
+      }
+    },
+    {
+      "id": "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
+      "type": "markdown",
+      "label": "Problem Framing",
+      "position": {
+        "x": -75.3901042297157,
+        "y": 224.58627310725197
+      },
+      "width": 758.6194479946176,
+      "height": 330.79282994992195,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe’re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships — especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can’t be easily shared, and aren’t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don’t fail because they’re bad — they fail because they’re all trying to use a medium that doesn’t exist yet, so everyone builds a private substitute.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe’re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships — especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can’t be easily shared, and aren’t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don’t fail because they’re bad — they fail because they’re all trying to use a medium that doesn’t exist yet, so everyone builds a private substitute."
+      }
+    },
+    {
+      "id": "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41",
+      "type": "markdown",
+      "label": "Core Insight",
+      "position": {
+        "x": -70.69764392854789,
+        "y": 686.7679069830094
+      },
+      "width": 740.1682796551938,
+      "height": 295.29061375696176,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilight *fundamentally different* from other tools?\n\n**Answer:**\nTwilight treats the node graph itself as the shared source of intelligence — not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilight lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn’t limited by predefined features, but by imagination and iteration — because the graph is both the medium and the interface for collaboration.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilight *fundamentally different* from other tools?\n\n**Answer:**\nTwilight treats the node graph itself as the shared source of intelligence — not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilight lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn’t limited by predefined features, but by imagination and iteration — because the graph is both the medium and the interface for collaboration."
+      }
+    },
+    {
+      "id": "9b7e0d41-6a3f-4c9e-8c5b-3e7d1a2f6b8c",
+      "type": "markdown",
+      "label": "Live Demo",
+      "position": {
+        "x": -78.75289932096426,
+        "y": 1151.6484837791886
+      },
+      "width": 747.6832892845055,
+      "height": 298.7428913482139,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say “oh… I get it”?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application — the breadboard — proving this isn’t just conversational novelty, but a foundation for real software.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say “oh… I get it”?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application — the breadboard — proving this isn’t just conversational novelty, but a foundation for real software."
+      }
+    },
+    {
+      "id": "7e5a6b9d-2c3a-4f8e-9d41-0b7c1e3a6f52",
+      "type": "markdown",
+      "label": "Why This Is Different",
+      "position": {
+        "x": -79.28332528028292,
+        "y": 1598.701221812009
+      },
+      "width": 744.6177753966613,
+      "height": 333.24927189057644,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Why This Is Different\n\n**Question:**\nWhy can’t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilight could be reduced to a feature inside an existing graph or workflow tool — but in practice, it can’t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilight treats the graph itself as the product — a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn’t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That’s why everyone builds graph-based tools — but no one has built a universal graph medium.\n\nTwilight isn’t a feature because it replaces the assumption those tools are built on.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Why This Is Different\n\n**Question:**\nWhy can’t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilight could be reduced to a feature inside an existing graph or workflow tool — but in practice, it can’t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilight treats the graph itself as the product — a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn’t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That’s why everyone builds graph-based tools — but no one has built a universal graph medium.\n\nTwilight isn’t a feature because it replaces the assumption those tools are built on."
+      }
+    },
+    {
+      "id": "d1f2c9a6-4e8b-4b2f-9a5c-7e0d3b1a8f9c",
+      "type": "markdown",
+      "label": "Credibility & Proof",
+      "position": {
+        "x": -81.60253636396526,
+        "y": 2068.4692415412514
+      },
+      "width": 742.3451030436559,
+      "height": 323.73532888931913,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilight is not speculative — it’s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilight’s graph model. And this pitch itself is being authored inside Twilight, using the same mechanisms we’re describing.\n\nIn other words, this isn’t a concept demo — it’s a system that’s already in use by its creator, doing real work.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilight is not speculative — it’s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilight’s graph model. And this pitch itself is being authored inside Twilight, using the same mechanisms we’re describing.\n\nIn other words, this isn’t a concept demo — it’s a system that’s already in use by its creator, doing real work."
+      }
+    },
+    {
+      "id": "4b9a7d0e-1c5f-4b3e-8a6d-2f9c7e1a0b54",
+      "type": "markdown",
+      "label": "What Comes Next",
+      "position": {
+        "x": -84.60278496314521,
+        "y": 2482.195617258905
+      },
+      "width": 742.614128454228,
+      "height": 303.95402484897977,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality — not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilight already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilight claim the space early with a coherent, logical abstraction — instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality — not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilight already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilight claim the space early with a coherent, logical abstraction — instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first."
+      }
+    },
+    {
+      "id": "b3e1a4f2-7c6d-4a9e-8f21-0d9c6a5e3b42",
+      "type": "markdown",
+      "label": "Pitch Script (Rehearsal)",
+      "position": {
+        "x": 751.8075418430844,
+        "y": -137.8531742103483
+      },
+      "width": 178.46736705283777,
+      "height": 2941.8378718356016,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Twilight Pitch Script\n\n---\n\n**Opening**\n\nToday I’m not here to show you an idea — I’m here to show you a *new medium*.\n\nWhat you’re looking at is Twilight: a web-native node graph that can be read, written, and evolved by both humans and AI.\n\n---\n\n**The Problem**\n\nWe’re in a transition period.\n\nNode graphs are clearly becoming the dominant way to express complex logic, workflows, and relationships — especially in AI systems. Everyone is building them.\n\nBut the web itself has no shared graph format.\n\nSo every tool reinvents its own closed graph, trapped inside a product boundary. These graphs can’t interoperate, can’t be shared cleanly, and weren’t designed to be collaborated on by AI.\n\n---\n\n**The Core Insight**\n\nTwilight treats the node graph itself as the product.\n\nNot just a UI.\nNot just an internal data structure.\n\nThe graph is a living artifact on the web — readable, editable, and executable by both humans and AI.\n\nThat changes the relationship between structure, intent, and execution. AI doesn’t sit outside the system generating text — it operates *inside* the same graph you do.\n\n---\n\n**Live Demonstration**\n\nHere’s the moment where it usually clicks.\n\nI copy a graph. An AI reads it. The AI proposes a concrete structural change. I paste that change back — and the graph updates instantly.\n\nIn seconds, you’re watching a new class of web content emerge: not text, not code, but shared structure evolving in real time.\n\nThen I show the breadboard — a working application built entirely from these same nodes — to prove this isn’t novelty. It’s software.\n\n---\n\n**Why This Is Different**\n\nCould this be a feature in another tool?\n\nIn theory, maybe.\n\nIn practice, no — because Twilight changes what a graph *is*.\n\nExisting tools treat graphs as internal implementation details. Twilight treats the graph as a first-class, portable, executable medium on the web.\n\nThat shift isn’t additive. It requires rethinking persistence, interoperability, authorship, and AI collaboration from the ground up.\n\n---\n\n**Credibility & Proof**\n\nThis isn’t speculative.\n\nTwilight already exists. It runs in the browser. It saves graphs to the web. AI can read and modify them. And the breadboard app is a non-trivial system built entirely on this model.\n\nThis pitch itself was authored inside Twilight.\n\n---\n\n**What Comes Next**\n\nThe most obvious expansion is Virtual Reality — not as a separate product, but as another rendering surface for the same graph.\n\nScenes, objects, and interactions become nodes. The graph remains the source of truth.\n\nAnyone who follows will be forced to interoperate with the format established first.\n\n---\n\n**Close**\n\nTwilight isn’t finished.\n\nIt’s already useful.\nIt’s already working.\n\nWhat comes next depends on who helps build it.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "f1c2a9b3-6d7e-4a5f-8c21-9e0b4d3a2f11",
+      "type": "markdown",
+      "label": "Q: What is this, really?",
+      "position": {
+        "x": 981.860569619261,
+        "y": -134.63293510180188
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**What is Twilight, really — a tool, a platform, or a protocol?**\n\n**Draft Answer:**\n\nTwilight is a browser — but not in the traditional sense.\n\nIt’s a browser for structured thought and executable graphs on the web.\n\nAt the surface, it looks like a tool. Underneath, it behaves like a platform. And over time, it naturally wants to become a protocol — because it defines a shared, interoperable graph format that both humans and AI can read, modify, and execute.\n\nWe didn’t start by declaring a protocol. We started by building something people can actually use. The protocol emerges from that use.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a2e4d7f1-9c6b-4f8a-8d31-0b5c9e2f7a44",
+      "type": "markdown",
+      "label": "Q: Why now?",
+      "position": {
+        "x": 981.860569619261,
+        "y": 165.36706489819812
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**Why does this need to exist *now*? What changed recently?**\n\n**Draft Answer:**\n\nThis needs to exist now because AI has crossed a threshold where text is no longer a sufficient interface.\n\nLarge language models can reason, plan, and modify structure — but the web doesn’t have a shared, structured medium for them to work in. Everything is still flattened into prompts, documents, or proprietary tools.\n\nWhat changed recently is that AI became capable enough to use a graph meaningfully — and at the same time, the cost of building and sharing software dropped low enough that an individual could actually create the missing layer.\n\nTwilight exists now because the models are ready, the web is ready, and for the first time, the gap between human intent and machine execution can be bridged by a shared artifact instead of code alone.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d9b1c5a7-3f6e-4c8d-9a52-7e0f2b4c6a19",
+      "type": "markdown",
+      "label": "Q: Competition",
+      "position": {
+        "x": 978.7560415371045,
+        "y": 464.3322222041459
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**Why won’t an existing player (Notion, Figma, React Flow, OpenAI, etc.) just do this?**\n\n**Draft Answer:**\n\nThey’re all close — and that’s exactly the problem.\n\nEach of these tools treats the graph as an internal implementation detail, tightly coupled to their UI, execution model, or business boundaries. That works well for building a product, but it breaks down when the graph itself needs to be shared, extended, and operated on by both humans and AI across contexts.\n\nTwilight starts from a different assumption: the graph is the product. It’s the portable, executable artifact that lives on the web, independent of any single application.\n\nFor an incumbent to do this properly, they wouldn’t be adding a feature — they’d be undoing core architectural and product decisions that made them successful in the first place. That’s not impossible, but it’s extraordinarily difficult, slow, and internally risky.\n\nThat’s why you see many graph-based tools — but no universal graph medium.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e3a6f2d9-4b7c-4a8e-9d51-0c2b7f5a6e33",
+      "type": "markdown",
+      "label": "Q: Monetization",
+      "position": {
+        "x": 982.7327371344749,
+        "y": 805.3670648981981
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**How does this make money? Who pays, and for what?**\n\n**Draft Answer:**\nTwilight is designed to monetize at the points where value concentrates — not by taxing experimentation.\n\nThe core graph format remains open and usable, because adoption and interoperability matter more than early revenue. Monetization happens around that core through premium capabilities: hosted services, advanced AI workflows, private or enterprise graphs, and an ecosystem of paid plugins and extensions.\n\nIndividual developers pay for power and convenience. Teams and companies pay for collaboration, governance, and scale. And over time, an app and plugin marketplace emerges naturally, with Twilight taking a platform share.\n\nThe key point is that the system doesn’t depend on a single revenue bet. The architecture supports multiple monetization paths — and we can sequence them based on real usage instead of speculation.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b7c2e9d5-0f1a-4b8c-9a64-3e5f2d1c8a77",
+      "type": "markdown",
+      "label": "Q: Defensibility",
+      "position": {
+        "x": 981.860569619261,
+        "y": 1105.3670648981981
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**What makes this defensible once people realize it’s important?**\n\n**Draft Answer:**\n\nDefensibility comes from accumulation, not exclusion.\n\nEvery time someone creates, saves, or shares a graph in Twilight, they’re adding to a growing body of structured knowledge that’s immediately usable by both humans and AI. Every plugin, node type, or workflow strengthens the ecosystem for everyone else.\n\nThat creates natural inertia: switching away doesn’t just mean changing tools — it means leaving behind living graphs, shared conventions, and accumulated intelligence.\n\nAt the same time, Twilight benefits from power creep in a positive way. Any useful idea from another node-based system can be expressed as a graph or plugin inside Twilight. Instead of competing feature-for-feature, the system absorbs progress across the entire category.\n\nOnce that loop starts — shared graphs, shared tooling, shared AI collaboration — it becomes very difficult for late entrants to replicate without starting from zero.\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c4a1b7e9-6d2f-4f8a-8c53-9e0d5b1a7f88",
+      "type": "markdown",
+      "label": "Q: Scope Risk",
+      "position": {
+        "x": 982.9861800117073,
+        "y": 1446.2392324134119
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Investor Question\n\n**This seems very broad. How do you avoid it becoming unfocused or unshippable?**\n\n**Draft Answer:**\nBreadth comes from extensibility, not from scope creep.\n\nTwilight stays focused by maintaining a small, stable core: a limited set of fundamental node types and a clear execution model. Everything else lives at the edges through plugins.\n\nThat means the platform itself doesn’t need to grow bloated to support new use cases. Users only load the node types and capabilities they need for a given graph, whether that’s logic, visualization, simulation, or rendering.\n\nAs a result, Twilight can support an extremely wide range of applications while remaining shippable, understandable, and maintainable. The system grows outward, not inward — which lets it evolve indefinitely without collapsing under its own weight.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1a3b4c5-8d7f-4b9c-9e6a-0d1f2c3b4a5e",
+      "type": "step",
+      "source": "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
+      "target": "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "sets",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "2f1e4d6a-8b9c-4a7f-9d3e-5c0a1b2d3e4f",
+      "type": "step",
+      "source": "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
+      "target": "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "leads to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "6b4c1a5f-9e8d-4f2a-8c7b-3e0d1a2b4c6d",
+      "type": "step",
+      "source": "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41",
+      "target": "9b7e0d41-6a3f-4c9e-8c5b-3e7d1a2f6b8c",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "demonstrated by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "9a5b6c7d-1e3f-4c8a-9b2d-0e1f2a3b4c5d",
+      "type": "step",
+      "source": "9b7e0d41-6a3f-4c9e-8c5b-3e7d1a2f6b8c",
+      "target": "7e5a6b9d-2c3a-4f8e-9d41-0b7c1e3a6f52",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "reveals",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "0c2a1b4d-9e6f-4a7b-8c3d-5e1a2b3c4d6e",
+      "type": "step",
+      "source": "7e5a6b9d-2c3a-4f8e-9d41-0b7c1e3a6f52",
+      "target": "d1f2c9a6-4e8b-4b2f-9a5c-7e0d3b1a8f9c",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "supported by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f6e5d4c3-2b1a-4c9e-8d7a-0b1c2d3e4f5a",
+      "type": "step",
+      "source": "d1f2c9a6-4e8b-4b2f-9a5c-7e0d3b1a8f9c",
+      "target": "4b9a7d0e-1c5f-4b3e-8a6d-2f9c7e1a0b54",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "trigger",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "trigger",
+          "direction": "input"
+        }
+      },
+      "label": "points to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

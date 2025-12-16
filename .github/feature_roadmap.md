@@ -309,7 +309,7 @@ A focused engineering backlog to harden and ship the plugin platform. Items are 
   
   - [x] Author breadboard component nodes (jumpers, resistors, DIP packages) whose handles snap to nearby socket nodes using the existing grid spacing/selection hooks, emitting warnings when sockets are occupied or rail polarity mismatches occur; delivered via the new `io.breadboard.components` plugin (Components: `public/plugins/breadboard-components`).
   
-  - [ ] Update drag/selection/handle handlers plus GraphCRUD glue so moving or wiring a component simply reassigns edges between component handles and socket nodes, keeping history/undo intact (`components/GraphEditor/handlers/graphEditorHandlers.js`, `components/NodeGraph/HandleLayer.js`).
+  - [x] Update drag/selection/handle handlers plus GraphCRUD glue so moving or wiring a component simply reassigns edges between component handles and socket nodes, keeping history/undo intact (`components/GraphEditor/handlers/graphEditorHandlers.js`, `components/NodeGraph/HandleLayer.js`).
   
   - [ ] Add optional “board skin” nodes (canvas node or locked background image) for visuals without introducing custom rendering layers; confirm the graph still performs with ~800 socket nodes + rails.
 

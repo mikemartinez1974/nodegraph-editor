@@ -58,6 +58,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
 
+
   useEffect(() => {
     try {
       const stored = localStorage.getItem('homeUrl');

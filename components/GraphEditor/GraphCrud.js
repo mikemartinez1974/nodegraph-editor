@@ -392,6 +392,46 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
   return { edge: sanitizedEdge };
 };
 
+const applyNodeUpdates = (node, updates = {}) => {
+  const nextInputs = updates.inputs
+    ? updates.inputs.map(handle => ({ ...handle }))
+    : node.inputs;
+  const nextOutputs = updates.outputs
+    ? updates.outputs.map(handle => ({ ...handle }))
+    : node.outputs;
+
+  let nextHandles = node.handles;
+  if (updates.handles) {
+    nextHandles = normalizeHandleDefinitions({
+      handles: updates.handles,
+      inputs: nextInputs,
+      outputs: nextOutputs
+    }).handles;
+  } else if (updates.inputs || updates.outputs) {
+    nextHandles = normalizeHandleDefinitions({
+      handles: node.handles,
+      inputs: nextInputs,
+      outputs: nextOutputs
+    }).handles;
+  }
+
+  return {
+    ...node,
+    ...updates,
+    inputs: nextInputs,
+    outputs: nextOutputs,
+    handles: nextHandles,
+    data: updates.data ? { ...node.data, ...updates.data } : node.data,
+    position: updates.position ? { ...node.position, ...updates.position } : node.position,
+    state: updates.state ? { ...node.state, ...updates.state } : node.state,
+    style: updates.style ? { ...node.style, ...updates.style } : node.style,
+    extensions:
+      updates.extensions === undefined
+        ? node.extensions
+        : mergeExtensions(node.extensions, updates.extensions)
+  };
+};
+
 /**
  * CRUD API for Node Graph Editor
  * All functions return { success: boolean, data?: any, error?: string }
@@ -522,41 +562,7 @@ export default class GraphCRUD {
 
       const updatedNodes = currentNodes.map(node => {
         if (node.id === id) {
-          const nextInputs = updates.inputs
-            ? updates.inputs.map(handle => ({ ...handle }))
-            : node.inputs;
-          const nextOutputs = updates.outputs
-            ? updates.outputs.map(handle => ({ ...handle }))
-            : node.outputs;
-          let nextHandles = node.handles;
-          if (updates.handles) {
-            nextHandles = normalizeHandleDefinitions({
-              handles: updates.handles,
-              inputs: nextInputs,
-              outputs: nextOutputs
-            }).handles;
-          } else if (updates.inputs || updates.outputs) {
-            nextHandles = normalizeHandleDefinitions({
-              handles: node.handles,
-              inputs: nextInputs,
-              outputs: nextOutputs
-            }).handles;
-          }
-          return {
-            ...node,
-            ...updates,
-            inputs: nextInputs,
-            outputs: nextOutputs,
-            handles: nextHandles,
-            data: updates.data ? { ...node.data, ...updates.data } : node.data,
-            position: updates.position ? { ...node.position, ...updates.position } : node.position,
-            state: updates.state ? { ...node.state, ...updates.state } : node.state,
-            style: updates.style ? { ...node.style, ...updates.style } : node.style,
-            extensions:
-              updates.extensions === undefined
-                ? node.extensions
-                : mergeExtensions(node.extensions, updates.extensions)
-          };
+          return applyNodeUpdates(node, updates);
         }
         return node;
       });
@@ -569,6 +575,56 @@ export default class GraphCRUD {
       this.saveToHistory(updatedNodes, this.getEdges());
 
       return { success: true, data: updatedNodes[nodeIndex] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Update multiple nodes with the same changes
+   * @param {string[]} ids - Array of node IDs
+   * @param {Object} updates - Properties to update
+   */
+  updateNodes(ids, updates) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+      if (!updates || typeof updates !== 'object') {
+        return { success: false, error: 'updates must be provided' };
+      }
+
+      const idSet = new Set(ids);
+      const currentNodes = this.getNodes();
+      const missing = ids.filter(id => !currentNodes.some(node => node.id === id));
+      if (missing.length === ids.length) {
+        return { success: false, error: 'None of the specified node ids were found', data: { missing } };
+      }
+
+      const updatedItems = [];
+      const updatedNodes = currentNodes.map(node => {
+        if (!idSet.has(node.id)) {
+          return node;
+        }
+        const nextNode = applyNodeUpdates(node, updates);
+        updatedItems.push(nextNode);
+        return nextNode;
+      });
+
+      this.setNodes(prev => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
+      this.saveToHistory(updatedNodes, this.getEdges());
+
+      return {
+        success: true,
+        data: {
+          updated: updatedItems,
+          missing: missing.length ? missing : undefined
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }

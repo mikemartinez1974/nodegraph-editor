@@ -38,7 +38,13 @@ const MarkdownNode = (props) => {
   };
 
   const nodeLabel = node?.label || 'Markdown';
-  const markdownContent = node?.data?.memo || '';
+  const markdownContent = (() => {
+    const primary = typeof node?.data?.markdown === 'string' ? node.data.markdown : '';
+    if (primary.trim().length > 0) {
+      return primary;
+    }
+    return node?.data?.memo || '';
+  })();
 
   // Resize handlers (same as DefaultNode)
   const getPointerPosition = (event) => {

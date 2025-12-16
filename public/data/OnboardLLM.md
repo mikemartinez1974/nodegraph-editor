@@ -22,6 +22,7 @@ This guide shows how to generate JSON commands the editor will execute when past
 - Always include an `action`.
 - Use RFC4122 v4 UUIDs for all `id` fields (36 chars, lower-case hex, hyphens). Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`
 - Do not use non-UUID IDs (e.g., `node123`, `feature-x`).
+- Every edge **must** declare which handles it uses: add both `sourceHandle` and `targetHandle`. Default nodes expose a single `out` handle (output) and `in` handle (input); plugin nodes may define custom handle ids, so always match the handle keys published by the node definition.
 
 ## Supported Actions
 
@@ -68,7 +69,9 @@ Use one `create` command to paste an entire mini-graph at once. Nodes are create
     {
       "id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
       "source": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
+      "sourceHandle": "out",
       "target": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d",
+      "targetHandle": "in",
       "type": "child",
       "label": "then"
     }
@@ -99,6 +102,25 @@ Update a node:
   "type": "node",
   "id": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
   "updates": { "label": "Task A — Updated", "color": "#2e7d32" }
+}
+```
+
+Update several nodes at once (all receive the same changes):
+
+```json
+{
+  "action": "update",
+  "type": "node",
+  "ids": [
+    "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
+    "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
+    "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41"
+  ],
+  "updates": {
+    "type": "markdown",
+    "width": 280,
+    "height": 180
+  }
 }
 ```
 

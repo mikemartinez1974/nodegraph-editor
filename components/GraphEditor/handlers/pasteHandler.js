@@ -66,7 +66,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     }
 
     // Fallback to switch-based handling for other actions
-    const { nodes, edges, id, updates, criteria } = command;
+    const { nodes, edges, id, updates, criteria, ids } = command;
     let result;
 
     switch (action) {
@@ -86,7 +86,13 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         break;
 
       case 'update':
-        if (command.type === 'node' && id && updates) {
+        if (command.type === 'node' && Array.isArray(ids) && ids.length && updates) {
+          if (typeof graphCRUD.updateNodes === 'function') {
+            result = await graphCRUD.updateNodes(ids, updates);
+          } else {
+            result = { success: false, error: 'Bulk node update is not supported' };
+          }
+        } else if (command.type === 'node' && id && updates) {
           result = await graphCRUD.updateNode(id, updates);
         } else if (command.type === 'edge' && id && updates) {
           result = await graphCRUD.updateEdge(id, updates);

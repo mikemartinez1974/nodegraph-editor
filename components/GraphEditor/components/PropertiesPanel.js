@@ -209,6 +209,7 @@ export default function ConsolidatedPropertiesPanel({
     if (!selectedNode || !Array.isArray(edges)) return [];
     return edges.filter(edge => edge.source === selectedNode.id || edge.target === selectedNode.id);
   }, [edges, selectedNode]);
+  const isMarkdownNode = selectedNode?.type === 'markdown';
   
   // Edge-specific states
   const [edgeType, setEdgeType] = useState('');
@@ -363,7 +364,10 @@ export default function ConsolidatedPropertiesPanel({
   useEffect(() => {
     if (selectedNode) {
       setLabel(selectedNode.label || '');
-      setMemo(selectedNode.data?.memo || '');
+      const initialMemo = selectedNode.type === 'markdown'
+        ? (selectedNode.data?.markdown ?? selectedNode.data?.memo ?? '')
+        : (selectedNode.data?.memo || '');
+      setMemo(initialMemo);
       
       // Check if node color is a gradient
       const currentColor = selectedNode.color || defaultNodeColor;
@@ -447,6 +451,7 @@ export default function ConsolidatedPropertiesPanel({
       setBorderWidth(selectedGroup.style?.borderWidth || 2);
       setVisible(selectedGroup.visible !== false);
     } else {
+      setMemo('');
       setNodeHandles([]);
       setNodeStateFields({ locked: false, collapsed: false, hidden: false });
       setEdgeStateFields({ enabled: true, locked: false });
@@ -500,8 +505,12 @@ export default function ConsolidatedPropertiesPanel({
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
     setMemo(newMemo);
-    // Use the same third parameter (true) as label to skip history
-    if (onUpdateNode) onUpdateNode(entityId, { data: { memo: newMemo } }, true);
+    if (onUpdateNode) {
+      const dataPayload = isMarkdownNode
+        ? { markdown: newMemo }
+        : { memo: newMemo };
+      onUpdateNode(entityId, { data: dataPayload }, true);
+    }
   };
 
   const handleNodeColorChange = (color) => {
@@ -930,7 +939,9 @@ export default function ConsolidatedPropertiesPanel({
               onChange={(_, expanded) => setMemoExpanded(expanded)}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2">Memo (Markdown)</Typography>
+                <Typography variant="subtitle2">
+                  {isMarkdownNode ? 'Markdown Content' : 'Memo (Markdown)'}
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
