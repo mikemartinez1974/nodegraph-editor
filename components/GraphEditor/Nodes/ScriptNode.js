@@ -393,8 +393,8 @@ export default function ScriptNode({
     };
   }, [node?.data?.autoRun, node?.data?.scriptId, scriptSource, node.id]);
 
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
+  const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
+  const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;

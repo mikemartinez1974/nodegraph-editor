@@ -104,8 +104,8 @@ export default function ToggleNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
+  const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
+  const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
   // Handles are rendered via the shared HandleLayer
   return (

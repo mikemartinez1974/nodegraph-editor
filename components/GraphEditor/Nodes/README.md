@@ -82,7 +82,7 @@ This folder contains the built-in node components used by the graph editor. Each
 
 ## Common conventions
 
-- Positioning: All nodes expect `node.position {x,y}` in graph coordinates. Node components apply the same pan/zoom transforms and center the node on that position.
+- Positioning: All nodes expect `node.position {x,y}` in graph coordinates and render from the top-left using the same pan/zoom transforms.
 - Sizing: `width`/`height` are stored on node (user-resizable for DefaultNode). Default fallback sizes exist when `width`/`height` are missing.
 - Interaction: Nodes must call `eventBus` events for selection and pointer interactions (`nodeMouseDown`, `nodeClick`, `nodeMouseEnter`, `nodeMouseLeave`) to keep editor state in sync.
 - `nodeRefs`: Many nodes register their DOM ref in `nodeRefs` (a Map-like ref) so the editor can measure nodes for edge and handle placement.

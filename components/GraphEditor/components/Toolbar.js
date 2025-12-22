@@ -219,12 +219,35 @@ const Toolbar = ({
 
   // Snackbar state (replaces transient Chips)
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const lastClipboardMessageRef = useRef('');
+  const wasSnackbarOpenRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPos({ x: window.innerWidth - 600, y: 88 });
     }
   }, []);
+
+  useEffect(() => {
+    const isOpen = Boolean(snackbar?.open);
+    if (!isOpen) {
+      wasSnackbarOpenRef.current = false;
+      return;
+    }
+    if (!snackbar?.copyToClipboard) {
+      wasSnackbarOpenRef.current = true;
+      return;
+    }
+    const message = snackbar?.message ? String(snackbar.message) : '';
+    const shouldCopy = !wasSnackbarOpenRef.current || message !== lastClipboardMessageRef.current;
+    wasSnackbarOpenRef.current = true;
+    if (!message || !shouldCopy) return;
+    lastClipboardMessageRef.current = message;
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return;
+    navigator.clipboard.writeText(message).catch((err) => {
+      console.warn('[Snackbar] Failed to copy message to clipboard', err);
+    });
+  }, [snackbar?.open, snackbar?.message, snackbar?.copyToClipboard]);
 
   const handleAddressSet = useCallback((data) => {
     const url = typeof data === 'string' ? data : data?.url;
@@ -246,7 +269,7 @@ const Toolbar = ({
     } else if (saved) {
       setSnackbar({ open: true, message: 'Graph saved to .node file', severity: 'success' });
     } else if (pasted) {
-      setSnackbar({ open: true, message: 'Pasted content applied', severity: 'success' });
+      setSnackbar({ open: true, message: 'Pasted content applied', severity: 'success', copyToClipboard: true });
     } else if (selectedCopied) {
       setSnackbar({ open: true, message: 'Selected nodes copied', severity: 'success' });
     } else if (onboardCopied) {
@@ -626,7 +649,9 @@ const Toolbar = ({
       handlers: null, 
       state: { setNodes, nodesRef, setEdges, edgesRef, setGroups, pan, zoom }, 
       historyHook: { saveToHistory }, 
-      onShowMessage,
+      onShowMessage: onShowMessage
+        ? (message, severity) => onShowMessage(message, severity, { copyToClipboard: true })
+        : null,
       graphCRUD: graphCRUDRef.current
     });
   };

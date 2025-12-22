@@ -7,11 +7,32 @@ import { useState, useRef, useEffect } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GroupManager from '../GroupManager';
 
+const GRAPH_STORAGE_KEY = 'twilight_local_graph';
+const loadStoredGraph = () => {
+  if (typeof window === 'undefined' || !window.localStorage) return null;
+  try {
+    const raw = window.localStorage.getItem(GRAPH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      return {
+        nodes: Array.isArray(parsed.nodes) ? parsed.nodes : [],
+        edges: Array.isArray(parsed.edges) ? parsed.edges : [],
+        groups: Array.isArray(parsed.groups) ? parsed.groups : []
+      };
+    }
+  } catch (err) {
+    console.warn('Failed to load stored graph state:', err);
+  }
+  return null;
+};
+
 export function useGraphEditorState() {
+  const storedGraph = loadStoredGraph();
   // Graph data
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [nodes, setNodes] = useState(() => storedGraph?.nodes || []);
+  const [edges, setEdges] = useState(() => storedGraph?.edges || []);
+  const [groups, setGroups] = useState(() => storedGraph?.groups || []);
   
   // View state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -53,6 +74,7 @@ export function useGraphEditorState() {
   // Refs for current state access
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
+  const groupsRef = useRef(groups);
   const groupManager = useRef(new GroupManager());
   const initialGraphLoadedRef = useRef(false);
   
@@ -64,6 +86,25 @@ export function useGraphEditorState() {
   useEffect(() => {
     edgesRef.current = edges;
   }, [edges]);
+
+  useEffect(() => {
+    groupsRef.current = groups;
+  }, [groups]);
+
+  // Persist graph data locally
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      const payload = JSON.stringify({
+        nodes: nodesRef.current || [],
+        edges: edgesRef.current || [],
+        groups
+      });
+      window.localStorage.setItem(GRAPH_STORAGE_KEY, payload);
+    } catch (err) {
+      console.warn('Failed to persist graph state:', err);
+    }
+  }, [nodes, edges, groups, nodesRef, edgesRef]);
   
   // Save color preferences
   useEffect(() => {
@@ -88,7 +129,7 @@ export function useGraphEditorState() {
     // Graph data
     nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
-    groups, setGroups,
+    groups, setGroups, groupsRef,
     
     // View
     pan, setPan,

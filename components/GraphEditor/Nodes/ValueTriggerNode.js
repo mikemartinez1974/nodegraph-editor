@@ -163,8 +163,8 @@ export default function ValueTriggerNode({
     emitTrigger({ previous: lastValueRef.current });
   };
 
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
+  const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
+  const baseTop = (node?.position?.y || 0) * zoom + pan.y;
   const selectedGradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselectedGradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 

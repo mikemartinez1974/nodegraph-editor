@@ -112,11 +112,13 @@ const EdgeLayer = forwardRef(({
   onEdgeClick, 
   onEdgeDoubleClick, 
   draggingInfoRef,
+  getHandlePositionForEdge: getHandlePositionForEdgeProp,
   showAllEdgeLabels = false // <-- Add prop
 }, ref) => {
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const [hoveredEdge, setHoveredEdge] = useState(null);
-  const { getHandlePositionForEdge } = useContext(HandlePositionContext);
+  const { getHandlePositionForEdge: getHandlePositionForEdgeContext } = useContext(HandlePositionContext);
+  const getHandlePositionForEdge = getHandlePositionForEdgeProp || getHandlePositionForEdgeContext;
   const prevHoveredEdgeRef = useRef(null);
   const edgeDataRef = useRef([]);
   const getNodeCenter = useCallback((node) => {
@@ -179,13 +181,18 @@ const EdgeLayer = forwardRef(({
       const isHovered = hoveredEdge === edge.id;
       
       let sourcePos, targetPos, curveDirectionOverride;
+      let sourceFromHandle = false;
+      let targetFromHandle = false;
       
       if (typeof getHandlePositionForEdge === 'function') {
-        const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source');
-        const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target');
+        const sourceHandleKey = edge.sourceHandle || edge.handleMeta?.source?.key;
+        const targetHandleKey = edge.targetHandle || edge.handleMeta?.target?.key;
+        const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source', sourceHandleKey, targetHandleKey);
+        const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target', sourceHandleKey, targetHandleKey);
         
         if (sourceResult && typeof sourceResult === 'object') {
           sourcePos = { x: sourceResult.x, y: sourceResult.y };
+          sourceFromHandle = sourceResult.fromHandle === true;
           if (sourceResult.curveDirection) curveDirectionOverride = sourceResult.curveDirection;
         } else {
           sourcePos = sourceResult;
@@ -193,6 +200,7 @@ const EdgeLayer = forwardRef(({
         
         if (targetResult && typeof targetResult === 'object') {
           targetPos = { x: targetResult.x, y: targetResult.y };
+          targetFromHandle = targetResult.fromHandle === true;
           if (targetResult.curveDirection) curveDirectionOverride = targetResult.curveDirection;
         } else {
           targetPos = targetResult;
@@ -235,26 +243,32 @@ const EdgeLayer = forwardRef(({
         const targetHeight = targetNode.height || 60;
         const sourceRotation = sourceNode.data?.rotation || 0;
         const targetRotation = targetNode.data?.rotation || 0;
+        const sourceCenter = getNodeCenter(sourceNode);
+        const targetCenter = getNodeCenter(targetNode);
 
-        // Get intersection points on node boundaries, accounting for rotation
-        const edgeSourcePos = getNodeBoundaryIntersection(
-          sourcePos.x, sourcePos.y,
-          targetPos.x, targetPos.y,
-          sourcePos.x, sourcePos.y,
-          sourceWidth, sourceHeight,
-          sourceRotation
-        );
+        if (!sourceFromHandle) {
+          const start = sourcePos || sourceCenter;
+          const end = targetPos || targetCenter;
+          sourcePos = getNodeBoundaryIntersection(
+            start.x, start.y,
+            end.x, end.y,
+            sourceCenter.x, sourceCenter.y,
+            sourceWidth, sourceHeight,
+            sourceRotation
+          );
+        }
 
-        const edgeTargetPos = getNodeBoundaryIntersection(
-          targetPos.x, targetPos.y,
-          sourcePos.x, sourcePos.y,
-          targetPos.x, targetPos.y,
-          targetWidth, targetHeight,
-          targetRotation
-        );
-
-        sourcePos = edgeSourcePos;
-        targetPos = edgeTargetPos;
+        if (!targetFromHandle) {
+          const start = targetPos || targetCenter;
+          const end = sourcePos || sourceCenter;
+          targetPos = getNodeBoundaryIntersection(
+            start.x, start.y,
+            end.x, end.y,
+            targetCenter.x, targetCenter.y,
+            targetWidth, targetHeight,
+            targetRotation
+          );
+        }
       }
       
       ctx.save();

@@ -40,8 +40,8 @@ const SvgNode = ({
 
   const width = (node?.width || 100) * zoom;
   const height = (node?.height || 100) * zoom;
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
+  const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
+  const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
   const borderColor = isSelected ? theme.palette.secondary.main : theme.palette.primary.main;
 

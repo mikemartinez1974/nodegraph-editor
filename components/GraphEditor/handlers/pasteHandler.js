@@ -10,11 +10,65 @@ const maybeAugmentHandleError = (message) => {
 
 /**
  * Execute CRUD commands from pasted JSON
- * Supported actions: create, update, delete, read, createNodes, createEdges, clearGraph, findNodes, findEdges, getStats
+ * Supported actions: create, update, delete, read, createNodes, createEdges, createGroups,
+ * addNodesToGroup, removeNodesFromGroup, setGroupNodes, clearGraph, findNodes, findEdges,
+ * getStats, translate, duplicate, batch
  */
+const estimateCrudImpact = (command = {}) => {
+  const { action } = command;
+  if (!action) return { nodes: 0, edges: 0, groups: 0 };
+  switch (action) {
+    case 'create': {
+      const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
+      const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
+      const groups = Array.isArray(command.groups) ? command.groups : (command.group ? [command.group] : []);
+      return { nodes: nodes.length, edges: edges.length, groups: groups.length };
+    }
+    case 'createNodes':
+      return { nodes: Array.isArray(command.nodes) ? command.nodes.length : 0, edges: 0, groups: 0 };
+    case 'createEdges':
+      return { nodes: 0, edges: Array.isArray(command.edges) ? command.edges.length : 0, groups: 0 };
+    case 'createGroups':
+      return { nodes: 0, edges: 0, groups: Array.isArray(command.groups) ? command.groups.length : 0 };
+    case 'update':
+    case 'delete':
+    case 'translate':
+    case 'duplicate': {
+      const count = Array.isArray(command.ids) ? command.ids.length : command.id ? 1 : 0;
+      if (command.type === 'edge') return { nodes: 0, edges: count, groups: 0 };
+      if (command.type === 'group') return { nodes: 0, edges: 0, groups: count };
+      return { nodes: count, edges: 0, groups: 0 };
+    }
+    case 'batch':
+    case 'transaction': {
+      const commands = Array.isArray(command.commands) ? command.commands : [];
+      return commands.reduce(
+        (acc, entry) => {
+          const result = estimateCrudImpact(entry || {});
+          return {
+            nodes: acc.nodes + (result.nodes || 0),
+            edges: acc.edges + (result.edges || 0),
+            groups: acc.groups + (result.groups || 0)
+          };
+        },
+        { nodes: 0, edges: 0, groups: 0 }
+      );
+    }
+    default:
+      return { nodes: 0, edges: 0, groups: 0 };
+  }
+};
 async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
   try {
     const { action } = command;
+
+    if (command.dryRun === true) {
+      const estimate = estimateCrudImpact(command);
+      if (onShowMessage) {
+        onShowMessage(`Dry run: ${action} would affect ${estimate.nodes} nodes, ${estimate.edges} edges, ${estimate.groups} groups`, 'info');
+      }
+      return { ...estimate, dryRun: true };
+    }
 
     // Handle combined create (nodes + edges + groups) in one command
     if (action === 'create') {
@@ -66,7 +120,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     }
 
     // Fallback to switch-based handling for other actions
-    const { nodes, edges, id, updates, criteria, ids } = command;
+    const { nodes, edges, id, updates, criteria, ids, groups } = command;
     let result;
 
     switch (action) {
@@ -85,6 +139,16 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         }
         break;
 
+      case 'createGroups':
+        if (groups && Array.isArray(groups)) {
+          if (typeof graphCRUD.createGroups === 'function') {
+            result = await graphCRUD.createGroups(groups);
+          } else {
+            result = { success: false, error: 'Group creation is not supported' };
+          }
+        }
+        break;
+
       case 'update':
         if (command.type === 'node' && Array.isArray(ids) && ids.length && updates) {
           if (typeof graphCRUD.updateNodes === 'function') {
@@ -92,10 +156,28 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           } else {
             result = { success: false, error: 'Bulk node update is not supported' };
           }
+        } else if (command.type === 'edge' && Array.isArray(ids) && ids.length && updates) {
+          if (typeof graphCRUD.updateEdges === 'function') {
+            result = await graphCRUD.updateEdges(ids, updates);
+          } else {
+            result = { success: false, error: 'Bulk edge update is not supported' };
+          }
+        } else if (command.type === 'group' && Array.isArray(ids) && ids.length && updates) {
+          if (typeof graphCRUD.updateGroups === 'function') {
+            result = await graphCRUD.updateGroups(ids, updates);
+          } else {
+            result = { success: false, error: 'Bulk group update is not supported' };
+          }
         } else if (command.type === 'node' && id && updates) {
           result = await graphCRUD.updateNode(id, updates);
         } else if (command.type === 'edge' && id && updates) {
           result = await graphCRUD.updateEdge(id, updates);
+        } else if (command.type === 'group' && id && updates) {
+          if (typeof graphCRUD.updateGroup === 'function') {
+            result = await graphCRUD.updateGroup(id, updates);
+          } else {
+            result = { success: false, error: 'Group updates are not supported' };
+          }
         }
         break;
 
@@ -104,6 +186,12 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           result = await graphCRUD.deleteNode(id);
         } else if (command.type === 'edge' && id) {
           result = await graphCRUD.deleteEdge(id);
+        } else if (command.type === 'group' && id) {
+          if (typeof graphCRUD.deleteGroup === 'function') {
+            result = await graphCRUD.deleteGroup(id);
+          } else {
+            result = { success: false, error: 'Group deletion is not supported' };
+          }
         }
         break;
 
@@ -112,8 +200,109 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           result = await graphCRUD.readNode(id);
         } else if (command.type === 'edge') {
           result = await graphCRUD.readEdge(id);
+        } else if (command.type === 'group') {
+          if (typeof graphCRUD.readGroup === 'function') {
+            result = await graphCRUD.readGroup(id);
+          } else {
+            result = { success: false, error: 'Group reads are not supported' };
+          }
         }
         break;
+
+      case 'addNodesToGroup': {
+        const groupId = command.groupId || id;
+        if (typeof graphCRUD.addNodesToGroup === 'function') {
+          result = await graphCRUD.addNodesToGroup(groupId, command.nodeIds || []);
+        } else {
+          result = { success: false, error: 'Group membership updates are not supported' };
+        }
+        break;
+      }
+
+      case 'removeNodesFromGroup': {
+        const groupId = command.groupId || id;
+        if (typeof graphCRUD.removeNodesFromGroup === 'function') {
+          result = await graphCRUD.removeNodesFromGroup(groupId, command.nodeIds || []);
+        } else {
+          result = { success: false, error: 'Group membership updates are not supported' };
+        }
+        break;
+      }
+
+      case 'setGroupNodes': {
+        const groupId = command.groupId || id;
+        if (typeof graphCRUD.setGroupNodes === 'function') {
+          result = await graphCRUD.setGroupNodes(groupId, command.nodeIds || []);
+        } else {
+          result = { success: false, error: 'Group membership updates are not supported' };
+        }
+        break;
+      }
+
+      case 'translate':
+      case 'move': {
+        const targetIds = Array.isArray(ids) && ids.length ? ids : id ? [id] : [];
+        const delta = command.delta || command.offset || { x: 0, y: 0 };
+        const targetType = command.type || 'node';
+        if (targetIds.length === 0) {
+          result = { success: false, error: 'translate requires id or ids' };
+        } else if (targetType === 'group' && typeof graphCRUD.translateGroups === 'function') {
+          result = await graphCRUD.translateGroups(targetIds, delta);
+        } else if (targetType === 'node' && typeof graphCRUD.translateNodes === 'function') {
+          result = await graphCRUD.translateNodes(targetIds, delta);
+        } else {
+          result = { success: false, error: `translate not supported for type: ${targetType}` };
+        }
+        break;
+      }
+
+      case 'duplicate': {
+        const targetIds = Array.isArray(ids) && ids.length ? ids : id ? [id] : [];
+        const targetType = command.type || 'node';
+        if (targetIds.length === 0) {
+          result = { success: false, error: 'duplicate requires id or ids' };
+        } else if (targetType === 'node' && typeof graphCRUD.duplicateNodes === 'function') {
+          result = await graphCRUD.duplicateNodes(
+            targetIds,
+            command.options || { offset: command.offset, includeEdges: command.includeEdges }
+          );
+        } else {
+          result = { success: false, error: `duplicate not supported for type: ${targetType}` };
+        }
+        break;
+      }
+
+      case 'batch':
+      case 'transaction': {
+        const commands = Array.isArray(command.commands) ? command.commands : [];
+        const continueOnError = command.continueOnError === true;
+        let totals = { nodes: 0, edges: 0, groups: 0 };
+        for (let i = 0; i < commands.length; i++) {
+          const entry = commands[i];
+          if (!entry || typeof entry !== 'object') {
+            if (!continueOnError) {
+              result = { success: false, error: `Command ${i} is not an object` };
+              break;
+            }
+            continue;
+          }
+          const child = command.dryRun ? { ...entry, dryRun: true } : entry;
+          const childResult = await executeCRUDCommand(child, graphCRUD, onShowMessage);
+          if (childResult && childResult.nodes !== undefined) {
+            totals.nodes += childResult.nodes || 0;
+            totals.edges += childResult.edges || 0;
+            totals.groups += childResult.groups || 0;
+          }
+          if (childResult?.error && !continueOnError) {
+            result = { success: false, error: childResult.error };
+            break;
+          }
+        }
+        if (!result) {
+          result = { success: true, data: { message: 'Batch completed', totals } };
+        }
+        break;
+      }
 
       case 'clearGraph':
         result = await graphCRUD.clearGraph();
@@ -148,6 +337,18 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       } else if (action === 'createEdges') {
         const created = result.data?.created || [];
         return { nodes: 0, edges: created.length, groups: 0 };
+      } else if (action === 'createGroups') {
+        const created = result.data?.created || [];
+        return { nodes: 0, edges: 0, groups: created.length };
+      } else if (action === 'translate' || action === 'move') {
+        if (command.type === 'group') {
+          return { nodes: 0, edges: 0, groups: result.data?.updated || 0 };
+        }
+        return { nodes: result.data?.updated || 0, edges: 0, groups: 0 };
+      } else if (action === 'duplicate') {
+        const createdNodes = result.data?.createdNodes || [];
+        const createdEdges = result.data?.createdEdges || [];
+        return { nodes: createdNodes.length, edges: createdEdges.length, groups: 0 };
       }
 
       return { nodes: 0, edges: 0, groups: 0 };
@@ -155,7 +356,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       if (onShowMessage) {
         onShowMessage(result?.error || 'CRUD command failed', 'error');
       }
-      return { nodes: 0, edges: 0, groups: 0 };
+      return { nodes: 0, edges: 0, groups: 0, error: result?.error || 'CRUD command failed' };
     }
   } catch (error) {
     console.error('executeCRUDCommand error:', error);

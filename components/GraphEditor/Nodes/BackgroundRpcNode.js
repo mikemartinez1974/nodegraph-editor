@@ -27,8 +27,8 @@ export default function BackgroundRpcNode({
 
   const width = (node?.width || CARD_WIDTH) * zoom;
   const height = (node?.height || CARD_HEIGHT) * zoom;
-  const baseLeft = (node?.position?.x || 0) * zoom + pan.x - width / 2;
-  const baseTop = (node?.position?.y || 0) * zoom + pan.y - height / 2;
+  const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
+  const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
   const initialData = node?.data || {};
 

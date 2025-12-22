@@ -34,6 +34,8 @@ export default function usePluginRuntime({
     setEdges,
     setGroups,
     groups,
+    groupsRef,
+    groupManager,
     defaultNodeColor,
     defaultEdgeColor
   } = state || {};
@@ -128,11 +130,12 @@ export default function usePluginRuntime({
       historyHook.saveToHistory,
       nodesRef,
       edgesRef,
-      () => groups || [],
+      () => groupsRef?.current || groups || [],
       setGroups,
-      undefined
+      groupsRef,
+      groupManager
     );
-  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups]);
+  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups, groupsRef, groupManager]);
 
   const handleScriptRequest = useCallback(async (method, args = [], meta = {}) => {
     try {

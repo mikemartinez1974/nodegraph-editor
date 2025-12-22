@@ -1002,7 +1002,7 @@ useEffect(() => {
             zoom
           },
           historyHook,
-          onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity }),
+          onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity, copyToClipboard: true }),
           graphCRUD
         });
         
@@ -1011,7 +1011,7 @@ useEffect(() => {
         }
       } catch (err) {
         console.error('[GraphEditor] Paste handler error:', err);
-        setSnackbar({ open: true, message: 'Paste failed', severity: 'error' });
+        setSnackbar({ open: true, message: 'Paste failed', severity: 'error', copyToClipboard: true });
       }
     };
 
@@ -1042,7 +1042,7 @@ useEffect(() => {
     setGroups,
     pan,
     zoom,
-    onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity })
+    onShowMessage: (message, severity) => setSnackbar({ open: true, message, severity, copyToClipboard: true })
   });
 
   // Keep node list docked opposite the properties panel
@@ -1433,7 +1433,7 @@ useEffect(() => {
               });
             }
           }
-          setSnackbar({ open: true, message: 'Pasted graph data', severity: 'success' });
+          setSnackbar({ open: true, message: 'Pasted graph data', severity: 'success', copyToClipboard: true });
           return;
         }
 
@@ -1443,7 +1443,7 @@ useEffect(() => {
             const next = [...prev, ...data.groups];
             return next;
           });
-          setSnackbar({ open: true, message: 'Pasted groups', severity: 'success' });
+          setSnackbar({ open: true, message: 'Pasted groups', severity: 'success', copyToClipboard: true });
         }
       } catch (err) {
         console.warn('Failed to apply pasted data:', err);

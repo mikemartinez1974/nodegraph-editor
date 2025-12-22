@@ -137,15 +137,15 @@ const toHandleMeta = (handle) => ({
   position: handle.position ? { ...handle.position } : undefined
 });
 
-const getHandleList = (node, field, fallback) => {
-  if (!node) return [cloneHandleDescriptor(fallback)];
+const getHandleList = (node, field) => {
+  if (!node) return [];
   const unified = extractHandlesFromUnified(node, field);
   if (unified.length > 0) {
     return unified.map(handle => cloneHandleDescriptor(handle));
   }
   const handles = Array.isArray(node[field]) ? node[field].filter(Boolean) : [];
   if (handles.length === 0) {
-    return [cloneHandleDescriptor(fallback)];
+    return [];
   }
   return handles
     .map((handle, index) => toHandleDescriptor(handle, field === 'outputs' ? 'output' : 'input', index))
@@ -273,7 +273,7 @@ const normalizeEndpoint = (endpoint, explicitHandleKey) => {
   return { nodeId: endpoint ?? null, handleKey: explicitHandleKey || null };
 };
 
-const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandleKey) => {
+const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandleKey, edgeType) => {
   if (!sourceNode || !sourceNode.id) {
     return { error: 'Source node not found' };
   }
@@ -287,8 +287,8 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
     return { error: `targetHandle is required for node ${targetNode.id}` };
   }
 
-  const sourceHandles = getHandleList(sourceNode, 'outputs', DEFAULT_OUTPUT_HANDLE);
-  const targetHandles = getHandleList(targetNode, 'inputs', DEFAULT_INPUT_HANDLE);
+  const sourceHandles = getHandleList(sourceNode, 'outputs');
+  const targetHandles = getHandleList(targetNode, 'inputs');
 
   const sourceHandle = sourceHandles.find(h => h.key === sourceHandleKey);
   if (!sourceHandle) {
@@ -297,6 +297,20 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
   const targetHandle = targetHandles.find(h => h.key === targetHandleKey);
   if (!targetHandle) {
     return { error: `Input handle "${targetHandleKey}" not found on node ${targetNode.id}` };
+  }
+  if (edgeType) {
+    const sourceAllowed = Array.isArray(sourceHandle.allowedEdgeTypes)
+      ? sourceHandle.allowedEdgeTypes
+      : null;
+    const targetAllowed = Array.isArray(targetHandle.allowedEdgeTypes)
+      ? targetHandle.allowedEdgeTypes
+      : null;
+    if (sourceAllowed && !sourceAllowed.includes(edgeType)) {
+      return { error: `Edge type "${edgeType}" is not allowed by source handle "${sourceHandleKey}"` };
+    }
+    if (targetAllowed && !targetAllowed.includes(edgeType)) {
+      return { error: `Edge type "${edgeType}" is not allowed by target handle "${targetHandleKey}"` };
+    }
   }
 
   if (
@@ -343,11 +357,13 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
     return { error: `Target node ${normalizedTarget} not found` };
   }
 
+  const edgeType = edgeInput.type || defaultType || 'child';
   const handleValidation = validateHandlePair(
     sourceNode,
     targetNode,
     normalizedSourceHandle,
-    normalizedTargetHandle
+    normalizedTargetHandle,
+    edgeType
   );
   if (handleValidation.error) {
     return { error: handleValidation.error };
@@ -367,7 +383,7 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
     target: normalizedTarget,
     sourceHandle: normalizedSourceHandle,
     targetHandle: normalizedTargetHandle,
-    type: edgeInput.type || defaultType || 'child',
+    type: edgeType,
     label: edgeInput.label || '',
     color: edgeInput.color,
     visible: edgeInput.visible !== false,
@@ -432,13 +448,32 @@ const applyNodeUpdates = (node, updates = {}) => {
   };
 };
 
+const applyEdgeUpdates = (edge, updates = {}) => {
+  const mergedEdge = {
+    ...edge,
+    ...updates,
+    style: updates.style ? { ...edge.style, ...updates.style } : edge.style,
+    state: updates.state ? { ...edge.state, ...updates.state } : edge.state,
+    logic: updates.logic ? { ...edge.logic, ...updates.logic } : edge.logic,
+    routing: updates.routing ? { ...edge.routing, ...updates.routing } : edge.routing,
+    extensions:
+      updates.extensions === undefined
+        ? edge.extensions
+        : mergeExtensions(edge.extensions, updates.extensions)
+  };
+  if (updates.data) {
+    mergedEdge.data = { ...edge.data, ...updates.data };
+  }
+  return mergedEdge;
+};
+
 /**
  * CRUD API for Node Graph Editor
  * All functions return { success: boolean, data?: any, error?: string }
  */
 
 export default class GraphCRUD {
-  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef, getGroups, setGroups, groupsRef) {
+  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef, getGroups, setGroups, groupsRef, groupManagerRef) {
     this.getNodes = getNodes;
     this.setNodes = setNodes;
     this.getEdges = getEdges;
@@ -451,6 +486,7 @@ export default class GraphCRUD {
     this.getGroups = typeof getGroups === 'function' ? getGroups : (() => (groupsRef && groupsRef.current) || []);
     this.setGroups = typeof setGroups === 'function' ? setGroups : (() => {});
     this.groupsRef = groupsRef;
+    this.groupManagerRef = groupManagerRef;
   }
 
   // ==================== NODE CRUD ====================
@@ -745,21 +781,7 @@ export default class GraphCRUD {
       }
 
       const existingEdge = currentEdges[edgeIndex];
-      const mergedEdge = {
-        ...existingEdge,
-        ...updates,
-        style: updates.style ? { ...existingEdge.style, ...updates.style } : existingEdge.style,
-        state: updates.state ? { ...existingEdge.state, ...updates.state } : existingEdge.state,
-        logic: updates.logic ? { ...existingEdge.logic, ...updates.logic } : existingEdge.logic,
-        routing: updates.routing ? { ...existingEdge.routing, ...updates.routing } : existingEdge.routing,
-        extensions:
-          updates.extensions === undefined
-            ? existingEdge.extensions
-            : mergeExtensions(existingEdge.extensions, updates.extensions)
-      };
-      if (updates.data) {
-        mergedEdge.data = { ...existingEdge.data, ...updates.data };
-      }
+      const mergedEdge = applyEdgeUpdates(existingEdge, updates);
 
       const nodes = this.getNodes();
       const sourceNode = nodes.find(n => n.id === mergedEdge.source);
@@ -768,7 +790,8 @@ export default class GraphCRUD {
         sourceNode,
         targetNode,
         mergedEdge.sourceHandle,
-        mergedEdge.targetHandle
+        mergedEdge.targetHandle,
+        mergedEdge.type
       );
       if (handleValidation.error) {
         return { success: false, error: handleValidation.error };
@@ -785,6 +808,70 @@ export default class GraphCRUD {
       this.saveToHistory(nodes, updatedEdges);
 
       return { success: true, data: mergedEdge };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Update multiple edges with the same changes
+   * @param {string[]} ids - Array of edge IDs
+   * @param {Object} updates - Properties to update
+   */
+  updateEdges(ids, updates) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+      if (!updates || typeof updates !== 'object') {
+        return { success: false, error: 'updates must be provided' };
+      }
+
+      const idSet = new Set(ids);
+      const currentEdges = this.getEdges();
+      const missing = ids.filter(id => !currentEdges.some(edge => edge.id === id));
+      if (missing.length === ids.length) {
+        return { success: false, error: 'None of the specified edge ids were found', data: { missing } };
+      }
+
+      const nodes = this.getNodes();
+      const updatedItems = [];
+      const updatedEdges = currentEdges.map(edge => {
+        if (!idSet.has(edge.id)) {
+          return edge;
+        }
+        const mergedEdge = applyEdgeUpdates(edge, updates);
+        const sourceNode = nodes.find(n => n.id === mergedEdge.source);
+        const targetNode = nodes.find(n => n.id === mergedEdge.target);
+        const handleValidation = validateHandlePair(
+          sourceNode,
+          targetNode,
+          mergedEdge.sourceHandle,
+          mergedEdge.targetHandle,
+          mergedEdge.type
+        );
+        if (handleValidation.error) {
+          throw new Error(`Edge ${edge.id}: ${handleValidation.error}`);
+        }
+        mergedEdge.handleMeta = handleValidation.meta;
+        updatedItems.push(mergedEdge);
+        return mergedEdge;
+      });
+
+      this.setEdges(() => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
+      this.saveToHistory(nodes, updatedEdges);
+
+      return {
+        success: true,
+        data: {
+          updated: updatedItems,
+          missing: missing.length ? missing : undefined
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -965,6 +1052,38 @@ export default class GraphCRUD {
     }
   }
 
+  _syncGroupManager(nextGroups, nodes = null) {
+    if (!this.groupManagerRef) return;
+    const manager = this.groupManagerRef.current || this.groupManagerRef;
+    if (!manager) return;
+    const groupStore = manager.groups;
+    const nodeToGroup = manager.nodeToGroup;
+    if (typeof manager.clear === 'function') {
+      manager.clear();
+    } else {
+      groupStore?.clear?.();
+      nodeToGroup?.clear?.();
+    }
+    if (!Array.isArray(nextGroups)) return;
+    nextGroups.forEach(group => {
+      if (!group || !group.id) return;
+      if (groupStore?.set) {
+        groupStore.set(group.id, group);
+      }
+      if (nodeToGroup?.set && Array.isArray(group.nodeIds)) {
+        group.nodeIds.forEach(nodeId => nodeToGroup.set(nodeId, group.id));
+      }
+    });
+  }
+
+  _commitGroups(nextGroups) {
+    this.setGroups(() => {
+      if (this.groupsRef) this.groupsRef.current = nextGroups;
+      return nextGroups;
+    });
+    this._syncGroupManager(nextGroups);
+  }
+
   /**
    * Create multiple groups at once
    * @param {Array} groupsArray - Array of group options
@@ -998,8 +1117,8 @@ export default class GraphCRUD {
         }
 
         const nodeIds = Array.isArray(opts.nodeIds) ? opts.nodeIds.filter(id => nodeIdSet.has(id)) : [];
-        if (nodeIds.length === 0) {
-          failed.push(`Group ${gid}: no valid nodeIds found (must reference existing nodes)`);
+        if (nodeIds.length < 2) {
+          failed.push(`Group ${gid}: must reference at least two existing nodes`);
           continue;
         }
 
@@ -1009,7 +1128,9 @@ export default class GraphCRUD {
           nodeIds: nodeIds,
           bounds: opts.bounds || { x: 0, y: 0, width: 0, height: 0 },
           visible: opts.visible !== false,
-          style: opts.style || {}
+          style: opts.style || {},
+          collapsed: opts.collapsed === true,
+          extensions: cloneExtensions(opts.extensions)
         };
 
         createdGroups.push(newGroup);
@@ -1021,11 +1142,7 @@ export default class GraphCRUD {
       }
 
       const updatedGroups = [...(currentGroups || []), ...createdGroups];
-      this.setGroups(prev => {
-        const next = updatedGroups;
-        if (this.groupsRef) this.groupsRef.current = next;
-        return next;
-      });
+      this._commitGroups(updatedGroups);
 
       // Save history using current nodes/edges (groups are part of UI state but history handler can be used)
       if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
@@ -1035,6 +1152,480 @@ export default class GraphCRUD {
         data: {
           created: createdGroups,
           failed: failed.length ? failed : undefined
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Read/Get group(s)
+   * @param {string} id - Optional group ID. If omitted, returns all groups
+   * @returns {Object} Result with group(s)
+   */
+  readGroup(id) {
+    try {
+      const groups = this.getGroups();
+      if (id) {
+        const group = groups.find(g => g.id === id);
+        if (!group) return { success: false, error: `Group ${id} not found` };
+        return { success: true, data: group };
+      }
+      return { success: true, data: groups };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Update a group
+   * @param {string} id - Group ID
+   * @param {Object} updates - Properties to update
+   * @returns {Object} Result with updated group
+   */
+  updateGroup(id, updates) {
+    try {
+      const currentGroups = this.getGroups();
+      const groupIndex = currentGroups.findIndex(g => g.id === id);
+      if (groupIndex === -1) {
+        return { success: false, error: `Group ${id} not found` };
+      }
+      const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
+      const updatedGroups = currentGroups.map(group => {
+        if (group.id !== id) return group;
+        const nextGroup = {
+          ...group,
+          ...updates,
+          bounds: updates.bounds ? { ...group.bounds, ...updates.bounds } : group.bounds,
+          style: updates.style ? { ...group.style, ...updates.style } : group.style,
+          extensions:
+            updates.extensions === undefined
+              ? group.extensions
+              : mergeExtensions(group.extensions, updates.extensions)
+        };
+        if (updates.nodeIds !== undefined) {
+          if (!Array.isArray(updates.nodeIds)) {
+            throw new Error('nodeIds must be an array');
+          }
+          const filtered = updates.nodeIds.filter(nodeId => nodeIdSet.has(nodeId));
+          if (filtered.length < 2) {
+            throw new Error(`Group ${id}: must reference at least two existing nodes`);
+          }
+          nextGroup.nodeIds = filtered;
+        }
+        return nextGroup;
+      });
+
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return { success: true, data: updatedGroups[groupIndex] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Update multiple groups with the same changes
+   * @param {string[]} ids - Array of group IDs
+   * @param {Object} updates - Properties to update
+   */
+  updateGroups(ids, updates) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+      if (!updates || typeof updates !== 'object') {
+        return { success: false, error: 'updates must be provided' };
+      }
+
+      const idSet = new Set(ids);
+      const currentGroups = this.getGroups();
+      const missing = ids.filter(id => !currentGroups.some(group => group.id === id));
+      if (missing.length === ids.length) {
+        return { success: false, error: 'None of the specified group ids were found', data: { missing } };
+      }
+
+      const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
+      const updatedItems = [];
+      const updatedGroups = currentGroups.map(group => {
+        if (!idSet.has(group.id)) {
+          return group;
+        }
+        const nextGroup = {
+          ...group,
+          ...updates,
+          bounds: updates.bounds ? { ...group.bounds, ...updates.bounds } : group.bounds,
+          style: updates.style ? { ...group.style, ...updates.style } : group.style,
+          extensions:
+            updates.extensions === undefined
+              ? group.extensions
+              : mergeExtensions(group.extensions, updates.extensions)
+        };
+        if (updates.nodeIds !== undefined) {
+          if (!Array.isArray(updates.nodeIds)) {
+            throw new Error('nodeIds must be an array');
+          }
+          const filtered = updates.nodeIds.filter(nodeId => nodeIdSet.has(nodeId));
+          if (filtered.length < 2) {
+            throw new Error(`Group ${group.id}: must reference at least two existing nodes`);
+          }
+          nextGroup.nodeIds = filtered;
+        }
+        updatedItems.push(nextGroup);
+        return nextGroup;
+      });
+
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return {
+        success: true,
+        data: {
+          updated: updatedItems,
+          missing: missing.length ? missing : undefined
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Delete a group
+   * @param {string} id - Group ID
+   * @returns {Object} Result
+   */
+  deleteGroup(id) {
+    try {
+      const currentGroups = this.getGroups();
+      const groupExists = currentGroups.some(g => g.id === id);
+      if (!groupExists) {
+        return { success: false, error: `Group ${id} not found` };
+      }
+
+      const updatedGroups = currentGroups.filter(g => g.id !== id);
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return { success: true, data: { deletedGroupId: id } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Add nodes to an existing group
+   * @param {string} groupId - Group ID
+   * @param {string[]} nodeIds - Node IDs to add
+   */
+  addNodesToGroup(groupId, nodeIds) {
+    try {
+      if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
+        return { success: false, error: 'nodeIds must be a non-empty array' };
+      }
+      const currentGroups = this.getGroups();
+      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      if (groupIndex === -1) {
+        return { success: false, error: `Group ${groupId} not found` };
+      }
+
+      const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
+      const additions = nodeIds.filter(id => nodeIdSet.has(id));
+      if (additions.length === 0) {
+        return { success: false, error: 'No valid nodeIds found' };
+      }
+
+      const updatedGroups = currentGroups.map(group => {
+        if (group.id !== groupId) return group;
+        const nextNodeIds = Array.from(new Set([...(group.nodeIds || []), ...additions]));
+        if (nextNodeIds.length < 2) {
+          throw new Error(`Group ${groupId}: must reference at least two existing nodes`);
+        }
+        return { ...group, nodeIds: nextNodeIds };
+      });
+
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return { success: true, data: updatedGroups[groupIndex] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Remove nodes from an existing group
+   * @param {string} groupId - Group ID
+   * @param {string[]} nodeIds - Node IDs to remove
+   */
+  removeNodesFromGroup(groupId, nodeIds) {
+    try {
+      if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
+        return { success: false, error: 'nodeIds must be a non-empty array' };
+      }
+      const currentGroups = this.getGroups();
+      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      if (groupIndex === -1) {
+        return { success: false, error: `Group ${groupId} not found` };
+      }
+
+      let removedGroup = false;
+      const updatedGroups = currentGroups
+        .map(group => {
+          if (group.id !== groupId) return group;
+          const nextNodeIds = (group.nodeIds || []).filter(id => !nodeIds.includes(id));
+          if (nextNodeIds.length < 2) {
+            removedGroup = true;
+            return null;
+          }
+          return { ...group, nodeIds: nextNodeIds };
+        })
+        .filter(Boolean);
+
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return {
+        success: true,
+        data: removedGroup ? { deletedGroupId: groupId } : updatedGroups[groupIndex]
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Replace a group's nodeIds
+   * @param {string} groupId - Group ID
+   * @param {string[]} nodeIds - New node IDs
+   */
+  setGroupNodes(groupId, nodeIds) {
+    try {
+      if (!Array.isArray(nodeIds)) {
+        return { success: false, error: 'nodeIds must be an array' };
+      }
+      const currentGroups = this.getGroups();
+      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      if (groupIndex === -1) {
+        return { success: false, error: `Group ${groupId} not found` };
+      }
+
+      const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
+      const filtered = nodeIds.filter(id => nodeIdSet.has(id));
+      if (filtered.length < 2) {
+        return { success: false, error: `Group ${groupId}: must reference at least two existing nodes` };
+      }
+
+      const updatedGroups = currentGroups.map(group =>
+        group.id === groupId ? { ...group, nodeIds: filtered } : group
+      );
+
+      this._commitGroups(updatedGroups);
+      if (this.saveToHistory) this.saveToHistory(this.getNodes(), this.getEdges());
+
+      return { success: true, data: updatedGroups[groupIndex] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Translate nodes by a delta
+   * @param {string[]} ids - Array of node IDs
+   * @param {Object} delta - {x, y} delta
+   */
+  translateNodes(ids, delta = {}) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+      const dx = Number(delta.x ?? delta.dx ?? 0);
+      const dy = Number(delta.y ?? delta.dy ?? 0);
+      if (!Number.isFinite(dx) || !Number.isFinite(dy)) {
+        return { success: false, error: 'delta must include numeric x and y' };
+      }
+
+      const idSet = new Set(ids);
+      const currentNodes = this.getNodes();
+      const missing = ids.filter(id => !currentNodes.some(node => node.id === id));
+      if (missing.length === ids.length) {
+        return { success: false, error: 'None of the specified node ids were found', data: { missing } };
+      }
+
+      const updatedNodes = currentNodes.map(node => {
+        if (!idSet.has(node.id)) return node;
+        const position = node.position || { x: 0, y: 0 };
+        return {
+          ...node,
+          position: { x: position.x + dx, y: position.y + dy }
+        };
+      });
+
+      this.setNodes(() => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
+      this.saveToHistory(updatedNodes, this.getEdges());
+
+      return { success: true, data: { updated: ids.length, missing: missing.length ? missing : undefined } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Translate groups and their member nodes by a delta
+   * @param {string[]} ids - Array of group IDs
+   * @param {Object} delta - {x, y} delta
+   */
+  translateGroups(ids, delta = {}) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+      const dx = Number(delta.x ?? delta.dx ?? 0);
+      const dy = Number(delta.y ?? delta.dy ?? 0);
+      if (!Number.isFinite(dx) || !Number.isFinite(dy)) {
+        return { success: false, error: 'delta must include numeric x and y' };
+      }
+
+      const idSet = new Set(ids);
+      const currentGroups = this.getGroups();
+      const missing = ids.filter(id => !currentGroups.some(group => group.id === id));
+      if (missing.length === ids.length) {
+        return { success: false, error: 'None of the specified group ids were found', data: { missing } };
+      }
+
+      const nodeIdsToMove = new Set();
+      const updatedGroups = currentGroups.map(group => {
+        if (!idSet.has(group.id)) return group;
+        (group.nodeIds || []).forEach(nodeId => nodeIdsToMove.add(nodeId));
+        const bounds = group.bounds || { x: 0, y: 0, width: 0, height: 0 };
+        return {
+          ...group,
+          bounds: { ...bounds, x: bounds.x + dx, y: bounds.y + dy }
+        };
+      });
+
+      const currentNodes = this.getNodes();
+      const updatedNodes = currentNodes.map(node => {
+        if (!nodeIdsToMove.has(node.id)) return node;
+        const position = node.position || { x: 0, y: 0 };
+        return {
+          ...node,
+          position: { x: position.x + dx, y: position.y + dy }
+        };
+      });
+
+      this.setNodes(() => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
+      this._commitGroups(updatedGroups);
+      this.saveToHistory(updatedNodes, this.getEdges());
+
+      return { success: true, data: { updated: ids.length, missing: missing.length ? missing : undefined } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Duplicate nodes (optionally include edges between them)
+   * @param {string[]} ids - Array of node IDs
+   * @param {Object} options - { offset: {x,y}, includeEdges: boolean }
+   */
+  duplicateNodes(ids, options = {}) {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return { success: false, error: 'ids must be a non-empty array' };
+      }
+
+      const currentNodes = this.getNodes();
+      const currentEdges = this.getEdges();
+      const idSet = new Set(ids);
+      const nodesToDuplicate = currentNodes.filter(node => idSet.has(node.id));
+      if (nodesToDuplicate.length === 0) {
+        return { success: false, error: 'No matching nodes found to duplicate' };
+      }
+
+      const dx = Number(options?.offset?.x ?? options?.offset?.dx ?? 40);
+      const dy = Number(options?.offset?.y ?? options?.offset?.dy ?? 40);
+      if (!Number.isFinite(dx) || !Number.isFinite(dy)) {
+        return { success: false, error: 'offset must include numeric x and y' };
+      }
+      const includeEdges = options.includeEdges !== false;
+
+      const idMap = new Map();
+      const createdNodes = nodesToDuplicate.map(node => {
+        let newId = this._generateId();
+        while (currentNodes.some(n => n.id === newId) || idMap.has(newId)) {
+          newId = this._generateId();
+        }
+        idMap.set(node.id, newId);
+        const position = node.position || { x: 0, y: 0 };
+        return {
+          ...cloneValue(node),
+          id: newId,
+          position: { x: position.x + dx, y: position.y + dy }
+        };
+      });
+
+      const updatedNodes = deduplicateNodes([...currentNodes, ...createdNodes]);
+      let createdEdges = [];
+      let edgeErrors = [];
+
+      if (includeEdges) {
+        const nodeMap = new Map(updatedNodes.map(n => [n.id, n]));
+        const existingEdgeIds = new Set(currentEdges.map(e => e.id));
+        const edgesToDuplicate = currentEdges.filter(
+          edge => idSet.has(edge.source) && idSet.has(edge.target)
+        );
+        edgesToDuplicate.forEach((edge, index) => {
+          const newEdge = {
+            ...cloneValue(edge),
+            id: this._generateId(),
+            source: idMap.get(edge.source),
+            target: idMap.get(edge.target)
+          };
+          const { edge: normalized, error } = buildEdgePayload(newEdge, {
+            nodeMap,
+            existingEdgeIds,
+            generateId: () => this._generateId(),
+            defaultType: newEdge.type || edge.type || 'child'
+          });
+          if (error) {
+            edgeErrors.push(`Edge ${index}: ${error}`);
+            return;
+          }
+          createdEdges.push(normalized);
+          existingEdgeIds.add(normalized.id);
+        });
+      }
+
+      const updatedEdges = [...currentEdges, ...createdEdges];
+      this.setNodes(() => {
+        const next = updatedNodes;
+        if (this.nodesRef) this.nodesRef.current = next;
+        return next;
+      });
+      this.setEdges(() => {
+        const next = updatedEdges;
+        if (this.edgesRef) this.edgesRef.current = next;
+        return next;
+      });
+      this.saveToHistory(updatedNodes, updatedEdges);
+
+      return {
+        success: true,
+        data: {
+          createdNodes,
+          createdEdges,
+          warnings: edgeErrors.length ? edgeErrors : undefined
         }
       };
     } catch (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import NodeGraph from '../NodeGraph';
@@ -167,9 +167,33 @@ const GraphEditorContent = () => {
     setSnapToGrid(prev => !prev);
   }, [setSnapToGrid]);
 
-  const showSnackbar = useCallback((message, severity = 'info') => {
-    setSnackbar({ open: true, message, severity });
+  const showSnackbar = useCallback((message, severity = 'info', options = {}) => {
+    setSnackbar({ open: true, message, severity, ...options });
   }, [setSnackbar]);
+
+  const lastClipboardMessageRef = useRef('');
+  const wasSnackbarOpenRef = useRef(false);
+
+  useEffect(() => {
+    const isOpen = Boolean(snackbar?.open);
+    if (!isOpen) {
+      wasSnackbarOpenRef.current = false;
+      return;
+    }
+    if (!snackbar?.copyToClipboard) {
+      wasSnackbarOpenRef.current = true;
+      return;
+    }
+    const message = snackbar?.message ? String(snackbar.message) : '';
+    const shouldCopy = !wasSnackbarOpenRef.current || message !== lastClipboardMessageRef.current;
+    wasSnackbarOpenRef.current = true;
+    if (!message || !shouldCopy) return;
+    lastClipboardMessageRef.current = message;
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return;
+    navigator.clipboard.writeText(message).catch((err) => {
+      console.warn('[Snackbar] Failed to copy message to clipboard', err);
+    });
+  }, [snackbar?.open, snackbar?.message, snackbar?.copyToClipboard]);
 
   // Surface snackbar errors to the console with a trace so we can debug deep render loops.
   useEffect(() => {
@@ -206,7 +230,8 @@ const GraphEditorContent = () => {
   }, []);
 
   const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
-  const showNewTabPage = !loading && isGraphEmpty;
+  // The gallery/new-tab surface now appears only when explicitly requested.
+  const showNewTabPage = false;
 
   const handleCreateBlankGraph = useCallback(() => {
     const newNode = {

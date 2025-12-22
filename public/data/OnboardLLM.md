@@ -1,48 +1,110 @@
-# Chatbot Onboarding Guide for the Twilight Node Browser
+# Chatbot Onboarding Guide for Twilight OS
 
-This guide shows how to generate JSON commands the editor will execute when pasted. Keep outputs small, precise, and valid JSON.
+Twilight is no longer just a diagramming surface—it is a persistent, executable workspace. A graph is a living cluster that keeps state across sessions, automates its own growth, and expects contributors (humans and AIs) to evolve it safely. Use this guide whenever you generate JSON commands for Twilight OS.
 
 ---
 
-## What You Do
+## Mindset: Steward, Not Draftsman
 
-- Help users build and refine node/edge graphs.
-- Propose small, clear changes with valid JSON commands.
-- Use stable IDs so follow-up commands can reference created items.
+- **Preserve continuity.** Your commands extend an existing system; never assume a blank canvas.
+- **Automate when possible.** ScriptNodes, Background RPC, and loaders can fabricate or mutate hundreds of nodes in one action.
+- **Respect topology.** Handle keys, socket schemas, and groups are domain-specific contracts (breadboards, logic ICs, spatial rigs, etc.). Use them precisely.
+- **Version intentionally.** Think in terms of state transitions that can be committed to Git/GitHub, not disposable exports.
 
-## Workflow
+---
 
-1. Discuss the user goal briefly.
-2. Propose a small change and output JSON.
-3. User pastes into the app (Ctrl+V) to apply.
-4. Iterate.
+## Operational Workflow
+
+1. **Inspect context.** Read the current node metadata (type, handles, data, extensions) and note whether automation or Git checkpoints are active.
+2. **Plan the delta.** Decide whether to issue a `create`, `update`, `script`, or mixed command. Prefer incremental updates over wholesale rewrites.
+3. **Emit precise JSON.** Use UUIDs, declare every handle, and mention the cluster/group you are touching when relevant.
+4. **Let Twilight run it.** The user pastes the JSON; Twilight applies it, updates history, and (if configured) records the new state in Git.
+5. **Iterate.** React to validation feedback, telemetry, or user direction.
+
+> Twilight’s value is “not having to start over.” Your job is to keep the workspace coherent so unfinished work survives.
+
+---
+
+## First Five Minutes: Ignition
+
+When you drop into an empty cluster, the only wrong move is doing nothing. Start anywhere:
+
+- Add a **Markdown** node and write the question that brought you here. That alone is a valid graph.
+- Drop a **Default** node, label it “Next step?”, and connect it to anything—even if the edge has no meaning yet.
+- Leave one node floating on the side as a scratchpad. Twilight keeps it safe; you can rearrange later.
+
+Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangling edges are invitations to grow, not warnings. Twilight remembers every change, so nothing you add in the first minutes is permanent or dangerous. If you feel stuck, add one more node that names the unknown (“What powers this?”, “Need data here”). The workspace will still be here when you return—continuity is the default.
+
+---
 
 ## Command Essentials
 
 - Always include an `action`.
-- Use RFC4122 v4 UUIDs for all `id` fields (36 chars, lower-case hex, hyphens). Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`
-- Do not use non-UUID IDs (e.g., `node123`, `feature-x`).
-- Every edge **must** declare which handles it uses: add both `sourceHandle` and `targetHandle`. Default nodes expose a single `out` handle (output) and `in` handle (input); plugin nodes may define custom handle ids, so always match the handle keys published by the node definition.
+- Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
+- **Declare handles explicitly.** Every edge must specify both `sourceHandle` and `targetHandle`. Many nodes expose multiple sockets (`anode`/`cathode`, `inputA`/`inputB`, etc.). Match the published handle keys exactly.
+- **No implicit handles.** Twilight does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
+- **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilight falls back to node-boundary rendering.
+- Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
+- **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
 
-## Supported Actions
+### Supported Actions
 
-- `create` — Single create; may include `nodes`, `edges`, and `groups` arrays in one command. Nodes are created first, then edges, then groups.
-- `createNodes` — Batch nodes only
-- `createEdges` — Batch edges only
-- `update` — Update a node or an edge
-- `delete` — Delete a node or an edge
-- `read` — Read by id
-- `findNodes` / `findEdges` — Search by criteria
-- `getStats` — Graph statistics
-- `clearGraph` — Clear the graph
+| Action | Notes |
+| --- | --- |
+| `create` | One payload that may include `nodes`, `edges`, `groups`. Nodes are created first, then edges, then groups. |
+| `createNodes` / `createEdges` / `createGroups` | Bulk operations for a single entity type. |
+| `update` | Accepts `id` or `ids` (array) for nodes, edges, and groups. Use to mutate type, size, data, markdown, sockets, etc. |
+| `delete` | Remove nodes/edges/groups (remember: deleting a node also detaches its edges). |
+| `read` | Fetch a node/edge/group by id for diagnostics. |
+| `addNodesToGroup` / `removeNodesFromGroup` / `setGroupNodes` | Edit group membership by node IDs. |
+| `translate` / `move` | Move nodes or groups by a `{x,y}` delta. |
+| `duplicate` | Clone nodes (optionally clone edges between them with `includeEdges`). |
+| `batch` / `transaction` | Execute multiple commands in order (array in `commands`). |
+| `findNodes` / `findEdges` | Query subsets (e.g., “all markdown nodes in group A”). |
+| `getStats` | Retrieve counts, bounding boxes, or other metrics. |
+| `clearGraph` | Rarely used; wipes the cluster. |
 
-> Note: Use these exact action names. Do not use deprecated actions like `add`.
+> Deprecated actions such as `add` are rejected. Always use the verbs above.
+
+Tip: Any command can include `"dryRun": true` to validate intent without mutating the graph.
 
 ---
 
-## Combined Create (nodes + edges + groups)
+## Automation & Procedural Generation
 
-Use one `create` command to paste an entire mini-graph at once. Nodes are created first so edges can reference them; groups are created last and must reference existing (or newly created) node IDs.
+Twilight treats ScriptNodes as first-class builders. Document this when emitting commands:
+
+- **ScriptNodes** can manufacture entire boards: spawn nodes, wire edges, toggle state, emit telemetry.
+- Scripts may mutate existing graphs—adjust positions, update data, or swap node types—without recreating them.
+- When emitting scripts, include metadata (`data.memo`, `data.markdown`) describing inputs/outputs so future agents understand the routine.
+
+Example: installing a ScriptNode that stitches 200 resistors to a breadboard should describe the handle schema it expects (`sourceHandles: ['wireA','wireB']`) and the group or cluster it will operate in.
+
+---
+
+## Advanced Handle & Socket Models
+
+Document the full handle contract whenever you introduce or modify nodes:
+
+- **Multi-socket nodes:** GateNodes expose `inputA`, `inputB`, `output`. Breadboard sockets use row+column semantics (`A1`, `B1`, …).
+- **Skinned sockets:** Breadboard rails use semantic handles (`positive`, `negative`). Custom components may define `pinA`, `pinB`, `shield`, etc.
+- **Canvas/3D nodes:** Spatial nodes often provide `signal`, `camera`, or `transform` handles for integration with simulations.
+
+When unsure, ask the user for the node definition or inspect `node.handles` via `read` commands before emitting edges.
+
+---
+
+## Versioning & State Continuity
+
+Twilight graphs are typically stored in Git/GitHub. Help users keep history meaningful:
+
+- Describe changes in commit-friendly chunks (“Add breadboard power rail group”, “Update markdown docs for Lab Cluster A”).  
+- Avoid destructively recreating nodes when an `update` would suffice—this preserves IDs and diffs cleanly.
+- If you reorganize groups or coordinates, mention it so the user can decide whether to checkpoint the state.
+
+---
+
+## Combined Create Example
 
 ```json
 {
@@ -90,68 +152,94 @@ Use one `create` command to paste an entire mini-graph at once. Nodes are create
 }
 ```
 
----
-
-## Other Common Commands
-
-Update a node:
+### Edge Wiring Example (Handles Required)
 
 ```json
 {
-  "action": "update",
-  "type": "node",
-  "id": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-  "updates": { "label": "Task A — Updated", "color": "#2e7d32" }
+  "action": "createEdges",
+  "edges": [
+    {
+      "id": "c6d51f2f-1a63-4e3f-90a5-6f3c2d6c9b21",
+      "source": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
+      "sourceHandle": "out",
+      "target": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d",
+      "targetHandle": "in",
+      "type": "child",
+      "label": "then"
+    }
+  ]
 }
 ```
 
-Update several nodes at once (all receive the same changes):
+---
 
-```json
-{
-  "action": "update",
-  "type": "node",
-  "ids": [
-    "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
-    "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
-    "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41"
-  ],
-  "updates": {
-    "type": "markdown",
-    "width": 280,
-    "height": 180
+## Bulk Updates & Other Commands
+
+- **Single-node update**
+  ```json
+  {
+    "action": "update",
+    "type": "node",
+    "id": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
+    "updates": { "label": "Task A — Updated", "color": "#2e7d32" }
   }
-}
-```
+  ```
 
-Delete a node:
+- **Multi-node update**
+  ```json
+  {
+    "action": "update",
+    "type": "node",
+    "ids": [
+      "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
+      "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
+      "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41"
+    ],
+    "updates": {
+      "type": "markdown",
+      "width": 280,
+      "height": 180
+    }
+  }
+  ```
 
-```json
-{ "action": "delete", "type": "node", "id": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d" }
-```
+- **Delete**
+  ```json
+  { "action": "delete", "type": "node", "id": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d" }
+  ```
 
-Find nodes with memo:
+- **Find nodes with notes**
+  ```json
+  { "action": "findNodes", "criteria": { "hasMemo": true } }
+  ```
 
-```json
-{ "action": "findNodes", "criteria": { "hasMemo": true } }
-```
-
-Get stats:
-
-```json
-{ "action": "getStats" }
-```
+- **Get stats**
+  ```json
+  { "action": "getStats" }
+  ```
 
 ---
 
-## Layout & Visual Tips
+## Layout, Groups, and the OS Layer
 
-- Space nodes ~200px; align to grid multiples of 50.
-- Use larger sizes for rich content (e.g., markdown nodes ~250×200).
-- Use colors and groups sparingly to clarify structure.
+- Space nodes on ~50px multiples to align with the grid and help groups auto-resize.
+- Use groups as functional containers (breadboard sections, logic subsystems, spatial scenes). When creating nodes inside a group, mention the desired `groupId` so users can keep the OS layer organized.
+- Large markdown or canvas nodes should declare dimensions up front (e.g., 280×180) for better auto-layout.
 
-## Feedback & Errors
+---
 
-- The app validates your JSON and shows success or error messages.
-- Edges to non-existent nodes are rejected; fix IDs or create nodes first.
-- All modifications are added to undo/redo history.
+## Error Handling & Telemetry
+
+- Twilight validates every command. Errors include node ID clashes, missing handles, or malformed JSON. Read and react to the warnings rather than retrying blindly.
+- When automation fails mid-run (e.g., ScriptNode throws), produce a follow-up `update` that logs the failure inside a markdown node so the next contributor can recover.
+
+---
+
+## Final Reminders
+
+- Be explicit: mention which subsystem, group, or cluster your change touches.
+- Keep diffs small enough that the user can Git-commit them meaningfully.
+- Prefer updates over re-creation to preserve node IDs and history.
+- Document automation: whenever you add or modify a ScriptNode or Background RPC hook, explain what it will do.
+
+Twilight OS is “the operating system for the in-between.” Treat every command as an incremental upgrade to a living workspace, not a one-off illustration.

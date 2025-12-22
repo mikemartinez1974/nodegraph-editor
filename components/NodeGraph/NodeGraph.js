@@ -303,7 +303,9 @@ export default function NodeGraph({
       }
 
       // Only allow output→input connections with matching types
-      if (handle.type === 'output' && targetHandle && targetHandle.type === 'input') {
+      const sourceOk = handle.type === 'output' || handle.type === 'bidirectional';
+      const targetOk = targetHandle && (targetHandle.type === 'input' || targetHandle.type === 'bidirectional');
+      if (sourceOk && targetOk) {
         // Validate type match
         if (handle.handleType && targetHandle.handleType && handle.handleType !== targetHandle.handleType) {
           if (setSnackbar) {
@@ -324,7 +326,7 @@ export default function NodeGraph({
             source: { label: handle.label, type: handle.handleType },
             target: { label: targetHandle.label, type: targetHandle.handleType }
           },
-          type: 'default',
+          type: validation?.edgeType || 'default',
           label: '',
           style: {}
         };
@@ -1172,6 +1174,11 @@ export default function NodeGraph({
           selectedEdgeIds={selectedEdgeIds}
           theme={theme}
           hoveredNodeId={hoveredNodeId}
+          getHandlePositionForEdge={(...args) =>
+            handleLayerImperativeRef.current?.getHandlePositionForEdge
+              ? handleLayerImperativeRef.current.getHandlePositionForEdge(...args)
+              : undefined
+          }
           onEdgeClick={(edge, event) => {
             eventBus.emit('edgeClick', { id: edge?.id, event });
           }}

@@ -6,7 +6,7 @@ import HandlePositionContext from './HandlePositionContext';
 import { getEdgeHandlePosition } from './utils';
 
 const handleRadius = 8;
-const handleExtension = 12; // was 20, now closer to node
+const handleExtension = 0; // center on edge for half-in/half-out handles
 const nodeHoverMargin = 24; // px, for easier node hover
 const getNodeHandleExtension = (node) => {
   const value = node?.extensions?.layout?.handleExtension;
@@ -24,49 +24,128 @@ const getNodeFrame = (node) => {
 };
 const SNAP_DISTANCE = 28;
 
+const getHandleSide = (handle, fallback) => {
+  const side = handle?.position?.side;
+  if (side === 'top' || side === 'right' || side === 'bottom' || side === 'left') {
+    return side;
+  }
+  return fallback;
+};
+
+const getHandleOffset = (handle, fallback) => {
+  const offset = handle?.position?.offset;
+  if (typeof offset === 'number' && isFinite(offset)) {
+    return Math.min(1, Math.max(0, offset));
+  }
+  return fallback;
+};
+
+const getNodeHandleDefs = (node) => {
+  if (!node) return [];
+  const result = [];
+  const seen = new Set();
+  if (Array.isArray(node.handles) && node.handles.length > 0) {
+    node.handles.forEach((handle) => {
+      const key = handle.id || handle.key;
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      result.push({
+        key,
+        label: handle.label,
+        type: handle.dataType || handle.type,
+        direction: handle.direction || (handle.type === 'input' ? 'input' : handle.type === 'output' ? 'output' : 'output'),
+        position: handle.position,
+        allowedEdgeTypes: handle.allowedEdgeTypes,
+        metadata: handle.metadata
+      });
+    });
+  }
+  const inputs = Array.isArray(node.inputs) ? node.inputs : [];
+  const outputs = Array.isArray(node.outputs) ? node.outputs : [];
+  inputs.forEach((handle) => {
+    if (!handle?.key || seen.has(handle.key)) return;
+    seen.add(handle.key);
+    result.push({
+      key: handle.key,
+      label: handle.label,
+      type: handle.type,
+      direction: 'input',
+      position: handle.position,
+      allowedEdgeTypes: handle.allowedEdgeTypes,
+      metadata: handle.metadata
+    });
+  });
+  outputs.forEach((handle) => {
+    if (!handle?.key || seen.has(handle.key)) return;
+    seen.add(handle.key);
+    result.push({
+      key: handle.key,
+      label: handle.label,
+      type: handle.type,
+      direction: 'output',
+      position: handle.position,
+      allowedEdgeTypes: handle.allowedEdgeTypes,
+      metadata: handle.metadata
+    });
+  });
+  return result;
+};
+
+const computeHandlePosition = (frame, extension, handle, fallbackIndex, fallbackCount, defaultSide) => {
+  const side = getHandleSide(handle, defaultSide);
+  const offset = getHandleOffset(handle, fallbackCount > 0 ? (fallbackIndex + 1) / (fallbackCount + 1) : 0.5);
+  switch (side) {
+    case 'top':
+      return { x: frame.left + offset * frame.width, y: frame.top - extension };
+    case 'right':
+      return { x: frame.left + frame.width + extension, y: frame.top + offset * frame.height };
+    case 'bottom':
+      return { x: frame.left + offset * frame.width, y: frame.top + frame.height + extension };
+    case 'left':
+    default:
+      return { x: frame.left - extension, y: frame.top + offset * frame.height };
+  }
+};
+
 // --- NEW: Get handles from node schema ---
 function getHandlePositions(node) {
   const frame = getNodeFrame(node);
   const extension = getNodeHandleExtension(node);
   const handles = [];
-  // Inputs (left)
-  if (Array.isArray(node.inputs)) {
-    node.inputs.forEach((h, i) => {
-      handles.push({
-        id: `${node.id}-input-${h.key}`,
-        nodeId: node.id,
-        type: 'input',
-        direction: 'target',
-        key: h.key,
-        label: h.label,
-        handleType: h.type,
-        position: {
-          x: frame.left - extension,
-          y: frame.top + ((i + 1) / (node.inputs.length + 1)) * frame.height
-        },
-        color: '#0288d1',
-      });
+  const defs = getNodeHandleDefs(node);
+  const inputs = defs.filter(handle => handle.direction === 'input' || handle.direction === 'bidirectional');
+  const outputs = defs.filter(handle => handle.direction === 'output' || handle.direction === 'bidirectional');
+
+  inputs.forEach((h, i) => {
+    handles.push({
+      id: `${node.id}-input-${h.key}`,
+      nodeId: node.id,
+      type: h.direction === 'bidirectional' ? 'bidirectional' : 'input',
+      direction: 'target',
+      key: h.key,
+      label: h.label,
+      handleType: h.type,
+      allowedEdgeTypes: h.allowedEdgeTypes,
+      position: computeHandlePosition(frame, extension, h, i, inputs.length, 'left'),
+      color: '#0288d1'
     });
-  }
-  // Outputs (right)
-  if (Array.isArray(node.outputs)) {
-    node.outputs.forEach((h, i) => {
-      handles.push({
-        id: `${node.id}-output-${h.key}`,
-        nodeId: node.id,
-        type: 'output',
-        direction: 'source',
-        key: h.key,
-        label: h.label,
-        handleType: h.type,
-        position: {
-          x: frame.left + frame.width + extension,
-          y: frame.top + ((i + 1) / (node.outputs.length + 1)) * frame.height
-        },
-        color: '#43a047',
-      });
+  });
+
+  outputs.forEach((h, i) => {
+    handles.push({
+      id: `${node.id}-output-${h.key}`,
+      nodeId: node.id,
+      type: h.direction === 'bidirectional' ? 'bidirectional' : 'output',
+      direction: 'source',
+      key: h.key,
+      label: h.label,
+      handleType: h.type,
+      allowedEdgeTypes: h.allowedEdgeTypes,
+      position: computeHandlePosition(frame, extension, h, i, outputs.length, 'right'),
+      color: '#43a047'
     });
-  }
+  });
+
   return handles;
 }
 
@@ -98,7 +177,9 @@ const HandleLayer = forwardRef(({
     },
     hitTest: (clientX, clientY) => {
       return findHandleAt(clientX, clientY);
-    }
+    },
+    getHandlePosition,
+    getHandlePositionForEdge
   }));
 
   // Listen to node hover events from event bus (single listener)
@@ -192,68 +273,64 @@ const HandleLayer = forwardRef(({
     }
   };
 
-  const getHandlePositionForEdge = useCallback((sourceId, targetId, direction) => {
+  const getHandlePositionForEdge = useCallback((sourceId, targetId, direction, sourceHandleKey, targetHandleKey) => {
     const sourceNode = nodes.find(n => n.id === sourceId);
     const targetNode = nodes.find(n => n.id === targetId);
     if (sourceNode && targetNode) {
+      const sourceHandles = getHandlePositions(sourceNode);
+      const targetHandles = getHandlePositions(targetNode);
+      if (direction === 'source' && sourceHandleKey) {
+        const handle = sourceHandles.find(
+          h => h.key === sourceHandleKey && (h.type === 'output' || h.type === 'bidirectional')
+        );
+        if (handle) return { ...handle.position, fromHandle: true };
+      }
+      if (direction === 'target' && targetHandleKey) {
+        const handle = targetHandles.find(
+          h => h.key === targetHandleKey && (h.type === 'input' || h.type === 'bidirectional')
+        );
+        if (handle) return { ...handle.position, fromHandle: true };
+      }
       if (direction === 'source') {
         const tFrame = getNodeFrame(targetNode);
-        return getNodeEdgeIntersection(sourceNode, tFrame.cx, tFrame.cy);
+        const point = getNodeEdgeIntersection(sourceNode, tFrame.cx, tFrame.cy);
+        return { ...point, fromHandle: false };
       } else {
         const sFrame = getNodeFrame(sourceNode);
-        return getNodeEdgeIntersection(targetNode, sFrame.cx, sFrame.cy);
+        const point = getNodeEdgeIntersection(targetNode, sFrame.cx, sFrame.cy);
+        return { ...point, fromHandle: false };
       }
     }
     // Fallback: if only one node exists, use its center derived from top-left
     if (sourceNode && !targetNode) {
       const sFrame = getNodeFrame(sourceNode);
-      return { x: sFrame.cx, y: sFrame.cy };
+      return { x: sFrame.cx, y: sFrame.cy, fromHandle: false };
     }
     if (!sourceNode && targetNode) {
       const tFrame = getNodeFrame(targetNode);
-      return { x: tFrame.cx, y: tFrame.cy };
+      return { x: tFrame.cx, y: tFrame.cy, fromHandle: false };
     }
     // If neither node exists, fallback to origin
-    return { x: 0, y: 0 };
+    return { x: 0, y: 0, fromHandle: false };
   }, [nodes]);
 
   // --- NEW: getCurrentHandles uses schema handles ---
   const getCurrentHandles = useCallback(() => {
     const allHandles = [];
-    // Only show handles for the hovered node (or dragging node)
-    const targetNodeId = draggingHandle
-      ? (dragTargetNodeId || hoveredNodeId || draggingHandle.nodeId)
-      : hoveredNodeId;
-    if (!targetNodeId) return allHandles;
-    const targetNode = nodes.find(n => n.id === targetNodeId && n.visible !== false);
-    if (!targetNode) return allHandles;
-    // If not dragging, check if mouse is within margin of node bounds
-    if (!draggingHandle && hoveredNodeId === targetNodeId && window.__NG_LAST_MOUSE) {
-      const { x, y } = window.__NG_LAST_MOUSE;
-      const frame = getNodeFrame(targetNode);
-      const left = frame.left - nodeHoverMargin;
-      const right = frame.left + frame.width + nodeHoverMargin;
-      const top = frame.top - nodeHoverMargin;
-      const bottom = frame.top + frame.height + nodeHoverMargin;
-      // Convert screen to graph coords
-      const graphX = (x - pan.x) / zoom;
-      const graphY = (y - pan.y) / zoom;
-      if (graphX < left || graphX > right || graphY < top || graphY > bottom) {
-        return allHandles;
+    nodes.forEach((node) => {
+      if (!node || node.visible === false) return;
+      const handles = getHandlePositions(node);
+      if (draggingInfoRef?.current?.nodeIds?.includes(node.id)) {
+        const offset = draggingInfoRef.current.offset;
+        handles.forEach(h => {
+          h.position.x += offset.x;
+          h.position.y += offset.y;
+        });
       }
-    }
-    // Use schema handles
-    const handles = getHandlePositions(targetNode);
-    if (draggingInfoRef?.current?.nodeIds?.includes(targetNode.id)) {
-      const offset = draggingInfoRef.current.offset;
-      handles.forEach(h => {
-        h.position.x += offset.x;
-        h.position.y += offset.y;
-      });
-    }
-    allHandles.push(...handles);
+      allHandles.push(...handles);
+    });
     return allHandles;
-  }, [nodes, draggingInfoRef, hoveredNodeId, draggingHandle, dragTargetNodeId, pan, zoom]);
+  }, [nodes, draggingInfoRef]);
 
   // Track last mouse position globally for node hover margin
   useEffect(() => {
@@ -537,9 +614,13 @@ const HandleLayer = forwardRef(({
     };
     if (targetHandle) {
       let validation = { ok: true, message: '' };
-      if (draggingHandle.type !== 'output') {
+      const sourceType = draggingHandle.type;
+      const targetType = targetHandle.type;
+      const sourceOk = sourceType === 'output' || sourceType === 'bidirectional';
+      const targetOk = targetType === 'input' || targetType === 'bidirectional';
+      if (!sourceOk) {
         validation = { ok: false, message: 'Start connections from an output handle.' };
-      } else if (targetHandle.type !== 'input') {
+      } else if (!targetOk) {
         validation = { ok: false, message: 'Connections must end on an input handle.' };
       } else if (draggingHandle.nodeId === targetHandle.nodeId) {
         validation = { ok: false, message: 'Cannot connect a node to itself.' };
@@ -552,6 +633,32 @@ const HandleLayer = forwardRef(({
           ok: false,
           message: `Handle types do not match: ${draggingHandle.handleType} → ${targetHandle.handleType}`
         };
+      } else {
+        const sourceAllowed = Array.isArray(draggingHandle.allowedEdgeTypes)
+          ? draggingHandle.allowedEdgeTypes
+          : null;
+        const targetAllowed = Array.isArray(targetHandle.allowedEdgeTypes)
+          ? targetHandle.allowedEdgeTypes
+          : null;
+        let edgeType = 'default';
+        if (sourceAllowed && targetAllowed) {
+          const intersection = sourceAllowed.filter(type => targetAllowed.includes(type));
+          if (intersection.length === 0) {
+            validation = { ok: false, message: 'No compatible edge type between handles.' };
+          } else {
+            edgeType = intersection[0];
+          }
+        } else if (sourceAllowed) {
+          edgeType = sourceAllowed[0] || edgeType;
+        } else if (targetAllowed) {
+          edgeType = targetAllowed[0] || edgeType;
+        }
+        if (validation.ok !== false) {
+          validation = { ok: true, edgeType };
+        }
+      }
+      if (validation.ok && validation.edgeType) {
+        dropEvent.edgeType = validation.edgeType;
       }
       dropEvent.validation = validation;
     }

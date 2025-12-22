@@ -1,196 +1,191 @@
-# Twilight Node Browser – Supercharged User Manual
+# Twilight OS User Manual  
+_“The operating system for the in-between.”_
 
-Welcome to **Twilight Node Browser**, your interactive graph editor that transforms AI prompts into beautiful, editable visual diagrams. Whether you're mapping systems, visualizing concepts, or just playing with ideas—this manual will help you unlock the app's full potential.
-
----
-
-## 🚀 What is This App?
-
-**Twilight Node Browser** turns AI-generated JSON into interactive graphs. Describe an idea to your favorite AI (like ChatGPT), paste the response here, and voilà—a visual diagram you can edit, style, and expand.
-
-### ✨ Core Features
-
-- **Visual Graph Editing**: Drag, connect, and customize nodes and edges.
-- **AI Workflow**: Paste in AI-generated JSON to auto-generate diagrams.
-- **Scripting Support**: Run custom logic to analyze or modify graphs.
-- **Rich Node Types**: From markdown to counters, timers, and even APIs.
-- **Groups & Layouts**: Stay organized with collapsible groups and auto-arranged graphs.
+Twilight is a persistent, executable workspace. Every graph is a living system that remembers where you left off, automates its own growth, and invites you (and your AI copilots) to keep building without starting over. This manual explains how to operate that workspace with confidence.
 
 ---
 
-## ⚡ Quick Start: From Idea to Graph in 30 Seconds
+## 1. Core Principles
 
-### Step 1: Set Up Side-by-Side
+1. **Persistent State** – Clusters preserve unfinished work, live data, and history. Closing the tab does not reset your canvas.  
+2. **Executable Nodes** – Nodes are applications: they fetch data, run scripts, drive breadboards, render 3D scenes, and fire triggers.  
+3. **Systemic Layout** – Groups act like OS containers. Handles, sockets, and edges are contracts between subsystems.  
+4. **Versioned Reality** – Save and commit clusters through Git/GitHub to maintain a chain of state transitions instead of brittle snapshots.  
+5. **Automation First** – ScriptNodes, Background RPC, and procedural loaders construct or mutate graphs at scale.
 
-Open this app and your AI chat window (ChatGPT, Claude, etc.).
-
-### Step 2: Onboard the AI
-
-1. Click **📋 Onboard LLM** in the toolbar.
-2. Paste the copied prompt into your AI chat.
-
-### Step 3: Ask for a Graph
-
-Examples:
-
-- "Create a graph of a product development lifecycle."
-- "Visualize an e-commerce checkout flow."
-- "Show a pros/cons decision tree for remote work."
-
-### Step 4: Paste and Watch It Appear
-
-1. Copy the JSON response from the AI.
-2. Click anywhere in this app.
-3. Hit **Ctrl+V** or click **📋 Paste**.
-4. Magic! Your graph is live and editable.
+Remember: Twilight’s value is _not having to start over_. Work with that continuity in mind.
 
 ---
 
-## 🛠️ Toolbar: Your Command Center
+## 2. Getting Started Fast
 
-### Core Actions
+### Step 1 – Sync Your AI
+1. Open **📋 Onboard LLM** in the toolbar.  
+2. Paste the generated prompt into your AI assistant.  
+3. The AI can now emit valid Twilight JSON commands that respect handles, groups, and automation.
 
-- **📋 Onboard LLM**: Copy setup prompt for AI.
-- **📋 Paste**: Paste JSON or create node from text.
-- **📋 Copy Selected**: Copy highlighted nodes/edges.
-- **📋 Copy Graph**: Copy entire graph as JSON.
-- **➕ Add Node**: Add a blank node manually.
-- **📁 Group List / 📑 Node List**: Toggle visibility.
-- **🗑️ Delete / 👎 Clear Graph**: Remove selected or all.
-- **💾 Save / 📂 Load**: Export/import JSON graph files.
+### Step 2 – Load / Resume
+- Use the Browser address bar to open a `.node` or `tlz://` cluster.  
+- Twilight restores the last-saved state (layout, groups, selections).  
+- Version-enabled workspaces can pull/push directly from Git using the Browser drawer commands.
 
-### History + Layout
-
-- **↩️ Undo / ↪️ Redo**: Revert mistakes instantly.
-- **✏️ Manual Mode**: Free editing.
-- **🧭 Nav Mode**: Move around without editing.
-- **🔧 Auto-Layout**: Clean it up automatically.
+### Step 3 – Iterate
+1. Paste JSON (`Ctrl+V` or **📋 Paste**) to apply AI or scripted changes.  
+2. Use **Undo/Redo** while refining.  
+3. Save checkpoints or commit to Git when a milestone is met.
 
 ---
 
-## 🖱️ Power Shortcuts
+## 3. Twilight Shell & Toolbar
 
-| Action | Shortcut |
-|--------|----------|
-| Undo | Ctrl+Z |
-| Redo | Ctrl+Y |
-| Paste | Ctrl+V |
-| Copy | Ctrl+C |
-| Delete | Delete |
-| Move (1px) | Ctrl + Arrows |
-| Move (10px) | Ctrl + Shift + Arrows |
+| Zone | Purpose |
+| --- | --- |
+| **Browser App Bar** | Navigation history, Template Gallery, Git actions, bookmarks, theme controls. |
+| **Graph Toolbar** | Context-sensitive controls for nodes, edges, automation, history, view, scripting. |
+| **Properties Panel** | Edit node/edge/group metadata, markdown, handles, automation toggles. |
+| **Panels & Drawers** | Node palette, plugin manager, scripting console, plugin runtime diagnostics. |
 
----
+Key toolbar actions:
 
-## 🧠 Smart Node Types
-
-Here’s when to use each type:
-
-- **DefaultNode**: All-purpose visual box. Use for most ideas.
-- **DivNode**: Add raw HTML or markdown blocks.
-- **MarkdownNode**: Rich text, notes, and documentation.
-- **APINode**: Call APIs and preview responses.
-- **CounterNode**: Track increments, quantities, or states.
-- **TimerNode**: Useful for timelines or stopwatch logic.
-- **ScriptNode**: Run code on your graph.
-- **GateNode**: Logic flows (AND, OR, XOR, etc.).
-- **DelayNode**: Introduce intentional pauses.
-- **ToggleNode**: Simple ON/OFF states.
-- **SvgNode**: Add inline vector graphics.
-- **FixedNode**: Small labels/icons that stay fixed.
-
-### Pro Tip
-
-Use **MarkdownNode** for step-by-step instructions directly in the graph. Or nest **ToggleNodes** inside **Groups** for collapsible workflows.
+- **Automation** – Launch ScriptNodes, run Background RPC calls, or trigger graph macros.  
+- **Mode Switcher** – Manual edit, Navigation-only, Auto-layout (with multiple layout presets).  
+- **History Timeline** – Scroll through reversible checkpoints, diff changes, or create named restore points.  
+- **Git Controls** – Stage/commit/branch graph files without leaving Twilight.
 
 ---
 
-## ➿ Edge Types Cheat Sheet
+## 4. Persistent State & Versioning
 
-| Type | Use Case |
-|------|----------|
-| Child / Parent | Hierarchies (trees, outlines) |
-| Peer | Sibling nodes (e.g., teams, features) |
-| Data Flow | Show movement of info or inputs |
-| Dependency | Requirements or order dependencies |
-| Reference | Documentation links |
-| Bidirectional | Mutual relationships |
-| Weak Link | Optional or inferred relationships |
-| Strong Link | Must-have connections |
+### Auto-Save & Checkpoints
+- Twilight records every command into an undo/redo stack.
+- Named checkpoints (History Timeline) capture the full graph plus metadata.
+
+### Git / GitHub Integration
+- The Browser drawer exposes **Pull**, **Commit**, and **Push** for the active workspace.  
+- Commits record JSON diffs of the cluster plus optional notes.  
+- Use small, descriptive commits (“Wire LED row to rails”) so other collaborators (or future you) can replay the evolution.
 
 ---
 
-## 🧩 Scripting Magic
+## 5. Node Catalog (Executable Components)
 
-Scripts run in a secure sandbox—great for data processing or procedural generation.
+| Category | Node | Highlights |
+| --- | --- | --- |
+| **Visual & Docs** | **MarkdownNode** | Renders `data.markdown` (falls back to `data.memo`). Supports live previews, documentation cards, and rich formatting. |
+|  | **DivNode / SvgNode** | Custom HTML/SVG surfaces for bespoke controls or dashboards. |
+| **Logic & Flow** | **ValueTrigger Node** | Converts value changes into rising/falling edge triggers. Configure thresholds, debounce, and outputs for chaining automation. |
+|  | **Toggle Node** | Supports latching (persistent) and momentary (spring) behavior. Expose handles for ON/OFF events. |
+|  | **Gate Node** | Multi-handle logic (AND/OR/XOR). Handles `inputA`, `inputB`, `output`. Works with ValueTrigger for edge detection. |
+|  | **Delay Node** | Queues or throttles trigger propagation. Parameters for delay ms, repeat, cancel. |
+| **Automation** | **ScriptNode** | Executes stored scripts to generate or mutate graphs, hit APIs, or drive breadboards. Script output can place nodes, edit data, and emit telemetry. |
+|  | **Background RPC Node** | Bridges to iframe/worker runtimes. Use `testBackgroundRpc()` from the console to verify exposed methods. |
+| **Data & APIs** | **APINode** | Full REST support: choose method (GET/POST/PUT/DELETE), headers, body, auth tokens, and preview responses. Pipe results into downstream nodes. |
+| **Stateful Components** | **Counter Node** | Tracks increments/decrements with optional triggers on thresholds. |
+|  | **Timer Node** | Stopwatch or countdown with bindings to toggles, scripts, or UI elements. |
+| **Spatial / 3D** | **3D Node / Spatial Canvas** | Renders Three.js scenes inside Twilight. Connect handles for camera control, data feeds, and signal events. |
+| **Hardware / Breadboard** | **Breadboard Sockets, Rails, Components** | Domain-specific nodes with precise handle schemas (`socket`, `positive`, `negative`, `pinA`, `pinB`). Combine with autowire runtimes for rapid prototyping. |
 
----
-
-## 🗂️ Groups
-
-Group related nodes for:
-
-- Collapsible views  
-- Organizing by theme or workflow  
-- Managing complexity  
-
-Each group can be styled, labeled, and edited just like a node.
-
----
-
-## 🧪 Examples To Try Right Now
-
-### 🪐 Solar System  
-
-**Prompt:** "Create a graph showing the solar system with the sun and 3 planets."
-
-### 🗃️ Product Roadmap  
-
-**Prompt:** "Make a quarterly product roadmap with milestones and dependencies."
-
-### ⚙️ DevOps Pipeline  
-
-**Prompt:** "Visualize a CI/CD pipeline for a SaaS app."
-
-### 📖 Story Outline  
-
-**Prompt:** "Show a plot structure for a mystery novel with intro, conflict, climax, resolution."
-
-### 🧬 Biology Diagram  
-
-**Prompt:** "Graph the process of DNA replication."
+> Tip: Use the Node Palette search to browse plugin-provided nodes. Each entry shows handle definitions, default data, and categories.
 
 ---
 
-## 🛠️ Troubleshooting Tips
+## 6. Edge Types & Handle Contracts
 
-- **Graph doesn’t show?** Zoom out or click "Auto-Layout."
-- **Paste not working?** Check if JSON copied fully.
-- **Overlaps?** Ask AI: "spread out the layout more."
-- **Errors?** Validate JSON before pasting.
+- **Child / Parent** – Vertical hierarchy. Handles typically `out` → `in`, but can be custom (e.g., `anode` → `socket`).  
+- **Peer** – Lateral relationships; horizontal routing.  
+- **Data Flow / Dependency / Reference / Bidirectional / Weak / Strong** – Styled links for flow, prerequisites, citations, or emphasis.  
+- **Breadboard Handles** – Use semantic labels like `positive`, `negative`, `pinA`, `shield`. Twilight enforces handle existence during paste/create operations.  
+- **Spatial Handles** – Nodes may expose `signal`, `transform`, `camera`, or `pointer` inputs/outputs.
 
-### 🔍 Validation Warnings & How To Fix Them
-
-When pasting malformed JSON, the editor now skips only the broken records and shows a warning like `Skipped 2 invalid items. node index 0: missing string "id" | edge e-1: missing string "target"`.
-
-- **Missing node ids** – Ask your AI to set a stable `id` for every node. Example prompt tweak: "Include an `id` field for each node using a slug of the label."
-- **Missing positions** – Remind the AI to provide `position: {"x":0,"y":0}` for every node or add a `layout` step to your workflow.
-- **Edge handle errors** – Ensure each edge has both `sourceHandle` and `targetHandle` values that match the node’s handle schema. Add "Include handle keys for all edges" to your AI instructions.
-- **Empty groups** – Request that `groups` list at least one node id (ideally two) so they survive validation. Try "Create groups with `nodeIds` populated by the nodes they contain."
-
-If you see additional warning text, copy it back into your AI prompt so it can adjust the JSON shape for the next attempt.
+Always inspect `node.handles`, `node.inputs`, and `node.outputs` in the Properties Panel before wiring unfamiliar nodes.
 
 ---
 
-## 🧙 Pro Tips
+## 7. Groups as the OS Layer
 
-- **Start small**: 5–10 nodes = fast iteration.  
-- **Markdown everywhere**: Use it for notes, docs, or structure.  
-- **Save often**: Don’t trust your browser session!  
-- **Group to declutter**: Hide complexity till you need it.  
-- **Undo is your friend**: Ctrl+Z gets you out of trouble.
+Groups do more than declutter—they are structural boundaries:
+
+- **Subsystem Containers** – Encapsulate breadboards, logic circuits, or app modules.  
+- **State Isolation** – Hide or lock a group to freeze a subsystem while iterating elsewhere.  
+- **Mini Applications** – Combine nodes, scripts, and markdown inside a group to build self-contained tools.  
+- **Layout Anchors** – Groups maintain bounds even as inner nodes move, making them perfect for dashboards or labs.  
+
+Use the Group panel to rename, style, collapse, or ungroup as your system evolves.
 
 ---
 
-**Happy Graphing!** 🎨📊  
-Questions? Ideas? Want more examples? You know where to find us.
+## 8. Automation & Procedural Growth
+
+### ScriptNodes
+- Author scripts that read/write the graph via the exposed Graph API.  
+- Typical uses: autowire breadboards, generate feature maps, sync with external services, clean up layouts.  
+- Scripts can schedule runs, accept parameters, and log output into markdown nodes.
+
+### Background RPC & Plugins
+- Plugins run in sandboxed iframes/workers with a minimal Graph API surface.  
+- Use `window.testBackgroundRpc(method, args)` to ping plugin methods.  
+- Plugins may register custom nodes, panels, or runtime hooks.
+
+### Event Bus Helpers
+- The global `window.eventBus` lets advanced users trigger internal events (e.g., `eventBus.emit('toggleTemplateGallery')`).  
+- Background runtimes can listen for drag/drop, node move, or clipboard events.
+
+---
+
+## 9. 3D & Spatial Systems
+
+Spatial nodes are live today:
+
+- Render Three.js scenes, animated canvases, or VR previews directly inside nodes.  
+- Feed in telemetry from ScriptNodes or ValueTriggers to animate or react to user input.  
+- Use groups to partition spatial scenes (“Lab A”, “Simulation Stage”).  
+- Combine with Toggle/ValueTrigger nodes to run stateful simulations.
+
+---
+
+## 10. Example Workflows
+
+1. **Breadboard Lab** – Use the Template Gallery to load a breadboard scene. ScriptNodes drop resistors, LEDs, and autowire them. Markdown nodes capture lab notes. ValueTriggers light the LED when rails are powered.  
+2. **Product OS** – Organize roadmap clusters in groups (Quarterly, Teams). API nodes fetch metrics, Markdown nodes host planning docs, ScriptNodes sync status from REST endpoints. Git commits track decisions over time.  
+3. **Spatial Storyboard** – Combine 3D nodes with Toggle/Timer nodes to storyboard interactions. Markdown nodes narrate scenes, while groups isolate each act.  
+4. **Automation Hub** – Build a control room group containing ScriptNodes and ValueTriggers that mutate other groups on schedule (e.g., nightly cleanup, import pipelines).
+
+---
+
+## 11. Troubleshooting & Recovery
+
+| Symptom | Fix |
+| --- | --- |
+| Paste fails with handle errors | Ensure every edge declares valid handle keys. Inspect node schemas in Properties Panel. |
+| Graph looks empty | Use **Auto-Layout**, zoom out, or check if you loaded a new branch without nodes. |
+| Markdown doesn’t update | Confirm you’re editing `data.markdown` (Properties Panel does this automatically). |
+| ScriptNode error | Open the Script panel log; errors surface there. Fix inputs or update the script, then rerun. |
+| Git conflicts | Pull latest, resolve JSON conflicts in the built-in diff viewer, then recommit. |
+
+Validation warnings include skipped nodes/edges with reasons (missing IDs, invalid handles, etc.). Feed those warnings back into your AI prompt so it can correct the JSON next time.
+
+---
+
+## 12. Pro Tips
+
+- **Checkpoint often.** Named history entries make it easy to experiment and roll back.  
+- **Narrate with Markdown.** Document playbooks, TODOs, and hypotheses inline.  
+- **Use ValueTriggers for instrumentation.** Trigger nodes provide telemetry for dashboards or automation.  
+- **Stay modular.** Treat each group as a deployable subsystem. When it graduates, export the `.node` file or branch it in Git.  
+- **Leverage the console.** Devtools expose helpers: `window.eventBus`, `window.graphAPI`, `window.backgroundRpcStatus()`, `window.testBackgroundRpc()`.
+
+---
+
+## 13. Glossary
+
+- **Cluster** – A `.node` file loaded in Twilight; comparable to a project or workspace.  
+- **Cognitive Runtime** – Twilight’s role as an execution layer for unfinished systems.  
+- **Handle** – A named socket on a node that defines connection semantics (type, position, label).  
+- **Group** – A structural container acting like an OS window or package.  
+- **ScriptNode** – Embedded automation engine for procedural graph mutations.  
+- **ValueTrigger** – Node that fires on rising/falling edges, enabling instrumentation and control.  
+- **Twilight OS** – The browser + GraphEditor + runtime ecosystem.
+
+---
+
+**Twilight OS: the operating system for the in-between.** Keep building, keep iterating, and never start from zero again.

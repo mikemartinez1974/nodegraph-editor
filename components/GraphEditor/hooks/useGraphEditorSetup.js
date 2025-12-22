@@ -10,7 +10,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
   const graphAPI = useRef(null);
   const {
     nodesRef, setNodes, edgesRef, setEdges, setGroups,
-    groupManager, initialGraphLoadedRef,
+    groupsRef, groupManager, initialGraphLoadedRef,
     defaultNodeColor, defaultEdgeColor, setDefaultNodeColor, setDefaultEdgeColor,
     zoom, setLoading, setSelectedNodeIds, setSelectedEdgeIds
   } = state;
@@ -28,9 +28,10 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       saveToHistory,
       nodesRef,
       edgesRef,
-      undefined,
+      () => groupsRef.current,
       setGroups,
-      undefined
+      groupsRef,
+      groupManager
     );
     
     const originalCreateNode = graphAPI.current.createNode;

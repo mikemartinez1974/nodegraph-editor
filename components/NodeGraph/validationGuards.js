@@ -423,6 +423,54 @@ export class ValidationGuard {
         }
       }
 
+      const sanitizeIoHandles = (list, fieldName) => {
+        if (!Array.isArray(list)) return list;
+        const seen = new Set();
+        const sanitizedList = [];
+        list.forEach((handle, index) => {
+          if (!handle) return;
+          let candidate = handle;
+          if (typeof handle === 'string') {
+            candidate = { key: handle, label: handle, type: 'value' };
+          }
+          if (typeof candidate !== 'object') return;
+          const key = candidate.key || candidate.id;
+          if (!key) {
+            result.errors.push({
+              type: VALIDATION_ERRORS.INVALID_DATA,
+              message: `${fieldName} handle missing key`,
+              field: fieldName
+            });
+            return;
+          }
+          if (seen.has(key)) {
+            result.errors.push({
+              type: VALIDATION_ERRORS.DUPLICATE_ID,
+              message: `Duplicate ${fieldName} handle key '${key}'`,
+              field: fieldName
+            });
+            return;
+          }
+          seen.add(key);
+          sanitizedList.push({
+            key,
+            label: candidate.label || key,
+            type: candidate.type || candidate.dataType || 'value',
+            position: candidate.position ? { ...candidate.position } : undefined,
+            allowedEdgeTypes: Array.isArray(candidate.allowedEdgeTypes) ? [...candidate.allowedEdgeTypes] : undefined,
+            metadata: candidate.metadata ? { ...candidate.metadata } : undefined
+          });
+        });
+        return sanitizedList;
+      };
+
+      if (sanitized.inputs !== undefined) {
+        sanitized.inputs = sanitizeIoHandles(sanitized.inputs, 'inputs') || [];
+      }
+      if (sanitized.outputs !== undefined) {
+        sanitized.outputs = sanitizeIoHandles(sanitized.outputs, 'outputs') || [];
+      }
+
       sanitized = this.applyBreadboardExtensionValidation(sanitized, result);
 
       const deriveLegacyHandles = (direction) => {

@@ -102,7 +102,7 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
       try {
         JSON.parse(text);
         // Delegate to unified handler so behavior matches toolbar
-        await pasteFromClipboardUnified({ handlers, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook, onShowMessage: state.setSnackbar ? (msg, sev='info') => state.setSnackbar({ open: true, message: msg, severity: sev }) : null });
+        await pasteFromClipboardUnified({ handlers, state: { setNodes, nodesRef, edgesRef, pan, zoom }, historyHook, onShowMessage: state.setSnackbar ? (msg, sev='info') => state.setSnackbar({ open: true, message: msg, severity: sev, copyToClipboard: true }) : null });
        } catch (jsonError) {
         // Not JSON - create a resizable node from text
         const lines = text.trim().split('\n');
@@ -133,7 +133,7 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
         });
         
         saveToHistory(nodesRef.current, edgesRef.current);
-        state.setSnackbar({ open: true, message: 'Created resizable node from pasted text', severity: 'success' });
+        state.setSnackbar({ open: true, message: 'Created resizable node from pasted text', severity: 'success', copyToClipboard: true });
        }
     } catch (error) {
       console.error('Error handling paste:', error);
