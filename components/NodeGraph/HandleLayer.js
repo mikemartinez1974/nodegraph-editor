@@ -96,14 +96,14 @@ const computeHandlePosition = (frame, extension, handle, fallbackIndex, fallback
   const offset = getHandleOffset(handle, fallbackCount > 0 ? (fallbackIndex + 1) / (fallbackCount + 1) : 0.5);
   switch (side) {
     case 'top':
-      return { x: frame.left + offset * frame.width, y: frame.top - extension };
+      return { x: frame.left + offset * frame.width, y: frame.top - extension, side };
     case 'right':
-      return { x: frame.left + frame.width + extension, y: frame.top + offset * frame.height };
+      return { x: frame.left + frame.width + extension, y: frame.top + offset * frame.height, side };
     case 'bottom':
-      return { x: frame.left + offset * frame.width, y: frame.top + frame.height + extension };
+      return { x: frame.left + offset * frame.width, y: frame.top + frame.height + extension, side };
     case 'left':
     default:
-      return { x: frame.left - extension, y: frame.top + offset * frame.height };
+      return { x: frame.left - extension, y: frame.top + offset * frame.height, side };
   }
 };
 

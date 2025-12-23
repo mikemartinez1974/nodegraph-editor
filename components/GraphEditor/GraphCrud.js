@@ -965,11 +965,8 @@ export default class GraphCRUD {
 
       // Update state once with all nodes
       const updatedNodes = deduplicateNodes([...currentNodes, ...createdNodes]);
-      this.setNodes(prev => {
-        const next = updatedNodes;
-        if (this.nodesRef) this.nodesRef.current = next;
-        return next;
-      });
+      if (this.nodesRef) this.nodesRef.current = updatedNodes;
+      this.setNodes(() => updatedNodes);
       this.saveToHistory(updatedNodes, this.getEdges());
 
       return {

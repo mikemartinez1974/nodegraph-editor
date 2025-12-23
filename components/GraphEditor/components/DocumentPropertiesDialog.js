@@ -41,6 +41,11 @@ import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
 
 const ROLE_OPTIONS = ['Owner', 'Editor', 'Viewer'];
+const EDGE_ROUTING_OPTIONS = [
+  { value: 'auto', label: 'Auto (use edge style)' },
+  { value: 'orthogonal', label: 'Orthogonal (force)' },
+  { value: 'curved', label: 'Curved (force)' }
+];
 
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
@@ -77,6 +82,8 @@ export default function DocumentPropertiesDialog({
   open,
   onClose,
   backgroundUrl = '',
+  documentSettings,
+  onDocumentSettingsChange,
   projectMeta,
   onProjectMetaChange,
   onResetProjectMeta,
@@ -93,6 +100,7 @@ export default function DocumentPropertiesDialog({
   const [settings, setSettings] = useState(loadSettings());
   const [activeTab, setActiveTab] = useState('overview');
   const [meta, setMeta] = useState(mapProjectMeta(projectMeta, defaultShareLink));
+  const [docSettings, setDocSettings] = useState(documentSettings || {});
   const [tagInput, setTagInput] = useState('');
   const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
 
@@ -108,10 +116,11 @@ export default function DocumentPropertiesDialog({
     if (!open) return;
     setSettings(loadSettings());
     setMeta(mapProjectMeta(projectMeta, defaultShareLink));
+    setDocSettings(documentSettings || {});
     setActiveTab('overview');
     setTagInput('');
     setNewCollaborator({ name: '', email: '', role: 'Editor' });
-  }, [open, projectMeta, defaultShareLink]);
+  }, [open, projectMeta, defaultShareLink, documentSettings]);
 
   const handleSettingsChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -119,6 +128,10 @@ export default function DocumentPropertiesDialog({
 
   const handleMetaChange = (key, value) => {
     setMeta((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleDocSettingsChange = (key, value) => {
+    setDocSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleAddTag = () => {
@@ -233,6 +246,13 @@ export default function DocumentPropertiesDialog({
       });
     }
 
+    if (typeof onDocumentSettingsChange === 'function') {
+      onDocumentSettingsChange((prev) => ({
+        ...prev,
+        ...docSettings
+      }));
+    }
+
     onClose();
   };
 
@@ -243,6 +263,7 @@ export default function DocumentPropertiesDialog({
       onResetProjectMeta();
     }
     setMeta(mapProjectMeta({}, meta.shareLink || defaultShareLink));
+    setDocSettings((prev) => ({ ...prev, edgeRouting: 'auto' }));
   };
 
   const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
@@ -604,6 +625,23 @@ export default function DocumentPropertiesDialog({
               <Typography variant="subtitle1" gutterBottom>
                 Canvas & Background
               </Typography>
+              <Stack spacing={2} sx={{ mb: 2 }}>
+                <TextField
+                  select
+                  size="small"
+                  label="Edge routing"
+                  value={docSettings.edgeRouting || 'auto'}
+                  onChange={(event) => handleDocSettingsChange('edgeRouting', event.target.value)}
+                  helperText="Auto respects edge styles; force modes override per-edge routing."
+                  fullWidth
+                >
+                  {EDGE_ROUTING_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Stack>
               <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
             </Paper>
           </Stack>

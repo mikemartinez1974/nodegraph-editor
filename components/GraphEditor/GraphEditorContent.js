@@ -84,6 +84,7 @@ const GraphEditorContent = () => {
     setMobileAddNodeSearch,
     memoAutoExpandToken,
     documentSettings,
+    setDocumentSettings,
     documentTheme,
     documentBackgroundImage,
     projectMeta,
@@ -341,6 +342,7 @@ const GraphEditorContent = () => {
           snapToGrid={snapToGrid}
           onToggleSnapToGrid={handleToggleSnapToGrid}
           gridSize={documentSettings.gridSize}
+          edgeRouting={documentSettings.edgeRouting}
           documentTheme={documentTheme}
           isMobile={isMobile}
           isSmallScreen={isSmallScreen}
@@ -502,6 +504,7 @@ const GraphEditorContent = () => {
             snapToGrid={snapToGrid}
             showGrid={showGrid}
             gridSize={documentSettings.gridSize}
+            defaultEdgeRouting={documentSettings.edgeRouting}
             lockedNodes={lockedNodes}
             lockedEdges={lockedEdges}
             onEdgeClick={undefined}
@@ -542,6 +545,7 @@ const GraphEditorContent = () => {
           snapToGrid={snapToGrid}
           showGrid={showGrid}
           gridSize={documentSettings.gridSize}
+          defaultEdgeRouting={documentSettings.edgeRouting}
           lockedNodes={lockedNodes}
           lockedEdges={lockedEdges}
           onEdgeClick={undefined}
@@ -559,6 +563,8 @@ const GraphEditorContent = () => {
         onClose={() => setShowDocumentPropertiesDialog(false)}
         backgroundUrl={backgroundUrl}
         setBackgroundUrl={setBackgroundUrl}
+        documentSettings={documentSettings}
+        onDocumentSettingsChange={setDocumentSettings}
         projectMeta={projectMeta}
         onProjectMetaChange={handleUpdateProjectMeta}
         onResetProjectMeta={handleResetProjectMeta}

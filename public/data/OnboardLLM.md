@@ -43,9 +43,12 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
 - **Declare handles explicitly.** Every edge must specify both `sourceHandle` and `targetHandle`. Many nodes expose multiple sockets (`anode`/`cathode`, `inputA`/`inputB`, etc.). Match the published handle keys exactly.
 - **No implicit handles.** Twilight does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
+- **Handles must be declared before use.** If you want `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).
 - **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilight falls back to node-boundary rendering.
 - Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
 - **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
+- **Edge routing is configurable.** Use `edge.style.route: "orthogonal"` (or `edge.style.orthogonal: true`) to force right-angled paths; set `edge.style.curved: true` for bezier curves. The user can also override routing in Document Properties.
+- **Creation order matters.** Always create `nodes` first, then `edges`, then `groups` (every pass). If using `batch`/`transaction`, ensure each command respects this order.
 
 ### Supported Actions
 
@@ -67,6 +70,30 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 > Deprecated actions such as `add` are rejected. Always use the verbs above.
 
 Tip: Any command can include `"dryRun": true` to validate intent without mutating the graph.
+
+---
+
+## Documentation Nodes and Handles (Important)
+
+Markdown, Canvas, and other documentation-style nodes **do not expose input/output handles by default**.
+
+If you want to connect edges to a documentation node, you must explicitly declare its handles (for example, `in` and/or `out`) using the node’s handle schema (`handles`, or mapped `inputs`/`outputs`). Twilight will not infer or auto-create handles for documentation nodes.
+
+If a node does not declare a handle, **edges referencing that handle will fail**.
+
+If a documentation node is intended to participate in a conceptual or logical flow, declare its handles explicitly.  
+If it is purely descriptive, leave it unconnected or organize it using groups instead of edges.
+
+**Do not assume** that a node supports `in` / `out`. Always inspect or define the handle contract before wiring edges.
+
+**Important schema details:**
+
+- `handles` must be an **array** of handle objects (not a map/object). Each handle should include `id`, `label`, `direction`, `dataType`, and `position`.
+- Markdown content belongs in `data.markdown` (or `data.memo`), not a top-level `markdown` field.
+- Handle `direction` must be `input`, `output`, or `bidirectional` (not `source`/`target`).
+- Handle `position` must be an object like `{ "side": "left|right|top|bottom", "offset": 0.5 }` (not a string).
+- `sourceHandle` / `targetHandle` must match the handle `id` values you declare.
+- `update` requires a target: include `id` or `ids` for nodes/edges/groups. There is no implicit “update all.”
 
 ---
 
@@ -176,6 +203,7 @@ Twilight graphs are typically stored in Git/GitHub. Help users keep history mean
 ## Bulk Updates & Other Commands
 
 - **Single-node update**
+
   ```json
   {
     "action": "update",
@@ -186,6 +214,7 @@ Twilight graphs are typically stored in Git/GitHub. Help users keep history mean
   ```
 
 - **Multi-node update**
+
   ```json
   {
     "action": "update",
@@ -204,16 +233,19 @@ Twilight graphs are typically stored in Git/GitHub. Help users keep history mean
   ```
 
 - **Delete**
+
   ```json
   { "action": "delete", "type": "node", "id": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d" }
   ```
 
 - **Find nodes with notes**
+
   ```json
   { "action": "findNodes", "criteria": { "hasMemo": true } }
   ```
 
 - **Get stats**
+
   ```json
   { "action": "getStats" }
   ```

@@ -126,6 +126,7 @@ const Toolbar = ({
   snapToGrid = false,  // NEW: Add prop
   onToggleSnapToGrid,  // NEW: Add prop
   gridSize = 20,  // Grid size from document settings
+  edgeRouting = 'auto', // Edge routing mode from document settings
   documentTheme = null  // Document theme (not browser theme)
 }) => {
   const theme = useTheme();  // Browser theme for UI
@@ -420,6 +421,7 @@ const Toolbar = ({
         defaultEdgeColor: defaultEdgeColor,
         snapToGrid: snapToGrid,
         gridSize: gridSize,
+        edgeRouting: edgeRouting,
         autoSave: false
       },
       viewport: {

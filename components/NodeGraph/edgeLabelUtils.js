@@ -27,9 +27,18 @@ export function drawEdgeLabel(ctx, edge, theme) {
   let angle = 0;
   if (edge.sourcePos && edge.targetPos) {
     // Check if edge is curved (check if edge has curve data or style)
-    const isCurved = edge.style?.curved || false;
+    const isOrthogonal = edge.isOrthogonal === true || edge.style?.orthogonal === true;
+    const isCurved = !isOrthogonal && (edge.style?.curved || false);
     
-    if (isCurved && edge.midX !== undefined) {
+    if (isCurved && edge.cp1 && edge.cp2) {
+      angle = getBezierTangentAngle(
+        0.5,
+        edge.sourcePos.x, edge.sourcePos.y,
+        edge.cp1.x, edge.cp1.y,
+        edge.cp2.x, edge.cp2.y,
+        edge.targetPos.x, edge.targetPos.y
+      );
+    } else if (isCurved && edge.midX !== undefined) {
       // For curved edges, calculate tangent at midpoint (t=0.5)
       const curveDirection = edge.curveDirection || 'horizontal';
       if (curveDirection === 'horizontal') {
@@ -49,6 +58,8 @@ export function drawEdgeLabel(ctx, edge, theme) {
           edge.targetPos.x, edge.targetPos.y
         );
       }
+    } else if (isOrthogonal) {
+      angle = 0;
     } else {
       // For straight edges
       angle = getAngleBetweenPoints(

@@ -113,9 +113,13 @@ const EdgeLayer = forwardRef(({
   onEdgeDoubleClick, 
   draggingInfoRef,
   getHandlePositionForEdge: getHandlePositionForEdgeProp,
-  showAllEdgeLabels = false // <-- Add prop
+  showAllEdgeLabels = false, // <-- Add prop
+  defaultEdgeRouting = 'auto'
 }, ref) => {
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
+  const BUNDLE_BUCKET = 160;
+  const BUNDLE_SPACING = 14;
+  const FAN_SPACING = 10;
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const { getHandlePositionForEdge: getHandlePositionForEdgeContext } = useContext(HandlePositionContext);
   const getHandlePositionForEdge = getHandlePositionForEdgeProp || getHandlePositionForEdgeContext;
@@ -129,6 +133,86 @@ const EdgeLayer = forwardRef(({
     const top = node.position?.y ?? node.y ?? 0;
     return { x: left + w / 2, y: top + h / 2 };
   }, []);
+
+  const getNodeSideFromPoint = useCallback((node, point) => {
+    if (!node || !point) return null;
+    const w = node.width || 60;
+    const h = node.height || 60;
+    const left = node.position?.x ?? node.x ?? 0;
+    const top = node.position?.y ?? node.y ?? 0;
+    const right = left + w;
+    const bottom = top + h;
+    const distances = {
+      left: Math.abs(point.x - left),
+      right: Math.abs(point.x - right),
+      top: Math.abs(point.y - top),
+      bottom: Math.abs(point.y - bottom)
+    };
+    return Object.keys(distances).reduce((a, b) => (distances[a] < distances[b] ? a : b));
+  }, []);
+
+  const getSideNormal = useCallback((side) => {
+    switch (side) {
+      case 'left':
+        return { x: -1, y: 0 };
+      case 'right':
+        return { x: 1, y: 0 };
+      case 'top':
+        return { x: 0, y: -1 };
+      case 'bottom':
+        return { x: 0, y: 1 };
+      default:
+        return null;
+    }
+  }, []);
+
+  const getPerpFromNormal = useCallback((normal) => {
+    if (!normal) return null;
+    return Math.abs(normal.x) > 0 ? { x: 0, y: 1 } : { x: 1, y: 0 };
+  }, []);
+
+  const getObstacleRects = useCallback((nodes, sourceId, targetId, padding = 12) => {
+    return (nodes || [])
+      .filter((node) => node && node.id !== sourceId && node.id !== targetId && node.visible !== false)
+      .map((node) => {
+        const w = node.width || 60;
+        const h = node.height || 60;
+        const left = node.position?.x ?? node.x ?? 0;
+        const top = node.position?.y ?? node.y ?? 0;
+        return {
+          left: left - padding,
+          right: left + w + padding,
+          top: top - padding,
+          bottom: top + h + padding
+        };
+      });
+  }, []);
+
+  const segmentIntersectsRect = useCallback((a, b, rect) => {
+    const minX = Math.min(a.x, b.x);
+    const maxX = Math.max(a.x, b.x);
+    const minY = Math.min(a.y, b.y);
+    const maxY = Math.max(a.y, b.y);
+
+    if (a.x === b.x) {
+      if (a.x < rect.left || a.x > rect.right) return false;
+      return maxY >= rect.top && minY <= rect.bottom;
+    }
+    if (a.y === b.y) {
+      if (a.y < rect.top || a.y > rect.bottom) return false;
+      return maxX >= rect.left && minX <= rect.right;
+    }
+    return maxX >= rect.left && minX <= rect.right && maxY >= rect.top && minY <= rect.bottom;
+  }, []);
+
+  const routeIsClear = useCallback((segments, obstacles) => {
+    for (const [start, end] of segments) {
+      for (const rect of obstacles) {
+        if (segmentIntersectsRect(start, end, rect)) return false;
+      }
+    }
+    return true;
+  }, [segmentIntersectsRect]);
   
   // Animation refs
   const animationStartTimeRef = useRef(null);
@@ -175,14 +259,114 @@ const EdgeLayer = forwardRef(({
       if (sourceNode?.visible === false || targetNode?.visible === false) return false;
       return true;
     });
+
+    const bundleGroups = new Map();
+    const bundleOffsets = new Map();
+    const fanSourceGroups = new Map();
+    const fanTargetGroups = new Map();
+    const fanSourceOffsets = new Map();
+    const fanTargetOffsets = new Map();
+
+    visibleEdges.forEach((edge) => {
+      let sourcePos = null;
+      let targetPos = null;
+      let sourceSide = null;
+      let targetSide = null;
+
+      if (typeof getHandlePositionForEdge === 'function') {
+        const sourceHandleKey = edge.sourceHandle || edge.handleMeta?.source?.key;
+        const targetHandleKey = edge.targetHandle || edge.handleMeta?.target?.key;
+        const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source', sourceHandleKey, targetHandleKey);
+        const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target', sourceHandleKey, targetHandleKey);
+        if (sourceResult && typeof sourceResult === 'object') {
+          sourcePos = { x: sourceResult.x, y: sourceResult.y };
+          if (sourceResult.side) sourceSide = sourceResult.side;
+        }
+        if (targetResult && typeof targetResult === 'object') {
+          targetPos = { x: targetResult.x, y: targetResult.y };
+          if (targetResult.side) targetSide = targetResult.side;
+        }
+      }
+
+      if (!sourcePos) {
+        const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
+        sourcePos = getNodeCenter(sourceNode);
+        if (!sourceSide && sourceNode) sourceSide = getNodeSideFromPoint(sourceNode, sourcePos);
+      }
+      if (!targetPos) {
+        const targetNode = nodeListRef.current.find(n => n.id === edge.target);
+        targetPos = getNodeCenter(targetNode);
+        if (!targetSide && targetNode) targetSide = getNodeSideFromPoint(targetNode, targetPos);
+      }
+
+      const midX = (sourcePos.x + targetPos.x) / 2;
+      const midY = (sourcePos.y + targetPos.y) / 2;
+      const sourceAxis = getSideNormal(sourceSide)
+        ? (getSideNormal(sourceSide).x !== 0 ? 'horizontal' : 'vertical')
+        : 'mixed';
+      const targetAxis = getSideNormal(targetSide)
+        ? (getSideNormal(targetSide).x !== 0 ? 'horizontal' : 'vertical')
+        : 'mixed';
+
+      let key;
+      if (sourceAxis === 'horizontal' && targetAxis === 'horizontal') {
+        key = `h-${Math.round(midX / BUNDLE_BUCKET)}`;
+      } else if (sourceAxis === 'vertical' && targetAxis === 'vertical') {
+        key = `v-${Math.round(midY / BUNDLE_BUCKET)}`;
+      } else {
+        key = `m-${Math.round(midX / BUNDLE_BUCKET)}-${Math.round(midY / BUNDLE_BUCKET)}`;
+      }
+
+      const groupKey = `${sourceSide || 'none'}-${targetSide || 'none'}-${key}`;
+      if (!bundleGroups.has(groupKey)) bundleGroups.set(groupKey, []);
+      bundleGroups.get(groupKey).push(edge.id);
+
+      if (sourceSide) {
+        const sourceKey = `source-${edge.source}-${sourceSide}`;
+        if (!fanSourceGroups.has(sourceKey)) fanSourceGroups.set(sourceKey, []);
+        fanSourceGroups.get(sourceKey).push(edge.id);
+      }
+      if (targetSide) {
+        const targetKey = `target-${edge.target}-${targetSide}`;
+        if (!fanTargetGroups.has(targetKey)) fanTargetGroups.set(targetKey, []);
+        fanTargetGroups.get(targetKey).push(edge.id);
+      }
+    });
+
+    for (const ids of bundleGroups.values()) {
+      if (ids.length < 2) continue;
+      const sorted = [...ids].sort();
+      const mid = (sorted.length - 1) / 2;
+      sorted.forEach((id, index) => {
+        bundleOffsets.set(id, (index - mid) * BUNDLE_SPACING);
+      });
+    }
+
+    const assignFanOffsets = (groupMap, targetMap) => {
+      for (const ids of groupMap.values()) {
+        if (ids.length < 2) continue;
+        const sorted = [...ids].sort();
+        const mid = (sorted.length - 1) / 2;
+        sorted.forEach((id, index) => {
+          targetMap.set(id, (index - mid) * FAN_SPACING);
+        });
+      }
+    };
+    assignFanOffsets(fanSourceGroups, fanSourceOffsets);
+    assignFanOffsets(fanTargetGroups, fanTargetOffsets);
     
     visibleEdges.forEach(edge => {
       const isSelected = selectedEdgeIds.includes(edge.id) || selectedEdgeId === edge.id;
       const isHovered = hoveredEdge === edge.id;
+      const bundleOffset = bundleOffsets.get(edge.id) || 0;
+      const sourceFan = fanSourceOffsets.get(edge.id) || 0;
+      const targetFan = fanTargetOffsets.get(edge.id) || 0;
       
       let sourcePos, targetPos, curveDirectionOverride;
       let sourceFromHandle = false;
       let targetFromHandle = false;
+      let sourceSide = null;
+      let targetSide = null;
       
       if (typeof getHandlePositionForEdge === 'function') {
         const sourceHandleKey = edge.sourceHandle || edge.handleMeta?.source?.key;
@@ -193,6 +377,7 @@ const EdgeLayer = forwardRef(({
         if (sourceResult && typeof sourceResult === 'object') {
           sourcePos = { x: sourceResult.x, y: sourceResult.y };
           sourceFromHandle = sourceResult.fromHandle === true;
+          if (sourceResult.side) sourceSide = sourceResult.side;
           if (sourceResult.curveDirection) curveDirectionOverride = sourceResult.curveDirection;
         } else {
           sourcePos = sourceResult;
@@ -201,6 +386,7 @@ const EdgeLayer = forwardRef(({
         if (targetResult && typeof targetResult === 'object') {
           targetPos = { x: targetResult.x, y: targetResult.y };
           targetFromHandle = targetResult.fromHandle === true;
+          if (targetResult.side) targetSide = targetResult.side;
           if (targetResult.curveDirection) curveDirectionOverride = targetResult.curveDirection;
         } else {
           targetPos = targetResult;
@@ -270,6 +456,15 @@ const EdgeLayer = forwardRef(({
           );
         }
       }
+
+      if (!sourceSide && sourceNode && sourcePos) {
+        sourceSide = getNodeSideFromPoint(sourceNode, sourcePos);
+      }
+      if (!targetSide && targetNode && targetPos) {
+        targetSide = getNodeSideFromPoint(targetNode, targetPos);
+      }
+
+      const obstacleRects = getObstacleRects(nodeListRef.current, edge.source, edge.target, 12);
       
       ctx.save();
       
@@ -282,6 +477,8 @@ const EdgeLayer = forwardRef(({
         width: edge.style?.width ?? styleDef.width ?? 2,
         dash: edge.style?.dash ?? styleDef.dash ?? [],
         curved: edge.style?.curved ?? styleDef.curved ?? false,
+        route: edge.style?.route ?? edge.style?.routing ?? edge.style?.router ?? styleDef.route,
+        orthogonal: edge.style?.orthogonal ?? styleDef.orthogonal ?? false,
         opacity: edge.style?.opacity ?? styleDef.opacity ?? 1,
         arrowSize: edge.style?.arrowSize ?? styleDef.arrowSize ?? 8,
         showArrow: edge.style?.showArrow ?? styleDef.showArrow ?? true,
@@ -341,7 +538,14 @@ const EdgeLayer = forwardRef(({
         ctx.setLineDash(style.dash);
       }
       
-      const isCurved = style.curved;
+      const routeStyle = style.route;
+      const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
+      const isOrthogonal = forceRouting
+        ? defaultEdgeRouting === 'orthogonal'
+        : routeStyle === 'orthogonal' || style.orthogonal === true;
+      const isCurved = forceRouting
+        ? defaultEdgeRouting === 'curved'
+        : !isOrthogonal && style.curved;
       let curveDirection = curveDirectionOverride || styleDef.curveDirection || 'auto';
       
       if (curveDirection === 'auto') {
@@ -352,13 +556,181 @@ const EdgeLayer = forwardRef(({
       
       let midX = (sourcePos.x + targetPos.x) / 2;
       let midY = (sourcePos.y + targetPos.y) / 2;
+      let cp1 = null;
+      let cp2 = null;
+      const useHandleControls = isCurved && (sourceSide || targetSide || sourceFromHandle || targetFromHandle);
+
+      if (useHandleControls) {
+        const dx = targetPos.x - sourcePos.x;
+        const dy = targetPos.y - sourcePos.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const base = Math.max(40, Math.min(220, dist * 0.35));
+        const normalize = (x, y, fallbackX, fallbackY) => {
+          const len = Math.hypot(x, y);
+          if (!len) return { x: fallbackX, y: fallbackY };
+          return { x: x / len, y: y / len };
+        };
+
+        const sourceCenter = sourceNode ? getNodeCenter(sourceNode) : sourcePos;
+        const targetCenter = targetNode ? getNodeCenter(targetNode) : targetPos;
+        const fallbackDir = normalize(dx, dy, 1, 0);
+        const sourceNormal = getSideNormal(sourceSide);
+        const targetNormal = getSideNormal(targetSide);
+        const sourceDir = sourceNormal
+          ? sourceNormal
+          : sourceFromHandle
+          ? normalize(sourcePos.x - sourceCenter.x, sourcePos.y - sourceCenter.y, fallbackDir.x, fallbackDir.y)
+          : fallbackDir;
+        const targetDir = targetNormal
+          ? targetNormal
+          : targetFromHandle
+          ? normalize(targetPos.x - targetCenter.x, targetPos.y - targetCenter.y, -fallbackDir.x, -fallbackDir.y)
+          : { x: -fallbackDir.x, y: -fallbackDir.y };
+
+        cp1 = { x: sourcePos.x + sourceDir.x * base, y: sourcePos.y + sourceDir.y * base };
+        cp2 = { x: targetPos.x + targetDir.x * base, y: targetPos.y + targetDir.y * base };
+        curveDirection = 'custom';
+        const midPoint = getBezierPoint(0.5, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+        midX = midPoint.x;
+        midY = midPoint.y;
+      }
       
+      const buildOrthogonalSegments = () => {
+        const lead = 24;
+        const sourceNormal = getSideNormal(sourceSide);
+        const targetNormal = getSideNormal(targetSide);
+        const sourcePerp = getPerpFromNormal(sourceNormal);
+        const targetPerp = getPerpFromNormal(targetNormal);
+        const sourceLead = sourceNormal
+          ? { x: sourcePos.x + sourceNormal.x * lead, y: sourcePos.y + sourceNormal.y * lead }
+          : sourcePos;
+        const targetLead = targetNormal
+          ? { x: targetPos.x + targetNormal.x * lead, y: targetPos.y + targetNormal.y * lead }
+          : targetPos;
+
+        const sourceLeadAdj = sourcePerp
+          ? { x: sourceLead.x + sourcePerp.x * sourceFan, y: sourceLead.y + sourcePerp.y * sourceFan }
+          : sourceLead;
+        const targetLeadAdj = targetPerp
+          ? { x: targetLead.x + targetPerp.x * targetFan, y: targetLead.y + targetPerp.y * targetFan }
+          : targetLead;
+
+        const sourceAxis = sourceNormal
+          ? (sourceNormal.x !== 0 ? 'horizontal' : 'vertical')
+          : curveDirection;
+        const targetAxis = targetNormal
+          ? (targetNormal.x !== 0 ? 'horizontal' : 'vertical')
+          : curveDirection;
+
+        const segments = [];
+        const push = (a, b) => {
+          if (!a || !b) return;
+          if (a.x === b.x && a.y === b.y) return;
+          segments.push([a, b]);
+        };
+
+        const finalize = (coreSegments) => {
+          const fullSegments = [];
+          const add = (a, b) => {
+            if (!a || !b) return;
+            if (a.x === b.x && a.y === b.y) return;
+            fullSegments.push([a, b]);
+          };
+          add(sourcePos, sourceLeadAdj);
+          coreSegments.forEach(([a, b]) => add(a, b));
+          add(targetLeadAdj, targetPos);
+          return fullSegments;
+        };
+
+        const tryRoutes = (candidates) => {
+          for (const coreSegments of candidates) {
+            const fullSegments = finalize(coreSegments);
+            if (routeIsClear(fullSegments, obstacleRects)) return fullSegments;
+          }
+          return finalize(candidates[0] || []);
+        };
+
+        if (sourceAxis === 'horizontal' && targetAxis === 'horizontal') {
+          const baseMid = (sourceLeadAdj.x + targetLeadAdj.x) / 2 + bundleOffset;
+          const offsets = [0, 40, -40, 80, -80, 120, -120];
+          const candidates = offsets.map((offset) => {
+            const mid = baseMid + offset;
+            const p1 = { x: mid, y: sourceLeadAdj.y };
+            const p2 = { x: mid, y: targetLeadAdj.y };
+            return [[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]];
+          });
+          return tryRoutes(candidates);
+        }
+
+        if (sourceAxis === 'vertical' && targetAxis === 'vertical') {
+          const baseMid = (sourceLeadAdj.y + targetLeadAdj.y) / 2 + bundleOffset;
+          const offsets = [0, 40, -40, 80, -80, 120, -120];
+          const candidates = offsets.map((offset) => {
+            const mid = baseMid + offset;
+            const p1 = { x: sourceLeadAdj.x, y: mid };
+            const p2 = { x: targetLeadAdj.x, y: mid };
+            return [[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]];
+          });
+          return tryRoutes(candidates);
+        }
+
+        if (sourceAxis === 'horizontal' && targetAxis === 'vertical') {
+          const corner = { x: targetLeadAdj.x, y: sourceLeadAdj.y + bundleOffset };
+          const altCorner = { x: sourceLeadAdj.x + lead, y: targetLeadAdj.y + bundleOffset };
+          const candidates = [
+            [[sourceLeadAdj, corner], [corner, targetLeadAdj]],
+            [[sourceLeadAdj, altCorner], [altCorner, targetLeadAdj]]
+          ];
+          return tryRoutes(candidates);
+        }
+
+        if (sourceAxis === 'vertical' && targetAxis === 'horizontal') {
+          const corner = { x: sourceLeadAdj.x + bundleOffset, y: targetLeadAdj.y };
+          const altCorner = { x: targetLeadAdj.x + bundleOffset, y: sourceLeadAdj.y - lead };
+          const candidates = [
+            [[sourceLeadAdj, corner], [corner, targetLeadAdj]],
+            [[sourceLeadAdj, altCorner], [altCorner, targetLeadAdj]]
+          ];
+          return tryRoutes(candidates);
+        }
+
+        const p1 = { x: midX, y: sourcePos.y };
+        const p2 = { x: midX, y: targetPos.y };
+        return finalize([[sourcePos, p1], [p1, p2], [p2, targetPos]]);
+      };
+
+      const getPointOnSegments = (segments, t) => {
+        const lengths = segments.map(([a, b]) => Math.hypot(b.x - a.x, b.y - a.y));
+        const total = lengths.reduce((sum, value) => sum + value, 0) || 1;
+        let remaining = t * total;
+        for (let i = 0; i < segments.length; i += 1) {
+          const segLen = lengths[i];
+          if (remaining <= segLen || i === segments.length - 1) {
+            const ratio = segLen === 0 ? 0 : remaining / segLen;
+            const [a, b] = segments[i];
+            return { x: a.x + (b.x - a.x) * ratio, y: a.y + (b.y - a.y) * ratio };
+          }
+          remaining -= segLen;
+        }
+        return segments[segments.length - 1][1];
+      };
+
+      const orthogonalSegments = isOrthogonal ? buildOrthogonalSegments() : null;
+
       // Draw edge path
-      if (isCurved) {
+      if (isOrthogonal) {
         ctx.beginPath();
         ctx.moveTo(sourcePos.x, sourcePos.y);
-        
-        if (curveDirection === 'horizontal') {
+        orthogonalSegments.forEach(([, end]) => {
+          ctx.lineTo(end.x, end.y);
+        });
+        ctx.stroke();
+      } else if (isCurved) {
+        ctx.beginPath();
+        ctx.moveTo(sourcePos.x, sourcePos.y);
+        if (useHandleControls && cp1 && cp2) {
+          ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+        } else if (curveDirection === 'horizontal') {
           ctx.bezierCurveTo(
             midX, sourcePos.y,
             midX, targetPos.y,
@@ -388,8 +760,15 @@ const EdgeLayer = forwardRef(({
         
         if (style.arrowPosition === 'end' || style.arrowPosition === 'both') {
           let angle, arrowPos;
-          if (isCurved) {
-            if (curveDirection === 'horizontal') {
+          if (isOrthogonal) {
+            const last = orthogonalSegments[orthogonalSegments.length - 1];
+            angle = Math.atan2(last[1].y - last[0].y, last[1].x - last[0].x);
+            arrowPos = targetPos;
+          } else if (isCurved) {
+            if (useHandleControls && cp1 && cp2) {
+              angle = getBezierAngle(0.99, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+              arrowPos = getBezierPoint(0.99, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+            } else if (curveDirection === 'horizontal') {
               angle = getBezierAngle(0.99, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
               arrowPos = getBezierPoint(0.99, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
             } else {
@@ -405,8 +784,15 @@ const EdgeLayer = forwardRef(({
         
         if (style.arrowPosition === 'start' || style.arrowPosition === 'both') {
           let angle, arrowPos;
-          if (isCurved) {
-            if (curveDirection === 'horizontal') {
+          if (isOrthogonal) {
+            const first = orthogonalSegments[0];
+            angle = Math.atan2(first[0].y - first[1].y, first[0].x - first[1].x);
+            arrowPos = sourcePos;
+          } else if (isCurved) {
+            if (useHandleControls && cp1 && cp2) {
+              angle = getBezierAngle(0.01, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y) + Math.PI;
+              arrowPos = getBezierPoint(0.01, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+            } else if (curveDirection === 'horizontal') {
               angle = getBezierAngle(0.01, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y) + Math.PI;
               arrowPos = getBezierPoint(0.01, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
             } else {
@@ -431,8 +817,12 @@ const EdgeLayer = forwardRef(({
           const t = (offset % 1);
           
           let particlePos;
-          if (isCurved) {
-            if (curveDirection === 'horizontal') {
+          if (isOrthogonal) {
+            particlePos = getPointOnSegments(orthogonalSegments, t);
+          } else if (isCurved) {
+            if (useHandleControls && cp1 && cp2) {
+              particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+            } else if (curveDirection === 'horizontal') {
               particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
             } else {
               particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, sourcePos.x, midY, targetPos.x, midY, targetPos.x, targetPos.y);
@@ -471,9 +861,16 @@ const EdgeLayer = forwardRef(({
         ctx.lineDashOffset = -offset;
         
         ctx.beginPath();
-        if (isCurved) {
+        if (isOrthogonal) {
           ctx.moveTo(sourcePos.x, sourcePos.y);
-          if (curveDirection === 'horizontal') {
+          orthogonalSegments.forEach(([, end]) => {
+            ctx.lineTo(end.x, end.y);
+          });
+        } else if (isCurved) {
+          ctx.moveTo(sourcePos.x, sourcePos.y);
+          if (useHandleControls && cp1 && cp2) {
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
+          } else if (curveDirection === 'horizontal') {
             ctx.bezierCurveTo(midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
           } else {
             ctx.bezierCurveTo(sourcePos.x, midY, targetPos.x, midY, targetPos.x, targetPos.y);
@@ -495,6 +892,9 @@ const EdgeLayer = forwardRef(({
           targetPos, 
           midX, 
           midY, 
+          cp1,
+          cp2,
+          isOrthogonal,
           curveDirection,
           style: { ...edge.style, curved: isCurved }
         }, theme);
@@ -506,9 +906,13 @@ const EdgeLayer = forwardRef(({
         sourcePos,
         targetPos,
         isCurved,
+        isOrthogonal,
         curveDirection,
         midX,
         midY,
+        cp1,
+        cp2,
+        segments: orthogonalSegments,
         label: edge.label,
         style: edge.style
       });
@@ -612,8 +1016,20 @@ const EdgeLayer = forwardRef(({
       
       // Then check edge path hit test
       let edgeHit = false;
-      if (edgeData.isCurved) {
-        if (edgeData.curveDirection === 'horizontal') {
+      if (edgeData.isOrthogonal && edgeData.segments) {
+        edgeHit = edgeData.segments.some(([start, end]) =>
+          isPointNearLine(graphX, graphY, start.x, start.y, end.x, end.y)
+        );
+      } else if (edgeData.isCurved) {
+        if (edgeData.cp1 && edgeData.cp2) {
+          edgeHit = isPointNearBezier(
+            graphX, graphY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.cp1.x, edgeData.cp1.y,
+            edgeData.cp2.x, edgeData.cp2.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        } else if (edgeData.curveDirection === 'horizontal') {
           edgeHit = isPointNearBezier(
             graphX, graphY,
             edgeData.sourcePos.x, edgeData.sourcePos.y,
@@ -677,8 +1093,20 @@ const EdgeLayer = forwardRef(({
       if (!edgeData) continue;
 
       let hit = false;
-      if (edgeData.isCurved) {
-        if (edgeData.curveDirection === 'horizontal') {
+      if (edgeData.isOrthogonal && edgeData.segments) {
+        hit = edgeData.segments.some(([start, end]) =>
+          isPointNearLine(mouseX, mouseY, start.x, start.y, end.x, end.y)
+        );
+      } else if (edgeData.isCurved) {
+        if (edgeData.cp1 && edgeData.cp2) {
+          hit = isPointNearBezier(
+            mouseX, mouseY,
+            edgeData.sourcePos.x, edgeData.sourcePos.y,
+            edgeData.cp1.x, edgeData.cp1.y,
+            edgeData.cp2.x, edgeData.cp2.y,
+            edgeData.targetPos.x, edgeData.targetPos.y
+          );
+        } else if (edgeData.curveDirection === 'horizontal') {
           hit = isPointNearBezier(
             mouseX, mouseY,
             edgeData.sourcePos.x, edgeData.sourcePos.y,

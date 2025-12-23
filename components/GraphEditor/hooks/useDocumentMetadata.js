@@ -8,7 +8,8 @@ const createInitialDocumentSettings = (theme) => ({
   url: '',
   backgroundImage: '',
   gridSize: DEFAULT_GRID_SIZE,
-  theme: themeConfigFromMuiTheme(theme)
+  theme: themeConfigFromMuiTheme(theme),
+  edgeRouting: 'auto'
 });
 
 export default function useDocumentMetadata() {

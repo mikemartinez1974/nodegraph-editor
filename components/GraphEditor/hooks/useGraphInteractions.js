@@ -88,6 +88,9 @@ export default function useGraphInteractions({
         if (settings.gridSize && settings.gridSize >= 5 && settings.gridSize <= 100) {
           setDocumentSettings((prev) => ({ ...prev, gridSize: settings.gridSize }));
         }
+        if (settings.edgeRouting) {
+          setDocumentSettings((prev) => ({ ...prev, edgeRouting: settings.edgeRouting }));
+        }
         try {
           const scriptsToLoad = Array.isArray(topLevelScripts)
             ? topLevelScripts

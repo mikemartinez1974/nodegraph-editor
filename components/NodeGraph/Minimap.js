@@ -3,6 +3,27 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 
+const getGradientStops = (value) => {
+  if (typeof value !== 'string') return [];
+  return value.match(/(rgba?\([^)]+\)|hsla?\([^)]+\)|#[0-9a-fA-F]{3,8})/g) || [];
+};
+
+const getNodeFillStyle = (ctx, color, x, y, w, h) => {
+  if (typeof color === 'string' && color.includes('gradient')) {
+    const stops = getGradientStops(color);
+    if (stops.length >= 2) {
+      const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+      gradient.addColorStop(0, stops[0]);
+      gradient.addColorStop(1, stops[1]);
+      return gradient;
+    }
+    if (stops.length === 1) {
+      return stops[0];
+    }
+  }
+  return color;
+};
+
 const Minimap = ({ 
   nodes = [], 
   groups = [],
@@ -119,7 +140,8 @@ const Minimap = ({
       const w = ((node.width || 60) * scale);
       const h = ((node.height || 60) * scale);
 
-      ctx.fillStyle = node.color || theme.palette.primary.main;
+      const baseColor = node.color || theme.palette.primary.main;
+      ctx.fillStyle = getNodeFillStyle(ctx, baseColor, x, y, w, h);
       ctx.fillRect(x, y, w, h);
     });
 
