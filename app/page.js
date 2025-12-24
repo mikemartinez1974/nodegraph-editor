@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import themeMap from '@/components/Browser/themes';
 import GraphEditor from "@/components/GraphEditor/GraphEditor";
 import { useMediaQuery } from '@mui/material';
+import eventBus from '@/components/NodeGraph/eventBus';
 
 export default function Home() {
   const getSystemTheme = () => {
@@ -83,6 +84,41 @@ export default function Home() {
       
       setThemeReady(true);
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const doc = (params.get('doc') || '').trim();
+    if (!doc) return;
+
+    const resolveDocUrl = (value) => {
+      if (value.startsWith('tlz://')) {
+        const rest = value.slice('tlz://'.length);
+        const firstSlash = rest.indexOf('/');
+        if (firstSlash !== -1) {
+          const host = rest.slice(0, firstSlash);
+          const path = rest.slice(firstSlash);
+          return `https://${host}${path.startsWith('/') ? path : `/${path}`}`;
+        }
+        return `/${rest}`;
+      }
+      if (value.startsWith('http://') || value.startsWith('https://')) return value;
+      if (value.startsWith('/')) return value;
+      if (value.includes('://')) return value;
+      return `/${value}`;
+    };
+
+    const fetchUrl = resolveDocUrl(doc);
+    eventBus.emit('setAddress', fetchUrl);
+    const emitFetch = () => {
+      eventBus.emit('fetchUrl', { url: fetchUrl, source: 'query-doc' });
+    };
+    emitFetch();
+    const timers = [50, 200, 600].map((delay) =>
+      setTimeout(emitFetch, delay)
+    );
+    return () => timers.forEach((timer) => clearTimeout(timer));
   }, []);
 
   useEffect(() => {
