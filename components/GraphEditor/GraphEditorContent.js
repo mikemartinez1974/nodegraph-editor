@@ -109,6 +109,7 @@ const GraphEditorContent = () => {
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,
+    storySnapshots,
     handleUpdateProjectMeta,
     handleResetProjectMeta,
     isMobile,
@@ -570,6 +571,7 @@ const GraphEditorContent = () => {
         onResetProjectMeta={handleResetProjectMeta}
         graphStats={graphStats}
         recentSnapshots={recentSnapshots}
+        storySnapshots={storySnapshots}
       />
 
       <Snackbar

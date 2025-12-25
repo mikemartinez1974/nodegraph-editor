@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups) {
   const [history, setHistory] = useState([
@@ -6,6 +6,11 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const historyIndexRef = useRef(historyIndex);
+  const historyRef = useRef(history);
+
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
 
   // Save to history
   const saveToHistory = useCallback((newNodes, newEdges, newGroups) => {
@@ -48,12 +53,28 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
     }
   }, [history, setNodes, setEdges, setGroups]);
 
+  const restoreToIndex = useCallback((index) => {
+    const list = historyRef.current || [];
+    if (!Array.isArray(list) || list.length === 0) return false;
+    if (index < 0 || index >= list.length) return false;
+    setHistoryIndex(index);
+    historyIndexRef.current = index;
+    const snapshot = list[index];
+    if (snapshot) {
+      setNodes(snapshot.nodes);
+      setEdges(snapshot.edges);
+      if (setGroups) setGroups(snapshot.groups || []);
+    }
+    return true;
+  }, [setNodes, setEdges, setGroups]);
+
   return {
     history,
     historyIndex,
     saveToHistory,
     handleUndo,
     handleRedo,
+    restoreToIndex,
     canUndo: historyIndex > 0,
     canRedo: historyIndex < history.length - 1
   };

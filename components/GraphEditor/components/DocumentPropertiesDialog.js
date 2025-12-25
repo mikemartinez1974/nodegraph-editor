@@ -10,6 +10,7 @@ import {
   TextField,
   Select,
   MenuItem,
+  Slider,
   Typography,
   Box,
   Tabs,
@@ -88,7 +89,8 @@ export default function DocumentPropertiesDialog({
   onProjectMetaChange,
   onResetProjectMeta,
   graphStats,
-  recentSnapshots = []
+  recentSnapshots = [],
+  storySnapshots = []
 }) {
   const currentTheme = useTheme();
   const isMobile = useMediaQuery(currentTheme.breakpoints.down('sm'));
@@ -105,6 +107,32 @@ export default function DocumentPropertiesDialog({
   const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
   const [githubPat, setGithubPat] = useState('');
   const [githubCommitMessage, setGithubCommitMessage] = useState('');
+  const [storySnapshotIndex, setStorySnapshotIndex] = useState(0);
+  const [storyMilestoneLabel, setStoryMilestoneLabel] = useState('');
+  const [liveStorySnapshots, setLiveStorySnapshots] = useState([]);
+  const [liveRecentSnapshots, setLiveRecentSnapshots] = useState([]);
+
+  useEffect(() => {
+    const handleStorySnapshotsUpdated = ({ snapshots } = {}) => {
+      if (Array.isArray(snapshots)) {
+        setLiveStorySnapshots(snapshots);
+      }
+    };
+    const handleRecentSnapshotsUpdated = ({ snapshots } = {}) => {
+      if (Array.isArray(snapshots)) {
+        setLiveRecentSnapshots(snapshots);
+      }
+    };
+    eventBus.on('storySnapshotsUpdated', handleStorySnapshotsUpdated);
+    eventBus.on('recentSnapshotsUpdated', handleRecentSnapshotsUpdated);
+    return () => {
+      eventBus.off('storySnapshotsUpdated', handleStorySnapshotsUpdated);
+      eventBus.off('recentSnapshotsUpdated', handleRecentSnapshotsUpdated);
+    };
+  }, []);
+
+  const resolvedStorySnapshots = storySnapshots.length > 0 ? storySnapshots : liveStorySnapshots;
+  const resolvedRecentSnapshots = recentSnapshots.length > 0 ? recentSnapshots : liveRecentSnapshots;
 
   const safeStats = useMemo(() => ({
     nodeCount: graphStats?.nodeCount ?? 0,
@@ -130,6 +158,11 @@ export default function DocumentPropertiesDialog({
       setGithubPat('');
     }
   }, [open, projectMeta, defaultShareLink, documentSettings]);
+
+  useEffect(() => {
+    if (!resolvedStorySnapshots.length) return;
+    setStorySnapshotIndex(resolvedStorySnapshots.length - 1);
+  }, [resolvedStorySnapshots.length]);
 
   const handleSettingsChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -555,15 +588,90 @@ export default function DocumentPropertiesDialog({
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                 <QueryStatsIcon color="primary" fontSize="small" />
+                <Typography variant="subtitle1">Story Timeline</Typography>
+              </Stack>
+              {resolvedStorySnapshots.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No story snapshots yet.
+                </Typography>
+              ) : (
+                <>
+                  <Slider
+                    value={storySnapshotIndex}
+                    min={0}
+                    max={Math.max(resolvedStorySnapshots.length - 1, 0)}
+                    step={1}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(value) => {
+                      const snapshot = resolvedStorySnapshots[value];
+                      return snapshot ? `#${snapshot.id}` : `${value + 1}`;
+                    }}
+                    onChange={(_, value) => {
+                      setStorySnapshotIndex(Array.isArray(value) ? value[0] : value);
+                    }}
+                    onChangeCommitted={(_, value) => {
+                      const indexValue = Array.isArray(value) ? value[0] : value;
+                      const snapshot = resolvedStorySnapshots[indexValue];
+                      if (snapshot) {
+                        eventBus.emit('restoreHistoryToIndex', { index: snapshot.historyIndex });
+                      }
+                    }}
+                  />
+                  {resolvedStorySnapshots[storySnapshotIndex] && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2">
+                        Snapshot #{resolvedStorySnapshots[storySnapshotIndex].id}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatTimestamp(resolvedStorySnapshots[storySnapshotIndex].timestamp)} · {resolvedStorySnapshots[storySnapshotIndex].reason}
+                      </Typography>
+                      {resolvedStorySnapshots[storySnapshotIndex].label && (
+                        <Typography variant="body2" color="text.secondary">
+                          {resolvedStorySnapshots[storySnapshotIndex].label}
+                        </Typography>
+                      )}
+                      <Typography variant="body2" color="text.secondary">
+                        {resolvedStorySnapshots[storySnapshotIndex].nodeCount} nodes • {resolvedStorySnapshots[storySnapshotIndex].edgeCount} edges • {resolvedStorySnapshots[storySnapshotIndex].groupCount} groups
+                      </Typography>
+                      {storySnapshotIndex > 0 && (
+                        <Typography variant="body2" color="text.secondary">
+                          Δ {resolvedStorySnapshots[storySnapshotIndex].nodeCount - resolvedStorySnapshots[storySnapshotIndex - 1].nodeCount} nodes • Δ {resolvedStorySnapshots[storySnapshotIndex].edgeCount - resolvedStorySnapshots[storySnapshotIndex - 1].edgeCount} edges • Δ {resolvedStorySnapshots[storySnapshotIndex].groupCount - resolvedStorySnapshots[storySnapshotIndex - 1].groupCount} groups
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                </>
+              )}
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 2 }}>
+                <TextField
+                  label="Milestone label"
+                  value={storyMilestoneLabel}
+                  onChange={(event) => setStoryMilestoneLabel(event.target.value)}
+                  fullWidth
+                />
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    eventBus.emit('storyMilestone', { label: storyMilestoneLabel });
+                    setStoryMilestoneLabel('');
+                  }}
+                >
+                  Add Milestone
+                </Button>
+              </Stack>
+            </Paper>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <QueryStatsIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle1">Recent Activity</Typography>
               </Stack>
               <List dense disablePadding>
-                {recentSnapshots.length === 0 ? (
+                {resolvedRecentSnapshots.length === 0 ? (
                   <ListItem disableGutters>
                     <ListItemText primary="No history captured yet." />
                   </ListItem>
                 ) : (
-                  recentSnapshots.map((snapshot) => (
+                  resolvedRecentSnapshots.map((snapshot) => (
                     <ListItem key={snapshot.id} disableGutters sx={{ mb: 1.25 }}>
                       <ListItemText
                         primary={`Snapshot #${snapshot.id}`}

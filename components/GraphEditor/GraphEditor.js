@@ -463,6 +463,58 @@ useEffect(() => {
   });
   
   const historyHook = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
+  const [storySnapshots, setStorySnapshots] = useState([]);
+
+  const captureStorySnapshot = useCallback((reason = 'auto', label = '') => {
+    const historyIndex = historyHook.historyIndex;
+    setStorySnapshots((prev) => {
+      const last = prev[prev.length - 1];
+      if (last && last.historyIndex === historyIndex && reason !== 'milestone') return prev;
+      const nodeCount = nodesRef.current ? nodesRef.current.length : nodes.length;
+      const edgeCount = edgesRef.current ? edgesRef.current.length : edges.length;
+      const groupCount = Array.isArray(groups) ? groups.length : 0;
+      const nextId = last ? last.id + 1 : 1;
+      const timestamp = new Date().toISOString();
+      const next = [
+        ...prev,
+        {
+          id: nextId,
+          historyIndex,
+          timestamp,
+          reason,
+          label: label ? String(label).trim() : '',
+          nodeCount,
+          edgeCount,
+          groupCount
+        }
+      ];
+      try {
+        eventBus.emit('storySnapshotsUpdated', { snapshots: next });
+      } catch (err) {
+        // ignore event bus errors
+      }
+      return next;
+    });
+  }, [historyHook.historyIndex, nodes, edges, groups, nodesRef, edgesRef]);
+
+  useEffect(() => {
+    if (storySnapshots.length === 0 && historyHook.history.length > 0) {
+      captureStorySnapshot('init');
+    }
+  }, [storySnapshots.length, historyHook.history.length, captureStorySnapshot]);
+
+  useEffect(() => {
+    if (historyHook.history.length > 0) {
+      captureStorySnapshot('edit');
+    }
+  }, [historyHook.historyIndex, historyHook.history.length, captureStorySnapshot]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      captureStorySnapshot('auto');
+    }, 5 * 60 * 1000);
+    return () => window.clearInterval(interval);
+  }, [captureStorySnapshot]);
 
   const readLocalScripts = useCallback(() => {
     try {
@@ -577,6 +629,33 @@ useEffect(() => {
   }, [historyHook.historyIndex, projectActivityInitializedRef, updateProjectMeta]);
 
   useEffect(() => {
+    const handleRestoreHistory = ({ index } = {}) => {
+      if (typeof index !== 'number') return;
+      const restored = historyHook.restoreToIndex(index);
+      if (restored) {
+        setSnackbar({ open: true, message: `Restored snapshot #${index + 1}`, severity: 'success' });
+      }
+    };
+
+    const handleGraphSaved = ({ reason } = {}) => {
+      captureStorySnapshot(reason || 'save');
+    };
+
+    const handleStoryMilestone = ({ label } = {}) => {
+      captureStorySnapshot('milestone', label || '');
+    };
+
+    eventBus.on('restoreHistoryToIndex', handleRestoreHistory);
+    eventBus.on('graphSaved', handleGraphSaved);
+    eventBus.on('storyMilestone', handleStoryMilestone);
+    return () => {
+      eventBus.off('restoreHistoryToIndex', handleRestoreHistory);
+      eventBus.off('graphSaved', handleGraphSaved);
+      eventBus.off('storyMilestone', handleStoryMilestone);
+    };
+  }, [historyHook, captureStorySnapshot, setSnackbar]);
+
+  useEffect(() => {
     if (memoAutoExpandToken > 0) {
       const timer = typeof window !== 'undefined'
         ? window.setTimeout(() => setMemoAutoExpandToken(0), 0)
@@ -613,6 +692,14 @@ useEffect(() => {
       groupCount: (snapshot?.groups || []).length
     }));
   }, [historyHook.history]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('recentSnapshotsUpdated', { snapshots: recentSnapshots });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [recentSnapshots]);
 
   const handleUpdateProjectMeta = useCallback(
     (updates) => updateProjectMeta(updates),
@@ -855,6 +942,7 @@ useEffect(() => {
       handlers.handleLoadGraph?.(nodesToLoad, edgesToLoad, groupsToLoad);
     } finally {
       setGraphRenderKey(prev => prev + 1);
+      setStorySnapshots([]);
       if (!firstGraphLoadHandledRef.current) {
         firstGraphLoadHandledRef.current = true;
         if (Array.isArray(nodesToLoad) && nodesToLoad.length > 0) {
@@ -869,7 +957,7 @@ useEffect(() => {
         setMemoAutoExpandToken((token) => token + 1);
       }
     }
-  }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
+  }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken, setStorySnapshots]);
 
   useEffect(() => {
     const showMessage = (message, severity = 'info') => {
@@ -946,6 +1034,7 @@ useEffect(() => {
 
         showMessage('GitHub commit successful.', 'success');
         eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+        captureStorySnapshot('github');
       } catch (err) {
         showMessage(`GitHub commit error: ${err.message || String(err)}`, 'error');
       }
@@ -2345,6 +2434,7 @@ useEffect(() => {
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,
+    storySnapshots,
     handleUpdateProjectMeta,
     handleResetProjectMeta,
     isMobile,
@@ -2412,6 +2502,7 @@ useEffect(() => {
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,
+    storySnapshots,
     handleUpdateProjectMeta,
     handleResetProjectMeta,
     isMobile,

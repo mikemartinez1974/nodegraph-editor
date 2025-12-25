@@ -399,6 +399,13 @@ const Toolbar = ({
 
   const handleSaveToFile = async () => {
     const now = new Date().toISOString();
+    const notifySaved = () => {
+      try {
+        eventBus.emit('graphSaved', { reason: 'save' });
+      } catch (err) {
+        // ignore emit failures
+      }
+    };
     
     // Save document theme (not browser theme)
     const themeToSave = documentTheme || null;
@@ -516,6 +523,7 @@ const Toolbar = ({
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
         if (onShowMessage) onShowMessage(`Saved as ${actualFilename}`, 'success');
+        notifySaved();
         return;
       } catch (err) {
         // User cancelled or error occurred, fall through to legacy method
@@ -544,6 +552,7 @@ const Toolbar = ({
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     if (onShowMessage) onShowMessage(`Saved as ${filename}. If you renamed it, reload to sync.`, 'info');
+    notifySaved();
   };
 
   const handleCopyOnboard = async () => {
