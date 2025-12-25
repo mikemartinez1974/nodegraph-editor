@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Theme Paste Roadmap",
+    "description": "Paste-in theme commands applied directly to the canvas",
+    "created": "2025-12-25T01:20:00.000Z",
+    "modified": "2025-12-25T01:20:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "theme-goal",
+      "type": "markdown",
+      "label": "Goal",
+      "position": { "x": 80, "y": 60 },
+      "width": 520,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goal\nPaste a theme **directly onto the canvas** as a command.\n\nFlow: ask AI for a color scheme → paste → graph updates theme instantly."
+      }
+    },
+    {
+      "id": "theme-ux",
+      "type": "markdown",
+      "label": "UX Flow",
+      "position": { "x": 80, "y": 280 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## UX Flow\n- User pastes JSON into canvas\n- Parser detects **theme command**\n- Validate\n- Apply to **document theme only**\n- Show confirm dialog; revert if rejected"
+      }
+    },
+    {
+      "id": "theme-format",
+      "type": "markdown",
+      "label": "Command Format",
+      "position": { "x": 80, "y": 540 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Command Format\nMinimal paste payload:\n```json\n{ \"action\": \"setTheme\", \"theme\": { ... } }\n```\nInclude defaults:\n- `defaultNodeColor`\n- `defaultEdgeColor`"
+      }
+    },
+    {
+      "id": "theme-validate",
+      "type": "markdown",
+      "label": "Validation + Safety",
+      "position": { "x": 640, "y": 280 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation + Safety\n- Schema check for palette keys\n- Reject invalid colors\n- Apply + confirm dialog\n- Revert if user rejects\n- Clear error feedback in snackbar"
+      }
+    },
+    {
+      "id": "theme-mvp",
+      "type": "markdown",
+      "label": "MVP",
+      "position": { "x": 80, "y": 800 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## MVP Scope\n- Paste JSON command\n- Apply **document theme only**\n- Set default node/edge colors\n- Confirm dialog + rollback\n- Save into `.node` settings"
+      }
+    },
+    {
+      "id": "theme-expand",
+      "type": "markdown",
+      "label": "Expansion",
+      "position": { "x": 80, "y": 1060 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Expansion\n- Theme library + naming\n- AI prompt helper (generate + paste)\n- Sync to browser theme\n- Per-node palette tags"
+      }
+    },
+    {
+      "id": "theme-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 640, "y": 560 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\nDecisions locked:\n- Document theme only\n- Apply + confirm via toast (revert on reject)\n\nRemaining questions:\n- Any edge cases for invalid theme payloads?"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "theme-edge-1",
+      "type": "child",
+      "source": "theme-goal",
+      "target": "theme-ux",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "flow",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "theme-edge-2",
+      "type": "child",
+      "source": "theme-ux",
+      "target": "theme-format",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "define",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "theme-edge-3",
+      "type": "child",
+      "source": "theme-format",
+      "target": "theme-mvp",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "implement",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "theme-edge-4",
+      "type": "child",
+      "source": "theme-mvp",
+      "target": "theme-expand",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "extend",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "theme-edge-5",
+      "type": "child",
+      "source": "theme-ux",
+      "target": "theme-validate",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "guard",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "theme-edge-6",
+      "type": "child",
+      "source": "theme-validate",
+      "target": "theme-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "decide",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

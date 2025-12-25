@@ -107,7 +107,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 6. **Paste** into the app (Ctrl+V)
 7. **Done!** Your graph appears instantly
 
-See the [User Manual](public/data/UserManual.md) for full documentation.
+See the [User Manual](public/documentation/UserManual.md) for full documentation.
 
 ### For Developers
 
@@ -276,8 +276,8 @@ Use these docs as a launchpad when working with other assistants—the descripti
 
 | Doc | Purpose |
 | --- | --- |
-| **[User Manual](public/data/UserManual.md)** | End-user playbook for Twilight Node Browser (AI workflow, toolbar, shortcuts). |
-| **[LLM Onboarding](public/data/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
+| **[User Manual](public/documentation/UserManual.md)** | End-user playbook for Twilight Node Browser (AI workflow, toolbar, shortcuts). |
+| **[LLM Onboarding](public/documentation/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
 | **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)** | Reference for `window.graphAPI` with create/update/delete/find examples. |
 | **[NodeGraph README](components/NodeGraph/README.md)** | Deep dive into the layered renderer (EdgeLayer, HandleLayer, PanZoomLayer). |
 | **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for handles, edges, and trigger/data flow. |

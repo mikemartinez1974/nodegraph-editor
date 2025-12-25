@@ -28,6 +28,35 @@ import usePluginRuntime from './hooks/usePluginRuntime';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
+const encodeBase64 = (value) => {
+  if (typeof window === 'undefined') return '';
+  return window.btoa(unescape(encodeURIComponent(value)));
+};
+
+const decodeBase64 = (value) => {
+  if (typeof window === 'undefined') return '';
+  return decodeURIComponent(escape(window.atob(value)));
+};
+
+const parseRepoString = (value = '') => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const [owner, repo] = trimmed.split('/');
+  if (!owner || !repo) return null;
+  return { owner, repo };
+};
+
+const buildGitHubContentUrl = ({ owner, repo, path, branch, includeRef = false }) => {
+  const safePath = (path || '')
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+  let url = `https://api.github.com/repos/${owner}/${repo}/contents/${safePath}`;
+  if (includeRef && branch) {
+    url += `?ref=${encodeURIComponent(branch)}`;
+  }
+  return url;
+};
 const roundTo3 = (value) => Math.round(value * 1000) / 1000;
 const ensureNumber = (value, fallback) => {
   const num = Number(value);
@@ -435,6 +464,110 @@ useEffect(() => {
   
   const historyHook = useGraphHistory(nodes, edges, groups, setNodes, setEdges, setGroups);
 
+  const readLocalScripts = useCallback(() => {
+    try {
+      if (typeof window === 'undefined') return [];
+      const raw = localStorage.getItem('scripts');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const buildGraphSaveData = useCallback(() => {
+    const now = new Date().toISOString();
+    const nodeList = nodesRef.current || nodes;
+    const edgeList = edgesRef.current || edges;
+    const groupsList = groups || [];
+    return {
+      fileVersion: '1.0',
+      metadata: {
+        title: projectMeta?.title || 'Untitled Graph',
+        description: projectMeta?.description || '',
+        created: projectMeta?.createdAt || now,
+        modified: now,
+        author: '',
+        tags: Array.isArray(projectMeta?.tags) ? projectMeta.tags : []
+      },
+      settings: {
+        theme: documentTheme || documentSettings?.theme || null,
+        backgroundImage: documentBackgroundImage || null,
+        defaultNodeColor: defaultNodeColor,
+        defaultEdgeColor: defaultEdgeColor,
+        snapToGrid: snapToGrid,
+        gridSize: documentSettings?.gridSize || 20,
+        edgeRouting: documentSettings?.edgeRouting || 'auto',
+        github: documentSettings?.github || null,
+        autoSave: false
+      },
+      viewport: {
+        pan: pan || { x: 0, y: 0 },
+        zoom: zoom || 1
+      },
+      document: backgroundUrl ? { url: backgroundUrl } : null,
+      scripts: readLocalScripts(),
+      nodes: nodeList.map((node) => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        color: node.color,
+        visible: node.visible !== false,
+        showLabel: node.showLabel !== false,
+        data: node.data || {}
+      })),
+      edges: edgeList.map((edge) => {
+        const sourceNodeId = typeof edge.source === 'object' && edge.source
+          ? (edge.source.nodeId ?? edge.source.id ?? '')
+          : edge.source;
+        const targetNodeId = typeof edge.target === 'object' && edge.target
+          ? (edge.target.nodeId ?? edge.target.id ?? '')
+          : edge.target;
+        const sourceHandle = edge.sourceHandle || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
+        const targetHandle = edge.targetHandle || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
+        return {
+          id: edge.id,
+          type: edge.type,
+          source: sourceNodeId,
+          target: targetNodeId,
+          sourceHandle: sourceHandle,
+          targetHandle: targetHandle,
+          handleMeta: edge.handleMeta || undefined,
+          label: edge.label || '',
+          style: edge.style || {},
+          data: edge.data || {}
+        };
+      }),
+      groups: groupsList.map((group) => ({
+        id: group.id,
+        label: group.label || '',
+        nodeIds: group.nodeIds || [],
+        bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
+        visible: group.visible !== false,
+        style: group.style || {}
+      }))
+    };
+  }, [
+    nodes,
+    edges,
+    groups,
+    nodesRef,
+    edgesRef,
+    projectMeta,
+    documentTheme,
+    documentSettings,
+    documentBackgroundImage,
+    defaultNodeColor,
+    defaultEdgeColor,
+    snapToGrid,
+    pan,
+    zoom,
+    backgroundUrl,
+    readLocalScripts
+  ]);
+
   useEffect(() => {
     if (!projectActivityInitializedRef.current) {
       projectActivityInitializedRef.current = true;
@@ -737,6 +870,157 @@ useEffect(() => {
       }
     }
   }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken]);
+
+  useEffect(() => {
+    const showMessage = (message, severity = 'info') => {
+      if (setSnackbar) {
+        setSnackbar({ open: true, message, severity });
+      }
+    };
+
+    const handleGithubCommit = async ({ token, settings = {}, message } = {}) => {
+      if (!token) {
+        showMessage('GitHub PAT is required.', 'error');
+        return;
+      }
+      const repoInfo = parseRepoString(settings.repo || '');
+      if (!repoInfo) {
+        showMessage('GitHub repo must be in the form owner/name.', 'error');
+        return;
+      }
+      const path = (settings.path || '').trim();
+      if (!path) {
+        showMessage('GitHub file path is required.', 'error');
+        return;
+      }
+      const branch = (settings.branch || 'main').trim();
+      const { owner, repo } = repoInfo;
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github+json'
+      };
+
+      try {
+        showMessage('Committing graph to GitHub...', 'info');
+        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
+        const putUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: false });
+        let sha = null;
+
+        const readResp = await fetch(readUrl, { headers });
+        if (readResp.ok) {
+          const existing = await readResp.json();
+          if (existing && existing.type === 'file' && existing.sha) {
+            sha = existing.sha;
+          } else {
+            showMessage('GitHub path points to a directory, not a file.', 'error');
+            return;
+          }
+        } else if (readResp.status !== 404) {
+          const errorJson = await readResp.json().catch(() => ({}));
+          showMessage(`GitHub read failed: ${errorJson.message || readResp.statusText}`, 'error');
+          return;
+        }
+
+        const payload = {
+          message: (message || '').trim() || `Update ${path}`,
+          content: encodeBase64(JSON.stringify(buildGraphSaveData(), null, 2)),
+          branch
+        };
+        if (sha) {
+          payload.sha = sha;
+        }
+
+        const writeResp = await fetch(putUrl, {
+          method: 'PUT',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!writeResp.ok) {
+          const errorJson = await writeResp.json().catch(() => ({}));
+          showMessage(`GitHub commit failed: ${errorJson.message || writeResp.statusText}`, 'error');
+          return;
+        }
+
+        showMessage('GitHub commit successful.', 'success');
+        eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+      } catch (err) {
+        showMessage(`GitHub commit error: ${err.message || String(err)}`, 'error');
+      }
+    };
+
+    const handleGithubLoad = async ({ token, settings = {} } = {}) => {
+      if (!token) {
+        showMessage('GitHub PAT is required.', 'error');
+        return;
+      }
+      const repoInfo = parseRepoString(settings.repo || '');
+      if (!repoInfo) {
+        showMessage('GitHub repo must be in the form owner/name.', 'error');
+        return;
+      }
+      const path = (settings.path || '').trim();
+      if (!path) {
+        showMessage('GitHub file path is required.', 'error');
+        return;
+      }
+      const branch = (settings.branch || 'main').trim();
+      const { owner, repo } = repoInfo;
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github+json'
+      };
+
+      try {
+        showMessage('Loading graph from GitHub...', 'info');
+        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
+        const readResp = await fetch(readUrl, { headers });
+        if (!readResp.ok) {
+          const errorJson = await readResp.json().catch(() => ({}));
+          showMessage(`GitHub load failed: ${errorJson.message || readResp.statusText}`, 'error');
+          return;
+        }
+
+        const payload = await readResp.json();
+        if (!payload || payload.type !== 'file' || !payload.content) {
+          showMessage('GitHub response did not include file content.', 'error');
+          return;
+        }
+
+        const decoded = decodeBase64(payload.content.replace(/\n/g, ''));
+        const data = JSON.parse(decoded);
+        const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
+        const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
+        const groupsToLoad = Array.isArray(data.groups) ? data.groups : [];
+        handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+
+        try {
+          eventBus.emit('loadSaveFile', {
+            settings: data.settings || {},
+            viewport: data.viewport || {},
+            scripts: data.scripts || null,
+            filename: path.split('/').pop() || path
+          });
+        } catch (err) {
+          console.warn('Failed to emit loadSaveFile after GitHub load:', err);
+        }
+
+        showMessage('GitHub load successful.', 'success');
+        eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+      } catch (err) {
+        showMessage(`GitHub load error: ${err.message || String(err)}`, 'error');
+      }
+    };
+
+    eventBus.on('githubCommit', handleGithubCommit);
+    eventBus.on('githubLoad', handleGithubLoad);
+    return () => {
+      eventBus.off('githubCommit', handleGithubCommit);
+      eventBus.off('githubLoad', handleGithubLoad);
+    };
+  }, [buildGraphSaveData, handleLoadGraph, setSnackbar]);
 
 
   useEffect(() => {

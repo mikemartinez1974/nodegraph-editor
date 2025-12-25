@@ -8,6 +8,18 @@ import { getEdgeHandlePosition } from './utils';
 const handleRadius = 8;
 const handleExtension = 0; // center on edge for half-in/half-out handles
 const nodeHoverMargin = 24; // px, for easier node hover
+const isWildcardHandleType = (value) => {
+  if (!value) return true;
+  const normalized = String(value).toLowerCase();
+  return (
+    normalized === 'value' ||
+    normalized === 'trigger' ||
+    normalized === 'any' ||
+    normalized === 'input' ||
+    normalized === 'output' ||
+    normalized === 'bidirectional'
+  );
+};
 const getNodeHandleExtension = (node) => {
   const value = node?.extensions?.layout?.handleExtension;
   return typeof value === 'number' ? value : handleExtension;
@@ -625,8 +637,8 @@ const HandleLayer = forwardRef(({
       } else if (draggingHandle.nodeId === targetHandle.nodeId) {
         validation = { ok: false, message: 'Cannot connect a node to itself.' };
       } else if (
-        draggingHandle.handleType &&
-        targetHandle.handleType &&
+        !isWildcardHandleType(draggingHandle.handleType) &&
+        !isWildcardHandleType(targetHandle.handleType) &&
         draggingHandle.handleType !== targetHandle.handleType
       ) {
         validation = {

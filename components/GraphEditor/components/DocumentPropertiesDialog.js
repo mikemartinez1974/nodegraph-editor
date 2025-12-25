@@ -103,6 +103,8 @@ export default function DocumentPropertiesDialog({
   const [docSettings, setDocSettings] = useState(documentSettings || {});
   const [tagInput, setTagInput] = useState('');
   const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
+  const [githubPat, setGithubPat] = useState('');
+  const [githubCommitMessage, setGithubCommitMessage] = useState('');
 
   const safeStats = useMemo(() => ({
     nodeCount: graphStats?.nodeCount ?? 0,
@@ -120,6 +122,13 @@ export default function DocumentPropertiesDialog({
     setActiveTab('overview');
     setTagInput('');
     setNewCollaborator({ name: '', email: '', role: 'Editor' });
+    try {
+      if (typeof window !== 'undefined') {
+        setGithubPat(localStorage.getItem('githubPat') || '');
+      }
+    } catch (err) {
+      setGithubPat('');
+    }
   }, [open, projectMeta, defaultShareLink, documentSettings]);
 
   const handleSettingsChange = (key, value) => {
@@ -132,6 +141,16 @@ export default function DocumentPropertiesDialog({
 
   const handleDocSettingsChange = (key, value) => {
     setDocSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleGithubSettingsChange = (updates = {}) => {
+    setDocSettings((prev) => ({
+      ...prev,
+      github: {
+        ...(prev.github || {}),
+        ...updates
+      }
+    }));
   };
 
   const handleAddTag = () => {
@@ -297,6 +316,7 @@ export default function DocumentPropertiesDialog({
           <Tab label="Collaboration" value="collaboration" />
           <Tab label="Activity" value="activity" />
           <Tab label="Appearance" value="appearance" />
+          <Tab label="GitHub" value="github" />
         </Tabs>
 
         {activeTab === 'overview' && (
@@ -643,6 +663,91 @@ export default function DocumentPropertiesDialog({
                 </TextField>
               </Stack>
               <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
+            </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'github' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                GitHub Sync (PAT)
+              </Typography>
+              <Stack spacing={2}>
+                <TextField
+                  label="Personal Access Token (PAT)"
+                  type="password"
+                  value={githubPat}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setGithubPat(next);
+                    try {
+                      if (typeof window !== 'undefined') {
+                        if (next) {
+                          localStorage.setItem('githubPat', next);
+                        } else {
+                          localStorage.removeItem('githubPat');
+                        }
+                      }
+                    } catch (err) {
+                      // ignore storage errors
+                    }
+                  }}
+                  fullWidth
+                  helperText="Stored locally in this browser. Required for commit/load."
+                />
+                <TextField
+                  label="Repository (owner/name)"
+                  value={docSettings.github?.repo || ''}
+                  onChange={(event) => handleGithubSettingsChange({ repo: event.target.value })}
+                  fullWidth
+                />
+                <TextField
+                  label="File path in repo"
+                  value={docSettings.github?.path || ''}
+                  onChange={(event) => handleGithubSettingsChange({ path: event.target.value })}
+                  fullWidth
+                  placeholder="graphs/my-graph.node"
+                />
+                <TextField
+                  label="Branch"
+                  value={docSettings.github?.branch || 'main'}
+                  onChange={(event) => handleGithubSettingsChange({ branch: event.target.value })}
+                  fullWidth
+                />
+                <TextField
+                  label="Commit message"
+                  value={githubCommitMessage}
+                  onChange={(event) => setGithubCommitMessage(event.target.value)}
+                  fullWidth
+                  placeholder="Update graph"
+                />
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      eventBus.emit('githubCommit', {
+                        token: githubPat,
+                        settings: docSettings.github || {},
+                        message: githubCommitMessage
+                      });
+                    }}
+                  >
+                    Commit to GitHub
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      eventBus.emit('githubLoad', {
+                        token: githubPat,
+                        settings: docSettings.github || {}
+                      });
+                    }}
+                  >
+                    Load from GitHub
+                  </Button>
+                </Stack>
+              </Stack>
             </Paper>
           </Stack>
         )}

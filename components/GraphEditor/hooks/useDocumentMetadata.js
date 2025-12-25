@@ -9,7 +9,12 @@ const createInitialDocumentSettings = (theme) => ({
   backgroundImage: '',
   gridSize: DEFAULT_GRID_SIZE,
   theme: themeConfigFromMuiTheme(theme),
-  edgeRouting: 'auto'
+  edgeRouting: 'auto',
+  github: {
+    repo: '',
+    path: '',
+    branch: 'main'
+  }
 });
 
 export default function useDocumentMetadata() {

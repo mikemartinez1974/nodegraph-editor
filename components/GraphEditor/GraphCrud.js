@@ -75,6 +75,18 @@ const mergeExtensions = (existing, updates) => {
 
 const DEFAULT_INPUT_HANDLE = Object.freeze({ key: 'in', label: 'In', type: 'trigger', direction: 'input' });
 const DEFAULT_OUTPUT_HANDLE = Object.freeze({ key: 'out', label: 'Out', type: 'trigger', direction: 'output' });
+const isWildcardHandleType = (value) => {
+  if (!value) return true;
+  const normalized = String(value).toLowerCase();
+  return (
+    normalized === 'value' ||
+    normalized === 'trigger' ||
+    normalized === 'any' ||
+    normalized === 'input' ||
+    normalized === 'output' ||
+    normalized === 'bidirectional'
+  );
+};
 
 const legacyHandleFromNormalized = (handle) => ({
   key: handle.id,
@@ -280,23 +292,32 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
   if (!targetNode || !targetNode.id) {
     return { error: 'Target node not found' };
   }
-  if (!sourceHandleKey) {
-    return { error: `sourceHandle is required for node ${sourceNode.id}` };
-  }
-  if (!targetHandleKey) {
-    return { error: `targetHandle is required for node ${targetNode.id}` };
+  if (!sourceHandleKey && !targetHandleKey) {
+    return { meta: null };
   }
 
   const sourceHandles = getHandleList(sourceNode, 'outputs');
   const targetHandles = getHandleList(targetNode, 'inputs');
 
-  const sourceHandle = sourceHandles.find(h => h.key === sourceHandleKey);
-  if (!sourceHandle) {
+  const sourceHandle = sourceHandleKey
+    ? sourceHandles.find(h => h.key === sourceHandleKey)
+    : null;
+  if (sourceHandleKey && !sourceHandle) {
     return { error: `Output handle "${sourceHandleKey}" not found on node ${sourceNode.id}` };
   }
-  const targetHandle = targetHandles.find(h => h.key === targetHandleKey);
-  if (!targetHandle) {
+  const targetHandle = targetHandleKey
+    ? targetHandles.find(h => h.key === targetHandleKey)
+    : null;
+  if (targetHandleKey && !targetHandle) {
     return { error: `Input handle "${targetHandleKey}" not found on node ${targetNode.id}` };
+  }
+  if (!sourceHandle || !targetHandle) {
+    return {
+      meta: {
+        source: sourceHandle ? toHandleMeta(sourceHandle) : undefined,
+        target: targetHandle ? toHandleMeta(targetHandle) : undefined
+      }
+    };
   }
   if (edgeType) {
     const sourceAllowed = Array.isArray(sourceHandle.allowedEdgeTypes)
@@ -314,8 +335,8 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
   }
 
   if (
-    sourceHandle.type &&
-    targetHandle.type &&
+    !isWildcardHandleType(sourceHandle.type) &&
+    !isWildcardHandleType(targetHandle.type) &&
     sourceHandle.type !== targetHandle.type
   ) {
     return { error: `Handle types do not match: ${sourceHandle.type} → ${targetHandle.type}` };

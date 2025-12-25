@@ -1,0 +1,143 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Next Session - Twilight Context",
+    "description": "Quick context map for the next session",
+    "created": "2025-01-01T00:00:00.000Z",
+    "modified": "2025-01-01T00:00:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "next-kickoff",
+      "type": "markdown",
+      "label": "Session Kickoff",
+      "position": { "x": 80, "y": 80 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Next Session Kickoff\n\n- Review recent changes and schema rules\n- Open key files below\n- Validate edge routing and doc loading\n\nGoal: get productive fast without re-learning the rules."
+      }
+    },
+    {
+      "id": "next-recent",
+      "type": "markdown",
+      "label": "Recent Work",
+      "position": { "x": 80, "y": 360 },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Recent Work Summary\n\n- Edge routing: orthogonal default option in Document Properties\n- Edge approach: per-handle side (perpendicular entry)\n- Simple avoidance and bundling to reduce overlap\n- Minimap: gradients render (or first stop used)\n- URL loader: ?doc= supports tlz, absolute URLs, or public-root paths\n- CRUD createNodes updates node table before createEdges"
+      }
+    },
+    {
+      "id": "next-files",
+      "type": "markdown",
+      "label": "Key Files",
+      "position": { "x": 80, "y": 670 },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Key Files\n\n- `public/data/OnboardLLM.md`\n- `public/data/UserManual.md`\n- `public/data/NodeGraphSaveFormat.json`\n- `public/tlz/IntroGraph.node`\n- `components/NodeGraph/EdgeLayer.js`\n- `components/GraphEditor/GraphCrud.js`\n- `app/page.js`"
+      }
+    },
+    {
+      "id": "next-schema",
+      "type": "markdown",
+      "label": "Schema Rules",
+      "position": { "x": 80, "y": 980 },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Schema Rules (Do Not Forget)\n\n- Documentation nodes do not expose handles by default\n- `handles` must be an array of objects\n- Handle direction: `input`, `output`, or `bidirectional`\n- Handle position: `{ side: left|right|top|bottom, offset: 0-1 }`\n- Markdown content goes in `data.markdown` or `data.memo`\n- `sourceHandle`/`targetHandle` must match handle `id`\n- If edges reference new nodes, use `createNodes` then `createEdges`"
+      }
+    },
+    {
+      "id": "next-nextsteps",
+      "type": "markdown",
+      "label": "Open Questions / Next Steps",
+      "position": { "x": 80, "y": 1320 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Open Questions / Next Steps\n\n- Improve edge bundling for dense graphs\n- Add stronger obstacle avoidance (route around nodes)\n- Decide if create should guarantee node visibility for edges\n- Expand onboarding examples with strict handle schema"
+      }
+    },
+    {
+      "id": "next-verify",
+      "type": "markdown",
+      "label": "Quick Verification",
+      "position": { "x": 80, "y": 1600 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Quick Verification\n\n- Load a graph via `?doc=tlz/IntroGraph.node`\n- Toggle edge routing in Document Properties\n- Confirm edges enter handles per side\n- Check minimap node gradients"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "next-edge-1",
+      "source": "next-kickoff",
+      "target": "next-recent",
+      "label": "review",
+      "style": {}
+    },
+    {
+      "id": "next-edge-2",
+      "source": "next-recent",
+      "target": "next-files",
+      "label": "inspect",
+      "style": {}
+    },
+    {
+      "id": "next-edge-3",
+      "source": "next-files",
+      "target": "next-schema",
+      "label": "align",
+      "style": {}
+    },
+    {
+      "id": "next-edge-4",
+      "source": "next-schema",
+      "target": "next-nextsteps",
+      "label": "plan",
+      "style": {}
+    },
+    {
+      "id": "next-edge-5",
+      "source": "next-nextsteps",
+      "target": "next-verify",
+      "label": "check",
+      "style": {}
+    }
+  ],
+  "groups": []
+}

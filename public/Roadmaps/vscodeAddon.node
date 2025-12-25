@@ -1,0 +1,164 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "VS Code Add-on Roadmap",
+    "description": "Paid VS Code add-in path for graph visibility and revenue",
+    "created": "2025-12-25T01:05:00.000Z",
+    "modified": "2025-12-25T01:05:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "vscode-core",
+      "type": "markdown",
+      "label": "Core Idea",
+      "position": { "x": 80, "y": 60 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## VS Code Add-in (Paid)\n**Goal:** Monetize graph visibility inside the developer's primary workspace.\n\nWhy it matters: graphs become reviewable, searchable, and shareable where code already lives."
+      }
+    },
+    {
+      "id": "vscode-decision",
+      "type": "markdown",
+      "label": "Decision",
+      "position": { "x": 80, "y": 300 },
+      "width": 520,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision\nBuild a **paid** VS Code viewer first; expand to editing later."
+      }
+    },
+    {
+      "id": "vscode-mvp",
+      "type": "markdown",
+      "label": "MVP Scope",
+      "position": { "x": 80, "y": 500 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## MVP Scope (Read-only)\n- Open `.node` files in a webview\n- Pan/zoom + fit-to-graph\n- Search nodes by label/text\n- Snapshot export (png)\n- PR review support (preview links)"
+      }
+    },
+    {
+      "id": "vscode-next",
+      "type": "markdown",
+      "label": "Expansion",
+      "position": { "x": 80, "y": 780 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Expansion\n- Inline diff view (graph changes in PRs)\n- Comment pins anchored to nodes\n- Limited edits (node labels + markdown)\n- Full editor parity later"
+      }
+    },
+    {
+      "id": "vscode-risk",
+      "type": "markdown",
+      "label": "Risks",
+      "position": { "x": 640, "y": 300 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Risks / Costs\n- Webview performance on large graphs\n- Keeping rendering in sync with web editor\n- Auth + licensing UX in VS Code\n- Support burden across platforms"
+      }
+    },
+    {
+      "id": "vscode-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 640, "y": 560 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n- Price point + licensing model?\n- Free tier limits (file size, private repos)?\n- Should GitHub integration be required?"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "vscode-edge-1",
+      "type": "child",
+      "source": "vscode-core",
+      "target": "vscode-decision",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "choose",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "vscode-edge-2",
+      "type": "child",
+      "source": "vscode-decision",
+      "target": "vscode-mvp",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "define",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "vscode-edge-3",
+      "type": "child",
+      "source": "vscode-mvp",
+      "target": "vscode-next",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "expand",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "vscode-edge-4",
+      "type": "child",
+      "source": "vscode-decision",
+      "target": "vscode-risk",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "check",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "vscode-edge-5",
+      "type": "child",
+      "source": "vscode-risk",
+      "target": "vscode-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "clarify",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

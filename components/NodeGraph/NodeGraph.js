@@ -17,6 +17,18 @@ import useTouchGestures from './hooks/useTouchGestures';
 const NON_PASSIVE_LISTENER = { passive: false };
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 3;
+const isWildcardHandleType = (value) => {
+  if (!value) return true;
+  const normalized = String(value).toLowerCase();
+  return (
+    normalized === 'value' ||
+    normalized === 'trigger' ||
+    normalized === 'any' ||
+    normalized === 'input' ||
+    normalized === 'output' ||
+    normalized === 'bidirectional'
+  );
+};
 
 export default function NodeGraph({ 
   nodes = [], 
@@ -308,7 +320,11 @@ export default function NodeGraph({
       const targetOk = targetHandle && (targetHandle.type === 'input' || targetHandle.type === 'bidirectional');
       if (sourceOk && targetOk) {
         // Validate type match
-        if (handle.handleType && targetHandle.handleType && handle.handleType !== targetHandle.handleType) {
+        if (
+          !isWildcardHandleType(handle.handleType) &&
+          !isWildcardHandleType(targetHandle.handleType) &&
+          handle.handleType !== targetHandle.handleType
+        ) {
           if (setSnackbar) {
             setSnackbar({ open: true, message: `Handle types do not match: ${handle.handleType} → ${targetHandle.handleType}`, severity: 'warning' });
           }

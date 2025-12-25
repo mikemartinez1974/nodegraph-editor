@@ -422,6 +422,7 @@ const Toolbar = ({
         snapToGrid: snapToGrid,
         gridSize: gridSize,
         edgeRouting: edgeRouting,
+        github: documentSettings?.github || null,
         autoSave: false
       },
       viewport: {
@@ -547,7 +548,7 @@ const Toolbar = ({
 
   const handleCopyOnboard = async () => {
     try {
-      const resp = await fetch('/data/OnboardLLM.md');
+      const resp = await fetch('/documentation/OnboardLLM.md');
       let text;
       if (resp.ok) text = await resp.text(); else text = 'OnboardLLM.md not available.';
       await navigator.clipboard.writeText(text);
@@ -629,7 +630,7 @@ const Toolbar = ({
 
   const handleCopyUserManual = async () => {
     try {
-      const res = await fetch('/data/UserManual.md');
+      const res = await fetch('/documentation/UserManual.md');
       if (!res.ok) throw new Error('Manual not found');
       const text = await res.text();
       await navigator.clipboard.writeText(text);

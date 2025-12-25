@@ -1,6 +1,6 @@
 import eventBus from '../../NodeGraph/eventBus';
 
-const HANDLE_IMPORT_HINT = 'Edges must include sourceHandle/targetHandle keys that match each node\'s handle schema.';
+const HANDLE_IMPORT_HINT = 'Handles are optional; when provided they must match each node\'s handle schema.';
 const maybeAugmentHandleError = (message) => {
   if (message && typeof message === 'string' && /handle/i.test(message)) {
     return `${message} (${HANDLE_IMPORT_HINT})`;

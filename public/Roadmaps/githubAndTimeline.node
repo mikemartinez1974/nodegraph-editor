@@ -1,0 +1,613 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-25T00:45:50.742Z",
+    "modified": "2025-12-25T00:45:50.742Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 417.63463278614967,
+      "y": -511.5391040310976
+    },
+    "zoom": 0.8744416163266786
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "a0000001-0000-4000-8000-000000000001",
+      "type": "markdown",
+      "label": "Design Axes",
+      "position": {
+        "x": 88.55295131367095,
+        "y": -20.18391856566518
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Axes\nTwo parallel concerns:\n- **GitHub integration** (storage, versioning, collaboration)\n- **Timeline** (history, debugging, storytelling)\n\nBoth treat graphs as **first-class artifacts**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000001-0000-4000-8000-000000000002",
+      "type": "markdown",
+      "label": "GitHub Integration — Core Idea",
+      "position": {
+        "x": -107.09580998655213,
+        "y": 273.8985458847153
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## GitHub Integration\n**Core idea:** Treat graphs as *versioned artifacts* with explicit save / publish / export.\n\nDocs are **files in a repo** (repo = project container for graphs + plugins/assets).\n\nThe model already exists; work is mostly:\n- auth\n- storage\n- diff UX",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000002-0000-4000-8000-000000000009",
+      "type": "markdown",
+      "label": "Decision — Repo Scope",
+      "position": {
+        "x": -90,
+        "y": 430
+      },
+      "width": 420,
+      "height": 170,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Repo as Project Container\nDocs are **files inside a repo**.\n\nPlugins/assets live alongside the graphs in the same repo.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000002-0000-4000-8000-000000000003",
+      "type": "markdown",
+      "label": "GitHub Integration — MVP",
+      "position": {
+        "x": -34.39572382034901,
+        "y": 575.5941835388611
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Minimal Viable Path\n- OAuth\n- Select repo\n- Choose path\n- Save/load `.node` files + metadata\n- GitHub acts as **sync target** (not canonical yet)",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000003-0000-4000-8000-000000000010",
+      "type": "markdown",
+      "label": "Decision — Sync + Commits",
+      "position": {
+        "x": -70,
+        "y": 760
+      },
+      "width": 420,
+      "height": 170,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Sync Target + Explicit Commits\nGitHub remains a **sync target** (not canonical) and changes are saved via **explicit commits**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000003-0000-4000-8000-000000000004",
+      "type": "markdown",
+      "label": "GitHub Integration — Advanced",
+      "position": {
+        "x": -100.68109650129887,
+        "y": 904.4603942225007
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Advanced GitHub Flow\n- Commit history browser\n- Restore / open historical version\n- Diff summary (nodes / edges changed)\n- PR-based graph changes\n- Auto-generated markdown summaries\n- Webhook validation (schema, handle rules)\n- Optional: **canonical GitHub storage** per project",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000001-0000-4000-8000-000000000005",
+      "type": "markdown",
+      "label": "Timeline — Core Concept",
+      "position": {
+        "x": 600,
+        "y": 260
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Timeline\nTwo interpretations:\n- **Document timeline** (graph revisions)\n- **Interaction timeline** (user sessions)\n\nBoth expose *change over time*.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000002-0000-4000-8000-000000000006",
+      "type": "markdown",
+      "label": "Timeline — MVP",
+      "position": {
+        "x": 600,
+        "y": 520
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Minimal Timeline\n- Snapshot bar\n- Auto snapshots (every N minutes or on save)\n- Scrub + restore\n- Change summary per snapshot",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000004-0000-4000-8000-000000000011",
+      "type": "markdown",
+      "label": "Decision — Timeline Scope",
+      "position": {
+        "x": 600,
+        "y": 700
+      },
+      "width": 420,
+      "height": 190,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Storytelling First\nStart with a **storytelling timeline** view.\n\nDocument timeline, graph mutations only in MVP.\nInteraction/viewport events are out of scope.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000003-0000-4000-8000-000000000007",
+      "type": "markdown",
+      "label": "Timeline — Advanced",
+      "position": {
+        "x": 600,
+        "y": 820
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Advanced Timeline\n- Timeline modes (Story vs Debug)\n- Events list (add / move / edge edit)\n- Milestones (manual labeled snapshots)\n- Branch / merge timelines\n- Visual diff overlays between points",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000001-0000-4000-8000-000000000008",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 252.01898966490415,
+        "y": 1244.0177940482288
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\nRepo scope + sync/commit decisions are locked.\nTimeline scope is locked.\n\n**Timeline**\n- Debugging/history vs storytelling?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0000001-0000-4000-8000-000000000101",
+      "type": "child",
+      "source": "a0000001-0000-4000-8000-000000000001",
+      "target": "b0000001-0000-4000-8000-000000000002",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "axis",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000002-0000-4000-8000-000000000102",
+      "type": "child",
+      "source": "a0000001-0000-4000-8000-000000000001",
+      "target": "c0000001-0000-4000-8000-000000000005",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "axis",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000007-0000-4000-8000-000000000107",
+      "type": "child",
+      "source": "b0000001-0000-4000-8000-000000000002",
+      "target": "d0000002-0000-4000-8000-000000000009",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "decision",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000008-0000-4000-8000-000000000108",
+      "type": "child",
+      "source": "d0000002-0000-4000-8000-000000000009",
+      "target": "b0000002-0000-4000-8000-000000000003",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "mvp",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000004-0000-4000-8000-000000000104",
+      "type": "child",
+      "source": "d0000003-0000-4000-8000-000000000010",
+      "target": "b0000003-0000-4000-8000-000000000004",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "evolves to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000005-0000-4000-8000-000000000105",
+      "type": "child",
+      "source": "c0000001-0000-4000-8000-000000000005",
+      "target": "c0000002-0000-4000-8000-000000000006",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "mvp",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000009-0000-4000-8000-000000000109",
+      "type": "child",
+      "source": "b0000002-0000-4000-8000-000000000003",
+      "target": "d0000003-0000-4000-8000-000000000010",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "decision",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000006-0000-4000-8000-000000000106",
+      "type": "child",
+      "source": "c0000002-0000-4000-8000-000000000006",
+      "target": "d0000004-0000-4000-8000-000000000011",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "evolves to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e0000010-0000-4000-8000-000000000110",
+      "type": "child",
+      "source": "d0000004-0000-4000-8000-000000000011",
+      "target": "c0000003-0000-4000-8000-000000000007",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "handleMeta": {
+        "source": {
+          "key": "out",
+          "label": "out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "in",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "evolves to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

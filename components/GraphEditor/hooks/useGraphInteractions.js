@@ -91,6 +91,15 @@ export default function useGraphInteractions({
         if (settings.edgeRouting) {
           setDocumentSettings((prev) => ({ ...prev, edgeRouting: settings.edgeRouting }));
         }
+        if (settings.github) {
+          setDocumentSettings((prev) => ({
+            ...prev,
+            github: {
+              ...(prev.github || {}),
+              ...(typeof settings.github === 'object' ? settings.github : {})
+            }
+          }));
+        }
         try {
           const scriptsToLoad = Array.isArray(topLevelScripts)
             ? topLevelScripts

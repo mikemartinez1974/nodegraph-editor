@@ -25,6 +25,12 @@ Twilight is no longer just a diagramming surface—it is a persistent, executabl
 
 ---
 
+## Node Types Reference
+
+See `public/documentation/LLMNodeTypes.md` for the full list of core and plugin node types, plus handle keys for breadboard nodes.
+
+---
+
 ## First Five Minutes: Ignition
 
 When you drop into an empty cluster, the only wrong move is doing nothing. Start anywhere:
@@ -41,10 +47,11 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 
 - Always include an `action`.
 - Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
-- **Declare handles explicitly.** Every edge must specify both `sourceHandle` and `targetHandle`. Many nodes expose multiple sockets (`anode`/`cathode`, `inputA`/`inputB`, etc.). Match the published handle keys exactly.
+- **Handles are optional.** If you omit `sourceHandle`/`targetHandle`, the edge attaches to the node boundary. When you do include them, match the published handle keys exactly.
 - **No implicit handles.** Twilight does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
-- **Handles must be declared before use.** If you want `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).
+- **Handles must be declared before use.** If you specify `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).
 - **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilight falls back to node-boundary rendering.
+- **Handle type matching is opt-in.** Types like `value`, `trigger`, `any`, or direction tokens (`input`, `output`, `bidirectional`) are treated as wildcards. Only enforce matching when both handles declare strict semantic types (e.g., `boolean`, `number`, `string`).
 - Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
 - **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
 - **Edge routing is configurable.** Use `edge.style.route: "orthogonal"` (or `edge.style.orthogonal: true`) to force right-angled paths; set `edge.style.curved: true` for bezier curves. The user can also override routing in Document Properties.
