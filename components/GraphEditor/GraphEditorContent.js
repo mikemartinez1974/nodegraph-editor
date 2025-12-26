@@ -63,6 +63,7 @@ const GraphEditorContent = () => {
     nodePanelAnchor,
     defaultNodeColor,
     defaultEdgeColor,
+    edgeRoutes,
     groupManager
   } = state || {};
 
@@ -496,6 +497,7 @@ const GraphEditorContent = () => {
             hoveredNodeId={hoveredNodeId}
             nodeTypes={nodeTypes}
             edgeTypes={EdgeTypes}
+            edgeRoutes={edgeRoutes}
             mode={modesHook.mode}
             backgroundUrl={backgroundUrl}
             backgroundInteractive={backgroundInteractive}
@@ -537,6 +539,7 @@ const GraphEditorContent = () => {
           hoveredNodeId={hoveredNodeId}
           nodeTypes={nodeTypes}
           edgeTypes={EdgeTypes}
+          edgeRoutes={edgeRoutes}
           mode={modesHook.mode}
           backgroundUrl={backgroundUrl}
           backgroundInteractive={backgroundInteractive}

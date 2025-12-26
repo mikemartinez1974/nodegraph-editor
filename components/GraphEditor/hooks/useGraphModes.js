@@ -1,12 +1,74 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { gsap } from 'gsap';
 
-export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges }) {
+let elkInstance = null;
+const getElk = async () => {
+  if (elkInstance) return elkInstance;
+  const { default: ELK } = await import('elkjs/lib/elk.bundled.js');
+  elkInstance = new ELK();
+  return elkInstance;
+};
+
+const getNodeSize = (node) => ({
+  width: Number(node?.width) || 200,
+  height: Number(node?.height) || 120
+});
+
+const getBoundsFromPositions = (positions = [], sizeMap = {}) => {
+  if (!positions.length) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  positions.forEach((pos) => {
+    const size = sizeMap[pos.id] || { width: 0, height: 0 };
+    const left = pos.x;
+    const top = pos.y;
+    const right = left + size.width;
+    const bottom = top + size.height;
+    minX = Math.min(minX, left);
+    minY = Math.min(minY, top);
+    maxX = Math.max(maxX, right);
+    maxY = Math.max(maxY, bottom);
+  });
+  return { minX, minY, maxX, maxY };
+};
+
+export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges, setEdgeRoutes }) {
   const [mode, setMode] = useState('manual'); // 'manual' | 'nav' | 'auto'
   const [autoLayoutType, setAutoLayoutType] = useState('hierarchical'); // 'hierarchical' | 'radial' | 'grid'
   const animationRef = useRef(null);
   const physicsRef = useRef(null);
   const velocitiesRef = useRef(new Map()); // Store velocity for each node
+
+  const buildElkEdgeRoutes = useCallback((layoutEdges = [], offset = { x: 0, y: 0 }) => {
+    const offsetX = Number(offset.x) || 0;
+    const offsetY = Number(offset.y) || 0;
+    const routeMap = {};
+    layoutEdges.forEach((edge) => {
+      if (!edge || !edge.id) return;
+      const sections = Array.isArray(edge.sections) ? edge.sections : [];
+      const points = [];
+      const pushPoint = (pt) => {
+        if (!pt || !Number.isFinite(pt.x) || !Number.isFinite(pt.y)) return;
+        const last = points[points.length - 1];
+        const nextPoint = { x: pt.x + offsetX, y: pt.y + offsetY };
+        if (last && last.x === nextPoint.x && last.y === nextPoint.y) return;
+        points.push(nextPoint);
+      };
+      sections.forEach((section) => {
+        if (!section) return;
+        pushPoint(section.startPoint);
+        const bends = Array.isArray(section.bendPoints) ? section.bendPoints : [];
+        bends.forEach(pushPoint);
+        pushPoint(section.endPoint);
+      });
+      if (points.length >= 2) {
+        routeMap[edge.id] = { points };
+      }
+    });
+    return routeMap;
+  }, []);
 
   // Get the center node for nav mode
   const getCenterNode = useCallback(() => {
@@ -123,34 +185,12 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges 
     setNodes(newNodes);
   }, [mode, nodes, edges, getCenterNode, setNodes]);
 
-  // Auto layout algorithms
-  const applyAutoLayout = useCallback((layoutType) => {
-    if (nodes.length === 0) return;
-
-    let newPositions = [];
-
-    switch (layoutType) {
-      case 'hierarchical':
-        newPositions = calculateHierarchicalLayout(nodes, edges);
-        break;
-      case 'radial':
-        newPositions = calculateRadialLayout(nodes);
-        break;
-      case 'grid':
-        newPositions = calculateGridLayout(nodes);
-        break;
-      default:
-        return;
-    }
-
-    // Animate to new positions
-    animateToPositions(newPositions);
-  }, [nodes, edges]);
-
   // Layout algorithms
   const calculateHierarchicalLayout = (nodes, edges) => {
     // Simple top-down hierarchy
-    const spacing = { x: 150, y: 120 };
+    const maxWidth = Math.max(...nodes.map((node) => getNodeSize(node).width), 200);
+    const maxHeight = Math.max(...nodes.map((node) => getNodeSize(node).height), 120);
+    const spacing = { x: maxWidth + 80, y: maxHeight + 80 };
     const levels = {};
     
     // Find root nodes (no incoming edges)
@@ -269,6 +309,108 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges 
     
     animationRef.current = timeline;
   }, [nodes, setNodes]);
+
+  // Auto layout algorithms
+  const applyAutoLayout = useCallback((layoutType) => {
+    if (nodes.length === 0) return;
+
+    if (layoutType === 'hierarchical') {
+      (async () => {
+        try {
+          const elk = await getElk();
+          const elkGraph = {
+            id: 'root',
+            layoutOptions: {
+              'elk.algorithm': 'layered',
+              'elk.direction': 'DOWN',
+              'elk.spacing.nodeNode': '120',
+              'elk.layered.spacing.nodeNodeBetweenLayers': '160',
+              'elk.layered.spacing.edgeNodeBetweenLayers': '80',
+              'elk.edgeRouting': 'ORTHOGONAL'
+            },
+            children: nodes.map((node) => ({
+              id: node.id,
+              width: getNodeSize(node).width,
+              height: getNodeSize(node).height
+            })),
+            edges: edges.map((edge, index) => ({
+              id: edge.id || `edge_${index}`,
+              sources: [edge.source],
+              targets: [edge.target]
+            }))
+          };
+
+          const layout = await elk.layout(elkGraph);
+          const newPositions = (layout.children || []).map((child) => ({
+            id: child.id,
+            x: child.x || 0,
+            y: child.y || 0
+          }));
+
+          if (newPositions.length > 0) {
+            const sizeMap = Object.fromEntries(
+              nodes.map((node) => [node.id, getNodeSize(node)])
+            );
+            const currentPositions = nodes.map((node) => ({
+              id: node.id,
+              x: node.position?.x || 0,
+              y: node.position?.y || 0
+            }));
+            const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+            const nextBounds = getBoundsFromPositions(newPositions, sizeMap);
+            let offset = { x: 0, y: 0 };
+            if (currentBounds && nextBounds) {
+              const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+              const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+              const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+              const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+              offset = {
+                x: currentCenterX - nextCenterX,
+                y: currentCenterY - nextCenterY
+              };
+              newPositions.forEach((pos) => {
+                pos.x += offset.x;
+                pos.y += offset.y;
+              });
+            }
+
+            animateToPositions(newPositions);
+            if (typeof setEdgeRoutes === 'function') {
+              const routeMap = buildElkEdgeRoutes(layout.edges || [], offset);
+              setEdgeRoutes(routeMap);
+            }
+          }
+        } catch (err) {
+          console.warn('[AutoLayout] ELK layout failed, falling back:', err);
+          const fallback = calculateHierarchicalLayout(nodes, edges);
+          animateToPositions(fallback);
+          if (typeof setEdgeRoutes === 'function') {
+            setEdgeRoutes({});
+          }
+        }
+      })();
+      return;
+    }
+
+    let newPositions = [];
+
+    switch (layoutType) {
+      case 'radial':
+        newPositions = calculateRadialLayout(nodes);
+        break;
+      case 'grid':
+        newPositions = calculateGridLayout(nodes);
+        break;
+      default:
+        return;
+    }
+
+    // Animate to new positions
+    animateToPositions(newPositions);
+    if (typeof setEdgeRoutes === 'function') {
+      setEdgeRoutes({});
+    }
+  }, [nodes, edges, animateToPositions, setEdgeRoutes, buildElkEdgeRoutes]);
 
   // Handle mode changes
   const handleModeChange = useCallback((newMode) => {

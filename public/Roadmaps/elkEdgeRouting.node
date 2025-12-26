@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "ELK Edge Routing Roadmap",
+    "description": "Use ELK routing output for professional edge rendering",
+    "created": "2025-12-26T05:35:00.000Z",
+    "modified": "2025-12-26T05:35:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "elk-edges-goal",
+      "type": "markdown",
+      "label": "Goal",
+      "position": { "x": 80, "y": 60 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goal\nUse **ELK edge routing** so edges look intentional, readable, and professional.\n\nNo more edge spaghetti in dense graphs."
+      }
+    },
+    {
+      "id": "elk-edges-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": { "x": 80, "y": 300 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n- Request routing from ELK\n- Render ELK segments in EdgeLayer\n- Keep handles optional\n- Support orthogonal as default" 
+      }
+    },
+    {
+      "id": "elk-edges-data",
+      "type": "markdown",
+      "label": "Data Contract",
+      "position": { "x": 640, "y": 300 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Contract\n- Store ELK edge routes per edge id\n- Persist in memory (not required in .node)\n- Map ELK bend points → segments" 
+      }
+    },
+    {
+      "id": "elk-edges-impl",
+      "type": "markdown",
+      "label": "Implementation",
+      "position": { "x": 80, "y": 560 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implementation\n- Extend ELK layout call to return edge sections\n- Cache routes by edge id\n- Update EdgeLayer to use routed segments\n- Fallback to current routing" 
+      }
+    },
+    {
+      "id": "elk-edges-style",
+      "type": "markdown",
+      "label": "Style Rules",
+      "position": { "x": 640, "y": 580 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Style Rules\n- Route by layout direction\n- Minimize crossings\n- Preserve edge labels\n- Keep arrowheads aligned" 
+      }
+    },
+    {
+      "id": "elk-edges-test",
+      "type": "markdown",
+      "label": "Testing",
+      "position": { "x": 80, "y": 820 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Testing\n- Chain graphs (serpentine + routed edges)\n- Dense DAGs (crossing reduction)\n- Handle vs no-handle edges\n- Performance on 100+ edges" 
+      }
+    },
+    {
+      "id": "elk-edges-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 640, "y": 820 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decisions (Draft)\n- Routes are computed (not persisted)\n- No manual edge nudging for now\n- Per-group routing when groups are isolated; otherwise global" 
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "elk-edges-edge-1",
+      "type": "child",
+      "source": "elk-edges-goal",
+      "target": "elk-edges-scope",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "define",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edges-edge-2",
+      "type": "child",
+      "source": "elk-edges-scope",
+      "target": "elk-edges-impl",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "build",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edges-edge-3",
+      "type": "child",
+      "source": "elk-edges-scope",
+      "target": "elk-edges-data",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "contract",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edges-edge-4",
+      "type": "child",
+      "source": "elk-edges-impl",
+      "target": "elk-edges-style",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "style",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edges-edge-5",
+      "type": "child",
+      "source": "elk-edges-impl",
+      "target": "elk-edges-test",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "verify",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edges-edge-6",
+      "type": "child",
+      "source": "elk-edges-test",
+      "target": "elk-edges-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "decide",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

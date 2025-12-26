@@ -19,6 +19,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "elkjs": "^0.11.0",
     "emoji-picker-react": "^4.13.3",
     "gsap": "^3.13.0",
     "isomorphic-dompurify": "^2.31.0",

@@ -114,7 +114,8 @@ const EdgeLayer = forwardRef(({
   draggingInfoRef,
   getHandlePositionForEdge: getHandlePositionForEdgeProp,
   showAllEdgeLabels = false, // <-- Add prop
-  defaultEdgeRouting = 'auto'
+  defaultEdgeRouting = 'auto',
+  edgeRoutes = {}
 }, ref) => {
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const BUNDLE_BUCKET = 160;
@@ -221,15 +222,30 @@ const EdgeLayer = forwardRef(({
   // Keep fresh references to avoid stale closures in animation loop
   const edgeListRef = useRef(edgeList);
   const nodeListRef = useRef(nodeList);
+  const edgeRoutesRef = useRef(edgeRoutes);
   
   useEffect(() => {
     edgeListRef.current = edgeList;
     nodeListRef.current = nodeList;
-  }, [edgeList, nodeList]);
+    edgeRoutesRef.current = edgeRoutes;
+  }, [edgeList, nodeList, edgeRoutes]);
 
   useImperativeHandle(ref, () => ({
     redraw: () => drawEdges()
   }));
+
+  const buildSegmentsFromPoints = (points = []) => {
+    if (!Array.isArray(points) || points.length < 2) return null;
+    const segments = [];
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const start = points[i];
+      const end = points[i + 1];
+      if (!start || !end) continue;
+      if (start.x === end.x && start.y === end.y) continue;
+      segments.push([{ x: start.x, y: start.y }, { x: end.x, y: end.y }]);
+    }
+    return segments.length > 0 ? segments : null;
+  };
 
   function drawEdges() {
     const canvas = canvasRef.current;
@@ -538,9 +554,24 @@ const EdgeLayer = forwardRef(({
         ctx.setLineDash(style.dash);
       }
       
+      const routeOverride = edgeRoutesRef.current?.[edge.id];
+      const routedPoints = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
+      const allowRoutedSegments = !(draggingInfoRef?.current?.nodeIds?.length);
+      const routedSegments = allowRoutedSegments ? buildSegmentsFromPoints(routedPoints) : null;
+      const useRoutedSegments = Boolean(routedSegments && routedSegments.length);
+
+      if (useRoutedSegments) {
+        sourcePos = { x: routedPoints[0].x, y: routedPoints[0].y };
+        targetPos = { x: routedPoints[routedPoints.length - 1].x, y: routedPoints[routedPoints.length - 1].y };
+        sourceFromHandle = true;
+        targetFromHandle = true;
+      }
+
       const routeStyle = style.route;
       const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
-      const isOrthogonal = forceRouting
+      const isOrthogonal = useRoutedSegments
+        ? true
+        : forceRouting
         ? defaultEdgeRouting === 'orthogonal'
         : routeStyle === 'orthogonal' || style.orthogonal === true;
       const isCurved = forceRouting
@@ -715,7 +746,9 @@ const EdgeLayer = forwardRef(({
         return segments[segments.length - 1][1];
       };
 
-      const orthogonalSegments = isOrthogonal ? buildOrthogonalSegments() : null;
+      const orthogonalSegments = isOrthogonal
+        ? (useRoutedSegments ? routedSegments : buildOrthogonalSegments())
+        : null;
 
       // Draw edge path
       if (isOrthogonal) {

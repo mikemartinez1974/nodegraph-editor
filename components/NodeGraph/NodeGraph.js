@@ -71,6 +71,7 @@ export default function NodeGraph({
   lockedNodes = new Set(),
   lockedEdges = new Set(),
   showAllEdgeLabels = false,
+  edgeRoutes = {},
 }) {
   const theme = useTheme();
   const clampZoom = useCallback((value) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value)), []);
@@ -1185,6 +1186,7 @@ export default function NodeGraph({
           canvasRef={edgeCanvasRef}
           edgeList={edges}
           nodeList={nodes}
+          edgeRoutes={edgeRoutes}
           pan={pan}
           zoom={zoom}
           selectedEdgeId={selectedEdgeId}

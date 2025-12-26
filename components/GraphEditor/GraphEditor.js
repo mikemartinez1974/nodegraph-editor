@@ -227,6 +227,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const backgroundRpcReadyRef = useRef(false);
 
   const state = useGraphEditorState();
+  const [edgeRoutes, setEdgeRoutes] = useState({});
 
 // Destructure editor state immediately so variables like `pan` are available for subsequent effects
   const {
@@ -718,8 +719,24 @@ useEffect(() => {
     nodes,
     setNodes,
     selectedNodeIds,
-    edges
+    edges,
+    setEdgeRoutes
   });
+
+  useEffect(() => {
+    const handleNodeDragEnd = () => {
+      if (!edgeRoutes || Object.keys(edgeRoutes).length === 0) return;
+      if (modesHook.mode === 'auto') {
+        modesHook.applyAutoLayout();
+        return;
+      }
+      setEdgeRoutes({});
+      setSnackbar({ open: true, message: 'Layout changed. Click Apply to reroute edges.', severity: 'info' });
+    };
+
+    eventBus.on('nodeDragEnd', handleNodeDragEnd);
+    return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
+  }, [edgeRoutes, modesHook, setEdgeRoutes, setSnackbar]);
   
   const groupManagerHook = useGroupManager({
     groups, setGroups,
@@ -2616,9 +2633,14 @@ useEffect(() => {
     pluginRuntimeInfo
   ]);
 
+  const stateWithEdgeRoutes = useMemo(() => {
+    if (!state) return state;
+    return { ...state, edgeRoutes, setEdgeRoutes };
+  }, [state, edgeRoutes]);
+
   return (
     <GraphEditorContextProvider
-      state={state}
+      state={stateWithEdgeRoutes}
       history={historyHook}
       rpc={rpcContextValue}
       layout={layoutContextValue}

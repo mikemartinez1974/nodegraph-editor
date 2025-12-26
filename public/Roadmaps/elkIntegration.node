@@ -129,10 +129,23 @@
       }
     },
     {
+      "id": "elk-plan-edge-routing",
+      "type": "markdown",
+      "label": "Plan: ELK Edge Routing",
+      "position": { "x": 640, "y": 1080 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Plan: ELK Edge Routing\nSee `public/Roadmaps/elkEdgeRouting.node` for the detailed roadmap."
+      }
+    },
+    {
       "id": "elk-plan-streamline",
       "type": "markdown",
       "label": "Plan: Streamline Graph Data",
-      "position": { "x": 640, "y": 1080 },
+      "position": { "x": 640, "y": 1340 },
       "width": 520,
       "height": 240,
       "visible": true,
@@ -224,6 +237,17 @@
       "id": "elk-edge-8",
       "type": "child",
       "source": "elk-plan-layout",
+      "target": "elk-plan-edge-routing",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "parallel",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "elk-edge-9",
+      "type": "child",
+      "source": "elk-plan-edge-routing",
       "target": "elk-plan-streamline",
       "sourceHandle": "out",
       "targetHandle": "in",

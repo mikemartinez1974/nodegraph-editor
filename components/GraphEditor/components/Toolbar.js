@@ -913,28 +913,26 @@ const Toolbar = ({
           </ToggleButton>
         </ToggleButtonGroup>
 
-        {mode === 'auto' && (
-          <ButtonGroup size="small" sx={{ ml: 1 }}>
-            <Button
-              onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
-              endIcon={<ExpandMoreIcon fontSize="small" />}
-              size="small"
-              variant="outlined"
-              disabled={isFreeUser}
-            >
-              {autoLayoutType}
-            </Button>
-            <Button
-              onClick={onApplyLayout}
-              size="small"
-              variant="contained"
-              startIcon={<AutoIcon fontSize="small" />}
-              disabled={isFreeUser}
-            >
-              Apply
-            </Button>
-          </ButtonGroup>
-        )}
+        <ButtonGroup size="small" sx={{ ml: 1 }}>
+          <Button
+            onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
+            endIcon={<ExpandMoreIcon fontSize="small" />}
+            size="small"
+            variant="outlined"
+            disabled={isFreeUser}
+          >
+            {autoLayoutType}
+          </Button>
+          <Button
+            onClick={onApplyLayout}
+            size="small"
+            variant="contained"
+            startIcon={<AutoIcon fontSize="small" />}
+            disabled={isFreeUser}
+          >
+            Apply
+          </Button>
+        </ButtonGroup>
 
         {/* Viewport Indicator */}
         <Box
