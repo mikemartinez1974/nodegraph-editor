@@ -1,0 +1,164 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Twilight Editor",
+    "description": "Core editor surface and workflow",
+    "created": "2025-12-25T12:00:00.000Z",
+    "modified": "2025-12-25T12:00:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "editor-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": { "x": 80, "y": 60 },
+      "width": 520,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Editor\nThe Editor is the **canvas + tools** where graphs are created and refined.\n\nIt owns node placement, selection, and graph editing." 
+      }
+    },
+    {
+      "id": "editor-panels",
+      "type": "markdown",
+      "label": "Panels",
+      "position": { "x": 80, "y": 280 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Panels\n- Node Palette (add nodes)\n- Properties Panel (edit)\n- Node/Group lists\n- Script panel + plugin manager"
+      }
+    },
+    {
+      "id": "editor-interaction",
+      "type": "markdown",
+      "label": "Interaction",
+      "position": { "x": 80, "y": 540 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Interaction\n- Drag nodes, connect edges\n- Multi-select + align tools\n- Undo/redo history\n- Snap-to-grid + minimap"
+      }
+    },
+    {
+      "id": "editor-doc",
+      "type": "markdown",
+      "label": "Document",
+      "position": { "x": 640, "y": 280 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Document Settings\n- Title + metadata\n- Theme + background\n- GitHub sync\n- Activity + timeline"
+      }
+    },
+    {
+      "id": "editor-save",
+      "type": "markdown",
+      "label": "Save + Share",
+      "position": { "x": 640, "y": 540 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Save + Share\n- Save to `.node`\n- Copy share link\n- Explicit GitHub commit\n- Sync target for live edits"
+      }
+    },
+    {
+      "id": "editor-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 80, "y": 820 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n- How much editor UI should be customizable?\n- What defaults should ship?\n- How to guide new users?"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "editor-edge-1",
+      "type": "child",
+      "source": "editor-purpose",
+      "target": "editor-panels",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "tools",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "editor-edge-2",
+      "type": "child",
+      "source": "editor-panels",
+      "target": "editor-interaction",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "use",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "editor-edge-3",
+      "type": "child",
+      "source": "editor-panels",
+      "target": "editor-doc",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "configure",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "editor-edge-4",
+      "type": "child",
+      "source": "editor-doc",
+      "target": "editor-save",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "share",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "editor-edge-5",
+      "type": "child",
+      "source": "editor-save",
+      "target": "editor-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "questions",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

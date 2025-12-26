@@ -125,6 +125,7 @@ Use the Group panel to rename, style, collapse, or ungroup as your system evolve
 - Plugins run in sandboxed iframes/workers with a minimal Graph API surface.  
 - Use `window.testBackgroundRpc(method, args)` to ping plugin methods.  
 - Plugins may register custom nodes, panels, or runtime hooks.
+- Plugin manifests and bundles must be hosted at http(s) URLs to install; local file paths are not supported.
 
 ### Event Bus Helpers
 - The global `window.eventBus` lets advanced users trigger internal events (e.g., `eventBus.emit('toggleTemplateGallery')`).  

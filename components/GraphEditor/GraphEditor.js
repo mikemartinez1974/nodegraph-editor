@@ -3,6 +3,7 @@
 // ============================================
 "use client";
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { Button, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../NodeGraph/eventBus';
 import { useHandleClickHandler } from '../NodeGraph/eventHandlers';
@@ -246,7 +247,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     loading,
     nodePanelAnchor, setNodePanelAnchor,
     nodeListAnchor, setNodeListAnchor,
-    defaultNodeColor, defaultEdgeColor,
+    defaultNodeColor, setDefaultNodeColor,
+    defaultEdgeColor, setDefaultEdgeColor,
     groupManager
   } = state || {};
 
@@ -257,6 +259,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   });
   const lastPointerRef = useRef({ x: 0, y: 0, inside: false });
   const lastLoggedNodeIdRef = useRef(null);
+  const pendingThemePasteRef = useRef(null);
 
   useEffect(() => {
     selectionSnapshotRef.current = {
@@ -2271,6 +2274,74 @@ useEffect(() => {
     eventBus.on('updateDocumentTheme', handleUpdateDocumentTheme);
     return () => eventBus.off('updateDocumentTheme', handleUpdateDocumentTheme);
   }, []);
+
+  // Apply theme paste commands after validation (toast confirm + rollback)
+  useEffect(() => {
+    const handleThemePasteValidated = (payload = {}) => {
+      const { theme, defaultNodeColor: nextNodeColor, defaultEdgeColor: nextEdgeColor } = payload;
+      const previous = {
+        theme: documentTheme || documentSettings?.theme || null,
+        defaultNodeColor,
+        defaultEdgeColor
+      };
+      pendingThemePasteRef.current = previous;
+
+      if (theme !== undefined && theme !== null) {
+        setDocumentTheme(theme);
+      }
+      if (typeof nextNodeColor === 'string' && nextNodeColor.trim()) {
+        setDefaultNodeColor(nextNodeColor.trim());
+      }
+      if (typeof nextEdgeColor === 'string' && nextEdgeColor.trim()) {
+        setDefaultEdgeColor(nextEdgeColor.trim());
+      }
+
+      const handleKeep = () => {
+        pendingThemePasteRef.current = null;
+        setSnackbar((prev) => ({ ...prev, open: false }));
+      };
+
+      const handleRevert = () => {
+        const rollback = pendingThemePasteRef.current || previous;
+        if (rollback) {
+          setDocumentTheme(rollback.theme || null);
+          setDefaultNodeColor(rollback.defaultNodeColor);
+          setDefaultEdgeColor(rollback.defaultEdgeColor);
+        }
+        pendingThemePasteRef.current = null;
+        setSnackbar({ open: true, message: 'Theme reverted', severity: 'info' });
+      };
+
+      setSnackbar({
+        open: true,
+        message: 'Theme applied. Keep changes?',
+        severity: 'info',
+        autoHideDuration: null,
+        action: (
+          <Stack direction="row" spacing={1}>
+            <Button size="small" color="inherit" onClick={handleKeep}>
+              Keep
+            </Button>
+            <Button size="small" color="inherit" onClick={handleRevert}>
+              Revert
+            </Button>
+          </Stack>
+        )
+      });
+    };
+
+    eventBus.on('themePasteValidated', handleThemePasteValidated);
+    return () => eventBus.off('themePasteValidated', handleThemePasteValidated);
+  }, [
+    documentTheme,
+    documentSettings,
+    defaultNodeColor,
+    defaultEdgeColor,
+    setDocumentTheme,
+    setDefaultNodeColor,
+    setDefaultEdgeColor,
+    setSnackbar
+  ]);
 
   // Register single handleClick event handler
   const handleClickHandlerId = Math.random().toString(36).substr(2, 8);

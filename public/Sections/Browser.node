@@ -1,0 +1,164 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Twilight Browser",
+    "description": "How the browser surface works in Twilight",
+    "created": "2025-12-25T12:00:00.000Z",
+    "modified": "2025-12-25T12:00:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "browser-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": { "x": 80, "y": 60 },
+      "width": 520,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Browser Surface\nThe Browser is the **home + navigation layer**.\n\nIt loads graphs, tracks addresses, and keeps the editor focused on a single document."
+      }
+    },
+    {
+      "id": "browser-address",
+      "type": "markdown",
+      "label": "Address Bar",
+      "position": { "x": 80, "y": 280 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Address Bar\n- Shows the current graph path\n- Accepts pasted URLs or file paths\n- Sets the **document source**\n- Drives re-load + history"
+      }
+    },
+    {
+      "id": "browser-tabs",
+      "type": "markdown",
+      "label": "Tabs & Sessions",
+      "position": { "x": 80, "y": 520 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Tabs & Sessions\n- Multiple graphs open at once\n- Session remembers last graphs\n- Reload restores the editor state"
+      }
+    },
+    {
+      "id": "browser-launch",
+      "type": "markdown",
+      "label": "Launch Paths",
+      "position": { "x": 640, "y": 280 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Launch Paths\n- `local://` for unsaved graphs\n- `/doc=...` for hosted graphs\n- Direct URL fetch for remote docs"
+      }
+    },
+    {
+      "id": "browser-storage",
+      "type": "markdown",
+      "label": "Storage",
+      "position": { "x": 640, "y": 540 },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Storage\n- Local drafts stay in browser storage\n- Saved graphs live at URLs\n- GitHub sync is a separate workflow"
+      }
+    },
+    {
+      "id": "browser-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 80, "y": 780 },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n- How to surface recent graphs?\n- Should browser track global search?\n- How much history to keep?"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "browser-edge-1",
+      "type": "child",
+      "source": "browser-purpose",
+      "target": "browser-address",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "navigate",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "browser-edge-2",
+      "type": "child",
+      "source": "browser-address",
+      "target": "browser-tabs",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "session",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "browser-edge-3",
+      "type": "child",
+      "source": "browser-address",
+      "target": "browser-launch",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "load",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "browser-edge-4",
+      "type": "child",
+      "source": "browser-tabs",
+      "target": "browser-storage",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "persist",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "browser-edge-5",
+      "type": "child",
+      "source": "browser-storage",
+      "target": "browser-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "questions",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

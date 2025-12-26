@@ -576,13 +576,14 @@ const GraphEditorContent = () => {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={snackbar.autoHideDuration ?? 6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity || 'info'}
+          action={snackbar.action || null}
           sx={{ width: '100%' }}
         >
           {snackbar.message}

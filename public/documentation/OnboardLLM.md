@@ -27,7 +27,7 @@ Twilight is no longer just a diagramming surface—it is a persistent, executabl
 
 ## Node Types Reference
 
-See `public/documentation/LLMNodeTypes.md` for the full list of core and plugin node types, plus handle keys for breadboard nodes.
+See `public/documentation/LLMNodeTypes.md` for the full list of core and plugin node types, plus handle keys for breadboard nodes. Also read `public/documentation/UserManual.md` for the broader editor and workflow overview.
 
 ---
 

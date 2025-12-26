@@ -58,6 +58,86 @@ const estimateCrudImpact = (command = {}) => {
       return { nodes: 0, edges: 0, groups: 0 };
   }
 };
+
+const isPlainObject = (value) => Boolean(value && typeof value === 'object' && !Array.isArray(value));
+
+const isColorString = (value) => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (typeof CSS !== 'undefined' && CSS.supports) {
+    return CSS.supports('color', trimmed);
+  }
+  return /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed);
+};
+
+const validateThemeSection = (section, keys, path, errors) => {
+  if (section === undefined || section === null) return;
+  if (!isPlainObject(section)) {
+    errors.push(`${path} must be an object`);
+    return;
+  }
+  keys.forEach((key) => {
+    if (section[key] === undefined) return;
+    if (!isColorString(section[key])) {
+      errors.push(`${path}.${key} must be a valid color`);
+    }
+  });
+};
+
+const validateThemePasteCommand = (command = {}) => {
+  const errors = [];
+  if (!command || command.action !== 'setTheme') {
+    return { valid: false, errors: ['Action must be setTheme'] };
+  }
+
+  const theme = command.theme;
+  const defaultNodeColor = command.defaultNodeColor;
+  const defaultEdgeColor = command.defaultEdgeColor;
+
+  if (theme === undefined && defaultNodeColor === undefined && defaultEdgeColor === undefined) {
+    errors.push('Theme payload must include theme and/or defaultNodeColor/defaultEdgeColor');
+  }
+
+  if (theme !== undefined) {
+    if (!isPlainObject(theme)) {
+      errors.push('theme must be an object');
+    } else {
+      if (theme.mode !== undefined && theme.mode !== 'light' && theme.mode !== 'dark') {
+        errors.push('theme.mode must be light or dark');
+      }
+      validateThemeSection(theme.primary, ['main', 'light', 'dark', 'contrastText'], 'theme.primary', errors);
+      validateThemeSection(theme.secondary, ['main', 'light', 'dark', 'contrastText'], 'theme.secondary', errors);
+      validateThemeSection(theme.background, ['default', 'paper'], 'theme.background', errors);
+      validateThemeSection(theme.text, ['primary', 'secondary'], 'theme.text', errors);
+      if (theme.divider !== undefined && !isColorString(theme.divider)) {
+        errors.push('theme.divider must be a valid color');
+      }
+    }
+  }
+
+  if (defaultNodeColor !== undefined && !isColorString(defaultNodeColor)) {
+    errors.push('defaultNodeColor must be a valid color');
+  }
+  if (defaultEdgeColor !== undefined && !isColorString(defaultEdgeColor)) {
+    errors.push('defaultEdgeColor must be a valid color');
+  }
+
+  if (errors.length > 0) {
+    return { valid: false, errors };
+  }
+
+  return {
+    valid: true,
+    errors: [],
+    normalized: {
+      action: 'setTheme',
+      theme: theme || null,
+      defaultNodeColor: defaultNodeColor || null,
+      defaultEdgeColor: defaultEdgeColor || null
+    }
+  };
+};
 async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
   try {
     const { action } = command;
@@ -380,6 +460,16 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
     try { parsed = JSON.parse(text); } catch (err) { parsed = null; }
 
     if (parsed) {
+      if (parsed.action === 'setTheme') {
+        const validation = validateThemePasteCommand(parsed);
+        if (!validation.valid) {
+          if (onShowMessage) onShowMessage(`Theme command invalid: ${validation.errors.join('; ')}`, 'error');
+          return { nodes: 0, edges: 0, groups: 0, error: validation.errors.join('; ') };
+        }
+        eventBus.emit('themePasteValidated', validation.normalized);
+        if (onShowMessage) onShowMessage('Theme command validated', 'success');
+        return { nodes: 0, edges: 0, groups: 0 };
+      }
       // Check if this is a CRUD command (has action property)
       if (parsed.action && graphCRUD) {
         const result = await executeCRUDCommand(parsed, graphCRUD, onShowMessage);

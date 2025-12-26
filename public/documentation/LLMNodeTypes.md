@@ -61,3 +61,63 @@ Additional plugin node types can be installed. Always read the plugin manifest o
 - default data fields
 - size/extension constraints
 
+---
+
+## Edge Types
+
+Edges use the `type` field. These are defined in `components/GraphEditor/edgeTypes.js`:
+
+| Type | Label | Purpose |
+| --- | --- | --- |
+| `child` | Child | Parent-child hierarchy (default). |
+| `parent` | Parent | Reverse parent relationship. |
+| `peer` | Peer | Peer-to-peer relationship. |
+| `dataFlow` | Data Flow | Data moving from source to target. |
+| `dependency` | Dependency | Dependency linkage. |
+| `reference` | Reference | Lightweight reference or link. |
+| `bidirectional` | Bidirectional | Two-way relationship. |
+| `weak` | Weak Link | Optional/low-strength relationship. |
+| `strong` | Strong Link | Required/high-strength relationship. |
+| `temporal` | Temporal | Time-based relationship. |
+| `energyFlow` | Energy Flow | Gradient-styled flow. |
+
+Notes:
+- `sourceHandle` and `targetHandle` are optional; when omitted the edge attaches to the node boundary.
+- Edge styling comes from the edge type; you can override per-edge with `style`.
+
+### Example: simple child edge
+```json
+{
+  "id": "edge-1",
+  "type": "child",
+  "source": "node-a",
+  "target": "node-b"
+}
+```
+
+### Example: data flow edge with handles
+```json
+{
+  "id": "edge-2",
+  "type": "dataFlow",
+  "source": "api-node",
+  "target": "display-node",
+  "sourceHandle": "out",
+  "targetHandle": "in"
+}
+```
+
+### Example: custom style override
+```json
+{
+  "id": "edge-3",
+  "type": "dependency",
+  "source": "task-a",
+  "target": "task-b",
+  "style": {
+    "width": 3,
+    "curved": true,
+    "dash": [4, 4]
+  }
+}
+```
