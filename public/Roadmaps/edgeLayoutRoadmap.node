@@ -116,7 +116,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 1 — Handles & Edges (Foundation)\n**Goal:** edges attach predictably and route deterministically **without** requiring handles everywhere.\n\n- Handles are **functional but optional**\n  - omit handles unless you need precise semantics\n  - docs/markdown nodes should not require handles to connect\n- Do **not** force every node into left/right input/output handles\n- Practical routing policy\n  - **Live editing** uses deterministic geometry fallback (side-by-direction + orthogonal segments)\n  - **Beautify/Reroute** runs ELK and replaces fallback routes with ELK routes\n  - If handles exist, pass them to ELK as port constraints; otherwise omit and let ELK choose\n- If handles are omitted: use **geometry-based** deterministic attachment\n  - Choose side based on source→target direction (top/right/bottom/left)\n  - Attach on the node boundary on that side\n  - Stable slotting: order by **edge id** to avoid stacking jitter\n- Reliable node bounds\n  - **Create** includes width/height unless the node type declares defaults\n  - **Update** omits width/height unless changing size\n- Minimize LLM payload: `source/target` required; `sourceHandle/targetHandle` optional; omit redundant node fields\n- Default edge style: **orthogonal** routing\n- Default label placement: **centered on the edge**\n- Dev view: show ports + route points; expose as a toggle in **Edge Properties**"
+        "markdown": "## Phase 1 — Handles & Edges (Foundation)\n**Goal:** edges attach predictably and route deterministically **without** requiring handles everywhere.\n\n### Status\n- ✅ Handles are optional (functional but not required)\n- ✅ Deterministic fallback attachment when handles omitted\n- ✅ Reroute action (ELK routing without moving nodes)\n- ✅ Node bounds defaults (create includes size; updates omit unless changed)\n- ✅ Orthogonal-by-default edge style + centered labels\n\n---\n\n### Decisions\n- Handles are **functional but optional**\n  - omit handles unless you need precise semantics\n  - docs/markdown nodes should not require handles to connect\n- Do **not** force every node into left/right input/output handles\n- Practical routing policy\n  - **Live editing** uses deterministic geometry fallback (side-by-direction + orthogonal segments)\n  - **Beautify/Reroute** runs ELK and replaces fallback routes with ELK routes\n  - If handles exist, pass them to ELK as port constraints; otherwise omit and let ELK choose\n- If handles are omitted: use **geometry-based** deterministic attachment\n  - Choose side based on source→target direction (top/right/bottom/left)\n  - Attach on the node boundary on that side\n  - Stable slotting: order by **edge id** to avoid stacking jitter\n- Reliable node bounds\n  - **Create** includes width/height unless the node type declares defaults\n  - **Update** omits width/height unless changing size\n- Minimize LLM payload: `source/target` required; `sourceHandle/targetHandle` optional; omit redundant node fields\n- Dev view: show ports + route points; expose as a toggle in **Edge Properties**"
       }
     },
     {
@@ -180,7 +180,23 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 3 — Routing Polish (Edges Look Intentional)\n**Goal:** reduce crossings and visual noise.\n\n- Use ELK routing sections (orthogonal) as the default path\n- Improve crossing reduction by tuning ELK layered options\n- Handle multi-edges/fan-in/fan-out (parallel edge spacing)\n- Keep labels simple for now (centered), add smarter placement later\n- Add a \"Reroute edges\" action without moving nodes\n- Minimize payload: routes are computed (not stored in `.node` by default)"
+        "markdown": "## Phase 3 — Routing Polish (Edges Look Intentional)\n**Goal:** reduce crossings and visual noise.\n\n### Status\n- ✅ Multi-edge lane spacing is configurable: `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n- ✅ Multi-label contract: `edge.labels = [start, middle, end]` (strings render; missing slots are ignored)\n- ✅ Label placement MVP: middle label uses the **center segment** (orthogonal)\n\n---\n\n### Work\n- Use ELK routing sections (orthogonal) as the default path\n- Improve crossing reduction by tuning ELK layered options\n- Handle multi-edges/fan-in/fan-out (parallel edge spacing)\n  - Policy: if multiple edges share a handle, fan them.\n  - If handles are omitted, slot edges on the chosen node side so endpoints don’t overlap.\n- Add a \"Reroute edges\" action without moving nodes\n- Minimize payload: routes are computed (not stored in `.node` by default)"
+      }
+    },
+    {
+      "id": "edge-layout-phase-3-considerations",
+      "type": "markdown",
+      "label": "Phase 3 — Considerations",
+      "position": {
+        "x": -655,
+        "y": 730
+      },
+      "width": 620,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 3 — Considerations / Blockers\n- **Port/handle side truth:** ELK routing looks best when port sides are known. If handles are omitted, fallback attachment must be stable/deterministic so reroutes don’t “randomize” sides.\n  - Policy: if handle ids exist and resolve → obey them.\n  - Otherwise choose side **per endpoint** from geometry (source side can differ from target side).\n  - This allows spatially sensible cases like \"exit left\" → \"enter top\" without special casing (orthogonal still works; curved edges can use the same endpoints).\n- **Dominant axis vs mixed sides:** don’t force both ends to share one axis. Pick each end independently from the center→center direction (or from routed segment tangent when available).\n- **When to recompute routes:** define triggers (node move, node resize, edge add/remove) to avoid stale routes or constant jitter.\n- **Bounds reliability:** rerouting only helps if the model has correct `node.width/height`.\n  - If a node can resize due to render/content (markdown, plugins), update width/height first, then reroute.\n- **Label placement MVP:** choose the segment that is “most central” along the polyline (ELK-routed or fallback), and place the label on that segment.\n- **Multi-label contract:** `edge.labels = [start, middle, end]`\n  - A string renders a label; `null/undefined` means no label.\n  - If `edge.labels` exists, it overrides legacy `edge.label`.\n  - Default fallback: `edge.label` maps to `labels[1]`.\n- **Multi-edge spacing:** bundled edges need deterministic offsets (keyed by `edge.id`) so order doesn’t change between sessions."
       }
     },
     {
@@ -197,6 +213,22 @@
       "showLabel": true,
       "data": {
         "markdown": "## Phase 4 — Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the affected subgraph (local reflow)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-group layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
+      }
+    },
+    {
+      "id": "edge-layout-phase-4-considerations",
+      "type": "markdown",
+      "label": "Phase 4 — Considerations",
+      "position": {
+        "x": -655,
+        "y": 1180
+      },
+      "width": 620,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 4 — Considerations / Blockers\n- **Stability policy:** adding one node/edge should not reshuffle the whole graph; define “local reflow” boundaries.\n- **Serpentine beyond chains:** current serpentine is intentionally strict; consider heuristics (longest path, per-row lanes) so more real graphs benefit.\n- **Pinned/locked nodes:** need a first-class way to keep regions stable while still allowing growth elsewhere.\n- **Groups:** MVP treats groups as logical only; incremental layout may need optional group constraints later."
       }
     },
     {
@@ -297,11 +329,29 @@
       "data": {}
     },
     {
+      "id": "edge-layout-e5b",
+      "type": "child",
+      "source": "edge-layout-phase-3",
+      "target": "edge-layout-phase-3-considerations",
+      "label": "consider",
+      "style": {},
+      "data": {}
+    },
+    {
       "id": "edge-layout-e6",
       "type": "child",
       "source": "edge-layout-phase-4",
       "target": "edge-layout-phase-5",
       "label": "extend",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e6b",
+      "type": "child",
+      "source": "edge-layout-phase-4",
+      "target": "edge-layout-phase-4-considerations",
+      "label": "consider",
       "style": {},
       "data": {}
     },

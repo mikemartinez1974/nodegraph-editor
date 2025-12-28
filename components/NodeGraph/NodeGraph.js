@@ -68,6 +68,7 @@ export default function NodeGraph({
   showGrid = false,
   gridSize = 20,
   defaultEdgeRouting = 'auto',
+  edgeLaneGapPx = 10,
   lockedNodes = new Set(),
   lockedEdges = new Set(),
   showAllEdgeLabels = false,
@@ -1194,6 +1195,7 @@ export default function NodeGraph({
           theme={theme}
           hoveredNodeId={hoveredNodeId}
           defaultEdgeRouting={defaultEdgeRouting}
+          edgeLaneGapPx={edgeLaneGapPx}
           getHandlePositionForEdge={(...args) =>
             handleLayerImperativeRef.current?.getHandlePositionForEdge
               ? handleLayerImperativeRef.current.getHandlePositionForEdge(...args)

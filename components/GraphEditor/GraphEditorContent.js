@@ -511,6 +511,7 @@ const GraphEditorContent = () => {
             showGrid={showGrid}
             gridSize={documentSettings.gridSize}
             defaultEdgeRouting={documentSettings.edgeRouting}
+            edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
             lockedNodes={lockedNodes}
             lockedEdges={lockedEdges}
             onEdgeClick={undefined}
@@ -553,6 +554,7 @@ const GraphEditorContent = () => {
           showGrid={showGrid}
           gridSize={documentSettings.gridSize}
           defaultEdgeRouting={documentSettings.edgeRouting}
+          edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
           lockedNodes={lockedNodes}
           lockedEdges={lockedEdges}
           onEdgeClick={undefined}

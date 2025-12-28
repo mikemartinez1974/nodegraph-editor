@@ -115,17 +115,83 @@ const EdgeLayer = forwardRef(({
   getHandlePositionForEdge: getHandlePositionForEdgeProp,
   showAllEdgeLabels = false, // <-- Add prop
   defaultEdgeRouting = 'auto',
+  edgeLaneGapPx = 10,
   edgeRoutes = {}
 }, ref) => {
   const [canvasSize, setCanvasSize] = useState({ width: '100vw', height: '100vh' });
   const BUNDLE_BUCKET = 160;
   const BUNDLE_SPACING = 14;
-  const FAN_SPACING = 10;
+  const FAN_SPACING = (() => {
+    const value = Number(edgeLaneGapPx);
+    if (!Number.isFinite(value)) return 10;
+    return Math.max(0, Math.min(50, value));
+  })();
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const { getHandlePositionForEdge: getHandlePositionForEdgeContext } = useContext(HandlePositionContext);
   const getHandlePositionForEdge = getHandlePositionForEdgeProp || getHandlePositionForEdgeContext;
   const prevHoveredEdgeRef = useRef(null);
   const edgeDataRef = useRef([]);
+  const getDirectionSide = useCallback((from, to) => {
+    if (!from || !to) return null;
+    const dx = (to.x ?? 0) - (from.x ?? 0);
+    const dy = (to.y ?? 0) - (from.y ?? 0);
+    const ax = Math.abs(dx);
+    const ay = Math.abs(dy);
+    if (ax >= ay) {
+      return dx >= 0 ? 'right' : 'left';
+    }
+    return dy >= 0 ? 'bottom' : 'top';
+  }, []);
+  const applyEndpointLaneOffsetsToPoints = useCallback((points, startOffset, endOffset) => {
+    const safePoints = Array.isArray(points) ? points : null;
+    if (!safePoints || safePoints.length < 2) return safePoints;
+    const start = Number(startOffset) || 0;
+    const end = Number(endOffset) || 0;
+    if (!start && !end) return safePoints;
+
+    const normalizedPerp = (dx, dy) => {
+      const len = Math.hypot(dx, dy);
+      if (!len) return null;
+      return { x: -dy / len, y: dx / len };
+    };
+
+    // Sum per-index offsets so 2-point edges don't double-apply.
+    const deltaByIndex = new Map();
+    const addDelta = (index, delta) => {
+      if (!delta) return;
+      const prev = deltaByIndex.get(index) || { x: 0, y: 0 };
+      deltaByIndex.set(index, { x: prev.x + delta.x, y: prev.y + delta.y });
+    };
+
+    if (start) {
+      const a = safePoints[0];
+      const b = safePoints[1];
+      const perp = normalizedPerp((b?.x ?? 0) - (a?.x ?? 0), (b?.y ?? 0) - (a?.y ?? 0));
+      if (perp) {
+        const delta = { x: perp.x * start, y: perp.y * start };
+        addDelta(0, delta);
+        addDelta(1, delta);
+      }
+    }
+
+    if (end) {
+      const n = safePoints.length;
+      const a = safePoints[n - 2];
+      const b = safePoints[n - 1];
+      const perp = normalizedPerp((b?.x ?? 0) - (a?.x ?? 0), (b?.y ?? 0) - (a?.y ?? 0));
+      if (perp) {
+        const delta = { x: perp.x * end, y: perp.y * end };
+        addDelta(n - 2, delta);
+        addDelta(n - 1, delta);
+      }
+    }
+
+    return safePoints.map((pt, index) => {
+      const delta = deltaByIndex.get(index);
+      if (!delta) return pt;
+      return { x: (pt?.x ?? 0) + delta.x, y: (pt?.y ?? 0) + delta.y };
+    });
+  }, []);
   const getNodeCenter = useCallback((node) => {
     if (!node) return { x: 0, y: 0 };
     const w = node.width || 60;
@@ -307,12 +373,26 @@ const EdgeLayer = forwardRef(({
       if (!sourcePos) {
         const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
         sourcePos = getNodeCenter(sourceNode);
-        if (!sourceSide && sourceNode) sourceSide = getNodeSideFromPoint(sourceNode, sourcePos);
       }
       if (!targetPos) {
         const targetNode = nodeListRef.current.find(n => n.id === edge.target);
         targetPos = getNodeCenter(targetNode);
-        if (!targetSide && targetNode) targetSide = getNodeSideFromPoint(targetNode, targetPos);
+      }
+
+      // If handle info didn't provide a side, infer side from direction for stable grouping/slotting.
+      if (!sourceSide) {
+        const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
+        const targetNode = nodeListRef.current.find(n => n.id === edge.target);
+        if (sourceNode && targetNode) {
+          sourceSide = getDirectionSide(getNodeCenter(sourceNode), getNodeCenter(targetNode));
+        }
+      }
+      if (!targetSide) {
+        const sourceNode = nodeListRef.current.find(n => n.id === edge.source);
+        const targetNode = nodeListRef.current.find(n => n.id === edge.target);
+        if (sourceNode && targetNode) {
+          targetSide = getDirectionSide(getNodeCenter(targetNode), getNodeCenter(sourceNode));
+        }
       }
 
       const midX = (sourcePos.x + targetPos.x) / 2;
@@ -555,8 +635,11 @@ const EdgeLayer = forwardRef(({
       }
       
       const routeOverride = edgeRoutesRef.current?.[edge.id];
-      const routedPoints = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
+      const routedPointsRaw = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
       const allowRoutedSegments = !(draggingInfoRef?.current?.nodeIds?.length);
+      const routedPoints = allowRoutedSegments
+        ? applyEndpointLaneOffsetsToPoints(routedPointsRaw, sourceFan, targetFan)
+        : routedPointsRaw;
       const routedSegments = allowRoutedSegments ? buildSegmentsFromPoints(routedPoints) : null;
       const useRoutedSegments = Boolean(routedSegments && routedSegments.length);
 
@@ -921,21 +1004,30 @@ const EdgeLayer = forwardRef(({
         ctx.restore();
       }
       
-      // Draw edge label if showAllEdgeLabels or edge.label is non-empty
-      if (showAllEdgeLabels || (edge.label && edge.label.trim() !== '')) {
-        // Pass sourcePos, targetPos, curve info to drawEdgeLabel
-        drawEdgeLabel(ctx, { 
-          ...edge, 
-          sourcePos, 
-          targetPos, 
-          midX, 
-          midY, 
-          cp1,
-          cp2,
-          isOrthogonal,
-          curveDirection,
-          style: { ...edge.style, curved: isCurved }
-        }, theme);
+      const labels = Array.isArray(edge.labels) ? edge.labels : null;
+      const hasAnyLabel =
+        (typeof edge.label === 'string' && edge.label.trim() !== '') ||
+        (labels && labels.some((value) => typeof value === 'string' && value.trim() !== ''));
+
+      // Draw edge label(s) if showAllEdgeLabels or any label is non-empty
+      if (showAllEdgeLabels || hasAnyLabel) {
+        drawEdgeLabel(
+          ctx,
+          {
+            ...edge,
+            sourcePos,
+            targetPos,
+            midX,
+            midY,
+            cp1,
+            cp2,
+            isOrthogonal,
+            curveDirection,
+            segments: isOrthogonal ? orthogonalSegments : null,
+            style: { ...edge.style, curved: isCurved }
+          },
+          theme
+        );
       }
       
       // Store edge data for hit testing
@@ -952,6 +1044,7 @@ const EdgeLayer = forwardRef(({
         cp2,
         segments: orthogonalSegments,
         label: edge.label,
+        labels: Array.isArray(edge.labels) ? edge.labels : undefined,
         style: edge.style
       });
       

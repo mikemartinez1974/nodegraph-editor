@@ -7,6 +7,7 @@ const DEFAULT_LAYOUT_SETTINGS = {
   mode: 'autoOnMissingPositions', // 'autoOnMissingPositions' | 'manual'
   defaultLayout: 'hierarchical', // 'hierarchical' | 'serpentine' | 'radial' | 'grid'
   direction: 'DOWN', // 'DOWN' | 'RIGHT'
+  edgeLaneGapPx: 10,
   serpentine: {
     maxPerRow: 6
   },

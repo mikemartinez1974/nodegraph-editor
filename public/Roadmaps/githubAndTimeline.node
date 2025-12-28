@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2025-12-25T00:45:50.742Z",
-    "modified": "2025-12-25T00:45:50.742Z",
+    "created": "2025-12-28T20:06:35.324Z",
+    "modified": "2025-12-28T20:06:35.324Z",
     "author": "",
     "tags": []
   },
@@ -39,12 +39,17 @@
     "snapToGrid": false,
     "gridSize": 20,
     "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
     "autoSave": false
   },
   "viewport": {
     "pan": {
-      "x": 417.63463278614967,
-      "y": -511.5391040310976
+      "x": 240.63463278614967,
+      "y": 32.46089596890238
     },
     "zoom": 0.8744416163266786
   },
@@ -58,8 +63,8 @@
       "type": "markdown",
       "label": "Design Axes",
       "position": {
-        "x": 88.55295131367095,
-        "y": -20.18391856566518
+        "x": 306.45209500672394,
+        "y": -308.0830622587182
       },
       "width": 300,
       "height": 160,
@@ -78,8 +83,8 @@
       "type": "markdown",
       "label": "GitHub Integration — Core Idea",
       "position": {
-        "x": -107.09580998655213,
-        "y": 273.8985458847153
+        "x": 736.452095006724,
+        "y": 11.9169377412818
       },
       "width": 420,
       "height": 200,
@@ -98,8 +103,8 @@
       "type": "markdown",
       "label": "Decision — Repo Scope",
       "position": {
-        "x": -90,
-        "y": 430
+        "x": 736.452095006724,
+        "y": 396.9169377412818
       },
       "width": 420,
       "height": 170,
@@ -118,8 +123,8 @@
       "type": "markdown",
       "label": "GitHub Integration — MVP",
       "position": {
-        "x": -34.39572382034901,
-        "y": 575.5941835388611
+        "x": 736.452095006724,
+        "y": 751.9169377412818
       },
       "width": 420,
       "height": 220,
@@ -138,8 +143,8 @@
       "type": "markdown",
       "label": "Decision — Sync + Commits",
       "position": {
-        "x": -70,
-        "y": 760
+        "x": 736.452095006724,
+        "y": 1166.9169377412818
       },
       "width": 420,
       "height": 170,
@@ -158,8 +163,8 @@
       "type": "markdown",
       "label": "GitHub Integration — Advanced",
       "position": {
-        "x": -100.68109650129887,
-        "y": 904.4603942225007
+        "x": 736.452095006724,
+        "y": 1531.9169377412818
       },
       "width": 420,
       "height": 260,
@@ -178,8 +183,8 @@
       "type": "markdown",
       "label": "Timeline — Core Concept",
       "position": {
-        "x": 600,
-        "y": 260
+        "x": 196.45209500672394,
+        "y": 11.9169377412818
       },
       "width": 420,
       "height": 200,
@@ -198,8 +203,8 @@
       "type": "markdown",
       "label": "Timeline — MVP",
       "position": {
-        "x": 600,
-        "y": 520
+        "x": 196.45209500672394,
+        "y": 371.9169377412818
       },
       "width": 420,
       "height": 220,
@@ -218,8 +223,8 @@
       "type": "markdown",
       "label": "Decision — Timeline Scope",
       "position": {
-        "x": 600,
-        "y": 700
+        "x": 196.45209500672394,
+        "y": 766.9169377412818
       },
       "width": 420,
       "height": 190,
@@ -238,8 +243,8 @@
       "type": "markdown",
       "label": "Timeline — Advanced",
       "position": {
-        "x": 600,
-        "y": 820
+        "x": 196.45209500672394,
+        "y": 1131.9169377412818
       },
       "width": 420,
       "height": 240,
@@ -258,8 +263,8 @@
       "type": "markdown",
       "label": "Open Questions",
       "position": {
-        "x": 252.01898966490415,
-        "y": 1244.0177940482288
+        "x": -243.54790499327606,
+        "y": -308.0830622587182
       },
       "width": 420,
       "height": 260,

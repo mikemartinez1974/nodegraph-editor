@@ -645,6 +645,7 @@ export function createGraphEditorHandlers({
 
     try {
       let pastedNodes = [], pastedEdges = [], pastedGroups = [];
+      let shouldAutoLayout = false;
 
       if (!pastedData) return;
 
@@ -665,6 +666,28 @@ export function createGraphEditorHandlers({
         pastedGroups = [pastedData];
       }
 
+      // Allow nodegraph-data payloads to omit positions (Phase 2/3 policy).
+      // We hydrate positions for validation/storage, and separately track whether positions were omitted.
+      if (Array.isArray(pastedNodes) && pastedNodes.length > 0) {
+        shouldAutoLayout = pastedNodes.every(
+          (node) => node && !Object.prototype.hasOwnProperty.call(node, 'position')
+        );
+        pastedNodes = pastedNodes.map((node, index) => {
+          const safe = node && typeof node === 'object' ? node : {};
+          const x = 120 + (index % 4) * 260;
+          const y = 120 + Math.floor(index / 4) * 160;
+          return {
+            ...safe,
+            // ValidationGuard requires id + position; keep caller-provided values when present.
+            id: safe.id || `node_${Date.now()}_${index}`,
+            label: safe.label || `Node ${index + 1}`,
+            position: safe.position || { x, y },
+            width: Number.isFinite(Number(safe.width)) ? safe.width : safe.width ?? 160,
+            height: Number.isFinite(Number(safe.height)) ? safe.height : safe.height ?? 80
+          };
+        });
+      }
+
       const sanitizeGroups = (groupsArray, availableNodeIdSet) => {
         return groupsArray.map(g => {
           const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => availableNodeIdSet.has(id)) : [];
@@ -679,7 +702,7 @@ export function createGraphEditorHandlers({
       };
 
       const nodeValidation = validateNodes(pastedNodes);
-      const edgeValidation = validateEdges(pastedEdges);
+      const edgeValidation = validateEdges(pastedEdges, nodeValidation.valid);
       const groupValidation = validateGroups(pastedGroups);
       pastedNodes = nodeValidation.valid.map(ensureUnifiedHandles);
       pastedEdges = edgeValidation.valid.map(normalizeEdgeSchema);
@@ -719,6 +742,18 @@ export function createGraphEditorHandlers({
         setSelectedEdgeIds([]);
         setSelectedGroupIds([]);
         saveToHistory(pastedNodes, pastedEdges, groupsSanitized);
+
+        if (shouldAutoLayout && pastedNodes.length > 0) {
+          try {
+            eventBus.emit('layout:autoOnMissingPositions', {
+              reason: 'pasteGraphData',
+              action: 'replace',
+              nodeIds: pastedNodes.map((n) => n.id)
+            });
+          } catch (err) {
+            // ignore
+          }
+        }
       } else if (action === 'add') {
         const existingNodeIds = new Set(nodesRef.current.map(n => n.id));
         const existingEdgeIds = new Set(edgesRef.current.map(e => e.id));
@@ -752,6 +787,18 @@ export function createGraphEditorHandlers({
         });
 
         saveToHistory(newNodes, newEdges, newGroups);
+
+        if (shouldAutoLayout && nodesToAdd.length > 0) {
+          try {
+            eventBus.emit('layout:autoOnMissingPositions', {
+              reason: 'pasteGraphData',
+              action: 'add',
+              nodeIds: nodesToAdd.map((n) => n.id)
+            });
+          } catch (err) {
+            // ignore
+          }
+        }
       }
     } catch (err) {
       console.error('Error in handlePasteGraphData:', err);

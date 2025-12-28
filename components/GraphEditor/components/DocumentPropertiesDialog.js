@@ -69,6 +69,7 @@ const DEFAULT_LAYOUT_SETTINGS = {
   mode: 'autoOnMissingPositions',
   defaultLayout: 'hierarchical',
   direction: 'DOWN',
+  edgeLaneGapPx: 10,
   serpentine: {
     maxPerRow: 6
   },
@@ -897,6 +898,21 @@ export default function DocumentPropertiesDialog({
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <TextField
+                  size="small"
+                  type="number"
+                  label="Edge lane spacing (px)"
+                  value={docSettings.layout?.edgeLaneGapPx ?? DEFAULT_LAYOUT_SETTINGS.edgeLaneGapPx}
+                  onChange={(event) => {
+                    const raw = event.target.value;
+                    const value = raw === '' ? '' : Math.max(0, Math.min(50, Number(raw)));
+                    handleLayoutSettingsChange('edgeLaneGapPx', value);
+                  }}
+                  helperText="Used for multi-edge spacing (fan/slot) near endpoints."
+                  fullWidth
+                  inputProps={{ min: 0, max: 50 }}
+                />
 
                 <TextField
                   size="small"
