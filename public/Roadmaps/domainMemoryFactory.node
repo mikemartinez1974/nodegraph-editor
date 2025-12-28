@@ -1,0 +1,108 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "dmf-goal",
+      "type": "markdown",
+      "label": "Thesis",
+      "position": { "x": -40, "y": -320 },
+      "width": 660,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Domain Memory Factory (Agents)\n**Thesis:** long-running agents fail when they are *amnesiac*. The fix is not a smarter model — it’s **durable domain memory** + a **harness ritual** that forces disciplined progress.\n\nTwilight turns domain memory into a shareable artifact: a persistent `.node` graph that evolves by validated deltas."
+      }
+    },
+    {
+      "id": "dmf-problem",
+      "type": "markdown",
+      "label": "Problem",
+      "position": { "x": -40, "y": -70 },
+      "width": 660,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Problem with “General Agents”\n- Context windows reset → agent becomes an amnesiac with tools\n- Long-horizon work degrades into:\n  - manic bursts that fail\n  - wandering partial progress\n  - false success reports\n- Without durable state, each run re-derives “definition of done”"
+      }
+    },
+    {
+      "id": "dmf-solution",
+      "type": "markdown",
+      "label": "Solution",
+      "position": { "x": 700, "y": -70 },
+      "width": 660,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Solution: Domain Memory as Structured State\nDomain memory is not “a vector DB lookup.”\n\nIt is a **persistent structured representation** of:\n- goals and backlog\n- constraints and requirements\n- status (passing/failing/blocked)\n- what was tried, what broke, what was reverted\n- rituals: how to run, test, deploy, extend\n\nThe agent becomes a policy that transforms one memory state into the next."
+      }
+    },
+    {
+      "id": "dmf-pattern",
+      "type": "markdown",
+      "label": "Two-Agent Pattern",
+      "position": { "x": -40, "y": 220 },
+      "width": 660,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Two-Agent Pattern (Initializer → Worker)\nNot about personalities — about who owns memory.\n\n- **Initializer:** expands the prompt into memory artifacts (feature list, rules, scaffolding)\n- **Worker:** reads memory, picks one item, makes small testable progress, updates memory, commits, exits\n\nEvery run starts the same way: **read memory → verify state → act**."
+      }
+    },
+    {
+      "id": "dmf-twilight-fit",
+      "type": "markdown",
+      "label": "Why Twilight",
+      "position": { "x": 700, "y": 240 },
+      "width": 660,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Twilight Fits This Perfectly\nTwilight provides the domain memory artifact and the harness:\n\n- `.node` graphs are **durable memory** (portable + shareable)\n- LLMs emit **validated deltas** (create/update/delete), not overwriting snapshots\n- History/timeline/milestones record state transitions\n- Autolayout/routing makes minimal payloads readable\n- Git/GitHub workflows make progress reviewable\n\nMoat = memory schema + harness + workflows, not a proprietary model."
+      }
+    },
+    {
+      "id": "dmf-ritual",
+      "type": "markdown",
+      "label": "Boot Ritual",
+      "position": { "x": -40, "y": 560 },
+      "width": 660,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Boot Ritual (Session Discipline)\nA serious run follows a ritual:\n\n1. Read the graph memory (goal, backlog, constraints)\n2. Read history (timeline / Git commits)\n3. Select one atomic target (a failing feature or open question)\n4. Execute small changes + validate\n5. Update memory (status + notes)\n6. Commit / milestone\n\nThis turns “LLM calls” into durable progress."
+      }
+    },
+    {
+      "id": "dmf-next",
+      "type": "markdown",
+      "label": "What To Build",
+      "position": { "x": 700, "y": 600 },
+      "width": 660,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What To Build in Twilight (Domain Memory Factory)\n- Templates: backlog/status/constraints nodes\n- Commands: create/update flows that preserve IDs\n- Validation: prevent overwrite-by-snapshot\n- Checkpoints: timeline milestones + commit hooks\n- Live docs: reload/watch so memory stays current\n\nResult: agents behave like disciplined engineers, not autocomplete."
+      }
+    }
+  ],
+  "edges": [
+    { "id": "dmf-e1", "type": "child", "source": "dmf-goal", "target": "dmf-problem", "label": "problem" },
+    { "id": "dmf-e2", "type": "child", "source": "dmf-problem", "target": "dmf-solution", "label": "requires" },
+    { "id": "dmf-e3", "type": "child", "source": "dmf-solution", "target": "dmf-pattern", "label": "pattern" },
+    { "id": "dmf-e4", "type": "child", "source": "dmf-pattern", "target": "dmf-twilight-fit", "label": "implemented by" },
+    { "id": "dmf-e5", "type": "child", "source": "dmf-twilight-fit", "target": "dmf-ritual", "label": "ritual" },
+    { "id": "dmf-e6", "type": "child", "source": "dmf-ritual", "target": "dmf-next", "label": "build next" }
+  ],
+  "timestamp": "2025-12-28T00:00:00.000Z",
+  "nodeCount": 7,
+  "edgeCount": 6
+}
+

@@ -34,12 +34,114 @@ const getBoundsFromPositions = (positions = [], sizeMap = {}) => {
   return { minX, minY, maxX, maxY };
 };
 
-export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges, setEdgeRoutes }) {
+const getCycleInfo = (nodeIds = [], edges = []) => {
+  const ids = Array.isArray(nodeIds) ? nodeIds : [];
+  if (ids.length === 0) return { hasCycle: false, largestSccSize: 0, sccCount: 0 };
+
+  const nodeIdSet = new Set(ids);
+  const adjacency = new Map();
+  ids.forEach((id) => adjacency.set(id, []));
+  (edges || []).forEach((edge) => {
+    const source = edge?.source;
+    const target = edge?.target;
+    if (!nodeIdSet.has(source) || !nodeIdSet.has(target)) return;
+    adjacency.get(source).push(target);
+  });
+
+  // Tarjan SCC
+  let index = 0;
+  const stack = [];
+  const onStack = new Set();
+  const indices = new Map();
+  const lowlink = new Map();
+  const sccs = [];
+
+  const strongConnect = (v) => {
+    indices.set(v, index);
+    lowlink.set(v, index);
+    index += 1;
+    stack.push(v);
+    onStack.add(v);
+
+    const neighbors = adjacency.get(v) || [];
+    neighbors.forEach((w) => {
+      if (!indices.has(w)) {
+        strongConnect(w);
+        lowlink.set(v, Math.min(lowlink.get(v), lowlink.get(w)));
+      } else if (onStack.has(w)) {
+        lowlink.set(v, Math.min(lowlink.get(v), indices.get(w)));
+      }
+    });
+
+    if (lowlink.get(v) === indices.get(v)) {
+      const scc = [];
+      while (stack.length) {
+        const w = stack.pop();
+        onStack.delete(w);
+        scc.push(w);
+        if (w === v) break;
+      }
+      sccs.push(scc);
+    }
+  };
+
+  ids.forEach((id) => {
+    if (!indices.has(id)) strongConnect(id);
+  });
+
+  let hasCycle = false;
+  let largestSccSize = 0;
+  sccs.forEach((scc) => {
+    largestSccSize = Math.max(largestSccSize, scc.length);
+    if (scc.length > 1) hasCycle = true;
+  });
+  if (!hasCycle) {
+    // Single-node SCC can still be a cycle if there is a self-loop.
+    const hasSelfLoop = (edges || []).some((e) => e?.source && e?.target && e.source === e.target && nodeIdSet.has(e.source));
+    if (hasSelfLoop) {
+      hasCycle = true;
+      largestSccSize = Math.max(largestSccSize, 1);
+    }
+  }
+  return { hasCycle, largestSccSize, sccCount: sccs.length };
+};
+
+export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges, setEdgeRoutes, layoutSettings = null }) {
   const [mode, setMode] = useState('manual'); // 'manual' | 'nav' | 'auto'
-  const [autoLayoutType, setAutoLayoutType] = useState('hierarchical'); // 'hierarchical' | 'radial' | 'grid'
+  const [autoLayoutType, setAutoLayoutType] = useState('hierarchical'); // 'hierarchical' | 'serpentine' | 'radial' | 'grid'
   const animationRef = useRef(null);
   const physicsRef = useRef(null);
   const velocitiesRef = useRef(new Map()); // Store velocity for each node
+
+  const SERPENTINE_DEFAULT_MAX_PER_ROW = 6;
+  const HEAVY_CYCLE_SCC_THRESHOLD = 0.35;
+  const HEAVY_CYCLE_MIN_SCC_SIZE = 4;
+  const HEAVY_CYCLE_MIN_NODES = 6;
+
+  const layoutDirection = String(layoutSettings?.direction || 'DOWN').toUpperCase() === 'RIGHT'
+    ? 'RIGHT'
+    : 'DOWN';
+  const serpentineMaxPerRow = (() => {
+    const value = Number(layoutSettings?.serpentine?.maxPerRow);
+    if (!Number.isFinite(value)) return SERPENTINE_DEFAULT_MAX_PER_ROW;
+    return Math.max(2, Math.min(50, value));
+  })();
+  const cycleFallbackEnabled = layoutSettings?.cycleFallback?.enabled !== false;
+  const heavyCycleThreshold = (() => {
+    const value = Number(layoutSettings?.cycleFallback?.heavySccThreshold);
+    if (!Number.isFinite(value)) return HEAVY_CYCLE_SCC_THRESHOLD;
+    return Math.max(0.05, Math.min(0.9, value));
+  })();
+  const heavyCycleMinSccSize = (() => {
+    const value = Number(layoutSettings?.cycleFallback?.minSccSize);
+    if (!Number.isFinite(value)) return HEAVY_CYCLE_MIN_SCC_SIZE;
+    return Math.max(2, Math.min(1000, Math.floor(value)));
+  })();
+  const heavyCycleMinNodes = (() => {
+    const value = Number(layoutSettings?.cycleFallback?.minNodes);
+    if (!Number.isFinite(value)) return HEAVY_CYCLE_MIN_NODES;
+    return Math.max(3, Math.min(10000, Math.floor(value)));
+  })();
 
   const buildElkEdgeRoutes = useCallback((layoutEdges = [], offset = { x: 0, y: 0 }) => {
     const offsetX = Number(offset.x) || 0;
@@ -266,6 +368,140 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     }));
   };
 
+  const detectChainOrder = useCallback((nodesToOrder, edgeList) => {
+    if (!Array.isArray(nodesToOrder) || nodesToOrder.length === 0) return null;
+    const nodeIds = new Set(nodesToOrder.map((n) => n.id));
+    const outgoing = new Map();
+    const incomingCount = new Map();
+    nodesToOrder.forEach((node) => {
+      outgoing.set(node.id, []);
+      incomingCount.set(node.id, 0);
+    });
+
+    (edgeList || []).forEach((edge) => {
+      const source = edge?.source;
+      const target = edge?.target;
+      if (!nodeIds.has(source) || !nodeIds.has(target)) return;
+      outgoing.get(source).push(target);
+      incomingCount.set(target, (incomingCount.get(target) || 0) + 1);
+    });
+
+    // Chain requirement: each node has <=1 outgoing and <=1 incoming; exactly one root.
+    const roots = [];
+    for (const nodeId of nodeIds) {
+      const out = outgoing.get(nodeId) || [];
+      const inc = incomingCount.get(nodeId) || 0;
+      if (out.length > 1 || inc > 1) return null;
+      if (inc === 0) roots.push(nodeId);
+    }
+    if (roots.length !== 1) return null;
+
+    const order = [];
+    const visited = new Set();
+    let current = roots[0];
+    while (current && !visited.has(current)) {
+      visited.add(current);
+      order.push(current);
+      const nextCandidates = outgoing.get(current) || [];
+      current = nextCandidates.length === 1 ? nextCandidates[0] : null;
+    }
+    if (order.length !== nodesToOrder.length) return null;
+    return order;
+  }, []);
+
+  const calculateSerpentineLayout = useCallback((nodesToLayout, edgeList, maxPerRow = SERPENTINE_DEFAULT_MAX_PER_ROW) => {
+    const order = detectChainOrder(nodesToLayout, edgeList);
+    if (!order) return null;
+
+    const maxPerRowSafe = Math.max(2, Math.min(50, Number(maxPerRow) || SERPENTINE_DEFAULT_MAX_PER_ROW));
+    const nodeById = new Map(nodesToLayout.map((n) => [n.id, n]));
+    const sizeById = new Map(nodesToLayout.map((n) => [n.id, getNodeSize(n)]));
+
+    const xGap = 120;
+    const yGap = 160;
+
+    const positions = [];
+    let x = 0;
+    let y = 0;
+    let rowMaxHeight = 0;
+    let colIndex = 0;
+    let rowIndex = 0;
+
+    const rowIds = [];
+    const flushRow = () => {
+      if (rowIds.length === 0) return;
+      const isReverse = rowIndex % 2 === 1;
+      const ids = isReverse ? [...rowIds].reverse() : [...rowIds];
+      let cursorX = 0;
+      ids.forEach((nodeId) => {
+        const size = sizeById.get(nodeId) || { width: 200, height: 120 };
+        positions.push({ id: nodeId, x: cursorX, y });
+        cursorX += size.width + xGap;
+      });
+      rowIds.length = 0;
+    };
+
+    order.forEach((nodeId, index) => {
+      const size = sizeById.get(nodeId) || { width: 200, height: 120 };
+      rowMaxHeight = Math.max(rowMaxHeight, size.height);
+      rowIds.push(nodeId);
+      colIndex += 1;
+      const isRowEnd = colIndex >= maxPerRowSafe || index === order.length - 1;
+      if (isRowEnd) {
+        flushRow();
+        rowIndex += 1;
+        colIndex = 0;
+        y += rowMaxHeight + yGap;
+        rowMaxHeight = 0;
+      }
+    });
+
+    // Center around origin for a nicer initial placement.
+    if (positions.length > 0) {
+      const sizeMap = Object.fromEntries(nodesToLayout.map((node) => [node.id, getNodeSize(node)]));
+      const bounds = getBoundsFromPositions(positions, sizeMap);
+      if (bounds) {
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+        positions.forEach((pos) => {
+          pos.x -= centerX;
+          pos.y -= centerY;
+        });
+      }
+    }
+
+    // Preserve current graph center to avoid big camera jumps.
+    const sizeMap = Object.fromEntries(nodesToLayout.map((node) => [node.id, getNodeSize(node)]));
+    const currentPositions = nodesToLayout.map((node) => ({
+      id: node.id,
+      x: node.position?.x || 0,
+      y: node.position?.y || 0
+    }));
+    const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+    const nextBounds = getBoundsFromPositions(positions, sizeMap);
+    if (currentBounds && nextBounds) {
+      const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+      const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+      const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+      const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+      const dx = currentCenterX - nextCenterX;
+      const dy = currentCenterY - nextCenterY;
+      positions.forEach((pos) => {
+        pos.x += dx;
+        pos.y += dy;
+      });
+    }
+
+    // Ensure every node in nodesToLayout is present.
+    const fallbackForMissing = nodesToLayout.map((node) => ({
+      id: node.id,
+      x: node.position?.x || 0,
+      y: node.position?.y || 0
+    }));
+    const posById = new Map(positions.map((p) => [p.id, p]));
+    return fallbackForMissing.map((p) => posById.get(p.id) || p);
+  }, [detectChainOrder]);
+
   // Animate nodes to new positions
   const animateToPositions = useCallback((newPositions) => {
     if (animationRef.current) {
@@ -309,108 +545,6 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     
     animationRef.current = timeline;
   }, [nodes, setNodes]);
-
-  // Auto layout algorithms
-  const applyAutoLayout = useCallback((layoutType) => {
-    if (nodes.length === 0) return;
-
-    if (layoutType === 'hierarchical') {
-      (async () => {
-        try {
-          const elk = await getElk();
-          const elkGraph = {
-            id: 'root',
-            layoutOptions: {
-              'elk.algorithm': 'layered',
-              'elk.direction': 'DOWN',
-              'elk.spacing.nodeNode': '120',
-              'elk.layered.spacing.nodeNodeBetweenLayers': '160',
-              'elk.layered.spacing.edgeNodeBetweenLayers': '80',
-              'elk.edgeRouting': 'ORTHOGONAL'
-            },
-            children: nodes.map((node) => ({
-              id: node.id,
-              width: getNodeSize(node).width,
-              height: getNodeSize(node).height
-            })),
-            edges: edges.map((edge, index) => ({
-              id: edge.id || `edge_${index}`,
-              sources: [edge.source],
-              targets: [edge.target]
-            }))
-          };
-
-          const layout = await elk.layout(elkGraph);
-          const newPositions = (layout.children || []).map((child) => ({
-            id: child.id,
-            x: child.x || 0,
-            y: child.y || 0
-          }));
-
-          if (newPositions.length > 0) {
-            const sizeMap = Object.fromEntries(
-              nodes.map((node) => [node.id, getNodeSize(node)])
-            );
-            const currentPositions = nodes.map((node) => ({
-              id: node.id,
-              x: node.position?.x || 0,
-              y: node.position?.y || 0
-            }));
-            const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
-            const nextBounds = getBoundsFromPositions(newPositions, sizeMap);
-            let offset = { x: 0, y: 0 };
-            if (currentBounds && nextBounds) {
-              const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
-              const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
-              const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
-              const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
-              offset = {
-                x: currentCenterX - nextCenterX,
-                y: currentCenterY - nextCenterY
-              };
-              newPositions.forEach((pos) => {
-                pos.x += offset.x;
-                pos.y += offset.y;
-              });
-            }
-
-            animateToPositions(newPositions);
-            if (typeof setEdgeRoutes === 'function') {
-              const routeMap = buildElkEdgeRoutes(layout.edges || [], offset);
-              setEdgeRoutes(routeMap);
-            }
-          }
-        } catch (err) {
-          console.warn('[AutoLayout] ELK layout failed, falling back:', err);
-          const fallback = calculateHierarchicalLayout(nodes, edges);
-          animateToPositions(fallback);
-          if (typeof setEdgeRoutes === 'function') {
-            setEdgeRoutes({});
-          }
-        }
-      })();
-      return;
-    }
-
-    let newPositions = [];
-
-    switch (layoutType) {
-      case 'radial':
-        newPositions = calculateRadialLayout(nodes);
-        break;
-      case 'grid':
-        newPositions = calculateGridLayout(nodes);
-        break;
-      default:
-        return;
-    }
-
-    // Animate to new positions
-    animateToPositions(newPositions);
-    if (typeof setEdgeRoutes === 'function') {
-      setEdgeRoutes({});
-    }
-  }, [nodes, edges, animateToPositions, setEdgeRoutes, buildElkEdgeRoutes]);
 
   const rerouteEdges = useCallback(async () => {
     if (!Array.isArray(nodes) || nodes.length === 0) return;
@@ -538,6 +672,202 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
       }
     }
   }, [nodes, edges, setEdgeRoutes, buildElkEdgeRoutes]);
+
+  // Auto layout algorithms
+  const applyAutoLayout = useCallback((layoutType) => {
+    if (nodes.length === 0) return;
+
+    if (layoutType === 'hierarchical') {
+      const nodeIds = nodes.map((n) => n?.id).filter(Boolean);
+      const cycleInfo = getCycleInfo(nodeIds, edges);
+      const heavyCycleSize = Math.max(
+        heavyCycleMinSccSize,
+        Math.ceil(nodeIds.length * heavyCycleThreshold)
+      );
+      const isHeavilyCyclic = cycleFallbackEnabled && cycleInfo.hasCycle && nodeIds.length >= heavyCycleMinNodes && cycleInfo.largestSccSize >= heavyCycleSize;
+
+      if (isHeavilyCyclic) {
+        const gridPositions = calculateGridLayout(nodes);
+        const sizeMap = Object.fromEntries(nodes.map((node) => [node.id, getNodeSize(node)]));
+        const currentPositions = nodes.map((node) => ({
+          id: node.id,
+          x: node.position?.x || 0,
+          y: node.position?.y || 0
+        }));
+        const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+        const nextBounds = getBoundsFromPositions(gridPositions, sizeMap);
+        if (currentBounds && nextBounds) {
+          const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+          const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+          const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+          const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+          const dx = currentCenterX - nextCenterX;
+          const dy = currentCenterY - nextCenterY;
+          gridPositions.forEach((pos) => {
+            pos.x += dx;
+            pos.y += dy;
+          });
+        }
+
+        animateToPositions(gridPositions);
+        if (typeof setEdgeRoutes === 'function') {
+          setEdgeRoutes({});
+        }
+        setTimeout(() => {
+          try {
+            rerouteEdges();
+          } catch {
+            // ignore
+          }
+        }, 1050);
+        return;
+      }
+
+      (async () => {
+        try {
+          const elk = await getElk();
+          const elkGraph = {
+            id: 'root',
+            layoutOptions: {
+              'elk.algorithm': 'layered',
+              'elk.direction': layoutDirection,
+              'elk.spacing.nodeNode': '120',
+              'elk.layered.spacing.nodeNodeBetweenLayers': '160',
+              'elk.layered.spacing.edgeNodeBetweenLayers': '80',
+              'elk.edgeRouting': 'ORTHOGONAL'
+            },
+            children: nodes.map((node) => ({
+              id: node.id,
+              width: getNodeSize(node).width,
+              height: getNodeSize(node).height
+            })),
+            edges: edges.map((edge, index) => ({
+              id: edge.id || `edge_${index}`,
+              sources: [edge.source],
+              targets: [edge.target]
+            }))
+          };
+
+          const layout = await elk.layout(elkGraph);
+          const newPositions = (layout.children || []).map((child) => ({
+            id: child.id,
+            x: child.x || 0,
+            y: child.y || 0
+          }));
+
+          if (newPositions.length > 0) {
+            const sizeMap = Object.fromEntries(
+              nodes.map((node) => [node.id, getNodeSize(node)])
+            );
+            const currentPositions = nodes.map((node) => ({
+              id: node.id,
+              x: node.position?.x || 0,
+              y: node.position?.y || 0
+            }));
+            const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+            const nextBounds = getBoundsFromPositions(newPositions, sizeMap);
+            let offset = { x: 0, y: 0 };
+            if (currentBounds && nextBounds) {
+              const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+              const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+              const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+              const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+              offset = {
+                x: currentCenterX - nextCenterX,
+                y: currentCenterY - nextCenterY
+              };
+              newPositions.forEach((pos) => {
+                pos.x += offset.x;
+                pos.y += offset.y;
+              });
+            }
+
+            animateToPositions(newPositions);
+            if (typeof setEdgeRoutes === 'function') {
+              const routeMap = buildElkEdgeRoutes(layout.edges || [], offset);
+              setEdgeRoutes(routeMap);
+            }
+          }
+        } catch (err) {
+          console.warn('[AutoLayout] ELK layout failed, falling back:', err);
+          const fallback = calculateHierarchicalLayout(nodes, edges);
+          animateToPositions(fallback);
+          if (typeof setEdgeRoutes === 'function') {
+            setEdgeRoutes({});
+          }
+        }
+      })();
+      return;
+    }
+
+    if (layoutType === 'serpentine') {
+      const serpentine = calculateSerpentineLayout(nodes, edges, serpentineMaxPerRow);
+      if (!serpentine) {
+        // Fallback to hierarchical for non-chain graphs.
+        applyAutoLayout('hierarchical');
+        return;
+      }
+
+      animateToPositions(serpentine);
+      if (typeof setEdgeRoutes === 'function') {
+        setEdgeRoutes({});
+      }
+      // Reroute edges after the animation finishes.
+      if (typeof setEdgeRoutes === 'function') {
+        setTimeout(() => {
+          try {
+            // Reuse rerouteEdges to get ELK orthogonal routes without moving nodes.
+            rerouteEdges();
+          } catch {
+            // ignore
+          }
+        }, 1050);
+      }
+      return;
+    }
+
+    let newPositions = [];
+
+    switch (layoutType) {
+      case 'radial':
+        newPositions = calculateRadialLayout(nodes);
+        break;
+      case 'grid':
+        newPositions = calculateGridLayout(nodes);
+        break;
+      default:
+        return;
+    }
+
+    // Animate to new positions
+    animateToPositions(newPositions);
+    if (typeof setEdgeRoutes === 'function') {
+      setEdgeRoutes({});
+    }
+
+    // Keep behavior consistent: any layout pass should also reroute.
+    setTimeout(() => {
+      try {
+        rerouteEdges();
+      } catch {
+        // ignore
+      }
+    }, 1050);
+  }, [
+    nodes,
+    edges,
+    animateToPositions,
+    setEdgeRoutes,
+    buildElkEdgeRoutes,
+    calculateSerpentineLayout,
+    rerouteEdges,
+    layoutDirection,
+    serpentineMaxPerRow,
+    cycleFallbackEnabled,
+    heavyCycleThreshold,
+    heavyCycleMinSccSize,
+    heavyCycleMinNodes
+  ]);
 
   // Handle mode changes
   const handleModeChange = useCallback((newMode) => {

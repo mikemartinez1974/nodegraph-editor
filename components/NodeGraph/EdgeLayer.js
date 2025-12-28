@@ -746,8 +746,13 @@ const EdgeLayer = forwardRef(({
         return segments[segments.length - 1][1];
       };
 
-      const orthogonalSegments = isOrthogonal
+      const orthogonalSegmentsRaw = isOrthogonal
         ? (useRoutedSegments ? routedSegments : buildOrthogonalSegments())
+        : null;
+      const orthogonalSegments = isOrthogonal
+        ? (Array.isArray(orthogonalSegmentsRaw) && orthogonalSegmentsRaw.length
+          ? orthogonalSegmentsRaw
+          : [[sourcePos, targetPos]])
         : null;
 
       // Draw edge path

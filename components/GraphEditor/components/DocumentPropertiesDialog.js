@@ -48,6 +48,35 @@ const EDGE_ROUTING_OPTIONS = [
   { value: 'curved', label: 'Curved (force)' }
 ];
 
+const LAYOUT_MODE_OPTIONS = [
+  { value: 'autoOnMissingPositions', label: 'Auto (only when positions omitted)' },
+  { value: 'manual', label: 'Manual (never auto-layout on paste)' }
+];
+
+const LAYOUT_TYPE_OPTIONS = [
+  { value: 'hierarchical', label: 'Hierarchical' },
+  { value: 'serpentine', label: 'Serpentine' },
+  { value: 'grid', label: 'Grid' },
+  { value: 'radial', label: 'Radial' }
+];
+
+const LAYOUT_DIRECTION_OPTIONS = [
+  { value: 'DOWN', label: 'Top-down' },
+  { value: 'RIGHT', label: 'Left-right' }
+];
+
+const DEFAULT_LAYOUT_SETTINGS = {
+  mode: 'autoOnMissingPositions',
+  defaultLayout: 'hierarchical',
+  direction: 'DOWN',
+  serpentine: {
+    maxPerRow: 6
+  },
+  cycleFallback: {
+    enabled: true
+  }
+};
+
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
   const date = new Date(iso);
@@ -174,6 +203,46 @@ export default function DocumentPropertiesDialog({
 
   const handleDocSettingsChange = (key, value) => {
     setDocSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleLayoutSettingsChange = (key, value) => {
+    setDocSettings((prev) => ({
+      ...prev,
+      layout: {
+        ...(prev.layout || {}),
+        [key]: value,
+        serpentine: { ...(prev.layout?.serpentine || {}) },
+        cycleFallback: { ...(prev.layout?.cycleFallback || {}) }
+      }
+    }));
+  };
+
+  const handleLayoutSerpentineChange = (key, value) => {
+    setDocSettings((prev) => ({
+      ...prev,
+      layout: {
+        ...(prev.layout || {}),
+        serpentine: {
+          ...(prev.layout?.serpentine || {}),
+          [key]: value
+        },
+        cycleFallback: { ...(prev.layout?.cycleFallback || {}) }
+      }
+    }));
+  };
+
+  const handleLayoutCycleFallbackChange = (key, value) => {
+    setDocSettings((prev) => ({
+      ...prev,
+      layout: {
+        ...(prev.layout || {}),
+        serpentine: { ...(prev.layout?.serpentine || {}) },
+        cycleFallback: {
+          ...(prev.layout?.cycleFallback || {}),
+          [key]: value
+        }
+      }
+    }));
   };
 
   const handleGithubSettingsChange = (updates = {}) => {
@@ -315,7 +384,15 @@ export default function DocumentPropertiesDialog({
       onResetProjectMeta();
     }
     setMeta(mapProjectMeta({}, meta.shareLink || defaultShareLink));
-    setDocSettings((prev) => ({ ...prev, edgeRouting: 'auto' }));
+    setDocSettings((prev) => ({
+      ...prev,
+      edgeRouting: 'auto',
+      layout: {
+        ...DEFAULT_LAYOUT_SETTINGS,
+        serpentine: { ...(DEFAULT_LAYOUT_SETTINGS.serpentine || {}) },
+        cycleFallback: { ...(DEFAULT_LAYOUT_SETTINGS.cycleFallback || {}) }
+      }
+    }));
   };
 
   const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
@@ -769,6 +846,82 @@ export default function DocumentPropertiesDialog({
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                  Layout Defaults
+                </Typography>
+                <TextField
+                  select
+                  size="small"
+                  label="Auto-layout mode"
+                  value={docSettings.layout?.mode || DEFAULT_LAYOUT_SETTINGS.mode}
+                  onChange={(event) => handleLayoutSettingsChange('mode', event.target.value)}
+                  helperText="Controls whether Twilight auto-layouts when pasted nodes omit positions."
+                  fullWidth
+                >
+                  {LAYOUT_MODE_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  select
+                  size="small"
+                  label="Default layout"
+                  value={docSettings.layout?.defaultLayout || DEFAULT_LAYOUT_SETTINGS.defaultLayout}
+                  onChange={(event) => handleLayoutSettingsChange('defaultLayout', event.target.value)}
+                  helperText="Used for Auto-on-missing-positions and the Apply button default."
+                  fullWidth
+                >
+                  {LAYOUT_TYPE_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  select
+                  size="small"
+                  label="Direction"
+                  value={docSettings.layout?.direction || DEFAULT_LAYOUT_SETTINGS.direction}
+                  onChange={(event) => handleLayoutSettingsChange('direction', event.target.value)}
+                  helperText="Applies to hierarchical layout."
+                  fullWidth
+                >
+                  {LAYOUT_DIRECTION_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  size="small"
+                  type="number"
+                  label="Serpentine: max nodes per row"
+                  value={docSettings.layout?.serpentine?.maxPerRow ?? DEFAULT_LAYOUT_SETTINGS.serpentine.maxPerRow}
+                  onChange={(event) => {
+                    const raw = event.target.value;
+                    const value = raw === '' ? '' : Math.max(2, Math.min(50, Number(raw)));
+                    handleLayoutSerpentineChange('maxPerRow', value);
+                  }}
+                  helperText="MVP serpentine rule for long chains."
+                  fullWidth
+                  inputProps={{ min: 2, max: 50 }}
+                />
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.layout?.cycleFallback?.enabled ?? DEFAULT_LAYOUT_SETTINGS.cycleFallback.enabled}
+                      onChange={(event) => handleLayoutCycleFallbackChange('enabled', event.target.checked)}
+                    />
+                  }
+                  label="Cycles fallback: allow grid for heavily cyclic graphs"
+                />
               </Stack>
               <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
             </Paper>

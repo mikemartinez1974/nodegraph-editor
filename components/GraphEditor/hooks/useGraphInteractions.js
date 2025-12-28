@@ -91,6 +91,23 @@ export default function useGraphInteractions({
         if (settings.edgeRouting) {
           setDocumentSettings((prev) => ({ ...prev, edgeRouting: settings.edgeRouting }));
         }
+        if (settings.layout && typeof settings.layout === 'object') {
+          setDocumentSettings((prev) => ({
+            ...prev,
+            layout: {
+              ...(prev.layout || {}),
+              ...settings.layout,
+              serpentine: {
+                ...(prev.layout?.serpentine || {}),
+                ...(settings.layout?.serpentine || {})
+              },
+              cycleFallback: {
+                ...(prev.layout?.cycleFallback || {}),
+                ...(settings.layout?.cycleFallback || {})
+              }
+            }
+          }));
+        }
         if (settings.github) {
           setDocumentSettings((prev) => ({
             ...prev,

@@ -556,6 +556,7 @@ useEffect(() => {
         snapToGrid: snapToGrid,
         gridSize: documentSettings?.gridSize || 20,
         edgeRouting: documentSettings?.edgeRouting || 'auto',
+        layout: documentSettings?.layout || null,
         github: documentSettings?.github || null,
         autoSave: false
       },
@@ -723,10 +724,12 @@ useEffect(() => {
     setNodes,
     selectedNodeIds,
     edges,
-    setEdgeRoutes
+    setEdgeRoutes,
+    layoutSettings: documentSettings?.layout
   });
 
   const pendingAutoLayoutOnPasteRef = useRef(false);
+  const defaultLayoutSyncRef = useRef(null);
 
   useEffect(() => {
     const handleAutoLayoutRequested = () => {
@@ -739,13 +742,28 @@ useEffect(() => {
   useEffect(() => {
     if (!pendingAutoLayoutOnPasteRef.current) return;
     pendingAutoLayoutOnPasteRef.current = false;
+    const layoutMode = documentSettings?.layout?.mode || 'autoOnMissingPositions';
+    if (layoutMode === 'manual') return;
     try {
       modesHook.applyAutoLayout?.();
       setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
     } catch (err) {
       setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
     }
-  }, [nodes.length, edges.length, modesHook.applyAutoLayout, setSnackbar]);
+  }, [nodes.length, edges.length, documentSettings?.layout?.mode, modesHook.applyAutoLayout, setSnackbar]);
+
+  useEffect(() => {
+    const defaultLayout = documentSettings?.layout?.defaultLayout;
+    if (!defaultLayout) return;
+    if (typeof modesHook.setAutoLayoutType !== 'function') return;
+    if (defaultLayoutSyncRef.current === defaultLayout) return;
+    try {
+      modesHook.setAutoLayoutType(defaultLayout);
+      defaultLayoutSyncRef.current = defaultLayout;
+    } catch {
+      // ignore
+    }
+  }, [documentSettings?.layout?.defaultLayout, modesHook.setAutoLayoutType]);
 
   useEffect(() => {
     const rerouteEdges = modesHook.rerouteEdges;

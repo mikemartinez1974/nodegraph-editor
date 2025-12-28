@@ -163,6 +163,14 @@ const Toolbar = ({
   const canAlign = selectionCount > 1;
   const canDistribute = selectionCount > 2;
 
+  const autoLayoutLabelByType = {
+    hierarchical: 'Hierarchical',
+    serpentine: 'Serpentine',
+    radial: 'Radial',
+    grid: 'Grid'
+  };
+  const autoLayoutLabel = autoLayoutLabelByType[autoLayoutType] || autoLayoutType;
+
   // Retractable drawer state
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -921,7 +929,7 @@ const Toolbar = ({
             variant="outlined"
             disabled={isFreeUser}
           >
-            {autoLayoutType}
+            {autoLayoutLabel}
           </Button>
           <Button
             onClick={onApplyLayout}
@@ -971,6 +979,9 @@ const Toolbar = ({
       >
         <MenuItem onClick={() => { onAutoLayoutChange('hierarchical'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'hierarchical'}>
           Hierarchical
+        </MenuItem>
+        <MenuItem onClick={() => { onAutoLayoutChange('serpentine'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'serpentine'}>
+          Serpentine
         </MenuItem>
         <MenuItem onClick={() => { onAutoLayoutChange('radial'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'radial'}>
           Radial

@@ -3,6 +3,17 @@ import { useTheme } from '@mui/material/styles';
 import { themeConfigFromMuiTheme } from '../utils/themeUtils';
 
 const DEFAULT_GRID_SIZE = 20;
+const DEFAULT_LAYOUT_SETTINGS = {
+  mode: 'autoOnMissingPositions', // 'autoOnMissingPositions' | 'manual'
+  defaultLayout: 'hierarchical', // 'hierarchical' | 'serpentine' | 'radial' | 'grid'
+  direction: 'DOWN', // 'DOWN' | 'RIGHT'
+  serpentine: {
+    maxPerRow: 6
+  },
+  cycleFallback: {
+    enabled: true
+  }
+};
 
 const createInitialDocumentSettings = (theme) => ({
   url: '',
@@ -10,6 +21,11 @@ const createInitialDocumentSettings = (theme) => ({
   gridSize: DEFAULT_GRID_SIZE,
   theme: themeConfigFromMuiTheme(theme),
   edgeRouting: 'auto',
+  layout: {
+    ...DEFAULT_LAYOUT_SETTINGS,
+    serpentine: { ...(DEFAULT_LAYOUT_SETTINGS.serpentine || {}) },
+    cycleFallback: { ...(DEFAULT_LAYOUT_SETTINGS.cycleFallback || {}) }
+  },
   github: {
     repo: '',
     path: '',
