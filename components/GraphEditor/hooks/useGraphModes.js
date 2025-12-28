@@ -412,6 +412,133 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     }
   }, [nodes, edges, animateToPositions, setEdgeRoutes, buildElkEdgeRoutes]);
 
+  const rerouteEdges = useCallback(async () => {
+    if (!Array.isArray(nodes) || nodes.length === 0) return;
+    if (!Array.isArray(edges) || edges.length === 0) {
+      if (typeof setEdgeRoutes === 'function') setEdgeRoutes({});
+      return;
+    }
+
+    try {
+      const elk = await getElk();
+
+      const nodeById = new Map(nodes.map((node) => [node.id, node]));
+
+      const normalizeSide = (side) => {
+        switch (String(side || '').toLowerCase()) {
+          case 'left':
+            return 'WEST';
+          case 'right':
+            return 'EAST';
+          case 'top':
+            return 'NORTH';
+          case 'bottom':
+            return 'SOUTH';
+          default:
+            return null;
+        }
+      };
+
+      const portsByNodeId = new Map();
+      const getPortsForNode = (node) => {
+        if (!node) return [];
+        if (portsByNodeId.has(node.id)) return portsByNodeId.get(node.id);
+        const w = getNodeSize(node).width;
+        const h = getNodeSize(node).height;
+        const handles = Array.isArray(node?.handles) ? node.handles : [];
+        const ports = handles
+          .filter((handle) => handle && typeof handle.id === 'string' && handle.id)
+          .map((handle) => {
+            const rawSide = handle?.position?.side;
+            const side = normalizeSide(rawSide);
+            const offset = Number(handle?.position?.offset);
+            const t = Number.isFinite(offset) ? Math.min(1, Math.max(0, offset)) : 0.5;
+            const portId = `${node.id}::${handle.id}`;
+            const port = {
+              id: portId,
+              width: 1,
+              height: 1,
+              layoutOptions: {}
+            };
+            if (side) {
+              port.layoutOptions['elk.port.side'] = side;
+            }
+            if (side === 'WEST') {
+              port.x = 0;
+              port.y = h * t;
+            } else if (side === 'EAST') {
+              port.x = w;
+              port.y = h * t;
+            } else if (side === 'NORTH') {
+              port.x = w * t;
+              port.y = 0;
+            } else if (side === 'SOUTH') {
+              port.x = w * t;
+              port.y = h;
+            }
+            return port;
+          });
+        portsByNodeId.set(node.id, ports);
+        return ports;
+      };
+
+      const resolvePort = (nodeId, handleId) => {
+        if (!nodeId || !handleId) return null;
+        const node = nodeById.get(nodeId);
+        if (!node) return null;
+        const ports = getPortsForNode(node);
+        const portId = `${node.id}::${handleId}`;
+        return ports.some((p) => p.id === portId) ? portId : null;
+      };
+
+      const elkGraph = {
+        id: 'root',
+        layoutOptions: {
+          'elk.algorithm': 'fixed',
+          'elk.edgeRouting': 'ORTHOGONAL',
+          'elk.portConstraints': 'FIXED_SIDE'
+        },
+        children: nodes.map((node) => {
+          const size = getNodeSize(node);
+          const x = Number(node?.position?.x) || 0;
+          const y = Number(node?.position?.y) || 0;
+          const ports = getPortsForNode(node);
+          return {
+            id: node.id,
+            x,
+            y,
+            width: size.width,
+            height: size.height,
+            ports: ports.length ? ports : undefined
+          };
+        }),
+        edges: edges
+          .filter((edge) => edge && edge.source && edge.target)
+          .map((edge, index) => {
+            const id = edge.id || `edge_${index}`;
+            const sourcePort = resolvePort(edge.source, edge.sourceHandle);
+            const targetPort = resolvePort(edge.target, edge.targetHandle);
+            return {
+              id,
+              sources: [sourcePort || edge.source],
+              targets: [targetPort || edge.target]
+            };
+          })
+      };
+
+      const layout = await elk.layout(elkGraph);
+      const routeMap = buildElkEdgeRoutes(layout.edges || []);
+      if (typeof setEdgeRoutes === 'function') {
+        setEdgeRoutes(routeMap);
+      }
+    } catch (err) {
+      console.warn('[EdgeReroute] ELK routing failed:', err);
+      if (typeof setEdgeRoutes === 'function') {
+        setEdgeRoutes({});
+      }
+    }
+  }, [nodes, edges, setEdgeRoutes, buildElkEdgeRoutes]);
+
   // Handle mode changes
   const handleModeChange = useCallback((newMode) => {
     if (newMode === mode) return;
@@ -445,6 +572,7 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     autoLayoutType,
     handleModeChange,
     setAutoLayoutType, // <-- ensure this is exported
-    applyAutoLayout: () => applyAutoLayout(autoLayoutType)
+    applyAutoLayout: () => applyAutoLayout(autoLayoutType),
+    rerouteEdges
   };
 }

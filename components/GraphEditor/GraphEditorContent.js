@@ -345,6 +345,7 @@ const GraphEditorContent = () => {
           onToggleSnapToGrid={handleToggleSnapToGrid}
           gridSize={documentSettings.gridSize}
           edgeRouting={documentSettings.edgeRouting}
+          githubSettings={documentSettings.github}
           documentTheme={documentTheme}
           isMobile={isMobile}
           isSmallScreen={isSmallScreen}
@@ -378,11 +379,13 @@ const GraphEditorContent = () => {
               }
               return next;
             });
-            try {
-              if (handlers && typeof handlers.handleUpdateNodeData === 'function') {
-                handlers.handleUpdateNodeData(id, updates, options);
-              }
-            } catch (err) {}
+            if (!options || options !== true) {
+              try {
+                if (handlers && typeof handlers.handleUpdateNodeData === 'function') {
+                  handlers.handleUpdateNodeData(id, updates, options);
+                }
+              } catch (err) {}
+            }
           }}
           onUpdateEdge={(id, updates) => {
             setEdges(prev => {

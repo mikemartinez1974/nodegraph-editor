@@ -11,11 +11,13 @@ import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 export default function ViewActions({ 
   onToggleMinimap,
   onToggleGrid,
   onAutoLayout,
+  onRerouteEdges,
   onAlignNodes,
   onDistributeNodes,
   showMinimap,
@@ -80,6 +82,19 @@ export default function ViewActions({
             disabled={isFreeUser || selectionCount < 2}
           >
             <FormatAlignCenterIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Tooltip title="Reroute Edges (ELK)">
+        <span>
+          <IconButton
+            onClick={onRerouteEdges}
+            color="inherit"
+            size="small"
+            disabled={isFreeUser}
+          >
+            <AltRouteIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>

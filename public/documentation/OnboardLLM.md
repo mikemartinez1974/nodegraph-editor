@@ -54,6 +54,7 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - **Handle type matching is opt-in.** Types like `value`, `trigger`, `any`, or direction tokens (`input`, `output`, `bidirectional`) are treated as wildcards. Only enforce matching when both handles declare strict semantic types (e.g., `boolean`, `number`, `string`).
 - Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
 - **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
+- **Use colors + emojis intentionally.** Color-code clusters and add small emojis in labels to make graphs scannable at a glance.
 - **Edge routing is configurable.** Use `edge.style.route: "orthogonal"` (or `edge.style.orthogonal: true`) to force right-angled paths; set `edge.style.curved: true` for bezier curves. The user can also override routing in Document Properties.
 - **Creation order matters.** Always create `nodes` first, then `edges`, then `groups` (every pass). If using `batch`/`transaction`, ensure each command respects this order.
 
@@ -101,6 +102,61 @@ If it is purely descriptive, leave it unconnected or organize it using groups in
 - Handle `position` must be an object like `{ "side": "left|right|top|bottom", "offset": 0.5 }` (not a string).
 - `sourceHandle` / `targetHandle` must match the handle `id` values you declare.
 - `update` requires a target: include `id` or `ids` for nodes/edges/groups. There is no implicit “update all.”
+
+---
+
+## Graph Mutation vs Graph Illustration (Critical)
+
+If a graph already exists, **never** output a full `nodegraph-data` object. That implicitly replaces the entire workspace and will destroy user state.
+
+This is the single most common and most damaging mistake an AI can make in Twilight.
+
+**Forbidden in existing graphs:**
+
+- Re-output `{ "type": "nodegraph-data", ... }`
+- Assume an empty canvas
+- “Redraw” the graph in full
+- Recreate existing nodes instead of updating them
+- Emit nodes without an explicit `action`
+- Implicitly replace content by omission
+
+If you are not explicitly asked to wipe or recreate the graph, assume persistence.
+
+**Required pattern: state deltas only:**
+
+- `createNodes`
+- `createEdges`
+- `update`
+- `delete`
+- `move` / `translate`
+- `batch` / `transaction`
+
+Every change must be additive, mutative, or subtractive — never declarative.
+
+**Decision rule (memorize this):**
+
+- If you are describing a graph → use prose or examples
+- If you are changing a graph → use action commands only
+- If you are adding analysis → append new nodes downstream
+- If unsure → do nothing and ask
+
+When in doubt, append, never overwrite.
+
+**Safe defaults for AI agents:**
+
+- Assume the graph already exists
+- Assume IDs must be preserved
+- Assume history matters
+- Assume Git diffs should stay small
+- Assume erasure is a bug
+
+Twilight’s core value is continuity. Breaking continuity is always worse than adding clutter.
+
+**Why this rule exists:**
+
+Most diagram tools treat graphs as disposable pictures. Twilight treats graphs as stateful cognitive systems.
+
+Therefore: re-emitting a full graph is equivalent to calling `clearGraph`. This is almost never what the user wants.
 
 ---
 

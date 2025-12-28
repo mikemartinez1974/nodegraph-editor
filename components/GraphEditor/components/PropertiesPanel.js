@@ -183,8 +183,10 @@ export default function ConsolidatedPropertiesPanel({
   
   // Node-specific states
   const [memo, setMemo] = useState('');
+  const memoRef = useRef('');
   const [memoView, setMemoView] = useState('edit');
   const [memoExpanded, setMemoExpanded] = useState(false);
+  const [memoDirty, setMemoDirty] = useState(false);
   const [nodeColor, setNodeColor] = useState(defaultNodeColor);
   const [nodeGradientEnabled, setNodeGradientEnabled] = useState(false);
   const [nodeGradientStart, setNodeGradientStart] = useState('#2196f3');
@@ -258,6 +260,7 @@ export default function ConsolidatedPropertiesPanel({
   const panelTitleId = useId();
   const descriptionId = useId();
   const headerRef = useRef(null);
+  const prevEntityIdRef = useRef(null);
 
   const dashPatterns = {
     solid: [],
@@ -362,12 +365,20 @@ export default function ConsolidatedPropertiesPanel({
 
   // Update states based on selected entity
   useEffect(() => {
+    const isNewSelection = entityId !== prevEntityIdRef.current;
+    if (isNewSelection) {
+      prevEntityIdRef.current = entityId;
+      setMemoDirty(false);
+    }
     if (selectedNode) {
       setLabel(selectedNode.label || '');
       const initialMemo = selectedNode.type === 'markdown'
         ? (selectedNode.data?.markdown ?? selectedNode.data?.memo ?? '')
         : (selectedNode.data?.memo || '');
-      setMemo(initialMemo);
+      if ((isNewSelection || !memoDirty) && initialMemo !== memoRef.current) {
+        setMemo(initialMemo);
+        memoRef.current = initialMemo;
+      }
       
       // Check if node color is a gradient
       const currentColor = selectedNode.color || defaultNodeColor;
@@ -452,12 +463,14 @@ export default function ConsolidatedPropertiesPanel({
       setVisible(selectedGroup.visible !== false);
     } else {
       setMemo('');
+      memoRef.current = '';
+      setMemoDirty(false);
       setNodeHandles([]);
       setNodeStateFields({ locked: false, collapsed: false, hidden: false });
       setEdgeStateFields({ enabled: true, locked: false });
       setEdgeLogicFields({ condition: '', transform: '', delayMs: '', throttleMs: '' });
     }
-  }, [entityId, defaultNodeColor, defaultEdgeColor, selectedNode, selectedEdge, selectedGroup]);
+  }, [entityId, defaultNodeColor, defaultEdgeColor, selectedNode, selectedEdge, selectedGroup, memoDirty]);
 
   useEffect(() => {
     if (selectedNode) {
@@ -504,13 +517,18 @@ export default function ConsolidatedPropertiesPanel({
 
   const handleMemoChange = (e) => {
     const newMemo = e.target.value;
-    setMemo(newMemo);
-    if (onUpdateNode) {
-      const dataPayload = isMarkdownNode
-        ? { markdown: newMemo }
-        : { memo: newMemo };
-      onUpdateNode(entityId, { data: dataPayload }, true);
-    }
+    memoRef.current = newMemo;
+    if (!memoDirty) setMemoDirty(true);
+  };
+
+  const handleMemoBlur = () => {
+    if (!onUpdateNode || !entityId || isLocked) return;
+    const dataPayload = isMarkdownNode
+      ? { markdown: memoRef.current }
+      : { memo: memoRef.current };
+    onUpdateNode(entityId, { data: dataPayload }, true);
+    setMemo(memoRef.current);
+    setMemoDirty(false);
   };
 
   const handleNodeColorChange = (color) => {
@@ -961,11 +979,13 @@ export default function ConsolidatedPropertiesPanel({
                 </Box>
                 {memoView === 'edit' ? (
                   <TextField
+                    key={entityId || 'memo-input'}
                     inputRef={memoInputRef}
                     multiline
                     rows={8}
-                    value={memo}
+                    defaultValue={memo}
                     onChange={handleMemoChange}
+                    onBlur={handleMemoBlur}
                     fullWidth
                     variant="filled"
                     disabled={isLocked}

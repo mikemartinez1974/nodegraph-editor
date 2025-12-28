@@ -1,0 +1,109 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "live-docs-goal",
+      "type": "markdown",
+      "label": "Goal",
+      "position": { "x": -40, "y": -320 },
+      "width": 640,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Live Documents — Goal\nMake document-backed graphs feel **live**: edits to the underlying source should be reflected in the open editor without a full manual workflow.\n\nFirst target: a clear **Reload** button."
+      }
+    },
+    {
+      "id": "live-docs-types",
+      "type": "markdown",
+      "label": "Document Types",
+      "position": { "x": 680, "y": -320 },
+      "width": 640,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Local vs Web Documents\n**Web (http/https):** can be polled or pushed (SSE/WebSocket).\n\n**Local file (file picker / local://):** browsers can’t reliably watch disk changes; needs manual reload, polling a local server, or a desktop wrapper."
+      }
+    },
+    {
+      "id": "live-docs-mvp",
+      "type": "markdown",
+      "label": "MVP",
+      "position": { "x": -40, "y": -80 },
+      "width": 640,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## MVP — Reload Button\n- Add **Reload document** action in toolbar\n- Re-fetch/re-read the current document source\n- Replace graph state (simple) or apply a patch (later)\n- Show a snackbar: \"Reloaded\" / \"No changes\" / \"Failed\""
+      }
+    },
+    {
+      "id": "live-docs-safety",
+      "type": "markdown",
+      "label": "Safety",
+      "position": { "x": 680, "y": -40 },
+      "width": 640,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Safety / Conflict Policy\n- If there are unsaved local edits:\n  - either block reload, or\n  - confirm: \"Reload will overwrite local changes\"\n- Later: merge/patch strategy + conflict UI\n- Keep IDs stable where possible"
+      }
+    },
+    {
+      "id": "live-docs-web",
+      "type": "markdown",
+      "label": "Web Live Modes",
+      "position": { "x": -40, "y": 220 },
+      "width": 640,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Web Documents — Live Modes\n- **Polling**: `HEAD`/`GET` every N seconds (ETag/Last-Modified)\n- **Push**: SSE/WebSocket sends \"doc changed\" events\n- Prefer polling first (MVP), add push later"
+      }
+    },
+    {
+      "id": "live-docs-local",
+      "type": "markdown",
+      "label": "Local Live Options",
+      "position": { "x": 680, "y": 260 },
+      "width": 640,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Local Documents — Options\n- **Manual reload** (MVP)\n- **Local server**: serve the file over http://localhost and use web polling\n- **Desktop wrapper** (Electron/Tauri): true filesystem watch\n\nDecision: keep web-first; document local limitations clearly."
+      }
+    },
+    {
+      "id": "live-docs-next",
+      "type": "markdown",
+      "label": "Next Iterations",
+      "position": { "x": -40, "y": 540 },
+      "width": 640,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Next Iterations\n- Add per-document \"Live\" toggle + poll interval\n- Patch-based updates (apply deltas, preserve selection)\n- Visual diff / history integration\n- Server-side collaboration (multi-editor)\n- VS Code extension integration (best-in-class local live)"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "live-docs-e1", "type": "child", "source": "live-docs-goal", "target": "live-docs-types", "label": "scope" },
+    { "id": "live-docs-e2", "type": "child", "source": "live-docs-goal", "target": "live-docs-mvp", "label": "start" },
+    { "id": "live-docs-e3", "type": "child", "source": "live-docs-mvp", "target": "live-docs-safety", "label": "needs" },
+    { "id": "live-docs-e4", "type": "child", "source": "live-docs-types", "target": "live-docs-web", "label": "web path" },
+    { "id": "live-docs-e5", "type": "child", "source": "live-docs-types", "target": "live-docs-local", "label": "local path" },
+    { "id": "live-docs-e6", "type": "child", "source": "live-docs-web", "target": "live-docs-next", "label": "iterate" },
+    { "id": "live-docs-e7", "type": "child", "source": "live-docs-local", "target": "live-docs-next", "label": "iterate" }
+  ],
+  "timestamp": "2025-12-28T00:00:00.000Z",
+  "nodeCount": 7,
+  "edgeCount": 7
+}
+

@@ -1,0 +1,319 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-28T05:33:17.145Z",
+    "modified": "2025-12-28T05:33:17.145Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 106,
+      "y": 287.5
+    },
+    "zoom": 1
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "edge-layout-goal",
+      "type": "markdown",
+      "label": "Goal",
+      "position": {
+        "x": 515,
+        "y": -980
+      },
+      "width": 620,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goal\nMake Twilight graphs look **professional by default**.\n\nPrimary pain: **messy edges**.\n\nConstraint: optimize for **small LLM payloads** (IDs + intent, not geometry)."
+      }
+    },
+    {
+      "id": "edge-layout-payload",
+      "type": "markdown",
+      "label": "LLM Payload Minimization",
+      "position": {
+        "x": 515,
+        "y": -620
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## LLM Payload Minimization (Principles)\n**Goal:** keep chatbot commands small while preserving power.\n\n- Prefer **intent** over geometry (\"connect A→B\", not ports+coordinates)\n- Use **type defaults** + hydration on load (size/style/ports when needed)\n- Handles are **functional but optional**\n  - omit handles unless you need precise semantics\n  - rely on deterministic fallback attachment + routing\n- Avoid sending redundant fields (width/height/colors/positions) unless necessary\n- Provide robust editor-side tools: autolayout, reroute, incremental growth, debug toggles"
+      }
+    },
+    {
+      "id": "edge-layout-phase-1",
+      "type": "markdown",
+      "label": "Phase 1 — Handles & Edges",
+      "position": {
+        "x": 515,
+        "y": -200
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 1 — Handles & Edges (Foundation)\n**Goal:** edges attach predictably and route deterministically **without** requiring handles everywhere.\n\n- Handles are **functional but optional**\n  - omit handles unless you need precise semantics\n  - docs/markdown nodes should not require handles to connect\n- Do **not** force every node into left/right input/output handles\n- Practical routing policy\n  - **Live editing** uses deterministic geometry fallback (side-by-direction + orthogonal segments)\n  - **Beautify/Reroute** runs ELK and replaces fallback routes with ELK routes\n  - If handles exist, pass them to ELK as port constraints; otherwise omit and let ELK choose\n- If handles are omitted: use **geometry-based** deterministic attachment\n  - Choose side based on source→target direction (top/right/bottom/left)\n  - Attach on the node boundary on that side\n  - Stable slotting: order by **edge id** to avoid stacking jitter\n- Reliable node bounds\n  - **Create** includes width/height unless the node type declares defaults\n  - **Update** omits width/height unless changing size\n- Minimize LLM payload: `source/target` required; `sourceHandle/targetHandle` optional; omit redundant node fields\n- Default edge style: **orthogonal** routing\n- Default label placement: **centered on the edge**\n- Dev view: show ports + route points; expose as a toggle in **Edge Properties**"
+      }
+    },
+    {
+      "id": "edge-layout-phase-1-blockers",
+      "type": "markdown",
+      "label": "Phase 1 — Considerations",
+      "position": {
+        "x": -121.66666666666674,
+        "y": 220
+      },
+      "width": 620,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 1 — Considerations / Blockers\n- Edge authority rules\n  - Live: geometry fallback\n  - Beautify/Reroute: ELK routes override\n  - Handles override fallback; passed to ELK when present\n- Reliable node bounds\n  - Create includes size (or node-type defaults exist)\n  - Updates omit size unless changing it\n- Stable slotting\n  - Use **edge id** ordering per node-side\n- Orthogonal-by-default\n  - Prefer ELK routes when available; otherwise use deterministic orthogonal fallback\n- Dev overlay\n  - Toggle in Edge Properties; render ports + route points in EdgeLayer\n- Validation + hydration\n  - Handles/positions optional; hydrate defaults so small LLM payloads don’t fail"
+      }
+    },
+    {
+      "id": "edge-layout-phase-2",
+      "type": "markdown",
+      "label": "Phase 2 — Layered Layout",
+      "position": {
+        "x": 618.3333333333333,
+        "y": 260
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 2 — Layered Layout (Readable DAGs)\n**Goal:** most pasted/generated graphs become readable without manual work.\n\n### Status\n- ✅ Auto-layout trigger implemented: when positions are omitted in pasted `create` / `createNodes`\n- ✅ Layout mutates node positions (positions persist when saved)\n\n### Remaining\n- Serpentine option (MVP: max nodes per row)\n- Cycles/non-DAG fallback (best-effort layered; grid fallback threshold)\n- Beautify = layout + reroute consistency across entry points\n- Document-level `documentSettings.layout` (first-class config)\n\n---\n\n### Decisions\n- **Auto-layout trigger:** only when positions are **not present** in the pasted `create` command (positions optional by design)\n- \"Beautify\" is the explicit override (runs even if positions exist)\n- Layered direction: top-down default; support left-right\n- Tune spacing/padding defaults (node-node, layer spacing)\n- Avoid overlaps; respect node sizes\n- Handle long chains with a **serpentine option**\n- Defer overlap prompts/toasts; later consider \"pin nodes\" for stability\n- Minimize LLM payload: positions optional; if missing, autolayout fills in"
+      }
+    },
+    {
+      "id": "edge-layout-phase-2-considerations",
+      "type": "markdown",
+      "label": "Phase 2 — Considerations",
+      "position": {
+        "x": 721.6666666666666,
+        "y": 700
+      },
+      "width": 620,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 2 — Considerations / Blockers\n- Positions policy\n  - \"Missing\" means **not present in the pasted create command**\n  - Positions are optional; include them only when intentional\n- Node bounds\n  - Nodes need a size to exist; default sizes must be reliable\n  - Avoid \"index card stack\" as the default look (tune spacing + direction)\n- Routing after layout\n  - Treat routes as **computed** (not canonical)\n  - **Beautify = layout + reroute** so edges match immediately\n  - If routes are stale, clear and fall back until reroute runs\n- Serpentine\n  - MVP rule: **max nodes per row** (explicit wrap count)\n  - Will need deeper heuristics later\n- Groups\n  - Treat as **logical** groupings for MVP (do not constrain layout yet)\n- Cycles/non-DAGs\n  - Default: layered **best effort** (accept some backward/feedback edges)\n  - Fallback: if graph is heavily cyclic (large SCC), use **grid** for stability\n  - Keep behavior deterministic (simple heuristic threshold)"
+      }
+    },
+    {
+      "id": "edge-layout-phase-3",
+      "type": "markdown",
+      "label": "Phase 3 — Routing Polish",
+      "position": {
+        "x": -18.33333333333337,
+        "y": 730
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 3 — Routing Polish (Edges Look Intentional)\n**Goal:** reduce crossings and visual noise.\n\n- Use ELK routing sections (orthogonal) as the default path\n- Improve crossing reduction by tuning ELK layered options\n- Handle multi-edges/fan-in/fan-out (parallel edge spacing)\n- Keep labels simple for now (centered), add smarter placement later\n- Add a \"Reroute edges\" action without moving nodes\n- Minimize payload: routes are computed (not stored in `.node` by default)"
+      }
+    },
+    {
+      "id": "edge-layout-phase-4",
+      "type": "markdown",
+      "label": "Phase 4 — Incremental / Mental Map",
+      "position": {
+        "x": -18.33333333333337,
+        "y": 1180
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 4 — Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the affected subgraph (local reflow)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-group layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
+      }
+    },
+    {
+      "id": "edge-layout-phase-5",
+      "type": "markdown",
+      "label": "Phase 5 — Extensibility",
+      "position": {
+        "x": -18.33333333333337,
+        "y": 1600
+      },
+      "width": 620,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase 5 — Extensibility (More Layouts Over Time)\n**Goal:** add new layout strategies without refactors.\n\n- Make layout **first-class** in the document (`documentSettings.layout`)\n  - `mode` (manual/auto), `algorithm`, `direction`, `spacingPreset`\n  - optional knobs: `serpentine.maxPerRow`, cycle fallback policy\n- Define a layout strategy API: `layout(graph, options) -> { positions, routes }`\n- Implement a few built-ins: layered, serpentine, grid, radial\n- Store per-document defaults + per-group overrides\n- Allow plugins to register layout strategies\n- Add a small \"Layout\" panel: direction, spacing, routing mode\n- Minimize LLM payload: expose editor-side commands (Beautify/Reroute/Grow) so chat payload stays small"
+      }
+    },
+    {
+      "id": "edge-layout-testing",
+      "type": "markdown",
+      "label": "Testing & Examples",
+      "position": {
+        "x": -18.33333333333337,
+        "y": 2020
+      },
+      "width": 620,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Testing & Example Corpus\n- Chain graph (serpentine)\n- Dense DAG (crossing reduction)\n- Mixed sizes (markdown + plugin nodes)\n- Groups/subsystems\n- Performance target: 100 nodes / 200 edges stays interactive\n- LLM payload target: minimal create/connect commands work without handles/positions"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-layout-e1",
+      "type": "child",
+      "source": "edge-layout-goal",
+      "target": "edge-layout-payload",
+      "label": "optimize for",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e2",
+      "type": "child",
+      "source": "edge-layout-payload",
+      "target": "edge-layout-phase-1",
+      "label": "drives",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e2b",
+      "type": "child",
+      "source": "edge-layout-phase-1",
+      "target": "edge-layout-phase-1-blockers",
+      "label": "consider",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e3",
+      "type": "child",
+      "source": "edge-layout-phase-1",
+      "target": "edge-layout-phase-2",
+      "label": "then",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e3b",
+      "type": "child",
+      "source": "edge-layout-phase-2",
+      "target": "edge-layout-phase-2-considerations",
+      "label": "consider",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e4",
+      "type": "child",
+      "source": "edge-layout-phase-2",
+      "target": "edge-layout-phase-3",
+      "label": "polish",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e5",
+      "type": "child",
+      "source": "edge-layout-phase-3",
+      "target": "edge-layout-phase-4",
+      "label": "stability",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e6",
+      "type": "child",
+      "source": "edge-layout-phase-4",
+      "target": "edge-layout-phase-5",
+      "label": "extend",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-layout-e7",
+      "type": "child",
+      "source": "edge-layout-phase-5",
+      "target": "edge-layout-testing",
+      "label": "validate",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

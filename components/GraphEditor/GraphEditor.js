@@ -492,14 +492,17 @@ useEffect(() => {
           groupCount
         }
       ];
-      try {
-        eventBus.emit('storySnapshotsUpdated', { snapshots: next });
-      } catch (err) {
-        // ignore event bus errors
-      }
       return next;
     });
   }, [historyHook.historyIndex, nodes, edges, groups, nodesRef, edgesRef]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('storySnapshotsUpdated', { snapshots: storySnapshots });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [storySnapshots]);
 
   useEffect(() => {
     if (storySnapshots.length === 0 && historyHook.history.length > 0) {
@@ -722,6 +725,42 @@ useEffect(() => {
     edges,
     setEdgeRoutes
   });
+
+  const pendingAutoLayoutOnPasteRef = useRef(false);
+
+  useEffect(() => {
+    const handleAutoLayoutRequested = () => {
+      pendingAutoLayoutOnPasteRef.current = true;
+    };
+    eventBus.on('layout:autoOnMissingPositions', handleAutoLayoutRequested);
+    return () => eventBus.off('layout:autoOnMissingPositions', handleAutoLayoutRequested);
+  }, []);
+
+  useEffect(() => {
+    if (!pendingAutoLayoutOnPasteRef.current) return;
+    pendingAutoLayoutOnPasteRef.current = false;
+    try {
+      modesHook.applyAutoLayout?.();
+      setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
+    } catch (err) {
+      setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
+    }
+  }, [nodes.length, edges.length, modesHook.applyAutoLayout, setSnackbar]);
+
+  useEffect(() => {
+    const rerouteEdges = modesHook.rerouteEdges;
+    const handleReroute = async () => {
+      try {
+        await rerouteEdges?.();
+        setSnackbar({ open: true, message: 'Edges rerouted', severity: 'success' });
+      } catch (err) {
+        setSnackbar({ open: true, message: 'Failed to reroute edges', severity: 'error', copyToClipboard: true });
+      }
+    };
+
+    eventBus.on('edges:reroute', handleReroute);
+    return () => eventBus.off('edges:reroute', handleReroute);
+  }, [modesHook.rerouteEdges, setSnackbar]);
 
   useEffect(() => {
     const handleNodeDragEnd = () => {

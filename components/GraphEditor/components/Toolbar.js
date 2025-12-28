@@ -62,7 +62,6 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import ShapeLineIcon from '@mui/icons-material/ShapeLine';
 import eventBus, { useEventBusListener } from '../../NodeGraph/eventBus';
-import DocumentPropertiesDialog from './DocumentPropertiesDialog';
 import { pasteFromClipboardUnified } from '../handlers/pasteHandler';
 import AddNodeMenu from './AddNodeMenu';
 import PlumbingIcon from '@mui/icons-material/Plumbing';
@@ -127,7 +126,8 @@ const Toolbar = ({
   onToggleSnapToGrid,  // NEW: Add prop
   gridSize = 20,  // Grid size from document settings
   edgeRouting = 'auto', // Edge routing mode from document settings
-  documentTheme = null  // Document theme (not browser theme)
+  documentTheme = null,  // Document theme (not browser theme)
+  githubSettings = null  // GitHub sync target settings
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -137,7 +137,6 @@ const Toolbar = ({
   const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
   const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
   const [pluginManagerOpen, setPluginManagerOpen] = useState(false);
   const dragging = useRef(false);
@@ -429,7 +428,7 @@ const Toolbar = ({
         snapToGrid: snapToGrid,
         gridSize: gridSize,
         edgeRouting: edgeRouting,
-        github: documentSettings?.github || null,
+        github: githubSettings || null,
         autoSave: false
       },
       viewport: {
@@ -820,6 +819,7 @@ const Toolbar = ({
             onToggleMinimap={onToggleMinimap}
             onToggleGrid={() => eventBus.emit('toggleShowGrid')}
             onAutoLayout={onApplyLayout}
+            onRerouteEdges={() => eventBus.emit('edges:reroute')}
             onAlignNodes={(mode) => {
               const didAlign = onAlignSelection(mode);
               if (didAlign && onShowMessage) {
@@ -879,7 +879,7 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
-            onClick={() => setPreferencesOpen(true)}
+          onClick={() => eventBus.emit('toggleDocumentProperties')}
             title="Preferences"
             aria-label="Open Preferences"
             size="small"
@@ -988,12 +988,6 @@ const Toolbar = ({
         style={{ display: 'none' }}
       />
 
-      <DocumentPropertiesDialog  
-        open={preferencesOpen}
-        onClose={() => setPreferencesOpen(false)}
-        backgroundUrl={backgroundUrl}
-        setBackgroundUrl={setBackgroundUrl}
-      />
       <PluginManagerPanel
         open={pluginManagerOpen}
         onClose={() => setPluginManagerOpen(false)}

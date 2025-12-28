@@ -141,6 +141,10 @@ const validateThemePasteCommand = (command = {}) => {
 async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
   try {
     const { action } = command;
+    const positionsOmitted = (nodes = []) => {
+      if (!Array.isArray(nodes) || nodes.length === 0) return false;
+      return nodes.every((node) => node && !Object.prototype.hasOwnProperty.call(node, 'position'));
+    };
 
     if (command.dryRun === true) {
       const estimate = estimateCrudImpact(command);
@@ -155,10 +159,12 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
       const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
       const groups = Array.isArray(command.groups) ? command.groups : (command.group ? [command.group] : []);
+      const shouldAutoLayout = positionsOmitted(nodes);
 
       let createdNodes = 0;
       let createdEdges = 0;
       let createdGroups = 0;
+      let createdNodeIds = [];
 
       // Create nodes first (if any)
       if (nodes.length > 0) {
@@ -169,6 +175,9 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           return { nodes: 0, edges: 0, groups: 0 };
         }
         createdNodes = Array.isArray(nodeResult.data?.created) ? nodeResult.data.created.length : nodes.length;
+        createdNodeIds = Array.isArray(nodeResult.data?.created)
+          ? nodeResult.data.created.map((node) => node?.id).filter(Boolean)
+          : [];
       }
 
       // Then create edges (if any). graphCRUD.createEdges validates that source/target nodes exist.
@@ -196,6 +205,17 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       }
 
       if (onShowMessage) onShowMessage(`Created ${createdNodes} nodes, ${createdEdges} edges, ${createdGroups} groups`, 'success');
+      if (shouldAutoLayout && createdNodes > 0) {
+        try {
+          eventBus.emit('layout:autoOnMissingPositions', {
+            reason: 'paste',
+            action: 'create',
+            nodeIds: createdNodeIds
+          });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
       return { nodes: createdNodes, edges: createdEdges, groups: createdGroups };
     }
 
@@ -206,7 +226,22 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     switch (action) {
       case 'createNodes':
         if (nodes && Array.isArray(nodes)) {
+          const shouldAutoLayout = positionsOmitted(nodes);
           result = await graphCRUD.createNodes(nodes);
+          if (result?.success && shouldAutoLayout) {
+            const createdNodeIds = Array.isArray(result.data?.created)
+              ? result.data.created.map((node) => node?.id).filter(Boolean)
+              : [];
+            try {
+              eventBus.emit('layout:autoOnMissingPositions', {
+                reason: 'paste',
+                action: 'createNodes',
+                nodeIds: createdNodeIds
+              });
+            } catch (err) {
+              // ignore event bus errors
+            }
+          }
         }
         break;
 
