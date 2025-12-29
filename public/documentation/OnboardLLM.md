@@ -48,6 +48,10 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - Always include an `action`.
 - Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
 - **Include `width` and `height` on node creation (for now).** Until node-type defaults are fully reliable, every node created via `create` / `createNodes` should include explicit size. (Updates can omit size unless changing it.)
+- **Positions are optional (and drive auto-layout/growth).**
+  - If you omit `position` on **every** newly-created node in a `create` / `createNodes` payload, Twilight will auto-place them (and auto-layout/reroute as needed).
+  - If you include any explicit `position`, Twilight treats it as intentional and will not auto-layout that batch by default (use Beautify if you want a full layout pass).
+  - Placement is designed to avoid overlaps; locked/pinned nodes act as obstacles and won’t be moved.
 - **Handles are optional.** If you omit `sourceHandle`/`targetHandle`, the edge attaches to the node boundary. When you do include them, match the published handle keys exactly.
 - **No implicit handles.** Twilight does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
 - **Handles must be declared before use.** If you specify `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).

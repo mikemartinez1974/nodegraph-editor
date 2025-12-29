@@ -301,7 +301,62 @@ export function createGraphEditorHandlers({
           ? meta.label
           : 'New Node',
       data: initialData,
-      position: { x: centerX, y: centerY },
+      position: (() => {
+        // Phase 4: avoid dropping new nodes directly on top of existing content.
+        const size = {
+          width: Number.isFinite(Number(resolvedWidth)) ? Number(resolvedWidth) : 200,
+          height: Number.isFinite(Number(resolvedHeight)) ? Number(resolvedHeight) : 120
+        };
+        const rectsOverlap = (a, b) =>
+          a.x < b.x + b.width &&
+          a.x + a.width > b.x &&
+          a.y < b.y + b.height &&
+          a.y + a.height > b.y;
+
+        const obstacles = [];
+        (nodesRef?.current || nodes || []).forEach((n) => {
+          if (!n?.position) return;
+          const w = Number(n.width) || 200;
+          const h = Number(n.height) || 120;
+          obstacles.push({ x: n.position.x, y: n.position.y, width: w, height: h });
+        });
+        (groups || []).forEach((g) => {
+          const b = g?.bounds;
+          if (!b) return;
+          const w = Number(b.width) || 0;
+          const h = Number(b.height) || 0;
+          if (w <= 1 || h <= 1) return;
+          obstacles.push({ x: Number(b.x) || 0, y: Number(b.y) || 0, width: w, height: h });
+        });
+
+        const start = { x: centerX, y: centerY };
+        const candidateRect = (pt) => ({
+          x: pt.x,
+          y: pt.y,
+          width: size.width,
+          height: size.height
+        });
+        const collides = (pt) => {
+          const r = candidateRect(pt);
+          return obstacles.some((o) => rectsOverlap(r, o));
+        };
+
+        if (!collides(start)) return start;
+
+        const step = 40;
+        const maxR = 20;
+        for (let r = 1; r <= maxR; r += 1) {
+          for (let dx = -r; dx <= r; dx += 1) {
+            for (let dy = -r; dy <= r; dy += 1) {
+              if (Math.abs(dx) !== r && Math.abs(dy) !== r) continue;
+              const pt = { x: start.x + dx * step, y: start.y + dy * step };
+              if (!collides(pt)) return pt;
+            }
+          }
+        }
+
+        return { x: start.x + maxR * step, y: start.y + maxR * step };
+      })(),
       width: resolvedWidth,
       height: resolvedHeight,
       resizable: true,

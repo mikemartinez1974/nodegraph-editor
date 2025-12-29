@@ -938,6 +938,7 @@ export default class GraphCRUD {
       const currentNodes = this.getNodes();
       const createdNodes = [];
       const failed = [];
+      let autoPlacedIndex = 0;
 
       // Create all nodes without calling setNodes/saveToHistory for each
       for (const opts of nodesArray) {
@@ -956,12 +957,20 @@ export default class GraphCRUD {
             outputs: opts.outputs
           });
           const sanitizedData = sanitizeNodeData(opts.data);
+          const hasExplicitPosition = opts && Object.prototype.hasOwnProperty.call(opts, 'position');
+          const fallbackPosition = hasExplicitPosition
+            ? opts.position
+            : {
+                x: 100 + (autoPlacedIndex % 4) * 260,
+                y: 100 + Math.floor(autoPlacedIndex / 4) * 160
+              };
+          if (!hasExplicitPosition) autoPlacedIndex += 1;
 
           const newNode = {
             id: nodeId,
             type: opts.type || 'default',
             label: opts.label || '',
-            position: opts.position || { x: 100, y: 100 },
+            position: fallbackPosition || { x: 100, y: 100 },
             width: opts.width !== undefined ? opts.width : 160,
             height: opts.height !== undefined ? opts.height : 80,
             color: opts.color,

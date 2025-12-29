@@ -18,6 +18,7 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
+import { placeNodesIncrementally } from './utils/growthPlacement';
 import usePluginRegistry from './hooks/usePluginRegistry';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { GraphEditorContextProvider } from './providers/GraphEditorContext';
@@ -729,11 +730,14 @@ useEffect(() => {
   });
 
   const pendingAutoLayoutOnPasteRef = useRef(false);
+  const pendingAutoLayoutPayloadRef = useRef(null);
   const defaultLayoutSyncRef = useRef(null);
 
   useEffect(() => {
-    const handleAutoLayoutRequested = () => {
+    const handleAutoLayoutRequested = (payload) => {
       pendingAutoLayoutOnPasteRef.current = true;
+      pendingAutoLayoutPayloadRef.current =
+        payload && typeof payload === 'object' ? payload : null;
     };
     eventBus.on('layout:autoOnMissingPositions', handleAutoLayoutRequested);
     return () => eventBus.off('layout:autoOnMissingPositions', handleAutoLayoutRequested);
@@ -744,13 +748,79 @@ useEffect(() => {
     pendingAutoLayoutOnPasteRef.current = false;
     const layoutMode = documentSettings?.layout?.mode || 'autoOnMissingPositions';
     if (layoutMode === 'manual') return;
+    const payload = pendingAutoLayoutPayloadRef.current;
+    pendingAutoLayoutPayloadRef.current = null;
+    const nodeIdsRaw = Array.isArray(payload?.nodeIds) ? payload.nodeIds.filter(Boolean) : [];
+    const nodeIds = lockedNodes instanceof Set
+      ? nodeIdsRaw.filter((id) => !lockedNodes.has(id))
+      : nodeIdsRaw;
+
+    // Phase 4 policy: grow without mangling. If we're adding nodes to an existing graph,
+    // place only the incoming nodes (local reflow) and reroute edges. For brand-new graphs,
+    // run a full ELK layout.
+    const shouldTreatAsGrowth =
+      nodeIds.length > 0 && Array.isArray(nodes) && nodes.length > nodeIds.length;
+
+    if (shouldTreatAsGrowth) {
+      try {
+        const result = placeNodesIncrementally({
+          nodes,
+          edges,
+          groups,
+          lockedNodeIds: lockedNodes,
+          nodeIdsToPlace: nodeIds,
+          pointer: lastPointerRef.current,
+          direction: documentSettings?.layout?.direction,
+          paddingPx: 60,
+          gapPx: 80,
+          stepPx: (documentSettings?.gridSize || 20) * 2
+        });
+        setNodes(result.nodes);
+        // Clearing routes avoids stale rendering while reroute runs.
+        setEdgeRoutes?.({});
+        Promise.resolve(modesHook.rerouteEdges?.())
+          .then(() => {
+            setSnackbar({ open: true, message: 'Placed new nodes and rerouted edges', severity: 'success' });
+          })
+          .catch(() => {
+            setSnackbar({ open: true, message: 'Placed new nodes (reroute failed)', severity: 'warning' });
+          });
+      } catch (err) {
+        setSnackbar({
+          open: true,
+          message: 'Incremental placement failed (falling back to auto-layout)',
+          severity: 'warning'
+        });
+        try {
+          modesHook.applyAutoLayout?.();
+          setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
+        } catch (err2) {
+          setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
+        }
+      }
+      return;
+    }
+
     try {
       modesHook.applyAutoLayout?.();
       setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
     } catch (err) {
       setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
     }
-  }, [nodes.length, edges.length, documentSettings?.layout?.mode, modesHook.applyAutoLayout, setSnackbar]);
+  }, [
+    nodes,
+    edges,
+    groups,
+    lockedNodes,
+    documentSettings?.layout?.mode,
+    documentSettings?.layout?.direction,
+    documentSettings?.gridSize,
+    modesHook.applyAutoLayout,
+    modesHook.rerouteEdges,
+    setEdgeRoutes,
+    setNodes,
+    setSnackbar
+  ]);
 
   useEffect(() => {
     const defaultLayout = documentSettings?.layout?.defaultLayout;

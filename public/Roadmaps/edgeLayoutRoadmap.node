@@ -212,7 +212,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 4 — Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the affected subgraph (local reflow)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-group layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
+        "markdown": "## Phase 4 — Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the **affected** region (local reflow)\n  - Affected region = bounding box of the newly-added/changed nodes (+ padding)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-group layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
       }
     },
     {
@@ -228,7 +228,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 4 — Considerations / Blockers\n- **Stability policy:** adding one node/edge should not reshuffle the whole graph; define “local reflow” boundaries.\n- **Serpentine beyond chains:** current serpentine is intentionally strict; consider heuristics (longest path, per-row lanes) so more real graphs benefit.\n- **Pinned/locked nodes:** need a first-class way to keep regions stable while still allowing growth elsewhere.\n- **Groups:** MVP treats groups as logical only; incremental layout may need optional group constraints later."
+        "markdown": "## Phase 4 — Considerations / Blockers\n- **Stability policy:** adding one node/edge should not reshuffle the whole graph; define “local reflow” boundaries.\n- **Affected region:** use the bounding box of the newly-added/changed nodes (+ padding) as the default local-reflow scope.\n- **Overlaps (multiple collisions):** Option A — keep existing nodes fixed; move the incoming node/selection cluster to the nearest non-overlapping spot (grid/spiral search).\n- **Pinned/locked nodes:** do both\n  - Pinned nodes never move\n  - Treat pinned nodes as hard obstacles during placement/reflow (cannot overlap; cannot be pushed through)\n- **All additions follow the same rule:** paste/import, add-node, and programmatic create all go through the same placement + overlap-avoidance pipeline.\n- **Serpentine beyond chains:** current serpentine is intentionally strict; consider heuristics (longest path backbone, sidecar branches) so more real graphs benefit.\n- **Groups:** MVP treats groups as logical only; growth needs a predictable group policy.\n  - Group-as-obstacle: new nodes/clusters should not land on top of group bounds.\n  - Per-group vs global: allow a per-group layout override that runs layout **inside the group** (internal edges), then reroutes cross-group edges after.\n  - Group pinning: support `lockMembers` (members fixed) and `lockBounds` (group rectangle fixed) so users can stabilize subsystems."
       }
     },
     {
@@ -244,7 +244,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 5 — Extensibility (More Layouts Over Time)\n**Goal:** add new layout strategies without refactors.\n\n- Make layout **first-class** in the document (`documentSettings.layout`)\n  - `mode` (manual/auto), `algorithm`, `direction`, `spacingPreset`\n  - optional knobs: `serpentine.maxPerRow`, cycle fallback policy\n- Define a layout strategy API: `layout(graph, options) -> { positions, routes }`\n- Implement a few built-ins: layered, serpentine, grid, radial\n- Store per-document defaults + per-group overrides\n- Allow plugins to register layout strategies\n- Add a small \"Layout\" panel: direction, spacing, routing mode\n- Minimize LLM payload: expose editor-side commands (Beautify/Reroute/Grow) so chat payload stays small"
+        "markdown": "## Phase 5 — Extensibility (More Layouts Over Time)\n**Goal:** add new layout strategies without refactors.\n\n- Make layout **first-class** in the document (`documentSettings.layout`)\n  - `mode` (manual/auto), `algorithm`, `direction`, `spacingPreset`\n  - optional knobs: `serpentine.maxPerRow`, cycle fallback policy\n- Define a layout strategy API: `layout(graph, options) -> { positions, routes }`\n- Implement a few built-ins: layered, serpentine, grid, radial\n- Store per-document defaults + per-group overrides\n  - `group.layout.enabled`, `group.layout.algorithm`, `group.layout.direction`, `group.layout.serpentine.maxPerRow`\n  - `group.lockMembers`, `group.lockBounds` (growth constraints)\n- Consider a lightweight **\"sequence\" group** flavor (signals ordered content; serpentine becomes a natural default)\n- Allow plugins to register layout strategies\n- Add a small \"Layout\" panel: direction, spacing, routing mode\n- Minimize LLM payload: expose editor-side commands (Beautify/Reroute/Grow) so chat payload stays small"
       }
     },
     {
