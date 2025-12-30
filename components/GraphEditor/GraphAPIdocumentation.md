@@ -97,6 +97,8 @@ window.graphAPI.createEdge({
   id: "optional-custom-id",
   source: "source-node-id",
   target: "target-node-id",
+  // Optional. If omitted, the edge attaches to the node boundary.
+  // If provided, they must match handle keys declared by the nodes.
   sourceHandle: "output-handle-key",
   targetHandle: "input-handle-key",
   type: "child",              // Edge type id
@@ -122,7 +124,7 @@ window.graphAPI.createEdge({
 // Returns: { success: true, data: <edge object> }
 ```
 
-> **Note:** Handles are required. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to determine the proper `sourceHandle` and `targetHandle` keys. Handle types must match (or be `trigger`).
+> **Note:** Handles are optional. If you provide `sourceHandle` / `targetHandle`, they must exist on the source/target nodes (from the node's `outputs`/`inputs` arrays, or explicit `handles`). When both handles are present and typed, Twilight validates type compatibility.
 
 ### Read Edge(s)
 

@@ -1,0 +1,288 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Twilight — Graph-Native Workspace (Thesis)",
+    "description": "Product story: graphs as first-class artifacts that can live on the web, be read/written by AI, and eventually execute.",
+    "created": "2025-12-29T00:00:00.000Z",
+    "modified": "2025-12-29T19:55:00.000Z",
+    "author": "",
+    "tags": [
+      "roadmap",
+      "twilight",
+      "thesis",
+      "artifact",
+      "ai",
+      "execution",
+      "distribution",
+      "product"
+    ]
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 120, "y": 300 },
+    "zoom": 0.85
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "tpt-title",
+      "type": "markdown",
+      "label": "Thesis",
+      "position": { "x": 400, "y": -500 },
+      "width": 900,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Twilight\n## The Graph is the Product\n\nTwilight is a **graph-native workspace** where visual thinking meets AI collaboration.\n\n**The core insight:** Most graph tools treat the graph as UI state. Twilight treats it as a **durable, portable artifact** — a file format that humans and AI agents can both read and write.\n\n| Capability | What It Means |\n|------------|---------------|\n| 🌐 **Web-native** | Graphs live at URLs, can be linked, embedded, shared |\n| 🤖 **AI-first** | Agents can create, update, and reason about graphs safely |\n| ⚡ **Executable** | Graphs can evolve from thinking → workflows → running code |\n\n*The editor is a means. The artifact is the thing with power.*"
+      }
+    },
+    {
+      "id": "tpt-whygraphs",
+      "type": "markdown",
+      "label": "Why Graphs?",
+      "position": { "x": -200, "y": -180 },
+      "width": 560,
+      "height": 560,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Node Graphs?\n\n*Because anything is possible on a node graph on the web.*\n\n### Graphs Are a Universal Canvas\nA node can be **anything**: text, code, data, UI, API, AI model, video, live query. An edge can mean **anything**: flows into, depends on, triggers, contains.\n\nThere's no schema to fight. No format to escape. **You decide what nodes and edges mean.**\n\n### Graphs Are Executable\nThis isn't just visualization — nodes can **run code**, call APIs, stream data, respond to events. The graph isn't a picture of your system. **The graph IS your system.**\n\n### The Browser Is the Runtime\nNo install. No deploy. Share a URL and it runs. The entire web platform — fetch, canvas, websockets, workers — is your execution environment.\n\n### Infinite Extensibility\nToday: markdown, shapes, links.\nTomorrow: live database nodes, AI inference nodes, video players, form builders, dashboards.\n\n**Plugins add new node types.** The platform grows without limits.\n\n### Composition All the Way Down\nGraphs can contain graphs. Nodes can expose handles. Build primitives, compose them into systems, share them as templates.\n\n**Graphs are the new code.**"
+      }
+    },
+    {
+      "id": "tpt-oneliner",
+      "type": "markdown",
+      "label": "One-Liner",
+      "position": { "x": 400, "y": -180 },
+      "width": 560,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Pitch\n\n> **\"Figma meets ChatGPT for visual thinking.\"**\n\nDescribe what you want to an AI → AI generates a graph → Paste into Twilight → Graph appears instantly.\n\nNo manual clicking and dragging. Just think, describe, and see."
+      }
+    },
+    {
+      "id": "tpt-possibilities",
+      "type": "markdown",
+      "label": "What You Can Build",
+      "position": { "x": 1000, "y": -180 },
+      "width": 560,
+      "height": 560,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What You Can Build\n\n*The graph has no ceiling.*\n\n🗺️ **Thinking & Planning**\nRoadmaps, mind maps, knowledge bases, research notes, decision trees\n\n📊 **Dashboards**\nLive data nodes pulling from APIs, databases, spreadsheets — updated in real time\n\n⚡ **Automation**\nEvent nodes, trigger nodes, action nodes. Build Zapier-style workflows visually.\n\n🤖 **AI Agents**\nPrompt nodes, model nodes, memory nodes. Wire up multi-step reasoning.\n\n📱 **Interactive Docs**\nForms, calculators, configurators. The graph responds to user input.\n\n🎮 **Games & Simulations**\nState machines, behavior trees, game logic. Nodes are game objects.\n\n🔌 **Integrations**\nAny API becomes a node. Any webhook becomes a trigger. **The graph talks to everything.**\n\n---\n\n*Today it's notes and roadmaps. Tomorrow it's anything you can imagine.*"
+      }
+    },
+    {
+      "id": "tpt-problem",
+      "type": "markdown",
+      "label": "The Problem",
+      "position": { "x": -200, "y": 0 },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Problem\n\nVisual thinking tools are **broken**:\n\n❌ **Graphs are ephemeral** — screenshots, not files\n\n❌ **No stable identity** — can't diff, can't version, can't review\n\n❌ **AI can't help** — tools don't have machine-readable formats\n\n❌ **Build from scratch every time** — no reuse, no templates, no remix\n\n❌ **Vendor lock-in** — your thinking is trapped in someone else's app\n\n---\n\n**The deeper issue:** The graph isn't treated as the *real thing*. It's treated as a picture of the real thing."
+      }
+    },
+    {
+      "id": "tpt-solution",
+      "type": "markdown",
+      "label": "The Solution",
+      "position": { "x": 400, "y": 0 },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Solution\n\nMake the graph a **first-class artifact**:\n\n✅ **Portable `.node` files** — JSON you can store anywhere\n\n✅ **Stable IDs** — nodes and edges have identity across time\n\n✅ **AI mutation contract** — deltas, not rewrites; validation, not chaos\n\n✅ **Web distribution** — URLs, embeds, GitHub, templates\n\n✅ **Progressive complexity** — start with notes, evolve to workflows, end with execution\n\n---\n\n**The result:** A graph that survives time, tools, and assistants. Your thinking becomes infrastructure."
+      }
+    },
+    {
+      "id": "tpt-alternatives",
+      "type": "markdown",
+      "label": "Alternatives",
+      "position": { "x": 1000, "y": 0 },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Not Existing Tools?\n\n| Tool | Limitation |\n|------|------------|\n| **Miro/FigJam** | Graphs are visual-only, no semantic structure |\n| **Notion** | Great for docs, weak for relationships |\n| **Obsidian** | File-based but graph is read-only |\n| **React Flow** | Developer tool, not end-user product |\n| **Lucidchart** | Proprietary, no AI integration |\n| **Excalidraw** | Drawing, not structured graphs |\n\n---\n\n**Twilight's difference:**\n- Graphs are *writable* by AI (not just viewable)\n- Graphs are *portable* (not locked in)\n- Graphs can *execute* (not just visualize)"
+      }
+    },
+    {
+      "id": "tpt-artifact",
+      "type": "markdown",
+      "label": "The Artifact",
+      "position": { "x": -200, "y": 420 },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Artifact\n\nA Twilight graph is a `.node` file:\n\n```json\n{\n  \"fileVersion\": \"1.0\",\n  \"metadata\": { ... },\n  \"settings\": { ... },\n  \"viewport\": { ... },\n  \"nodes\": [ ... ],\n  \"edges\": [ ... ],\n  \"groups\": [ ... ]\n}\n```\n\n**Properties:**\n- 📁 Portable JSON (store in Git, S3, anywhere)\n- 🔑 Stable node/edge IDs (meaningful diffs)\n- 🎨 Settings + viewport (opens exactly as saved)\n- 🔌 Plugin extensions (namespaced custom data)\n- 📄 Optional embedded document\n\n**Goal:** A graph that survives time, tools, and AI assistants."
+      }
+    },
+    {
+      "id": "tpt-ai",
+      "type": "markdown",
+      "label": "AI Contract",
+      "position": { "x": 400, "y": 420 },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## AI Contract\n\n**The key innovation:** A mutation protocol that lets AI safely edit graphs.\n\n### Actions\n```\ncreate   → add nodes/edges\nupdate   → modify existing by ID\ndelete   → remove by ID\nbatch    → multiple operations atomically\n```\n\n### Principles\n- **Deltas over rewrites** — AI sends changes, not full snapshots\n- **Validation gates** — malformed commands fail gracefully\n- **Minimal payloads** — positions/handles optional; editor fills in\n- **Dry run mode** — preview impact before applying\n\n### Outcome\nPaste JSON from ChatGPT/Claude → graph appears instantly → AI can evolve it coherently over time."
+      }
+    },
+    {
+      "id": "tpt-workflow",
+      "type": "markdown",
+      "label": "The Workflow",
+      "position": { "x": 1000, "y": 420 },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Workflow\n\n### For Humans\n1. **Describe** what you want to an AI\n2. **AI generates** graph JSON\n3. **Paste** into Twilight (Ctrl+V)\n4. **Graph appears** — edit, extend, save\n\n### For AI Agents\n1. **Read** `.node` files from filesystem/URLs\n2. **Reason** about structure and relationships\n3. **Write** delta mutations (create/update/delete)\n4. **Validate** changes before applying\n\n### For Teams\n1. **Store** graphs in Git\n2. **Review** changes as diffs in PRs\n3. **Share** via URLs or embeds\n4. **Remix** templates and patterns"
+      }
+    },
+    {
+      "id": "tpt-progression",
+      "type": "markdown",
+      "label": "Progressive Complexity",
+      "position": { "x": -200, "y": 860 },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Progressive Complexity\n\nNot every graph needs to execute. The platform supports a spectrum:\n\n### 1. Conceptual Graphs\n*Thinking, planning, knowledge*\n- Roadmaps, mind maps, research notes\n- Handles optional, edges are relationships\n\n### 2. Workflow Graphs\n*Typed connections, data flow*\n- Handles define inputs/outputs\n- Edges carry semantic meaning\n\n### 3. Executable Graphs\n*Scripts, plugins, live data*\n- Nodes run code (scripting API)\n- Background RPC for async operations\n- Plugin nodes extend capabilities"
+      }
+    },
+    {
+      "id": "tpt-web",
+      "type": "markdown",
+      "label": "Web Distribution",
+      "position": { "x": 400, "y": 860 },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Web Distribution\n\nGraphs live on the web:\n\n🔗 **Linkable**\n- Direct URLs to `.node` files\n- Query params: `?doc=https://...`\n- GitHub raw URLs work natively\n\n📦 **Shareable**\n- Export/import JSON\n- Embed in docs/wikis\n- Read-only viewer for publishing\n\n🎨 **Remixable**\n- Template gallery\n- Fork and modify\n- Community patterns\n\n---\n\n**The format travels.** The editor is just the best way to interact with it."
+      }
+    },
+    {
+      "id": "tpt-moat",
+      "type": "markdown",
+      "label": "Defensibility",
+      "position": { "x": 1000, "y": 860 },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What Makes It Defensible\n\n*\"Better graph\" isn't the pitch. It's the mechanism.*\n\n### The Moat\n- **Artifact standardization** — compatibility guarantees\n- **AI mutation contract** — deltas, validation, safety\n- **Layout intelligence** — small payloads, professional output\n- **Plugin contract** — extensible without fragmentation\n- **Git-native workflows** — diffs, PRs, history\n\n---\n\n**This is a governance + workflow moat**, not a model moat.\n\nCompetitors can copy features. They can't easily copy the contract that makes AI collaboration safe and predictable."
+      }
+    },
+    {
+      "id": "tpt-wedges",
+      "type": "markdown",
+      "label": "First Wedges",
+      "position": { "x": 100, "y": 1280 },
+      "width": 700,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## First Wedges\n\n*Start with jobs that are true today:*\n\n### 🗺️ Roadmaps as Artifacts\nPlanning docs that can be versioned, reviewed, and evolved.\n\n### 📝 AI-to-Graph Note Taking\n\"Turn this conversation into a diagram\" — instant structure.\n\n### 🔍 PR-Reviewable Graphs\nChanges as deltas. Review graphs like you review code.\n\n### 🧠 Agent Domain Memory\nDurable state for long-running AI work. Graphs as context.\n\n---\n\n**Success metric:** A stranger can create a useful graph in 5 minutes and come back tomorrow to find it exactly as they left it."
+      }
+    },
+    {
+      "id": "tpt-usecases",
+      "type": "markdown",
+      "label": "Use Cases",
+      "position": { "x": 860, "y": 1280 },
+      "width": 700,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Use Cases\n\n| Category | Examples |\n|----------|----------|\n| **Visual Thinking** | Brainstorming, mind maps, ideation |\n| **Knowledge Graphs** | Concepts, relationships, hierarchies |\n| **Project Planning** | Roadmaps, timelines, dependencies |\n| **Learning** | Study diagrams, concept maps |\n| **Research** | Notes, citations, connections |\n| **Storytelling** | Narrative structures, character webs |\n| **Architecture** | System design, component maps |\n| **Decision Making** | Pros/cons, options, tradeoffs |\n\n---\n\n**Common thread:** Any time you need to *see* how things connect, Twilight can help — and AI can help you build it."
+      }
+    },
+    {
+      "id": "tpt-next",
+      "type": "markdown",
+      "label": "Next Steps",
+      "position": { "x": 100, "y": 1700 },
+      "width": 1460,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Next Steps\n\n### Near-Term\n- ✅ Standardize `.node` format on `fileVersion: \"1.0\"`\n- ✅ Enforce safe delta mutations (reject unsafe full rewrites)\n- 🔄 Improve auto-layout so minimal payloads look professional\n- 🔄 Formalize document URL semantics\n\n### Medium-Term\n- Publish explicit command schema for AI integrations\n- Template gallery + community sharing\n- Read-only embed viewer\n- Plugin marketplace\n\n### Long-Term\n- Real-time collaboration\n- Execution runtime for workflow graphs\n- Agent SDK for building on Twilight"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "tpt-e-title-whygraphs", "type": "child", "source": "tpt-title", "target": "tpt-whygraphs", "label": "but why?" },
+    { "id": "tpt-e-whygraphs-oneliner", "type": "peer", "source": "tpt-whygraphs", "target": "tpt-oneliner", "label": "" },
+    { "id": "tpt-e-oneliner-possibilities", "type": "peer", "source": "tpt-oneliner", "target": "tpt-possibilities", "label": "imagine" },
+    { "id": "tpt-e-title-oneliner", "type": "child", "source": "tpt-title", "target": "tpt-oneliner", "label": "" },
+    { "id": "tpt-e-title-possibilities", "type": "child", "source": "tpt-title", "target": "tpt-possibilities", "label": "what's possible" },
+    { "id": "tpt-e-oneliner-problem", "type": "child", "source": "tpt-oneliner", "target": "tpt-problem", "label": "the pain" },
+    { "id": "tpt-e-oneliner-solution", "type": "child", "source": "tpt-oneliner", "target": "tpt-solution", "label": "the fix" },
+    { "id": "tpt-e-oneliner-alternatives", "type": "child", "source": "tpt-oneliner", "target": "tpt-alternatives", "label": "vs others" },
+    { "id": "tpt-e-problem-artifact", "type": "child", "source": "tpt-problem", "target": "tpt-artifact", "label": "so we built" },
+    { "id": "tpt-e-solution-ai", "type": "child", "source": "tpt-solution", "target": "tpt-ai", "label": "enables" },
+    { "id": "tpt-e-alternatives-workflow", "type": "child", "source": "tpt-alternatives", "target": "tpt-workflow", "label": "our way" },
+    { "id": "tpt-e-artifact-progression", "type": "child", "source": "tpt-artifact", "target": "tpt-progression", "label": "evolves into" },
+    { "id": "tpt-e-ai-web", "type": "child", "source": "tpt-ai", "target": "tpt-web", "label": "distributed via" },
+    { "id": "tpt-e-workflow-moat", "type": "child", "source": "tpt-workflow", "target": "tpt-moat", "label": "creates" },
+    { "id": "tpt-e-progression-wedges", "type": "child", "source": "tpt-progression", "target": "tpt-wedges", "label": "start with" },
+    { "id": "tpt-e-web-wedges", "type": "child", "source": "tpt-web", "target": "tpt-wedges", "label": "find users" },
+    { "id": "tpt-e-moat-usecases", "type": "child", "source": "tpt-moat", "target": "tpt-usecases", "label": "applies to" },
+    { "id": "tpt-e-wedges-next", "type": "child", "source": "tpt-wedges", "target": "tpt-next", "label": "ship" },
+    { "id": "tpt-e-usecases-next", "type": "child", "source": "tpt-usecases", "target": "tpt-next", "label": "roadmap" },
+    { "id": "tpt-e-peer-artifact-ai", "type": "peer", "source": "tpt-artifact", "target": "tpt-ai", "label": "supports" },
+    { "id": "tpt-e-peer-ai-workflow", "type": "peer", "source": "tpt-ai", "target": "tpt-workflow", "label": "enables" }
+  ],
+  "groups": [
+    {
+      "id": "tpt-group-core",
+      "label": "Core Concept",
+      "color": "#e3f2fd",
+      "collapsed": false
+    },
+    {
+      "id": "tpt-group-how",
+      "label": "How It Works",
+      "color": "#f3e5f5",
+      "collapsed": false
+    },
+    {
+      "id": "tpt-group-market",
+      "label": "Go-to-Market",
+      "color": "#e8f5e9",
+      "collapsed": false
+    }
+  ]
+}

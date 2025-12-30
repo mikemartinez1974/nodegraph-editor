@@ -53,7 +53,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const currentUrl = browserHistory[historyIndex] || '';
 
   // Home URL management
-  const DEFAULT_HOME = '';
+  const DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const LEGACY_DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
@@ -138,8 +138,16 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       } else {
         path = '/' + rest;
       }
-      const origin = (window.location.protocol === 'https:' ? 'https://' : window.location.protocol + '//') + host;
-      return origin + path;
+      
+      const localhostNames = ['localhost', '127.0.0.1', '[::1]'];
+      if (!host || localhostNames.includes(host)) {
+        const origin = (typeof window !== 'undefined' && window.location.origin && window.location.origin !== 'null')
+          ? window.location.origin
+          : 'http://localhost:3000';
+        return origin + path;
+      }
+      
+      return `https://${host}${path}`;
     } catch (err) {
       return url;
     }
@@ -416,10 +424,28 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                 const fetchUrl = (function(input) {
                   const trimmed = (input || '').trim();
                   if (!trimmed) return '';
+                  
+                  // Already handled protocol?
                   if (trimmed.startsWith('tlz://')) return convertTlzToFetchUrl(trimmed);
                   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
-                  if (/[.]/.test(trimmed.split('/')[0])) return 'https://' + trimmed;
-                  return trimmed;
+                  
+                  // Local paths (explicit)
+                  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return trimmed;
+                  
+                  // If it's a bare .node filename, assume local first
+                  if (trimmed.endsWith('.node')) return '/' + trimmed;
+                  
+                  // If it looks like a domain (e.g. google.com), prepend https://
+                  // But exclude common filenames or single words without dots
+                  const firstPart = trimmed.split('/')[0];
+                  if (firstPart.includes('.') && 
+                      !firstPart.endsWith('.node') && 
+                      !firstPart.endsWith('.json')) {
+                    return 'https://' + trimmed;
+                  }
+                  
+                  // Default to local path if it doesn't look like anything else
+                  return '/' + trimmed;
                 })(address);
                 if (fetchUrl) {
                   eventBus.emit('fetchUrl', { url: fetchUrl });

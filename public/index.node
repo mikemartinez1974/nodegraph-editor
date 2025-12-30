@@ -1,0 +1,161 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Index of All Graphs",
+    "created": "2025-12-30T18:29:23.784Z",
+    "modified": "2025-12-30T18:29:23.784Z"
+  },
+  "settings": {
+    "theme": {
+      "mode": "dark",
+      "primary": {
+        "main": "#1976d2"
+      },
+      "background": {
+        "default": "#121212",
+        "paper": "#1e1e1e"
+      },
+      "text": {
+        "primary": "#ffffff",
+        "secondary": "rgba(255, 255, 255, 0.7)"
+      }
+    }
+  },
+  "viewport": {
+    "pan": {
+      "x": 400,
+      "y": 300
+    },
+    "zoom": 0.8
+  },
+  "nodes": [
+    {
+      "id": "header",
+      "type": "markdown",
+      "label": "📂 All Graphs",
+      "position": {
+        "x": 0,
+        "y": -200
+      },
+      "width": 600,
+      "height": 100,
+      "data": {
+        "markdown": "# Index of All Graphs\nExplore the nodegraphs in this directory."
+      }
+    },
+    {
+      "id": "node-0",
+      "type": "default",
+      "label": "data",
+      "position": {
+        "x": -330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///data/index.node"
+      }
+    },
+    {
+      "id": "node-1",
+      "type": "default",
+      "label": "data/breadboard",
+      "position": {
+        "x": -110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///data/breadboard/index.node"
+      }
+    },
+    {
+      "id": "node-2",
+      "type": "default",
+      "label": "next",
+      "position": {
+        "x": 110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///next/index.node"
+      }
+    },
+    {
+      "id": "node-3",
+      "type": "default",
+      "label": "Roadmaps",
+      "position": {
+        "x": 330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///Roadmaps/index.node"
+      }
+    },
+    {
+      "id": "node-4",
+      "type": "default",
+      "label": "Sections",
+      "position": {
+        "x": -330,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///Sections/index.node"
+      }
+    },
+    {
+      "id": "node-5",
+      "type": "default",
+      "label": "tlz",
+      "position": {
+        "x": -110,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/index.node"
+      }
+    },
+    {
+      "id": "node-6",
+      "type": "default",
+      "label": "tlz/node_intro",
+      "position": {
+        "x": 110,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/node_intro/index.node"
+      }
+    },
+    {
+      "id": "node-7",
+      "type": "default",
+      "label": "tlz/project1",
+      "position": {
+        "x": 330,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/project1/index.node"
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

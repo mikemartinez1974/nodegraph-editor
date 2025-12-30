@@ -172,16 +172,20 @@ const Toolbar = ({
   const autoLayoutLabel = autoLayoutLabelByType[autoLayoutType] || autoLayoutType;
 
   // Retractable drawer state
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
+  const [initialVisit, setInitialVisit] = useState(true);
   const retractTimerRef = useRef(null);
 
   // Auto-retract after delay when mouse leaves
   useEffect(() => {
     if (!isHovering && isExpanded) {
+      // Stay expanded for 30s on first load, then 800ms for subsequent retractions
+      const delay = initialVisit ? 30000 : 800;
       retractTimerRef.current = setTimeout(() => {
         setIsExpanded(false);
-      }, 800); // 800ms delay before retracting
+        setInitialVisit(false);
+      }, delay);
     } else {
       if (retractTimerRef.current) {
         clearTimeout(retractTimerRef.current);
@@ -194,11 +198,12 @@ const Toolbar = ({
         clearTimeout(retractTimerRef.current);
       }
     };
-  }, [isHovering, isExpanded]);
+  }, [isHovering, isExpanded, initialVisit]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
     setIsExpanded(true);
+    setInitialVisit(false); // Once they interact, we drop the long "initial" timer
   };
 
   const handleMouseLeave = () => {

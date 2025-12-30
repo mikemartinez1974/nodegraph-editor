@@ -1825,6 +1825,7 @@ useEffect(() => {
         }
 
         const text = await response.text();
+        const contentType = response.headers.get('content-type') || '';
 
         // Try to parse as JSON (graph data)
         try {
@@ -1840,10 +1841,18 @@ useEffect(() => {
             return;
           }
         } catch (e) {
-          // Not JSON, fall through to create text node
+          // Not JSON or missing nodes
         }
 
-        // Create text node
+        // If it's HTML, we should probably NOT create a node if it was intended to be a graph
+        if (contentType.includes('text/html') || text.trim().startsWith('<!DOCTYPE html>') || text.trim().startsWith('<html')) {
+           if (fullUrl.endsWith('.node') || fullUrl.endsWith('.json')) {
+             setSnackbar({ open: true, message: `Failed to load graph: Received HTML instead of graph data. (Check if the file exists at ${fullUrl})`, severity: 'error' });
+             return;
+           }
+        }
+
+        // Create text node (fallback for actual text files)
         const lines = text.trim().split('\n');
         const label = lines[0] ? lines[0].substring(0, 50) : 'Fetched Text';
         const memo = text.trim();

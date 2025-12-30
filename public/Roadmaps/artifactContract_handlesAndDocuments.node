@@ -1,0 +1,163 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Artifact Contract — Handles + Document URLs",
+    "description": "Clarifies the reality of handle behavior, how AIs should edit graphs (deltas vs replace), and how to represent local/remote document URLs.",
+    "created": "2025-12-29T00:00:00.000Z",
+    "modified": "2025-12-29T00:00:00.000Z",
+    "author": "",
+    "tags": [
+      "roadmap",
+      "contract",
+      "artifact",
+      "ai",
+      "handles",
+      "documents"
+    ]
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 80, "y": 80 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "ac-goal",
+      "type": "markdown",
+      "label": "Goal",
+      "position": { "x": 0, "y": 0 },
+      "width": 760,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Artifact Contract — Handles + Document URLs\n\n**Goal:** make Twilight artifacts reliably editable by humans and AIs.\n\nThis graph defines:\n- the **reality** of handle behavior (what the editor actually enforces)\n- how agents should mutate graphs (**deltas**, not overwrites)\n- how to represent **document URLs** when graphs can be local *or* remote"
+      }
+    },
+    {
+      "id": "ac-reality-handles",
+      "type": "markdown",
+      "label": "Reality: Handles",
+      "position": { "x": 0, "y": 260 },
+      "width": 760,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reality: Handles (Today)\n- **Edges do not require handles.** If `sourceHandle`/`targetHandle` are omitted, edges attach to the node boundary.\n- **Handles are validated when supplied.** If you provide a handle key, it must exist on that node.\n- If both endpoint handles are present and typed, Twilight can enforce compatibility.\n\nImplication: documentation-style graphs (roadmaps) should usually omit handles."
+      }
+    },
+    {
+      "id": "ac-contract-handles",
+      "type": "markdown",
+      "label": "Contract: Handles",
+      "position": { "x": 0, "y": 560 },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contract: Handles (What agents should do)\n- Omit handles for conceptual links.\n- Use handles when wiring **execution/dataflow** nodes (Timer → Script → API, breadboards, etc.).\n- When handles are used:\n  - **declare them first** on the nodes (via `inputs`/`outputs` or `handles`)\n  - reference handle keys exactly in edges\n\nOpen choice: for some edge types (e.g. `dataFlow`), do we want to *recommend* handles or *require* them? (Recommendation is lower friction.)"
+      }
+    },
+    {
+      "id": "ac-reality-docurl",
+      "type": "markdown",
+      "label": "Reality: Document URL",
+      "position": { "x": 0, "y": 920 },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reality: Document URL (Problem)\nA graph can be loaded from:\n- a **remote** URL (`https://…/graph.node`)\n- a **GitHub** path (`github://owner/repo/path.node`)\n- a **local label** (`local://something.node`) which is *not* a fetchable URL\n- a Twilight link (`tlz://…`) which is convertible\n\nSeparately, the graph can embed a **background document** (`document.url`) used by the BackgroundFrame/RPC.\n\nWe need a contract that distinguishes:\n- where the graph was loaded from (address/source)\n- what document the graph embeds (background document)"
+      }
+    },
+    {
+      "id": "ac-contract-docurl",
+      "type": "markdown",
+      "label": "Contract: Document URL",
+      "position": { "x": 0, "y": 1280 },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contract: Document URL (Proposed)\nUse **two concepts**:\n\n1) **Graph address** (where the `.node` came from)\n- UI-only: drives the address bar + history.\n- Examples: `https://…`, `github://…`, `local://…`, `tlz://…`.\n\n2) **Embedded document** (what the graph references)\n- Stored in the artifact as `document: { url }`.\n- URL may be remote, local-path-like, or empty.\n\nSuggestion: keep `document.url` as the canonical storage, and optionally mirror to `settings.document.url` for backward compatibility if needed."
+      }
+    },
+    {
+      "id": "ac-deltas-vs-replace",
+      "type": "markdown",
+      "label": "Deltas vs Replace",
+      "position": { "x": 0, "y": 1680 },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Mutation Contract: Deltas vs Replace\nTwilight’s superpower is continuity.\n\n- Default: AIs should emit **delta commands** (`action: create/update/delete/batch`), not full snapshots.\n- Replace is dangerous: importing a full `{nodes,edges,groups}` payload can wipe state.\n\nProposal:\n- Introduce an explicit, hard-to-accidentally-trigger replace mode (e.g., `action: \"replace\"` + `confirmReplace: true`).\n- For agents: treat replace as *forbidden* unless user explicitly asked to reset."
+      }
+    },
+    {
+      "id": "ac-format-unification",
+      "type": "markdown",
+      "label": "Format Unification",
+      "position": { "x": 0, "y": 2080 },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Format Unification (Artifacts)\nCurrent reality: some files are `fileVersion: \"1.0\"`, some are legacy `type: \"nodegraph-data\"`.\n\nProposal:\n- Standardize all roadmaps on `fileVersion: \"1.0\"`.\n- Ensure `metadata.title/description/tags` are set (no \"Untitled Graph\").\n- Keep artifacts diff-friendly (stable ids, stable ordering, minimal churn)."
+      }
+    },
+    {
+      "id": "ac-command-schema",
+      "type": "markdown",
+      "label": "Command Schema",
+      "position": { "x": 0, "y": 2440 },
+      "width": 760,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Command Schema (AI Contract)\nYou already support many `action` commands.\n\nMissing piece:\n- a machine-checkable schema for those commands (JSON Schema) + clearer error messages.\n\nProposal:\n- Publish `ActionCommand.schema.json` for the paste interface.\n- Keep `dryRun` as the safe default for agent-generated commands.\n- Add a \"lint\" mode: validate commands and show what would change."
+      }
+    },
+    {
+      "id": "ac-next-steps",
+      "type": "markdown",
+      "label": "Next Steps",
+      "position": { "x": 0, "y": 2820 },
+      "width": 760,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Next Steps\n- Update docs so handle behavior is consistent everywhere.\n- Pick the document URL storage contract (`document.url` canonical is simplest).\n- Add a safe replace gate for snapshot imports.\n- Migrate legacy roadmap artifacts to `fileVersion: \"1.0\"`.\n- Add command schemas + optional lint/dry-run UX."
+      }
+    }
+  ],
+  "edges": [
+    { "id": "ac-e1", "type": "child", "source": "ac-goal", "target": "ac-reality-handles", "label": "handles" },
+    { "id": "ac-e2", "type": "child", "source": "ac-reality-handles", "target": "ac-contract-handles", "label": "contract" },
+    { "id": "ac-e3", "type": "child", "source": "ac-contract-handles", "target": "ac-reality-docurl", "label": "documents" },
+    { "id": "ac-e4", "type": "child", "source": "ac-reality-docurl", "target": "ac-contract-docurl", "label": "contract" },
+    { "id": "ac-e5", "type": "child", "source": "ac-contract-docurl", "target": "ac-deltas-vs-replace", "label": "mutation safety" },
+    { "id": "ac-e6", "type": "child", "source": "ac-deltas-vs-replace", "target": "ac-format-unification", "label": "standardize" },
+    { "id": "ac-e7", "type": "child", "source": "ac-format-unification", "target": "ac-command-schema", "label": "enforce" },
+    { "id": "ac-e8", "type": "child", "source": "ac-command-schema", "target": "ac-next-steps", "label": "do next" }
+  ],
+  "groups": []
+}

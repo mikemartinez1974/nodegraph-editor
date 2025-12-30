@@ -1,0 +1,77 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Index of data/breadboard",
+    "created": "2025-12-30T18:29:23.745Z",
+    "modified": "2025-12-30T18:29:23.745Z"
+  },
+  "settings": {
+    "theme": {
+      "mode": "dark",
+      "primary": {
+        "main": "#1976d2"
+      },
+      "background": {
+        "default": "#121212",
+        "paper": "#1e1e1e"
+      },
+      "text": {
+        "primary": "#ffffff",
+        "secondary": "rgba(255, 255, 255, 0.7)"
+      }
+    }
+  },
+  "viewport": {
+    "pan": {
+      "x": 400,
+      "y": 300
+    },
+    "zoom": 0.8
+  },
+  "nodes": [
+    {
+      "id": "header",
+      "type": "markdown",
+      "label": "📂 data/breadboard",
+      "position": {
+        "x": 0,
+        "y": -200
+      },
+      "width": 600,
+      "height": 100,
+      "data": {
+        "markdown": "# Index of data/breadboard\nExplore the nodegraphs in this directory."
+      }
+    },
+    {
+      "id": "back",
+      "type": "default",
+      "label": "⬅️ Back to Parent",
+      "position": {
+        "x": -300,
+        "y": -200
+      },
+      "width": 180,
+      "height": 60,
+      "data": {
+        "link": "tlz:///data/index.node"
+      }
+    },
+    {
+      "id": "node-0",
+      "type": "default",
+      "label": "breadboard",
+      "position": {
+        "x": -330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///data/breadboard/breadboard.node"
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

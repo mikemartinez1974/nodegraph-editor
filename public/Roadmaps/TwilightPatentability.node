@@ -1,0 +1,283 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-29T17:34:05.340Z",
+    "modified": "2025-12-29T17:34:05.340Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -297.30589699776056,
+      "y": -184.35088378525438
+    },
+    "zoom": 0.950319840469184
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "pat-01",
+      "type": "markdown",
+      "label": "🧭 The Question",
+      "position": {
+        "x": 831.6666666666666,
+        "y": -445
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Do we have something **patentable** — not just interesting, useful, or clever — but defensible as a *system*?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-02",
+      "type": "markdown",
+      "label": "❌ Not Patentable (Alone)",
+      "position": {
+        "x": 395,
+        "y": -85
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "- Node graphs\n- Auto-layout\n- AI coding tools\n- Agents\n- RAG\n- Orchestration\n\nAll are **prior art** when taken individually.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-03",
+      "type": "markdown",
+      "label": "✅ Potentially Patentable Core",
+      "position": {
+        "x": 855,
+        "y": -85
+      },
+      "width": 380,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**System-level combination:**\n\n• Graph is the *primary persistent artifact*\n• Graph may be authored **headlessly** (no layout)\n• Rendering is a **derived projection**, not state\n• AI mutates graph structure, not pixels\n• Copy/paste transmits executable graph state\n• Stable IDs + history preserved across views\n• Offline (Codex) and online (agents/RAG) share the same graph",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-04",
+      "type": "markdown",
+      "label": "⚖️ Why This Is Non-Obvious",
+      "position": {
+        "x": 500,
+        "y": 385
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Most systems do:\n\nrender → edit → serialize\n\nTwilight does:\n\n**structure → persist → project**\n\nThis inversion changes how AI, humans, and tools interact with state.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-05",
+      "type": "markdown",
+      "label": "🏗️ Competitive Context",
+      "position": {
+        "x": 20,
+        "y": 385
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Big players (e.g. Google Antigravity):\n\n• UI-first\n• SaaS-hosted\n• Execution-centric\n• Rendering assumed\n• Ephemeral cognition\n\nTwilight is orthogonal, not replaceable.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-06",
+      "type": "markdown",
+      "label": "📌 Current Status",
+      "position": {
+        "x": 980,
+        "y": 405
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "• Architecture is real\n• Insight recently crystallized\n• Patentability depends on **mechanism**, not philosophy\n• Needs concrete system description\n• Not ready to file — ready to *define*",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "pat-07",
+      "type": "markdown",
+      "label": "🛤️ Next Decision Fork",
+      "position": {
+        "x": 960,
+        "y": 805
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Options:\n\n1. Draft plain-English system claim\n2. Identify prior art to distinguish\n3. Consult patent attorney (after #1)\n4. Decide *not* to patent (and why)\n\nNo urgency — clarity first.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "pat-e1",
+      "type": "straight",
+      "source": "pat-01",
+      "target": "pat-02",
+      "label": "eliminate",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "pat-e2",
+      "type": "straight",
+      "source": "pat-01",
+      "target": "pat-03",
+      "label": "focus on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "pat-e3",
+      "type": "straight",
+      "source": "pat-03",
+      "target": "pat-04",
+      "label": "justified by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "pat-e4",
+      "type": "straight",
+      "source": "pat-03",
+      "target": "pat-05",
+      "label": "distinguished from",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "pat-e5",
+      "type": "straight",
+      "source": "pat-03",
+      "target": "pat-06",
+      "label": "current assessment",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "pat-e6",
+      "type": "straight",
+      "source": "pat-06",
+      "target": "pat-07",
+      "label": "leads to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

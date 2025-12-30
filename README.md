@@ -218,7 +218,7 @@ window.graphAPI.getStats();
 // { nodeCount: 10, edgeCount: 15, ... }
 ```
 
-> ℹ️ Edge creation now requires `sourceHandle`/`targetHandle` keys. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to pick the correct connection points.
+> ℹ️ Edge handles are optional. If you include `sourceHandle`/`targetHandle`, they must match handle keys declared by the nodes (check `outputs`/`inputs` or explicit `handles`).
 
 See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) for full API reference.
 

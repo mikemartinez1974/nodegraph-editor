@@ -107,6 +107,9 @@ Notes:
 }
 ```
 
+Tip:
+- Only use `sourceHandle` / `targetHandle` when the nodes actually declare those handle keys (some nodes have none by default). If you’re unsure, omit handles and let the edge attach to the node boundary.
+
 ### Example: custom style override
 ```json
 {

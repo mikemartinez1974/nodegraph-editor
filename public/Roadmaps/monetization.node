@@ -1,0 +1,400 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-30T03:44:48.913Z",
+    "modified": "2025-12-30T03:44:48.913Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 20,
+      "y": -531.5
+    },
+    "zoom": 1
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "m0000000-0000-4aaa-8aaa-000000000001",
+      "type": "markdown",
+      "label": "💰 Monetization Doctrine",
+      "position": {
+        "x": 720,
+        "y": -140
+      },
+      "width": 460,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Monetization Doctrine\n\nTwilight must **capture value without capturing minds**.\n\nThis graph defines *where monetization is allowed*, *where it is forbidden*, and *how value compounds without breaking trust*.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4bbb-8bbb-000000000002",
+      "type": "default",
+      "label": "🟢 Safe Zone: Leverage",
+      "position": {
+        "x": 925,
+        "y": 250
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Charge for acceleration, power, scale, safety, and convenience — never for existence or access.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4bbb-8bbb-000000000003",
+      "type": "default",
+      "label": "🔴 Forbidden Zone: Ownership",
+      "position": {
+        "x": 525,
+        "y": 250
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Never paywall graphs, block forks, restrict reading, lock formats, or claim ownership over user thinking.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4bbb-8bbb-000000000004",
+      "type": "default",
+      "label": "⚠️ Danger Zone: Premature Capture",
+      "position": {
+        "x": 125,
+        "y": 250
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Avoid monetizing too early. Let the medium spread before formalizing revenue boundaries.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4ccc-8ccc-000000000005",
+      "type": "default",
+      "label": "🛠 Dev Tools (Primary Wedge)",
+      "position": {
+        "x": 995,
+        "y": 580
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Paid IDE features, graph diffs, validation, simulation, debugging lenses, power-user tooling.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4ccc-8ccc-000000000006",
+      "type": "default",
+      "label": "🚀 Acceleration > Access",
+      "position": {
+        "x": 595,
+        "y": 580
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Free to open, read, fork, and continue. Paid to go faster, safer, and further.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4ccc-8ccc-000000000007",
+      "type": "default",
+      "label": "☁️ Hosted Services",
+      "position": {
+        "x": 195,
+        "y": 580
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Monetize compute, previews, collaboration, background agents, secrets, simulations, reliability.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4ddd-8ddd-000000000008",
+      "type": "default",
+      "label": "🧠 Trust as a Moat",
+      "position": {
+        "x": 935,
+        "y": 900
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Trust compounds faster than features. Never violate continuity, authorship, or user ownership.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4ddd-8ddd-000000000009",
+      "type": "default",
+      "label": "📈 Monetization Arc",
+      "position": {
+        "x": 185,
+        "y": 900
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Phase 1: Dev leverage → Phase 2: Team gravity → Phase 3: Infrastructure & SLAs.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "m0000000-0000-4eee-8eee-000000000010",
+      "type": "markdown",
+      "label": "🧪 Litmus Test",
+      "position": {
+        "x": 778.3333333333333,
+        "y": 1220
+      },
+      "width": 460,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Litmus Test\n\n**If this feature vanished tomorrow, would users still own their thinking?**\n\n- Yes → Safe to monetize\n- No → Do not ship\n\nCharge for leverage. Never charge for memory, continuity, or existence.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "me1",
+      "type": "child",
+      "source": "m0000000-0000-4aaa-8aaa-000000000001",
+      "target": "m0000000-0000-4bbb-8bbb-000000000002",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me2",
+      "type": "child",
+      "source": "m0000000-0000-4aaa-8aaa-000000000001",
+      "target": "m0000000-0000-4bbb-8bbb-000000000003",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me3",
+      "type": "child",
+      "source": "m0000000-0000-4aaa-8aaa-000000000001",
+      "target": "m0000000-0000-4bbb-8bbb-000000000004",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me4",
+      "type": "child",
+      "source": "m0000000-0000-4bbb-8bbb-000000000002",
+      "target": "m0000000-0000-4ccc-8ccc-000000000005",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me5",
+      "type": "child",
+      "source": "m0000000-0000-4bbb-8bbb-000000000002",
+      "target": "m0000000-0000-4ccc-8ccc-000000000006",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me6",
+      "type": "child",
+      "source": "m0000000-0000-4bbb-8bbb-000000000002",
+      "target": "m0000000-0000-4ccc-8ccc-000000000007",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me7",
+      "type": "child",
+      "source": "m0000000-0000-4ccc-8ccc-000000000005",
+      "target": "m0000000-0000-4ddd-8ddd-000000000008",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me8",
+      "type": "child",
+      "source": "m0000000-0000-4ccc-8ccc-000000000006",
+      "target": "m0000000-0000-4ddd-8ddd-000000000008",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me9",
+      "type": "child",
+      "source": "m0000000-0000-4ccc-8ccc-000000000007",
+      "target": "m0000000-0000-4ddd-8ddd-000000000009",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me10",
+      "type": "child",
+      "source": "m0000000-0000-4ddd-8ddd-000000000008",
+      "target": "m0000000-0000-4eee-8eee-000000000010",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "me11",
+      "type": "child",
+      "source": "m0000000-0000-4ddd-8ddd-000000000009",
+      "target": "m0000000-0000-4eee-8eee-000000000010",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

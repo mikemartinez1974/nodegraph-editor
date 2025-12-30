@@ -1,0 +1,432 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-30T01:42:53.475Z",
+    "modified": "2025-12-30T01:42:53.475Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 290.7684735442393,
+      "y": 471.87968153325187
+    },
+    "zoom": 1.085448274712218
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "a0000000-0000-4aaa-8aaa-000000000001",
+      "type": "markdown",
+      "label": "🧭 API Evolution Goals",
+      "position": {
+        "x": 125,
+        "y": -125
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# API Evolution Goals\n\n**Reduce agent error. Preserve continuity. Enable safe autonomy.**\n\nThis graph captures *incremental improvements* to the existing Graph API—not a rewrite. Each node represents a pressure point where Twilight can become more resilient to human + AI collaboration.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000000-0000-4bbb-8bbb-000000000002",
+      "type": "default",
+      "label": "🧩 Patch / Delta Model",
+      "position": {
+        "x": 860,
+        "y": 245
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Introduce a first-class GraphPatch abstraction: ordered ops, atomic apply, replayable, dry-run native.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000000-0000-4bbb-8bbb-000000000003",
+      "type": "default",
+      "label": "🛡 Intent Validation Layer",
+      "position": {
+        "x": 480,
+        "y": 245
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Preflight validation beyond syntax: topology, locked nodes, breadboard substrate, validation modes.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b0000000-0000-4bbb-8bbb-000000000004",
+      "type": "default",
+      "label": "🔍 Action Preview / Diff",
+      "position": {
+        "x": 100,
+        "y": 245
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Preview affected nodes, edges, groups, and bounds before commit. Git-style mental model.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000000-0000-4ccc-8ccc-000000000005",
+      "type": "default",
+      "label": "🧠 Graph Introspection API",
+      "position": {
+        "x": 860,
+        "y": 545
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Read-only schema access for agents: node types, handle contracts, validation rules.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000000-0000-4ccc-8ccc-000000000006",
+      "type": "default",
+      "label": "📌 \"Why\" Metadata",
+      "position": {
+        "x": 480,
+        "y": 545
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Encourage reason/purpose metadata on nodes, groups, and scripts to preserve intent over time.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c0000000-0000-4ccc-8ccc-000000000007",
+      "type": "default",
+      "label": "🎭 Agent Roles",
+      "position": {
+        "x": 100,
+        "y": 545
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Declare agent roles (observer/editor/builder/simulator) to gate allowed actions and scope.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000000-0000-4ddd-8ddd-000000000008",
+      "type": "default",
+      "label": "🧬 Group Semantics",
+      "position": {
+        "x": 860,
+        "y": 845
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Groups as domains: allowed node types, handle namespaces, auto-layout rules.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000000-0000-4ddd-8ddd-000000000009",
+      "type": "default",
+      "label": "🔌 Handle Schemas",
+      "position": {
+        "x": 480,
+        "y": 845
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Reusable named handle contracts (logic.boolean.in, breadboard.socket, trigger.any).",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0000000-0000-4ddd-8ddd-000000000010",
+      "type": "default",
+      "label": "⚙ ScriptNode Contracts",
+      "position": {
+        "x": 100,
+        "y": 845
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Scripts declare inputs, outputs, affected scopes, and side effects for auditability.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e0000000-0000-4eee-8eee-000000000011",
+      "type": "markdown",
+      "label": "🌱 Living System Principle",
+      "position": {
+        "x": 400,
+        "y": 1145
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Twilight as a Living System\n\nThe graph is not a picture.\n\nIt is **memory**, **intention**, and **executable history**.\n\nEvery improvement above reinforces continuity over convenience.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "type": "child",
+      "source": "a0000000-0000-4aaa-8aaa-000000000001",
+      "target": "b0000000-0000-4bbb-8bbb-000000000002",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e2",
+      "type": "child",
+      "source": "a0000000-0000-4aaa-8aaa-000000000001",
+      "target": "b0000000-0000-4bbb-8bbb-000000000003",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e3",
+      "type": "child",
+      "source": "a0000000-0000-4aaa-8aaa-000000000001",
+      "target": "b0000000-0000-4bbb-8bbb-000000000004",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e4",
+      "type": "child",
+      "source": "b0000000-0000-4bbb-8bbb-000000000002",
+      "target": "c0000000-0000-4ccc-8ccc-000000000005",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e5",
+      "type": "child",
+      "source": "b0000000-0000-4bbb-8bbb-000000000003",
+      "target": "c0000000-0000-4ccc-8ccc-000000000006",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e6",
+      "type": "child",
+      "source": "b0000000-0000-4bbb-8bbb-000000000004",
+      "target": "c0000000-0000-4ccc-8ccc-000000000007",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e7",
+      "type": "child",
+      "source": "c0000000-0000-4ccc-8ccc-000000000005",
+      "target": "d0000000-0000-4ddd-8ddd-000000000008",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e8",
+      "type": "child",
+      "source": "c0000000-0000-4ccc-8ccc-000000000006",
+      "target": "d0000000-0000-4ddd-8ddd-000000000009",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e9",
+      "type": "child",
+      "source": "c0000000-0000-4ccc-8ccc-000000000007",
+      "target": "d0000000-0000-4ddd-8ddd-000000000010",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e10",
+      "type": "child",
+      "source": "d0000000-0000-4ddd-8ddd-000000000008",
+      "target": "e0000000-0000-4eee-8eee-000000000011",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e11",
+      "type": "child",
+      "source": "d0000000-0000-4ddd-8ddd-000000000009",
+      "target": "e0000000-0000-4eee-8eee-000000000011",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e12",
+      "type": "child",
+      "source": "d0000000-0000-4ddd-8ddd-000000000010",
+      "target": "e0000000-0000-4eee-8eee-000000000011",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}
