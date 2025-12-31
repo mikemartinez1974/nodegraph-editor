@@ -126,6 +126,20 @@
       "data": {
         "link": "tlz:///data/RealtimeOpsDashboard.node"
       }
+    },
+    {
+      "id": "node-5",
+      "type": "default",
+      "label": "IntroManual",
+      "position": {
+        "x": 110,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///data/IntroManual.node"
+      }
     }
   ],
   "edges": [],

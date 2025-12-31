@@ -1,0 +1,386 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-10-26T01:27:31.292Z",
+    "modified": "2025-10-26T01:27:31.292Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#90a4ae",
+      "primaryContrast": "rgba(0, 0, 0, 0.87)",
+      "secondary": "#b0bec5",
+      "secondaryContrast": "rgba(0, 0, 0, 0.87)",
+      "background": "#cfd8dc",
+      "paper": "#eceff1",
+      "textPrimary": "rgba(0, 0, 0, 0.87)",
+      "textSecondary": "rgba(0, 0, 0, 0.6)",
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 215.13333336639403,
+      "y": 145.59999923324585
+    },
+    "zoom": 0.9333333358764648
+  },
+  "nodes": [
+    {
+      "id": "node_tz",
+      "type": "default",
+      "label": "The Twilight Zone 🌌",
+      "position": {
+        "x": 400,
+        "y": 50
+      },
+      "width": 200,
+      "height": 100,
+      "color": "linear-gradient(135deg, #00f7ff 0%, #ff00ff 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_create",
+      "type": "default",
+      "label": "Create 📝",
+      "position": {
+        "x": 28.92857175846484,
+        "y": 208.21428582814275
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#00f7ff",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_create_graphs",
+      "type": "default",
+      "label": "Build Node Graphs",
+      "position": {
+        "x": -21.07142824153516,
+        "y": 358.21428582814275
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#00b7eb",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_create_ideas",
+      "type": "default",
+      "label": "Organize Ideas",
+      "position": {
+        "x": 128.92857175846484,
+        "y": 358.21428582814275
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#00b7eb",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_connect",
+      "type": "default",
+      "label": "Connect 🔗",
+      "position": {
+        "x": 388.21428574639924,
+        "y": 209.28571439665188
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#ff00ff",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_connect_graphs",
+      "type": "default",
+      "label": "Link Graphs (tlz://)",
+      "position": {
+        "x": 338.21428574639924,
+        "y": 359.2857143966519
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#e040fb",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_connect_collaborate",
+      "type": "default",
+      "label": "Collaborate",
+      "position": {
+        "x": 488.21428574639924,
+        "y": 359.2857143966519
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#e040fb",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_visualize",
+      "type": "default",
+      "label": "Visualize 📊",
+      "position": {
+        "x": 757.142856850916,
+        "y": 212.5000001021794
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#ff4081",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_visualize_data",
+      "type": "default",
+      "label": "Display Data",
+      "position": {
+        "x": 707.142856850916,
+        "y": 362.5000001021794
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#f50057",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_extend",
+      "type": "default",
+      "label": "Extend 🚀",
+      "position": {
+        "x": 1037.1428567691726,
+        "y": 217.85714294472518
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#00e676",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_extend_vr",
+      "type": "default",
+      "label": "VR Nodes",
+      "position": {
+        "x": 987.1428567691726,
+        "y": 367.8571429447252
+      },
+      "width": 140,
+      "height": 70,
+      "color": "#00c853",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "node_doc",
+      "type": "markdown",
+      "label": "About The Twilight Zone",
+      "position": {
+        "x": 50,
+        "y": 600
+      },
+      "width": 300,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# The Twilight Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it’s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.json)"
+      }
+    },
+    {
+      "id": "node_icon",
+      "type": "svg",
+      "label": "Zone Icon",
+      "position": {
+        "x": 600,
+        "y": 600
+      },
+      "width": 120,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "svg": "<svg viewBox='0 0 100 100'><rect x='10' y='10' width='80' height='80' fill='none' stroke='#00f7ff' stroke-width='4'/><circle cx='50' cy='50' r='30' fill='#ff00ff'/><text x='50' y='55' font-size='20' text-anchor='middle' fill='#00f7ff'>TLZ</text></svg>"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_tz_create",
+      "type": "child",
+      "source": "node_tz",
+      "target": "node_create",
+      "label": "",
+      "style": {}
+    },
+    {
+      "id": "edge_create_graphs",
+      "type": "child",
+      "source": "node_create",
+      "target": "node_create_graphs",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "edge_create_ideas",
+      "type": "child",
+      "source": "node_create",
+      "target": "node_create_ideas",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "edge_tz_connect",
+      "type": "child",
+      "source": "node_tz",
+      "target": "node_connect",
+      "label": "",
+      "style": {}
+    },
+    {
+      "id": "edge_connect_graphs",
+      "type": "child",
+      "source": "node_connect",
+      "target": "node_connect_graphs",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "edge_connect_collaborate",
+      "type": "child",
+      "source": "node_connect",
+      "target": "node_connect_collaborate",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "edge_tz_visualize",
+      "type": "child",
+      "source": "node_tz",
+      "target": "node_visualize",
+      "label": "",
+      "style": {}
+    },
+    {
+      "id": "edge_visualize_data",
+      "type": "child",
+      "source": "node_visualize",
+      "target": "node_visualize_data",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "edge_tz_extend",
+      "type": "child",
+      "source": "node_tz",
+      "target": "node_extend",
+      "label": "",
+      "style": {}
+    },
+    {
+      "id": "edge_extend_vr",
+      "type": "child",
+      "source": "node_extend",
+      "target": "node_extend_vr",
+      "label": "includes",
+      "style": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "group_create",
+      "label": "Creation Zone 📝",
+      "nodeIds": [
+        "node_create",
+        "node_create_graphs",
+        "node_create_ideas"
+      ],
+      "bounds": {
+        "x": -111.07142824153516,
+        "y": 148.21428582814275,
+        "width": 330,
+        "height": 265
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group_connect",
+      "label": "Connection Zone 🔗",
+      "nodeIds": [
+        "node_connect",
+        "node_connect_graphs",
+        "node_connect_collaborate"
+      ],
+      "bounds": {
+        "x": 248.21428574639924,
+        "y": 149.28571439665188,
+        "width": 330,
+        "height": 265
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group_visualize",
+      "label": "Visualization Zone 📊",
+      "nodeIds": [
+        "node_visualize",
+        "node_visualize_data"
+      ],
+      "bounds": {
+        "x": 617.142856850916,
+        "y": 152.5000001021794,
+        "width": 240,
+        "height": 265
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group_extend",
+      "label": "Future Zone 🚀",
+      "nodeIds": [
+        "node_extend",
+        "node_extend_vr"
+      ],
+      "bounds": {
+        "x": 897.1428567691726,
+        "y": 157.85714294472518,
+        "width": 240,
+        "height": 265
+      },
+      "visible": true,
+      "style": {}
+    }
+  ]
+}

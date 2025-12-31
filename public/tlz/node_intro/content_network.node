@@ -1,0 +1,241 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-10-31T09:11:49.538Z",
+    "modified": "2025-10-31T09:11:49.538Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#1976d2",
+      "primaryContrast": "#fff",
+      "secondary": "#dc004e",
+      "secondaryContrast": "#fff",
+      "background": "#e8eaf6",
+      "paper": "#ffffff",
+      "textPrimary": "rgba(0, 0, 0, 0.87)",
+      "textSecondary": "rgba(0, 0, 0, 0.6)",
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 669,
+      "y": 419.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "central",
+      "type": "markdown",
+      "label": "Node Graph as Content Network 🌐📦",
+      "position": {
+        "x": 210.1469304547285,
+        "y": 153.9836834668957
+      },
+      "width": 350,
+      "height": 220,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Node Graph = Content Network\n\nImagine a graph where **nodes hold content** (text, data, links) and **edges weave relationships**. It's a living web of ideas:\n\n- **Nodes**: Vessels for knowledge chunks.\n- **Edges**: Threads connecting meaning.\n- **Network**: Emergent understanding.\n\nThis self-describes: Each node below is content about this structure! 🔄"
+      }
+    },
+    {
+      "id": "nodes-content",
+      "type": "markdown",
+      "label": "Nodes: Content Containers 🗃️",
+      "position": {
+        "x": 400,
+        "y": -150
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#4CAF50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Nodes Hold the Stuff\n\nNodes aren't just dots—they're **containers**:\n- **Text/Markdown**: Stories, notes, code.\n- **Data**: APIs, timers, scripts injecting live content.\n- **Visuals**: SVGs, images as embedded media.\n\nExample: This node contains *this* explanation. Infinite nesting? Why not! 📜"
+      }
+    },
+    {
+      "id": "edges-links",
+      "type": "markdown",
+      "label": "Edges: Relationship Weavers 🧵",
+      "position": {
+        "x": 711.946250630712,
+        "y": 138.34491931404247
+      },
+      "width": 260,
+      "height": 160,
+      "color": "#FF9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Edges Connect the Dots\n\nEdges transform isolated content into a **network**:\n- **Types**: Flows (data), hierarchies (parent-child), peers (equals).\n- **Labels**: 'Depends On', 'Inspires', 'Links To'.\n- **Styles**: Colors for categories, animations for dynamics.\n\nWithout edges, nodes are a pile; with them, a tapestry. 🎨"
+      }
+    },
+    {
+      "id": "network-emergence",
+      "type": "markdown",
+      "label": "Network: Emergent Knowledge 🌱",
+      "position": {
+        "x": -427.42001306814973,
+        "y": 72.18801829540962
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#9C27B0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# The Whole > Sum of Parts\n\nA node graph births **emergence**:\n- **Patterns**: Clusters reveal themes.\n- **Flows**: Trace ideas from source to insight.\n- **Scalability**: Add nodes/edges; the network grows smarter.\n\nMeta: This graph *is* its own emergent content network. Zoom out—what do you see? 🔍"
+      }
+    },
+    {
+      "id": "self-reflect",
+      "type": "markdown",
+      "label": "Self-Reference Loop ♾️",
+      "position": {
+        "x": -125.99040740578451,
+        "y": 381.2321937482459
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#F44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# It's About Itself\n\nThis graph **embodies** the concept:\n- Central node: The thesis.\n- Branches: Explains components.\n- Loop back: Reflects on the reflection.\n\nAdd your content: Paste new nodes to evolve the network. What's your twist? 🤔"
+      }
+    },
+    {
+      "id": "examples-meta",
+      "type": "markdown",
+      "label": "Examples in the Wild 🌍",
+      "position": {
+        "x": -244.66603005674438,
+        "y": -191.26099411933262
+      },
+      "width": 220,
+      "height": 140,
+      "color": "#FFC107",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Real Networks\n\n- **Wiki**: Pages (nodes) hyperlinked (edges).\n- **Blockchain**: Blocks chained by hashes.\n- **Social Media**: Posts connected by shares.\n- **Your Brain**: Neurons firing networks of thought.\n\nAll node graphs at heart! 🧠"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-central-nodes",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "nodes-content",
+      "label": "Contains",
+      "style": {}
+    },
+    {
+      "id": "e-central-edges",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "edges-links",
+      "label": "Connects Via",
+      "style": {}
+    },
+    {
+      "id": "e-central-network",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "network-emergence",
+      "label": "Forms",
+      "style": {}
+    },
+    {
+      "id": "e-network-self",
+      "type": "bidirectional",
+      "source": "network-emergence",
+      "target": "self-reflect",
+      "label": "Reflects",
+      "style": {}
+    },
+    {
+      "id": "e-self-examples",
+      "type": "peer",
+      "source": "self-reflect",
+      "target": "examples-meta",
+      "label": "Like",
+      "style": {}
+    },
+    {
+      "id": "e-examples-central",
+      "type": "reference",
+      "source": "examples-meta",
+      "target": "central",
+      "label": "Exemplifies",
+      "style": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-structure",
+      "label": "Core Structure 🏗️",
+      "nodeIds": [
+        "nodes-content",
+        "edges-links",
+        "network-emergence"
+      ],
+      "bounds": {
+        "x": -597.4200130681497,
+        "y": -260,
+        "width": 1459.3662636988618,
+        "height": 498.3449193140425
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group-meta",
+      "label": "Meta Layer 🔄",
+      "nodeIds": [
+        "self-reflect",
+        "examples-meta"
+      ],
+      "bounds": {
+        "x": -374.6660300567444,
+        "y": -281.2609941193326,
+        "width": 393.6756226509599,
+        "height": 757.4931878675785
+      },
+      "visible": true,
+      "style": {}
+    }
+  ]
+}

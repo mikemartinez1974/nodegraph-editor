@@ -1,0 +1,73 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-01T22:43:12.875Z",
+    "modified": "2025-11-01T22:43:12.875Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#3949ab",
+      "primaryContrast": "#fff",
+      "secondary": "#5e35b1",
+      "secondaryContrast": "#fff",
+      "background": "#0a0e27",
+      "paper": "#1a1f3a",
+      "textPrimary": "#fff",
+      "textSecondary": "rgba(255, 255, 255, 0.7)",
+      "divider": "rgba(255, 255, 255, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 622.358166019431,
+      "y": 229.96344883971057
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "0201a422-a722-4a75-8330-4674ab4a0283",
+      "type": "default",
+      "label": "New Node",
+      "position": {
+        "x": 57.641833980569004,
+        "y": 86.53655116028943
+      },
+      "width": 200,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

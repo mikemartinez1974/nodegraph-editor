@@ -1,0 +1,46 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Getting Started",
+    "description": "Step-by-step getting started guide",
+    "created": "2025-10-26T00:00:00Z"
+  },
+  "settings": {},
+  "viewport": { "pan": { "x": 0, "y": 0 }, "zoom": 1 },
+  "nodes": [
+    {
+      "id": "gs-1",
+      "type": "markdown",
+      "label": "First Steps (Markdown)",
+      "position": { "x": 220, "y": 140 },
+      "width": 380,
+      "height": 180,
+      "data": {
+        "memo": "# Getting Started\n\nFollow these steps:\n\n1. Open the Intro node: [Intro](tlz://cpwith.me/tlz/IntroGraph.node)\n2. Explore Examples: [Examples](tlz://cpwith.me/tlz/Examples.node)\n\nThis markdown node demonstrates TLZ outbound links."
+      }
+    },
+    {
+      "id": "gs-2",
+      "type": "default",
+      "label": "Create a Node",
+      "position": { "x": 540, "y": 140 },
+      "width": 200,
+      "height": 90,
+      "data": { "memo": "Use the toolbar or drag to add nodes." }
+    },
+    {
+      "id": "gs-3",
+      "type": "default",
+      "label": "Save Your Work",
+      "position": { "x": 380, "y": 380 },
+      "width": 220,
+      "height": 100,
+      "data": { "memo": "Remember to save periodically via the Save button." }
+    }
+  ],
+  "edges": [
+    { "id": "gs-edge-1", "source": "gs-1", "target": "gs-2", "label": "Try" },
+    { "id": "gs-edge-2", "source": "gs-2", "target": "gs-3", "label": "Then" }
+  ],
+  "groups": []
+}

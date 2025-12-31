@@ -1,0 +1,315 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Index of tlz",
+    "created": "2025-12-30T18:29:23.772Z",
+    "modified": "2025-12-30T18:29:23.772Z"
+  },
+  "settings": {
+    "theme": {
+      "mode": "dark",
+      "primary": {
+        "main": "#1976d2"
+      },
+      "background": {
+        "default": "#121212",
+        "paper": "#1e1e1e"
+      },
+      "text": {
+        "primary": "#ffffff",
+        "secondary": "rgba(255, 255, 255, 0.7)"
+      }
+    }
+  },
+  "viewport": {
+    "pan": {
+      "x": 400,
+      "y": 300
+    },
+    "zoom": 0.8
+  },
+  "nodes": [
+    {
+      "id": "header",
+      "type": "markdown",
+      "label": "📂 tlz",
+      "position": {
+        "x": 0,
+        "y": -200
+      },
+      "width": 600,
+      "height": 100,
+      "data": {
+        "markdown": "# Index of tlz\nExplore the nodegraphs in this directory."
+      }
+    },
+    {
+      "id": "back",
+      "type": "default",
+      "label": "⬅️ Back to Parent",
+      "position": {
+        "x": -300,
+        "y": -200
+      },
+      "width": 180,
+      "height": 60,
+      "data": {
+        "link": "tlz:///index.node"
+      }
+    },
+    {
+      "id": "node-0",
+      "type": "default",
+      "label": "circuit-sample",
+      "position": {
+        "x": -330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/circuit-sample.node"
+      }
+    },
+    {
+      "id": "node-1",
+      "type": "default",
+      "label": "conspiracyByChatGPT",
+      "position": {
+        "x": -110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/conspiracyByChatGPT.node"
+      }
+    },
+    {
+      "id": "node-2",
+      "type": "default",
+      "label": "conspiracyByGrok",
+      "position": {
+        "x": 110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/conspiracyByGrok.node"
+      }
+    },
+    {
+      "id": "node-3",
+      "type": "default",
+      "label": "divTest",
+      "position": {
+        "x": 330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/divTest.node"
+      }
+    },
+    {
+      "id": "node-4",
+      "type": "default",
+      "label": "Examples",
+      "position": {
+        "x": -330,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/Examples.node"
+      }
+    },
+    {
+      "id": "node-5",
+      "type": "default",
+      "label": "Features",
+      "position": {
+        "x": -110,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/Features.node"
+      }
+    },
+    {
+      "id": "node-6",
+      "type": "default",
+      "label": "GettingStarted",
+      "position": {
+        "x": 110,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/GettingStarted.node"
+      }
+    },
+    {
+      "id": "node-7",
+      "type": "default",
+      "label": "intro2",
+      "position": {
+        "x": 330,
+        "y": 120
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/intro2.node"
+      }
+    },
+    {
+      "id": "node-8",
+      "type": "default",
+      "label": "IntroGraph",
+      "position": {
+        "x": -330,
+        "y": 240
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/IntroGraph.node"
+      }
+    },
+    {
+      "id": "node-9",
+      "type": "default",
+      "label": "LogicSystemTest",
+      "position": {
+        "x": -110,
+        "y": 240
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/LogicSystemTest.node"
+      }
+    },
+    {
+      "id": "node-10",
+      "type": "default",
+      "label": "NodeSampler",
+      "position": {
+        "x": 110,
+        "y": 240
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/NodeSampler.node"
+      }
+    },
+    {
+      "id": "node-11",
+      "type": "default",
+      "label": "NodeTest",
+      "position": {
+        "x": 330,
+        "y": 240
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/NodeTest.node"
+      }
+    },
+    {
+      "id": "node-12",
+      "type": "default",
+      "label": "node_content_types",
+      "position": {
+        "x": -330,
+        "y": 360
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/node_content_types.node"
+      }
+    },
+    {
+      "id": "node-13",
+      "type": "default",
+      "label": "savetest",
+      "position": {
+        "x": -110,
+        "y": 360
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/savetest.node"
+      }
+    },
+    {
+      "id": "node-14",
+      "type": "default",
+      "label": "test",
+      "position": {
+        "x": 110,
+        "y": 360
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/test.node"
+      }
+    },
+    {
+      "id": "node-15",
+      "type": "default",
+      "label": "thePitch",
+      "position": {
+        "x": 330,
+        "y": 360
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/thePitch.node"
+      }
+    },
+    {
+      "id": "node-16",
+      "type": "default",
+      "label": "twilightzone_concept",
+      "position": {
+        "x": -330,
+        "y": 480
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/twilightzone_concept.node"
+      }
+    },
+    {
+      "id": "node-17",
+      "type": "default",
+      "label": "whynodegraphs",
+      "position": {
+        "x": -110,
+        "y": 480
+      },
+      "width": 200,
+      "height": 80,
+      "data": {
+        "link": "tlz:///tlz/whynodegraphs.node"
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

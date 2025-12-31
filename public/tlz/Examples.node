@@ -1,0 +1,46 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Examples",
+    "description": "Concrete examples and recipes",
+    "created": "2025-10-26T00:00:00Z"
+  },
+  "settings": {},
+  "viewport": { "pan": { "x": 0, "y": 0 }, "zoom": 1 },
+  "nodes": [
+    {
+      "id": "ex-1",
+      "type": "markdown",
+      "label": "Example Recipes (Markdown)",
+      "position": { "x": 260, "y": 140 },
+      "width": 420,
+      "height": 200,
+      "data": {
+        "memo": "# Examples\n\nTry these examples:\n\n- Intro: [Intro](tlz://cpwith.me/tlz/IntroGraph.node)\n- Features: [Features](tlz://cpwith.me/tlz/Features.node)\n\nEach example demonstrates workflows from the onboarding guide."
+      }
+    },
+    {
+      "id": "ex-2",
+      "type": "default",
+      "label": "Auto Layout Demo",
+      "position": { "x": 620, "y": 160 },
+      "width": 200,
+      "height": 90,
+      "data": { "memo": "Try the Auto Layout feature on this set of nodes." }
+    },
+    {
+      "id": "ex-3",
+      "type": "default",
+      "label": "Copy/Paste",
+      "position": { "x": 420, "y": 400 },
+      "width": 220,
+      "height": 100,
+      "data": { "memo": "Examples show copying nodes between graphs." }
+    }
+  ],
+  "edges": [
+    { "id": "ex-edge-1", "source": "ex-1", "target": "ex-2", "label": "Demo" },
+    { "id": "ex-edge-2", "source": "ex-2", "target": "ex-3", "label": "Try" }
+  ],
+  "groups": []
+}

@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-02T04:36:04.276Z",
+    "modified": "2025-11-02T04:36:04.276Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#3949ab",
+      "primaryContrast": "#fff",
+      "secondary": "#5e35b1",
+      "secondaryContrast": "#fff",
+      "background": "#0a0e27",
+      "paper": "#1a1f3a",
+      "textPrimary": "#fff",
+      "textSecondary": "rgba(255, 255, 255, 0.7)",
+      "divider": "rgba(255, 255, 255, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 212.68092194604014,
+      "y": 133.9326575823534
+    },
+    "zoom": 0.9994444444179534
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "type": "markdown",
+      "label": "The Veil Lifts 🌑",
+      "position": {
+        "x": 400,
+        "y": 200
+      },
+      "width": 250,
+      "height": 200,
+      "color": "linear-gradient(135deg, #0f0f23, #1a1a2e)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Conspiracy Nexus\n\n*In the Twilight Zone of truth, every shadow hides a handler.*\n\n[Enter the rabbit hole...](https://example.com/deeper)",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
+      "type": "default",
+      "label": "Moon Hoax 🎥",
+      "position": {
+        "x": -11,
+        "y": 55
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#ff6b35",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c3d4e5f6-g7h8-9012-cdef-345678901234",
+      "type": "svg",
+      "label": "Flat Earth 🗺️",
+      "position": {
+        "x": 769,
+        "y": 71
+      },
+      "width": 160,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "<svg viewBox='0 0 100 50'><circle cx='50' cy='25' r='20' fill='#4ecdc4'/><text x='50' y='30' text-anchor='middle' fill='white'>Disc</text></svg>"
+      }
+    },
+    {
+      "id": "d4e5f6g7-h8i9-0123-def0-456789012345",
+      "type": "default",
+      "label": "Illuminati 👁️",
+      "position": {
+        "x": -13,
+        "y": 334
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#9b59b6",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e5f6g7h8-i9j0-1234-ef01-567890123456",
+      "type": "default",
+      "label": "Reptilians 🦎",
+      "position": {
+        "x": 776,
+        "y": 353
+      },
+      "width": 160,
+      "height": 80,
+      "color": "#27ae60",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "f6g7h8i9-j0k1-2345-fg02-678901234567",
+      "type": "dependency",
+      "source": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "target": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
+      "label": "Staged",
+      "style": {}
+    },
+    {
+      "id": "g7h8i9j0-k1l2-3456-gh13-789012345678",
+      "type": "reference",
+      "source": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "target": "c3d4e5f6-g7h8-9012-cdef-345678901234",
+      "label": "Hidden",
+      "style": {}
+    },
+    {
+      "id": "h8i9j0k1-l2m3-4567-hi24-890123456789",
+      "type": "dataFlow",
+      "source": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "target": "d4e5f6g7-h8i9-0123-def0-456789012345",
+      "label": "Puppet",
+      "style": {}
+    },
+    {
+      "id": "i9j0k1l2-m3n4-5678-ij35-901234567890",
+      "type": "bidirectional",
+      "source": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "target": "e5f6g7h8-i9j0-1234-ef01-567890123456",
+      "label": "Infiltrate",
+      "style": {}
+    }
+  ],
+  "groups": []
+}

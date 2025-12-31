@@ -1,0 +1,228 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-31T18:15:49.899Z",
+    "modified": "2025-12-31T18:15:49.899Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 159.43103916278938,
+      "y": 451.10644750416316
+    },
+    "zoom": 0.6763586022238579
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "c1a8e3f1-9c2e-4c3a-9f91-0a7c3e2b1d01",
+      "type": "markdown",
+      "label": "🧩 VS Code Plugin — Purpose",
+      "position": {
+        "x": 538.6928950545948,
+        "y": -653.3748719047522
+      },
+      "width": 599.5179117517633,
+      "height": 367.93091085110325,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why this plugin exists\n\nThe VS Code plugin places **Twilight next to consequence**.\n\n- The browser editor is the **thinking surface**\n- VS Code is the **execution surface**\n- The plugin is the **bridge**\n\nThis plugin is not about power.\nIt is about *context at the moment decisions are made*.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "4e0a9c6d-7b83-4a27-9f30-8fbc0f01a112",
+      "type": "markdown",
+      "label": "✅ v0 Feature Set",
+      "position": {
+        "x": 536.0854231950813,
+        "y": -125.44396105364899
+      },
+      "width": 604.7328554707904,
+      "height": 375.40378703296255,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## v0: Minimal, Honest Capabilities\n\n- Open a Twilight graph file in VS Code\n- Render nodes, edges, and groups (read-only)\n- Pan and zoom the graph\n- Select nodes\n- View node metadata in a side panel\n- Render Markdown content faithfully\n\n> If this alone is useful, the abstraction is correct.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "9b3c5e2a-0b7d-4f4f-8d16-6c5b8bfe9011",
+      "type": "markdown",
+      "label": "🚫 Explicit Non-Goals",
+      "position": {
+        "x": 237.02290173346228,
+        "y": 409.9598259793137
+      },
+      "width": 374.08597748761076,
+      "height": 419.0598770825194,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What v0 explicitly does NOT do\n\n- ❌ Edit graphs\n- ❌ Modify files\n- ❌ Execute code\n- ❌ Run AI agents\n- ❌ Write back to the editor\n- ❌ Automate anything\n\nThese are *deliberate omissions*.\n\nRead-only is a **truth test**, not a limitation.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "7d8c41a3-2f9e-46e3-bef2-5c9d3b4b7022",
+      "type": "markdown",
+      "label": "🔁 Editor ↔ VS Code Boundary",
+      "position": {
+        "x": 731.108879221073,
+        "y": 409.9598259793137
+      },
+      "width": 416.26356190907035,
+      "height": 443.41504592543856,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Responsibility Split\n\n**Browser Editor**\n- Holds intent\n- Preserves continuity\n- Allows safe mutation\n\n**VS Code Plugin**\n- Displays intent\n- Correlates intent with files\n- Adds pressure without authority\n\n> AI advises. Humans decide.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e3a1fbc2-6d4e-41d1-9f66-7d1a4f8c9013",
+      "type": "markdown",
+      "label": "❓ Open Questions (Pull List)",
+      "position": {
+        "x": 729.2406601756081,
+        "y": 1013.3748719047522
+      },
+      "width": 421.4785056280973,
+      "height": 376.88229266105986,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Questions to be answered *by use*\n\n- When should node ↔ file linking become bidirectional?\n- What metadata is missing when coding?\n- Do I want this visible all the time?\n- When does read-only stop being enough?\n\n> These questions should be *pulled* by friction, not pushed by design.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "f9012b4a-7c61-4dcb-9c9a-2a1d4c7e8101",
+      "type": "child",
+      "source": "c1a8e3f1-9c2e-4c3a-9f91-0a7c3e2b1d01",
+      "target": "4e0a9c6d-7b83-4a27-9f30-8fbc0f01a112",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "1d5e9b27-8c92-4c63-a99a-5f6d3bce1022",
+      "type": "child",
+      "source": "4e0a9c6d-7b83-4a27-9f30-8fbc0f01a112",
+      "target": "9b3c5e2a-0b7d-4f4f-8d16-6c5b8bfe9011",
+      "label": "constrained by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "8a7d2c91-41a3-4f2e-8b9d-3c9f5e7a6003",
+      "type": "child",
+      "source": "4e0a9c6d-7b83-4a27-9f30-8fbc0f01a112",
+      "target": "7d8c41a3-2f9e-46e3-bef2-5c9d3b4b7022",
+      "label": "operates within",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "3f4b7a9c-8d11-4f2a-9d55-1b6c2a1e4033",
+      "type": "child",
+      "source": "7d8c41a3-2f9e-46e3-bef2-5c9d3b4b7022",
+      "target": "e3a1fbc2-6d4e-41d1-9f66-7d1a4f8c9013",
+      "label": "raises",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

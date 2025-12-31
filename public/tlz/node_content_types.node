@@ -1,0 +1,395 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-08T22:42:23.717Z",
+    "modified": "2025-11-08T22:42:23.717Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 248.38874753644632,
+      "y": 596.9172314820278
+    },
+    "zoom": 0.8744556268125306
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node_overview",
+      "type": "markdown",
+      "label": "Content Types — Overview",
+      "position": {
+        "x": 558.8614116211597,
+        "y": -281.0896440443539
+      },
+      "width": 424.57427441410647,
+      "height": 302.33693945391656,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Node Content Types\n\nThis graph documents the kinds of content you can place inside nodes and shows example node types.\n\nCommon content: **Markdown text**, **images & media**, **code snippets**, **tables/datasets**, **embeds (charts/iframes)**, **links (tlz:// / http(s)://)**, **tasks & status**, **decisions/logic**, **annotations/comments**, and **custom SVG/icons**.\n\nUse the examples around this overview to explore each content type.\n\nSee the Twilight Zone concept graph: [Twilight Zone Concept](tlz://cpwith.me/tlz/twilightzone_concept.json)"
+      }
+    },
+    {
+      "id": "node_text_md",
+      "type": "markdown",
+      "label": "Text / Markdown",
+      "position": {
+        "x": -154.4564648463891,
+        "y": 353.7726254891826
+      },
+      "width": 358.3219987798576,
+      "height": 320.6340371103425,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "### Markdown Example\n\n- Rich text formatting\n- Lists, links, code fences\n\n```js\n// Small code sample inside a markdown node\nfunction greet(name) {\n  return `Hello, ${name}`;\n}\n```\n\nMarkdown nodes are perfect for notes, documentation, and formatted content."
+      }
+    },
+    {
+      "id": "node_image_media",
+      "type": "default",
+      "label": "Images & Media",
+      "position": {
+        "x": 820.8332460977957,
+        "y": 209.68298144482878
+      },
+      "width": 220,
+      "height": 140,
+      "color": "#ffe082",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Images, GIFs, and small media blobs can be referenced or embedded in nodes (link or data payload). Use for visual references, screenshots, diagrams.",
+        "exampleSrc": "https://example.com/diagram.png"
+      }
+    },
+    {
+      "id": "node_code",
+      "type": "default",
+      "label": "Code Snippet",
+      "position": {
+        "x": 1118.7453178781961,
+        "y": 380.4995710438116
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#e1bee7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "```python\ndef compute(x):\n  # Example code stored as content in a node\n  return x * 2\n```\n\nCode nodes are useful for snippets, small utilities, and algorithm notes. Consider using specialized node types if you want execution or language-aware features."
+      }
+    },
+    {
+      "id": "node_table",
+      "type": "default",
+      "label": "Datasets / Tables",
+      "position": {
+        "x": -155.0796835949817,
+        "y": 83.85969579640559
+      },
+      "width": 320,
+      "height": 160,
+      "color": "#c8e6c9",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Tabular data (CSV/JSON) can be embedded or referenced. Nodes can hold small datasets or links to larger data sources. Use 'Display Data' nodes to visualize this content.",
+        "example": "[{ \"id\":1, \"value\": 42 }, { \"id\":2, \"value\": 17 }]"
+      }
+    },
+    {
+      "id": "node_embed",
+      "type": "default",
+      "label": "Embeds (charts, iframes)",
+      "position": {
+        "x": 670.0257590358087,
+        "y": 380.271338620617
+      },
+      "width": 360,
+      "height": 160,
+      "color": "#b3e5fc",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Nodes can embed interactive charts, iframes, or remote visualizations. Embeds often reference an external URL or a serialized chart spec (e.g., Vega/Lite).",
+        "exampleEmbed": "https://example.com/chart?spec=..."
+      }
+    },
+    {
+      "id": "node_links",
+      "type": "default",
+      "label": "Links (tlz:// and http)",
+      "position": {
+        "x": 1274.0606206086127,
+        "y": 128.61154247446564
+      },
+      "width": 300,
+      "height": 140,
+      "color": "#fff59d",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Nodes can contain links to other graphs (tlz://), websites (https://), or resources. Use tlz:// to link to other TLZ graph files and allow in-app routing.",
+        "exampleLink": "tlz://cpwith.me/tlz/twilightzone_concept.json"
+      }
+    },
+    {
+      "id": "node_task",
+      "type": "default",
+      "label": "Task / Status",
+      "position": {
+        "x": 62.5543535153609,
+        "y": 830.6390173350289
+      },
+      "width": 220,
+      "height": 120,
+      "color": "#ffccbc",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Task nodes hold actionable items with status metadata (todo, in-progress, done) and can integrate with automation or reminders.",
+        "status": "todo",
+        "assignee": ""
+      }
+    },
+    {
+      "id": "node_decision",
+      "type": "default",
+      "label": "Decision / Logic",
+      "position": {
+        "x": 320.9343991667007,
+        "y": 824.5792546387927
+      },
+      "width": 240,
+      "height": 120,
+      "color": "#d1c4e9",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Decision nodes represent branching logic or criteria. Use with labeled edges to show outcomes (yes/no, pass/fail)."
+      }
+    },
+    {
+      "id": "node_svg_icon",
+      "type": "svg",
+      "label": "Custom SVG / Icon",
+      "position": {
+        "x": 869.732783691692,
+        "y": 915.0157985864365
+      },
+      "width": 120,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "svg": "<svg viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='#90caf9'/><text x='50' y='55' font-size='14' text-anchor='middle' fill='#0d47a1'>IMG</text></svg>"
+      }
+    },
+    {
+      "id": "node_comments",
+      "type": "markdown",
+      "label": "Annotations & Comments",
+      "position": {
+        "x": -246.53958009087785,
+        "y": 845.4822238821972
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Use comment nodes for review notes, inline discussion, or change logs. They are often lightweight and linked to other nodes."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_overview_text",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_text_md",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_image",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_image_media",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_code",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_code",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_table",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_table",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_embed",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_embed",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_links",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_links",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_task",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_task",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_overview_decision",
+      "type": "child",
+      "source": "node_overview",
+      "target": "node_decision",
+      "label": "explains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_text_comments",
+      "type": "ref",
+      "source": "node_text_md",
+      "target": "node_comments",
+      "label": "discusses",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e_links_overview",
+      "type": "ref",
+      "source": "node_links",
+      "target": "node_overview",
+      "label": "references",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "group_content",
+      "label": "Content Examples",
+      "nodeIds": [
+        "node_text_md",
+        "node_image_media",
+        "node_code",
+        "node_table",
+        "node_embed",
+        "node_links"
+      ],
+      "bounds": {
+        "x": -353.6174642363179,
+        "y": -16.14030420359441,
+        "width": 1797.6780848449307,
+        "height": 550.2299482479482
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(144,164,174,0.06)",
+        "borderColor": "#90a4ae"
+      }
+    },
+    {
+      "id": "group_interactive",
+      "label": "Interactive / Workflow",
+      "nodeIds": [
+        "node_task",
+        "node_decision",
+        "node_comments"
+      ],
+      "bounds": {
+        "x": -426.53958009087785,
+        "y": 715.4822238821972,
+        "width": 887.4739792575785,
+        "height": 260
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(187,222,251,0.06)",
+        "borderColor": "#64b5f6"
+      }
+    }
+  ]
+}

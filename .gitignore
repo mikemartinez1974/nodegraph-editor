@@ -23,7 +23,6 @@
 # misc
 .DS_Store
 *.pem
-/public/tlz
 
 # debug
 npm-debug.log*

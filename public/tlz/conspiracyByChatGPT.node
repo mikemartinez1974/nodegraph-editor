@@ -1,0 +1,211 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-02T04:36:31.283Z",
+    "modified": "2025-11-02T04:36:31.283Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#3949ab",
+      "primaryContrast": "#fff",
+      "secondary": "#5e35b1",
+      "secondaryContrast": "#fff",
+      "background": "#0a0e27",
+      "paper": "#1a1f3a",
+      "textPrimary": "#fff",
+      "textSecondary": "rgba(255, 255, 255, 0.7)",
+      "divider": "rgba(255, 255, 255, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 189,
+      "y": 122.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "type": "topic",
+      "label": "Conspiracy Theories",
+      "position": {
+        "x": 400,
+        "y": 200
+      },
+      "width": 220,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "f15e6e4d-8d5b-4a3b-9b7e-2d65cddc2f17",
+      "type": "default",
+      "label": "Origins & Motives",
+      "position": {
+        "x": 86,
+        "y": 36
+      },
+      "width": 180,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a81cb8f2-3f9a-4f71-a9cd-09b9a5e5d478",
+      "type": "default",
+      "label": "Psychology",
+      "position": {
+        "x": 25,
+        "y": 287
+      },
+      "width": 160,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cc9ab57e-bc94-4b43-8a54-d046e1de3983",
+      "type": "default",
+      "label": "Information Spread",
+      "position": {
+        "x": 782,
+        "y": 83
+      },
+      "width": 200,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e22c9121-2a6c-41fd-815f-23c5f3c34d91",
+      "type": "default",
+      "label": "Popular Examples",
+      "position": {
+        "x": 787,
+        "y": 304
+      },
+      "width": 200,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d17b4c2d-c27e-47d0-9354-90dfd93c5e2b",
+      "type": "default",
+      "label": "Societal Impact",
+      "position": {
+        "x": 395,
+        "y": 447
+      },
+      "width": 190,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "c78a942a-7dc3-40f7-b4f2-df5135c4c733",
+      "type": "child",
+      "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "target": "f15e6e4d-8d5b-4a3b-9b7e-2d65cddc2f17",
+      "label": "explores",
+      "style": {}
+    },
+    {
+      "id": "d79d9392-f1cd-40a7-92c3-1d9e7bb1d5e9",
+      "type": "child",
+      "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "target": "a81cb8f2-3f9a-4f71-a9cd-09b9a5e5d478",
+      "label": "driven by",
+      "style": {}
+    },
+    {
+      "id": "a44736e2-d7b5-4e4d-83c8-3e03e8b85b16",
+      "type": "child",
+      "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "target": "cc9ab57e-bc94-4b43-8a54-d046e1de3983",
+      "label": "spreads through",
+      "style": {}
+    },
+    {
+      "id": "ba95ebf3-1f9a-45a2-8b32-6a9d6c98e227",
+      "type": "child",
+      "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "target": "e22c9121-2a6c-41fd-815f-23c5f3c34d91",
+      "label": "includes",
+      "style": {}
+    },
+    {
+      "id": "ec40470c-4820-4143-8a62-0c536f22a6b9",
+      "type": "child",
+      "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
+      "target": "d17b4c2d-c27e-47d0-9354-90dfd93c5e2b",
+      "label": "affects",
+      "style": {}
+    }
+  ],
+  "groups": []
+}

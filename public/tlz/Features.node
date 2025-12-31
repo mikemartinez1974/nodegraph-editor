@@ -1,0 +1,46 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Features",
+    "description": "Highlights of NodeGraph Editor",
+    "created": "2025-10-26T00:00:00Z"
+  },
+  "settings": {},
+  "viewport": { "pan": { "x": 0, "y": 0 }, "zoom": 1 },
+  "nodes": [
+    {
+      "id": "feat-1",
+      "type": "markdown",
+      "label": "Core Features (Markdown)",
+      "position": { "x": 240, "y": 160 },
+      "width": 400,
+      "height": 180,
+      "data": {
+        "memo": "# Features\n\nKey capabilities:\n\n- Links back to [Intro](tlz://cpwith.me/tlz/IntroGraph.node)\n- Step guide at [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n\nThis node demonstrates feature notes in markdown."
+      }
+    },
+    {
+      "id": "feat-2",
+      "type": "default",
+      "label": "Edge Types",
+      "position": { "x": 560, "y": 160 },
+      "width": 200,
+      "height": 90,
+      "data": { "memo": "Support for straight and curved edges." }
+    },
+    {
+      "id": "feat-3",
+      "type": "default",
+      "label": "Custom Nodes",
+      "position": { "x": 400, "y": 380 },
+      "width": 220,
+      "height": 100,
+      "data": { "memo": "Create markdown/svgs and other custom node types." }
+    }
+  ],
+  "edges": [
+    { "id": "feat-edge-1", "source": "feat-1", "target": "feat-2", "label": "See" },
+    { "id": "feat-edge-2", "source": "feat-2", "target": "feat-3", "label": "Also" }
+  ],
+  "groups": []
+}

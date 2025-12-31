@@ -204,15 +204,7 @@ export default function NodeGraph({
     nodeContainer: nodeContainerRef
   }), []);
 
-  // Provide default handles for any node missing them
-  const ensureHandles = node => ({
-    ...node,
-    inputs: Array.isArray(node.inputs) && node.inputs.length > 0 ? node.inputs : [{ key: 'in', label: 'In', type: 'trigger' }],
-    outputs: Array.isArray(node.outputs) && node.outputs.length > 0 ? node.outputs : [{ key: 'out', label: 'Out', type: 'trigger' }],
-  });
-
-  // Process nodes with defaults
-  const nodeList = useMemo(() => nodes.map(ensureHandles), [nodes]);
+  const nodeList = useMemo(() => nodes, [nodes]);
 
   const visibleNodeList = useMemo(() => nodeList.filter(n => n.visible !== false), [nodeList]);
 

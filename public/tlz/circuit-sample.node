@@ -1,0 +1,7285 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-24T04:19:32.688Z",
+    "modified": "2025-11-24T04:19:32.688Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": true,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 680,
+      "y": 436.5
+    },
+    "zoom": 1
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "auto-wire-handler",
+      "name": "Breadboard AutoWire",
+      "source": "(function () {\n  if (typeof window === 'undefined') return;\n\n  const normalizeSocketKey = (value) => {\n    if (!value) return null;\n    if (typeof value === 'string') return value.trim().toUpperCase();\n    if (typeof value === 'number') return String(value);\n    return null;\n  };\n\n  const buildSocketRowColumnKey = (row, column) => {\n    if (row === undefined || row === null) return null;\n    const normalizedRow = typeof row === 'string' ? row.trim().toUpperCase() : String(row).toUpperCase();\n    const numericColumn = Number(column);\n    if (!Number.isFinite(numericColumn)) return null;\n    return `${normalizedRow}${numericColumn}`;\n  };\n\n  const attemptAttach = () => {\n    const eventBus = window.eventBus;\n    const api = window.graphAPI;\n    if (!eventBus || !api || typeof api.readNode !== 'function') {\n      setTimeout(attemptAttach, 500);\n      return;\n    }\n    if (attemptAttach._attached) return;\n    attemptAttach._attached = true;\n\n    const handleNodeDragStart = ({ nodeIds }) => {\n      if (!Array.isArray(nodeIds) || nodeIds.length === 0) return;\n\n      const nodesResult = api.readNode?.();\n      const edgesResult = api.readEdge?.();\n      const allNodes = Array.isArray(nodesResult?.data) ? nodesResult.data : [];\n      const allEdges = Array.isArray(edgesResult?.data) ? edgesResult.data : [];\n      const socketNodes = allNodes.filter(node => node?.type === 'io.breadboard.sockets:socket');\n      const socketNodeIds = new Set(socketNodes.map(socket => socket.id).filter(Boolean));\n      nodeIds.forEach(nodeId => {\n        const node = allNodes.find(n => n.id === nodeId);\n        if (!node) return;\n        const relevantEdges = allEdges.filter(edge => {\n          if (!edge) return false;\n          const isSource = edge.source === node.id && socketNodeIds.has(edge.target);\n          const isTarget = edge.target === node.id && socketNodeIds.has(edge.source);\n          return isSource || isTarget;\n        });\n        const deleted = [];\n        relevantEdges.forEach(edge => {\n          if (!edge || !edge.id) return;\n          if (typeof api.deleteEdge === 'function') {\n            const result = api.deleteEdge(edge.id);\n            if (result?.success) {\n              deleted.push(edge.id);\n            }\n          }\n        });\n        if (deleted.length > 0) {\n          console.info(\n            `[BreadboardAutoWire] Deleted ${deleted.length} edge(s) for node ${node.id}:`,\n            deleted\n          );\n        }\n      });\n    };\n\n    const handleNodeDragEnd = ({ nodeIds }) => {\n      if (!Array.isArray(nodeIds) || nodeIds.length === 0) return;\n\n      const nodesResult = api.readNode?.();\n      const edgesResult = api.readEdge?.();\n      const allNodes = Array.isArray(nodesResult?.data) ? nodesResult.data : [];\n      const allEdges = Array.isArray(edgesResult?.data) ? edgesResult.data : [];\n\n      const socketNodes = allNodes.filter(node => node?.type === 'io.breadboard.sockets:socket');\n      if (socketNodes.length === 0) return;\n\n      const socketNodeIds = new Set();\n      const directory = new Map();\n      socketNodes.forEach(socket => {\n        if (!socket?.id) return;\n        socketNodeIds.add(socket.id);\n        const data = socket.data || {};\n        if (Array.isArray(data.sockets)) {\n          data.sockets.forEach(label => {\n            const key = normalizeSocketKey(label);\n            if (key) directory.set(key, socket);\n          });\n        }\n        if (Array.isArray(data.rows) && data.column !== undefined) {\n          data.rows.forEach(row => {\n            const key = buildSocketRowColumnKey(row, data.column);\n            if (key) directory.set(key, socket);\n          });\n        }\n      });\n      if (directory.size === 0) return;\n\n      const getSocketPosition = (row, column) => {\n        const key = buildSocketRowColumnKey(row, column);\n        const socket = directory.get(key);\n        if (!socket) return null;\n        const pos = socket.position || {};\n        return { x: typeof pos.x === 'number' ? pos.x : 0, y: typeof pos.y === 'number' ? pos.y : 0 };\n      };\n\n      const workingEdges = [...allEdges];\n\n      nodeIds.forEach(nodeId => {\n        const node = allNodes.find(n => n.id === nodeId);\n        if (!node || node.type === 'io.breadboard.sockets:socket') return;\n\n        const pins = Array.isArray(node.data?.pins) ? node.data.pins : [];\n        if (pins.length === 0) return;\n\n        pins.forEach(pin => {\n          let key = null;\n          if (pin?.socketId) {\n            key = normalizeSocketKey(pin.socketId);\n          } else if (pin?.socket) {\n            key = normalizeSocketKey(pin.socket);\n          } else if (pin?.row !== undefined && pin?.column !== undefined) {\n            key = buildSocketRowColumnKey(pin.row, pin.column);\n          }\n          if (!key) return;\n\n          const socket = directory.get(key);\n          if (!socket) return;\n\n          const handleKey = pin.handleKey || pin.key || pin.id || pin.label;\n          if (!handleKey) return;\n          const hasHandle = Array.isArray(node.handles)\n            ? node.handles.some(h => h.id === handleKey || h.key === handleKey)\n            : false;\n          if (!hasHandle) return;\n\n          const existingEdge = workingEdges.find(edge =>\n            edge.source === node.id &&\n            edge.sourceHandle === handleKey &&\n            edge.target === socket.id\n          );\n          if (existingEdge) return;\n\n          const conflictingEdges = workingEdges.filter(edge =>\n            edge.source === node.id &&\n            edge.sourceHandle === handleKey &&\n            socketNodeIds.has(edge.target)\n          );\n\n          conflictingEdges.forEach(edge => {\n            if (edge.target === socket.id) return;\n            if (typeof api.deleteEdge === 'function') {\n              api.deleteEdge(edge.id);\n            }\n            const idx = workingEdges.findIndex(e => e.id === edge.id);\n            if (idx !== -1) {\n              workingEdges.splice(idx, 1);\n            }\n          });\n\n          const payload = {\n            source: node.id,\n            sourceHandle: handleKey,\n            target: socket.id,\n            targetHandle: 'socket',\n            type: 'default'\n          };\n          const result = api.createEdge(payload);\n          if (result?.success && result.data) {\n            workingEdges.push(result.data);\n            console.info(\n              `[BreadboardAutoWire] Created edge ${result.data.id} (${node.id}.${handleKey} → ${socket.id})`\n            );\n          }\n        });\n\n        // Snap node to sockets if pins were resolved so it aligns with the board\n        if (Array.isArray(node.data?.pins) && node.data.pins.length > 0) {\n          const targetPositions = [];\n          node.data.pins.forEach(pin => {\n            const pos = pin.socket\n              ? normalizeSocketKey(pin.socket)\n              : pin.row && pin.column\n              ? buildSocketRowColumnKey(pin.row, pin.column)\n              : null;\n            if (!pos) return;\n            const socket = directory.get(pos);\n            if (!socket) return;\n            const socketPos = socket.position || {};\n            if (typeof socketPos.x === 'number' && typeof socketPos.y === 'number') {\n              targetPositions.push({ x: socketPos.x, y: socketPos.y });\n            }\n          });\n          if (targetPositions.length > 0) {\n            const avg = targetPositions.reduce(\n              (acc, curr) => ({ x: acc.x + curr.x, y: acc.y + curr.y }),\n              { x: 0, y: 0 }\n            );\n            avg.x /= targetPositions.length;\n            avg.y /= targetPositions.length;\n            avg.x += 1;\n            const currentPosition = node.position || {};\n            const shouldSnap =\n              typeof currentPosition.x !== 'number' ||\n              typeof currentPosition.y !== 'number' ||\n              Math.abs(currentPosition.x - avg.x) > 0.5 ||\n              Math.abs(currentPosition.y - avg.y) > 0.5;\n            if (shouldSnap) {\n              api.updateNode(node.id, { position: { x: avg.x, y: avg.y } });\n            }\n          }\n        }\n      });\n    };\n\n    eventBus.on('nodeDragStart', handleNodeDragStart);\n    eventBus.on('nodeDragEnd', handleNodeDragEnd);\n    console.info('[BreadboardAutoWire] Registered nodeDragEnd handler (public script).');\n  };\n\n  attemptAttach();\n})();\n",
+      "tags": "breadboard, wiring"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "bus-top-positive",
+      "type": "io.breadboard.bus",
+      "label": "TOP V+",
+      "position": {
+        "x": 0,
+        "y": -120
+      },
+      "width": 28,
+      "height": 20,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "polarity": "positive"
+      }
+    },
+    {
+      "id": "node-breadboard-autowire-script",
+      "type": "script",
+      "label": "Autowire Helper",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 220,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "scriptId": "",
+        "allowMutations": true,
+        "dryRun": false,
+        "script": "(function () {\n  if (typeof window === 'undefined' || typeof document === 'undefined') return;\n\n  const inject = () => {\n    if (window.__breadboardAutoWireInjected) return;\n    const existing = document.querySelector('script[data-breadboard-autowire=\"true\"]');\n    if (existing) {\n      window.__breadboardAutoWireInjected = true;\n      return;\n    }\n    const target = document.head || document.body || document.documentElement;\n    if (!target) return;\n    const script = document.createElement('script');\n    script.src = '/data/breadboard/autoWire.js';\n    script.defer = true;\n    script.dataset.breadboardAutowire = 'true';\n    script.addEventListener('error', () => {\n      window.__breadboardAutoWireInjected = false;\n    });\n    window.__breadboardAutoWireInjected = true;\n    target.appendChild(script);\n    console.info('[BreadboardAutoWire] Requested external helper script.');\n  };\n\n  if (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', inject, { once: true });\n  } else {\n    inject();\n  }\n})();\n",
+        "autoRun": true,
+        "lastResult": {
+          "type": "scriptResult",
+          "success": true,
+          "runId": "1763957788909_zo51h4nl4",
+          "token": "x9x0ev2en2omicmx1tm"
+        },
+        "lastRunAt": 1763957789784
+      }
+    },
+    {
+      "id": "bus-top-negative",
+      "type": "io.breadboard.bus",
+      "label": "TOP GND",
+      "position": {
+        "x": 0,
+        "y": -98
+      },
+      "width": 28,
+      "height": 20,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "polarity": "negative"
+      }
+    },
+    {
+      "id": "bus-bottom-positive",
+      "type": "io.breadboard.bus",
+      "label": "BOTTOM V+",
+      "position": {
+        "x": 0,
+        "y": 70
+      },
+      "width": 28,
+      "height": 20,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "polarity": "positive"
+      }
+    },
+    {
+      "id": "bus-bottom-negative",
+      "type": "io.breadboard.bus",
+      "label": "BOTTOM GND",
+      "position": {
+        "x": 0,
+        "y": 92
+      },
+      "width": 28,
+      "height": 20,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "polarity": "negative"
+      }
+    },
+    {
+      "id": "breadboard-skin",
+      "type": "io.breadboard.sockets:skin",
+      "label": "Breadboard Skin",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 784,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": 10,
+        "columns": 30,
+        "rowPitch": 1,
+        "columnPitch": 1,
+        "railInset": 32,
+        "railThickness": 24,
+        "gapHeight": 96
+      }
+    },
+    {
+      "id": "socket-top-1",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E1",
+      "position": {
+        "x": -348,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 1,
+        "sockets": [
+          "A1",
+          "B1",
+          "C1",
+          "D1",
+          "E1"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-1",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J1",
+      "position": {
+        "x": -348,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 1,
+        "sockets": [
+          "F1",
+          "G1",
+          "H1",
+          "I1",
+          "J1"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-2",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E2",
+      "position": {
+        "x": -324,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 2,
+        "sockets": [
+          "A2",
+          "B2",
+          "C2",
+          "D2",
+          "E2"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-2",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J2",
+      "position": {
+        "x": -324,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 2,
+        "sockets": [
+          "F2",
+          "G2",
+          "H2",
+          "I2",
+          "J2"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-3",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E3",
+      "position": {
+        "x": -300,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 3,
+        "sockets": [
+          "A3",
+          "B3",
+          "C3",
+          "D3",
+          "E3"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-3",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J3",
+      "position": {
+        "x": -300,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 3,
+        "sockets": [
+          "F3",
+          "G3",
+          "H3",
+          "I3",
+          "J3"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-4",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E4",
+      "position": {
+        "x": -276,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 4,
+        "sockets": [
+          "A4",
+          "B4",
+          "C4",
+          "D4",
+          "E4"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-4",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J4",
+      "position": {
+        "x": -276,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 4,
+        "sockets": [
+          "F4",
+          "G4",
+          "H4",
+          "I4",
+          "J4"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-5",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E5",
+      "position": {
+        "x": -252,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 5,
+        "sockets": [
+          "A5",
+          "B5",
+          "C5",
+          "D5",
+          "E5"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-5",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J5",
+      "position": {
+        "x": -252,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 5,
+        "sockets": [
+          "F5",
+          "G5",
+          "H5",
+          "I5",
+          "J5"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-6",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E6",
+      "position": {
+        "x": -228,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 6,
+        "sockets": [
+          "A6",
+          "B6",
+          "C6",
+          "D6",
+          "E6"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-6",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J6",
+      "position": {
+        "x": -228,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 6,
+        "sockets": [
+          "F6",
+          "G6",
+          "H6",
+          "I6",
+          "J6"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-7",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E7",
+      "position": {
+        "x": -204,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 7,
+        "sockets": [
+          "A7",
+          "B7",
+          "C7",
+          "D7",
+          "E7"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-7",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J7",
+      "position": {
+        "x": -204,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 7,
+        "sockets": [
+          "F7",
+          "G7",
+          "H7",
+          "I7",
+          "J7"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-8",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E8",
+      "position": {
+        "x": -180,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 8,
+        "sockets": [
+          "A8",
+          "B8",
+          "C8",
+          "D8",
+          "E8"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-8",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J8",
+      "position": {
+        "x": -180,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 8,
+        "sockets": [
+          "F8",
+          "G8",
+          "H8",
+          "I8",
+          "J8"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-9",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E9",
+      "position": {
+        "x": -156,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 9,
+        "sockets": [
+          "A9",
+          "B9",
+          "C9",
+          "D9",
+          "E9"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-9",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J9",
+      "position": {
+        "x": -156,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 9,
+        "sockets": [
+          "F9",
+          "G9",
+          "H9",
+          "I9",
+          "J9"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-10",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E10",
+      "position": {
+        "x": -132,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 10,
+        "sockets": [
+          "A10",
+          "B10",
+          "C10",
+          "D10",
+          "E10"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-10",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J10",
+      "position": {
+        "x": -132,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 10,
+        "sockets": [
+          "F10",
+          "G10",
+          "H10",
+          "I10",
+          "J10"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-11",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E11",
+      "position": {
+        "x": -108,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 11,
+        "sockets": [
+          "A11",
+          "B11",
+          "C11",
+          "D11",
+          "E11"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-11",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J11",
+      "position": {
+        "x": -108,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 11,
+        "sockets": [
+          "F11",
+          "G11",
+          "H11",
+          "I11",
+          "J11"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-12",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E12",
+      "position": {
+        "x": -84,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 12,
+        "sockets": [
+          "A12",
+          "B12",
+          "C12",
+          "D12",
+          "E12"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-12",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J12",
+      "position": {
+        "x": -84,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 12,
+        "sockets": [
+          "F12",
+          "G12",
+          "H12",
+          "I12",
+          "J12"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-13",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E13",
+      "position": {
+        "x": -60,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 13,
+        "sockets": [
+          "A13",
+          "B13",
+          "C13",
+          "D13",
+          "E13"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-13",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J13",
+      "position": {
+        "x": -60,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 13,
+        "sockets": [
+          "F13",
+          "G13",
+          "H13",
+          "I13",
+          "J13"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-14",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E14",
+      "position": {
+        "x": -36,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 14,
+        "sockets": [
+          "A14",
+          "B14",
+          "C14",
+          "D14",
+          "E14"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-14",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J14",
+      "position": {
+        "x": -36,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 14,
+        "sockets": [
+          "F14",
+          "G14",
+          "H14",
+          "I14",
+          "J14"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-15",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E15",
+      "position": {
+        "x": -12,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 15,
+        "sockets": [
+          "A15",
+          "B15",
+          "C15",
+          "D15",
+          "E15"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-15",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J15",
+      "position": {
+        "x": -12,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 15,
+        "sockets": [
+          "F15",
+          "G15",
+          "H15",
+          "I15",
+          "J15"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-16",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E16",
+      "position": {
+        "x": 12,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 16,
+        "sockets": [
+          "A16",
+          "B16",
+          "C16",
+          "D16",
+          "E16"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-16",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J16",
+      "position": {
+        "x": 12,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 16,
+        "sockets": [
+          "F16",
+          "G16",
+          "H16",
+          "I16",
+          "J16"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-17",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E17",
+      "position": {
+        "x": 36,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 17,
+        "sockets": [
+          "A17",
+          "B17",
+          "C17",
+          "D17",
+          "E17"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-17",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J17",
+      "position": {
+        "x": 36,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 17,
+        "sockets": [
+          "F17",
+          "G17",
+          "H17",
+          "I17",
+          "J17"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-18",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E18",
+      "position": {
+        "x": 60,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 18,
+        "sockets": [
+          "A18",
+          "B18",
+          "C18",
+          "D18",
+          "E18"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-18",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J18",
+      "position": {
+        "x": 60,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 18,
+        "sockets": [
+          "F18",
+          "G18",
+          "H18",
+          "I18",
+          "J18"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-19",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E19",
+      "position": {
+        "x": 84,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 19,
+        "sockets": [
+          "A19",
+          "B19",
+          "C19",
+          "D19",
+          "E19"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-19",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J19",
+      "position": {
+        "x": 84,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 19,
+        "sockets": [
+          "F19",
+          "G19",
+          "H19",
+          "I19",
+          "J19"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-20",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E20",
+      "position": {
+        "x": 108,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 20,
+        "sockets": [
+          "A20",
+          "B20",
+          "C20",
+          "D20",
+          "E20"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-20",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J20",
+      "position": {
+        "x": 108,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 20,
+        "sockets": [
+          "F20",
+          "G20",
+          "H20",
+          "I20",
+          "J20"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-21",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E21",
+      "position": {
+        "x": 132,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 21,
+        "sockets": [
+          "A21",
+          "B21",
+          "C21",
+          "D21",
+          "E21"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-21",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J21",
+      "position": {
+        "x": 132,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 21,
+        "sockets": [
+          "F21",
+          "G21",
+          "H21",
+          "I21",
+          "J21"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-22",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E22",
+      "position": {
+        "x": 156,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 22,
+        "sockets": [
+          "A22",
+          "B22",
+          "C22",
+          "D22",
+          "E22"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-22",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J22",
+      "position": {
+        "x": 156,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 22,
+        "sockets": [
+          "F22",
+          "G22",
+          "H22",
+          "I22",
+          "J22"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-23",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E23",
+      "position": {
+        "x": 180,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 23,
+        "sockets": [
+          "A23",
+          "B23",
+          "C23",
+          "D23",
+          "E23"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-23",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J23",
+      "position": {
+        "x": 180,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 23,
+        "sockets": [
+          "F23",
+          "G23",
+          "H23",
+          "I23",
+          "J23"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-24",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E24",
+      "position": {
+        "x": 204,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 24,
+        "sockets": [
+          "A24",
+          "B24",
+          "C24",
+          "D24",
+          "E24"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-24",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J24",
+      "position": {
+        "x": 204,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 24,
+        "sockets": [
+          "F24",
+          "G24",
+          "H24",
+          "I24",
+          "J24"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-25",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E25",
+      "position": {
+        "x": 228,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 25,
+        "sockets": [
+          "A25",
+          "B25",
+          "C25",
+          "D25",
+          "E25"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-25",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J25",
+      "position": {
+        "x": 228,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 25,
+        "sockets": [
+          "F25",
+          "G25",
+          "H25",
+          "I25",
+          "J25"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-26",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E26",
+      "position": {
+        "x": 252,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 26,
+        "sockets": [
+          "A26",
+          "B26",
+          "C26",
+          "D26",
+          "E26"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-26",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J26",
+      "position": {
+        "x": 252,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 26,
+        "sockets": [
+          "F26",
+          "G26",
+          "H26",
+          "I26",
+          "J26"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-27",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E27",
+      "position": {
+        "x": 276,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 27,
+        "sockets": [
+          "A27",
+          "B27",
+          "C27",
+          "D27",
+          "E27"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-27",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J27",
+      "position": {
+        "x": 276,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 27,
+        "sockets": [
+          "F27",
+          "G27",
+          "H27",
+          "I27",
+          "J27"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-28",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E28",
+      "position": {
+        "x": 300,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 28,
+        "sockets": [
+          "A28",
+          "B28",
+          "C28",
+          "D28",
+          "E28"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-28",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J28",
+      "position": {
+        "x": 300,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 28,
+        "sockets": [
+          "F28",
+          "G28",
+          "H28",
+          "I28",
+          "J28"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-29",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E29",
+      "position": {
+        "x": 324,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 29,
+        "sockets": [
+          "A29",
+          "B29",
+          "C29",
+          "D29",
+          "E29"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-29",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J29",
+      "position": {
+        "x": 324,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 29,
+        "sockets": [
+          "F29",
+          "G29",
+          "H29",
+          "I29",
+          "J29"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "socket-top-30",
+      "type": "io.breadboard.sockets:socket",
+      "label": "A-E30",
+      "position": {
+        "x": 348,
+        "y": -27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "column": 30,
+        "sockets": [
+          "A30",
+          "B30",
+          "C30",
+          "D30",
+          "E30"
+        ],
+        "segment": "top"
+      }
+    },
+    {
+      "id": "socket-bottom-30",
+      "type": "io.breadboard.sockets:socket",
+      "label": "F-J30",
+      "position": {
+        "x": 348,
+        "y": 27
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rows": [
+          "F",
+          "G",
+          "H",
+          "I",
+          "J"
+        ],
+        "column": 30,
+        "sockets": [
+          "F30",
+          "G30",
+          "H30",
+          "I30",
+          "J30"
+        ],
+        "segment": "bottom"
+      }
+    },
+    {
+      "id": "rail-top-1",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 1",
+      "position": {
+        "x": -348,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 1,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND1-outer",
+              "GND1-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+1-outer",
+              "V+1-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-1",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 1",
+      "position": {
+        "x": -348,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 1,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND1-outer",
+              "GND1-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+1-outer",
+              "V+1-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-2",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 2",
+      "position": {
+        "x": -324,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 2,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND2-outer",
+              "GND2-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+2-outer",
+              "V+2-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-2",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 2",
+      "position": {
+        "x": -324,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 2,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND2-outer",
+              "GND2-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+2-outer",
+              "V+2-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-3",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 3",
+      "position": {
+        "x": -300,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 3,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND3-outer",
+              "GND3-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+3-outer",
+              "V+3-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-3",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 3",
+      "position": {
+        "x": -300,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 3,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND3-outer",
+              "GND3-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+3-outer",
+              "V+3-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-4",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 4",
+      "position": {
+        "x": -276,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 4,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND4-outer",
+              "GND4-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+4-outer",
+              "V+4-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-4",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 4",
+      "position": {
+        "x": -276,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 4,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND4-outer",
+              "GND4-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+4-outer",
+              "V+4-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-5",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 5",
+      "position": {
+        "x": -252,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 5,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND5-outer",
+              "GND5-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+5-outer",
+              "V+5-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-5",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 5",
+      "position": {
+        "x": -252,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 5,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND5-outer",
+              "GND5-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+5-outer",
+              "V+5-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-6",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 6",
+      "position": {
+        "x": -228,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 6,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND6-outer",
+              "GND6-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+6-outer",
+              "V+6-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-6",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 6",
+      "position": {
+        "x": -228,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 6,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND6-outer",
+              "GND6-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+6-outer",
+              "V+6-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-7",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 7",
+      "position": {
+        "x": -204,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 7,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND7-outer",
+              "GND7-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+7-outer",
+              "V+7-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-7",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 7",
+      "position": {
+        "x": -204,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 7,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND7-outer",
+              "GND7-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+7-outer",
+              "V+7-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-8",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 8",
+      "position": {
+        "x": -180,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 8,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND8-outer",
+              "GND8-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+8-outer",
+              "V+8-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-8",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 8",
+      "position": {
+        "x": -180,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 8,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND8-outer",
+              "GND8-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+8-outer",
+              "V+8-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-9",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 9",
+      "position": {
+        "x": -156,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 9,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND9-outer",
+              "GND9-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+9-outer",
+              "V+9-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-9",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 9",
+      "position": {
+        "x": -156,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 9,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND9-outer",
+              "GND9-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+9-outer",
+              "V+9-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-10",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 10",
+      "position": {
+        "x": -132,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 10,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND10-outer",
+              "GND10-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+10-outer",
+              "V+10-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-10",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 10",
+      "position": {
+        "x": -132,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 10,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND10-outer",
+              "GND10-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+10-outer",
+              "V+10-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-11",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 11",
+      "position": {
+        "x": -108,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 11,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND11-outer",
+              "GND11-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+11-outer",
+              "V+11-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-11",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 11",
+      "position": {
+        "x": -108,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 11,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND11-outer",
+              "GND11-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+11-outer",
+              "V+11-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-12",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 12",
+      "position": {
+        "x": -84,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 12,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND12-outer",
+              "GND12-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+12-outer",
+              "V+12-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-12",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 12",
+      "position": {
+        "x": -84,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 12,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND12-outer",
+              "GND12-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+12-outer",
+              "V+12-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-13",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 13",
+      "position": {
+        "x": -60,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 13,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND13-outer",
+              "GND13-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+13-outer",
+              "V+13-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-13",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 13",
+      "position": {
+        "x": -60,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 13,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND13-outer",
+              "GND13-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+13-outer",
+              "V+13-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-14",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 14",
+      "position": {
+        "x": -36,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 14,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND14-outer",
+              "GND14-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+14-outer",
+              "V+14-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-14",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 14",
+      "position": {
+        "x": -36,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 14,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND14-outer",
+              "GND14-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+14-outer",
+              "V+14-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-15",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 15",
+      "position": {
+        "x": -12,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 15,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND15-outer",
+              "GND15-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+15-outer",
+              "V+15-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-15",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 15",
+      "position": {
+        "x": -12,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 15,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND15-outer",
+              "GND15-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+15-outer",
+              "V+15-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-16",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 16",
+      "position": {
+        "x": 12,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 16,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND16-outer",
+              "GND16-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+16-outer",
+              "V+16-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-16",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 16",
+      "position": {
+        "x": 12,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 16,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND16-outer",
+              "GND16-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+16-outer",
+              "V+16-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-17",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 17",
+      "position": {
+        "x": 36,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 17,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND17-outer",
+              "GND17-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+17-outer",
+              "V+17-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-17",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 17",
+      "position": {
+        "x": 36,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 17,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND17-outer",
+              "GND17-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+17-outer",
+              "V+17-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-18",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 18",
+      "position": {
+        "x": 60,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 18,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND18-outer",
+              "GND18-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+18-outer",
+              "V+18-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-18",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 18",
+      "position": {
+        "x": 60,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 18,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND18-outer",
+              "GND18-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+18-outer",
+              "V+18-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-19",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 19",
+      "position": {
+        "x": 84,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 19,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND19-outer",
+              "GND19-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+19-outer",
+              "V+19-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-19",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 19",
+      "position": {
+        "x": 84,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 19,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND19-outer",
+              "GND19-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+19-outer",
+              "V+19-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-20",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 20",
+      "position": {
+        "x": 108,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 20,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND20-outer",
+              "GND20-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+20-outer",
+              "V+20-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-20",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 20",
+      "position": {
+        "x": 108,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 20,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND20-outer",
+              "GND20-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+20-outer",
+              "V+20-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-21",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 21",
+      "position": {
+        "x": 132,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 21,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND21-outer",
+              "GND21-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+21-outer",
+              "V+21-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-21",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 21",
+      "position": {
+        "x": 132,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 21,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND21-outer",
+              "GND21-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+21-outer",
+              "V+21-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-22",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 22",
+      "position": {
+        "x": 156,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 22,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND22-outer",
+              "GND22-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+22-outer",
+              "V+22-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-22",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 22",
+      "position": {
+        "x": 156,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 22,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND22-outer",
+              "GND22-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+22-outer",
+              "V+22-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-23",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 23",
+      "position": {
+        "x": 180,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 23,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND23-outer",
+              "GND23-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+23-outer",
+              "V+23-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-23",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 23",
+      "position": {
+        "x": 180,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 23,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND23-outer",
+              "GND23-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+23-outer",
+              "V+23-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-24",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 24",
+      "position": {
+        "x": 204,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 24,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND24-outer",
+              "GND24-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+24-outer",
+              "V+24-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-24",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 24",
+      "position": {
+        "x": 204,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 24,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND24-outer",
+              "GND24-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+24-outer",
+              "V+24-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-25",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 25",
+      "position": {
+        "x": 228,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 25,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND25-outer",
+              "GND25-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+25-outer",
+              "V+25-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-25",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 25",
+      "position": {
+        "x": 228,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 25,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND25-outer",
+              "GND25-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+25-outer",
+              "V+25-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-26",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 26",
+      "position": {
+        "x": 252,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 26,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND26-outer",
+              "GND26-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+26-outer",
+              "V+26-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-26",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 26",
+      "position": {
+        "x": 252,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 26,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND26-outer",
+              "GND26-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+26-outer",
+              "V+26-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-27",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 27",
+      "position": {
+        "x": 276,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 27,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND27-outer",
+              "GND27-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+27-outer",
+              "V+27-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-27",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 27",
+      "position": {
+        "x": 276,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 27,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND27-outer",
+              "GND27-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+27-outer",
+              "V+27-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-28",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 28",
+      "position": {
+        "x": 300,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 28,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND28-outer",
+              "GND28-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+28-outer",
+              "V+28-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-28",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 28",
+      "position": {
+        "x": 300,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 28,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND28-outer",
+              "GND28-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+28-outer",
+              "V+28-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-29",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 29",
+      "position": {
+        "x": 324,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 29,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND29-outer",
+              "GND29-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+29-outer",
+              "V+29-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-29",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 29",
+      "position": {
+        "x": 324,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 29,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND29-outer",
+              "GND29-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+29-outer",
+              "V+29-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-top-30",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "TOP 30",
+      "position": {
+        "x": 348,
+        "y": -76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "top",
+        "column": 30,
+        "rails": [
+          {
+            "railId": "rail-top-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND30-outer",
+              "GND30-inner"
+            ]
+          },
+          {
+            "railId": "rail-top-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+30-outer",
+              "V+30-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rail-bottom-30",
+      "type": "io.breadboard.sockets:railSocket",
+      "label": "BOTTOM 30",
+      "position": {
+        "x": 348,
+        "y": 76
+      },
+      "width": 24,
+      "height": 44,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "channel": "bottom",
+        "column": 30,
+        "rails": [
+          {
+            "railId": "rail-bottom-negative",
+            "polarity": "negative",
+            "label": "GND",
+            "slot": 0,
+            "sockets": [
+              "GND30-outer",
+              "GND30-inner"
+            ]
+          },
+          {
+            "railId": "rail-bottom-positive",
+            "polarity": "positive",
+            "label": "V+",
+            "slot": 1,
+            "sockets": [
+              "V+30-outer",
+              "V+30-inner"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cced3aa1-bf3c-44e0-b67f-c08042a1159c",
+      "type": "io.breadboard.components:railTapPositive",
+      "label": "Rail Tap (+)",
+      "position": {
+        "x": -107,
+        "y": -51.5
+      },
+      "width": 16,
+      "height": 40,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "pins": [
+          {
+            "id": "rail",
+            "row": "V+",
+            "column": 11,
+            "columnOffset": 0,
+            "polarity": "positive",
+            "segmentPreference": "rail-top-positive",
+            "segment": "rail-top-positive",
+            "socket": "V+11"
+          },
+          {
+            "id": "tap",
+            "row": "A",
+            "column": 11,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top",
+            "segment": "top",
+            "socket": "A11"
+          }
+        ],
+        "footprint": {
+          "rows": 1,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 1
+        },
+        "html": "",
+        "svg": "",
+        "breadboard": {
+          "pinState": {
+            "rail": {
+              "socketId": "rail-top-11",
+              "socketKey": "V+11",
+              "segment": "rail-top-positive",
+              "column": 11,
+              "targetHandle": "positive"
+            },
+            "tap": {
+              "socketId": "socket-top-11",
+              "socketKey": "A11",
+              "segment": "top",
+              "column": 11,
+              "targetHandle": "socket"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "15fba3a5-2af2-40b4-86d6-1d8d8827804c",
+      "type": "io.breadboard.components:railTapNegative",
+      "label": "Rail Tap (-)",
+      "position": {
+        "x": -131,
+        "y": 55.400000000000006
+      },
+      "width": 16,
+      "height": 40,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "pins": [
+          {
+            "id": "rail",
+            "row": "GND",
+            "column": 10,
+            "columnOffset": 0,
+            "polarity": "negative",
+            "segmentPreference": "rail-bottom-negative",
+            "segment": "rail-bottom-negative",
+            "socket": "GND10"
+          },
+          {
+            "id": "tap",
+            "row": "A",
+            "column": 10,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "top",
+            "segment": "top",
+            "socket": "A10"
+          }
+        ],
+        "footprint": {
+          "rows": 1,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 1
+        },
+        "html": "",
+        "svg": "",
+        "breadboard": {
+          "pinState": {
+            "rail": {
+              "socketId": "rail-bottom-10",
+              "socketKey": "GND10",
+              "segment": "rail-bottom-negative",
+              "column": 10,
+              "targetHandle": "negative"
+            },
+            "tap": {
+              "socketId": "socket-top-10",
+              "socketKey": "A10",
+              "segment": "top",
+              "column": 10,
+              "targetHandle": "socket"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "00548b96-5b38-4031-92e2-7180cd737677",
+      "type": "io.breadboard.components:resistor",
+      "label": "Resistor",
+      "position": {
+        "x": -119,
+        "y": -27
+      },
+      "width": 32,
+      "height": 18,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "pins": [
+          {
+            "id": "pinA",
+            "row": "A",
+            "column": 10,
+            "columnOffset": 0,
+            "polarity": "neutral",
+            "segmentPreference": "same",
+            "segment": "top",
+            "socket": "A10"
+          },
+          {
+            "id": "pinB",
+            "row": "A",
+            "column": 11,
+            "columnOffset": 1,
+            "polarity": "neutral",
+            "segmentPreference": "same",
+            "segment": "top",
+            "socket": "A11"
+          }
+        ],
+        "footprint": {
+          "rows": 1,
+          "columns": 2,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 2,
+          "height": 1
+        },
+        "html": "",
+        "svg": "",
+        "breadboard": {
+          "pinState": {
+            "pinA": {
+              "socketId": "socket-top-10",
+              "socketKey": "A10",
+              "segment": "top",
+              "column": 10,
+              "targetHandle": "socket"
+            },
+            "pinB": {
+              "socketId": "socket-top-11",
+              "socketKey": "A11",
+              "segment": "top",
+              "column": 11,
+              "targetHandle": "socket"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "8362fc96-71b4-4fdf-a432-2abb0f19a8ed",
+      "type": "io.breadboard.components:led",
+      "label": "LED",
+      "position": {
+        "x": -131,
+        "y": 0
+      },
+      "width": 24,
+      "height": 54,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "pins": [
+          {
+            "id": "anode",
+            "row": "A",
+            "column": 10,
+            "columnOffset": 0,
+            "polarity": "anode",
+            "segmentPreference": "top",
+            "segment": "top",
+            "socket": "A10"
+          },
+          {
+            "id": "cathode",
+            "row": "F",
+            "column": 10,
+            "columnOffset": 0,
+            "polarity": "cathode",
+            "segmentPreference": "bottom",
+            "segment": "bottom",
+            "socket": "F10"
+          }
+        ],
+        "footprint": {
+          "rows": 2,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 2
+        },
+        "html": "",
+        "svg": "",
+        "breadboard": {
+          "pinState": {
+            "anode": {
+              "socketId": "socket-top-10",
+              "socketKey": "A10",
+              "segment": "top",
+              "column": 10,
+              "targetHandle": "socket"
+            },
+            "cathode": {
+              "socketId": "socket-bottom-10",
+              "socketKey": "F10",
+              "segment": "bottom",
+              "column": 10,
+              "targetHandle": "socket"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-resistor-1-pinA-to-socket-top-9",
+      "source": "component-resistor-1",
+      "target": "socket-top-9",
+      "sourceHandle": "pinA",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-resistor-1-pinB-to-socket-top-10",
+      "source": "component-resistor-1",
+      "target": "socket-top-10",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-led-1-anode-to-socket-top-18",
+      "source": "component-led-1",
+      "target": "socket-top-18",
+      "sourceHandle": "anode",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-led-1-cathode-to-socket-bottom-18",
+      "source": "component-led-1",
+      "target": "socket-bottom-18",
+      "sourceHandle": "cathode",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-jumper-1-wireA-to-socket-top-4",
+      "source": "component-jumper-1",
+      "target": "socket-top-4",
+      "sourceHandle": "wireA",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-jumper-1-wireB-to-socket-bottom-6",
+      "source": "component-jumper-1",
+      "target": "socket-bottom-6",
+      "sourceHandle": "wireB",
+      "targetHandle": "socket",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-1-V+-to-socket-top-1",
+      "source": "rail-top-1",
+      "target": "socket-top-1",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-1-GND-to-socket-top-1",
+      "source": "rail-top-1",
+      "target": "socket-top-1",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-1-V+-to-socket-bottom-1",
+      "source": "rail-bottom-1",
+      "target": "socket-bottom-1",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-1-GND-to-socket-bottom-1",
+      "source": "rail-bottom-1",
+      "target": "socket-bottom-1",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-2-V+-to-socket-top-2",
+      "source": "rail-top-2",
+      "target": "socket-top-2",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-2-GND-to-socket-top-2",
+      "source": "rail-top-2",
+      "target": "socket-top-2",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-2-V+-to-socket-bottom-2",
+      "source": "rail-bottom-2",
+      "target": "socket-bottom-2",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-2-GND-to-socket-bottom-2",
+      "source": "rail-bottom-2",
+      "target": "socket-bottom-2",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-3-V+-to-socket-top-3",
+      "source": "rail-top-3",
+      "target": "socket-top-3",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-3-GND-to-socket-top-3",
+      "source": "rail-top-3",
+      "target": "socket-top-3",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-3-V+-to-socket-bottom-3",
+      "source": "rail-bottom-3",
+      "target": "socket-bottom-3",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-3-GND-to-socket-bottom-3",
+      "source": "rail-bottom-3",
+      "target": "socket-bottom-3",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-4-V+-to-socket-top-4",
+      "source": "rail-top-4",
+      "target": "socket-top-4",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-4-GND-to-socket-top-4",
+      "source": "rail-top-4",
+      "target": "socket-top-4",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-4-V+-to-socket-bottom-4",
+      "source": "rail-bottom-4",
+      "target": "socket-bottom-4",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-4-GND-to-socket-bottom-4",
+      "source": "rail-bottom-4",
+      "target": "socket-bottom-4",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-5-V+-to-socket-top-5",
+      "source": "rail-top-5",
+      "target": "socket-top-5",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-5-GND-to-socket-top-5",
+      "source": "rail-top-5",
+      "target": "socket-top-5",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-5-V+-to-socket-bottom-5",
+      "source": "rail-bottom-5",
+      "target": "socket-bottom-5",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-5-GND-to-socket-bottom-5",
+      "source": "rail-bottom-5",
+      "target": "socket-bottom-5",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-6-V+-to-socket-top-6",
+      "source": "rail-top-6",
+      "target": "socket-top-6",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-6-GND-to-socket-top-6",
+      "source": "rail-top-6",
+      "target": "socket-top-6",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-6-V+-to-socket-bottom-6",
+      "source": "rail-bottom-6",
+      "target": "socket-bottom-6",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-6-GND-to-socket-bottom-6",
+      "source": "rail-bottom-6",
+      "target": "socket-bottom-6",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-7-V+-to-socket-top-7",
+      "source": "rail-top-7",
+      "target": "socket-top-7",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-7-GND-to-socket-top-7",
+      "source": "rail-top-7",
+      "target": "socket-top-7",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-7-V+-to-socket-bottom-7",
+      "source": "rail-bottom-7",
+      "target": "socket-bottom-7",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-7-GND-to-socket-bottom-7",
+      "source": "rail-bottom-7",
+      "target": "socket-bottom-7",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-8-V+-to-socket-top-8",
+      "source": "rail-top-8",
+      "target": "socket-top-8",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-8-GND-to-socket-top-8",
+      "source": "rail-top-8",
+      "target": "socket-top-8",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-8-V+-to-socket-bottom-8",
+      "source": "rail-bottom-8",
+      "target": "socket-bottom-8",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-8-GND-to-socket-bottom-8",
+      "source": "rail-bottom-8",
+      "target": "socket-bottom-8",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-9-V+-to-socket-top-9",
+      "source": "rail-top-9",
+      "target": "socket-top-9",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-9-GND-to-socket-top-9",
+      "source": "rail-top-9",
+      "target": "socket-top-9",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-9-V+-to-socket-bottom-9",
+      "source": "rail-bottom-9",
+      "target": "socket-bottom-9",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-9-GND-to-socket-bottom-9",
+      "source": "rail-bottom-9",
+      "target": "socket-bottom-9",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-10-V+-to-socket-top-10",
+      "source": "rail-top-10",
+      "target": "socket-top-10",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-10-GND-to-socket-top-10",
+      "source": "rail-top-10",
+      "target": "socket-top-10",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-10-V+-to-socket-bottom-10",
+      "source": "rail-bottom-10",
+      "target": "socket-bottom-10",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-10-GND-to-socket-bottom-10",
+      "source": "rail-bottom-10",
+      "target": "socket-bottom-10",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-11-V+-to-socket-top-11",
+      "source": "rail-top-11",
+      "target": "socket-top-11",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-11-GND-to-socket-top-11",
+      "source": "rail-top-11",
+      "target": "socket-top-11",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-11-V+-to-socket-bottom-11",
+      "source": "rail-bottom-11",
+      "target": "socket-bottom-11",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-11-GND-to-socket-bottom-11",
+      "source": "rail-bottom-11",
+      "target": "socket-bottom-11",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-12-V+-to-socket-top-12",
+      "source": "rail-top-12",
+      "target": "socket-top-12",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-12-GND-to-socket-top-12",
+      "source": "rail-top-12",
+      "target": "socket-top-12",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-12-V+-to-socket-bottom-12",
+      "source": "rail-bottom-12",
+      "target": "socket-bottom-12",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-12-GND-to-socket-bottom-12",
+      "source": "rail-bottom-12",
+      "target": "socket-bottom-12",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-13-V+-to-socket-top-13",
+      "source": "rail-top-13",
+      "target": "socket-top-13",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-13-GND-to-socket-top-13",
+      "source": "rail-top-13",
+      "target": "socket-top-13",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-13-V+-to-socket-bottom-13",
+      "source": "rail-bottom-13",
+      "target": "socket-bottom-13",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-13-GND-to-socket-bottom-13",
+      "source": "rail-bottom-13",
+      "target": "socket-bottom-13",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-14-V+-to-socket-top-14",
+      "source": "rail-top-14",
+      "target": "socket-top-14",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-14-GND-to-socket-top-14",
+      "source": "rail-top-14",
+      "target": "socket-top-14",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-14-V+-to-socket-bottom-14",
+      "source": "rail-bottom-14",
+      "target": "socket-bottom-14",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-14-GND-to-socket-bottom-14",
+      "source": "rail-bottom-14",
+      "target": "socket-bottom-14",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-15-V+-to-socket-top-15",
+      "source": "rail-top-15",
+      "target": "socket-top-15",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-15-GND-to-socket-top-15",
+      "source": "rail-top-15",
+      "target": "socket-top-15",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-15-V+-to-socket-bottom-15",
+      "source": "rail-bottom-15",
+      "target": "socket-bottom-15",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-15-GND-to-socket-bottom-15",
+      "source": "rail-bottom-15",
+      "target": "socket-bottom-15",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-16-V+-to-socket-top-16",
+      "source": "rail-top-16",
+      "target": "socket-top-16",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-16-GND-to-socket-top-16",
+      "source": "rail-top-16",
+      "target": "socket-top-16",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-16-V+-to-socket-bottom-16",
+      "source": "rail-bottom-16",
+      "target": "socket-bottom-16",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-16-GND-to-socket-bottom-16",
+      "source": "rail-bottom-16",
+      "target": "socket-bottom-16",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-17-V+-to-socket-top-17",
+      "source": "rail-top-17",
+      "target": "socket-top-17",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-17-GND-to-socket-top-17",
+      "source": "rail-top-17",
+      "target": "socket-top-17",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-17-V+-to-socket-bottom-17",
+      "source": "rail-bottom-17",
+      "target": "socket-bottom-17",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-17-GND-to-socket-bottom-17",
+      "source": "rail-bottom-17",
+      "target": "socket-bottom-17",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-18-V+-to-socket-top-18",
+      "source": "rail-top-18",
+      "target": "socket-top-18",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-18-GND-to-socket-top-18",
+      "source": "rail-top-18",
+      "target": "socket-top-18",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-18-V+-to-socket-bottom-18",
+      "source": "rail-bottom-18",
+      "target": "socket-bottom-18",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-18-GND-to-socket-bottom-18",
+      "source": "rail-bottom-18",
+      "target": "socket-bottom-18",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-19-V+-to-socket-top-19",
+      "source": "rail-top-19",
+      "target": "socket-top-19",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-19-GND-to-socket-top-19",
+      "source": "rail-top-19",
+      "target": "socket-top-19",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-19-V+-to-socket-bottom-19",
+      "source": "rail-bottom-19",
+      "target": "socket-bottom-19",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-19-GND-to-socket-bottom-19",
+      "source": "rail-bottom-19",
+      "target": "socket-bottom-19",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-20-V+-to-socket-top-20",
+      "source": "rail-top-20",
+      "target": "socket-top-20",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-20-GND-to-socket-top-20",
+      "source": "rail-top-20",
+      "target": "socket-top-20",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-20-V+-to-socket-bottom-20",
+      "source": "rail-bottom-20",
+      "target": "socket-bottom-20",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-20-GND-to-socket-bottom-20",
+      "source": "rail-bottom-20",
+      "target": "socket-bottom-20",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-21-V+-to-socket-top-21",
+      "source": "rail-top-21",
+      "target": "socket-top-21",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-21-GND-to-socket-top-21",
+      "source": "rail-top-21",
+      "target": "socket-top-21",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-21-V+-to-socket-bottom-21",
+      "source": "rail-bottom-21",
+      "target": "socket-bottom-21",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-21-GND-to-socket-bottom-21",
+      "source": "rail-bottom-21",
+      "target": "socket-bottom-21",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-22-V+-to-socket-top-22",
+      "source": "rail-top-22",
+      "target": "socket-top-22",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-22-GND-to-socket-top-22",
+      "source": "rail-top-22",
+      "target": "socket-top-22",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-22-V+-to-socket-bottom-22",
+      "source": "rail-bottom-22",
+      "target": "socket-bottom-22",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-22-GND-to-socket-bottom-22",
+      "source": "rail-bottom-22",
+      "target": "socket-bottom-22",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-23-V+-to-socket-top-23",
+      "source": "rail-top-23",
+      "target": "socket-top-23",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-23-GND-to-socket-top-23",
+      "source": "rail-top-23",
+      "target": "socket-top-23",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-23-V+-to-socket-bottom-23",
+      "source": "rail-bottom-23",
+      "target": "socket-bottom-23",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-23-GND-to-socket-bottom-23",
+      "source": "rail-bottom-23",
+      "target": "socket-bottom-23",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-24-V+-to-socket-top-24",
+      "source": "rail-top-24",
+      "target": "socket-top-24",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-24-GND-to-socket-top-24",
+      "source": "rail-top-24",
+      "target": "socket-top-24",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-24-V+-to-socket-bottom-24",
+      "source": "rail-bottom-24",
+      "target": "socket-bottom-24",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-24-GND-to-socket-bottom-24",
+      "source": "rail-bottom-24",
+      "target": "socket-bottom-24",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-25-V+-to-socket-top-25",
+      "source": "rail-top-25",
+      "target": "socket-top-25",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-25-GND-to-socket-top-25",
+      "source": "rail-top-25",
+      "target": "socket-top-25",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-25-V+-to-socket-bottom-25",
+      "source": "rail-bottom-25",
+      "target": "socket-bottom-25",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-25-GND-to-socket-bottom-25",
+      "source": "rail-bottom-25",
+      "target": "socket-bottom-25",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-26-V+-to-socket-top-26",
+      "source": "rail-top-26",
+      "target": "socket-top-26",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-26-GND-to-socket-top-26",
+      "source": "rail-top-26",
+      "target": "socket-top-26",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-26-V+-to-socket-bottom-26",
+      "source": "rail-bottom-26",
+      "target": "socket-bottom-26",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-26-GND-to-socket-bottom-26",
+      "source": "rail-bottom-26",
+      "target": "socket-bottom-26",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-27-V+-to-socket-top-27",
+      "source": "rail-top-27",
+      "target": "socket-top-27",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-27-GND-to-socket-top-27",
+      "source": "rail-top-27",
+      "target": "socket-top-27",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-27-V+-to-socket-bottom-27",
+      "source": "rail-bottom-27",
+      "target": "socket-bottom-27",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-27-GND-to-socket-bottom-27",
+      "source": "rail-bottom-27",
+      "target": "socket-bottom-27",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-28-V+-to-socket-top-28",
+      "source": "rail-top-28",
+      "target": "socket-top-28",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-28-GND-to-socket-top-28",
+      "source": "rail-top-28",
+      "target": "socket-top-28",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-28-V+-to-socket-bottom-28",
+      "source": "rail-bottom-28",
+      "target": "socket-bottom-28",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-28-GND-to-socket-bottom-28",
+      "source": "rail-bottom-28",
+      "target": "socket-bottom-28",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-29-V+-to-socket-top-29",
+      "source": "rail-top-29",
+      "target": "socket-top-29",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-29-GND-to-socket-top-29",
+      "source": "rail-top-29",
+      "target": "socket-top-29",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-29-V+-to-socket-bottom-29",
+      "source": "rail-bottom-29",
+      "target": "socket-bottom-29",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-29-GND-to-socket-bottom-29",
+      "source": "rail-bottom-29",
+      "target": "socket-bottom-29",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-30-V+-to-socket-top-30",
+      "source": "rail-top-30",
+      "target": "socket-top-30",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-top-30-GND-to-socket-top-30",
+      "source": "rail-top-30",
+      "target": "socket-top-30",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-30-V+-to-socket-bottom-30",
+      "source": "rail-bottom-30",
+      "target": "socket-bottom-30",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-rail-bottom-30-GND-to-socket-bottom-30",
+      "source": "rail-bottom-30",
+      "target": "socket-bottom-30",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-1",
+      "source": "bus-top-positive",
+      "target": "rail-top-1",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-1",
+      "source": "bus-top-negative",
+      "target": "rail-top-1",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-1",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-1",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-1",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-1",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-2",
+      "source": "bus-top-positive",
+      "target": "rail-top-2",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-2",
+      "source": "bus-top-negative",
+      "target": "rail-top-2",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-2",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-2",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-2",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-2",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-3",
+      "source": "bus-top-positive",
+      "target": "rail-top-3",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-3",
+      "source": "bus-top-negative",
+      "target": "rail-top-3",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-3",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-3",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-3",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-3",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-4",
+      "source": "bus-top-positive",
+      "target": "rail-top-4",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-4",
+      "source": "bus-top-negative",
+      "target": "rail-top-4",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-4",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-4",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-4",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-4",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-5",
+      "source": "bus-top-positive",
+      "target": "rail-top-5",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-5",
+      "source": "bus-top-negative",
+      "target": "rail-top-5",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-5",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-5",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-5",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-5",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-6",
+      "source": "bus-top-positive",
+      "target": "rail-top-6",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-6",
+      "source": "bus-top-negative",
+      "target": "rail-top-6",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-6",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-6",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-6",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-6",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-7",
+      "source": "bus-top-positive",
+      "target": "rail-top-7",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-7",
+      "source": "bus-top-negative",
+      "target": "rail-top-7",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-7",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-7",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-7",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-7",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-8",
+      "source": "bus-top-positive",
+      "target": "rail-top-8",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-8",
+      "source": "bus-top-negative",
+      "target": "rail-top-8",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-8",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-8",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-8",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-8",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-9",
+      "source": "bus-top-positive",
+      "target": "rail-top-9",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-9",
+      "source": "bus-top-negative",
+      "target": "rail-top-9",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-9",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-9",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-9",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-9",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-10",
+      "source": "bus-top-positive",
+      "target": "rail-top-10",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-10",
+      "source": "bus-top-negative",
+      "target": "rail-top-10",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-10",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-10",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-10",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-10",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-11",
+      "source": "bus-top-positive",
+      "target": "rail-top-11",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-11",
+      "source": "bus-top-negative",
+      "target": "rail-top-11",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-11",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-11",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-11",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-11",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-12",
+      "source": "bus-top-positive",
+      "target": "rail-top-12",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-12",
+      "source": "bus-top-negative",
+      "target": "rail-top-12",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-12",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-12",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-12",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-12",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-13",
+      "source": "bus-top-positive",
+      "target": "rail-top-13",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-13",
+      "source": "bus-top-negative",
+      "target": "rail-top-13",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-13",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-13",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-13",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-13",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-14",
+      "source": "bus-top-positive",
+      "target": "rail-top-14",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-14",
+      "source": "bus-top-negative",
+      "target": "rail-top-14",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-14",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-14",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-14",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-14",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-15",
+      "source": "bus-top-positive",
+      "target": "rail-top-15",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-15",
+      "source": "bus-top-negative",
+      "target": "rail-top-15",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-15",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-15",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-15",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-15",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-16",
+      "source": "bus-top-positive",
+      "target": "rail-top-16",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-16",
+      "source": "bus-top-negative",
+      "target": "rail-top-16",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-16",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-16",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-16",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-16",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-17",
+      "source": "bus-top-positive",
+      "target": "rail-top-17",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-17",
+      "source": "bus-top-negative",
+      "target": "rail-top-17",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-17",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-17",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-17",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-17",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-18",
+      "source": "bus-top-positive",
+      "target": "rail-top-18",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-18",
+      "source": "bus-top-negative",
+      "target": "rail-top-18",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-18",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-18",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-18",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-18",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-19",
+      "source": "bus-top-positive",
+      "target": "rail-top-19",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-19",
+      "source": "bus-top-negative",
+      "target": "rail-top-19",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-19",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-19",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-19",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-19",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-20",
+      "source": "bus-top-positive",
+      "target": "rail-top-20",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-20",
+      "source": "bus-top-negative",
+      "target": "rail-top-20",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-20",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-20",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-20",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-20",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-21",
+      "source": "bus-top-positive",
+      "target": "rail-top-21",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-21",
+      "source": "bus-top-negative",
+      "target": "rail-top-21",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-21",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-21",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-21",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-21",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-22",
+      "source": "bus-top-positive",
+      "target": "rail-top-22",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-22",
+      "source": "bus-top-negative",
+      "target": "rail-top-22",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-22",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-22",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-22",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-22",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-23",
+      "source": "bus-top-positive",
+      "target": "rail-top-23",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-23",
+      "source": "bus-top-negative",
+      "target": "rail-top-23",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-23",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-23",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-23",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-23",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-24",
+      "source": "bus-top-positive",
+      "target": "rail-top-24",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-24",
+      "source": "bus-top-negative",
+      "target": "rail-top-24",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-24",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-24",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-24",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-24",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-25",
+      "source": "bus-top-positive",
+      "target": "rail-top-25",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-25",
+      "source": "bus-top-negative",
+      "target": "rail-top-25",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-25",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-25",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-25",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-25",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-26",
+      "source": "bus-top-positive",
+      "target": "rail-top-26",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-26",
+      "source": "bus-top-negative",
+      "target": "rail-top-26",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-26",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-26",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-26",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-26",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-27",
+      "source": "bus-top-positive",
+      "target": "rail-top-27",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-27",
+      "source": "bus-top-negative",
+      "target": "rail-top-27",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-27",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-27",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-27",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-27",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-28",
+      "source": "bus-top-positive",
+      "target": "rail-top-28",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-28",
+      "source": "bus-top-negative",
+      "target": "rail-top-28",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-28",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-28",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-28",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-28",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-29",
+      "source": "bus-top-positive",
+      "target": "rail-top-29",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-29",
+      "source": "bus-top-negative",
+      "target": "rail-top-29",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-29",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-29",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-29",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-29",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-positive-to-rail-top-30",
+      "source": "bus-top-positive",
+      "target": "rail-top-30",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-top-negative-to-rail-top-30",
+      "source": "bus-top-negative",
+      "target": "rail-top-30",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-positive-to-rail-bottom-30",
+      "source": "bus-bottom-positive",
+      "target": "rail-bottom-30",
+      "sourceHandle": "positive",
+      "targetHandle": "vplus",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-bus-bottom-negative-to-rail-bottom-30",
+      "source": "bus-bottom-negative",
+      "target": "rail-bottom-30",
+      "sourceHandle": "negative",
+      "targetHandle": "gnd",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "0fa18a39-9904-4b17-a533-28c126b947ea",
+      "type": "default",
+      "source": "cced3aa1-bf3c-44e0-b67f-c08042a1159c",
+      "target": "socket-top-11",
+      "sourceHandle": "tap",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "tap",
+          "label": "tap",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "c2912d69-74ef-4414-a6e5-777c90dd3a8d",
+      "type": "default",
+      "source": "15fba3a5-2af2-40b4-86d6-1d8d8827804c",
+      "target": "socket-top-10",
+      "sourceHandle": "tap",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "tap",
+          "label": "tap",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "27100152-e35e-48b8-a470-6a014b4762c9",
+      "type": "default",
+      "source": "8362fc96-71b4-4fdf-a432-2abb0f19a8ed",
+      "target": "socket-bottom-10",
+      "sourceHandle": "cathode",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "cathode",
+          "label": "cathode",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "5868f662-6f06-4e94-9264-2b160776e7ef",
+      "type": "default",
+      "source": "8362fc96-71b4-4fdf-a432-2abb0f19a8ed",
+      "target": "socket-top-10",
+      "sourceHandle": "anode",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "anode",
+          "label": "anode",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "ba4cd6ad-0bb7-4cff-af60-033297fd7fd7",
+      "type": "default",
+      "source": "00548b96-5b38-4031-92e2-7180cd737677",
+      "target": "socket-top-11",
+      "sourceHandle": "pinB",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinB",
+          "label": "pinB",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "b52f53a8-845e-4397-8a44-e3e322676339",
+      "type": "default",
+      "source": "00548b96-5b38-4031-92e2-7180cd737677",
+      "target": "socket-top-10",
+      "sourceHandle": "pinA",
+      "targetHandle": "socket",
+      "handleMeta": {
+        "source": {
+          "key": "pinA",
+          "label": "pinA",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "socket",
+          "label": "Socket",
+          "type": "value",
+          "direction": "bidirectional"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

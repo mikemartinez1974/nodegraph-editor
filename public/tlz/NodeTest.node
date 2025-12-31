@@ -1,0 +1,268 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-14T21:29:59.798Z",
+    "modified": "2025-11-14T21:29:59.798Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -765.1239461182952,
+      "y": 353.9065627903341
+    },
+    "zoom": 0.9781162055794718
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node_1763149773357",
+      "type": "timer",
+      "label": "Timer Node",
+      "position": {
+        "x": 1704.1224694570099,
+        "y": -155.71929571829466
+      },
+      "width": 250,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "isRunning": true,
+        "isPaused": false,
+        "startTime": 1763152115780,
+        "pausedElapsed": 0
+      }
+    },
+    {
+      "id": "3fc690cc-cdb4-4eab-a046-24a717b080f5",
+      "type": "api",
+      "label": "API Node",
+      "position": {
+        "x": 903.5841320347797,
+        "y": -126.96412400405194
+      },
+      "width": 350,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "url": "https://api.agify.io/?name=Lisa",
+        "method": "GET",
+        "headers": {},
+        "body": "",
+        "lastStatus": 200,
+        "lastResponsePreview": "{\n  \"count\": 121918,\n  \"name\": \"Lisa\",\n  \"age\": 51\n}",
+        "lastError": "Failed to fetch"
+      }
+    },
+    {
+      "id": "92e770c7-409e-4bac-b738-92977cfc1c47",
+      "type": "backgroundRpc",
+      "label": "New Node",
+      "position": {
+        "x": 1195.845213282584,
+        "y": -271.3187256540306
+      },
+      "width": 200,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "availableMethods": [
+          "echo",
+          "getState",
+          "getDocumentInfo",
+          "setBackgroundColor"
+        ],
+        "isReady": true,
+        "selectedMethod": "echo",
+        "argsText": "{\"message\":\"Hello\"}",
+        "lastResult": "{\n  \"echo\": \"Hello\",\n  \"timestamp\": 1763153558816\n}",
+        "lastError": null
+      }
+    },
+    {
+      "id": "3bb9f7a0-e126-49a4-bc57-d93a62010ab0",
+      "type": "script",
+      "label": "Script Node",
+      "position": {
+        "x": 1448.512592698991,
+        "y": -4.910544286985877
+      },
+      "width": 250,
+      "height": 500,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "scriptId": "script_1761684295367",
+        "allowMutations": true,
+        "dryRun": true,
+        "lastResult": {
+          "type": "scriptResult",
+          "success": true,
+          "result": {
+            "count": 4
+          },
+          "runId": "1763154120587_dzig9702356",
+          "token": "sjmntx5sytmhz94l27"
+        },
+        "lastRunAt": 1763154120805
+      }
+    },
+    {
+      "id": "640be0f0-1651-4af7-8173-473312bfba98",
+      "type": "3d",
+      "label": "New Node",
+      "position": {
+        "x": 895.3391473388392,
+        "y": 79.26538294959613
+      },
+      "width": 150,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "d18be862-0081-4b4a-8a79-69dac577ebe0",
+      "type": "delay",
+      "label": "Delay Node",
+      "position": {
+        "x": 1145.8856228879156,
+        "y": 166.87831465567785
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "delay": 1000,
+        "lastFired": 1763154487357
+      }
+    },
+    {
+      "id": "4eccee59-c992-4fbb-b948-4b2adfe64d45",
+      "type": "counter",
+      "label": "Counter Node",
+      "position": {
+        "x": 1678.9780404360836,
+        "y": 98.01840021682511
+      },
+      "width": 200,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "count": 0
+      }
+    },
+    {
+      "id": "170dec5d-fbf5-4c19-a126-57e45e2853b1",
+      "type": "gate",
+      "label": "Gate Node",
+      "position": {
+        "x": 1931.8701656266148,
+        "y": -181.83065969546342
+      },
+      "width": 200,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "inputs": {
+          "a": false,
+          "b": false
+        },
+        "operator": "nor",
+        "output": true
+      }
+    },
+    {
+      "id": "aefada2f-be4b-40eb-a09c-c64801e4d8a5",
+      "type": "toggle",
+      "label": "Toggle Node",
+      "position": {
+        "x": 1882.3800284129886,
+        "y": 48.23001485490364
+      },
+      "width": 200,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "value": false
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

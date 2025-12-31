@@ -636,7 +636,10 @@ const EdgeLayer = forwardRef(({
       
       const routeOverride = edgeRoutesRef.current?.[edge.id];
       const routedPointsRaw = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
-      const allowRoutedSegments = !(draggingInfoRef?.current?.nodeIds?.length);
+      const draggedNodeIds = draggingInfoRef?.current?.nodeIds;
+      const allowRoutedSegments = Array.isArray(draggedNodeIds)
+        ? !(draggedNodeIds.includes(edge.source) || draggedNodeIds.includes(edge.target))
+        : true;
       const routedPoints = allowRoutedSegments
         ? applyEndpointLaneOffsetsToPoints(routedPointsRaw, sourceFan, targetFan)
         : routedPointsRaw;

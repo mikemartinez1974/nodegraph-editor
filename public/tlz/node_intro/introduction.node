@@ -1,0 +1,259 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-10-31T09:09:50.145Z",
+    "modified": "2025-10-31T09:09:50.145Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#1976d2",
+      "primaryContrast": "#fff",
+      "secondary": "#dc004e",
+      "secondaryContrast": "#fff",
+      "background": "#e8eaf6",
+      "paper": "#ffffff",
+      "textPrimary": "rgba(0, 0, 0, 0.87)",
+      "textSecondary": "rgba(0, 0, 0, 0.6)",
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 540,
+      "y": 341.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "title",
+      "type": "markdown",
+      "label": "An Introduction to Node Graphs 🌐",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 400,
+      "height": 200,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# An Introduction to Node Graphs\n\nNode graphs are visual diagrams that represent complex information as interconnected nodes and edges. They're powerful for brainstorming, planning, and modeling systems.\n\n**Why use them?** Easy to understand relationships at a glance!\n\nExplore below 👇"
+      }
+    },
+    {
+      "id": "what-is",
+      "type": "markdown",
+      "label": "What is a Node Graph? ❓",
+      "position": {
+        "x": 500,
+        "y": -100
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#2196F3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# What is It?\n\nA **node graph** (or graph diagram) consists of:\n- **Nodes**: Represent entities, ideas, or steps.\n- **Edges**: Show connections or flows between nodes.\n\nLike a mind map, but more structured for data or processes.\n\n*Example*: A family tree or software architecture."
+      }
+    },
+    {
+      "id": "history",
+      "type": "markdown",
+      "label": "A Brief History 📜",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#FF9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# History\n\n- **1960s**: Graph theory in computer science (e.g., flowcharts).\n- **1980s**: Rise with UML diagrams.\n- **2000s+**: Tools like Graphviz, Node-RED for workflows.\n- **Today**: Web apps like this one for collaborative editing!\n\nEvolved from math to everyday tools."
+      }
+    },
+    {
+      "id": "components",
+      "type": "markdown",
+      "label": "Key Components 🧩",
+      "position": {
+        "x": -570,
+        "y": -160
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#4CAF50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Components\n\n1. **Nodes**: Boxes with labels (e.g., tasks, data).\n   - Types: Text, Markdown, API calls.\n2. **Edges**: Lines connecting nodes.\n   - Types: Straight, curved, directed.\n3. **Groups**: Containers to organize clusters.\n\nColors and sizes enhance visuals!"
+      }
+    },
+    {
+      "id": "uses",
+      "type": "markdown",
+      "label": "Common Uses 🎯",
+      "position": {
+        "x": -549,
+        "y": 187
+      },
+      "width": 260,
+      "height": 160,
+      "color": "#9C27B0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Uses\n\n- **Mind Mapping**: Brainstorm ideas.\n- **Workflows**: Plan processes (e.g., DevOps).\n- **Data Viz**: Show networks or dependencies.\n- **Storyboarding**: Narratives or games.\n- **Education**: Teach concepts visually.\n\nVersatile for pros and beginners!"
+      }
+    },
+    {
+      "id": "building",
+      "type": "markdown",
+      "label": "How to Build One 🛠️",
+      "position": {
+        "x": 0,
+        "y": 300
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#F44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Building Steps\n\n1. **Start Central**: Add a main idea node.\n2. **Branch Out**: Connect related nodes.\n3. **Refine**: Adjust positions, labels, colors.\n4. **Group & Style**: Organize and beautify.\n5. **Iterate**: Add/remove as needed.\n\nTools like Copy/Paste w/ Me make it drag-and-drop easy!"
+      }
+    },
+    {
+      "id": "examples",
+      "type": "markdown",
+      "label": "Real-World Examples 💡",
+      "position": {
+        "x": 500,
+        "y": 400
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#FFC107",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Examples\n\n- **Project Management**: Gantt-like dependencies.\n- **Knowledge Base**: Wiki-style links.\n- **API Flows**: Sequence of calls.\n- **Halloween Planning**: Costumes → Party → Treats (spooky fun!).\n\nTry adapting one to your needs!"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-title-what",
+      "type": "child",
+      "source": "title",
+      "target": "what-is",
+      "label": "Define",
+      "style": {}
+    },
+    {
+      "id": "e-title-history",
+      "type": "child",
+      "source": "what-is",
+      "target": "history",
+      "label": "Evolved From",
+      "style": {}
+    },
+    {
+      "id": "e-title-components",
+      "type": "child",
+      "source": "title",
+      "target": "components",
+      "label": "Building Blocks",
+      "style": {}
+    },
+    {
+      "id": "e-title-uses",
+      "type": "peer",
+      "source": "components",
+      "target": "uses",
+      "label": "Applied In",
+      "style": {}
+    },
+    {
+      "id": "e-title-building",
+      "type": "child",
+      "source": "title",
+      "target": "building",
+      "label": "Create Your Own",
+      "style": {}
+    },
+    {
+      "id": "e-building-examples",
+      "type": "child",
+      "source": "building",
+      "target": "examples",
+      "label": "See In Action",
+      "style": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-basics",
+      "label": "Basics 📚",
+      "nodeIds": [
+        "what-is",
+        "history",
+        "components"
+      ],
+      "bounds": {
+        "x": -740,
+        "y": -280,
+        "width": 1400,
+        "height": 575
+      },
+      "visible": false,
+      "style": {}
+    },
+    {
+      "id": "group-applications",
+      "label": "Applications 🚀",
+      "nodeIds": [
+        "uses",
+        "building",
+        "examples"
+      ],
+      "bounds": {
+        "x": -699,
+        "y": 87,
+        "width": 1344,
+        "height": 408
+      },
+      "visible": false,
+      "style": {}
+    }
+  ]
+}

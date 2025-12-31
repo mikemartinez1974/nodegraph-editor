@@ -673,6 +673,100 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     }
   }, [nodes, edges, setEdgeRoutes, buildElkEdgeRoutes]);
 
+  const applyElkLayoutWithAlgorithms = useCallback(async ({
+    algorithms = [],
+    layoutOptions = {},
+    fallbackPositions
+  }) => {
+    const candidates = Array.isArray(algorithms) ? algorithms.filter(Boolean) : [];
+    if (!candidates.length) return false;
+
+    const sizeMap = Object.fromEntries(nodes.map((node) => [node.id, getNodeSize(node)]));
+    const currentPositions = nodes.map((node) => ({
+      id: node.id,
+      x: node.position?.x || 0,
+      y: node.position?.y || 0
+    }));
+    const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+
+    const runElkLayout = async (algorithm) => {
+      const elk = await getElk();
+      const elkGraph = {
+        id: 'root',
+        layoutOptions: {
+          'elk.algorithm': algorithm,
+          'elk.spacing.nodeNode': '120',
+          ...layoutOptions
+        },
+        children: nodes.map((node) => ({
+          id: node.id,
+          width: getNodeSize(node).width,
+          height: getNodeSize(node).height
+        })),
+        edges: edges.map((edge, index) => ({
+          id: edge.id || `edge_${index}`,
+          sources: [edge.source],
+          targets: [edge.target]
+        }))
+      };
+
+      const layout = await elk.layout(elkGraph);
+      const newPositions = (layout.children || []).map((child) => ({
+        id: child.id,
+        x: child.x || 0,
+        y: child.y || 0
+      }));
+
+      if (newPositions.length === 0) {
+        throw new Error('ELK layout returned no positions');
+      }
+
+      const nextBounds = getBoundsFromPositions(newPositions, sizeMap);
+      let offset = { x: 0, y: 0 };
+      if (currentBounds && nextBounds) {
+        const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+        const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+        const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+        const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+        offset = {
+          x: currentCenterX - nextCenterX,
+          y: currentCenterY - nextCenterY
+        };
+        newPositions.forEach((pos) => {
+          pos.x += offset.x;
+          pos.y += offset.y;
+        });
+      }
+
+      animateToPositions(newPositions);
+      if (typeof setEdgeRoutes === 'function') {
+        const routeMap = buildElkEdgeRoutes(layout.edges || [], offset);
+        setEdgeRoutes(routeMap);
+      }
+      return true;
+    };
+
+    for (const algorithm of candidates) {
+      try {
+        // eslint-disable-next-line no-console
+        console.log('[AutoLayout] ELK layout:', algorithm);
+        await runElkLayout(algorithm);
+        return true;
+      } catch (err) {
+        console.warn('[AutoLayout] ELK layout failed:', algorithm, err);
+      }
+    }
+
+    if (typeof fallbackPositions === 'function') {
+      const fallback = fallbackPositions();
+      animateToPositions(fallback);
+      if (typeof setEdgeRoutes === 'function') {
+        setEdgeRoutes({});
+      }
+    }
+    return false;
+  }, [nodes, edges, animateToPositions, setEdgeRoutes, buildElkEdgeRoutes]);
+
   // Auto layout algorithms
   const applyAutoLayout = useCallback((layoutType) => {
     if (nodes.length === 0) return;
@@ -826,39 +920,58 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
       return;
     }
 
-    let newPositions = [];
-
-    switch (layoutType) {
-      case 'radial':
-        newPositions = calculateRadialLayout(nodes);
-        break;
-      case 'grid':
-        newPositions = calculateGridLayout(nodes);
-        break;
-      default:
-        return;
+    if (layoutType === 'radial') {
+      (async () => {
+        const usedElk = await applyElkLayoutWithAlgorithms({
+          algorithms: ['radial', 'org.eclipse.elk.radial'],
+          layoutOptions: {
+            'elk.edgeRouting': 'ORTHOGONAL'
+          },
+          fallbackPositions: () => calculateRadialLayout(nodes)
+        });
+        if (!usedElk) {
+          setTimeout(() => {
+            try {
+              rerouteEdges();
+            } catch {
+              // ignore
+            }
+          }, 1050);
+        }
+      })();
+      return;
     }
 
-    // Animate to new positions
-    animateToPositions(newPositions);
-    if (typeof setEdgeRoutes === 'function') {
-      setEdgeRoutes({});
+    if (layoutType === 'grid') {
+      (async () => {
+        const usedElk = await applyElkLayoutWithAlgorithms({
+          algorithms: ['rectpacking', 'org.eclipse.elk.rectpacking', 'box', 'org.eclipse.elk.box'],
+          layoutOptions: {
+            'elk.edgeRouting': 'ORTHOGONAL'
+          },
+          fallbackPositions: () => calculateGridLayout(nodes)
+        });
+        if (!usedElk) {
+          setTimeout(() => {
+            try {
+              rerouteEdges();
+            } catch {
+              // ignore
+            }
+          }, 1050);
+        }
+      })();
+      return;
     }
-
-    // Keep behavior consistent: any layout pass should also reroute.
-    setTimeout(() => {
-      try {
-        rerouteEdges();
-      } catch {
-        // ignore
-      }
-    }, 1050);
   }, [
     nodes,
     edges,
     animateToPositions,
     setEdgeRoutes,
+    applyElkLayoutWithAlgorithms,
     buildElkEdgeRoutes,
+    calculateRadialLayout,
+    calculateGridLayout,
     calculateSerpentineLayout,
     rerouteEdges,
     layoutDirection,

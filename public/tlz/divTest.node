@@ -1,0 +1,73 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-03T19:18:37.897Z",
+    "modified": "2025-11-03T19:18:37.897Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "primary": "#5e35b1",
+      "primaryContrast": "#fff",
+      "secondary": "#00bcd4",
+      "secondaryContrast": "rgba(0, 0, 0, 0.87)",
+      "background": "#0a0014",
+      "paper": "#1f0d33",
+      "textPrimary": "#fff",
+      "textSecondary": "rgba(255, 255, 255, 0.7)",
+      "divider": "rgba(255, 255, 255, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 648.7041314540709,
+      "y": 204.9251045850268
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "eeae8090-ee3b-4bfb-ba3c-5e212ad4bb91",
+      "type": "div",
+      "label": "Div Test",
+      "position": {
+        "x": 31.295868545929114,
+        "y": 111.57489541497321
+      },
+      "width": 200,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Text.\n\n<a href=\"https://google.com\">google link</a>\n\n<a href=\"tlz://cpwith.me/tlz/conspiracyByGrok.node\">Grok's Conspiracy Graph</a>\n\n",
+        "link": ""
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

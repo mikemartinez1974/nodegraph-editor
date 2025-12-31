@@ -1,0 +1,310 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-16T00:57:47.464Z",
+    "modified": "2025-11-16T00:57:47.464Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -68.37906602166709,
+      "y": 338.0413547232289
+    },
+    "zoom": 0.8872096286423111
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "2cf2d7f9-f37f-4148-b131-cd91181b0f9d",
+      "type": "default",
+      "label": "Default Node",
+      "position": {
+        "x": 711.9327620097218,
+        "y": -395.1569643285991
+      },
+      "width": 200,
+      "height": 50,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "0ee7209c-84f3-4a30-8e5e-a5adce15ee8b",
+      "type": "fixed",
+      "label": "Fixed Node",
+      "position": {
+        "x": 711.932762009722,
+        "y": -333.5453350649225
+      },
+      "width": 200,
+      "height": 50,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "fbc87487-1083-40d7-9d7c-09f2c7cc615b",
+      "type": "timer",
+      "label": "Timer Node",
+      "position": {
+        "x": 409.11815860739534,
+        "y": -307.3276204846346
+      },
+      "width": 200,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "f589b43b-4294-45a8-a73a-e0465adf4dcd",
+      "type": "toggle",
+      "label": "Toggle Node",
+      "position": {
+        "x": 154.80632717860243,
+        "y": -258.8248485111019
+      },
+      "width": 250,
+      "height": 350,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "8f221c46-d033-4b17-9786-a356d8eee0ff",
+      "type": "counter",
+      "label": "Counter  Node",
+      "position": {
+        "x": -106.0599328952626,
+        "y": -281.1099059043467
+      },
+      "width": 200,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "14cb5e0d-5f79-4b74-82d2-13948bcfc518",
+      "type": "delay",
+      "label": "Delay Node",
+      "position": {
+        "x": -458.68819400013547,
+        "y": -342.72153516802337
+      },
+      "width": 400,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "delay": 1000
+      }
+    },
+    {
+      "id": "6d92fc7d-63c7-416d-bd1d-b9ba98484e84",
+      "type": "gate",
+      "label": "Gate Node",
+      "position": {
+        "x": -437.94831291889096,
+        "y": -67.6619611273342
+      },
+      "width": 200,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "inputs": {
+          "a": false,
+          "b": false
+        },
+        "operator": "and",
+        "output": false
+      }
+    },
+    {
+      "id": "cd639538-12ef-4c05-9bb1-177fb1da37fb",
+      "type": "valueTrigger",
+      "label": "Value Node",
+      "position": {
+        "x": -129.89016660050748,
+        "y": 56.87218312903359
+      },
+      "width": 250,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "mode": "rising",
+        "lastValue": null,
+        "lastTriggeredAt": null,
+        "triggerCount": 0
+      }
+    },
+    {
+      "id": "2296d0d1-c73a-4b41-ad3f-88226f9d1046",
+      "type": "script",
+      "label": "Script Node",
+      "position": {
+        "x": 180.7897511759047,
+        "y": 42.452440109875326
+      },
+      "width": 300,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "scriptId": "",
+        "allowMutations": false,
+        "dryRun": false,
+        "lastResult": null,
+        "lastRunAt": null
+      }
+    },
+    {
+      "id": "5055ea74-6ac5-4c02-a60f-9297d71f194b",
+      "type": "api",
+      "label": "New Node",
+      "position": {
+        "x": 571.4336984221952,
+        "y": 81.7790119803073
+      },
+      "width": 400,
+      "height": 400,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "url": "",
+        "method": "GET",
+        "headers": {},
+        "body": ""
+      }
+    },
+    {
+      "id": "0c7eb76e-784d-4843-a9bc-db71a13d114a",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 1372.105739600172,
+        "y": -555.2553121518858
+      },
+      "width": 449.1048694252084,
+      "height": 299.35550598615,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Text\ncontent.\n\n# test\n\n#test\n\nTest\n\n# test\n\n# test\n\n\n",
+        "link": ""
+      }
+    },
+    {
+      "id": "node_markdown_image_demo",
+      "type": "markdown",
+      "label": "Image Preview",
+      "position": {
+        "x": 1222.3793290837646,
+        "y": -139.91080512213216
+      },
+      "width": 523.7094579148583,
+      "height": 272.45887448678667,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "![Placeholder](https://lipsum.app/400x100/fcfcfc/ccc)\n\n<sup>Rendered from markdown node</sup>"
+      }
+    },
+    {
+      "id": "node_div_image_demo",
+      "type": "div",
+      "label": "Image Banner",
+      "position": {
+        "x": 1213.4990528420262,
+        "y": 131.10094645036665
+      },
+      "width": 415.2293374847433,
+      "height": 157.74574132715333,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "<img src=\"https://lipsum.app/400x100/fcfcfc/ccc\" alt=\"Banner\" style=\"width:100%;height:auto;display:block;border-radius:6px;\" />"
+      }
+    }
+  ],
+  "edges": [],
+  "groups": []
+}

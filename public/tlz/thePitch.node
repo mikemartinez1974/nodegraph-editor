@@ -1,0 +1,657 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-16T05:45:17.798Z",
+    "modified": "2025-11-16T05:45:17.798Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -2510.5948041205825,
+      "y": -330.9980552457739
+    },
+    "zoom": 1.2286747657105719
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "77521e68-d531-4eae-b39a-4d8c58bc0ef2",
+      "type": "markdown",
+      "label": "📍 Start Here: The Spark",
+      "position": {
+        "x": -1088.3168420266343,
+        "y": 138.69541511948094
+      },
+      "width": 321.771791034964,
+      "height": 158.75220540340388,
+      "color": "#3367d6",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "So how did we arrive here?  I'm 51 years old.  Unemployed... always and freaking forever unemployed. You have no idea what it's like trying to get a job in tech being a mediocre white guy."
+      }
+    },
+    {
+      "id": "f1294c31-6a1a-4116-94ac-b159df532b31",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": -497.12479738359946,
+        "y": 500.06950280294916
+      },
+      "width": 297.6337982014779,
+      "height": 248.42140771223646,
+      "color": "linear-gradient(225deg, #3fc804, #1976d2)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# STEP 1\n___\n\nI need to make this avatar.  I don't know how to do this either!  But I can rig something up.  I'll get the LLM to make me a cool avatar, and then I can do little squiggles and shit with the particles when it needs to giggle or whatever.",
+        "link": ""
+      }
+    },
+    {
+      "id": "5e5488fa-63ef-411b-91bb-be0b5e6478b0",
+      "type": "markdown",
+      "label": "This is a markdown node.",
+      "position": {
+        "x": -29.623773479699704,
+        "y": 233.12148479272463
+      },
+      "width": 308.847141307053,
+      "height": 299.2914869878832,
+      "color": "linear-gradient(45deg, #3fc804, #f8fb37)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "The particle effect tool is still a work in progress.  It is well under way, but such a thing is a complicated project, and before long, I was struggling to keep up mentally with the level of detail required, so I started looking for help.  The Brain is an obvious choice here, but I'm poor, and those kinds of tools always want more money than I want to spend on them.  But the concept is simple enough, so I began writing a quick & dirty mind map."
+      }
+    },
+    {
+      "id": "73ac961c-559f-49b9-8203-a87d27c82a54",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 403.78537910438894,
+        "y": 97.06239666153762
+      },
+      "width": 292.54041758315174,
+      "height": 318.87867386074254,
+      "color": "linear-gradient(90deg, #fdf73f, #f4bc43)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Around the end of the second day working on the mind map, I discovered that while a particle system was a complicated thing to describe in JSON (relatively), a mind map was not.  It was a very simple thing to describe in JSON indeed!  It was A LOT easier to get the AI to produce a node graph than it is to get it to produce a particle effect.  In fact, I was tickled at the variety and utility I could get with simple request.  And if I can get a node graph out of an AI, can I get one in too?  Oh yes I can, that's not very hard at all. And look how powerful that is!"
+      }
+    },
+    {
+      "id": "3d572999-590c-466e-a193-3eb9edcb8238",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 890.7669140679913,
+        "y": 106.0752790687623
+      },
+      "width": 384.4137135453854,
+      "height": 366.32671276865824,
+      "color": "linear-gradient(90deg, #f4bc43, #e09900)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "I don't know if you have the vision to see it, but node graphs are about to be a big thing.   I've been toying with the idea of building a node graph editor for years, but just as a display vehicle on the web was not enough to justify the effort.  They are too hard to make, and  there's just not enough bang for the buck there.  But now, things are different.  An AI can PRODUCE & CONSUME a node graph, which means any idea you can put into a graph (and the AI will help you do this, if you need it), you can then edit and feed back to the AI and it will just understand, *and* it speaks JSON!  This is enough to justify an app on it's own.  \n\nI know I just made a lot of mental leaps that some people probably do not follow, and I'm sorry.  135, not 105.  Forget the particle effects for a while.  THIS is what I need to be working on!  I suddenly feel like I have a purpose.  Do you see it yet?"
+      }
+    },
+    {
+      "id": "97c9dbec-fc4d-442f-84f0-35c31e0c811e",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 880.7818725945738,
+        "y": 503.43861968020605
+      },
+      "width": 417.841466866494,
+      "height": 187.9640886523122,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "So let's talk about Copy/Paste w/ Me.  The scope of this app has grown.  And before the goals became what they are now, I was trying for something which as it turns out is really just a tiny bit simpler than the matrix itself, and that's a simple web-based node graph editor that you could chat with an LLM and have it produce content for you."
+      }
+    },
+    {
+      "id": "e851e068-c5eb-4129-97e8-fc95f73a9d75",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 1443.7071468590984,
+        "y": -132.40107531978788
+      },
+      "width": 335.48620956927937,
+      "height": 205.6441647771673,
+      "color": "linear-gradient(90deg, #f4bc43, #e00000)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "So Copy/Paste W/ Me is a pretty cool and fun idea.  But why stop there?  The cool thing about nodes is you can render them any way you want.  I made a 3d node with ThreeJS.  It's going to be a short hop.... one lego brick... from there to VR.  Literally an afternoon of work or less. "
+      }
+    },
+    {
+      "id": "70be4c8a-052c-4d9c-b89e-ac577cdb59a9",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 1495.5319303567499,
+        "y": -471.20779262508347
+      },
+      "width": 396.87532852975755,
+      "height": 354.7845702965029,
+      "color": "#fd8077",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "But you know, I'm really thinking beyond that.  I can write applications based on the node graph too.\n\nAfter I get vr squared away, a breadboard is next.  So then, check this out, I'll be giving a breadboard to engineering students that gives them vr to play with.  Sometimes this stuff markets itself.\n\nAfter the breadboard, I dunno, a word document?  A spreadsheet?  A new paradigm of application will emerge that uses the node graph for structure, your browser for logic, the web as it's hard drive, and your documents are always shareable as links.\n\nThe VR applications will give people reason to host their own servers, either from home or in the cloud, and you'll be able to serve documents from there... it'll be cool.  The document can already hold a web page... that gets kind of crazy in vr... You could have react-based interfaces as wall controls in a scene."
+      }
+    },
+    {
+      "id": "4f3d29ff-9bce-4dca-8007-0d96137436a2",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 1469.6325545642935,
+        "y": 476.77897873391686
+      },
+      "width": 559.6151892942006,
+      "height": 265.75110035373297,
+      "color": "#8cf89e",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "So I wrote a node graph editor.  I want to stress at this point that the total development time on this project as of 11/7/2025 has been about 10 weeks.  So I wrote a node graph editor and I hope you like it, but if you think a feature is missing from you it, you'll just have to hold your horses.  But so far it's got a toolbar with a variety of features and lots of property panels to play with.  This app has had frighteningly little hands on use, but I think everything makes a clicking sound when you click on it.  You will come to see that the power is in the ideas represented in the graph, not in the app.  This is going to be an amazing time.\n\nLong story short (heh), [there's a whole page dedicated to getting you started with this app and the node graphs here](tlz://cpwith.me/data/IntroGraph.node)."
+      }
+    },
+    {
+      "id": "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 2043.4179894141344,
+        "y": 619.185776556168
+      },
+      "width": 420.2548665041589,
+      "height": 594.0968446491441,
+      "color": "#ff1919",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# But if you *are* my target audience...\n\n## Listen up!  \n\n<details>\n  <summary><strong>From the darkest depths of my mother's basement</strong></summary>\n  \n  <em>(We don't actually have basements in the bayou, but you get what I mean)</em>\n</details>\n\n<details>\n<summary><strong>From the mind of a mediocre white guy</strong></summary>\n \n<small><em>(This is what mediocre white guys are capable of.  Take notes.)</em></small>\n\n</details>\n\nI present to you the *next level* of the **World Wide Web**. A new browser for a new region of cyberspace.  \n\n### You are using the Twilight Node Browser, and this is \n\n# The Twilight Zone!\n\nMy name is Michael.\nI am The Architect.\n\nPlease support this project, and I promise to enable all of your Net Runner fantasies.  I need to raise money to buy new gear (and, you know, groceries), but there is clearly an actual application under development here.  Remember the scene creator we stuck a pin in?  You can support me with confidence.  For my next trick, I will write the first VR Killer App... An AI assisted building tool to create your own personal VR space... that you save to web as a node graph.... that can link to other virtual places... in The Twilight Zone.  Help me make it happen.  And be generous, because the domain name is going to be expensive.\n\n\n\n"
+      }
+    },
+    {
+      "id": "273a4c63-2906-44ab-97de-b8050c24a06c",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": -1103.1599085681366,
+        "y": 440.0143445440077
+      },
+      "width": 474.71138325722546,
+      "height": 229.48813873091262,
+      "color": "linear-gradient(135deg, #6f7071, #a83434)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "I don't know how personal I want to get here.  Mediocre white guys have plenty to complain about right now.  Let's just lay it all out on the line.  I was born in a trailer park next to an oil refinery.  I have a 9th grade education.  I am a self-taught software developer.  My IQ (according to the internet) is 135.  I'll stand by that number, and you can take it for what it's worth.  This is a sample of my work.  I hope you are getting all you are paying for with those H1Bs.  What's a guy gotta do to get a job around here?  Invent the Matrix?  Whatever, man.  I'm not even interested in working for you anymore."
+      }
+    },
+    {
+      "id": "f60b2670-0557-4915-85e3-142377a05d5f",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": -1132.5628021365183,
+        "y": 820.5687778007898
+      },
+      "width": 483.86642538282075,
+      "height": 343.6786732585582,
+      "color": "linear-gradient(135deg, #a83464, #1976d2)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Anyway, forever unemployed, fired from everything because I didn't go to school, and so I don't get great jobs, and so I get shitty projects and I've failed at everything.  My career is basically over.  There is nothing I can do with my time that will show me less than looking for work through conventional means.  I don't know what to do.  My mental health is suffering horribly.  So I just decide I'm going to start writing.  What can I start writing?   Ani looks cool.But  I'm not paying for Grok.  I can't afford it*.  So I decide there's a problem I can approach intelligently there in context management.  You can see all these different LLMs and they all do the same thing, maybe you can consolidate a personality across multiple models.\n\n* I want to take a moment here to say thank you to the Copilot people.  Copilot is the cheapest AI you can pay for, and absolutely far and away the best value for the money, and certainly the LLM mostly likely to make a noticeable difference in your daily life.  This project would not have been possible without it."
+      }
+    },
+    {
+      "id": "b6096152-0de7-4943-a6e3-4d8243b10b9a",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": -497.15196044950113,
+        "y": 808.7941909452861
+      },
+      "width": 476.75155632906285,
+      "height": 218.36145689127375,
+      "color": "linear-gradient(135deg, #1976d2, #405972)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Ok, so what's the task if I want to make an LLM-agnostic Ani?  I need to animate an avatar and have it respond emotionally.  This is a bit of a showstopper.  Rigging and animating an avatar is NOT a problem I'm prepared to \"approach intelligently\".  So what can I do?  Well, I can make a particle effect avatar and have THAT respond emotionally.  I'm trying to solve a context management problem, not an avatar problem.  I have no idea how to profit from such a thing, but my mental health is on the line, so I start writing."
+      }
+    },
+    {
+      "id": "03d96927-5967-447d-9103-b43330a3a713",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 71.84573603784554,
+        "y": 802.5284701191076
+      },
+      "width": 492.09553771391086,
+      "height": 310.0894292309075,
+      "color": "#3fc804",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# It starts with JSON.\nSee, there's JSON.  I don't know how to make this easy for a layman to understand, but the whole JSON to web to mind to LLM pipeline that exists right now is a little too good to be true.  I keep trying to explain it, but I just end up sounding like a crazy person, so you'll just have to take my word for it that's its cool.  You guys are worried about programmers...  programmers are going to be President.  But I digress.\n\nBasically, I figure if I can describe a particle effect in JSON, I can get the LLM to produce variations in JSON, which I can then adjust. It will, in theory, do the hard part about making particle effects.  I don't really know anything about particle effects, and I have no idea how to profit from such a thing.  But particle effects are pretty, and my mental health is on the line here, so I start writing."
+      }
+    },
+    {
+      "id": "3aa9521f-c663-4737-9f8e-7474a515fe0d",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 529.7680102012506,
+        "y": 830.0691297971737
+      },
+      "width": 263.996508621155,
+      "height": 349.25700646739665,
+      "color": "#9d1bda",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Not to highjack the thread, but there is *plenty* to know about particle effects, man.  That shit is like learning about special effects in movies.  I think I'm taking the easy route to content creation by \"only\" going after the particles.   Before long I'm realizing that creating the particle system is in fact where all the work is.  Once you can insert a particle effect into a scene, it is *absolutely trivial* to add anything else to that scene.  If you can add a particle emitter, you can add a block.  And at that point, you basically have a full 3d scene creator.  Stick a pin in that.📌"
+      }
+    },
+    {
+      "id": "11ec212d-aaa6-48e2-aa5b-08b3bddc6640",
+      "type": "markdown",
+      "label": "New Node",
+      "position": {
+        "x": 1984.178350660292,
+        "y": -271.83987810699483
+      },
+      "width": 428.007266822897,
+      "height": 289.78141131249384,
+      "color": "#82f89f",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "And at this point, I need us to slow down and appreciate how the technology has stacked up at this point.  I've written a scriptable graph editor that supports a variety of content.  The documents link together because they live on web.  At this point, the app is no longer a graph editor but instead it's a node browser.  And when you add the 3d/vr, on top of that... a scriptable node network that lives on the web rendered spatially, with content that can be generated by AI.... if I need to explain to you why that is important, then you are not my target audience.  However, I welcome you to my app and I hope you have fun playing with the node graphs.  You can expect improvement in that area.  I'm looking forward to controller-based web browsing.  I think you'll love it!"
+      }
+    },
+    {
+      "id": "053b9dc1-c367-426c-9b14-7dbfa2d6b106",
+      "type": "3d",
+      "label": "New Node",
+      "position": {
+        "x": 2619.358375241295,
+        "y": 94.69875760429785
+      },
+      "width": 212.4809481963287,
+      "height": 234.29331378374846,
+      "color": "#d21919",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "2857bb32-5513-4c50-a34d-5ac69471071d",
+      "type": "3d",
+      "label": "New Node",
+      "position": {
+        "x": 2189.07660884928,
+        "y": 82.01433696901675
+      },
+      "width": 209.60016631358053,
+      "height": 234.29331378374846,
+      "color": "#d21919",
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "4fdb3023-d6cc-4aa4-8921-7395b2eb1471",
+      "type": "markdown",
+      "label": "🌀 Where it Goes From Here",
+      "position": {
+        "x": 2767.4950574287122,
+        "y": 545.5657557653126
+      },
+      "width": 460,
+      "height": 320,
+      "color": "linear-gradient(135deg, #111111, #555555)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "This isn't just a devlog — it's a mission. The road ahead is still unwritten.\n\nI don't know what form this project will ultimately take — VR tool, browser, engine, movement — but it feels inevitable now. Every piece that’s come together is a reflection of a deeper need: *to be heard, to build, to belong*.\n\nIf you found yourself in this graph, then maybe it's yours too.\n\nThe work continues.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_1762568150411",
+      "type": "dataFlow",
+      "source": "5e5488fa-63ef-411b-91bb-be0b5e6478b0",
+      "target": "73ac961c-559f-49b9-8203-a87d27c82a54",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762568640422",
+      "type": "dataFlow",
+      "source": "73ac961c-559f-49b9-8203-a87d27c82a54",
+      "target": "3d572999-590c-466e-a193-3eb9edcb8238",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762568859288",
+      "type": "dataFlow",
+      "source": "3d572999-590c-466e-a193-3eb9edcb8238",
+      "target": "97c9dbec-fc4d-442f-84f0-35c31e0c811e",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762570004381",
+      "type": "dependency",
+      "source": "70be4c8a-052c-4d9c-b89e-ac577cdb59a9",
+      "target": "e851e068-c5eb-4129-97e8-fc95f73a9d75",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762578340328",
+      "type": "dataFlow",
+      "source": "97c9dbec-fc4d-442f-84f0-35c31e0c811e",
+      "target": "4f3d29ff-9bce-4dca-8007-0d96137436a2",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762582190629",
+      "type": "dataFlow",
+      "source": "77521e68-d531-4eae-b39a-4d8c58bc0ef2",
+      "target": "273a4c63-2906-44ab-97de-b8050c24a06c",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762583019199",
+      "type": "dataFlow",
+      "source": "273a4c63-2906-44ab-97de-b8050c24a06c",
+      "target": "f60b2670-0557-4915-85e3-142377a05d5f",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762583477761",
+      "type": "dataFlow",
+      "source": "f60b2670-0557-4915-85e3-142377a05d5f",
+      "target": "b6096152-0de7-4943-a6e3-4d8243b10b9a",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762583681360",
+      "type": "dataFlow",
+      "source": "b6096152-0de7-4943-a6e3-4d8243b10b9a",
+      "target": "f1294c31-6a1a-4116-94ac-b159df532b31",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762583702839",
+      "type": "dataFlow",
+      "source": "4f3d29ff-9bce-4dca-8007-0d96137436a2",
+      "target": "e851e068-c5eb-4129-97e8-fc95f73a9d75",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762584118960",
+      "type": "dataFlow",
+      "source": "f1294c31-6a1a-4116-94ac-b159df532b31",
+      "target": "03d96927-5967-447d-9103-b43330a3a713",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762586758841",
+      "type": "reference",
+      "source": "03d96927-5967-447d-9103-b43330a3a713",
+      "target": "3aa9521f-c663-4737-9f8e-7474a515fe0d",
+      "label": "",
+      "style": {
+        "width": 3
+      },
+      "data": {}
+    },
+    {
+      "id": "edge_1762588210046",
+      "type": "dataFlow",
+      "source": "e851e068-c5eb-4129-97e8-fc95f73a9d75",
+      "target": "11ec212d-aaa6-48e2-aa5b-08b3bddc6640",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762588516337",
+      "type": "energyFlow",
+      "source": "11ec212d-aaa6-48e2-aa5b-08b3bddc6640",
+      "target": "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762589772984",
+      "type": "energyFlow",
+      "source": "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+      "target": "053b9dc1-c367-426c-9b14-7dbfa2d6b106",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762589823809",
+      "type": "weak",
+      "source": "2857bb32-5513-4c50-a34d-5ac69471071d",
+      "target": "053b9dc1-c367-426c-9b14-7dbfa2d6b106",
+      "label": "Under Construction",
+      "style": {
+        "width": 4
+      },
+      "data": {}
+    },
+    {
+      "id": "edge_1762589830911",
+      "type": "energyFlow",
+      "source": "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+      "target": "2857bb32-5513-4c50-a34d-5ac69471071d",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge_1762614928005",
+      "type": "dataFlow",
+      "source": "03d96927-5967-447d-9103-b43330a3a713",
+      "target": "5e5488fa-63ef-411b-91bb-be0b5e6478b0",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "b69ef107-2f2a-4d61-935e-94c4cc9d92fc",
+      "type": "energyFlow",
+      "source": "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+      "target": "4fdb3023-d6cc-4aa4-8921-7395b2eb1471",
+      "label": "next phase",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "18b44f49-6e7f-4e1c-85ee-859a7e94fecc",
+      "label": "The Origin Story",
+      "nodeIds": [
+        "77521e68-d531-4eae-b39a-4d8c58bc0ef2",
+        "273a4c63-2906-44ab-97de-b8050c24a06c",
+        "f60b2670-0557-4915-85e3-142377a05d5f",
+        "b6096152-0de7-4943-a6e3-4d8243b10b9a"
+      ],
+      "bounds": {
+        "x": -1394.4960148279285,
+        "y": 39.319312417779,
+        "width": 1155.7198325429588,
+        "height": 973.08880201229
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "9c8a857d-ec84-4c3f-890e-b1cd2bc3e933",
+      "label": "Mind Map Realization",
+      "nodeIds": [
+        "5e5488fa-63ef-411b-91bb-be0b5e6478b0",
+        "73ac961c-559f-49b9-8203-a87d27c82a54",
+        "3d572999-590c-466e-a193-3eb9edcb8238",
+        "97c9dbec-fc4d-442f-84f0-35c31e0c811e"
+      ],
+      "bounds": {
+        "x": -204.0473441332262,
+        "y": -97.08807731556682,
+        "width": 1313.749950161047,
+        "height": 714.5087413219289
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "a36d74e3-c839-4059-b127-2e343157add4",
+      "label": "VR/Web Paradigm",
+      "nodeIds": [
+        "e851e068-c5eb-4129-97e8-fc95f73a9d75",
+        "70be4c8a-052c-4d9c-b89e-ac577cdb59a9",
+        "11ec212d-aaa6-48e2-aa5b-08b3bddc6640",
+        "053b9dc1-c367-426c-9b14-7dbfa2d6b106",
+        "2857bb32-5513-4c50-a34d-5ac69471071d"
+      ],
+      "bounds": {
+        "x": 1255.9640420744588,
+        "y": -668.600077773335,
+        "width": 1489.6348072650005,
+        "height": 900.4454922695071
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "dfd39184-5b46-4b35-98f1-4cf3e96a249e",
+      "label": "Manifesto: The Architect Speaks",
+      "nodeIds": [
+        "4840e691-1b3b-454c-b9f9-e27ab1125e0e",
+        "4f3d29ff-9bce-4dca-8007-0d96137436a2"
+      ],
+      "bounds": {
+        "x": 1169.8249599171932,
+        "y": 302.1373542315959,
+        "width": 1103.7204627490205,
+        "height": 634.096844649144
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "b4a2ad35-6e80-4d47-87dc-5a8f98c34a6f",
+      "label": "Tech Prototyping",
+      "nodeIds": [
+        "03d96927-5967-447d-9103-b43330a3a713",
+        "3aa9521f-c663-4737-9f8e-7474a515fe0d"
+      ],
+      "bounds": {
+        "x": -194.2020328191099,
+        "y": 627.4837555036538,
+        "width": 875.968297330938,
+        "height": 397.2138775272183
+      },
+      "visible": true,
+      "style": {}
+    }
+  ]
+}

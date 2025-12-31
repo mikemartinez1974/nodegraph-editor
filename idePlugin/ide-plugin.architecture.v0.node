@@ -1,0 +1,327 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-12-31T19:23:34.894Z",
+    "modified": "2025-12-31T19:23:34.894Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 214,
+      "y": 868
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "arch-graph-file",
+      "type": "markdown",
+      "label": "📄 Twilight Graph File",
+      "position": {
+        "x": 63,
+        "y": 1020
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Twilight Graph File (On Disk)\n\n**Owns:**\n- Graph state\n- Node IDs\n- History continuity\n\n**Guarantees:**\n- Stable read semantics\n- Git-compatible diffs\n\n**Does NOT:**\n- Execute\n- Render\n- Know about VS Code",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-vscode-host",
+      "type": "markdown",
+      "label": "🧠 VS Code Extension Host",
+      "position": {
+        "x": 112,
+        "y": -200
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## VS Code Extension Host\n\n**Owns:**\n- Extension lifecycle\n- File watching\n- Commands & activation\n\n**Does:**\n- Reads graph files\n- Launches WebView\n- Opens source files\n\n**Does NOT:**\n- Mutate graphs (v0)\n- Interpret intent",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-webview",
+      "type": "markdown",
+      "label": "🪟 WebView Container",
+      "position": {
+        "x": 698,
+        "y": 210
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## WebView\n\n**Owns:**\n- Isolated UI surface\n- Rendering sandbox\n\n**Does:**\n- Display graph visuals\n- Forward user selection\n\n**Does NOT:**\n- Access filesystem\n- Execute code\n- Persist state",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-renderer",
+      "type": "markdown",
+      "label": "🎨 Graph Renderer",
+      "position": {
+        "x": 688,
+        "y": 590
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Graph Renderer\n\n**Owns:**\n- Layout interpretation\n- Visual mapping of nodes/edges\n\n**Does:**\n- Render read-only graph\n- Highlight selections\n\n**Assumption:**\n- Shared with browser editor (optional)\n\n**Does NOT:**\n- Modify data\n- Apply semantics",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-filesystem",
+      "type": "markdown",
+      "label": "🗂️ Workspace Filesystem",
+      "position": {
+        "x": 218,
+        "y": 210
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Workspace Filesystem\n\n**Owns:**\n- Source files\n- Git state\n\n**Does:**\n- Provide file content\n\n**Does NOT:**\n- Know about graphs\n- Encode intent",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-editor-browser",
+      "type": "markdown",
+      "label": "🌐 Browser Editor",
+      "position": {
+        "x": 1208,
+        "y": 610
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Browser Editor\n\n**Owns:**\n- Graph mutation\n- Automation\n- ScriptNodes\n- AI collaboration\n\n**Does NOT:**\n- Live inside VS Code\n- Depend on extension",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-ai",
+      "type": "markdown",
+      "label": "🤖 AI (Advisory)",
+      "position": {
+        "x": -224,
+        "y": 617
+      },
+      "width": 421,
+      "height": 233,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## AI (Advisory Role)\n\n**Does:**\n- Analyze graph structure\n- Suggest changes\n- Surface risks\n\n**Does NOT:**\n- Execute actions\n- Mutate state\n- Hold authority",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "arch-assumptions",
+      "type": "markdown",
+      "label": "📌 Assumptions (v0)",
+      "position": {
+        "x": 92,
+        "y": -620
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Architectural Assumptions\n\n- Graph format is stable enough to read\n- Read-only is sufficient for v0 value\n- No network access required\n- Renderer performance acceptable for medium graphs\n- File ↔ node links are metadata only",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-read-graph",
+      "type": "child",
+      "source": "arch-vscode-host",
+      "target": "arch-graph-file",
+      "label": "reads",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-launch-webview",
+      "type": "child",
+      "source": "arch-vscode-host",
+      "target": "arch-webview",
+      "label": "launches",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-render",
+      "type": "child",
+      "source": "arch-webview",
+      "target": "arch-renderer",
+      "label": "uses",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-render-data",
+      "type": "child",
+      "source": "arch-renderer",
+      "target": "arch-graph-file",
+      "label": "renders (read-only)",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-open-file",
+      "type": "child",
+      "source": "arch-vscode-host",
+      "target": "arch-filesystem",
+      "label": "opens files",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-browser-owns",
+      "type": "child",
+      "source": "arch-editor-browser",
+      "target": "arch-graph-file",
+      "label": "creates & mutates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ai-advises",
+      "type": "child",
+      "source": "arch-ai",
+      "target": "arch-graph-file",
+      "label": "analyzes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-assumption-applies",
+      "type": "child",
+      "source": "arch-assumptions",
+      "target": "arch-vscode-host",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Globe Background</title>
+  <style>
+    html,body { height:100%; margin:0; }
+    body {
+      background: url('globe.svg') center center / cover no-repeat fixed;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .overlay {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      background: rgba(0,0,0,0.5);
+      padding: 12px 14px;
+      border-radius: 8px;
+      max-width: calc(100% - 32px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    a { color: #fff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <strong>Globe background</strong>
+    <div style="margin-top:6px; font-size:13px; opacity:0.95">This page displays <code>globe.svg</code> as a full-screen background.</div>
+    <div style="margin-top:8px">
+      <a href="globe.svg" target="_blank" rel="noopener">Open SVG file</a>
+    </div>
+  </div>
+</body>
+</html>

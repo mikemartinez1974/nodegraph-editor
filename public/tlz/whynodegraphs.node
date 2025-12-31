@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Why Node Graphs",
+    "description": "Usefulness of node graphs in the modern landscape",
+    "created": "2025-12-25T12:30:00.000Z",
+    "modified": "2025-12-25T12:30:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "whyg-overview",
+      "type": "markdown",
+      "label": "Thesis",
+      "position": { "x": 80, "y": 60 },
+      "width": 540,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Node Graphs\nNode graphs turn **systems thinking** into a visible, editable artifact.\nThey make structure, flow, and dependencies explicit." 
+      }
+    },
+    {
+      "id": "whyg-clarity",
+      "type": "markdown",
+      "label": "Clarity",
+      "position": { "x": 80, "y": 300 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Clarity at Scale\n- Complex systems are hard to explain in linear text\n- Graphs show **structure + flow** at once\n- Visual topology reduces cognitive load"
+      }
+    },
+    {
+      "id": "whyg-collab",
+      "type": "markdown",
+      "label": "Collaboration",
+      "position": { "x": 80, "y": 560 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Collaboration\n- Shared map of intent\n- Easier handoff between roles\n- Supports async work and iteration"
+      }
+    },
+    {
+      "id": "whyg-ai",
+      "type": "markdown",
+      "label": "AI + Automation",
+      "position": { "x": 660, "y": 300 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## AI + Automation\n- Graphs are structured inputs for agents\n- Nodes can represent tasks, tools, or prompts\n- Enables repeatable workflows"
+      }
+    },
+    {
+      "id": "whyg-products",
+      "type": "markdown",
+      "label": "Products",
+      "position": { "x": 660, "y": 560 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Product Design\n- Map user journeys + dependencies\n- Visualize architecture decisions\n- Align teams on system boundaries"
+      }
+    },
+    {
+      "id": "whyg-future",
+      "type": "markdown",
+      "label": "Modern Landscape",
+      "position": { "x": 80, "y": 820 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Now\n- Software is more modular and interconnected\n- AI agents need structured interfaces\n- Visual tooling bridges humans + automation"
+      }
+    },
+    {
+      "id": "whyg-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 660, "y": 820 },
+      "width": 540,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n- When is a graph too complex?\n- What defaults help new users?\n- How to keep graphs executable?"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "whyg-edge-1",
+      "type": "child",
+      "source": "whyg-overview",
+      "target": "whyg-clarity",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "value",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "whyg-edge-2",
+      "type": "child",
+      "source": "whyg-clarity",
+      "target": "whyg-collab",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "share",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "whyg-edge-3",
+      "type": "child",
+      "source": "whyg-clarity",
+      "target": "whyg-ai",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "enable",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "whyg-edge-4",
+      "type": "child",
+      "source": "whyg-ai",
+      "target": "whyg-products",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "apply",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "whyg-edge-5",
+      "type": "child",
+      "source": "whyg-collab",
+      "target": "whyg-future",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "scale",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "whyg-edge-6",
+      "type": "child",
+      "source": "whyg-future",
+      "target": "whyg-open",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "next",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

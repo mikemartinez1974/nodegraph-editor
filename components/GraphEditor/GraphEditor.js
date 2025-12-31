@@ -732,6 +732,7 @@ useEffect(() => {
   const pendingAutoLayoutOnPasteRef = useRef(false);
   const pendingAutoLayoutPayloadRef = useRef(null);
   const defaultLayoutSyncRef = useRef(null);
+  const pendingRerouteOnLoadRef = useRef(false);
 
   useEffect(() => {
     const handleAutoLayoutRequested = (payload) => {
@@ -852,18 +853,22 @@ useEffect(() => {
 
   useEffect(() => {
     const handleNodeDragEnd = () => {
-      if (!edgeRoutes || Object.keys(edgeRoutes).length === 0) return;
       if (modesHook.mode === 'auto') {
         modesHook.applyAutoLayout();
         return;
       }
-      setEdgeRoutes({});
-      setSnackbar({ open: true, message: 'Layout changed. Click Apply to reroute edges.', severity: 'info' });
+      if (typeof modesHook.rerouteEdges === 'function') {
+        Promise.resolve(modesHook.rerouteEdges())
+          .catch((err) => {
+            console.warn('[EdgeReroute] Failed after drag end:', err);
+            setSnackbar({ open: true, message: 'Failed to reroute edges', severity: 'error', copyToClipboard: true });
+          });
+      }
     };
 
     eventBus.on('nodeDragEnd', handleNodeDragEnd);
     return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
-  }, [edgeRoutes, modesHook, setEdgeRoutes, setSnackbar]);
+  }, [modesHook, setSnackbar]);
   
   const groupManagerHook = useGroupManager({
     groups, setGroups,
@@ -1088,6 +1093,7 @@ useEffect(() => {
     try {
       handlers.handleLoadGraph?.(nodesToLoad, edgesToLoad, groupsToLoad);
     } finally {
+      pendingRerouteOnLoadRef.current = Array.isArray(edgesToLoad) && edgesToLoad.length > 0;
       setGraphRenderKey(prev => prev + 1);
       setStorySnapshots([]);
       if (!firstGraphLoadHandledRef.current) {
@@ -1105,6 +1111,23 @@ useEffect(() => {
       }
     }
   }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken, setStorySnapshots]);
+
+  useEffect(() => {
+    if (!pendingRerouteOnLoadRef.current) return;
+    if (!Array.isArray(edges) || edges.length === 0) return;
+    if (documentSettings?.edgeRouting && documentSettings.edgeRouting !== 'auto') {
+      pendingRerouteOnLoadRef.current = false;
+      return;
+    }
+    pendingRerouteOnLoadRef.current = false;
+    if (typeof modesHook.rerouteEdges === 'function') {
+      Promise.resolve(modesHook.rerouteEdges())
+        .catch((err) => {
+          console.warn('[EdgeReroute] Failed on load:', err);
+          setSnackbar({ open: true, message: 'Failed to reroute edges on load', severity: 'error', copyToClipboard: true });
+        });
+    }
+  }, [edges, documentSettings?.edgeRouting, modesHook.rerouteEdges, setSnackbar]);
 
   useEffect(() => {
     const showMessage = (message, severity = 'info') => {
@@ -1763,6 +1786,19 @@ useEffect(() => {
           }
         }
 
+        const shouldTryIndexNode = (candidateUrl) => {
+          try {
+            const parsed = new URL(candidateUrl);
+            const path = parsed.pathname || '';
+            if (path.endsWith('/')) return true;
+            const lastSegment = path.split('/').pop() || '';
+            if (!lastSegment) return true;
+            return !lastSegment.includes('.');
+          } catch (err) {
+            return false;
+          }
+        };
+
         try {
           if (!response) {
             response = await tryFetch(fullUrl);
@@ -1778,6 +1814,8 @@ useEffect(() => {
           }
           if (fullUrl.endsWith('/')) {
             alternates.push(fullUrl + 'index.node');
+          } else if (shouldTryIndexNode(fullUrl)) {
+            alternates.push(fullUrl + '/index.node');
           }
           if (originalTlzPath) {
             const relPath = originalTlzPath.startsWith('/') ? originalTlzPath : `/${originalTlzPath}`;

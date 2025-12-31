@@ -1,0 +1,109 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2025-11-04T06:12:36.930Z",
+    "modified": "2025-11-04T06:12:36.930Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#8819d2",
+        "light": "#bc95d6",
+        "dark": "#9c2af8",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 611.5,
+      "y": 298.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "65936bdf-60da-452c-a189-bb1dcbaa5266",
+      "type": "default",
+      "label": "New Node",
+      "position": {
+        "x": -367,
+        "y": 54
+      },
+      "width": 200,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "12804ec9-a167-47ec-a0ad-e88514fd94a9",
+      "type": "default",
+      "label": "New Node",
+      "position": {
+        "x": -50.5,
+        "y": -1.5
+      },
+      "width": 200,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_1762234615058",
+      "source": "12804ec9-a167-47ec-a0ad-e88514fd94a9",
+      "target": "65936bdf-60da-452c-a189-bb1dcbaa5266",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}
