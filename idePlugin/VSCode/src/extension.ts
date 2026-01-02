@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 class NodeGraphDocument implements vscode.CustomDocument {
   uri: vscode.Uri;
@@ -33,20 +34,18 @@ class NodeGraphEditorProvider implements vscode.CustomReadonlyEditorProvider<Nod
   ): Promise<void> {
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
     const workspaceRoot = workspaceFolder?.uri;
-    const publicRoot = workspaceRoot ? vscode.Uri.joinPath(workspaceRoot, 'public') : null;
+    const outRoot = await this.resolveOutRoot(document.uri);
+    console.log('[Twilight] Opening graph', document.uri.fsPath);
+    console.log('[Twilight] outRoot', outRoot?.fsPath ?? 'none');
 
     webviewPanel.webview.options = {
       enableScripts: true,
       localResourceRoots: [
         this.context.extensionUri,
-        ...(publicRoot ? [publicRoot] : []),
+        ...(outRoot ? [outRoot] : []),
         ...(workspaceRoot ? [workspaceRoot] : [])
       ]
     };
-
-    const publicRootUri = publicRoot
-      ? webviewPanel.webview.asWebviewUri(publicRoot).toString()
-      : '';
 
     const updateWebview = async () => {
       const fresh = await this.readGraphFile(document.uri);
@@ -54,9 +53,27 @@ class NodeGraphEditorProvider implements vscode.CustomReadonlyEditorProvider<Nod
       webviewPanel.webview.postMessage({ type: 'graph', data: fresh });
     };
 
+    const safeStringify = (payload: any) => {
+      try {
+        return JSON.stringify(payload);
+      } catch {
+        return String(payload);
+      }
+    };
+
     webviewPanel.webview.onDidReceiveMessage((message) => {
-      if (message?.type === 'ready') {
+      if (!message || typeof message !== 'object') return;
+      if (message.type === 'ready') {
+        console.log('[Twilight] Webview ready');
         webviewPanel.webview.postMessage({ type: 'graph', data: document.data });
+        return;
+      }
+      if (message.type === 'webview-error') {
+        console.error('[Twilight Webview]', safeStringify(message));
+        return;
+      }
+      if (message.type === 'webview-log') {
+        console.log('[Twilight Webview]', safeStringify(message));
       }
     });
 
@@ -66,7 +83,7 @@ class NodeGraphEditorProvider implements vscode.CustomReadonlyEditorProvider<Nod
     watcher.onDidDelete(() => updateWebview());
     webviewPanel.onDidDispose(() => watcher.dispose());
 
-    webviewPanel.webview.html = this.getHtml(webviewPanel.webview, publicRootUri);
+    webviewPanel.webview.html = await this.getHtml(webviewPanel.webview, outRoot, document.uri);
   }
 
   private async readGraphFile(uri: vscode.Uri): Promise<any> {
@@ -79,310 +96,361 @@ class NodeGraphEditorProvider implements vscode.CustomReadonlyEditorProvider<Nod
     }
   }
 
-  private getHtml(webview: vscode.Webview, publicRootUri: string): string {
-    const nonce = getNonce();
-    return String.raw`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data: blob:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';" />
-  <title>Twilight Graph</title>
-  <style>
-    :root {
-      color-scheme: light dark;
-      --bg: #0f1115;
-      --panel: #171a21;
-      --panel-border: #2a2f3a;
-      --text: #e6e6e6;
-      --muted: #9aa0a6;
-      --node-shadow: rgba(0, 0, 0, 0.35);
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      overflow: hidden;
-    }
-
-    .app {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    .viewport {
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(circle at 10% 10%, rgba(93, 134, 255, 0.12), transparent 45%),
-                  radial-gradient(circle at 90% 20%, rgba(0, 209, 178, 0.12), transparent 40%),
-                  #0f1115;
-    }
-
-    .canvas {
-      position: absolute;
-      left: 0;
-      top: 0;
-      transform-origin: 0 0;
-    }
-
-    .node {
-      position: absolute;
-      border-radius: 14px;
-      padding: 10px 12px;
-      box-sizing: border-box;
-      color: #0b0b0b;
-      box-shadow: 0 16px 32px -20px var(--node-shadow);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      overflow: hidden;
-    }
-
-    .node.markdown {
-      color: #0b0b0b;
-      background: #ffffff;
-    }
-
-    .node-title {
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .node-body {
-      font-size: 12px;
-      line-height: 1.4;
-      color: #1d1d1d;
-      max-height: 100%;
-      overflow: hidden;
-    }
-
-    .sidebar {
-      border-left: 1px solid var(--panel-border);
-      background: var(--panel);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow: auto;
-    }
-
-    .sidebar h2 {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    .sidebar .meta {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .sidebar .content {
-      white-space: pre-wrap;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    svg.edges {
-      position: absolute;
-      left: 0;
-      top: 0;
-      overflow: visible;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: var(--muted);
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <div class="viewport" id="viewport">
-      <svg class="edges" id="edges"></svg>
-      <div class="canvas" id="canvas"></div>
-    </div>
-    <aside class="sidebar">
-      <h2 id="sidebar-title">No node selected</h2>
-      <div class="meta" id="sidebar-meta">Select a node to see details.</div>
-      <div class="content" id="sidebar-content"></div>
-      <div class="hint">Pan: drag empty space · Zoom: mouse wheel</div>
-    </aside>
-  </div>
-
-  <script nonce="${nonce}">
-    const vscode = acquireVsCodeApi();
-    const canvas = document.getElementById('canvas');
-    const edgesSvg = document.getElementById('edges');
-    const viewport = document.getElementById('viewport');
-    const sidebarTitle = document.getElementById('sidebar-title');
-    const sidebarMeta = document.getElementById('sidebar-meta');
-    const sidebarContent = document.getElementById('sidebar-content');
-    const publicRootUri = ${JSON.stringify(publicRootUri)};
-
-    let graph = { nodes: [], edges: [], groups: [], viewport: { pan: { x: 0, y: 0 }, zoom: 1 } };
-    let pan = { x: 0, y: 0 };
-    let zoom = 1;
-    let isPanning = false;
-    let panStart = { x: 0, y: 0 };
-    let panOrigin = { x: 0, y: 0 };
-
-    const markdownToHtml = (input) => {
-      if (!input) return '';
-      let html = input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      html = html.replace(/^### (.*)$/gm, '<h3>$1</h3>');
-      html = html.replace(/^## (.*)$/gm, '<h2>$1</h2>');
-      html = html.replace(/^# (.*)$/gm, '<h1>$1</h1>');
-      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      html = html.replace(new RegExp('\\u0060(.+?)\\u0060', 'g'), '<code>$1</code>');
-      html = html.replace(/^\s*[-*] (.*)$/gm, '<li>$1</li>');
-      html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
-      html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
-      html = html.replace(/!\[(.*?)\]\((.+?)\)/g, '<img alt="$1" src="$2" />');
-      html = html.replace(/\n{2,}/g, '</p><p>');
-      html = '<p>' + html + '</p>';
-      return html;
+  private async resolveOutRoot(documentUri: vscode.Uri): Promise<vscode.Uri | null> {
+    const candidates = new Set<string>();
+    const addCandidate = (fsPath: string) => {
+      if (fsPath) {
+        candidates.add(fsPath);
+      }
     };
 
-    const resolveImageSrc = (src) => {
-      if (!src) return src;
-      if (!publicRootUri) return src;
-      if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) return src;
-      if (src.startsWith('/data/')) {
-        return publicRootUri + src;
-      }
-      if (src.startsWith('data/')) {
-        return publicRootUri + '/' + src;
-      }
-      return src;
-    };
+    let currentDir = path.dirname(documentUri.fsPath);
+    let previousDir = '';
+    while (currentDir && currentDir !== previousDir) {
+      addCandidate(path.join(currentDir, 'out'));
+      previousDir = currentDir;
+      currentDir = path.dirname(currentDir);
+    }
 
-    const render = () => {
-      canvas.innerHTML = '';
-      edgesSvg.innerHTML = '';
+    for (const folder of vscode.workspace.workspaceFolders || []) {
+      addCandidate(path.join(folder.uri.fsPath, 'out'));
+    }
 
-      const nodes = graph.nodes || [];
-      const edges = graph.edges || [];
+    addCandidate(path.join(this.context.extensionPath, '..', '..', 'out'));
 
-      nodes.forEach((node) => {
-        const el = document.createElement('div');
-        el.className = 'node' + (node.type === 'markdown' ? ' markdown' : '');
-        const left = node.position?.x ?? node.x ?? 0;
-        const top = node.position?.y ?? node.y ?? 0;
-        const width = node.width || 200;
-        const height = node.height || 120;
-        el.style.left = left + 'px';
-        el.style.top = top + 'px';
-        el.style.width = width + 'px';
-        el.style.height = height + 'px';
-
-        if (node.color) {
-          el.style.background = node.color;
-        } else if (node.type !== 'markdown') {
-          el.style.background = 'linear-gradient(135deg, #a6c0fe 0%, #f68084 100%)';
+    for (const candidate of candidates) {
+      const entryCandidates = ['editor.html', 'editor/index.html', 'index.html'];
+      for (const entry of entryCandidates) {
+        const indexUri = vscode.Uri.file(path.join(candidate, entry));
+        try {
+          await vscode.workspace.fs.stat(indexUri);
+          return vscode.Uri.file(candidate);
+        } catch {
+          // Try next candidate.
         }
+      }
+    }
 
-        const title = document.createElement('div');
-        title.className = 'node-title';
-        title.textContent = node.label || node.id;
-        const body = document.createElement('div');
-        body.className = 'node-body';
-        const markdown = node.data?.markdown || node.data?.memo || '';
-        body.innerHTML = markdownToHtml(markdown);
-        body.querySelectorAll('img').forEach((img) => {
-          img.src = resolveImageSrc(img.getAttribute('src'));
-          img.style.maxWidth = '100%';
-          img.style.borderRadius = '8px';
-          img.style.marginTop = '6px';
-        });
+    return null;
+  }
 
-        el.appendChild(title);
-        el.appendChild(body);
+  private async getHtml(
+    webview: vscode.Webview,
+    outRoot: vscode.Uri | null,
+    documentUri: vscode.Uri
+  ): Promise<string> {
+    const nonce = getNonce();
+    if (!outRoot) {
+      return `<!DOCTYPE html><html><body>Missing out/ directory for ${documentUri.fsPath}</body></html>`;
+    }
 
-        el.addEventListener('click', (event) => {
-          event.stopPropagation();
-          sidebarTitle.textContent = node.label || node.id;
-          sidebarMeta.textContent = (node.type || 'default') + ' · ' + node.id;
-          sidebarContent.innerHTML = markdownToHtml(markdown);
-        });
+    try {
+      const entryCandidates = [
+        vscode.Uri.joinPath(outRoot, 'editor.html'),
+        vscode.Uri.joinPath(outRoot, 'editor', 'index.html'),
+        vscode.Uri.joinPath(outRoot, 'index.html')
+      ];
+      let raw: Uint8Array | null = null;
+      let entryPath: string | null = null;
+      let entryRelative: string | null = null;
+      for (const candidate of entryCandidates) {
+        try {
+          raw = await vscode.workspace.fs.readFile(candidate);
+          entryPath = candidate.fsPath;
+          entryRelative = path.relative(outRoot.fsPath, candidate.fsPath).replace(/\\/g, '/');
+          break;
+        } catch {
+          // Try next candidate.
+        }
+      }
+      if (!raw) {
+        throw new Error('Missing out/index.html (or out/editor.html / out/editor/index.html)');
+      }
+      console.log('[Twilight] Using entry', entryPath ?? 'unknown');
+      const baseUri = webview
+        .asWebviewUri(outRoot)
+        .toString()
+        .replace(/%2B/gi, '+');
+      const entryRoute = (() => {
+        if (!entryRelative) return '/';
+        if (entryRelative === 'index.html') return '/';
+        if (entryRelative.endsWith('/index.html')) {
+          const route = entryRelative.slice(0, -'/index.html'.length);
+          return `/${route}`;
+        }
+        if (entryRelative.endsWith('.html')) {
+          return `/${entryRelative.slice(0, -'.html'.length)}`;
+        }
+        return '/';
+      })();
+      console.log('[Twilight] baseUri', baseUri);
+      console.log('[Twilight] cspSource', webview.cspSource);
+      const csp = [
+        "default-src 'none'",
+        `img-src ${webview.cspSource} data: blob:`,
+        `style-src ${webview.cspSource} 'unsafe-inline'`,
+        `font-src ${webview.cspSource} data:`,
+        `script-src ${webview.cspSource} 'nonce-${nonce}' 'unsafe-eval'`,
+        `connect-src ${webview.cspSource} https: http:`,
+        `worker-src ${webview.cspSource} blob:`,
+        `frame-src ${webview.cspSource}`
+      ].join('; ');
 
-        canvas.appendChild(el);
-      });
+      let html = Buffer.from(raw).toString('utf8');
 
-      const bounds = canvas.getBoundingClientRect();
-      edgesSvg.setAttribute('width', bounds.width);
-      edgesSvg.setAttribute('height', bounds.height);
+      const turbopackMatch = html.match(/<script[^>]*src="([^"]*turbopack-[^"]+\.js)"[^>]*><\/script>/i);
+      if (turbopackMatch) {
+        const turbopackSrc = turbopackMatch[1];
+        const runtimePath = turbopackSrc.startsWith('/') ? turbopackSrc.slice(1) : turbopackSrc;
+        const runtimeUri = vscode.Uri.joinPath(outRoot, ...runtimePath.split('/'));
+        const runtimeRaw = await vscode.workspace.fs.readFile(runtimeUri);
+        let runtimeText = Buffer.from(runtimeRaw).toString('utf8');
+        const runtimePrefix = `${baseUri}/_next/`;
+        const runtimeChunkPath = runtimePath.replace(/^_next\//, '');
+        const runtimeRegex = /\b(let|var)\s+t="\/_next\/"/;
+        const currentScriptToken = '["object"==typeof document?document.currentScript:void 0,';
+        if (runtimeRegex.test(runtimeText)) {
+          runtimeText = runtimeText.replace(
+            runtimeRegex,
+            `$1 t=${JSON.stringify(runtimePrefix)}`
+          );
+          const runtimeUrlToken = 'function S(e){return`${t}${e.split("/").map(e=>encodeURIComponent(e)).join("/")}`}';
+          if (runtimeText.includes(runtimeUrlToken)) {
+            runtimeText = runtimeText.replace(
+              runtimeUrlToken,
+              'function S(e){return/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(e)?e:`${t}${e.replace(/^\\/_next\\//,"").split("/").map(e=>encodeURIComponent(e)).join("/")}`}'
+            );
+          }
+          if (runtimeText.includes(currentScriptToken)) {
+            runtimeText = runtimeText.replace(
+              currentScriptToken,
+              `[${JSON.stringify(runtimeChunkPath)},`
+            );
+          }
+          const patchedRuntimePath = runtimePath.replace(/\.js$/, '.vscode.js');
+          const patchedRuntimeUri = vscode.Uri.joinPath(outRoot, ...patchedRuntimePath.split('/'));
+          await vscode.workspace.fs.writeFile(patchedRuntimeUri, Buffer.from(runtimeText, 'utf8'));
+          const patchedSrc = turbopackSrc.startsWith('/')
+            ? `/${patchedRuntimePath}`
+            : patchedRuntimePath;
+          html = html.replace(
+            turbopackMatch[0],
+            `<script src="${patchedSrc}"></script>`
+          );
+        }
+      }
 
-      const nodeById = new Map(nodes.map((n) => [n.id, n]));
-      edges.forEach((edge) => {
-        const source = nodeById.get(edge.source);
-        const target = nodeById.get(edge.target);
-        if (!source || !target) return;
-        const sx = (source.position?.x ?? 0) + (source.width || 200) / 2;
-        const sy = (source.position?.y ?? 0) + (source.height || 120) / 2;
-        const tx = (target.position?.x ?? 0) + (target.width || 200) / 2;
-        const ty = (target.position?.y ?? 0) + (target.height || 120) / 2;
+      const scriptTagRegex = /<script[^>]*src="([^"]+)"[^>]*><\/script>/gi;
+      let scriptMatch: RegExpExecArray | null = null;
+      while ((scriptMatch = scriptTagRegex.exec(html))) {
+        const scriptTag = scriptMatch[0];
+        const scriptSrc = scriptMatch[1];
+        if (!scriptSrc.includes('/_next/static/chunks/') || scriptSrc.includes('.vscode.js')) continue;
+        const srcBase = scriptSrc.split('?')[0].split('#')[0];
+        const scriptPath = srcBase.startsWith('/') ? srcBase.slice(1) : srcBase;
+        const scriptUri = vscode.Uri.joinPath(outRoot, ...scriptPath.split('/'));
+        let scriptRaw: Uint8Array;
+        try {
+          scriptRaw = await vscode.workspace.fs.readFile(scriptUri);
+        } catch {
+          continue;
+        }
+        let scriptText = Buffer.from(scriptRaw).toString('utf8');
+        let patched = false;
+        const currentScriptToken = '["object"==typeof document?document.currentScript:void 0,';
+        if (scriptText.includes(currentScriptToken)) {
+          const chunkPath = scriptPath.replace(/^_next\//, '');
+          scriptText = scriptText.replace(
+            currentScriptToken,
+            `[${JSON.stringify(chunkPath)},`
+          );
+          patched = true;
+        }
+        if (scriptText.includes('getAssetPrefix') && scriptText.includes('document.currentScript')) {
+          const getAssetPrefixRegex =
+            /(Object\.defineProperty\(n,"getAssetPrefix"[\s\S]*?)function l\(\)\{[\s\S]*?return t\.slice\(0,n\)\}/;
+          if (getAssetPrefixRegex.test(scriptText)) {
+            const getAssetPrefixReplacement = `$1function l(){let e=document.currentScript,t=e&&e.src?e.src:"";if(!t){let e=typeof window!=="undefined"&&(window.__TWILIGHT_BASE_URI__||document.baseURI);return e?e.replace(/\\/$/,""):""}let n=-1;try{let e=new URL(t);n=e.pathname.indexOf("/_next/")}catch(e){}if(-1===n){let e=typeof window!=="undefined"&&(window.__TWILIGHT_BASE_URI__||document.baseURI);return e?e.replace(/\\/$/,""):t.replace(/\\/$/,"")}return t.slice(0,t.indexOf("/_next/"))}`;
+            scriptText = scriptText.replace(getAssetPrefixRegex, getAssetPrefixReplacement);
+            patched = true;
+          }
+        }
+        if (!patched) continue;
+        const patchedPath = scriptPath.replace(/\.js$/, '.vscode.js');
+        const patchedUri = vscode.Uri.joinPath(outRoot, ...patchedPath.split('/'));
+        await vscode.workspace.fs.writeFile(patchedUri, Buffer.from(scriptText, 'utf8'));
+        const patchedSrc = scriptSrc.startsWith('/')
+          ? `/${patchedPath}`
+          : patchedPath;
+        html = html.replace(scriptTag, scriptTag.replace(scriptSrc, patchedSrc));
+        console.log('[Twilight] Patched chunk', scriptPath);
+      }
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', sx);
-        line.setAttribute('y1', sy);
-        line.setAttribute('x2', tx);
-        line.setAttribute('y2', ty);
-        line.setAttribute('stroke', '#8b93a7');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-linecap', 'round');
-        edgesSvg.appendChild(line);
-      });
+      html = html.replace(
+        /<head>/i,
+        `<head>\n<meta http-equiv="Content-Security-Policy" content="${csp}">\n<base href="${baseUri}/">\n<script nonce="${nonce}">\n  (function() {\n    window.__TWILIGHT_EMBED__ = true;\n    window.__TWILIGHT_BASE_URI__ = ${JSON.stringify(baseUri)};\n    window.__TWILIGHT_EARLY_LOGS__ = [];\n    window.__TWILIGHT_EARLY_ERRORS__ = [];\n    window.__TWILIGHT_ENTRY_PATH__ = ${JSON.stringify(entryRoute)};\n\n    try {\n      const desiredPath = window.__TWILIGHT_ENTRY_PATH__ || '/';\n      const search = location?.search || '';\n      const hash = location?.hash || '';\n      if (location && location.pathname !== desiredPath) {\n        history.replaceState(null, '', desiredPath + search + hash);\n      }\n    } catch (e) {}\n\n    const coerceHistoryUrl = (value) => {\n      try {\n        if (!value) return value;\n        const base = window.__TWILIGHT_BASE_URI__ || '';\n        const raw = value instanceof URL ? value.href : String(value);\n        const resolved = new URL(raw, window.location.href);\n        if (resolved.origin === window.location.origin) {\n          return resolved.pathname + resolved.search + resolved.hash;\n        }\n        if (base && resolved.href.startsWith(base)) {\n          let suffix = resolved.href.slice(base.length);\n          if (!suffix.startsWith('/')) suffix = '/' + suffix;\n          return suffix;\n        }\n        return resolved.pathname + resolved.search + resolved.hash;\n      } catch (e) {\n        return value;\n      }\n    };\n\n    const wrapHistory = (method) => {\n      try {\n        const original = history[method];\n        if (typeof original !== 'function') return;\n        history[method] = function(state, title, url) {\n          try {\n            return original.call(this, state, title, coerceHistoryUrl(url));\n          } catch (e) {\n            try {\n              return original.call(this, state, title);\n            } catch (e2) {\n              return undefined;\n            }\n          }\n        };\n      } catch (e) {}\n    };\n\n    wrapHistory('replaceState');\n    wrapHistory('pushState');\n\n    const pushLog = (payload) => {\n      try {\n        if (typeof window.__TWILIGHT_LOG__ === 'function') {\n          window.__TWILIGHT_LOG__(payload);\n          return;\n        }\n        window.__TWILIGHT_EARLY_LOGS__.push(payload);\n      } catch (e) {}\n    };\n\n    const pushError = (payload) => {\n      try {\n        if (typeof window.__TWILIGHT_ERROR__ === 'function') {\n          window.__TWILIGHT_ERROR__(payload);\n          return;\n        }\n        window.__TWILIGHT_EARLY_ERRORS__.push(payload);\n      } catch (e) {}\n    };\n\n    const formatConsoleArg = (arg) => {\n      try {\n        if (arg instanceof Error) return arg.stack || arg.message || String(arg);\n        if (typeof arg === 'string') return arg;\n        return JSON.stringify(arg);\n      } catch (e) {\n        return String(arg);\n      }\n    };\n\n    const wrapConsole = (level) => {\n      const original = console[level];\n      if (typeof original !== 'function') return;\n      console[level] = (...args) => {\n        try {\n          pushError({ message: 'console-' + level, args: (args || []).slice(0, 4).map(formatConsoleArg), early: true });\n        } catch (e) {}\n        return original.apply(console, args);\n      };\n    };\n\n    ['error', 'warn'].forEach(wrapConsole);\n\n    const ensureNextQueue = () => {\n      try {\n        const globalObj = typeof self !== 'undefined' ? self : window;\n        const queue = Array.isArray(globalObj.__next_f) ? globalObj.__next_f : [];\n        if (!queue.__twilightWrapped) {\n          const origPush = queue.push ? queue.push.bind(queue) : Array.prototype.push.bind(queue);\n          queue.push = (...args) => {\n            pushLog({ message: 'nextf-push', count: args.length, early: true });\n            return origPush(...args);\n          };\n          queue.__twilightWrapped = true;\n        }\n        globalObj.__next_f = queue;\n      } catch (e) {}\n    };\n\n    const logNextState = (stage) => {\n      try {\n        const globalObj = typeof self !== 'undefined' ? self : window;\n        const queue = globalObj.__next_f;\n        const turbopackType = typeof globalObj.TURBOPACK;\n        const hasWebpack = typeof globalObj.__webpack_require__ === 'function'\n          || (Array.isArray(globalObj.webpackChunk_N_E));\n        pushLog({\n          message: 'next-state',\n          stage,\n          hasNextF: Array.isArray(queue),\n          nextFLen: Array.isArray(queue) ? queue.length : null,\n          nextFWrapped: !!(queue && queue.__twilightWrapped),\n          turbopackType,\n          hasTurbopack: turbopackType !== 'undefined',\n          hasWebpack\n        });\n      } catch (e) {}\n    };\n    ensureNextQueue();\n    logNextState('bootstrap');\n    document.addEventListener('DOMContentLoaded', () => logNextState('domcontentloaded'));\n    setTimeout(() => logNextState('timeout-2000'), 2000);\n\n\n    const baseUri = window.__TWILIGHT_BASE_URI__ || '';\n    const splitUrl = (value) => {\n      const match = String(value || '').match(/^([^?#]*)(.*)$/);\n      return { path: match ? match[1] : String(value || ''), suffix: match ? match[2] : '' };\n    };\n\n    const normalizePath = (path) => {\n      const entryPath = window.__TWILIGHT_ENTRY_PATH__ || '/';\n      if (!path || path === '/') {\n        if (entryPath === '/' || entryPath === '') return '/index.html';\n        return entryPath.endsWith('.html') ? entryPath : entryPath + '.html';\n      }\n      if (path.startsWith('/_next/')) return path;\n      if (path.endsWith('/')) return path.slice(0, -1) + '.html';\n      const last = path.split('/').pop() || '';\n      if (!last.includes('.')) return path + '.html';\n      return path;\n    };\n\n    const rewriteToBase = (value) => {\n      try {\n        if (!value || !baseUri) return value;\n        if (typeof value !== 'string') return value;\n        if (value.startsWith('#')) return value;\n        if (value.startsWith(baseUri)) return value;\n        if (value.startsWith('data:') || value.startsWith('blob:') || value.startsWith('file:') || value.startsWith('vscode-resource:') || value.startsWith('vscode-file:')) {\n          return value;\n        }\n        if (value.startsWith('vscode-webview://')) {\n          const parsed = new URL(value);\n          const path = normalizePath(parsed.pathname || '/');\n          return baseUri + path + (parsed.search || '') + (parsed.hash || '');\n        }\n        if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return value;\n        const parts = splitUrl(value);\n        const rawPath = parts.path || '';\n        const path = rawPath.startsWith('/') ? rawPath : '/' + rawPath.replace(/^\\.\\/?/, '');\n        return baseUri + normalizePath(path) + (parts.suffix || '');\n      } catch (e) {\n        return value;\n      }\n    };\n\n    window.__TWILIGHT_REWRITE_URL__ = rewriteToBase;\n\n    const trackResource = (el, kind, attr) => {\n      try {\n        if (!el || el.__twilightTracked) return;\n        el.__twilightTracked = true;\n        const rawUrl = el.getAttribute(attr) || '';\n        const rewritten = rewriteToBase(rawUrl);\n        if (rewritten && rewritten !== rawUrl) {\n          try { el.setAttribute(attr, rewritten); } catch (e) {}\n        }\n        const finalUrl = el.getAttribute(attr) || rewritten || rawUrl || '';\n        if (kind === 'script' || kind === 'link') {\n          el.addEventListener('load', () => {\n            pushLog({ message: 'resource-load', kind, url: finalUrl, early: true });\n          }, { once: true });\n        }\n        el.addEventListener('error', () => {\n          pushError({ message: 'resource-error', kind, url: finalUrl, early: true });\n        }, { once: true });\n      } catch (e) {}\n    };\n    const trackExistingResources = () => {\n      try {\n        document.querySelectorAll('script[src]').forEach((el) => trackResource(el, 'script', 'src'));\n        document.querySelectorAll('link[href]').forEach((el) => trackResource(el, 'link', 'href'));
+        document.querySelectorAll('img[src]').forEach((el) => trackResource(el, 'img', 'src'));
+        document.querySelectorAll('source[src]').forEach((el) => trackResource(el, 'source', 'src'));
+        document.querySelectorAll('video[src]').forEach((el) => trackResource(el, 'video', 'src'));
+        document.querySelectorAll('audio[src]').forEach((el) => trackResource(el, 'audio', 'src'));
+        document.querySelectorAll('iframe[src]').forEach((el) => trackResource(el, 'iframe', 'src'));\n      } catch (e) {}\n    };\n\n    trackExistingResources();\n\n    try {\n      const observer = new MutationObserver((mutations) => {\n        for (const mutation of mutations) {\n          for (const node of mutation.addedNodes || []) {\n            if (!node || !node.tagName) continue;\n            const tag = node.tagName.toLowerCase();\n            if (tag === 'script' && node.getAttribute('src')) {\n              trackResource(node, 'script', 'src');\n            }\n            if (tag === 'link' && node.getAttribute('href')) {
+              trackResource(node, 'link', 'href');
+            }
+            if (tag === 'img' && node.getAttribute('src')) {
+              trackResource(node, 'img', 'src');
+            }
+            if (tag === 'source' && node.getAttribute('src')) {
+              trackResource(node, 'source', 'src');
+            }
+            if (tag === 'video' && node.getAttribute('src')) {
+              trackResource(node, 'video', 'src');
+            }
+            if (tag === 'audio' && node.getAttribute('src')) {
+              trackResource(node, 'audio', 'src');
+            }
+            if (tag === 'iframe' && node.getAttribute('src')) {
+              trackResource(node, 'iframe', 'src');
+            }\n          }\n        }\n      });\n      observer.observe(document.documentElement || document, { childList: true, subtree: true });\n    } catch (e) {}\n\n    if (typeof fetch === 'function') {\n      try {\n        const origFetch = window.fetch.bind(window);\n        window.fetch = (...args) => {\n          const input = args[0];\n          const isUrl = input && typeof input === 'object' && typeof input.href === 'string';\n          const url = typeof input === 'string'\n            ? input\n            : (input && input.url ? input.url : (isUrl ? input.href : ''));\n          const rewritten = rewriteToBase(url);\n          if (rewritten && url && rewritten !== url) {\n            pushLog({ message: 'fetch-rewrite', url, rewritten, early: true });\n            try {\n              if (typeof input === 'string' || isUrl) {\n                args[0] = rewritten;\n              } else if (input && typeof Request === 'function' && input instanceof Request) {\n                args[0] = new Request(rewritten, input);\n              }\n            } catch (e) {}\n          }\n          return origFetch(...args)\n            .then((res) => {\n              if (res && !res.ok) {\n                pushError({ message: 'fetch-status', url: rewritten || url, status: res.status, statusText: res.statusText, early: true });\n              }\n              return res;\n            })\n            .catch((err) => {\n              pushError({ message: 'fetch-error', url: rewritten || url, error: String(err), early: true });\n              throw err;\n            });\n        };\n      } catch (e) {}\n    }\n\n    if (window.XMLHttpRequest && window.XMLHttpRequest.prototype) {\n      try {\n        const origOpen = window.XMLHttpRequest.prototype.open;\n        window.XMLHttpRequest.prototype.open = function(method, url, ...rest) {\n          const rawUrl = String(url || '');\n          const rewritten = rewriteToBase(rawUrl);\n          if (rewritten && rawUrl && rewritten !== rawUrl) {\n            pushLog({ message: 'xhr-rewrite', url: rawUrl, rewritten, early: true });\n          }\n          return origOpen.call(this, method, rewritten || rawUrl, ...rest);\n        };\n      } catch (e) {}\n    }\n\n    window.addEventListener('error', (event) => {\n      try {\n        const target = event && event.target;\n        const url = target && (target.src || target.href);\n        if (url) {\n          pushError({\n            message: 'resource-error',\n            kind: (target.tagName || '').toLowerCase(),\n            url: String(url),\n            early: true\n          });\n          return;\n        }\n      } catch (e) {}\n      pushError({\n        message: event?.message || 'Webview error',\n        filename: event?.filename,\n        lineno: event?.lineno,\n        colno: event?.colno,\n        stack: event?.error?.stack || String(event?.error || event?.message || 'unknown'),\n        early: true\n      });\n    }, true);\n\n    window.addEventListener('unhandledrejection', (event) => {\n      const reason = event?.reason;\n      pushError({\n        message: 'Unhandled promise rejection',\n        stack: reason?.stack || String(reason),\n        early: true\n      });\n    });\n\n    window.addEventListener('securitypolicyviolation', (event) => {\n      pushError({\n        message: 'CSP violation',\n        blockedURI: event?.blockedURI,\n        violatedDirective: event?.violatedDirective,\n        originalPolicy: event?.originalPolicy,\n        sourceFile: event?.sourceFile,\n        lineNumber: event?.lineNumber,\n        columnNumber: event?.columnNumber,\n        early: true\n      });\n    });\n\n    pushLog({ message: 'head-bootstrap', readyState: document.readyState });\n  })();\n</script>`
+      );
+      html = html.replace(/nonce="\\$undefined"/g, `nonce="${nonce}"`);
+      html = html.replace(/\\"nonce\\":\\"\\$undefined\\"/g, `\\\"nonce\\\":\\\"${nonce}\\\"`);
+      html = html.replace(/<script(?![^>]*\snonce=)/g, `<script nonce="${nonce}"`);
+      html = html.replace(/(src|href)=["']\/(?!\/)/g, `$1="${baseUri}/`);
+      html = html.replace(/url\(\//g, `url(${baseUri}/`);
+      html = html.replace(new RegExp('\\\\\"/_next/', 'g'), `\\\"${baseUri}/_next/`);
 
-      applyTransform();
+      const bridge = `<script nonce="${nonce}">
+  (function() {
+
+    const vscode = acquireVsCodeApi();
+    let pendingGraph = null;
+
+    const reportLog = (payload) => {
+      try { vscode.postMessage({ type: 'webview-log', ...payload }); } catch (e) {}
     };
 
-    const applyTransform = () => {
-      canvas.style.transform = 'translate(' + pan.x + 'px, ' + pan.y + 'px) scale(' + zoom + ')';
-      edgesSvg.style.transform = canvas.style.transform;
+    const reportError = (payload) => {
+      try { vscode.postMessage({ type: 'webview-error', ...payload }); } catch (e) {}
     };
 
-    viewport.addEventListener('mousedown', (event) => {
-      if (event.button !== 0) return;
-      isPanning = true;
-      panStart = { x: event.clientX, y: event.clientY };
-      panOrigin = { ...pan };
+    window.__TWILIGHT_LOG__ = reportLog;
+    window.__TWILIGHT_ERROR__ = reportError;
+
+    const earlyErrors = Array.isArray(window.__TWILIGHT_EARLY_ERRORS__) ? window.__TWILIGHT_EARLY_ERRORS__ : [];
+    if (earlyErrors.length) {
+      earlyErrors.forEach((payload) => reportError({ ...payload, flushed: true }));
+      window.__TWILIGHT_EARLY_ERRORS__ = [];
+    }
+
+    const earlyLogs = Array.isArray(window.__TWILIGHT_EARLY_LOGS__) ? window.__TWILIGHT_EARLY_LOGS__ : [];
+    if (earlyLogs.length) {
+      earlyLogs.forEach((payload) => reportLog({ ...payload, flushed: true }));
+      window.__TWILIGHT_EARLY_LOGS__ = [];
+    }
+
+    reportLog({
+      message: 'bridge-start',
+      href: window.location.href,
+      readyState: document.readyState
     });
 
-    window.addEventListener('mouseup', () => { isPanning = false; });
-    window.addEventListener('mousemove', (event) => {
-      if (!isPanning) return;
-      const dx = event.clientX - panStart.x;
-      const dy = event.clientY - panStart.y;
-      pan = { x: panOrigin.x + dx, y: panOrigin.y + dy };
-      applyTransform();
+    window.addEventListener('error', (event) => {
+      reportError({
+        message: event?.message || 'Webview error',
+        filename: event?.filename,
+        lineno: event?.lineno,
+        colno: event?.colno,
+        stack: event?.error?.stack || String(event?.error || event?.message || 'unknown')
+      });
     });
 
-    viewport.addEventListener('wheel', (event) => {
-      event.preventDefault();
-      const delta = Math.sign(event.deltaY) * -0.1;
-      const next = Math.min(2, Math.max(0.2, zoom + delta));
-      zoom = next;
-      applyTransform();
-    }, { passive: false });
+    window.addEventListener('unhandledrejection', (event) => {
+      const reason = event?.reason;
+      reportError({
+        message: 'Unhandled promise rejection',
+        stack: reason?.stack || String(reason)
+      });
+    });
+
+    window.addEventListener('securitypolicyviolation', (event) => {
+      reportError({
+        message: 'CSP violation',
+        blockedURI: event?.blockedURI,
+        violatedDirective: event?.violatedDirective,
+        originalPolicy: event?.originalPolicy,
+        sourceFile: event?.sourceFile,
+        lineNumber: event?.lineNumber,
+        columnNumber: event?.columnNumber
+      });
+    });
+
+    const deliverGraph = (graph) => {
+      if (typeof window.__TWILIGHT_APPLY_GRAPH__ === 'function') {
+        try {
+          window.__TWILIGHT_APPLY_GRAPH__(graph);
+          return true;
+        } catch (e) {
+          reportError({ message: 'applyGraph failed', stack: String(e && e.stack ? e.stack : e) });
+        }
+      }
+      if (window.eventBus && typeof window.eventBus.emit === 'function') {
+        window.eventBus.emit('pasteGraphData', graph);
+        try { window.eventBus.emit('forceRedraw'); } catch (e) {}
+        return true;
+      }
+      window.__TWILIGHT_PENDING_GRAPH__ = graph;
+      pendingGraph = graph;
+      return false;
+    };
 
     window.addEventListener('message', (event) => {
       const message = event.data;
       if (message?.type === 'graph') {
-        graph = message.data || { nodes: [], edges: [] };
-        const viewportData = graph.viewport || {};
-        pan = viewportData.pan || { x: 0, y: 0 };
-        zoom = typeof viewportData.zoom === 'number' ? viewportData.zoom : 1;
-        render();
+        reportLog({
+          message: 'graph-received',
+          nodes: Array.isArray(message.data?.nodes) ? message.data.nodes.length : null,
+          edges: Array.isArray(message.data?.edges) ? message.data.edges.length : null,
+          groups: Array.isArray(message.data?.groups) ? message.data.groups.length : null
+        });
+        deliverGraph(message.data);
       }
     });
 
-    vscode.postMessage({ type: 'ready' });
-  </script>
-</body>
-</html>`;
+    let busChecks = 0;
+    const busInterval = setInterval(() => {
+      busChecks += 1;
+      const applyReady = typeof window.__TWILIGHT_APPLY_GRAPH__ === 'function';
+      const busReady = Boolean(window.eventBus && typeof window.eventBus.emit === 'function');
+      const hasRoot = Boolean(document.getElementById('graph-editor-background'));
+      if (applyReady && pendingGraph) {
+        try {
+          window.__TWILIGHT_APPLY_GRAPH__(pendingGraph);
+          pendingGraph = null;
+        } catch (e) {}
+      }
+      if (applyReady || busReady || busChecks >= 25) {
+        reportLog({ message: 'eventBus-check', applyReady, busReady, hasRoot, attempts: busChecks });
+        clearInterval(busInterval);
+      }
+    }, 200);
+
+    const flushInterval = setInterval(() => {
+      if (pendingGraph && deliverGraph(pendingGraph)) {
+        pendingGraph = null;
+        clearInterval(flushInterval);
+      }
+    }, 200);
+
+    window.addEventListener('load', () => {\n      reportLog({\n        message: 'window-load',\n        readyState: document.readyState,\n        scripts: document.querySelectorAll('script').length\n      });\n      try {\n        const baseUri = window.__TWILIGHT_BASE_URI__ || '';\n        const scripts = Array.from(document.scripts || []).map((el) => el.src).filter(Boolean);\n        const links = Array.from(document.querySelectorAll('link[href]') || []).map((el) => el.href).filter(Boolean);\n        const all = scripts.concat(links);\n        const unresolved = all.filter((url) => {\n          if (!url) return false;\n          if (url.startsWith('vscode-webview://')) return true;\n          if (!baseUri) return false;\n          return !(url.startsWith(baseUri) || url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('vscode-resource:'));\n        });\n        reportLog({\n          message: 'resource-summary',\n          location: window.location.href,\n          baseUri,\n          scripts: scripts.slice(0, 8),\n          links: links.slice(0, 8),\n          unresolved: unresolved.slice(0, 8)\n        });\n      } catch (e) {}\n      vscode.postMessage({ type: 'ready' });
+    });
+  })();
+</script>`;
+
+      html = html.replace(/<\/body>/i, `${bridge}\n</body>`);
+      return html;
+    } catch (err) {
+      return `<!DOCTYPE html><html><body>Failed to load out/editor.html: ${String(err)}</body></html>`;
+    }
   }
 }
 

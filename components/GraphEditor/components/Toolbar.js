@@ -120,6 +120,7 @@ const Toolbar = ({
   defaultNodeColor = '#1976d2',
   defaultEdgeColor = '#666666',
   isFreeUser = false,
+  addressBarHeight = 64,
   showMinimap = true,  // NEW: Add prop
   onToggleMinimap,  // NEW: Add prop
   snapToGrid = false,  // NEW: Add prop
@@ -729,9 +730,6 @@ const Toolbar = ({
   };
 
   const isBookmarked = currentUrl && bookmarks.some(b => b.url === currentUrl);
-
-  // Calculate address bar height (typically 64px for MUI AppBar)
-  const addressBarHeight = 64;
 
   return (
     <>

@@ -58,6 +58,7 @@ export default function ScriptNode({
   const nodeRef = useRef(null);
   const runTokenRef = useRef(0);
   const node = useNodeHandleSchema(origNode, SCRIPT_INPUTS, SCRIPT_OUTPUTS);
+  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
 
   const width = (node?.width || 260) * zoom;
   const height = (node?.height || 160) * zoom;
@@ -128,6 +129,11 @@ export default function ScriptNode({
   // run the selected script
   const runScript = async (meta = {}) => {
     console.log('[ScriptNode] runScript invoked', node.id, meta);
+    if (isEmbedded) {
+      const result = { success: false, error: 'Script runner disabled in embedded mode' };
+      setLastResult(result);
+      return result;
+    }
     const script = scriptSource ? { source: scriptSource, name: node?.data?.name || 'Script' } : getSelectedScript();
     if (!script) {
       const result = { success: false, error: 'No script selected' };
@@ -195,6 +201,7 @@ export default function ScriptNode({
 
   // external trigger handler
   useEffect(() => {
+    if (isEmbedded) return undefined;
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
       // allow passing meta via value
@@ -204,17 +211,19 @@ export default function ScriptNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [selectedScriptId, scriptLibrary, allowMutations, dryRun, scriptSource]);
+  }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, scriptSource, node.id]);
 
   useEffect(() => {
+    if (isEmbedded) return;
     if (node?.data?.autoRun && !autoRunTriggered.current && scriptSource) {
       console.log('[ScriptNode] initial autoRun trigger', node.id);
       autoRunTriggered.current = true;
       runScriptRef.current?.();
     }
-  }, [node?.data?.autoRun, scriptSource, node.id]);
+  }, [isEmbedded, node?.data?.autoRun, scriptSource, node.id]);
 
   useEffect(() => {
+    if (isEmbedded) return undefined;
     const shouldAutoRun =
       !!scriptSource &&
       !!node?.data?.autoRun &&

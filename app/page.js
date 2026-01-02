@@ -18,6 +18,7 @@ export default function Home() {
   const [themeName, setThemeName] = useState('default');
   const [themeReady, setThemeReady] = useState(false);
   const [muiTheme, setMuiTheme] = useState(() => themeMap['default']);
+  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
   
   // Detect mobile devices and orientation
   const isMobile = useMediaQuery('(max-width:768px)');
@@ -57,6 +58,13 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if (isEmbedded) {
+        const systemTheme = getSystemTheme();
+        setThemeName(systemTheme);
+        setMuiTheme(themeMap[systemTheme] || themeMap.default);
+        setThemeReady(true);
+        return;
+      }
       // Load persisted browser theme
       const storedThemeObj = localStorage.getItem('browserThemeObject');
       const storedThemeName = localStorage.getItem('themeName');
@@ -88,6 +96,7 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (isEmbedded) return;
     const params = new URLSearchParams(window.location.search);
     const doc = (params.get('doc') || '').trim();
     if (!doc) return;
@@ -119,7 +128,7 @@ export default function Home() {
       setTimeout(emitFetch, delay)
     );
     return () => timers.forEach((timer) => clearTimeout(timer));
-  }, []);
+  }, [isEmbedded]);
 
   useEffect(() => {
     // Keep muiTheme in sync when themeName changes (for named themes)
@@ -133,22 +142,25 @@ export default function Home() {
   return (
     <ThemeProvider theme={muiTheme}>
       <div style={{ userSelect: "none", cursor: "default" }}>
-        <Browser 
-          themeName={themeName} 
-          setThemeName={setThemeName} 
-          theme={muiTheme}
-          applyBrowserTheme={applyBrowserTheme}
-          isMobile={isMobile}
-          isSmallScreen={isSmallScreen}
-          isPortrait={isPortrait}
-          isLandscape={isLandscape}
-        />
+        {!isEmbedded && (
+          <Browser 
+            themeName={themeName} 
+            setThemeName={setThemeName} 
+            theme={muiTheme}
+            applyBrowserTheme={applyBrowserTheme}
+            isMobile={isMobile}
+            isSmallScreen={isSmallScreen}
+            isPortrait={isPortrait}
+            isLandscape={isLandscape}
+          />
+        )}
         <div>
           <GraphEditor 
             isMobile={isMobile} 
             isSmallScreen={isSmallScreen}
             isPortrait={isPortrait}
             isLandscape={isLandscape}
+            addressBarHeight={isEmbedded ? 0 : undefined}
           />
         </div>
       </div>

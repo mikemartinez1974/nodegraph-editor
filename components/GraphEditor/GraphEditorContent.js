@@ -34,6 +34,8 @@ const GraphEditorContent = () => {
   const services = useGraphEditorServicesContext();
   const historyHook = useGraphEditorHistoryContext();
   const rpc = useGraphEditorRpcContext();
+  const loggedGraphRef = useRef(false);
+  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
 
   const {
     nodes,
@@ -117,6 +119,7 @@ const GraphEditorContent = () => {
     isSmallScreen,
     isPortrait,
     isLandscape,
+    addressBarHeight,
     backgroundImage,
     isFreeUser
   } = layout || {};
@@ -232,6 +235,57 @@ const GraphEditorContent = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const applyGraph = (data) => {
+      if (!data || typeof data !== 'object') return;
+      const log = typeof window.__TWILIGHT_LOG__ === 'function' ? window.__TWILIGHT_LOG__ : null;
+      const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
+      const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
+      const groupsToLoad = Array.isArray(data.groups) ? data.groups : [];
+
+      if (typeof handleLoadGraph === 'function') {
+        handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+        if (log) {
+          log({ message: 'apply-graph', via: 'handleLoadGraph', nodes: nodesToLoad.length, edges: edgesToLoad.length, groups: groupsToLoad.length });
+        }
+        return;
+      }
+
+      if (nodesToLoad.length && typeof setNodes === 'function') {
+        setNodes(nodesToLoad);
+        if (nodesRef) nodesRef.current = nodesToLoad;
+      }
+      if (edgesToLoad.length && typeof setEdges === 'function') {
+        setEdges(edgesToLoad);
+        if (edgesRef) edgesRef.current = edgesToLoad;
+      }
+      if (groupsToLoad.length && typeof setGroups === 'function') {
+        setGroups(groupsToLoad);
+      }
+      if (log) {
+        log({ message: 'apply-graph', via: 'setState', nodes: nodesToLoad.length, edges: edgesToLoad.length, groups: groupsToLoad.length });
+      }
+    };
+
+    window.__TWILIGHT_APPLY_GRAPH__ = applyGraph;
+    if (typeof window.__TWILIGHT_LOG__ === 'function') {
+      window.__TWILIGHT_LOG__({ message: 'apply-hook-ready', hasRoot: Boolean(document.getElementById('graph-editor-background')) });
+    }
+    if (window.__TWILIGHT_PENDING_GRAPH__) {
+      const pending = window.__TWILIGHT_PENDING_GRAPH__;
+      window.__TWILIGHT_PENDING_GRAPH__ = null;
+      applyGraph(pending);
+    }
+
+    return () => {
+      if (window.__TWILIGHT_APPLY_GRAPH__ === applyGraph) {
+        delete window.__TWILIGHT_APPLY_GRAPH__;
+      }
+    };
+  }, [handleLoadGraph, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
+
   const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
   // The gallery/new-tab surface now appears only when explicitly requested.
   const showNewTabPage = false;
@@ -269,6 +323,18 @@ const GraphEditorContent = () => {
       handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
     }
   }, [handleLoadGraph]);
+
+  useEffect(() => {
+    if (loggedGraphRef.current) return;
+    const nodeCount = Array.isArray(nodes) ? nodes.length : 0;
+    const edgeCount = Array.isArray(edges) ? edges.length : 0;
+    const groupCount = Array.isArray(groups) ? groups.length : 0;
+    if (nodeCount === 0 && edgeCount === 0 && groupCount === 0) return;
+    loggedGraphRef.current = true;
+    if (typeof window !== 'undefined' && typeof window.__TWILIGHT_LOG__ === 'function') {
+      window.__TWILIGHT_LOG__({ message: 'graph-state', nodes: nodeCount, edges: edgeCount, groups: groupCount });
+    }
+  }, [nodes, edges, groups]);
 
   return (
     <div
@@ -347,6 +413,7 @@ const GraphEditorContent = () => {
           edgeRouting={documentSettings.edgeRouting}
           githubSettings={documentSettings.github}
           documentTheme={documentTheme}
+          addressBarHeight={addressBarHeight}
           isMobile={isMobile}
           isSmallScreen={isSmallScreen}
           isPortrait={isPortrait}
@@ -564,8 +631,8 @@ const GraphEditorContent = () => {
         />
       )}
 
-      <ScriptRunner onRequest={handleScriptRequest} />
-      <ScriptPanel />
+      {!isEmbedded && <ScriptRunner onRequest={handleScriptRequest} />}
+      {!isEmbedded && <ScriptPanel />}
 
       <DocumentPropertiesDialog
         open={showDocumentPropertiesDialog}

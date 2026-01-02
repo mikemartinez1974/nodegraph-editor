@@ -182,7 +182,7 @@ const findNearestBreadboardTarget = (targets = [], point = {}, radius = BREADBOA
   return null;
 };
 
-export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape }) {
+export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, isPortrait, isLandscape, addressBarHeight = 64 }) {
   const theme = useTheme(); // Browser theme
   const { plugins } = usePluginRegistry();
   const nodeTypes = useMemo(() => getNodeTypes(), [plugins]);
@@ -2703,6 +2703,7 @@ useEffect(() => {
     isSmallScreen,
     isPortrait,
     isLandscape,
+    addressBarHeight,
     backgroundImage,
     isFreeUser
   }), [
@@ -2771,6 +2772,7 @@ useEffect(() => {
     isSmallScreen,
     isPortrait,
     isLandscape,
+    addressBarHeight,
     backgroundImage,
     isFreeUser
   ]);
