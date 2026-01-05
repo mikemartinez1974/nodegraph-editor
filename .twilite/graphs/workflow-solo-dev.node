@@ -1,0 +1,175 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-05T03:44:05.032Z",
+    "modified": "2026-01-05T03:44:05.032Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 156.7245859793474,
+      "y": -93.78315069895052
+    },
+    "zoom": 0.9959515594919868
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "work-modes-root",
+      "type": "markdown",
+      "label": "🧠 Work Modes",
+      "position": {
+        "x": -644,
+        "y": -302.7109053537647
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# 🧠 Work Modes\n\nThis graph exists to manage **cognitive load**, not tasks.\n\nWhen one mode is depleted, **switch modes** instead of stopping or forcing progress.\n\nProgress is defined as *sustainable movement*, not throughput."
+      }
+    },
+    {
+      "id": "mode-architecture",
+      "type": "markdown",
+      "label": "🏗️ Structural / Architectural",
+      "position": {
+        "x": -627.7102208299405,
+        "y": 109.49685339232168
+      },
+      "width": 339.6211676131474,
+      "height": 401.5019106352381,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structural / Architectural (HEAVY)\n\n**Purpose:** Define invariants and boundaries.\n\n**Examples:**\n- Core vs adapter vs app decisions\n- Refactors that move responsibility\n- Naming things that must last\n- Deciding what must *not* change\n\n**Capacity:** 1–2 decisions per day\n\n**Stop Signal:**\n- Head pressure\n- Urge to walk\n- \"I can’t hold this anymore\"\n\n➡️ When depleted, **stop immediately** and switch modes."
+      }
+    },
+    {
+      "id": "mode-implementation",
+      "type": "markdown",
+      "label": "🛠️ Implementation / Coding",
+      "position": {
+        "x": -255.5206924200337,
+        "y": 108.70947317914367
+      },
+      "width": 322.3853372108185,
+      "height": 410.3498298881635,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implementation / Coding (FOCUSED)\n\n**Purpose:** Execute already-made decisions.\n\n**Examples:**\n- Writing functions\n- Moving code\n- Implementing a known refactor\n- Fixing bounded bugs\n\n**Capacity:** Medium\n\n**Stop Signal:**\n- Sloppy code\n- Impatience\n- Tunnel vision\n\n➡️ When quality drops, **switch modes**."
+      }
+    },
+    {
+      "id": "mode-externalization",
+      "type": "markdown",
+      "label": "🌐 Externalization / Web",
+      "position": {
+        "x": 99.16787320266837,
+        "y": 108.67126342881687
+      },
+      "width": 300.65567636384696,
+      "height": 401.05678090292986,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Externalization / Web (LIGHT)\n\n**Purpose:** Make the project visible and legible.\n\n**Examples:**\n- Website (twilite.zone)\n- Canva layouts\n- README / copy\n- Explaining Twilite in words\n\n**Capacity:** High\n\n**Stop Signal:**\n- Boredom (not fatigue)\n\n➡️ Ideal after heavy architectural work."
+      }
+    },
+    {
+      "id": "mode-planning",
+      "type": "markdown",
+      "label": "🗺️ Planning / Parking",
+      "position": {
+        "x": 433.97878936461274,
+        "y": 106.87455086098736
+      },
+      "width": 295.53197085276327,
+      "height": 406.5261730105127,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Planning / Parking (RECOVERY)\n\n**Purpose:** Relieve pressure without losing progress.\n\n**Examples:**\n- TODO graphs\n- Parking future ideas\n- Writing \"later\" notes\n- Cleaning up thoughts\n\n**Capacity:** Very high\n\n**Stop Signal:**\n- Calm returns\n- Mental space opens\n\n➡️ This is the *best* way to end a day."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-arch",
+      "source": "work-modes-root",
+      "target": "mode-architecture",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-impl",
+      "source": "work-modes-root",
+      "target": "mode-implementation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-ext",
+      "source": "work-modes-root",
+      "target": "mode-externalization",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-plan",
+      "source": "work-modes-root",
+      "target": "mode-planning",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

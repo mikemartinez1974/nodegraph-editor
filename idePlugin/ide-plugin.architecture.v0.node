@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2025-12-31T19:23:34.894Z",
-    "modified": "2025-12-31T19:23:34.894Z",
+    "created": "2026-01-05T03:17:24.235Z",
+    "modified": "2026-01-05T03:17:24.235Z",
     "author": "",
     "tags": []
   },
@@ -48,10 +48,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 214,
-      "y": 868
+      "x": 307.1686300717431,
+      "y": 91.13771415270503
     },
-    "zoom": 1
+    "zoom": 0.6599379127977734
   },
   "document": null,
   "scripts": [],
@@ -61,8 +61,8 @@
       "type": "markdown",
       "label": "📄 Twilight Graph File",
       "position": {
-        "x": 63,
-        "y": 1020
+        "x": 670.822242805952,
+        "y": 910.2108418732792
       },
       "width": 360,
       "height": 220,
@@ -81,11 +81,11 @@
       "type": "markdown",
       "label": "🧠 VS Code Extension Host",
       "position": {
-        "x": 112,
-        "y": -200
+        "x": 64.90795312656928,
+        "y": -203.92433723945257
       },
-      "width": 380,
-      "height": 240,
+      "width": 304,
+      "height": 413,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -101,11 +101,11 @@
       "type": "markdown",
       "label": "🪟 WebView Container",
       "position": {
-        "x": 698,
-        "y": 210
+        "x": 987.3646069040761,
+        "y": 32.575352767938995
       },
-      "width": 380,
-      "height": 220,
+      "width": 241.04539272406305,
+      "height": 161.672606835882,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -121,11 +121,11 @@
       "type": "markdown",
       "label": "🎨 Graph Renderer",
       "position": {
-        "x": 688,
-        "y": 590
+        "x": 132.9208384373252,
+        "y": 352.39417184907103
       },
-      "width": 400,
-      "height": 260,
+      "width": 271.1256249865264,
+      "height": 393.56073410610065,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -141,11 +141,11 @@
       "type": "markdown",
       "label": "🗂️ Workspace Filesystem",
       "position": {
-        "x": 218,
-        "y": 210
+        "x": 632.0327682257667,
+        "y": -212.65951757753655
       },
-      "width": 360,
-      "height": 220,
+      "width": 283.2219251271352,
+      "height": 222.63181250627704,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -161,11 +161,11 @@
       "type": "markdown",
       "label": "🌐 Browser Editor",
       "position": {
-        "x": 1208,
-        "y": 610
+        "x": -208.80305006402727,
+        "y": 371.7328464288339
       },
-      "width": 380,
-      "height": 240,
+      "width": 216.97300398123056,
+      "height": 392.53987931580764,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -181,8 +181,8 @@
       "type": "markdown",
       "label": "🤖 AI (Advisory)",
       "position": {
-        "x": -224,
-        "y": 617
+        "x": -172.11318571336898,
+        "y": 932.6929766155836
       },
       "width": 421,
       "height": 233,
@@ -201,11 +201,11 @@
       "type": "markdown",
       "label": "📌 Assumptions (v0)",
       "position": {
-        "x": 92,
-        "y": -620
+        "x": -591.3976215853517,
+        "y": -415.4353017427437
       },
-      "width": 420,
-      "height": 260,
+      "width": 395.7552950213622,
+      "height": 519.1152844591912,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -323,5 +323,49 @@
       "data": {}
     }
   ],
-  "groups": []
+  "groups": [
+    {
+      "id": "group-4f7b62f6-3ec5-4f79-8262-e5588f2103d7",
+      "label": "These Nodes Belong To VSCode",
+      "nodeIds": [
+        "arch-vscode-host",
+        "arch-filesystem",
+        "arch-webview"
+      ],
+      "bounds": {
+        "x": 44.90795312656928,
+        "y": -232.65951757753655,
+        "width": 1203.50204650157,
+        "height": 461.735180338084
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-0c23d1b9-82b2-45f4-a84c-b82f2c0493e9",
+      "label": "These Nodes Belong To Twilite",
+      "nodeIds": [
+        "arch-editor-browser",
+        "arch-renderer"
+      ],
+      "bounds": {
+        "x": -228.80305006402727,
+        "y": 332.39417184907103,
+        "width": 652.8495134878789,
+        "height": 451.8785538955705
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    }
+  ]
 }

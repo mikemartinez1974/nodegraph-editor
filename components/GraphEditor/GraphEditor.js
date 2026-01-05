@@ -327,6 +327,48 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   }, [pan, zoom]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const handleLoadGraphMessage = (event) => {
+      const { data } = event || {};
+      if (!data || data.type !== 'loadGraph') return;
+      const payload = data.content;
+      if (!payload || typeof payload !== 'object') return;
+      const nextNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
+      const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
+      const nextGroups = Array.isArray(payload.groups) ? payload.groups : [];
+      setNodes(nextNodes);
+      setEdges(nextEdges);
+      setGroups(nextGroups);
+      setSelectedNodeIds([]);
+      setSelectedEdgeIds([]);
+      setSelectedGroupIds([]);
+      if (payload.viewport?.pan) {
+        setPan(payload.viewport.pan);
+      }
+      if (typeof payload.viewport?.zoom === 'number') {
+        setZoom(payload.viewport.zoom);
+      }
+      try {
+        eventBus.emit('loadSaveFile', payload);
+      } catch (err) {
+        console.warn('Failed to emit loadSaveFile from loadGraph message:', err);
+      }
+    };
+
+    window.addEventListener('message', handleLoadGraphMessage);
+    return () => window.removeEventListener('message', handleLoadGraphMessage);
+  }, [
+    setNodes,
+    setEdges,
+    setGroups,
+    setPan,
+    setZoom,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+    setSelectedGroupIds
+  ]);
+
+  useEffect(() => {
     if (autoSnapInitializedRef.current) return;
     if (
       !snapToGrid &&
@@ -628,6 +670,60 @@ useEffect(() => {
     backgroundUrl,
     readLocalScripts
   ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const exportGraph = () => buildGraphSaveData();
+    window.__TWILIGHT_EXPORT_GRAPH__ = exportGraph;
+    return () => {
+      if (window.__TWILIGHT_EXPORT_GRAPH__ === exportGraph) {
+        delete window.__TWILIGHT_EXPORT_GRAPH__;
+      }
+    };
+  }, [buildGraphSaveData]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('projectMetaUpdated', { meta: projectMeta || {} });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [projectMeta]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('documentSettingsUpdated', { settings: documentSettings || {} });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [documentSettings]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('documentThemeUpdated', { theme: documentTheme || null });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [documentTheme]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('documentUpdated', {
+        document: backgroundUrl ? { url: backgroundUrl } : null,
+        interactive: Boolean(backgroundInteractive)
+      });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [backgroundUrl, backgroundInteractive]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('backgroundImageUpdated', { backgroundImage: documentBackgroundImage || null });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [documentBackgroundImage]);
 
   useEffect(() => {
     if (!projectActivityInitializedRef.current) {

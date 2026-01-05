@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
+import Browser from '@/components/Browser/Browser';
 import themeMap from '@/components/Browser/themes';
 import GraphEditor from "@/components/GraphEditor/GraphEditor";
 import eventBus from '@/components/NodeGraph/eventBus';
 
-const DEFAULT_HOME_GRAPH_URL = '/site-layout.node';
-
-export default function Home() {
+export default function BrowserPage() {
   const getSystemTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
@@ -18,7 +17,8 @@ export default function Home() {
 
   const [themeName, setThemeName] = useState('default');
   const [themeReady, setThemeReady] = useState(false);
-  const [muiTheme, setMuiTheme] = useState(() => themeMap.default);
+  const [muiTheme, setMuiTheme] = useState(() => themeMap['default']);
+  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
 
   const isMobile = useMediaQuery('(max-width:768px)');
   const isTablet = useMediaQuery('(min-width:769px) and (max-width:1024px)');
@@ -26,10 +26,42 @@ export default function Home() {
   const isPortrait = useMediaQuery('(orientation: portrait)');
   const isLandscape = useMediaQuery('(orientation: landscape)');
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const applyBrowserTheme = (themeConfigOrName) => {
+    if (!themeConfigOrName) return;
 
-    try {
+    if (typeof themeConfigOrName === 'string') {
+      const mapped = themeMap[themeConfigOrName] || themeMap.default;
+      setMuiTheme(mapped);
+      setThemeName(themeConfigOrName);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('themeName', themeConfigOrName);
+        localStorage.removeItem('browserThemeObject');
+      }
+    } else {
+      try {
+        const customTheme = createTheme({ palette: themeConfigOrName });
+        setMuiTheme(customTheme);
+        setThemeName('custom');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('browserThemeObject', JSON.stringify(themeConfigOrName));
+          localStorage.setItem('themeName', 'custom');
+        }
+      } catch (err) {
+        console.warn('Invalid theme config', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (isEmbedded) {
+        const systemTheme = getSystemTheme();
+        setThemeName(systemTheme);
+        setMuiTheme(themeMap[systemTheme] || themeMap.default);
+        setThemeReady(true);
+        return;
+      }
+
       const storedThemeObj = localStorage.getItem('browserThemeObject');
       const storedThemeName = localStorage.getItem('themeName');
 
@@ -40,6 +72,7 @@ export default function Home() {
           setMuiTheme(customTheme);
           setThemeName('custom');
         } catch (e) {
+          console.warn('Failed to parse stored browser theme', e);
           const fallbackName = storedThemeName || getSystemTheme();
           setThemeName(fallbackName);
           setMuiTheme(themeMap[fallbackName] || themeMap.default);
@@ -52,17 +85,17 @@ export default function Home() {
         setThemeName(systemTheme);
         setMuiTheme(themeMap[systemTheme] || themeMap.default);
       }
-    } finally {
+
       setThemeReady(true);
     }
   }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
+    if (isEmbedded) return;
     const params = new URLSearchParams(window.location.search);
-    const docParam = (params.get('doc') || '').trim();
-    const doc = docParam || DEFAULT_HOME_GRAPH_URL;
+    const doc = (params.get('doc') || '').trim();
+    if (!doc) return;
 
     const resolveDocUrl = (value) => {
       if (value.startsWith('tlz://')) {
@@ -84,12 +117,14 @@ export default function Home() {
     const fetchUrl = resolveDocUrl(doc);
     eventBus.emit('setAddress', fetchUrl);
     const emitFetch = () => {
-      eventBus.emit('fetchUrl', { url: fetchUrl, source: 'home' });
+      eventBus.emit('fetchUrl', { url: fetchUrl, source: 'query-doc' });
     };
     emitFetch();
-    const timers = [50, 200, 600].map((delay) => setTimeout(emitFetch, delay));
+    const timers = [50, 200, 600].map((delay) =>
+      setTimeout(emitFetch, delay)
+    );
     return () => timers.forEach((timer) => clearTimeout(timer));
-  }, []);
+  }, [isEmbedded]);
 
   useEffect(() => {
     if (themeName && themeName !== 'custom') {
@@ -102,13 +137,27 @@ export default function Home() {
   return (
     <ThemeProvider theme={muiTheme}>
       <div style={{ userSelect: "none", cursor: "default" }}>
-        <GraphEditor
-          isMobile={isMobile}
-          isSmallScreen={isSmallScreen}
-          isPortrait={isPortrait}
-          isLandscape={isLandscape}
-          addressBarHeight={0}
-        />
+        {!isEmbedded && (
+          <Browser
+            themeName={themeName}
+            setThemeName={setThemeName}
+            theme={muiTheme}
+            applyBrowserTheme={applyBrowserTheme}
+            isMobile={isMobile}
+            isSmallScreen={isSmallScreen}
+            isPortrait={isPortrait}
+            isLandscape={isLandscape}
+          />
+        )}
+        <div>
+          <GraphEditor
+            isMobile={isMobile}
+            isSmallScreen={isSmallScreen}
+            isPortrait={isPortrait}
+            isLandscape={isLandscape}
+            addressBarHeight={isEmbedded ? 0 : undefined}
+          />
+        </div>
       </div>
     </ThemeProvider>
   );

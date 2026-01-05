@@ -34,7 +34,6 @@ const GraphEditorContent = () => {
   const services = useGraphEditorServicesContext();
   const historyHook = useGraphEditorHistoryContext();
   const rpc = useGraphEditorRpcContext();
-  const loggedGraphRef = useRef(false);
   const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
 
   const {
@@ -201,55 +200,17 @@ const GraphEditorContent = () => {
     });
   }, [snackbar?.open, snackbar?.message, snackbar?.copyToClipboard]);
 
-  // Surface snackbar errors to the console with a trace so we can debug deep render loops.
-  useEffect(() => {
-    if (!snackbar?.open) return;
-    if (snackbar.severity === 'error') {
-      console.error('[Snackbar:error]', snackbar.message);
-      // Trace to reveal the call site that triggered this snackbar.
-      console.trace('[Snackbar:error trace]');
-    }
-  }, [snackbar]);
-
-  // Global safety net: surface uncaught errors/rejections with traces so we can pinpoint drag/drop failures.
-  useEffect(() => {
-    const handleError = (event) => {
-      console.error('[GlobalError]', event.message || event.error || event);
-      if (event?.error?.stack) {
-        console.error(event.error.stack);
-      }
-      console.trace('[GlobalError trace]');
-    };
-    const handleRejection = (event) => {
-      console.error('[UnhandledRejection]', event.reason);
-      if (event?.reason?.stack) {
-        console.error(event.reason.stack);
-      }
-      console.trace('[UnhandledRejection trace]');
-    };
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleRejection);
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleRejection);
-    };
-  }, []);
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const applyGraph = (data) => {
       if (!data || typeof data !== 'object') return;
-      const log = typeof window.__TWILIGHT_LOG__ === 'function' ? window.__TWILIGHT_LOG__ : null;
       const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
       const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
       const groupsToLoad = Array.isArray(data.groups) ? data.groups : [];
 
       if (typeof handleLoadGraph === 'function') {
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
-        if (log) {
-          log({ message: 'apply-graph', via: 'handleLoadGraph', nodes: nodesToLoad.length, edges: edgesToLoad.length, groups: groupsToLoad.length });
-        }
         return;
       }
 
@@ -264,24 +225,25 @@ const GraphEditorContent = () => {
       if (groupsToLoad.length && typeof setGroups === 'function') {
         setGroups(groupsToLoad);
       }
-      if (log) {
-        log({ message: 'apply-graph', via: 'setState', nodes: nodesToLoad.length, edges: edgesToLoad.length, groups: groupsToLoad.length });
-      }
     };
 
     window.__TWILIGHT_APPLY_GRAPH__ = applyGraph;
-    if (typeof window.__TWILIGHT_LOG__ === 'function') {
-      window.__TWILIGHT_LOG__({ message: 'apply-hook-ready', hasRoot: Boolean(document.getElementById('graph-editor-background')) });
-    }
+    window.twilightApplyGraph = applyGraph;
     if (window.__TWILIGHT_PENDING_GRAPH__) {
       const pending = window.__TWILIGHT_PENDING_GRAPH__;
       window.__TWILIGHT_PENDING_GRAPH__ = null;
       applyGraph(pending);
     }
+    try {
+      window.dispatchEvent(new CustomEvent('twilight-ready'));
+    } catch {}
 
     return () => {
       if (window.__TWILIGHT_APPLY_GRAPH__ === applyGraph) {
         delete window.__TWILIGHT_APPLY_GRAPH__;
+      }
+      if (window.twilightApplyGraph === applyGraph) {
+        delete window.twilightApplyGraph;
       }
     };
   }, [handleLoadGraph, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
@@ -323,18 +285,6 @@ const GraphEditorContent = () => {
       handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
     }
   }, [handleLoadGraph]);
-
-  useEffect(() => {
-    if (loggedGraphRef.current) return;
-    const nodeCount = Array.isArray(nodes) ? nodes.length : 0;
-    const edgeCount = Array.isArray(edges) ? edges.length : 0;
-    const groupCount = Array.isArray(groups) ? groups.length : 0;
-    if (nodeCount === 0 && edgeCount === 0 && groupCount === 0) return;
-    loggedGraphRef.current = true;
-    if (typeof window !== 'undefined' && typeof window.__TWILIGHT_LOG__ === 'function') {
-      window.__TWILIGHT_LOG__({ message: 'graph-state', nodes: nodeCount, edges: edgeCount, groups: groupCount });
-    }
-  }, [nodes, edges, groups]);
 
   return (
     <div
@@ -446,12 +396,20 @@ const GraphEditorContent = () => {
               }
               return next;
             });
+            const hasHandler = handlers && typeof handlers.handleUpdateNodeData === 'function';
             if (!options || options !== true) {
               try {
-                if (handlers && typeof handlers.handleUpdateNodeData === 'function') {
+                if (hasHandler) {
                   handlers.handleUpdateNodeData(id, updates, options);
                 }
               } catch (err) {}
+            }
+            if (options === true || !hasHandler) {
+              try {
+                eventBus.emit('nodeUpdated', { id, patch: updates || {} });
+              } catch (err) {
+                // ignore event bus errors
+              }
             }
           }}
           onUpdateEdge={(id, updates) => {
@@ -461,9 +419,25 @@ const GraphEditorContent = () => {
               try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
               return next;
             });
+            try {
+              eventBus.emit('edgeUpdated', { id, patch: updates || {} });
+            } catch (err) {
+              // ignore event bus errors
+            }
           }}
           onUpdateGroup={(id, updates) => {
-            setGroups(prev => prev.map(g => g.id === id ? { ...g, ...updates } : g));
+            setGroups(prev => {
+              const next = prev.map(g => g.id === id ? { ...g, ...updates } : g);
+              const updatedGroup = next.find(g => g.id === id);
+              if (updatedGroup) {
+                try {
+                  eventBus.emit('groupUpdated', { id, patch: updates || {}, group: updatedGroup });
+                } catch (err) {
+                  // ignore event bus errors
+                }
+              }
+              return next;
+            });
           }}
           theme={theme}
           defaultNodeColor={defaultNodeColor}

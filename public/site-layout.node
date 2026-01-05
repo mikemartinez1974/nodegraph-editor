@@ -1,0 +1,126 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Twilite Site Layout",
+    "description": "Routes + deploy layout for twilite.zone",
+    "created": "2026-01-05T00:00:00.000Z",
+    "modified": "2026-01-05T00:00:00.000Z",
+    "author": "",
+    "tags": ["site", "routing", "deployment"]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": { "main": "#1976d2", "light": "#42a5f5", "dark": "#1565c0", "contrastText": "#fff" },
+      "secondary": { "main": "#dc004e", "light": "#ff4081", "dark": "#9a0036", "contrastText": "#fff" },
+      "background": { "default": "#e8eaf6", "paper": "#ffffff" },
+      "text": { "primary": "rgba(0, 0, 0, 0.87)", "secondary": "rgba(0, 0, 0, 0.6)" },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": { "repo": "", "path": "", "branch": "main" },
+    "autoSave": false
+  },
+  "viewport": { "pan": { "x": 0, "y": 0 }, "zoom": 0.9 },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "site-root",
+      "type": "markdown",
+      "label": "🏠 twilite.zone",
+      "position": { "x": 0, "y": 0 },
+      "width": 460,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# 🏠 twilite.zone\n\n**Goal:** the home page is an **HTML page** that **loads and displays a graph**.\n\n**Graph file lives at the website root:**\n- `https://twilite.zone/site-layout.node`\n\n**Home page behavior:**\n- Default loads `/site-layout.node`\n- Optional override: `/?doc=...`\n\nHome is a landing surface (no Browser chrome).",
+        "memo": "",
+        "link": "https://twilite.zone/",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "route-browser",
+      "type": "markdown",
+      "label": "🌐 /browser",
+      "position": { "x": 560, "y": -60 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🌐 /browser\n\n**Full app**\n\n- Browser UI (address bar / nav)\n- Graph editor canvas\n- Plugin manager, panels, etc.\n\nURL: `https://twilite.zone/browser/`",
+        "memo": "",
+        "link": "https://twilite.zone/browser/",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "route-editor",
+      "type": "markdown",
+      "label": "✍️ /editor",
+      "position": { "x": 560, "y": 260 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ✍️ /editor\n\n**Editor-only**\n\n- Graph editor canvas\n- No browser chrome\n\nURL: `https://twilite.zone/editor/`",
+        "memo": "",
+        "link": "https://twilite.zone/editor/",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "static-assets",
+      "type": "markdown",
+      "label": "📦 Static Assets",
+      "position": { "x": 0, "y": 350 },
+      "width": 460,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 📦 Static Assets\n\nServed from `/public`:\n\n- `/site-layout.node` (home graph document)\n- `/plugins/**` plugin bundles + manifests\n- `/data/**` helper datasets/modules\n- `/documentation/**` markdown docs\n- `/roadmaps/**` other graph documents\n\nSome of these URLs can load executable JS in the browser (e.g. plugin bundles).",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "build-output",
+      "type": "markdown",
+      "label": "🧱 Build Output",
+      "position": { "x": -560, "y": 140 },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🧱 Build Output\n\nNext.js is configured for **static export**.\n\nThat means:\n- No server-side code executes on URL requests in production\n- Page routes ship as HTML + JS bundles (`/_next/static/**`)\n\n\"Executable code\" from the browser perspective is downloaded JS modules.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    { "id": "edge-root-browser", "type": "reference", "source": "site-root", "target": "route-browser", "label": "links to", "style": { "width": 2, "curved": true }, "data": {} },
+    { "id": "edge-root-editor", "type": "reference", "source": "site-root", "target": "route-editor", "label": "links to", "style": { "width": 2, "curved": true }, "data": {} },
+    { "id": "edge-root-assets", "type": "reference", "source": "site-root", "target": "static-assets", "label": "serves", "style": { "width": 2, "curved": true }, "data": {} },
+    { "id": "edge-root-build", "type": "reference", "source": "site-root", "target": "build-output", "label": "built as", "style": { "width": 2, "curved": true }, "data": {} }
+  ],
+  "groups": []
+}

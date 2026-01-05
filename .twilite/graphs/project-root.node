@@ -1,0 +1,203 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-01-02T21:59:38.140Z",
+    "modified": "2026-01-02T21:59:45.065Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "layout": {
+      "mode": "autoOnMissingPositions",
+      "defaultLayout": "hierarchical",
+      "direction": "DOWN",
+      "edgeLaneGapPx": 10,
+      "serpentine": {
+        "maxPerRow": 6
+      },
+      "cycleFallback": {
+        "enabled": true
+      }
+    },
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 321,
+      "y": 203
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "project-identity",
+      "type": "markdown",
+      "label": "Project Identity",
+      "position": {
+        "x": 80,
+        "y": 40
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Project Identity\n\n**Twilight** is a persistent, disk-backed graph workspace used to capture intent alongside code.\n\nThis repository is the authoritative home for that system."
+      }
+    },
+    {
+      "id": "project-goals",
+      "type": "markdown",
+      "label": "Goals",
+      "position": {
+        "x": 80,
+        "y": 300
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goals\n\n- Keep graphs disk-native and versionable.\n- Preserve intent adjacent to implementation.\n- Maintain a reliable, readable viewer in VS Code."
+      }
+    },
+    {
+      "id": "project-non-goals",
+      "type": "spec",
+      "label": "Non-Goals",
+      "position": {
+        "x": 80,
+        "y": 560
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Non-Goals\n\n- Replacing the code editor.\n- Automatic code changes without explicit intent.\n- Hidden or opaque graph mutations."
+      }
+    },
+    {
+      "id": "project-constraints",
+      "type": "spec",
+      "label": "Constraints",
+      "position": {
+        "x": 80,
+        "y": 820
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Constraints\n\n- Graphs must remain human-readable on disk.\n- Minimal schema changes over time.\n- VS Code integration remains read-only for v0."
+      }
+    },
+    {
+      "id": "project-graph-index",
+      "type": "markdown",
+      "label": "Graph Index",
+      "position": {
+        "x": 700,
+        "y": 300
+      },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Graph Index\n\n- project-root.node (this graph)\n\nAdd links to other graphs here as they are created."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-identity-goals",
+      "type": "child",
+      "source": "project-identity",
+      "target": "project-goals",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-identity-non-goals",
+      "type": "child",
+      "source": "project-identity",
+      "target": "project-non-goals",
+      "label": "excludes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-identity-constraints",
+      "type": "child",
+      "source": "project-identity",
+      "target": "project-constraints",
+      "label": "limits",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-identity-index",
+      "type": "child",
+      "source": "project-identity",
+      "target": "project-graph-index",
+      "label": "indexes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

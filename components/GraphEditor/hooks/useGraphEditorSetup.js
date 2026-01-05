@@ -34,21 +34,103 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       groupManager
     );
     
+    const emitEvent = (name, payload) => {
+      try {
+        eventBus.emit(name, payload);
+      } catch (err) {
+        // ignore event bus errors
+      }
+    };
+
+    const wrapCrud = (method, handler) => {
+      const original = graphAPI.current?.[method];
+      if (typeof original !== 'function') return;
+      graphAPI.current[method] = (...args) => {
+        const result = original.apply(graphAPI.current, args);
+        handler(result, args);
+        return result;
+      };
+    };
+
     const originalCreateNode = graphAPI.current.createNode;
-    graphAPI.current.createNode = (nodeData) => {
-      return originalCreateNode.call(graphAPI.current, {
+    graphAPI.current.createNode = (nodeData = {}) => {
+      const result = originalCreateNode.call(graphAPI.current, {
         ...nodeData,
         color: nodeData.color || defaultNodeColor
       });
+      if (result?.success && result?.data) {
+        emitEvent('nodeAdded', { node: result.data });
+      }
+      return result;
     };
     
     const originalCreateEdge = graphAPI.current.createEdge;
-    graphAPI.current.createEdge = (edgeData) => {
-      return originalCreateEdge.call(graphAPI.current, {
+    graphAPI.current.createEdge = (edgeData = {}) => {
+      const result = originalCreateEdge.call(graphAPI.current, {
         ...edgeData,
         color: edgeData.color || defaultEdgeColor
       });
+      if (result?.success && result?.data) {
+        emitEvent('edgeAdded', { edge: result.data });
+      }
+      return result;
     };
+
+    wrapCrud('createNodes', (result) => {
+      const created = Array.isArray(result?.data?.created) ? result.data.created : [];
+      created.forEach((node) => {
+        if (node?.id) emitEvent('nodeAdded', { node });
+      });
+    });
+
+    wrapCrud('createEdges', (result) => {
+      const created = Array.isArray(result?.data?.created) ? result.data.created : [];
+      created.forEach((edge) => {
+        if (edge?.id) emitEvent('edgeAdded', { edge });
+      });
+    });
+
+    wrapCrud('updateNode', (result, args) => {
+      if (!result?.success) return;
+      const [id, updates] = args;
+      if (id) emitEvent('nodeUpdated', { id, patch: updates || {} });
+    });
+
+    wrapCrud('updateNodes', (result, args) => {
+      if (!result?.success) return;
+      const [ids, updates] = args;
+      const targets = Array.isArray(result?.data?.updated)
+        ? result.data.updated.map((node) => node?.id).filter(Boolean)
+        : Array.isArray(ids)
+        ? ids
+        : [];
+      targets.forEach((id) => emitEvent('nodeUpdated', { id, patch: updates || {} }));
+    });
+
+    wrapCrud('deleteNode', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('nodeDeleted', { id });
+    });
+
+    wrapCrud('updateEdge', (result, args) => {
+      if (!result?.success) return;
+      const [id, updates] = args;
+      if (id) emitEvent('edgeUpdated', { id, patch: updates || {} });
+    });
+
+    wrapCrud('updateEdges', (result, args) => {
+      if (!result?.success) return;
+      const [ids] = args;
+      const targets = Array.isArray(ids) ? ids : [];
+      targets.forEach((id) => emitEvent('edgeUpdated', { id }));
+    });
+
+    wrapCrud('deleteEdge', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('edgeDeleted', { id });
+    });
 
     if (typeof window !== 'undefined') {
       window.graphAPI = graphAPI.current;
@@ -84,11 +166,17 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     eventBus.on('nodeResize', handleNodeResize);
     eventBus.on('nodeResizeEnd', handleNodeResizeEnd);
     eventBus.on('pasteGraphData', handlePasteGraphData);
+    if (typeof window !== 'undefined') {
+      window.__TWILIGHT_PASTE_READY__ = true;
+    }
     
     return () => {
       eventBus.off('nodeResize', handleNodeResize);
       eventBus.off('nodeResizeEnd', handleNodeResizeEnd);
       eventBus.off('pasteGraphData', handlePasteGraphData);
+      if (typeof window !== 'undefined') {
+        delete window.__TWILIGHT_PASTE_READY__;
+      }
     };
   }, [handlePasteGraphData]);
   

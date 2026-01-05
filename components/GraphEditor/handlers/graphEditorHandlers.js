@@ -485,9 +485,9 @@ export function createGraphEditorHandlers({
     
     if (selectedNodeIds && selectedNodeIds.length > 0) {
       // Use refs as source of truth for consistent deletion
-      const deletedNodeId = selectedNodeIds[0];
-      const affectedEdges = edgesRef.current.filter(e => 
-        e.source === deletedNodeId || e.target === deletedNodeId
+      const deletedNodeIds = [...selectedNodeIds];
+      const affectedEdges = edgesRef.current.filter(e =>
+        deletedNodeIds.includes(e.source) || deletedNodeIds.includes(e.target)
       );
       
       // console.log('DELETING NODE:', deletedNodeId, 'WILL REMOVE EDGES:', affectedEdges.map(e => ({ id: e.id, type: e.type, label: e.label })));
@@ -512,6 +512,12 @@ export function createGraphEditorHandlers({
       } catch (e) {
         console.warn('Failed to emit forceRedraw:', e);
       }
+      try {
+        deletedNodeIds.forEach((id) => eventBus.emit('nodeDeleted', { id }));
+        affectedEdges.forEach((edge) => eventBus.emit('edgeDeleted', { id: edge.id }));
+      } catch (e) {
+        // ignore event bus errors
+      }
     } else if (selectedEdgeIds && selectedEdgeIds.length > 0) {
       // Use ref as source of truth, update both ref and state atomically
       // console.log('DELETING EDGES:', selectedEdgeIds, 'FROM:', edgesRef.current.map(e => e.id));
@@ -528,13 +534,24 @@ export function createGraphEditorHandlers({
       } catch (e) {
         console.warn('Failed to emit forceRedraw:', e);
       }
+      try {
+        selectedEdgeIds.forEach((id) => eventBus.emit('edgeDeleted', { id }));
+      } catch (e) {
+        // ignore event bus errors
+      }
     } else if (selectedGroupIds && selectedGroupIds.length > 0) {
+      const deletedGroupIds = [...selectedGroupIds];
       selectedGroupIds.forEach(groupId => {
         groupManager.current.removeGroup(groupId);
       });
       setGroups(groupManager.current.getAllGroups());
       setSelectedGroupIds([]);
       saveToHistory(nodesRef.current, edgesRef.current);
+      try {
+        deletedGroupIds.forEach((id) => eventBus.emit('groupDeleted', { id }));
+      } catch (e) {
+        // ignore event bus errors
+      }
     }
     
     // Reset debounce guard after a short delay
@@ -544,6 +561,9 @@ export function createGraphEditorHandlers({
   };
   
   const handleClearGraph = () => {
+    const prevNodes = nodesRef.current || [];
+    const prevEdges = edgesRef.current || [];
+    const prevGroups = groups || [];
     const newNodes = [], newEdges = [], newGroups = [];
     // Update refs first, then state to ensure consistency
     nodesRef.current = newNodes;
@@ -556,6 +576,13 @@ export function createGraphEditorHandlers({
     setSelectedGroupIds([]);
     groupManager.current?.clear?.();
     saveToHistory(newNodes, newEdges, newGroups);
+    try {
+      prevNodes.forEach((node) => node?.id && eventBus.emit('nodeDeleted', { id: node.id }));
+      prevEdges.forEach((edge) => edge?.id && eventBus.emit('edgeDeleted', { id: edge.id }));
+      prevGroups.forEach((group) => group?.id && eventBus.emit('groupDeleted', { id: group.id }));
+    } catch (e) {
+      // ignore event bus errors
+    }
   };
   
   // ===== LOAD/SAVE HANDLERS =====
@@ -631,6 +658,14 @@ export function createGraphEditorHandlers({
     );
     setGroups(updatedGroups);
     saveToHistory(nodes, edges);
+    const updatedGroup = updatedGroups.find(g => g.id === groupId);
+    if (updatedGroup) {
+      try {
+        eventBus.emit('groupUpdated', { id: groupId, patch: { visible: updatedGroup.visible }, group: updatedGroup });
+      } catch (err) {
+        // ignore event bus errors
+      }
+    }
   };
 
   const handleGroupDelete = (groupId) => {
@@ -639,6 +674,11 @@ export function createGraphEditorHandlers({
       setGroups(groupManager.current.getAllGroups());
       setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
       saveToHistory(nodes, edges);
+      try {
+        eventBus.emit('groupDeleted', { id: groupId });
+      } catch (err) {
+        // ignore event bus errors
+      }
     }
   };
 
@@ -648,6 +688,14 @@ export function createGraphEditorHandlers({
     );
     setGroups(updatedGroups);
     saveToHistory(nodes, edges);
+    const updatedGroup = updatedGroups.find(g => g.id === groupId);
+    if (updatedGroup) {
+      try {
+        eventBus.emit('groupUpdated', { id: groupId, patch: updates, group: updatedGroup });
+      } catch (err) {
+        // ignore event bus errors
+      }
+    }
   };
 
   const handleAddNodesToGroup = (groupId, nodeIds) => {
@@ -655,6 +703,14 @@ export function createGraphEditorHandlers({
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
       saveToHistory(nodes, edges);
+      const updatedGroup = result.data;
+      if (updatedGroup) {
+        try {
+          eventBus.emit('groupUpdated', { id: groupId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
     }
   };
 
@@ -663,6 +719,14 @@ export function createGraphEditorHandlers({
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
       saveToHistory(nodes, edges);
+      const updatedGroup = result.data;
+      if (updatedGroup) {
+        try {
+          eventBus.emit('groupUpdated', { id: groupId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
     }
   };
   
@@ -677,6 +741,11 @@ export function createGraphEditorHandlers({
       setSelectedNodeIds([]);
       setSelectedGroupIds([result.data.id]);
       saveToHistory(nodes, edges);
+      try {
+        eventBus.emit('groupAdded', { group: result.data });
+      } catch (err) {
+        // ignore event bus errors
+      }
     }
   };
 
@@ -684,7 +753,14 @@ export function createGraphEditorHandlers({
     if (selectedGroupIds.length === 0) return;
     let updated = false;
     selectedGroupIds.forEach(groupId => {
-      if (groupManager.current.removeGroup(groupId).success) updated = true;
+      if (groupManager.current.removeGroup(groupId).success) {
+        updated = true;
+        try {
+          eventBus.emit('groupDeleted', { id: groupId });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
     });
     if (updated) {
       setGroups(groupManager.current.getAllGroups());
