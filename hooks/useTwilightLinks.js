@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-export function useTwilightLinks() {
+export function useTwiliteLinks() {
   const router = useRouter();
 
   useEffect(() => {

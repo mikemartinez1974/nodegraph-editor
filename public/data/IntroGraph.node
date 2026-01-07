@@ -2,7 +2,7 @@
   "fileVersion": "1.0",
   "metadata": {
     "title": "Intro Graph",
-    "description": "Quick start walkthrough for Twilight Node Browser.",
+    "description": "Quick start walkthrough for Twilite Node Browser.",
     "created": "2025-11-10T08:32:27.411Z",
     "modified": "2025-12-30T21:50:49.318Z",
     "author": "",
@@ -57,7 +57,7 @@
     {
       "id": "intro_welcome",
       "type": "markdown",
-      "label": "🎨 Welcome to Twilight Node Browser!",
+      "label": "🎨 Welcome to Twilite Node Browser!",
       "position": {
         "x": 0,
         "y": 0
@@ -68,7 +68,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Twilight Node Browser on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click and drag to scroll the page, and follow the steps below. 🚀"
+        "markdown": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Twilite Node Browser on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click and drag to scroll the page, and follow the steps below. 🚀"
       }
     },
     {

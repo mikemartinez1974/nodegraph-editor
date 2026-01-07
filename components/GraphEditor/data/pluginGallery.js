@@ -1,15 +1,15 @@
 export const pluginGallery = [
   {
-    id: 'com.twilight.hello',
-    name: 'Twilight Hello',
+    id: 'com.Twilite.hello',
+    name: 'Twilite Hello',
     description: 'Ships with two sample nodes: a greeting card and a renderer-only canvas node identical to the native CanvasNode.',
-    manifestUrl: '/plugins/twilight-hello/manifest.json',
+    manifestUrl: '/plugins/Twilite-hello/manifest.json',
     version: '0.2.0',
     tags: ['demo', 'starter', 'canvas'],
-    maintainer: 'Twilight Lab',
+    maintainer: 'Twilite Lab',
     permissions: ['graph.read', 'selection.read'],
     status: 'beta',
-    homepage: 'https://example.com/twilight'
+    homepage: 'https://example.com/Twilite'
   },
   {
     id: 'io.breadboard.sockets',

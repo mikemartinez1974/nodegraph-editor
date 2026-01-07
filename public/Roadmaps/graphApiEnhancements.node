@@ -71,7 +71,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# API Evolution Goals\n\n**Reduce agent error. Preserve continuity. Enable safe autonomy.**\n\nThis graph captures *incremental improvements* to the existing Graph API—not a rewrite. Each node represents a pressure point where Twilight can become more resilient to human + AI collaboration.",
+        "markdown": "# API Evolution Goals\n\n**Reduce agent error. Preserve continuity. Enable safe autonomy.**\n\nThis graph captures *incremental improvements* to the existing Graph API—not a rewrite. Each node represents a pressure point where Twilite can become more resilient to human + AI collaboration.",
         "memo": "",
         "link": "",
         "html": "",
@@ -262,7 +262,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Twilight as a Living System\n\nThe graph is not a picture.\n\nIt is **memory**, **intention**, and **executable history**.\n\nEvery improvement above reinforces continuity over convenience.",
+        "markdown": "# Twilite as a Living System\n\nThe graph is not a picture.\n\nIt is **memory**, **intention**, and **executable history**.\n\nEvery improvement above reinforces continuity over convenience.",
         "memo": "",
         "link": "",
         "html": "",

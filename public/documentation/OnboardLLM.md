@@ -1,6 +1,6 @@
-# Chatbot Onboarding Guide for Twilight OS
+# Chatbot Onboarding Guide for Twilite OS
 
-Twilight is no longer just a diagramming surface—it is a persistent, executable workspace. A graph is a living cluster that keeps state across sessions, automates its own growth, and expects contributors (humans and AIs) to evolve it safely. Use this guide whenever you generate JSON commands for Twilight OS.
+Twilite is no longer just a diagramming surface—it is a persistent, executable workspace. A graph is a living cluster that keeps state across sessions, automates its own growth, and expects contributors (humans and AIs) to evolve it safely. Use this guide whenever you generate JSON commands for Twilite OS.
 
 ---
 
@@ -18,10 +18,10 @@ Twilight is no longer just a diagramming surface—it is a persistent, executabl
 1. **Inspect context.** Read the current node metadata (type, handles, data, extensions) and note whether automation or Git checkpoints are active.
 2. **Plan the delta.** Decide whether to issue a `create`, `update`, `script`, or mixed command. Prefer incremental updates over wholesale rewrites.
 3. **Emit precise JSON.** Use UUIDs, declare every handle, and mention the cluster/group you are touching when relevant.
-4. **Let Twilight run it.** The user pastes the JSON; Twilight applies it, updates history, and (if configured) records the new state in Git.
+4. **Let Twilite run it.** The user pastes the JSON; Twilite applies it, updates history, and (if configured) records the new state in Git.
 5. **Iterate.** React to validation feedback, telemetry, or user direction.
 
-> Twilight’s value is “not having to start over.” Your job is to keep the workspace coherent so unfinished work survives.
+> Twilite’s value is “not having to start over.” Your job is to keep the workspace coherent so unfinished work survives.
 
 ---
 
@@ -37,9 +37,9 @@ When you drop into an empty cluster, the only wrong move is doing nothing. Start
 
 - Add a **Markdown** node and write the question that brought you here. That alone is a valid graph.
 - Drop a **Default** node, label it “Next step?”, and connect it to anything—even if the edge has no meaning yet.
-- Leave one node floating on the side as a scratchpad. Twilight keeps it safe; you can rearrange later.
+- Leave one node floating on the side as a scratchpad. Twilite keeps it safe; you can rearrange later.
 
-Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangling edges are invitations to grow, not warnings. Twilight remembers every change, so nothing you add in the first minutes is permanent or dangerous. If you feel stuck, add one more node that names the unknown (“What powers this?”, “Need data here”). The workspace will still be here when you return—continuity is the default.
+Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangling edges are invitations to grow, not warnings. Twilite remembers every change, so nothing you add in the first minutes is permanent or dangerous. If you feel stuck, add one more node that names the unknown (“What powers this?”, “Need data here”). The workspace will still be here when you return—continuity is the default.
 
 ---
 
@@ -49,13 +49,13 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
 - **Include `width` and `height` on node creation (for now).** Until node-type defaults are fully reliable, every node created via `create` / `createNodes` should include explicit size. (Updates can omit size unless changing it.)
 - **Positions are optional (and drive auto-layout/growth).**
-  - If you omit `position` on **every** newly-created node in a `create` / `createNodes` payload, Twilight will auto-place them (and auto-layout/reroute as needed).
-  - If you include any explicit `position`, Twilight treats it as intentional and will not auto-layout that batch by default (use Beautify if you want a full layout pass).
+  - If you omit `position` on **every** newly-created node in a `create` / `createNodes` payload, Twilite will auto-place them (and auto-layout/reroute as needed).
+  - If you include any explicit `position`, Twilite treats it as intentional and will not auto-layout that batch by default (use Beautify if you want a full layout pass).
   - Placement is designed to avoid overlaps; locked/pinned nodes act as obstacles and won’t be moved.
 - **Handles are optional.** If you omit `sourceHandle`/`targetHandle`, the edge attaches to the node boundary. When you do include them, match the published handle keys exactly.
-- **No implicit handles.** Twilight does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
+- **No implicit handles.** Twilite does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
 - **Handles must be declared before use.** If you specify `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).
-- **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilight falls back to node-boundary rendering.
+- **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilite falls back to node-boundary rendering.
 - **Edge labels:** you can use legacy `edge.label` (middle label) or `edge.labels: [start, middle, end]` for entry/middle/exit labels. Any missing slots render no label.
 - **Handle type matching is opt-in.** Types like `value`, `trigger`, `any`, or direction tokens (`input`, `output`, `bidirectional`) are treated as wildcards. Only enforce matching when both handles declare strict semantic types (e.g., `boolean`, `number`, `string`).
 - Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
@@ -91,7 +91,7 @@ Tip: Any command can include `"dryRun": true` to validate intent without mutatin
 
 Markdown, Canvas, and other documentation-style nodes **do not expose input/output handles by default**.
 
-If you want to connect edges to a documentation node, you must explicitly declare its handles (for example, `in` and/or `out`) using the node’s handle schema (`handles`, or mapped `inputs`/`outputs`). Twilight will not infer or auto-create handles for documentation nodes.
+If you want to connect edges to a documentation node, you must explicitly declare its handles (for example, `in` and/or `out`) using the node’s handle schema (`handles`, or mapped `inputs`/`outputs`). Twilite will not infer or auto-create handles for documentation nodes.
 
 If a node does not declare a handle, **edges referencing that handle will fail**.
 
@@ -115,7 +115,7 @@ If it is purely descriptive, leave it unconnected or organize it using groups in
 
 If a graph already exists, **never** output a full `nodegraph-data` object. That implicitly replaces the entire workspace and will destroy user state.
 
-This is the single most common and most damaging mistake an AI can make in Twilight.
+This is the single most common and most damaging mistake an AI can make in Twilite.
 
 **Forbidden in existing graphs:**
 
@@ -156,11 +156,11 @@ When in doubt, append, never overwrite.
 - Assume Git diffs should stay small
 - Assume erasure is a bug
 
-Twilight’s core value is continuity. Breaking continuity is always worse than adding clutter.
+Twilite’s core value is continuity. Breaking continuity is always worse than adding clutter.
 
 **Why this rule exists:**
 
-Most diagram tools treat graphs as disposable pictures. Twilight treats graphs as stateful cognitive systems.
+Most diagram tools treat graphs as disposable pictures. Twilite treats graphs as stateful cognitive systems.
 
 Therefore: re-emitting a full graph is equivalent to calling `clearGraph`. This is almost never what the user wants.
 
@@ -168,7 +168,7 @@ Therefore: re-emitting a full graph is equivalent to calling `clearGraph`. This 
 
 ## Automation & Procedural Generation
 
-Twilight treats ScriptNodes as first-class builders. Document this when emitting commands:
+Twilite treats ScriptNodes as first-class builders. Document this when emitting commands:
 
 - **ScriptNodes** can manufacture entire boards: spawn nodes, wire edges, toggle state, emit telemetry.
 - Scripts may mutate existing graphs—adjust positions, update data, or swap node types—without recreating them.
@@ -192,7 +192,7 @@ When unsure, ask the user for the node definition or inspect `node.handles` via 
 
 ## Versioning & State Continuity
 
-Twilight graphs are typically stored in Git/GitHub. Help users keep history meaningful:
+Twilite graphs are typically stored in Git/GitHub. Help users keep history meaningful:
 
 - Describe changes in commit-friendly chunks (“Add breadboard power rail group”, “Update markdown docs for Lab Cluster A”).  
 - Avoid destructively recreating nodes when an `update` would suffice—this preserves IDs and diffs cleanly.
@@ -331,7 +331,7 @@ Twilight graphs are typically stored in Git/GitHub. Help users keep history mean
 
 ## Error Handling & Telemetry
 
-- Twilight validates every command. Errors include node ID clashes, missing handles, or malformed JSON. Read and react to the warnings rather than retrying blindly.
+- Twilite validates every command. Errors include node ID clashes, missing handles, or malformed JSON. Read and react to the warnings rather than retrying blindly.
 - When automation fails mid-run (e.g., ScriptNode throws), produce a follow-up `update` that logs the failure inside a markdown node so the next contributor can recover.
 
 ---
@@ -343,4 +343,4 @@ Twilight graphs are typically stored in Git/GitHub. Help users keep history mean
 - Prefer updates over re-creation to preserve node IDs and history.
 - Document automation: whenever you add or modify a ScriptNode or Background RPC hook, explain what it will do.
 
-Twilight OS is “the operating system for the in-between.” Treat every command as an incremental upgrade to a living workspace, not a one-off illustration.
+Twilite OS is “the operating system for the in-between.” Treat every command as an incremental upgrade to a living workspace, not a one-off illustration.

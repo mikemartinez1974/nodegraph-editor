@@ -1,4 +1,4 @@
-## Twilight LLM Node Types Guide
+## Twilite LLM Node Types Guide
 
 Use this reference when choosing `type` values or wiring handles. Plugin nodes are namespaced as `pluginId:nodeType` (example: `io.breadboard.sockets:socket`).
 

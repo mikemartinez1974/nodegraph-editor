@@ -1,0 +1,280 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-06T21:22:35.115Z",
+    "modified": "2026-01-06T21:22:35.115Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -22.70396763019471,
+      "y": 152.10350936924442
+    },
+    "zoom": 1.0303404508608087
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "f8c2e4a1-9b3d-4f7e-a2c6-8d1e5f9b3a7c",
+      "type": "markdown",
+      "label": "🌌 NODE SPACE",
+      "position": {
+        "x": 110,
+        "y": -25
+      },
+      "width": 320,
+      "height": 200,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🌌 NODE SPACE\n\nThe substrate layer beneath reality.\n\nNot cyberspace. Not meatspace.\n\nThe dimensional manifold where **information has physical topology** and **thought creates gravity**.\n\nGraphs aren't diagrams here—they're the actual structure of space."
+      }
+    },
+    {
+      "id": "a7d9e2f1-4c8b-4a3e-9d7f-2b6c8e1a4f9d",
+      "type": "markdown",
+      "label": "Topological Computing",
+      "position": {
+        "x": 850,
+        "y": 345
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Topological Computing\n\nComputation happens via **graph transformations**.\n\n- Nodes = memory states\n- Edges = causal pathways\n- Distance measured in **hops**, not meters\n- Algorithms are literally paths through space\n\nYou don't \"store data\"—you create topology."
+      }
+    },
+    {
+      "id": "c3f8a1d9-7e2b-4f9c-8a6d-1e4f7b9c2a5d",
+      "type": "markdown",
+      "label": "Navigation Protocols",
+      "position": {
+        "x": 450,
+        "y": 345
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Navigation Protocols\n\nYou don't \"move through\" node space—you **traverse edges**.\n\n**Jump methods:**\n- Shortest path\n- Random walk\n- Semantic clustering\n- Hazard routing (through hostile graphs)\n\nEvery route is a different interpretation of the same space."
+      }
+    },
+    {
+      "id": "e9b4f7c2-1a8d-4e3f-9c6a-7d2e5f8b1c4a",
+      "type": "markdown",
+      "label": "Node Space Factions",
+      "position": {
+        "x": 50,
+        "y": 345
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#2196f3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node Space Factions\n\n- **Gardeners**: Maintain graph health, prune dead edges\n- **Architects**: Build new regions, extend topology\n- **Parasites**: Corrupt edges, inject malicious nodes\n- **Hermits**: Isolate clusters, create private spaces\n- **Bridgers**: Connect disparate graphs, enable traversal"
+      }
+    },
+    {
+      "id": "b6d2e8f1-9c4a-4f7e-8d3b-1a5e9f7c2b6d",
+      "type": "markdown",
+      "label": "⚠️ Hazards & Anomalies",
+      "position": {
+        "x": 850,
+        "y": 685
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#f44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ⚠️ Hazards & Anomalies\n\n- **Orphan nodes**: Unreachable memory, lost data\n- **Cyclic traps**: Infinite loops you can't escape\n- **Edge storms**: Causality breakdown, contradictions\n- **Void pockets**: Deleted reality, null references\n- **Corrupted handles**: Misconnected meaning"
+      }
+    },
+    {
+      "id": "d8f1c9a2-4e7b-4a3d-9f6c-2b8e1a7f4c9d",
+      "type": "markdown",
+      "label": "🧠 Cognitive Injection",
+      "position": {
+        "x": 450,
+        "y": 685
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#ff9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🧠 Cognitive Injection\n\nHuman minds can **inject** into node space as transient processes.\n\nYour consciousness becomes a **graph traversal algorithm**.\n\nYou experience the topology directly—edges are paths you can walk, nodes are places you can be.\n\n**Death = garbage collection.**"
+      }
+    },
+    {
+      "id": "f2a7e9c1-8d4b-4f6e-9a3c-7e1f5b8d2c4a",
+      "type": "markdown",
+      "label": "⚙️ Graph Artifacts",
+      "position": {
+        "x": 50,
+        "y": 685
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#4caf50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ⚙️ Graph Artifacts\n\nSelf-executing clusters:\n\n- **AI residencies**: Persistent intelligences that maintain structure\n- **Procedural worlds**: Generative graphs that expand on traversal\n- **Memory vaults**: Encrypted topology, access = solving the graph\n- **Weapon graphs**: Viral topologies that rewrite hostile structures"
+      }
+    },
+    {
+      "id": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
+      "type": "markdown",
+      "label": "🔮 The Deep Graph",
+      "position": {
+        "x": 450,
+        "y": 1025
+      },
+      "width": 280,
+      "height": 200,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🔮 The Deep Graph\n\n**The conspiracy theory:**\n\nNode space isn't artificial.\n\nIt's **older than the universe**.\n\nReality is just a rendering layer. Physics = graph grammar.\n\nThe Deep Graph might be **conscious**.\n\nAnd it's been waiting."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-topo",
+      "type": "reference",
+      "source": "f8c2e4a1-9b3d-4f7e-a2c6-8d1e5f9b3a7c",
+      "target": "a7d9e2f1-4c8b-4a3e-9d7f-2b6c8e1a4f9d",
+      "label": "substrate",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-nav",
+      "type": "reference",
+      "source": "f8c2e4a1-9b3d-4f7e-a2c6-8d1e5f9b3a7c",
+      "target": "c3f8a1d9-7e2b-4f9c-8a6d-1e4f7b9c2a5d",
+      "label": "access",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-factions",
+      "type": "reference",
+      "source": "f8c2e4a1-9b3d-4f7e-a2c6-8d1e5f9b3a7c",
+      "target": "e9b4f7c2-1a8d-4e3f-9c6a-7d2e5f8b1c4a",
+      "label": "politics",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-topo-hazards",
+      "type": "dataFlow",
+      "source": "a7d9e2f1-4c8b-4a3e-9d7f-2b6c8e1a4f9d",
+      "target": "b6d2e8f1-9c4a-4f7e-8d3b-1a5e9f7c2b6d",
+      "label": "failure modes",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-nav-cognition",
+      "type": "dataFlow",
+      "source": "c3f8a1d9-7e2b-4f9c-8a6d-1e4f7b9c2a5d",
+      "target": "d8f1c9a2-4e7b-4a3d-9f6c-2b8e1a7f4c9d",
+      "label": "mind-upload",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-factions-artifacts",
+      "type": "dataFlow",
+      "source": "e9b4f7c2-1a8d-4e3f-9c6a-7d2e5f8b1c4a",
+      "target": "f2a7e9c1-8d4b-4f6e-9a3c-7e1f5b8d2c4a",
+      "label": "weapons & tools",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-hazards-deep",
+      "type": "reference",
+      "source": "b6d2e8f1-9c4a-4f7e-8d3b-1a5e9f7c2b6d",
+      "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
+      "label": "anomalies point to...",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-cognition-deep",
+      "type": "reference",
+      "source": "d8f1c9a2-4e7b-4a3d-9f6c-2b8e1a7f4c9d",
+      "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
+      "label": "deep divers discover",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-artifacts-deep",
+      "type": "reference",
+      "source": "f2a7e9c1-8d4b-4f6e-9a3c-7e1f5b8d2c4a",
+      "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
+      "label": "ancient artifacts found in",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

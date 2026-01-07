@@ -124,7 +124,7 @@ window.graphAPI.createEdge({
 // Returns: { success: true, data: <edge object> }
 ```
 
-> **Note:** Handles are optional. If you provide `sourceHandle` / `targetHandle`, they must exist on the source/target nodes (from the node's `outputs`/`inputs` arrays, or explicit `handles`). When both handles are present and typed, Twilight validates type compatibility.
+> **Note:** Handles are optional. If you provide `sourceHandle` / `targetHandle`, they must exist on the source/target nodes (from the node's `outputs`/`inputs` arrays, or explicit `handles`). When both handles are present and typed, Twilite validates type compatibility.
 
 ### Read Edge(s)
 

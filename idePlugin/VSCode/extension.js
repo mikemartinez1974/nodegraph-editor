@@ -2,7 +2,7 @@ const vscode = require('vscode');
 const path = require('path');
 
 function activate(context) {
-    console.log('Twilight Graph Viewer activated');
+    console.log('Twilite Graph Viewer activated');
     
     // Create status bar item
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -17,13 +17,12 @@ function activate(context) {
         if (autoOpeningUris.has(key)) {
             return;
         }
-        console.log('TwilightGraph: opening graph for', key);
         autoOpeningUris.add(key);
         try {
             await vscode.commands.executeCommand(
                 'vscode.openWith',
                 uri,
-                'twilight.graphEditor',
+                'Twilite.graphEditor',
                 { viewColumn: vscode.ViewColumn.Active, preview: false }
             );
         } catch (error) {
@@ -33,7 +32,7 @@ function activate(context) {
         }
     };
 
-    const openGraphCommand = vscode.commands.registerCommand('twilight.openGraph', async (resource) => {
+    const openGraphCommand = vscode.commands.registerCommand('Twilite.openGraph', async (resource) => {
         const targetUri = resource || vscode.window.activeTextEditor?.document.uri;
         if (!targetUri) {
             vscode.window.showInformationMessage('Select a graph file in the Explorer first.');
@@ -43,18 +42,18 @@ function activate(context) {
     });
     context.subscriptions.push(openGraphCommand);
 
-    const documentListener = vscode.workspace.onDidOpenTextDocument(async (document) => {
-        if (document.uri.scheme !== 'file' || path.extname(document.uri.fsPath) !== '.node') {
-            return;
-        }
-        await openGraphEditor(document.uri, { closePreview: false });
-    });
+	    const documentListener = vscode.workspace.onDidOpenTextDocument(async (document) => {
+	        if (document.uri.scheme !== 'file' || path.extname(document.uri.fsPath) !== '.node') {
+	            return;
+	        }
+	        await openGraphEditor(document.uri);
+	    });
     context.subscriptions.push(documentListener);
     
     context.subscriptions.push(
         vscode.window.registerCustomEditorProvider(
-            'twilight.graphEditor',
-            new TwilightGraphEditorProvider(context),
+            'Twilite.graphEditor',
+            new TwiliteGraphEditorProvider(context),
             {
                 webviewOptions: { retainContextWhenHidden: true },
                 supportsMultipleEditorsPerDocument: false
@@ -63,7 +62,7 @@ function activate(context) {
     );
 }
 
-class TwilightGraphEditorProvider {
+class TwiliteGraphEditorProvider {
     constructor(context) { 
         this.context = context; 
     }
@@ -89,7 +88,6 @@ class TwilightGraphEditorProvider {
         };
 
         const refreshGraph = () => {
-            console.log('TwilightGraph: refreshing graph for', document.uri.toString());
             latestGraphText = document.getText();
             sendGraphIfReady();
         };
@@ -136,7 +134,6 @@ class TwilightGraphEditorProvider {
     
     updateWebview(webview, graphText) {
         try {
-            console.log('TwilightGraph: posting update to webview', graphText?.slice?.(0, 60));
             const graphData = JSON.parse(graphText);
             webview.postMessage({
                 type: 'update',
@@ -167,14 +164,14 @@ class TwilightGraphEditorProvider {
     }
     
         getHtmlForWebview(webview) {
-            const appUrl = 'https://twilite.zone/browser/editor.html';
+            const appUrl = 'https://twilite.zone/editor';
             
             return `<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Twilight Graph</title>
+            <title>Twilite Graph</title>
             <style>
                 body, html {
                     margin: 0;
@@ -191,11 +188,11 @@ class TwilightGraphEditorProvider {
             </style>
         </head>
         <body>
-            <iframe id="twilight-frame" src="${appUrl}"></iframe>
+            <iframe id="Twilite-frame" src="${appUrl}"></iframe>
             
             <script>
                 const vscode = acquireVsCodeApi();
-                const iframe = document.getElementById('twilight-frame');
+                const iframe = document.getElementById('Twilite-frame');
                 
                 // Listen for messages from extension
                 window.addEventListener('message', event => {

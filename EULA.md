@@ -1,7 +1,7 @@
 ```text
 END USER LICENSE AGREEMENT (EULA)
 
-This End User License Agreement ("Agreement") is between you (the "Licensee") and Twilight Software, Eye In Sea ("Licensor").
+This End User License Agreement ("Agreement") is between you (the "Licensee") and Twilite Software, Eye In Sea ("Licensor").
 
 1. Grant of License
 Licensor grants Licensee a non-exclusive, non-transferable, limited license to use the Software solely for Licensee's internal business purposes, subject to the terms of this Agreement.

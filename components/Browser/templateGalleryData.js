@@ -7,7 +7,7 @@ export const TEMPLATE_GALLERY = [
     preview: '/data/TutorialScreenshot1.png',
     tags: ['onboarding', 'beginner', 'docs'],
     estimatedTime: '5 min',
-    publisher: 'Twilight Node Browser'
+    publisher: 'Twilite Node Browser'
   },
   {
     id: 'automation-starter',

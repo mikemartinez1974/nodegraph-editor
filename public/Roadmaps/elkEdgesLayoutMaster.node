@@ -2,7 +2,7 @@
   "fileVersion": "1.0",
   "metadata": {
     "title": "ELK + Edges + Layout — Master Roadmap",
-    "description": "Consolidated roadmap for ELK integration, edge routing, and layout policies in Twilight.",
+    "description": "Consolidated roadmap for ELK integration, edge routing, and layout policies in Twilite.",
     "created": "2025-12-28T00:00:00.000Z",
     "modified": "2025-12-28T00:00:00.000Z",
     "author": "",
@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# ELK + Edges + Layout — Master Roadmap\n\n**North Star:** Twilight graphs look **professional by default** while keeping **LLM payloads small**.\n\n**Authority model:**\n- Document model is source of truth for nodes/edges/groups\n- ELK is authority for layout + routing when invoked\n- Fallback routing is deterministic when ELK data is absent"
+        "markdown": "# ELK + Edges + Layout — Master Roadmap\n\n**North Star:** Twilite graphs look **professional by default** while keeping **LLM payloads small**.\n\n**Authority model:**\n- Document model is source of truth for nodes/edges/groups\n- ELK is authority for layout + routing when invoked\n- Fallback routing is deterministic when ELK data is absent"
       }
     },
     {

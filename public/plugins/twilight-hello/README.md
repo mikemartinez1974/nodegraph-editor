@@ -1,6 +1,6 @@
-# Hello from the Twilight Zone Plugin
+# Hello from the Twilite Zone Plugin
 
-This folder contains a minimal plugin that exercises the Plugin Platform Phase 3 contract. Load it through the Plugin Manager by pasting `http://localhost:3000/plugins/twilight-hello/manifest.json` while running the dev server.
+This folder contains a minimal plugin that exercises the Plugin Platform Phase 3 contract. Load it through the Plugin Manager by pasting `http://localhost:3000/plugins/Twilite-hello/manifest.json` while running the dev server.
 
 ## Manifest definition
 
@@ -19,12 +19,12 @@ Because of this schema the editor can render the node UI and property controls w
 ```js
 const sdk = window.NodeGraphPluginSDK;
 const runtime = sdk.createPluginRuntime({
-  capabilities: { runtime: 'twilight-hello', version: '0.1.0' }
+  capabilities: { runtime: 'Twilite-hello', version: '0.1.0' }
 });
 
 runtime.registerMethod('plugin:getInfo', async () => {
   const selection = await runtime.callHost('selection:get');
-  return { id: 'com.twilight.hello', selection };
+  return { id: 'com.Twilite.hello', selection };
 });
 ```
 

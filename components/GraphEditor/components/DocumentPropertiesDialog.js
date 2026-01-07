@@ -857,7 +857,7 @@ export default function DocumentPropertiesDialog({
                   label="Auto-layout mode"
                   value={docSettings.layout?.mode || DEFAULT_LAYOUT_SETTINGS.mode}
                   onChange={(event) => handleLayoutSettingsChange('mode', event.target.value)}
-                  helperText="Controls whether Twilight auto-layouts when pasted nodes omit positions."
+                  helperText="Controls whether Twilite auto-layouts when pasted nodes omit positions."
                   fullWidth
                 >
                   {LAYOUT_MODE_OPTIONS.map((option) => (

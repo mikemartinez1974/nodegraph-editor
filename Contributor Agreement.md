@@ -1,9 +1,9 @@
 ```text
 Contributor License Agreement (CLA) - Individual Contributor
 
-Copyright (c) 2025 Michael Martinez DBA "Twilight Software, Eye In Sea". All rights reserved.
+Copyright (c) 2025 Michael Martinez DBA "Twilite Software, Eye In Sea". All rights reserved.
 
-IMPORTANT - READ CAREFULLY: This Contributor License Agreement ("Agreement") is a legal agreement between you (either an individual or an entity you represent) ("Contributor") and Michael Martinez DBA "Twilight Software, Eye In Sea" ("Project Owner"). By signing this Agreement or making a contribution to the project, you agree to the terms below.
+IMPORTANT - READ CAREFULLY: This Contributor License Agreement ("Agreement") is a legal agreement between you (either an individual or an entity you represent) ("Contributor") and Michael Martinez DBA "Twilite Software, Eye In Sea" ("Project Owner"). By signing this Agreement or making a contribution to the project, you agree to the terms below.
 
 1. Definitions
 - "Contribution" means any original work of authorship, including any modifications or additions to existing works, that is intentionally submitted by Contributor to the Project Owner for inclusion in, or documentation of, the project (the "Project"). For clarity, Contribution includes but is not limited to: source code, patches, pull requests, bug reports, feature requests, documentation, diagrams, and other content.

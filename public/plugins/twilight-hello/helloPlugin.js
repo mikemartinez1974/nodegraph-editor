@@ -1,19 +1,19 @@
 (function () {
   const pluginInfo = {
-    id: 'com.twilight.hello',
+    id: 'com.Twilite.hello',
     version: '0.2.0'
   };
 
   const sdk = (typeof window !== 'undefined' ? window.NodeGraphPluginSDK : null) ||
     (typeof self !== 'undefined' ? self.NodeGraphPluginSDK : null);
   if (!sdk || typeof sdk.createPluginRuntime !== 'function') {
-    console.error('[TwilightPlugin] Plugin SDK is not available');
+    console.error('[TwilitePlugin] Plugin SDK is not available');
     return;
   }
 
   const runtime = sdk.createPluginRuntime({
     capabilities: {
-      runtime: 'twilight-hello',
+      runtime: 'Twilite-hello',
       version: pluginInfo.version
     }
   });
@@ -30,21 +30,21 @@
 
   runtime.registerMethod('plugin:listNodes', () => [
     {
-      type: 'twilight-hello',
-      label: 'Twilight Hello (runtime)',
+      type: 'Twilite-hello',
+      label: 'Twilite Hello (runtime)',
       description: 'Returned from the running plugin bundle.',
       category: 'demo',
       icon: 'WavingHand',
       defaultWidth: 240,
       defaultHeight: 160,
       defaultData: {
-        greeting: 'Hello, from the Twilight Zone!',
+        greeting: 'Hello, from the Twilite Zone!',
         tagline: 'Friendly signal from another dimension',
         mood: 'calm',
         emphasis: false
       },
       renderer: {
-        entry: '/plugins/twilight-hello/helloRenderer.js'
+        entry: '/plugins/Twilite-hello/helloRenderer.js'
       },
       handles: {
         inputs: [{ id: 'trigger', label: 'Trigger', dataType: 'trigger' }],
@@ -52,8 +52,8 @@
       }
     },
     {
-      type: 'twilight-canvas',
-      label: 'Twilight Canvas (runtime)',
+      type: 'Twilite-canvas',
+      label: 'Twilite Canvas (runtime)',
       description: 'Canvas-rendered plugin node without host chrome.',
       category: 'advanced',
       icon: 'Gesture',
@@ -69,7 +69,7 @@
         outputs: [{ id: 'out', label: 'Out', dataType: 'value' }]
       },
       renderer: {
-        entry: '/plugins/twilight-hello/canvasRenderer.js'
+        entry: '/plugins/Twilite-hello/canvasRenderer.js'
       },
       extensions: {
         layout: {
@@ -82,5 +82,5 @@
     }
   ]);
 
-  runtime.registerMethod('plugin:ping', () => 'twilight-pong');
+  runtime.registerMethod('plugin:ping', () => 'Twilite-pong');
 })();

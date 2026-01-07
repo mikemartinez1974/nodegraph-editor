@@ -84,7 +84,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\nMake Twilight graphs look **professional by default**.\n\nPrimary pain: **messy edges**.\n\nConstraint: optimize for **small LLM payloads** (IDs + intent, not geometry)."
+        "markdown": "## Goal\nMake Twilite graphs look **professional by default**.\n\nPrimary pain: **messy edges**.\n\nConstraint: optimize for **small LLM payloads** (IDs + intent, not geometry)."
       }
     },
     {

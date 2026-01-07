@@ -167,7 +167,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     eventBus.on('nodeResizeEnd', handleNodeResizeEnd);
     eventBus.on('pasteGraphData', handlePasteGraphData);
     if (typeof window !== 'undefined') {
-      window.__TWILIGHT_PASTE_READY__ = true;
+      window.__Twilite_PASTE_READY__ = true;
     }
     
     return () => {
@@ -175,7 +175,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       eventBus.off('nodeResizeEnd', handleNodeResizeEnd);
       eventBus.off('pasteGraphData', handlePasteGraphData);
       if (typeof window !== 'undefined') {
-        delete window.__TWILIGHT_PASTE_READY__;
+        delete window.__Twilite_PASTE_READY__;
       }
     };
   }, [handlePasteGraphData]);

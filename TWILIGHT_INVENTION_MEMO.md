@@ -1,10 +1,10 @@
-# Twilight — Invention Memo (Draft)
+# Twilite — Invention Memo (Draft)
 
-Not legal advice. This document is a technical “invention disclosure” style memo intended to capture what may be novel about Twilight and to create a dated internal record of core ideas and workflows.
+Not legal advice. This document is a technical “invention disclosure” style memo intended to capture what may be novel about Twilite and to create a dated internal record of core ideas and workflows.
 
 Date: 2025-12-28  
-Project: Twilight (nodegraph-editor)  
-Author: Michael (with assistant drafting)
+Project: Twilite (nodegraph-editor)  
+Author: Michael Martinez (with assistant drafting)
 
 ---
 
@@ -23,7 +23,7 @@ Key pain points in existing systems:
 
 ## 2) Summary of the Proposed Solution
 
-Twilight treats a node graph as a **persistent workspace artifact** (a canonical `.node` file) that evolves by applying **validated state-delta commands** rather than re-emitting full snapshots.
+Twilite treats a node graph as a **persistent workspace artifact** (a canonical `.node` file) that evolves by applying **validated state-delta commands** rather than re-emitting full snapshots.
 
 Core principles:
 
@@ -126,18 +126,18 @@ A system where the editor fills in missing details from node-type defaults and d
 
 1. User opens an existing `.node` graph (persistent state).
 2. LLM proposes a small command payload that mutates state.
-3. Twilight validates, applies, records history, and updates the UI.
+3. Twilite validates, applies, records history, and updates the UI.
 
 ### Workflow 2 — Minimal Edge Creation Without Handles
 
 1. LLM creates nodes and connects them with edges that omit handles.
-2. Twilight attaches edges deterministically to node boundaries (directional).
+2. Twilite attaches edges deterministically to node boundaries (directional).
 3. ELK-based routing (or equivalent) renders orthogonal routes by default.
 
 ### Workflow 3 — Confirm/Revert Transactional Paste
 
 1. LLM emits a command that changes document theme or layout.
-2. Twilight applies and displays a “Keep/Revert” confirmation.
+2. Twilite applies and displays a “Keep/Revert” confirmation.
 3. User can revert the change instantly; history remains coherent.
 
 ---

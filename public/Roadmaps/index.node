@@ -214,7 +214,7 @@
     {
       "id": "node-11",
       "type": "default",
-      "label": "TwilightPatentability",
+      "label": "TwilitePatentability",
       "position": {
         "x": 330,
         "y": 240
@@ -222,13 +222,13 @@
       "width": 200,
       "height": 80,
       "data": {
-        "link": "tlz:///Roadmaps/TwilightPatentability.node"
+        "link": "tlz:///Roadmaps/TwilitePatentability.node"
       }
     },
     {
       "id": "node-12",
       "type": "default",
-      "label": "twilightProductThesis",
+      "label": "TwiliteProductThesis",
       "position": {
         "x": -330,
         "y": 360
@@ -236,7 +236,7 @@
       "width": 200,
       "height": 80,
       "data": {
-        "link": "tlz:///Roadmaps/twilightProductThesis.node"
+        "link": "tlz:///Roadmaps/TwiliteProductThesis.node"
       }
     },
     {

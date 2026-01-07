@@ -1,7 +1,7 @@
 (function () {
   const sdk = window.NodeGraphPluginRenderer;
   if (!sdk || typeof sdk.createRenderer !== 'function') {
-    console.error('[TwilightRenderer] Renderer SDK missing');
+    console.error('[TwiliteRenderer] Renderer SDK missing');
     return;
   }
 
@@ -16,7 +16,7 @@
   const render = ({ data = {}, nodeId }) => {
     mount.innerHTML = '';
     const title = document.createElement('h3');
-    title.textContent = data.greeting || 'Hello from the Twilight Zone!';
+    title.textContent = data.greeting || 'Hello from the Twilite Zone!';
     title.style.margin = '0 0 8px';
     const tagline = document.createElement('p');
     tagline.textContent = data.tagline || 'Configure me from the Properties Panel';

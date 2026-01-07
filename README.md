@@ -1,4 +1,4 @@
-# Twilight Node Browser
+# Twilite Node Browser
 
 A production-grade, AI-first visual graph editor/browser built with React, Next.js, and Material-UI. Design, organize, and think visually by collaborating with AI assistants (ChatGPT, Claude, Grok, etc.) through a simple copy/paste workflow.
 
@@ -131,7 +131,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Sample Plugin
 
-There is a reference plugin under `public/plugins/twilight-hello`. In development you can open the toolbar Plugin Manager (puzzle icon) and paste `http://localhost:3000/plugins/twilight-hello/manifest.json` to install it. The manifest shows the required metadata (id, version, bundle, nodes, permissions) and the bundle responds to the BackgroundFrame handshake so future runtime hooks can pull the custom node definition.
+There is a reference plugin under `public/plugins/Twilite-hello`. In development you can open the toolbar Plugin Manager (puzzle icon) and paste `http://localhost:3000/plugins/Twilite-hello/manifest.json` to install it. The manifest shows the required metadata (id, version, bundle, nodes, permissions) and the bundle responds to the BackgroundFrame handshake so future runtime hooks can pull the custom node definition.
 
 ---
 
@@ -230,7 +230,7 @@ See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) 
 
 **Light Themes**: Ocean, Sunset, Forest, Lavender, Coffee, Desert, Emerald, Ruby, Sapphire, Retro, Arctic, Ice, Rose Gold, Jungle, Coral Reef, Peach, Sunrise, Candy
 
-**Dark Themes**: Midnight, Neon, Cyberpunk, Flame, Noir, Twilight, Steel, Galaxy
+**Dark Themes**: Midnight, Neon, Cyberpunk, Flame, Noir, Twilite, Steel, Galaxy
 
 **Neutral**: Vintage
 
@@ -276,7 +276,7 @@ Use these docs as a launchpad when working with other assistants—the descripti
 
 | Doc | Purpose |
 | --- | --- |
-| **[User Manual](public/documentation/UserManual.md)** | End-user playbook for Twilight Node Browser (AI workflow, toolbar, shortcuts). |
+| **[User Manual](public/documentation/UserManual.md)** | End-user playbook for Twilite Node Browser (AI workflow, toolbar, shortcuts). |
 | **[LLM Onboarding](public/documentation/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
 | **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)** | Reference for `window.graphAPI` with create/update/delete/find examples. |
 | **[NodeGraph README](components/NodeGraph/README.md)** | Deep dive into the layered renderer (EdgeLayer, HandleLayer, PanZoomLayer). |

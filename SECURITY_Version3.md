@@ -1,6 +1,6 @@
 # Security Policy
 
-Thank you for taking the time to report a security issue in the Twilight Node Browser. We take security seriously. This document describes how to report vulnerabilities and what to expect after you do.
+Thank you for taking the time to report a security issue in the Twilite Node Browser. We take security seriously. This document describes how to report vulnerabilities and what to expect after you do.
 
 ## 1) Reporting a Vulnerability
 

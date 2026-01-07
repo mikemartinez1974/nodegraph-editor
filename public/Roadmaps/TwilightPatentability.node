@@ -131,7 +131,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Most systems do:\n\nrender → edit → serialize\n\nTwilight does:\n\n**structure → persist → project**\n\nThis inversion changes how AI, humans, and tools interact with state.",
+        "markdown": "Most systems do:\n\nrender → edit → serialize\n\nTwilite does:\n\n**structure → persist → project**\n\nThis inversion changes how AI, humans, and tools interact with state.",
         "memo": "",
         "link": "",
         "html": "",
@@ -151,7 +151,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Big players (e.g. Google Antigravity):\n\n• UI-first\n• SaaS-hosted\n• Execution-centric\n• Rendering assumed\n• Ephemeral cognition\n\nTwilight is orthogonal, not replaceable.",
+        "markdown": "Big players (e.g. Google Antigravity):\n\n• UI-first\n• SaaS-hosted\n• Execution-centric\n• Rendering assumed\n• Ephemeral cognition\n\nTwilite is orthogonal, not replaceable.",
         "memo": "",
         "link": "",
         "html": "",

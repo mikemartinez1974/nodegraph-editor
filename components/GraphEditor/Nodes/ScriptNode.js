@@ -58,7 +58,7 @@ export default function ScriptNode({
   const nodeRef = useRef(null);
   const runTokenRef = useRef(0);
   const node = useNodeHandleSchema(origNode, SCRIPT_INPUTS, SCRIPT_OUTPUTS);
-  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
+  const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
 
   const width = (node?.width || 260) * zoom;
   const height = (node?.height || 160) * zoom;

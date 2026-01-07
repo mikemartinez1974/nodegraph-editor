@@ -38,7 +38,7 @@
     {
       "id": "node_tz",
       "type": "default",
-      "label": "The Twilight Zone 🌌",
+      "label": "The Twilite Zone 🌌",
       "position": {
         "x": 400,
         "y": 50
@@ -203,7 +203,7 @@
     {
       "id": "node_doc",
       "type": "markdown",
-      "label": "About The Twilight Zone",
+      "label": "About The Twilite Zone",
       "position": {
         "x": 50,
         "y": 600
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# The Twilight Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it’s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.node)"
+        "memo": "# The Twilite Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it’s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.node)"
       }
     },
     {

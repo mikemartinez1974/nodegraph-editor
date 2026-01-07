@@ -1,26 +1,26 @@
 {
-  "id": "com.twilight.hello",
+  "id": "com.Twilite.hello",
   "version": "0.2.0",
-  "name": "Hello from the Twilight Zone",
+  "name": "Hello from the Twilite Zone",
   "description": "Demo plugin that exposes sample nodes, including a custom canvas renderer.",
   "permissions": ["graph.read", "selection.read"],
   "bundle": {
-    "url": "/plugins/twilight-hello/helloPlugin.js",
+    "url": "/plugins/Twilite-hello/helloPlugin.js",
     "sandbox": "iframe",
     "integrity": ""
   },
   "nodes": [
     {
-      "type": "twilight-hello",
-      "label": "Twilight Hello",
+      "type": "Twilite-hello",
+      "label": "Twilite Hello",
       "description": "A plugin-backed node that emits a friendly greeting.",
       "category": "demo",
       "icon": "WavingHand",
-      "entry": "/plugins/twilight-hello/helloPlugin.js#TwilightHelloNode",
+      "entry": "/plugins/Twilite-hello/helloPlugin.js#TwiliteHelloNode",
       "defaultWidth": 240,
       "defaultHeight": 160,
       "defaultData": {
-        "greeting": "Hello, from the Twilight Zone!",
+        "greeting": "Hello, from the Twilite Zone!",
         "tagline": "Friendly signal from another dimension",
         "mood": "calm",
         "emphasis": false
@@ -51,7 +51,7 @@
             "key": "greeting",
             "label": "Greeting",
             "type": "textarea",
-            "default": "Hello, from the Twilight Zone!",
+            "default": "Hello, from the Twilite Zone!",
             "helperText": "Shown inside the node body"
           },
           {
@@ -89,16 +89,16 @@
         }
       },
       "renderer": {
-        "entry": "/plugins/twilight-hello/helloRenderer.js"
+        "entry": "/plugins/Twilite-hello/helloRenderer.js"
       }
     },
     {
-      "type": "twilight-canvas",
-      "label": "Twilight Canvas",
+      "type": "Twilite-canvas",
+      "label": "Twilite Canvas",
       "description": "Canvas-rendered node that mimics the native canvas node entirely inside the plugin iframe.",
       "category": "advanced",
       "icon": "Gesture",
-      "entry": "/plugins/twilight-hello/helloPlugin.js#TwilightCanvasNode",
+      "entry": "/plugins/Twilite-hello/helloPlugin.js#TwiliteCanvasNode",
       "defaultWidth": 220,
       "defaultHeight": 140,
       "defaultData": {
@@ -159,7 +159,7 @@
         ]
       },
       "renderer": {
-        "entry": "/plugins/twilight-hello/canvasRenderer.js"
+        "entry": "/plugins/Twilite-hello/canvasRenderer.js"
       },
       "extensions": {
         "layout": {
@@ -173,11 +173,11 @@
   ],
   "panels": [],
   "metadata": {
-    "homepage": "https://example.com/twilight",
+    "homepage": "https://example.com/Twilite",
     "license": "MIT",
     "changelog": "0.1.0 – Initial sample plugin shipped with the host",
     "author": {
-      "name": "Twilight Lab"
+      "name": "Twilite Lab"
     }
   }
 }

@@ -82,7 +82,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why this plugin exists\n\nThe VS Code plugin places **Twilight next to consequence**.\n\n- The browser editor is the **thinking surface**\n- VS Code is the **execution surface**\n- The plugin is the **bridge**\n\nThis plugin is not about power.\nIt is about *context at the moment decisions are made*.",
+        "markdown": "## Why this plugin exists\n\nThe VS Code plugin places **Twilite next to consequence**.\n\n- The browser editor is the **thinking surface**\n- VS Code is the **execution surface**\n- The plugin is the **bridge**\n\nThis plugin is not about power.\nIt is about *context at the moment decisions are made*.",
         "memo": "",
         "link": "",
         "html": "",
@@ -102,7 +102,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## v0: Minimal, Honest Capabilities\n\n- Open a Twilight graph file in VS Code\n- Render nodes, edges, and groups (read-only)\n- Pan and zoom the graph\n- Select nodes\n- View node metadata in a side panel\n- Render Markdown content faithfully\n\n> If this alone is useful, the abstraction is correct.",
+        "markdown": "## v0: Minimal, Honest Capabilities\n\n- Open a Twilite graph file in VS Code\n- Render nodes, edges, and groups (read-only)\n- Pan and zoom the graph\n- Select nodes\n- View node metadata in a side panel\n- Render Markdown content faithfully\n\n> If this alone is useful, the abstraction is correct.",
         "memo": "",
         "link": "",
         "html": "",

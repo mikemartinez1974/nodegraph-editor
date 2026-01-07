@@ -41,7 +41,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Artifact Contract — Handles + Document URLs\n\n**Goal:** make Twilight artifacts reliably editable by humans and AIs.\n\nThis graph defines:\n- the **reality** of handle behavior (what the editor actually enforces)\n- how agents should mutate graphs (**deltas**, not overwrites)\n- how to represent **document URLs** when graphs can be local *or* remote"
+        "markdown": "# Artifact Contract — Handles + Document URLs\n\n**Goal:** make Twilite artifacts reliably editable by humans and AIs.\n\nThis graph defines:\n- the **reality** of handle behavior (what the editor actually enforces)\n- how agents should mutate graphs (**deltas**, not overwrites)\n- how to represent **document URLs** when graphs can be local *or* remote"
       }
     },
     {
@@ -54,7 +54,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reality: Handles (Today)\n- **Edges do not require handles.** If `sourceHandle`/`targetHandle` are omitted, edges attach to the node boundary.\n- **Handles are validated when supplied.** If you provide a handle key, it must exist on that node.\n- If both endpoint handles are present and typed, Twilight can enforce compatibility.\n\nImplication: documentation-style graphs (roadmaps) should usually omit handles."
+        "markdown": "## Reality: Handles (Today)\n- **Edges do not require handles.** If `sourceHandle`/`targetHandle` are omitted, edges attach to the node boundary.\n- **Handles are validated when supplied.** If you provide a handle key, it must exist on that node.\n- If both endpoint handles are present and typed, Twilite can enforce compatibility.\n\nImplication: documentation-style graphs (roadmaps) should usually omit handles."
       }
     },
     {
@@ -80,7 +80,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reality: Document URL (Problem)\nA graph can be loaded from:\n- a **remote** URL (`https://…/graph.node`)\n- a **GitHub** path (`github://owner/repo/path.node`)\n- a **local label** (`local://something.node`) which is *not* a fetchable URL\n- a Twilight link (`tlz://…`) which is convertible\n\nSeparately, the graph can embed a **background document** (`document.url`) used by the BackgroundFrame/RPC.\n\nWe need a contract that distinguishes:\n- where the graph was loaded from (address/source)\n- what document the graph embeds (background document)"
+        "markdown": "## Reality: Document URL (Problem)\nA graph can be loaded from:\n- a **remote** URL (`https://…/graph.node`)\n- a **GitHub** path (`github://owner/repo/path.node`)\n- a **local label** (`local://something.node`) which is *not* a fetchable URL\n- a Twilite link (`tlz://…`) which is convertible\n\nSeparately, the graph can embed a **background document** (`document.url`) used by the BackgroundFrame/RPC.\n\nWe need a contract that distinguishes:\n- where the graph was loaded from (address/source)\n- what document the graph embeds (background document)"
       }
     },
     {
@@ -106,7 +106,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mutation Contract: Deltas vs Replace\nTwilight’s superpower is continuity.\n\n- Default: AIs should emit **delta commands** (`action: create/update/delete/batch`), not full snapshots.\n- Replace is dangerous: importing a full `{nodes,edges,groups}` payload can wipe state.\n\nProposal:\n- Introduce an explicit, hard-to-accidentally-trigger replace mode (e.g., `action: \"replace\"` + `confirmReplace: true`).\n- For agents: treat replace as *forbidden* unless user explicitly asked to reset."
+        "markdown": "## Mutation Contract: Deltas vs Replace\nTwilite’s superpower is continuity.\n\n- Default: AIs should emit **delta commands** (`action: create/update/delete/batch`), not full snapshots.\n- Replace is dangerous: importing a full `{nodes,edges,groups}` payload can wipe state.\n\nProposal:\n- Introduce an explicit, hard-to-accidentally-trigger replace mode (e.g., `action: \"replace\"` + `confirmReplace: true`).\n- For agents: treat replace as *forbidden* unless user explicitly asked to reset."
       }
     },
     {

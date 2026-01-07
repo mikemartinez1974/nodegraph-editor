@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { useTwilightLinks } from "@/hooks/useTwilightLinks";
+import { useTwiliteLinks } from "@/hooks/useTwiliteLinks";
 
 export default function App({ Component, pageProps }) {
-  useTwilightLinks();
+  useTwiliteLinks();
   useEffect(() => {
     const origWarn = console.warn;
     const filteredWarn = (...args) => {

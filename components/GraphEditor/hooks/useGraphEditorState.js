@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GroupManager from '../GroupManager';
 
-const GRAPH_STORAGE_KEY = 'twilight_local_graph';
+const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
 const loadStoredGraph = () => {
   if (typeof window === 'undefined' || !window.localStorage) return null;
   try {

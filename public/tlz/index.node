@@ -284,7 +284,7 @@
     {
       "id": "node-16",
       "type": "default",
-      "label": "twilightzone_concept",
+      "label": "Twilitezone_concept",
       "position": {
         "x": -330,
         "y": 480
@@ -292,7 +292,7 @@
       "width": 200,
       "height": 80,
       "data": {
-        "link": "tlz:///tlz/twilightzone_concept.node"
+        "link": "tlz:///tlz/Twilitezone_concept.node"
       }
     },
     {

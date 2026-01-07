@@ -1,13 +1,13 @@
-# Twilight Graph Context (Disk-Native)
-**Purpose:** Define how an AI collaborator (Codex) reads, writes, and evolves Twilight graphs directly from the project filesystem.
+# Twilite Graph Context (Disk-Native)
+**Purpose:** Define how an AI collaborator (Codex) reads, writes, and evolves Twilite graphs directly from the project filesystem.
 
 ---
 
-## 1. What Twilight Is
+## 1. What Twilite Is
 
-Twilight is a **persistent, executable, disk-backed graph workspace**.
+Twilite is a **persistent, executable, disk-backed graph workspace**.
 
-A Twilight graph is:
+A Twilite graph is:
 - A **shared source of truth**
 - A **coordination surface** between human and AI
 - A **structured representation of intent**
@@ -38,7 +38,7 @@ Discipline is mandatory.
 
 ## 3. What a Graph Represents
 
-Each Twilight graph represents **one coherent intent**, such as:
+Each Twilite graph represents **one coherent intent**, such as:
 - A feature
 - A system architecture
 - A refactor plan
@@ -142,7 +142,7 @@ Spatial chaos is considered a bug.
 
 ## 9. Standard Collaboration Loop
 
-When asked to work with Twilight graphs:
+When asked to work with Twilite graphs:
 
 1. Locate and read the relevant graph file(s)
 2. Summarize intent internally

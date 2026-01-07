@@ -18,7 +18,7 @@ export default function BrowserPage() {
   const [themeName, setThemeName] = useState('default');
   const [themeReady, setThemeReady] = useState(false);
   const [muiTheme, setMuiTheme] = useState(() => themeMap['default']);
-  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
+  const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
 
   const isMobile = useMediaQuery('(max-width:768px)');
   const isTablet = useMediaQuery('(min-width:769px) and (max-width:1024px)');

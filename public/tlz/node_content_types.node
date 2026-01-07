@@ -78,7 +78,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Node Content Types\n\nThis graph documents the kinds of content you can place inside nodes and shows example node types.\n\nCommon content: **Markdown text**, **images & media**, **code snippets**, **tables/datasets**, **embeds (charts/iframes)**, **links (tlz:// / http(s)://)**, **tasks & status**, **decisions/logic**, **annotations/comments**, and **custom SVG/icons**.\n\nUse the examples around this overview to explore each content type.\n\nSee the Twilight Zone concept graph: [Twilight Zone Concept](tlz://cpwith.me/tlz/twilightzone_concept.json)"
+        "memo": "# Node Content Types\n\nThis graph documents the kinds of content you can place inside nodes and shows example node types.\n\nCommon content: **Markdown text**, **images & media**, **code snippets**, **tables/datasets**, **embeds (charts/iframes)**, **links (tlz:// / http(s)://)**, **tasks & status**, **decisions/logic**, **annotations/comments**, and **custom SVG/icons**.\n\nUse the examples around this overview to explore each content type.\n\nSee the Twilite Zone concept graph: [Twilite Zone Concept](tlz://cpwith.me/tlz/Twilitezone_concept.json)"
       }
     },
     {
@@ -183,7 +183,7 @@
       "showLabel": true,
       "data": {
         "memo": "Nodes can contain links to other graphs (tlz://), websites (https://), or resources. Use tlz:// to link to other TLZ graph files and allow in-app routing.",
-        "exampleLink": "tlz://cpwith.me/tlz/twilightzone_concept.json"
+        "exampleLink": "tlz://cpwith.me/tlz/Twilitezone_concept.json"
       }
     },
     {

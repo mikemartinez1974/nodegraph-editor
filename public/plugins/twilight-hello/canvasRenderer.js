@@ -1,7 +1,7 @@
 (function () {
   const sdk = window.NodeGraphPluginRenderer;
   if (!sdk || typeof sdk.createRenderer !== 'function') {
-    console.error('[TwilightCanvasRenderer] Renderer SDK missing');
+    console.error('[TwiliteCanvasRenderer] Renderer SDK missing');
     return;
   }
 

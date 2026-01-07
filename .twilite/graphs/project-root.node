@@ -81,7 +81,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Project Identity\n\n**Twilight** is a persistent, disk-backed graph workspace used to capture intent alongside code.\n\nThis repository is the authoritative home for that system."
+        "markdown": "## Project Identity\n\n**Twilite** is a persistent, disk-backed graph workspace used to capture intent alongside code.\n\nThis repository is the authoritative home for that system."
       }
     },
     {

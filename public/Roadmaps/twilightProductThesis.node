@@ -1,14 +1,14 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Twilight — Graph-Native Workspace (Thesis)",
+    "title": "Twilite — Graph-Native Workspace (Thesis)",
     "description": "Product story: graphs as first-class artifacts that can live on the web, be read/written by AI, and eventually execute.",
     "created": "2025-12-29T00:00:00.000Z",
     "modified": "2025-12-29T19:55:00.000Z",
     "author": "",
     "tags": [
       "roadmap",
-      "twilight",
+      "Twilite",
       "thesis",
       "artifact",
       "ai",
@@ -43,7 +43,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Twilight\n## The Graph is the Product\n\nTwilight is a **graph-native workspace** where visual thinking meets AI collaboration.\n\n**The core insight:** Most graph tools treat the graph as UI state. Twilight treats it as a **durable, portable artifact** — a file format that humans and AI agents can both read and write.\n\n| Capability | What It Means |\n|------------|---------------|\n| 🌐 **Web-native** | Graphs live at URLs, can be linked, embedded, shared |\n| 🤖 **AI-first** | Agents can create, update, and reason about graphs safely |\n| ⚡ **Executable** | Graphs can evolve from thinking → workflows → running code |\n\n*The editor is a means. The artifact is the thing with power.*"
+        "markdown": "# Twilite\n## The Graph is the Product\n\nTwilite is a **graph-native workspace** where visual thinking meets AI collaboration.\n\n**The core insight:** Most graph tools treat the graph as UI state. Twilite treats it as a **durable, portable artifact** — a file format that humans and AI agents can both read and write.\n\n| Capability | What It Means |\n|------------|---------------|\n| 🌐 **Web-native** | Graphs live at URLs, can be linked, embedded, shared |\n| 🤖 **AI-first** | Agents can create, update, and reason about graphs safely |\n| ⚡ **Executable** | Graphs can evolve from thinking → workflows → running code |\n\n*The editor is a means. The artifact is the thing with power.*"
       }
     },
     {
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Pitch\n\n> **\"Figma meets ChatGPT for visual thinking.\"**\n\nDescribe what you want to an AI → AI generates a graph → Paste into Twilight → Graph appears instantly.\n\nNo manual clicking and dragging. Just think, describe, and see."
+        "markdown": "## The Pitch\n\n> **\"Figma meets ChatGPT for visual thinking.\"**\n\nDescribe what you want to an AI → AI generates a graph → Paste into Twilite → Graph appears instantly.\n\nNo manual clicking and dragging. Just think, describe, and see."
       }
     },
     {
@@ -121,7 +121,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why Not Existing Tools?\n\n| Tool | Limitation |\n|------|------------|\n| **Miro/FigJam** | Graphs are visual-only, no semantic structure |\n| **Notion** | Great for docs, weak for relationships |\n| **Obsidian** | File-based but graph is read-only |\n| **React Flow** | Developer tool, not end-user product |\n| **Lucidchart** | Proprietary, no AI integration |\n| **Excalidraw** | Drawing, not structured graphs |\n\n---\n\n**Twilight's difference:**\n- Graphs are *writable* by AI (not just viewable)\n- Graphs are *portable* (not locked in)\n- Graphs can *execute* (not just visualize)"
+        "markdown": "## Why Not Existing Tools?\n\n| Tool | Limitation |\n|------|------------|\n| **Miro/FigJam** | Graphs are visual-only, no semantic structure |\n| **Notion** | Great for docs, weak for relationships |\n| **Obsidian** | File-based but graph is read-only |\n| **React Flow** | Developer tool, not end-user product |\n| **Lucidchart** | Proprietary, no AI integration |\n| **Excalidraw** | Drawing, not structured graphs |\n\n---\n\n**Twilite's difference:**\n- Graphs are *writable* by AI (not just viewable)\n- Graphs are *portable* (not locked in)\n- Graphs can *execute* (not just visualize)"
       }
     },
     {
@@ -134,7 +134,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Artifact\n\nA Twilight graph is a `.node` file:\n\n```json\n{\n  \"fileVersion\": \"1.0\",\n  \"metadata\": { ... },\n  \"settings\": { ... },\n  \"viewport\": { ... },\n  \"nodes\": [ ... ],\n  \"edges\": [ ... ],\n  \"groups\": [ ... ]\n}\n```\n\n**Properties:**\n- 📁 Portable JSON (store in Git, S3, anywhere)\n- 🔑 Stable node/edge IDs (meaningful diffs)\n- 🎨 Settings + viewport (opens exactly as saved)\n- 🔌 Plugin extensions (namespaced custom data)\n- 📄 Optional embedded document\n\n**Goal:** A graph that survives time, tools, and AI assistants."
+        "markdown": "## The Artifact\n\nA Twilite graph is a `.node` file:\n\n```json\n{\n  \"fileVersion\": \"1.0\",\n  \"metadata\": { ... },\n  \"settings\": { ... },\n  \"viewport\": { ... },\n  \"nodes\": [ ... ],\n  \"edges\": [ ... ],\n  \"groups\": [ ... ]\n}\n```\n\n**Properties:**\n- 📁 Portable JSON (store in Git, S3, anywhere)\n- 🔑 Stable node/edge IDs (meaningful diffs)\n- 🎨 Settings + viewport (opens exactly as saved)\n- 🔌 Plugin extensions (namespaced custom data)\n- 📄 Optional embedded document\n\n**Goal:** A graph that survives time, tools, and AI assistants."
       }
     },
     {
@@ -160,7 +160,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Workflow\n\n### For Humans\n1. **Describe** what you want to an AI\n2. **AI generates** graph JSON\n3. **Paste** into Twilight (Ctrl+V)\n4. **Graph appears** — edit, extend, save\n\n### For AI Agents\n1. **Read** `.node` files from filesystem/URLs\n2. **Reason** about structure and relationships\n3. **Write** delta mutations (create/update/delete)\n4. **Validate** changes before applying\n\n### For Teams\n1. **Store** graphs in Git\n2. **Review** changes as diffs in PRs\n3. **Share** via URLs or embeds\n4. **Remix** templates and patterns"
+        "markdown": "## The Workflow\n\n### For Humans\n1. **Describe** what you want to an AI\n2. **AI generates** graph JSON\n3. **Paste** into Twilite (Ctrl+V)\n4. **Graph appears** — edit, extend, save\n\n### For AI Agents\n1. **Read** `.node` files from filesystem/URLs\n2. **Reason** about structure and relationships\n3. **Write** delta mutations (create/update/delete)\n4. **Validate** changes before applying\n\n### For Teams\n1. **Store** graphs in Git\n2. **Review** changes as diffs in PRs\n3. **Share** via URLs or embeds\n4. **Remix** templates and patterns"
       }
     },
     {
@@ -225,7 +225,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Use Cases\n\n| Category | Examples |\n|----------|----------|\n| **Visual Thinking** | Brainstorming, mind maps, ideation |\n| **Knowledge Graphs** | Concepts, relationships, hierarchies |\n| **Project Planning** | Roadmaps, timelines, dependencies |\n| **Learning** | Study diagrams, concept maps |\n| **Research** | Notes, citations, connections |\n| **Storytelling** | Narrative structures, character webs |\n| **Architecture** | System design, component maps |\n| **Decision Making** | Pros/cons, options, tradeoffs |\n\n---\n\n**Common thread:** Any time you need to *see* how things connect, Twilight can help — and AI can help you build it."
+        "markdown": "## Use Cases\n\n| Category | Examples |\n|----------|----------|\n| **Visual Thinking** | Brainstorming, mind maps, ideation |\n| **Knowledge Graphs** | Concepts, relationships, hierarchies |\n| **Project Planning** | Roadmaps, timelines, dependencies |\n| **Learning** | Study diagrams, concept maps |\n| **Research** | Notes, citations, connections |\n| **Storytelling** | Narrative structures, character webs |\n| **Architecture** | System design, component maps |\n| **Decision Making** | Pros/cons, options, tradeoffs |\n\n---\n\n**Common thread:** Any time you need to *see* how things connect, Twilite can help — and AI can help you build it."
       }
     },
     {
@@ -238,7 +238,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Next Steps\n\n### Near-Term\n- ✅ Standardize `.node` format on `fileVersion: \"1.0\"`\n- ✅ Enforce safe delta mutations (reject unsafe full rewrites)\n- 🔄 Improve auto-layout so minimal payloads look professional\n- 🔄 Formalize document URL semantics\n\n### Medium-Term\n- Publish explicit command schema for AI integrations\n- Template gallery + community sharing\n- Read-only embed viewer\n- Plugin marketplace\n\n### Long-Term\n- Real-time collaboration\n- Execution runtime for workflow graphs\n- Agent SDK for building on Twilight"
+        "markdown": "## Next Steps\n\n### Near-Term\n- ✅ Standardize `.node` format on `fileVersion: \"1.0\"`\n- ✅ Enforce safe delta mutations (reject unsafe full rewrites)\n- 🔄 Improve auto-layout so minimal payloads look professional\n- 🔄 Formalize document URL semantics\n\n### Medium-Term\n- Publish explicit command schema for AI integrations\n- Template gallery + community sharing\n- Read-only embed viewer\n- Plugin marketplace\n\n### Long-Term\n- Real-time collaboration\n- Execution runtime for workflow graphs\n- Agent SDK for building on Twilite"
       }
     }
   ],

@@ -59,7 +59,7 @@
     {
       "id": "arch-graph-file",
       "type": "markdown",
-      "label": "📄 Twilight Graph File",
+      "label": "📄 Twilite Graph File",
       "position": {
         "x": 670.822242805952,
         "y": 910.2108418732792
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Twilight Graph File (On Disk)\n\n**Owns:**\n- Graph state\n- Node IDs\n- History continuity\n\n**Guarantees:**\n- Stable read semantics\n- Git-compatible diffs\n\n**Does NOT:**\n- Execute\n- Render\n- Know about VS Code",
+        "markdown": "## Twilite Graph File (On Disk)\n\n**Owns:**\n- Graph state\n- Node IDs\n- History continuity\n\n**Guarantees:**\n- Stable read semantics\n- Git-compatible diffs\n\n**Does NOT:**\n- Execute\n- Render\n- Know about VS Code",
         "memo": "",
         "link": "",
         "html": "",

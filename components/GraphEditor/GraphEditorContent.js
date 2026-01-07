@@ -34,7 +34,7 @@ const GraphEditorContent = () => {
   const services = useGraphEditorServicesContext();
   const historyHook = useGraphEditorHistoryContext();
   const rpc = useGraphEditorRpcContext();
-  const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
+  const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
 
   const {
     nodes,
@@ -227,23 +227,23 @@ const GraphEditorContent = () => {
       }
     };
 
-    window.__TWILIGHT_APPLY_GRAPH__ = applyGraph;
-    window.twilightApplyGraph = applyGraph;
-    if (window.__TWILIGHT_PENDING_GRAPH__) {
-      const pending = window.__TWILIGHT_PENDING_GRAPH__;
-      window.__TWILIGHT_PENDING_GRAPH__ = null;
+    window.__Twilite_APPLY_GRAPH__ = applyGraph;
+    window.TwiliteApplyGraph = applyGraph;
+    if (window.__Twilite_PENDING_GRAPH__) {
+      const pending = window.__Twilite_PENDING_GRAPH__;
+      window.__Twilite_PENDING_GRAPH__ = null;
       applyGraph(pending);
     }
     try {
-      window.dispatchEvent(new CustomEvent('twilight-ready'));
+      window.dispatchEvent(new CustomEvent('Twilite-ready'));
     } catch {}
 
     return () => {
-      if (window.__TWILIGHT_APPLY_GRAPH__ === applyGraph) {
-        delete window.__TWILIGHT_APPLY_GRAPH__;
+      if (window.__Twilite_APPLY_GRAPH__ === applyGraph) {
+        delete window.__Twilite_APPLY_GRAPH__;
       }
-      if (window.twilightApplyGraph === applyGraph) {
-        delete window.twilightApplyGraph;
+      if (window.TwiliteApplyGraph === applyGraph) {
+        delete window.TwiliteApplyGraph;
       }
     };
   }, [handleLoadGraph, setNodes, setEdges, setGroups, nodesRef, edgesRef]);

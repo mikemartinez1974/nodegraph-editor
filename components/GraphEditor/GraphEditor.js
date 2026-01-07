@@ -674,10 +674,10 @@ useEffect(() => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const exportGraph = () => buildGraphSaveData();
-    window.__TWILIGHT_EXPORT_GRAPH__ = exportGraph;
+    window.__Twilite_EXPORT_GRAPH__ = exportGraph;
     return () => {
-      if (window.__TWILIGHT_EXPORT_GRAPH__ === exportGraph) {
-        delete window.__TWILIGHT_EXPORT_GRAPH__;
+      if (window.__Twilite_EXPORT_GRAPH__ === exportGraph) {
+        delete window.__Twilite_EXPORT_GRAPH__;
       }
     };
   }, [buildGraphSaveData]);

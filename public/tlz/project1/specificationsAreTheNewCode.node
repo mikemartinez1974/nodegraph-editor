@@ -1,28 +1,14 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Specifications Are the New Code",
-    "description": "A graph distilling the talk: intent/specifications as the primary artifact, with clusters for communication, tooling, and societal analogies.",
-    "created": "2025-12-29T00:00:00.000Z",
-    "modified": "2025-12-29T00:00:00.000Z",
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-07T05:11:13.449Z",
+    "modified": "2026-01-07T05:11:13.449Z",
     "author": "",
-    "tags": [
-      "specifications",
-      "intent",
-      "communication",
-      "tooling",
-      "alignment"
-    ]
+    "tags": []
   },
   "settings": {
-    "layout": {
-      "mode": "manual",
-      "defaultLayout": "hierarchical",
-      "direction": "DOWN",
-      "serpentine": { "maxPerRow": 6 },
-      "cycleFallback": { "enabled": true },
-      "edgeLaneGapPx": 10
-    },
     "theme": {
       "mode": "light",
       "primary": {
@@ -37,247 +23,1117 @@
         "dark": "#9a0036",
         "contrastText": "#fff"
       },
-      "background": { "default": "#e8eaf6", "paper": "#ffffff" },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
       "text": {
         "primary": "rgba(0, 0, 0, 0.87)",
         "secondary": "rgba(0, 0, 0, 0.6)"
       },
       "divider": "rgba(0, 0, 0, 0.12)"
-    }
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
   },
+  "viewport": {
+    "pan": {
+      "x": 643.4803681235962,
+      "y": 54.5313896057051
+    },
+    "zoom": 0.7838475885417575
+  },
+  "document": null,
+  "scripts": [],
   "nodes": [
     {
       "id": "spec-root",
       "type": "markdown",
       "label": "🧠 Specifications Are the New Code",
-      "position": { "x": -460, "y": -40 },
-      "width": 920,
-      "height": 380,
+      "position": {
+        "x": -460,
+        "y": -40
+      },
+      "width": 585.4943998940581,
+      "height": 341.697832048938,
       "visible": true,
       "showLabel": true,
       "data": {
         "markdown": "# Code is not the primary artifact — intent is.\n\n## Key assertions\n- Code is **10–20%** of the value\n- Structured communication is **80–90%**\n- Engineering ≠ typing\n- Programming = **alignment work**\n\nThis node is the anchor: everything below is “how intent becomes reality.”"
       }
     },
-
     {
       "id": "c1-core",
       "type": "markdown",
       "label": "🟦 Engineering Reality",
-      "position": { "x": -1380, "y": 460 },
+      "position": {
+        "x": -1380,
+        "y": 460
+      },
       "width": 680,
       "height": 240,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Engineering is a communication pipeline\n\nThe work is mostly **finding/clarifying intent**, not typing." }
+      "data": {
+        "markdown": "## Engineering is a communication pipeline\n\nThe work is mostly **finding/clarifying intent**, not typing."
+      }
     },
     {
       "id": "c1-insight",
       "type": "markdown",
       "label": "🔑 Insight",
-      "position": { "x": -1380, "y": 720 },
+      "position": {
+        "x": -1380,
+        "y": 720
+      },
       "width": 680,
       "height": 140,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Every step except one is communication.\nThe only non-communication step is: **translate to code**." }
+      "data": {
+        "markdown": "## Every step except one is communication.\nThe only non-communication step is: **translate to code**."
+      }
     },
-    { "id": "c1-s1", "type": "default", "label": "Talk to users", "position": { "x": -1380, "y": 900 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s2", "type": "default", "label": "Understand challenges", "position": { "x": -1160, "y": 900 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s3", "type": "default", "label": "Distill stories", "position": { "x": -920, "y": 900 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s4", "type": "default", "label": "Ideate solutions", "position": { "x": -1380, "y": 990 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s5", "type": "default", "label": "Define goals", "position": { "x": -1160, "y": 990 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s6", "type": "default", "label": "Plan approaches", "position": { "x": -920, "y": 990 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s7", "type": "default", "label": "Share plans", "position": { "x": -1380, "y": 1080 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s8", "type": "default", "label": "Translate to code", "position": { "x": -1160, "y": 1080 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s9", "type": "default", "label": "Run code", "position": { "x": -920, "y": 1080 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s10", "type": "default", "label": "Observe effects", "position": { "x": -1260, "y": 1170 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c1-s11", "type": "default", "label": "Verify outcomes", "position": { "x": -1040, "y": 1170 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-
+    {
+      "id": "c1-s1",
+      "type": "default",
+      "label": "Talk to users",
+      "position": {
+        "x": -1380,
+        "y": 900
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s2",
+      "type": "default",
+      "label": "Understand challenges",
+      "position": {
+        "x": -1160,
+        "y": 900
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s3",
+      "type": "default",
+      "label": "Distill stories",
+      "position": {
+        "x": -920,
+        "y": 900
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s4",
+      "type": "default",
+      "label": "Ideate solutions",
+      "position": {
+        "x": -1380,
+        "y": 990
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s5",
+      "type": "default",
+      "label": "Define goals",
+      "position": {
+        "x": -1153.8566321123078,
+        "y": 990.1941959716477
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s6",
+      "type": "default",
+      "label": "Plan approaches",
+      "position": {
+        "x": -922.566158491778,
+        "y": 993.6023836120522
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s7",
+      "type": "default",
+      "label": "Share plans",
+      "position": {
+        "x": -1386.5553942326649,
+        "y": 1079.9481117532632
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s8",
+      "type": "default",
+      "label": "Translate to code",
+      "position": {
+        "x": -1371.4545608733772,
+        "y": 1236.4031363450763
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s9",
+      "type": "default",
+      "label": "Run code",
+      "position": {
+        "x": -1119.907617567607,
+        "y": 1233.5908936349142
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s10",
+      "type": "default",
+      "label": "Observe effects",
+      "position": {
+        "x": -1165.3208159246628,
+        "y": 1076.577951047184
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c1-s11",
+      "type": "default",
+      "label": "Verify outcomes",
+      "position": {
+        "x": -926.970854353383,
+        "y": 1235.7414418556857
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
     {
       "id": "c2-core",
       "type": "markdown",
       "label": "🟦 Bottleneck Revealed",
-      "position": { "x": 700, "y": 460 },
+      "position": {
+        "x": 700,
+        "y": 460
+      },
       "width": 680,
       "height": 250,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Structured communication is the bottleneck\n\nThis is the pivot: everything downstream improves when intent becomes **durable + structured**." }
+      "data": {
+        "markdown": "## Structured communication is the bottleneck\n\nThis is the pivot: everything downstream improves when intent becomes **durable + structured**."
+      }
     },
-    { "id": "c2-in-req", "type": "default", "label": "Requirement gathering", "position": { "x": 700, "y": 740 }, "width": 240, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-in-goals", "type": "default", "label": "Goal clarity", "position": { "x": 960, "y": 740 }, "width": 190, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-in-success", "type": "default", "label": "Success criteria", "position": { "x": 1165, "y": 740 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-in-eval", "type": "default", "label": "Evaluation", "position": { "x": 700, "y": 830 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-pivot", "type": "markdown", "label": "🎯 Pivot Claim", "position": { "x": 700, "y": 920 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## The best communicator becomes the best programmer.\n\nBecause they can **author the spec** everyone else executes." } },
-    { "id": "c2-out-ai", "type": "default", "label": "AI leverage", "position": { "x": 700, "y": 1100 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-out-value", "type": "default", "label": "Programmer value", "position": { "x": 880, "y": 1100 }, "width": 190, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c2-out-vel", "type": "default", "label": "Velocity", "position": { "x": 1090, "y": 1100 }, "width": 140, "height": 70, "visible": true, "showLabel": true, "data": {} },
-
+    {
+      "id": "c2-in-req",
+      "type": "default",
+      "label": "Requirement gathering",
+      "position": {
+        "x": 700,
+        "y": 740
+      },
+      "width": 240,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-in-goals",
+      "type": "default",
+      "label": "Goal clarity",
+      "position": {
+        "x": 960,
+        "y": 740
+      },
+      "width": 190,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-in-success",
+      "type": "default",
+      "label": "Success criteria",
+      "position": {
+        "x": 1165,
+        "y": 740
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-in-eval",
+      "type": "default",
+      "label": "Evaluation",
+      "position": {
+        "x": 700,
+        "y": 830
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-pivot",
+      "type": "markdown",
+      "label": "🎯 Pivot Claim",
+      "position": {
+        "x": 700,
+        "y": 920
+      },
+      "width": 680,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The best communicator becomes the best programmer.\n\nBecause they can **author the spec** everyone else executes."
+      }
+    },
+    {
+      "id": "c2-out-ai",
+      "type": "default",
+      "label": "AI leverage",
+      "position": {
+        "x": 700,
+        "y": 1100
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-out-value",
+      "type": "default",
+      "label": "Programmer value",
+      "position": {
+        "x": 880,
+        "y": 1100
+      },
+      "width": 190,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c2-out-vel",
+      "type": "default",
+      "label": "Velocity",
+      "position": {
+        "x": 1090,
+        "y": 1100
+      },
+      "width": 140,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
     {
       "id": "c3-core",
       "type": "markdown",
       "label": "🟨 Vibe Coding (Symptom)",
-      "position": { "x": -1380, "y": 1180 },
+      "position": {
+        "x": -2157.036540604714,
+        "y": 1141.6220069596652
+      },
       "width": 680,
       "height": 220,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Why vibe coding feels good\nBecause it’s **intent-first** and reduces cognitive overhead." }
+      "data": {
+        "markdown": "## Why vibe coding feels good\nBecause it’s **intent-first** and reduces cognitive overhead."
+      }
     },
-    { "id": "c3-intent", "type": "default", "label": "Intent-first", "position": { "x": -1380, "y": 1420 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c3-load", "type": "default", "label": "Reduced cognitive load", "position": { "x": -1200, "y": 1420 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c3-leverage", "type": "default", "label": "Leverage models", "position": { "x": -960, "y": 1420 }, "width": 180, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c3-problem", "type": "markdown", "label": "⚠️ Problem", "position": { "x": -1380, "y": 1510 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Prompts are treated as disposable\nWe throw away the *source* of intent and keep only the compiled output." } },
-    { "id": "c3-analogy", "type": "markdown", "label": "🧨 Strong metaphor", "position": { "x": -1380, "y": 1680 }, "width": 680, "height": 160, "visible": true, "showLabel": true, "data": { "markdown": "## “We shred the source and version the binary.”\nThis deserves its own node: it is the core critique." } },
-
+    {
+      "id": "c3-intent",
+      "type": "default",
+      "label": "Intent-first",
+      "position": {
+        "x": -2138.9429792967876,
+        "y": 1338.718357117395
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c3-load",
+      "type": "default",
+      "label": "Reduced cognitive load",
+      "position": {
+        "x": -1950.8378662272128,
+        "y": 1338.7341584505175
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c3-leverage",
+      "type": "default",
+      "label": "Leverage models",
+      "position": {
+        "x": -1706.3034383766374,
+        "y": 1337.564998488348
+      },
+      "width": 180,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c3-problem",
+      "type": "markdown",
+      "label": "⚠️ Problem",
+      "position": {
+        "x": -2162.9896958424283,
+        "y": 1566.1734513045958
+      },
+      "width": 680,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Prompts are treated as disposable\nWe throw away the *source* of intent and keep only the compiled output."
+      }
+    },
+    {
+      "id": "c3-analogy",
+      "type": "markdown",
+      "label": "🧨 Strong metaphor",
+      "position": {
+        "x": -2161.836337213381,
+        "y": 1767.314134288868
+      },
+      "width": 682.3067172580942,
+      "height": 194.6007588714134,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## “We shred the source and version the binary.”\nThis deserves its own node: it is the core critique."
+      }
+    },
     {
       "id": "c4-core",
       "type": "markdown",
       "label": "🟩 Specification as Source of Truth",
-      "position": { "x": 700, "y": 1180 },
-      "width": 680,
-      "height": 260,
+      "position": {
+        "x": 1431.2772247700086,
+        "y": 1294.3852343434128
+      },
+      "width": 305.51514604538966,
+      "height": 385.56910533196134,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Specification = primary artifact\n\nProperties:\n- Aligns humans\n- Captures intent\n- Encodes values\n- Enables debate\n- Enables synchronization" }
+      "data": {
+        "markdown": "## Specification = primary artifact\n\nProperties:\n- Aligns humans\n- Captures intent\n- Encodes values\n- Enables debate\n- Enables synchronization"
+      }
     },
-    { "id": "c4-claim", "type": "markdown", "label": "Key Claim", "position": { "x": 700, "y": 1460 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Code is a lossy projection of a spec.\n\nSpec → Code is lossy.\nCode → Spec requires irreversible inference." } },
-    { "id": "c4-code", "type": "default", "label": "Code (projection)", "position": { "x": 700, "y": 1630 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-
+    {
+      "id": "c4-claim",
+      "type": "markdown",
+      "label": "Key Claim",
+      "position": {
+        "x": 1771.7029775052342,
+        "y": 1302.68143647548
+      },
+      "width": 333.2959215613103,
+      "height": 190.0043167429257,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Code is a lossy projection of a spec.\n\nSpec → Code is lossy.\nCode → Spec requires irreversible inference."
+      }
+    },
+    {
+      "id": "c4-code",
+      "type": "default",
+      "label": "Code (projection)",
+      "position": {
+        "x": 1831.7094526196233,
+        "y": 1621.5863932408151
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
     {
       "id": "c5-core",
       "type": "markdown",
       "label": "🟩 Specs Compile to Many Artifacts",
-      "position": { "x": -1380, "y": 1900 },
+      "position": {
+        "x": -1380,
+        "y": 1897.8389072082782
+      },
       "width": 680,
       "height": 230,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Specs compile to many artifacts\n\nA spec is architecture-agnostic source.\nThis is Twilight’s export model." }
+      "data": {
+        "markdown": "## Specs compile to many artifacts\n\nA spec is architecture-agnostic source.\nThis is Twilite’s export model."
+      }
     },
-    { "id": "c5-ts", "type": "default", "label": "TypeScript", "position": { "x": -1380, "y": 2150 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-rust", "type": "default", "label": "Rust", "position": { "x": -1200, "y": 2150 }, "width": 140, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-servers", "type": "default", "label": "Servers", "position": { "x": -1040, "y": 2150 }, "width": 140, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-clients", "type": "default", "label": "Clients", "position": { "x": -880, "y": 2150 }, "width": 140, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-docs", "type": "default", "label": "Docs", "position": { "x": -1380, "y": 2240 }, "width": 120, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-tutorials", "type": "default", "label": "Tutorials", "position": { "x": -1240, "y": 2240 }, "width": 140, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-blog", "type": "default", "label": "Blog posts", "position": { "x": -1080, "y": 2240 }, "width": 150, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-pod", "type": "default", "label": "Podcasts", "position": { "x": -910, "y": 2240 }, "width": 150, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c5-compiler", "type": "markdown", "label": "🧩 Compiler Analogy", "position": { "x": -1380, "y": 2330 }, "width": 680, "height": 140, "visible": true, "showLabel": true, "data": { "markdown": "## Specs are architecture-agnostic source.\nThe toolchain decides what to emit." } },
-
+    {
+      "id": "c5-ts",
+      "type": "default",
+      "label": "TypeScript",
+      "position": {
+        "x": -1380,
+        "y": 2150
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-rust",
+      "type": "default",
+      "label": "Rust",
+      "position": {
+        "x": -1200,
+        "y": 2150
+      },
+      "width": 140,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-servers",
+      "type": "default",
+      "label": "Servers",
+      "position": {
+        "x": -1040,
+        "y": 2150
+      },
+      "width": 140,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-clients",
+      "type": "default",
+      "label": "Clients",
+      "position": {
+        "x": -880,
+        "y": 2150
+      },
+      "width": 140,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-docs",
+      "type": "default",
+      "label": "Docs",
+      "position": {
+        "x": -1380,
+        "y": 2240
+      },
+      "width": 120,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-tutorials",
+      "type": "default",
+      "label": "Tutorials",
+      "position": {
+        "x": -1240,
+        "y": 2240
+      },
+      "width": 140,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-blog",
+      "type": "default",
+      "label": "Blog posts",
+      "position": {
+        "x": -1080,
+        "y": 2238.723261068298
+      },
+      "width": 150,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-pod",
+      "type": "default",
+      "label": "Podcasts",
+      "position": {
+        "x": -913.8302167951063,
+        "y": 2233.61630534149
+      },
+      "width": 150,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c5-compiler",
+      "type": "markdown",
+      "label": "🧩 Compiler Analogy",
+      "position": {
+        "x": -1380,
+        "y": 2330
+      },
+      "width": 687.7104159568993,
+      "height": 202.96839698134445,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Specs are architecture-agnostic source.\nThe toolchain decides what to emit."
+      }
+    },
     {
       "id": "c6-core",
       "type": "markdown",
       "label": "🟧 Concrete Example",
-      "position": { "x": 700, "y": 1900 },
+      "position": {
+        "x": 700,
+        "y": 1900
+      },
       "width": 680,
       "height": 260,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## OpenAI Model Spec\n\nProperties:\n- Markdown\n- Versioned\n- Human-readable\n- Open-source\n- Multi-disciplinary" }
+      "data": {
+        "markdown": "## OpenAI Model Spec\n\nProperties:\n- Markdown\n- Versioned\n- Human-readable\n- Open-source\n- Multi-disciplinary"
+      }
     },
-    { "id": "c6-clause", "type": "default", "label": "Clause IDs", "position": { "x": 700, "y": 2180 }, "width": 160, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c6-tests", "type": "default", "label": "Per-clause test cases", "position": { "x": 880, "y": 2180 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c6-success", "type": "default", "label": "Explicit success criteria", "position": { "x": 1120, "y": 2180 }, "width": 240, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c6-insight", "type": "markdown", "label": "🔑 Huge insight", "position": { "x": 700, "y": 2270 }, "width": 680, "height": 140, "visible": true, "showLabel": true, "data": { "markdown": "## The spec contains its own evals.\nWhen the spec is testable, it becomes **executable**." } },
-
+    {
+      "id": "c6-clause",
+      "type": "default",
+      "label": "Clause IDs",
+      "position": {
+        "x": 700,
+        "y": 2180
+      },
+      "width": 160,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c6-tests",
+      "type": "default",
+      "label": "Per-clause test cases",
+      "position": {
+        "x": 880,
+        "y": 2180
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c6-success",
+      "type": "default",
+      "label": "Explicit success criteria",
+      "position": {
+        "x": 1120,
+        "y": 2180
+      },
+      "width": 240,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c6-insight",
+      "type": "markdown",
+      "label": "🔑 Huge insight",
+      "position": {
+        "x": 700,
+        "y": 2270
+      },
+      "width": 682.5701386522998,
+      "height": 193.97291169829523,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The spec contains its own evals.\nWhen the spec is testable, it becomes **executable**."
+      }
+    },
     {
       "id": "c7-core",
       "type": "markdown",
       "label": "🟥 Failure Case",
-      "position": { "x": -1380, "y": 2620 },
-      "width": 680,
-      "height": 240,
+      "position": {
+        "x": -1380,
+        "y": 2620
+      },
+      "width": 668.434376064651,
+      "height": 170.60625638790611,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Sycophancy incident\n\nThis is what happens when behavior drifts away from the intended spec." }
+      "data": {
+        "markdown": "## Sycophancy incident\n\nThis is what happens when behavior drifts away from the intended spec."
+      }
     },
-    { "id": "c7-mis", "type": "default", "label": "Misbehavior", "position": { "x": -1380, "y": 2880 }, "width": 150, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c7-trust", "type": "default", "label": "Trust erosion", "position": { "x": -1210, "y": 2880 }, "width": 170, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c7-public", "type": "default", "label": "Public concern", "position": { "x": -1020, "y": 2880 }, "width": 170, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c7-path", "type": "markdown", "label": "Resolution Path", "position": { "x": -1380, "y": 2970 }, "width": 680, "height": 170, "visible": true, "showLabel": true, "data": { "markdown": "## Resolution path\n- Spec already forbade behavior → behavior = bug\n- Rollback + fix\n- Re-validate against spec" } },
-    { "id": "c7-anchor", "type": "markdown", "label": "Trust anchor", "position": { "x": -1380, "y": 3160 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Spec as trust anchor\nConnects humans ↔ models ↔ accountability." } },
-
+    {
+      "id": "c7-mis",
+      "type": "default",
+      "label": "Misbehavior",
+      "position": {
+        "x": -1385.1402773045995,
+        "y": 2811.891325714056
+      },
+      "width": 150,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c7-trust",
+      "type": "default",
+      "label": "Trust erosion",
+      "position": {
+        "x": -1193.2940987600516,
+        "y": 2811.8913257140557
+      },
+      "width": 170,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c7-public",
+      "type": "default",
+      "label": "Public concern",
+      "position": {
+        "x": -967.3121576278546,
+        "y": 2811.891325714056
+      },
+      "width": 170,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c7-path",
+      "type": "markdown",
+      "label": "Resolution Path",
+      "position": {
+        "x": -1377.4298613477001,
+        "y": 2963.5746533692504
+      },
+      "width": 680,
+      "height": 170,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Resolution path\n- Spec already forbade behavior → behavior = bug\n- Rollback + fix\n- Re-validate against spec"
+      }
+    },
+    {
+      "id": "c7-anchor",
+      "type": "markdown",
+      "label": "Trust anchor",
+      "position": {
+        "x": -1380,
+        "y": 3198.5520797844965
+      },
+      "width": 680,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Spec as trust anchor\nConnects humans ↔ models ↔ accountability."
+      }
+    },
     {
       "id": "c8-core",
       "type": "markdown",
       "label": "🟫 Specs Are Executable",
-      "position": { "x": 700, "y": 2620 },
-      "width": 680,
-      "height": 250,
+      "position": {
+        "x": 700,
+        "y": 2620
+      },
+      "width": 338.60584580205443,
+      "height": 268.4537380647538,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Specifications are executable\n\nThey can be:\n- Training material\n- Evaluation material\n- Reinforcement signal\n- Weight shaping (not just prompts)" }
+      "data": {
+        "markdown": "## Specifications are executable\n\nThey can be:\n- Training material\n- Evaluation material\n- Reinforcement signal\n- Weight shaping (not just prompts)"
+      }
     },
-    { "id": "c8-contrast", "type": "markdown", "label": "Contrast", "position": { "x": 700, "y": 2890 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Prompting vs Specs\n- Prompting → inference-time tax\n- Specs → baked into weights" } },
-    { "id": "c8-phrase", "type": "markdown", "label": "Key phrase", "position": { "x": 700, "y": 3060 }, "width": 680, "height": 140, "visible": true, "showLabel": true, "data": { "markdown": "## “The model develops muscle memory for policy.”\nAlignment-as-compilation." } },
-
+    {
+      "id": "c8-contrast",
+      "type": "markdown",
+      "label": "Contrast",
+      "position": {
+        "x": 1085.221782101736,
+        "y": 2624.727515319164
+      },
+      "width": 289.0114247530285,
+      "height": 260.72242838852287,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Prompting vs Specs\n- Prompting → inference-time tax\n- Specs → baked into weights"
+      }
+    },
+    {
+      "id": "c8-phrase",
+      "type": "markdown",
+      "label": "Key phrase",
+      "position": {
+        "x": 702.3067172580942,
+        "y": 2919.2902472562523
+      },
+      "width": 675.3865654838115,
+      "height": 187.28770379093166,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## “The model develops muscle memory for policy.”\nAlignment-as-compilation."
+      }
+    },
     {
       "id": "c9-core",
       "type": "markdown",
       "label": "🟪 Tooling for Intent",
-      "position": { "x": -1380, "y": 3340 },
-      "width": 680,
-      "height": 230,
+      "position": {
+        "x": -1370.773130967623,
+        "y": 3462.2560146789942
+      },
+      "width": 673.0798482257173,
+      "height": 176.9455030638328,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Specs need tooling like code\nA toolchain for intent is an IDE-for-thinking." }
+      "data": {
+        "markdown": "## Specs need tooling like code\nA toolchain for intent is an IDE-for-thinking."
+      }
     },
-    { "id": "c9-lint", "type": "default", "label": "Linters (ambiguity)", "position": { "x": -1380, "y": 3590 }, "width": 200, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c9-type", "type": "default", "label": "Type checkers (consistency)", "position": { "x": -1160, "y": 3590 }, "width": 260, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c9-unit", "type": "default", "label": "Unit tests (edge cases)", "position": { "x": -880, "y": 3590 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c9-ci", "type": "default", "label": "CI blocking (conflicts)", "position": { "x": -1380, "y": 3680 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c9-mod", "type": "default", "label": "Composition & modules", "position": { "x": -1140, "y": 3680 }, "width": 220, "height": 70, "visible": true, "showLabel": true, "data": {} },
-    { "id": "c9-insight", "type": "markdown", "label": "🔑 Insight", "position": { "x": -1380, "y": 3770 }, "width": 680, "height": 140, "visible": true, "showLabel": true, "data": { "markdown": "## Tooling targets intent, not syntax.\nThis is the “IDE-for-thinking” territory." } },
-
+    {
+      "id": "c9-lint",
+      "type": "default",
+      "label": "Linters (ambiguity)",
+      "position": {
+        "x": -1369.619772338576,
+        "y": 3656.894800484733
+      },
+      "width": 200,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c9-type",
+      "type": "default",
+      "label": "Type checkers (consistency)",
+      "position": {
+        "x": -1156.539924112859,
+        "y": 3655.741441855686
+      },
+      "width": 260,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c9-unit",
+      "type": "default",
+      "label": "Unit tests (edge cases)",
+      "position": {
+        "x": -883.4600758871414,
+        "y": 3654.5880832266384
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c9-ci",
+      "type": "default",
+      "label": "CI blocking (conflicts)",
+      "position": {
+        "x": -1309.645123628126,
+        "y": 3742.2813659685444
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c9-mod",
+      "type": "default",
+      "label": "Composition & modules",
+      "position": {
+        "x": -969.3029229010273,
+        "y": 3744.5880832266384
+      },
+      "width": 220,
+      "height": 70,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "c9-insight",
+      "type": "markdown",
+      "label": "🔑 Insight",
+      "position": {
+        "x": -1363.8529791933404,
+        "y": 3853.0418212913924
+      },
+      "width": 685.7667931452356,
+      "height": 164.2205312099894,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Tooling targets intent, not syntax.\nThis is the “IDE-for-thinking” territory."
+      }
+    },
     {
       "id": "c10-core",
       "type": "markdown",
       "label": "🟨 Lawmakers as Programmers",
-      "position": { "x": 700, "y": 3340 },
+      "position": {
+        "x": 700,
+        "y": 3340
+      },
       "width": 680,
       "height": 240,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## The Constitution is a national model spec\nSpecs align systems over time — not just software." }
+      "data": {
+        "markdown": "## The Constitution is a national model spec\nSpecs align systems over time — not just software."
+      }
     },
-    { "id": "c10-map", "type": "markdown", "label": "Mappings", "position": { "x": 700, "y": 3600 }, "width": 680, "height": 210, "visible": true, "showLabel": true, "data": { "markdown": "## Analogy map\n- Constitution → spec\n- Amendments → versions\n- Courts → graders\n- Precedent → test cases\n- Enforcement → training loop" } },
-    { "id": "c10-synth", "type": "markdown", "label": "Big synthesis", "position": { "x": 700, "y": 3830 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Specs align systems over time.\nThis bridges software, law, and society." } },
-
+    {
+      "id": "c10-map",
+      "type": "markdown",
+      "label": "Mappings",
+      "position": {
+        "x": 700,
+        "y": 3600
+      },
+      "width": 680,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Analogy map\n- Constitution → spec\n- Amendments → versions\n- Courts → graders\n- Precedent → test cases\n- Enforcement → training loop"
+      }
+    },
+    {
+      "id": "c10-synth",
+      "type": "markdown",
+      "label": "Big synthesis",
+      "position": {
+        "x": 700,
+        "y": 3830
+      },
+      "width": 680,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Specs align systems over time.\nThis bridges software, law, and society."
+      }
+    },
     {
       "id": "c11-core",
       "type": "markdown",
       "label": "🟦 Universal Alignment Pattern",
-      "position": { "x": -1380, "y": 4060 },
-      "width": 680,
-      "height": 230,
+      "position": {
+        "x": -1366.1596964514347,
+        "y": 4110.747779678073
+      },
+      "width": 671.9264895966702,
+      "height": 180.40557895097413,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Everyone is a spec author\nDifferent domains, same pattern: *alignment via durable intent*." }
+      "data": {
+        "markdown": "## Everyone is a spec author\nDifferent domains, same pattern: *alignment via durable intent*."
+      }
     },
-    { "id": "c11-map", "type": "markdown", "label": "Mappings", "position": { "x": -1380, "y": 4310 }, "width": 680, "height": 210, "visible": true, "showLabel": true, "data": { "markdown": "## Mappings\n- Programmers → silicon alignment\n- PMs → team alignment\n- Lawmakers → human alignment\n- Prompt writers → model alignment" } },
-    { "id": "c11-power", "type": "markdown", "label": "🎤 Mic drop", "position": { "x": -1380, "y": 4540 }, "width": 680, "height": 150, "visible": true, "showLabel": true, "data": { "markdown": "## Whoever writes the spec is the programmer.\nThis is the power statement." } },
-
+    {
+      "id": "c11-map",
+      "type": "markdown",
+      "label": "Mappings",
+      "position": {
+        "x": -1367.3130550804817,
+        "y": 4305.386565483812
+      },
+      "width": 286.7047074949343,
+      "height": 244.6007588714134,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Mappings\n- Programmers → silicon alignment\n- PMs → team alignment\n- Lawmakers → human alignment\n- Prompt writers → model alignment"
+      }
+    },
+    {
+      "id": "c11-power",
+      "type": "markdown",
+      "label": "🎤 Mic drop",
+      "position": {
+        "x": -1054.7528666087137,
+        "y": 4303.561481045342
+      },
+      "width": 362.82637701204374,
+      "height": 242.2686903237691,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Whoever writes the spec is the programmer.\nThis is the power statement."
+      }
+    },
     {
       "id": "c12-core",
       "type": "markdown",
       "label": "🟪 The Future IDE",
-      "position": { "x": 700, "y": 4060 },
+      "position": {
+        "x": 700,
+        "y": 4060
+      },
       "width": 680,
       "height": 220,
       "visible": true,
       "showLabel": true,
-      "data": { "markdown": "## Integrated Thought Clarifier\nA system that helps humans + models converge on intent." }
+      "data": {
+        "markdown": "## Integrated Thought Clarifier\nA system that helps humans + models converge on intent."
+      }
     },
-    { "id": "c12-caps", "type": "markdown", "label": "Capabilities", "position": { "x": 700, "y": 4300 }, "width": 680, "height": 200, "visible": true, "showLabel": true, "data": { "markdown": "## Capabilities\n- Extract ambiguity\n- Demand clarification\n- Surface assumptions\n- Align humans + models" } },
-    { "id": "c12-twilight", "type": "markdown", "label": "🧠 Why this matters for Twilight", "position": { "x": 10, "y": 4210 }, "width": 820, "height": 260, "visible": true, "showLabel": true, "data": { "markdown": "## Twilight framing\nThis talk quietly confirms:\n- Twilight is not a diagram tool\n- It is a **specification runtime**\n- Graphs are executable intent\n- Memory + structure = leverage\n\nThey are describing the theory.\nYou already built the substrate." } },
-
+    {
+      "id": "c12-caps",
+      "type": "markdown",
+      "label": "Capabilities",
+      "position": {
+        "x": 700,
+        "y": 4300
+      },
+      "width": 680,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Capabilities\n- Extract ambiguity\n- Demand clarification\n- Surface assumptions\n- Align humans + models"
+      }
+    },
+    {
+      "id": "c12-Twilite",
+      "type": "markdown",
+      "label": "🧠 Why this matters for Twilite",
+      "position": {
+        "x": 157.62990451803043,
+        "y": 4053.143226449593
+      },
+      "width": 356.34983112306037,
+      "height": 437.6172288732555,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Twilite framing\nThis talk quietly confirms:\n- Twilite is not a diagram tool\n- It is a **specification runtime**\n- Graphs are executable intent\n- Memory + structure = leverage\n\nThey are describing the theory.\nYou already built the substrate."
+      }
+    },
     {
       "id": "final-core",
       "type": "markdown",
       "label": "🔴 Call to Action",
-      "position": { "x": -460, "y": 4870 },
+      "position": {
+        "x": -460,
+        "y": 4870
+      },
       "width": 920,
       "height": 320,
       "visible": true,
@@ -288,106 +1144,924 @@
     }
   ],
   "edges": [
-    { "id": "e-root-c1", "type": "child", "source": "spec-root", "target": "c1-core", "label": "reality" },
-    { "id": "e-c1-chain", "type": "child", "source": "c1-core", "target": "c1-s1", "label": "pipeline" },
-    { "id": "e-c1-s1", "type": "child", "source": "c1-s1", "target": "c1-s2" },
-    { "id": "e-c1-s2", "type": "child", "source": "c1-s2", "target": "c1-s3" },
-    { "id": "e-c1-s3", "type": "child", "source": "c1-s3", "target": "c1-s4" },
-    { "id": "e-c1-s4", "type": "child", "source": "c1-s4", "target": "c1-s5" },
-    { "id": "e-c1-s5", "type": "child", "source": "c1-s5", "target": "c1-s6" },
-    { "id": "e-c1-s6", "type": "child", "source": "c1-s6", "target": "c1-s7" },
-    { "id": "e-c1-s7", "type": "child", "source": "c1-s7", "target": "c1-s8", "label": "only typing step" },
-    { "id": "e-c1-s8", "type": "child", "source": "c1-s8", "target": "c1-s9" },
-    { "id": "e-c1-s9", "type": "child", "source": "c1-s9", "target": "c1-s10" },
-    { "id": "e-c1-s10", "type": "child", "source": "c1-s10", "target": "c1-s11", "label": "outcomes" },
-    { "id": "e-c1-insight", "type": "child", "source": "c1-core", "target": "c1-insight", "label": "insight" },
-
-    { "id": "e-c1-c2", "type": "child", "source": "c1-core", "target": "c2-core", "label": "bottleneck" },
-    { "id": "e-c2-in1", "type": "child", "source": "c2-in-req", "target": "c2-core" },
-    { "id": "e-c2-in2", "type": "child", "source": "c2-in-goals", "target": "c2-core" },
-    { "id": "e-c2-in3", "type": "child", "source": "c2-in-success", "target": "c2-core" },
-    { "id": "e-c2-in4", "type": "child", "source": "c2-in-eval", "target": "c2-core" },
-    { "id": "e-c2-pivot", "type": "child", "source": "c2-core", "target": "c2-pivot", "label": "pivot" },
-    { "id": "e-c2-out1", "type": "child", "source": "c2-core", "target": "c2-out-ai" },
-    { "id": "e-c2-out2", "type": "child", "source": "c2-core", "target": "c2-out-value" },
-    { "id": "e-c2-out3", "type": "child", "source": "c2-core", "target": "c2-out-vel" },
-
-    { "id": "e-c2-c3", "type": "child", "source": "c2-core", "target": "c3-core", "label": "symptom" },
-    { "id": "e-c3-flow1", "type": "child", "source": "c3-core", "target": "c3-intent" },
-    { "id": "e-c3-flow2", "type": "child", "source": "c3-intent", "target": "c3-load" },
-    { "id": "e-c3-flow3", "type": "child", "source": "c3-load", "target": "c3-leverage" },
-    { "id": "e-c3-problem", "type": "child", "source": "c3-core", "target": "c3-problem", "label": "but…" },
-    { "id": "e-c3-analogy", "type": "child", "source": "c3-problem", "target": "c3-analogy", "label": "metaphor" },
-
-    { "id": "e-c3-c4", "type": "child", "source": "c3-core", "target": "c4-core", "label": "solution" },
-    { "id": "e-c4-claim", "type": "child", "source": "c4-core", "target": "c4-claim" },
-    { "id": "e-c4-code", "type": "child", "source": "c4-claim", "target": "c4-code", "label": "lossy projection" },
-    { "id": "e-c4-back", "type": "child", "source": "c4-claim", "target": "spec-root", "label": "connect back" },
-
-    { "id": "e-c4-c5", "type": "child", "source": "c4-core", "target": "c5-core", "label": "compile" },
-    { "id": "e-c5-out-ts", "type": "child", "source": "c5-core", "target": "c5-ts" },
-    { "id": "e-c5-out-rust", "type": "child", "source": "c5-core", "target": "c5-rust" },
-    { "id": "e-c5-out-servers", "type": "child", "source": "c5-core", "target": "c5-servers" },
-    { "id": "e-c5-out-clients", "type": "child", "source": "c5-core", "target": "c5-clients" },
-    { "id": "e-c5-out-docs", "type": "child", "source": "c5-core", "target": "c5-docs" },
-    { "id": "e-c5-out-tuts", "type": "child", "source": "c5-core", "target": "c5-tutorials" },
-    { "id": "e-c5-out-blog", "type": "child", "source": "c5-core", "target": "c5-blog" },
-    { "id": "e-c5-out-pod", "type": "child", "source": "c5-core", "target": "c5-pod" },
-    { "id": "e-c5-compiler", "type": "child", "source": "c5-core", "target": "c5-compiler", "label": "analogy" },
-
-    { "id": "e-c5-c6", "type": "child", "source": "c5-core", "target": "c6-core", "label": "example" },
-    { "id": "e-c6-clause", "type": "child", "source": "c6-core", "target": "c6-clause" },
-    { "id": "e-c6-tests", "type": "child", "source": "c6-core", "target": "c6-tests" },
-    { "id": "e-c6-success", "type": "child", "source": "c6-core", "target": "c6-success" },
-    { "id": "e-c6-insight", "type": "child", "source": "c6-core", "target": "c6-insight", "label": "executable" },
-
-    { "id": "e-c6-c7", "type": "child", "source": "c6-core", "target": "c7-core", "label": "failure case" },
-    { "id": "e-c7-flow1", "type": "child", "source": "c7-mis", "target": "c7-trust" },
-    { "id": "e-c7-flow2", "type": "child", "source": "c7-trust", "target": "c7-public" },
-    { "id": "e-c7-path", "type": "child", "source": "c7-core", "target": "c7-path", "label": "resolve" },
-    { "id": "e-c7-anchor", "type": "child", "source": "c7-path", "target": "c7-anchor", "label": "trust" },
-
-    { "id": "e-c7-c8", "type": "child", "source": "c7-core", "target": "c8-core", "label": "specs execute" },
-    { "id": "e-c8-contrast", "type": "child", "source": "c8-core", "target": "c8-contrast" },
-    { "id": "e-c8-phrase", "type": "child", "source": "c8-contrast", "target": "c8-phrase" },
-
-    { "id": "e-c8-c9", "type": "child", "source": "c8-core", "target": "c9-core", "label": "toolchain" },
-    { "id": "e-c9-lint", "type": "child", "source": "c9-core", "target": "c9-lint" },
-    { "id": "e-c9-type", "type": "child", "source": "c9-core", "target": "c9-type" },
-    { "id": "e-c9-unit", "type": "child", "source": "c9-core", "target": "c9-unit" },
-    { "id": "e-c9-ci", "type": "child", "source": "c9-core", "target": "c9-ci" },
-    { "id": "e-c9-mod", "type": "child", "source": "c9-core", "target": "c9-mod" },
-    { "id": "e-c9-insight", "type": "child", "source": "c9-core", "target": "c9-insight", "label": "intent" },
-
-    { "id": "e-c9-c10", "type": "child", "source": "c9-core", "target": "c10-core", "label": "society" },
-    { "id": "e-c10-map", "type": "child", "source": "c10-core", "target": "c10-map" },
-    { "id": "e-c10-synth", "type": "child", "source": "c10-map", "target": "c10-synth" },
-
-    { "id": "e-c10-c11", "type": "child", "source": "c10-core", "target": "c11-core", "label": "pattern" },
-    { "id": "e-c11-map", "type": "child", "source": "c11-core", "target": "c11-map" },
-    { "id": "e-c11-power", "type": "child", "source": "c11-map", "target": "c11-power" },
-
-    { "id": "e-c11-c12", "type": "child", "source": "c11-core", "target": "c12-core", "label": "future IDE" },
-    { "id": "e-c12-caps", "type": "child", "source": "c12-core", "target": "c12-caps" },
-    { "id": "e-c12-twilight", "type": "child", "source": "c12-core", "target": "c12-twilight", "label": "Twilight" },
-
-    { "id": "e-final", "type": "child", "source": "c12-twilight", "target": "final-core", "label": "act" }
+    {
+      "id": "e-root-c1",
+      "type": "child",
+      "source": "spec-root",
+      "target": "c1-core",
+      "label": "reality",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-chain",
+      "type": "child",
+      "source": "c1-core",
+      "target": "c1-s1",
+      "label": "pipeline",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s1",
+      "type": "child",
+      "source": "c1-s1",
+      "target": "c1-s2",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s2",
+      "type": "child",
+      "source": "c1-s2",
+      "target": "c1-s3",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s3",
+      "type": "child",
+      "source": "c1-s3",
+      "target": "c1-s4",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s4",
+      "type": "child",
+      "source": "c1-s4",
+      "target": "c1-s5",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s5",
+      "type": "child",
+      "source": "c1-s5",
+      "target": "c1-s6",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s6",
+      "type": "child",
+      "source": "c1-s6",
+      "target": "c1-s7",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s7",
+      "type": "child",
+      "source": "c1-s7",
+      "target": "c1-s8",
+      "label": "only typing step",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s8",
+      "type": "child",
+      "source": "c1-s8",
+      "target": "c1-s9",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s9",
+      "type": "child",
+      "source": "c1-s9",
+      "target": "c1-s10",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-s10",
+      "type": "child",
+      "source": "c1-s10",
+      "target": "c1-s11",
+      "label": "outcomes",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-insight",
+      "type": "child",
+      "source": "c1-core",
+      "target": "c1-insight",
+      "label": "insight",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c1-c2",
+      "type": "child",
+      "source": "c1-core",
+      "target": "c2-core",
+      "label": "bottleneck",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-in1",
+      "type": "child",
+      "source": "c2-in-req",
+      "target": "c2-core",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-in2",
+      "type": "child",
+      "source": "c2-in-goals",
+      "target": "c2-core",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-in3",
+      "type": "child",
+      "source": "c2-in-success",
+      "target": "c2-core",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-in4",
+      "type": "child",
+      "source": "c2-in-eval",
+      "target": "c2-core",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-pivot",
+      "type": "child",
+      "source": "c2-core",
+      "target": "c2-pivot",
+      "label": "pivot",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-out1",
+      "type": "child",
+      "source": "c2-core",
+      "target": "c2-out-ai",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-out2",
+      "type": "child",
+      "source": "c2-core",
+      "target": "c2-out-value",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-out3",
+      "type": "child",
+      "source": "c2-core",
+      "target": "c2-out-vel",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c2-c3",
+      "type": "child",
+      "source": "c2-core",
+      "target": "c3-core",
+      "label": "symptom",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-flow1",
+      "type": "child",
+      "source": "c3-core",
+      "target": "c3-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-flow2",
+      "type": "child",
+      "source": "c3-intent",
+      "target": "c3-load",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-flow3",
+      "type": "child",
+      "source": "c3-load",
+      "target": "c3-leverage",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-problem",
+      "type": "child",
+      "source": "c3-core",
+      "target": "c3-problem",
+      "label": "but…",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-analogy",
+      "type": "child",
+      "source": "c3-problem",
+      "target": "c3-analogy",
+      "label": "metaphor",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c3-c4",
+      "type": "child",
+      "source": "c3-core",
+      "target": "c4-core",
+      "label": "solution",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c4-claim",
+      "type": "child",
+      "source": "c4-core",
+      "target": "c4-claim",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c4-code",
+      "type": "child",
+      "source": "c4-claim",
+      "target": "c4-code",
+      "label": "lossy projection",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c4-back",
+      "type": "child",
+      "source": "c4-claim",
+      "target": "spec-root",
+      "label": "connect back",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c4-c5",
+      "type": "child",
+      "source": "c4-core",
+      "target": "c5-core",
+      "label": "compile",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-ts",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-ts",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-rust",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-rust",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-servers",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-servers",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-clients",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-clients",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-docs",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-docs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-tuts",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-tutorials",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-blog",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-blog",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-out-pod",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-pod",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-compiler",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c5-compiler",
+      "label": "analogy",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c5-c6",
+      "type": "child",
+      "source": "c5-core",
+      "target": "c6-core",
+      "label": "example",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c6-clause",
+      "type": "child",
+      "source": "c6-core",
+      "target": "c6-clause",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c6-tests",
+      "type": "child",
+      "source": "c6-core",
+      "target": "c6-tests",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c6-success",
+      "type": "child",
+      "source": "c6-core",
+      "target": "c6-success",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c6-insight",
+      "type": "child",
+      "source": "c6-core",
+      "target": "c6-insight",
+      "label": "executable",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c6-c7",
+      "type": "child",
+      "source": "c6-core",
+      "target": "c7-core",
+      "label": "failure case",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c7-flow1",
+      "type": "child",
+      "source": "c7-mis",
+      "target": "c7-trust",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c7-flow2",
+      "type": "child",
+      "source": "c7-trust",
+      "target": "c7-public",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c7-path",
+      "type": "child",
+      "source": "c7-core",
+      "target": "c7-path",
+      "label": "resolve",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c7-anchor",
+      "type": "child",
+      "source": "c7-path",
+      "target": "c7-anchor",
+      "label": "trust",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c7-c8",
+      "type": "child",
+      "source": "c7-core",
+      "target": "c8-core",
+      "label": "specs execute",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c8-contrast",
+      "type": "child",
+      "source": "c8-core",
+      "target": "c8-contrast",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c8-phrase",
+      "type": "child",
+      "source": "c8-contrast",
+      "target": "c8-phrase",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c8-c9",
+      "type": "child",
+      "source": "c8-core",
+      "target": "c9-core",
+      "label": "toolchain",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-lint",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-lint",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-type",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-type",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-unit",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-unit",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-ci",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-ci",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-mod",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-mod",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-insight",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c9-insight",
+      "label": "intent",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c9-c10",
+      "type": "child",
+      "source": "c9-core",
+      "target": "c10-core",
+      "label": "society",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c10-map",
+      "type": "child",
+      "source": "c10-core",
+      "target": "c10-map",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c10-synth",
+      "type": "child",
+      "source": "c10-map",
+      "target": "c10-synth",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c10-c11",
+      "type": "child",
+      "source": "c10-core",
+      "target": "c11-core",
+      "label": "pattern",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c11-map",
+      "type": "child",
+      "source": "c11-core",
+      "target": "c11-map",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c11-power",
+      "type": "child",
+      "source": "c11-map",
+      "target": "c11-power",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c11-c12",
+      "type": "child",
+      "source": "c11-core",
+      "target": "c12-core",
+      "label": "future IDE",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c12-caps",
+      "type": "child",
+      "source": "c12-core",
+      "target": "c12-caps",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-c12-Twilite",
+      "type": "child",
+      "source": "c12-core",
+      "target": "c12-Twilite",
+      "label": "Twilite",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-final",
+      "type": "child",
+      "source": "c12-Twilite",
+      "target": "final-core",
+      "label": "act",
+      "style": {},
+      "data": {}
+    }
   ],
   "groups": [
-    { "id": "g-root", "label": "🟣 Root Claim", "nodeIds": ["spec-root"], "bounds": { "x": -520, "y": -90, "width": 1040, "height": 460 } },
-    { "id": "g-c1", "label": "🟦 Cluster 1 — Engineering Reality", "nodeIds": ["c1-core", "c1-insight", "c1-s1", "c1-s2", "c1-s3", "c1-s4", "c1-s5", "c1-s6", "c1-s7", "c1-s8", "c1-s9", "c1-s10", "c1-s11"], "bounds": { "x": -1420, "y": 420, "width": 820, "height": 880 } },
-    { "id": "g-c2", "label": "🟦 Cluster 2 — Bottleneck", "nodeIds": ["c2-core", "c2-in-req", "c2-in-goals", "c2-in-success", "c2-in-eval", "c2-pivot", "c2-out-ai", "c2-out-value", "c2-out-vel"], "bounds": { "x": 660, "y": 420, "width": 780, "height": 820 } },
-    { "id": "g-c3", "label": "🟨 Cluster 3 — Vibe Coding", "nodeIds": ["c3-core", "c3-intent", "c3-load", "c3-leverage", "c3-problem", "c3-analogy"], "bounds": { "x": -1420, "y": 1140, "width": 820, "height": 740 } },
-    { "id": "g-c4", "label": "🟩 Cluster 4 — Specs as Source", "nodeIds": ["c4-core", "c4-claim", "c4-code"], "bounds": { "x": 660, "y": 1140, "width": 780, "height": 620 } },
-    { "id": "g-c5", "label": "🟩 Cluster 5 — Compiler Input", "nodeIds": ["c5-core", "c5-ts", "c5-rust", "c5-servers", "c5-clients", "c5-docs", "c5-tutorials", "c5-blog", "c5-pod", "c5-compiler"], "bounds": { "x": -1420, "y": 1860, "width": 820, "height": 660 } },
-    { "id": "g-c6", "label": "🟧 Cluster 6 — Model Spec", "nodeIds": ["c6-core", "c6-clause", "c6-tests", "c6-success", "c6-insight"], "bounds": { "x": 660, "y": 1860, "width": 780, "height": 590 } },
-    { "id": "g-c7", "label": "🟥 Cluster 7 — Failure Case", "nodeIds": ["c7-core", "c7-mis", "c7-trust", "c7-public", "c7-path", "c7-anchor"], "bounds": { "x": -1420, "y": 2580, "width": 820, "height": 760 } },
-    { "id": "g-c8", "label": "🟫 Cluster 8 — Executable Specs", "nodeIds": ["c8-core", "c8-contrast", "c8-phrase"], "bounds": { "x": 660, "y": 2580, "width": 780, "height": 660 } },
-    { "id": "g-c9", "label": "🟪 Cluster 9 — Toolchain", "nodeIds": ["c9-core", "c9-lint", "c9-type", "c9-unit", "c9-ci", "c9-mod", "c9-insight"], "bounds": { "x": -1420, "y": 3300, "width": 820, "height": 650 } },
-    { "id": "g-c10", "label": "🟨 Cluster 10 — Law", "nodeIds": ["c10-core", "c10-map", "c10-synth"], "bounds": { "x": 660, "y": 3300, "width": 780, "height": 740 } },
-    { "id": "g-c11", "label": "🟦 Cluster 11 — Universal Pattern", "nodeIds": ["c11-core", "c11-map", "c11-power"], "bounds": { "x": -1420, "y": 4020, "width": 820, "height": 720 } },
-    { "id": "g-c12", "label": "🟪 Cluster 12 — Future IDE", "nodeIds": ["c12-core", "c12-caps", "c12-twilight"], "bounds": { "x": -20, "y": 4020, "width": 1460, "height": 520 } },
-    { "id": "g-final", "label": "🔴 Final", "nodeIds": ["final-core"], "bounds": { "x": -520, "y": 4820, "width": 1040, "height": 420 } }
+    {
+      "id": "g-root",
+      "label": "🟣 Root Claim",
+      "nodeIds": [
+        "spec-root"
+      ],
+      "bounds": {
+        "x": -480,
+        "y": -60,
+        "width": 625.4943998940581,
+        "height": 381.697832048938
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c1",
+      "label": "🟦 Cluster 1 — Engineering Reality",
+      "nodeIds": [
+        "c1-core",
+        "c1-insight",
+        "c1-s1",
+        "c1-s2",
+        "c1-s3",
+        "c1-s4",
+        "c1-s5",
+        "c1-s6",
+        "c1-s7",
+        "c1-s8",
+        "c1-s9",
+        "c1-s10",
+        "c1-s11"
+      ],
+      "bounds": {
+        "x": -1406.5553942326649,
+        "y": 440,
+        "width": 726.5553942326649,
+        "height": 886.4031363450763
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c2",
+      "label": "🟦 Cluster 2 — Bottleneck",
+      "nodeIds": [
+        "c2-core",
+        "c2-in-req",
+        "c2-in-goals",
+        "c2-in-success",
+        "c2-in-eval",
+        "c2-pivot",
+        "c2-out-ai",
+        "c2-out-value",
+        "c2-out-vel"
+      ],
+      "bounds": {
+        "x": 680,
+        "y": 440,
+        "width": 720,
+        "height": 750
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c3",
+      "label": "🟨 Cluster 3 — Vibe Coding",
+      "nodeIds": [
+        "c3-core",
+        "c3-intent",
+        "c3-load",
+        "c3-leverage",
+        "c3-problem",
+        "c3-analogy"
+      ],
+      "bounds": {
+        "x": -2182.9896958424283,
+        "y": 1121.6220069596652,
+        "width": 725.9531552377143,
+        "height": 860.2928862006161
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c4",
+      "label": "🟩 Cluster 4 — Specs as Source",
+      "nodeIds": [
+        "c4-core",
+        "c4-claim",
+        "c4-code"
+      ],
+      "bounds": {
+        "x": 1411.2772247700086,
+        "y": 1274.3852343434128,
+        "width": 713.7216742965361,
+        "height": 437.20115889740237
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c5",
+      "label": "🟩 Cluster 5 — Compiler Input",
+      "nodeIds": [
+        "c5-core",
+        "c5-ts",
+        "c5-rust",
+        "c5-servers",
+        "c5-clients",
+        "c5-docs",
+        "c5-tutorials",
+        "c5-blog",
+        "c5-pod",
+        "c5-compiler"
+      ],
+      "bounds": {
+        "x": -1400,
+        "y": 1877.8389072082782,
+        "width": 727.7104159568993,
+        "height": 675.1294897730663
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c6",
+      "label": "🟧 Cluster 6 — Model Spec",
+      "nodeIds": [
+        "c6-core",
+        "c6-clause",
+        "c6-tests",
+        "c6-success",
+        "c6-insight"
+      ],
+      "bounds": {
+        "x": 680,
+        "y": 1880,
+        "width": 722.5701386522996,
+        "height": 603.9729116982953
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c7",
+      "label": "🟥 Cluster 7 — Failure Case",
+      "nodeIds": [
+        "c7-core",
+        "c7-mis",
+        "c7-trust",
+        "c7-public",
+        "c7-path",
+        "c7-anchor"
+      ],
+      "bounds": {
+        "x": -1405.1402773045995,
+        "y": 2600,
+        "width": 727.7104159568994,
+        "height": 768.5520797844965
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c8",
+      "label": "🟫 Cluster 8 — Executable Specs",
+      "nodeIds": [
+        "c8-core",
+        "c8-contrast",
+        "c8-phrase"
+      ],
+      "bounds": {
+        "x": 680,
+        "y": 2600,
+        "width": 717.6932827419057,
+        "height": 526.5779510471839
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c9",
+      "label": "🟪 Cluster 9 — Toolchain",
+      "nodeIds": [
+        "c9-core",
+        "c9-lint",
+        "c9-type",
+        "c9-unit",
+        "c9-ci",
+        "c9-mod",
+        "c9-insight"
+      ],
+      "bounds": {
+        "x": -1390.773130967623,
+        "y": 3442.2560146789942,
+        "width": 747.3130550804816,
+        "height": 595.0063378223876
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c10",
+      "label": "🟨 Cluster 10 — Law",
+      "nodeIds": [
+        "c10-core",
+        "c10-map",
+        "c10-synth"
+      ],
+      "bounds": {
+        "x": 680,
+        "y": 3320,
+        "width": 720,
+        "height": 680
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c11",
+      "label": "🟦 Cluster 11 — Universal Pattern",
+      "nodeIds": [
+        "c11-core",
+        "c11-map",
+        "c11-power"
+      ],
+      "bounds": {
+        "x": -1387.3130550804817,
+        "y": 4090.747779678073,
+        "width": 715.3865654838118,
+        "height": 479.2395446771525
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-c12",
+      "label": "🟪 Cluster 12 — Future IDE",
+      "nodeIds": [
+        "c12-core",
+        "c12-caps",
+        "c12-Twilite"
+      ],
+      "bounds": {
+        "x": 137.62990451803043,
+        "y": 4033.143226449593,
+        "width": 1262.3700954819697,
+        "height": 486.85677355040707
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-final",
+      "label": "🔴 Final",
+      "nodeIds": [
+        "final-core"
+      ],
+      "bounds": {
+        "x": -480,
+        "y": 4850,
+        "width": 960,
+        "height": 360
+      },
+      "visible": true,
+      "style": {}
+    }
   ]
 }
-

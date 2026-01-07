@@ -1,7 +1,7 @@
-# Twilight OS User Manual  
+# Twilite OS User Manual  
 _“The operating system for the in-between.”_
 
-Twilight is a persistent, executable workspace. Every graph is a living system that remembers where you left off, automates its own growth, and invites you (and your AI copilots) to keep building without starting over. This manual explains how to operate that workspace with confidence.
+Twilite is a persistent, executable workspace. Every graph is a living system that remembers where you left off, automates its own growth, and invites you (and your AI copilots) to keep building without starting over. This manual explains how to operate that workspace with confidence.
 
 ---
 
@@ -13,7 +13,7 @@ Twilight is a persistent, executable workspace. Every graph is a living system t
 4. **Versioned Reality** – Save and commit clusters through Git/GitHub to maintain a chain of state transitions instead of brittle snapshots.  
 5. **Automation First** – ScriptNodes, Background RPC, and procedural loaders construct or mutate graphs at scale.
 
-Remember: Twilight’s value is _not having to start over_. Work with that continuity in mind.
+Remember: Twilite’s value is _not having to start over_. Work with that continuity in mind.
 
 ---
 
@@ -22,11 +22,11 @@ Remember: Twilight’s value is _not having to start over_. Work with that conti
 ### Step 1 – Sync Your AI
 1. Open **📋 Onboard LLM** in the toolbar.  
 2. Paste the generated prompt into your AI assistant.  
-3. The AI can now emit valid Twilight JSON commands that respect handles, groups, and automation.
+3. The AI can now emit valid Twilite JSON commands that respect handles, groups, and automation.
 
 ### Step 2 – Load / Resume
 - Use the Browser address bar to open a `.node` or `tlz://` cluster.  
-- Twilight restores the last-saved state (layout, groups, selections).  
+- Twilite restores the last-saved state (layout, groups, selections).  
 - Version-enabled workspaces can pull/push directly from Git using the Browser drawer commands.
 
 ### Step 3 – Iterate
@@ -36,7 +36,7 @@ Remember: Twilight’s value is _not having to start over_. Work with that conti
 
 ---
 
-## 3. Twilight Shell & Toolbar
+## 3. Twilite Shell & Toolbar
 
 | Zone | Purpose |
 | --- | --- |
@@ -50,14 +50,14 @@ Key toolbar actions:
 - **Automation** – Launch ScriptNodes, run Background RPC calls, or trigger graph macros.  
 - **Mode Switcher** – Manual edit, Navigation-only, Auto-layout (with multiple layout presets).  
 - **History Timeline** – Scroll through reversible checkpoints, diff changes, or create named restore points.  
-- **Git Controls** – Stage/commit/branch graph files without leaving Twilight.
+- **Git Controls** – Stage/commit/branch graph files without leaving Twilite.
 
 ---
 
 ## 4. Persistent State & Versioning
 
 ### Auto-Save & Checkpoints
-- Twilight records every command into an undo/redo stack.
+- Twilite records every command into an undo/redo stack.
 - Named checkpoints (History Timeline) capture the full graph plus metadata.
 
 ### Git / GitHub Integration
@@ -82,7 +82,7 @@ Key toolbar actions:
 | **Data & APIs** | **APINode** | Full REST support: choose method (GET/POST/PUT/DELETE), headers, body, auth tokens, and preview responses. Pipe results into downstream nodes. |
 | **Stateful Components** | **Counter Node** | Tracks increments/decrements with optional triggers on thresholds. |
 |  | **Timer Node** | Stopwatch or countdown with bindings to toggles, scripts, or UI elements. |
-| **Spatial / 3D** | **3D Node / Spatial Canvas** | Renders Three.js scenes inside Twilight. Connect handles for camera control, data feeds, and signal events. |
+| **Spatial / 3D** | **3D Node / Spatial Canvas** | Renders Three.js scenes inside Twilite. Connect handles for camera control, data feeds, and signal events. |
 | **Hardware / Breadboard** | **Breadboard Sockets, Rails, Components** | Domain-specific nodes with precise handle schemas (`socket`, `positive`, `negative`, `pinA`, `pinB`). Combine with autowire runtimes for rapid prototyping. |
 
 > Tip: Use the Node Palette search to browse plugin-provided nodes. Each entry shows handle definitions, default data, and categories.
@@ -94,7 +94,7 @@ Key toolbar actions:
 - **Child / Parent** – Vertical hierarchy. Handles typically `out` → `in`, but can be custom (e.g., `anode` → `socket`).  
 - **Peer** – Lateral relationships; horizontal routing.  
 - **Data Flow / Dependency / Reference / Bidirectional / Weak / Strong** – Styled links for flow, prerequisites, citations, or emphasis.  
-- **Breadboard Handles** – Use semantic labels like `positive`, `negative`, `pinA`, `shield`. Twilight enforces handle existence during paste/create operations.  
+- **Breadboard Handles** – Use semantic labels like `positive`, `negative`, `pinA`, `shield`. Twilite enforces handle existence during paste/create operations.  
 - **Spatial Handles** – Nodes may expose `signal`, `transform`, `camera`, or `pointer` inputs/outputs.
 
 Always inspect `node.handles`, `node.inputs`, and `node.outputs` in the Properties Panel before wiring unfamiliar nodes.
@@ -179,14 +179,14 @@ Validation warnings include skipped nodes/edges with reasons (missing IDs, inval
 
 ## 13. Glossary
 
-- **Cluster** – A `.node` file loaded in Twilight; comparable to a project or workspace.  
-- **Cognitive Runtime** – Twilight’s role as an execution layer for unfinished systems.  
+- **Cluster** – A `.node` file loaded in Twilite; comparable to a project or workspace.  
+- **Cognitive Runtime** – Twilite’s role as an execution layer for unfinished systems.  
 - **Handle** – A named socket on a node that defines connection semantics (type, position, label).  
 - **Group** – A structural container acting like an OS window or package.  
 - **ScriptNode** – Embedded automation engine for procedural graph mutations.  
 - **ValueTrigger** – Node that fires on rising/falling edges, enabling instrumentation and control.  
-- **Twilight OS** – The browser + GraphEditor + runtime ecosystem.
+- **Twilite OS** – The browser + GraphEditor + runtime ecosystem.
 
 ---
 
-**Twilight OS: the operating system for the in-between.** Keep building, keep iterating, and never start from zero again.
+**Twilite OS: the operating system for the in-between.** Keep building, keep iterating, and never start from zero again.
