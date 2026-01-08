@@ -53,7 +53,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const currentUrl = browserHistory[historyIndex] || '';
 
   // Home URL management
-  const DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
+  const DEFAULT_HOME = 'https://twilite.zone/data/IntroGraph.node';
   const LEGACY_DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
@@ -76,26 +76,6 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       setHomeUrl(DEFAULT_HOME);
     }
   }, []);
-
-  // One-time startup: navigate to home URL if no graph is loaded
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        // Check if there's already content loaded (via localStorage or other means)
-        const hasInitialContent = localStorage.getItem('lastLoadedUrl');
-        
-        // Only navigate to home if there's no initial content
-        if (!hasInitialContent && homeUrl) {
-          const fetchable = convertTlzToFetchUrl(homeUrl);
-          eventBus.emit('fetchUrl', { url: fetchable });
-        }
-      } catch (err) {
-        console.warn('Startup home navigation failed:', err);
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [homeUrl]);
 
   // Load persisted bookmarks on mount
   useEffect(() => {

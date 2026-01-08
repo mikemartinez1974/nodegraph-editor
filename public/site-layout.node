@@ -3,35 +3,35 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-07T01:00:58.522Z",
-    "modified": "2026-01-07T01:00:58.522Z",
+    "created": "2026-01-08T01:54:30.285Z",
+    "modified": "2026-01-08T01:54:30.285Z",
     "author": "",
     "tags": []
   },
   "settings": {
     "theme": {
-      "mode": "dark",
+      "mode": "light",
       "primary": {
-        "main": "#7aa2ff",
-        "light": "#a9c0ff",
-        "dark": "#4c79ff",
-        "contrastText": "#0b0f14"
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
       },
       "secondary": {
-        "main": "#b78cff",
-        "light": "#d2b6ff",
-        "dark": "#9b60ff",
-        "contrastText": "#0b0f14"
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
       },
       "background": {
-        "default": "#0b0f14",
-        "paper": "#0f1620"
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
       },
       "text": {
-        "primary": "rgba(231, 237, 246, 0.95)",
-        "secondary": "rgba(169, 180, 194, 0.85)"
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
       },
-      "divider": "rgba(31, 42, 58, 0.8)"
+      "divider": "rgba(0, 0, 0, 0.12)"
     },
     "backgroundImage": null,
     "defaultNodeColor": "#1976d2",
@@ -48,10 +48,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 439.0607857779846,
-      "y": 539.4323977202522
+      "x": 1.8482048514185294,
+      "y": 44.51148408034737
     },
-    "zoom": 0.8164268397714126
+    "zoom": 1
   },
   "document": null,
   "scripts": [],
@@ -61,233 +61,162 @@
       "type": "markdown",
       "label": "Twilite",
       "position": {
-        "x": -40,
-        "y": -642.4496989841244
+        "x": 100,
+        "y": 50
       },
-      "width": 862.4496989841244,
-      "height": 358.7751505079378,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# The graph is the product.\n\n**Twilite** is a **graph-native workspace** where visual thinking meets AI collaboration — treating graphs as **durable, portable artifacts** that humans and agents can both read and write.\n\n**One-liner:**\n> *“Figma meets ChatGPT for visual thinking.”* Describe what you want → an AI generates a graph → paste it into Twilite → it appears instantly.\n\n**Start:**\n- Full app: `/browser/`\n- Editor-only: `/editor/`\n\n**Follow the build:** `mailto:admin@twilite.zone?subject=Twilite%20%E2%80%94%20early%20access`",
-        "memo": "",
-        "link": "/",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "home-pitch",
-      "type": "markdown",
-      "label": "Twilite in one sentence",
-      "position": {
-        "x": -40,
-        "y": -220
-      },
-      "width": 520,
-      "height": 220,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Twilite in one sentence\n\n*“Figma meets ChatGPT for visual thinking.”*\n\nDescribe what you want → an AI generates a graph → paste it into Twilite → it appears instantly.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "home-thesis",
-      "type": "markdown",
-      "label": "Core insight",
-      "position": {
-        "x": 560,
-        "y": -220
-      },
-      "width": 520,
-      "height": 220,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Core insight\n\nMost tools treat graphs as UI state.\n\nTwilite treats the graph as the artifact.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "why-graphs",
-      "type": "markdown",
-      "label": "Why graphs?",
-      "position": {
-        "x": -40,
-        "y": 60
-      },
-      "width": 700,
-      "height": 360,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Why graphs?\n\nA node can be anything: text, code, data, UI, API, AI model, video, live query.\n\nAn edge can mean anything: flows into, depends on, triggers, contains.\n\nYou decide what it means — and you can evolve it over time.\n\n**Capabilities**\n- 🌐 Web-native\n- 🤖 AI-first\n- ⚡ Executable\n- 📁 Portable\n- 🧬 Composable\n- 🧾 Git-friendly",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "problem",
-      "type": "markdown",
-      "label": "The problem",
-      "position": {
-        "x": 740,
-        "y": 60
-      },
-      "width": 340,
-      "height": 360,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## The problem\n\n- ❌ Graphs are ephemeral — screenshots, not files\n- ❌ No stable identity — no diff, no review, no versioning\n- ❌ AI can’t help — formats aren’t machine-writable\n- ❌ Rebuild from scratch — no templates, no remix culture",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "how",
-      "type": "markdown",
-      "label": "How it works",
-      "position": {
-        "x": -40,
-        "y": 470
-      },
-      "width": 520,
-      "height": 380,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## How it works\n\nTwilite makes the graph a first-class artifact and gives AI a safe mutation contract.\n\n1. **Describe** what you want (to an AI or a teammate)\n2. **Generate** graph JSON (or deltas) with stable IDs\n3. **Paste** into Twilite → it renders instantly\n4. **Evolve** it tomorrow without losing coherence",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "artifact-shape",
-      "type": "markdown",
-      "label": "Artifact shape",
-      "position": {
-        "x": 560,
-        "y": 470
-      },
-      "width": 520,
-      "height": 380,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Artifact shape\n\nPortable JSON. Stable IDs. Open in Git. Review in PRs.\n\n```json\n{\n  \"fileVersion\": \"1.0\",\n  \"metadata\": { /* ... */ },\n  \"viewport\": { /* ... */ },\n  \"nodes\": [ /* ... */ ],\n  \"edges\": [ /* ... */ ],\n  \"groups\": [ /* ... */ ]\n}\n```",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "mutation-contract",
-      "type": "markdown",
-      "label": "AI mutation contract",
-      "position": {
-        "x": -40,
-        "y": 900
-      },
-      "width": 520,
-      "height": 300,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## AI mutation contract\n\nDeltas over rewrites. Validation gates. Minimal payloads. Dry-run previews.\n\nThe goal is predictable evolution, not chaos.\n\n```text\ncreate  → add nodes/edges\nupdate  → modify existing by ID\ndelete  → remove by ID\nbatch   → apply multiple operations\n```",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "what-you-build",
-      "type": "markdown",
-      "label": "[What you can build](tlz://twilite.zone/breadboard/breadboard.node)",
-      "position": {
-        "x": 561.3374612996646,
-        "y": 897.3250774006708
-      },
-      "width": 520,
-      "height": 300,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## What you can build\n\nRoadmaps, knowledge bases, dashboards, automation, agent memory, interactive docs, simulations — anything that benefits from explicit structure.\n\n- 🗺️ Planning\n- 📊 Dashboards\n- ⚡ Workflows\n- 🤖 Agents\n- 📄 Interactive docs\n- 🎮 Simulations",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "status",
-      "type": "markdown",
-      "label": "# Status & Links",
-      "position": {
-        "x": -41.09075396071974,
-        "y": 1260
-      },
-      "width": 860,
+      "width": 900,
       "height": 320,
+      "color": "#9c27b0",
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "\nTwilite is under active development. The format is real. The editor is evolving.\n\nIf you’re the kind of person who wants durable thinking artifacts (and doesn’t mind sharp edges), you’re invited.\n\n- Contact the developer: admin@twilite.zone\n- Full app: [/browser/](https://twilite.zone/browser)\n- Editor-only: [/editor/](https://twilite.zone/editor)",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
+        "markdown": "# The graph is the product.\n\n**Twilite** is a storage format for thought — from a single idea to a complete executable system.\n\nEvery graph is a durable, portable artifact that humans and AI can both read and write.\n\n**Not a diagram tool. Not a note-taking app. A new format for storing human thought.**\n\n---\n\n**Try it:**\n- [Get Started](tlz://twilite.zone/tutorial/launchpad.document.node)\n\n\n**Contact the Developer:** [admin@twilite.zone](mailto:admin@twilite.zone?subject=Twilite%20Node%20Browser)"
+      }
+    },
+    {
+      "id": "home-spectrum",
+      "type": "markdown",
+      "label": "The Full Spectrum",
+      "position": {
+        "x": 90.98601156284711,
+        "y": 431.00155427079477
+      },
+      "width": 440,
+      "height": 320,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Full Spectrum\n\nA Twilite graph can store thought at any level of fidelity:\n\n- 💭 **A concept** (one node, some text)\n- 💬 **A conversation** (nodes as messages, edges as replies)\n- 🗺️ **A knowledge base** (concepts + relationships)\n- ⚡ **A workflow** (tasks + dependencies)\n- 🎮 **A simulation** (state + transitions)\n- 🌐 **An application** (UI + logic + data)\n\n**Same format. All renderable. All evolvable.**"
+      }
+    },
+    {
+      "id": "home-ai-native",
+      "type": "markdown",
+      "label": "AI-Native by Design",
+      "position": {
+        "x": 568.0124341663582,
+        "y": 425.9937829168209
+      },
+      "width": 440,
+      "height": 320,
+      "color": "#2196f3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## AI-Native by Design\n\nCopy a graph. Paste it into Claude or ChatGPT.\n\nThe AI reads the structure, understands relationships, generates mutations.\n\nPaste back. The graph evolves.\n\n**The graph is your AI's memory.**\n\nNo context windows. No starting over. No losing state.\n\nJust continuous evolution of thought."
+      }
+    },
+    {
+      "id": "home-problem",
+      "type": "markdown",
+      "label": "What's Broken Today",
+      "position": {
+        "x": 93.99067437523142,
+        "y": 807.0108798955633
+      },
+      "width": 440,
+      "height": 280,
+      "color": "#f44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What's Broken Today\n\n**Every tool fragments your thinking:**\n\n- Notes in Obsidian\n- Diagrams in Figma\n- Workflows in Notion\n- Code in GitHub\n- Conversations in ChatGPT\n\n**They're all disconnected islands.**\n\nNo shared format. No version control. No AI that can see the whole picture."
+      }
+    },
+    {
+      "id": "home-solution",
+      "type": "markdown",
+      "label": "The Twilite Answer",
+      "position": {
+        "x": 570.0155427079476,
+        "y": 807.0108798955633
+      },
+      "width": 440,
+      "height": 280,
+      "color": "#4caf50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Twilite Answer\n\n**One format for everything.**\n\nYour notes, diagrams, workflows, code, and conversations — all in the same graph.\n\n✓ **Portable** — JSON you can version in Git  \n✓ **Durable** — Stable IDs, incremental updates  \n✓ **Executable** — Graphs can run, not just display  \n✓ **AI-readable** — Agents can navigate and mutate  \n✓ **Web-native** — Renders anywhere  \n✓ **Composable** — Graphs link to graphs  "
+      }
+    },
+    {
+      "id": "home-format",
+      "type": "markdown",
+      "label": "The Format",
+      "position": {
+        "x": 65.94715479297798,
+        "y": 1131.001554270795
+      },
+      "width": 440,
+      "height": 300,
+      "color": "#ff9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Format\n\n**Portable JSON. Stable IDs. Git-friendly.**\n\n```json\n{\n  \"nodes\": [\n    { \"id\": \"...\", \"type\": \"...\", \"data\": {...} }\n  ],\n  \"edges\": [\n    { \"source\": \"...\", \"target\": \"...\" }\n  ]\n}\n```\n\n**Not locked to Twilite.** Any tool can read it. Any AI can write it.\n\nThe format is the infrastructure."
+      }
+    },
+    {
+      "id": "home-mutation",
+      "type": "markdown",
+      "label": "Safe Evolution",
+      "position": {
+        "x": 638.1212331219917,
+        "y": 1130
+      },
+      "width": 440,
+      "height": 300,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Safe Evolution\n\n**AI doesn't rewrite your graph. It mutates it.**\n\n```\ncreate  → add nodes/edges\nupdate  → modify by ID\ndelete  → remove by ID\nbatch   → atomic operations\n```\n\n**Deltas, not replacements.**\n\nYour graph has continuity. History. Identity.\n\nAI extends your thinking. It doesn't erase it."
+      }
+    },
+    {
+      "id": "home-vision",
+      "type": "markdown",
+      "label": "The Vision",
+      "position": {
+        "x": 100,
+        "y": 1480
+      },
+      "width": 900,
+      "height": 240,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Vision\n\n**Twilite isn't just a tool. It's infrastructure.**\n\nThe file system for the next era of computing — where thought, code, and AI collaboration happen in the same unified format.\n\nA graph can start as a napkin sketch and evolve into a running application **without ever leaving the format.**\n\n**That's what we're building.**"
+      }
+    },
+    {
+      "id": "home-status",
+      "type": "markdown",
+      "label": "Status & Invitation",
+      "position": {
+        "x": 100,
+        "y": 1770
+      },
+      "width": 900,
+      "height": 280,
+      "color": "#607d8b",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Status & Invitation\n\nTwilite is **under active development.** The format is real. The editor works. The examples are growing.\n\nIf you're the kind of person who wants durable thinking artifacts (and doesn't mind sharp edges), **you're invited.**\n\n---\n\n**Get started:**\n- Full browser: [/browser/](/browser/)\n- Editor only: [/editor/](/editor/)\n\n**Talk to the builder:**\n- Email: [admin@twilite.zone](mailto:admin@twilite.zone)\n\n**This page is a graph.** Copy it. Paste it to an AI. Evolve it. That's the point."
       }
     }
   ],
   "edges": [
     {
-      "id": "edge-hero-pitch",
-      "type": "reference",
-      "source": "home-hero",
-      "target": "home-pitch",
-      "label": "pitch",
-      "style": {
-        "width": 2,
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-hero-thesis",
-      "type": "reference",
-      "source": "home-hero",
-      "target": "home-thesis",
-      "label": "thesis",
-      "style": {
-        "width": 2,
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-hero-why",
+      "id": "edge-hero-spectrum",
       "type": "dataFlow",
       "source": "home-hero",
-      "target": "why-graphs",
-      "label": "why",
+      "target": "home-spectrum",
+      "label": "stores thought at every scale",
       "style": {
         "width": 2,
         "curved": true
@@ -295,23 +224,11 @@
       "data": {}
     },
     {
-      "id": "edge-why-problem",
-      "type": "reference",
-      "source": "why-graphs",
-      "target": "problem",
-      "label": "contrasts",
-      "style": {
-        "width": 2,
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-why-how",
+      "id": "edge-hero-ai",
       "type": "dataFlow",
-      "source": "why-graphs",
-      "target": "how",
-      "label": "how",
+      "source": "home-hero",
+      "target": "home-ai-native",
+      "label": "AI-readable & writable",
       "style": {
         "width": 2,
         "curved": true
@@ -319,11 +236,11 @@
       "data": {}
     },
     {
-      "id": "edge-how-shape",
+      "id": "edge-spectrum-problem",
       "type": "reference",
-      "source": "how",
-      "target": "artifact-shape",
-      "label": "as file",
+      "source": "home-spectrum",
+      "target": "home-problem",
+      "label": "vs. fragmented tools",
       "style": {
         "width": 2,
         "curved": true
@@ -331,23 +248,11 @@
       "data": {}
     },
     {
-      "id": "edge-how-contract",
-      "type": "dataFlow",
-      "source": "how",
-      "target": "mutation-contract",
-      "label": "safety",
-      "style": {
-        "width": 2,
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-contract-build",
+      "id": "edge-ai-solution",
       "type": "reference",
-      "source": "mutation-contract",
-      "target": "what-you-build",
-      "label": "enables",
+      "source": "home-ai-native",
+      "target": "home-solution",
+      "label": "enables unified format",
       "style": {
         "width": 2,
         "curved": true
@@ -355,11 +260,59 @@
       "data": {}
     },
     {
-      "id": "edge-build-status",
+      "id": "edge-solution-format",
       "type": "dataFlow",
-      "source": "what-you-build",
-      "target": "status",
-      "label": "invitation",
+      "source": "home-solution",
+      "target": "home-format",
+      "label": "as portable JSON",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-solution-mutation",
+      "type": "dataFlow",
+      "source": "home-solution",
+      "target": "home-mutation",
+      "label": "with safe evolution",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-format-vision",
+      "type": "reference",
+      "source": "home-format",
+      "target": "home-vision",
+      "label": "infrastructure vision",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mutation-vision",
+      "type": "reference",
+      "source": "home-mutation",
+      "target": "home-vision",
+      "label": "continuity enables",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-vision-status",
+      "type": "dataFlow",
+      "source": "home-vision",
+      "target": "home-status",
+      "label": "join the build",
       "style": {
         "width": 2,
         "curved": true

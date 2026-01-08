@@ -1,0 +1,469 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-07T18:27:53.180Z",
+    "modified": "2026-01-07T18:27:53.180Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 268.4586452238053,
+      "y": -644.6990629979889
+    },
+    "zoom": 0.8471519861582405
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "title-graph-interface-010",
+      "type": "markdown",
+      "label": "🧠 The Graph as Interface",
+      "position": {
+        "x": -449.90865157832354,
+        "y": 240
+      },
+      "width": 700,
+      "height": 320,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# 🧠 The Graph as Interface\n\n*A shared reasoning substrate for humans and AI*\n\nThis graph describes a way of working where:\n\n- Thought is **structured**, not buried in chat\n- State is **explicit**, not implicit\n- AI can **read, write, and reason** without taking control\n- Humans remain the source of judgment\n\nThe graph is not a visualization of work.\n\n**It is the interface where work happens.**"
+      }
+    },
+    {
+      "id": "twilite-why-008",
+      "type": "markdown",
+      "label": "❓ Why Use a Twilite Graph?",
+      "position": {
+        "x": -1180.8242452239183,
+        "y": 21.047210308857103
+      },
+      "width": 480,
+      "height": 360,
+      "color": "#2196f3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Use a Twilite Graph?\n\nA Twilite graph is a **shared reasoning substrate** for humans and AIs.\n\n**For AI:**\n- Read structured state (not just tokens)\n- Write without taking control\n- Reason over relationships\n\n**For humans:**\n- See the structure\n- Render on the web\n- Hold any idea, project, or system\n- Persists across sessions, models, and time\n\n---\n\nText is linear.  \nChats disappear.  \nAgents hide state.\n\nA Twilite graph makes thought **explicit, inspectable, and durable** — without automating judgment."
+      }
+    },
+    {
+      "id": "twilite-not-009",
+      "type": "markdown",
+      "label": "🚫 What Twilite Is Not",
+      "position": {
+        "x": -1179.62695036409,
+        "y": 483.83378851968183
+      },
+      "width": 480,
+      "height": 360,
+      "color": "#f44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What Twilite Is *Not*\n\nTwilite is intentionally **not**:\n\n- ❌ An autonomous agent system\n- ❌ A chatbot or conversational UI\n- ❌ A no-code replacement for thinking\n- ❌ A workflow engine that decides for you\n- ❌ A black-box AI controller\n\n---\n\nTwilite does **not**:\n\n- Decide what matters\n- Choose the next task\n- Hide state or reasoning\n- Replace human judgment\n\nIt provides **structure and memory**, not authority.\n\nIf Twilite feels like it is thinking *for* you, something has gone wrong."
+      }
+    },
+    {
+      "id": "loop-state-001",
+      "type": "markdown",
+      "label": "📊 Current Graph State",
+      "position": {
+        "x": 591.438727832477,
+        "y": 256.5873325523593
+      },
+      "width": 400,
+      "height": 320,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 📊 Current Graph State\n\nThis graph is the *only* shared context.\n\nIt represents:\n- What exists\n- What is connected\n- What has been decided\n\nThe LLM receives **this**, not a summary.\n\nThe graph **is** the memory."
+      }
+    },
+    {
+      "id": "loop-propose-002",
+      "type": "markdown",
+      "label": "🤖 LLM Proposals",
+      "position": {
+        "x": -449.90865157832354,
+        "y": 720
+      },
+      "width": 380,
+      "height": 320,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🤖 LLM Proposals\n\nThe LLM suggests **possible next tasks**:\n\n- Missing nodes or edges\n- Ambiguous relationships\n- Unanswered questions\n- Structural refactors\n\n---\n\nNo execution yet.\n\nOnly proposals."
+      }
+    },
+    {
+      "id": "loop-negotiate-003",
+      "type": "markdown",
+      "label": "💬 Negotiation",
+      "position": {
+        "x": 50.09134842167646,
+        "y": 720
+      },
+      "width": 380,
+      "height": 320,
+      "color": "#00bcd4",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 💬 Negotiation\n\nHuman + LLM discuss:\n\n- Is this task valuable *now*?\n- Is the scope correct?\n- What should *not* be touched?\n\n---\n\nThis is where judgment lives.\n\nNo automation here."
+      }
+    },
+    {
+      "id": "loop-select-004",
+      "type": "markdown",
+      "label": "✅ Selected Task",
+      "position": {
+        "x": 550.0913484216765,
+        "y": 720
+      },
+      "width": 380,
+      "height": 320,
+      "color": "#4caf50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ✅ Selected Task\n\nOne task survives.\n\nIt is:\n- Explicit\n- Bounded\n- Intentional\n\n---\n\nEverything else remains visible but inactive."
+      }
+    },
+    {
+      "id": "loop-mutate-005",
+      "type": "markdown",
+      "label": "🛠️ Mutation",
+      "position": {
+        "x": 1050.0913484216765,
+        "y": 720
+      },
+      "width": 380,
+      "height": 320,
+      "color": "#ff9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🛠️ Graph Mutation\n\nThe selected task executes:\n\n- Create nodes\n- Update edges\n- Annotate decisions\n- Generate code\n\n---\n\nThis is the *only* moment the graph changes.\n\nAll changes are explicit."
+      }
+    },
+    {
+      "id": "loop-trigger-006",
+      "type": "markdown",
+      "label": "🔁 Next Cycle",
+      "position": {
+        "x": 1586.5834800368668,
+        "y": 716.682533489528
+      },
+      "width": 380,
+      "height": 320,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🔁 Next Cycle\n\nThe updated graph becomes the input for the next LLM call.\n\n---\n\nNo additional memory is required.\n\nThe graph *is* the memory.\n\nThe loop continues."
+      }
+    },
+    {
+      "id": "work-modes-root",
+      "type": "markdown",
+      "label": "🧠 Work Modes",
+      "position": {
+        "x": -557.3523297341859,
+        "y": 1638.7585045036756
+      },
+      "width": 571.7183269720307,
+      "height": 240.95916669339482,
+      "color": "#607d8b",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# 🧠 Work Modes\n\nThis graph exists to manage **cognitive load**, not tasks.\n\nWhen one mode is depleted, **switch modes** instead of stopping or forcing progress.\n\nProgress is defined as *sustainable movement*, not throughput."
+      }
+    },
+    {
+      "id": "mode-architecture",
+      "type": "markdown",
+      "label": "🏗️ Structural",
+      "position": {
+        "x": 145.54054859990208,
+        "y": 1303.8730349725392
+      },
+      "width": 480,
+      "height": 380,
+      "color": "#e91e63",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🏗️ Structural / Architectural\n\n**Load:** Heavy  \n**Purpose:** Define invariants and boundaries\n\n**Examples:**\n- Core vs adapter vs app decisions\n- Refactors that move responsibility\n- Naming things that must last\n- Deciding what must *not* change\n\n**Capacity:** 1–2 decisions per day\n\n**Stop signals:**\n- Head pressure\n- Urge to walk\n- \"I can't hold this anymore\"\n\n➡️ **Stop immediately** and switch modes."
+      }
+    },
+    {
+      "id": "mode-implementation",
+      "type": "markdown",
+      "label": "🛠️ Implementation",
+      "position": {
+        "x": 745.5405485999021,
+        "y": 1303.8730349725392
+      },
+      "width": 480,
+      "height": 380,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🛠️ Implementation / Coding\n\n**Load:** Focused  \n**Purpose:** Execute already-made decisions\n\n**Examples:**\n- Writing functions\n- Moving code\n- Implementing a known refactor\n- Fixing bounded bugs\n\n**Capacity:** Medium\n\n**Stop signals:**\n- Sloppy code\n- Impatience\n- Tunnel vision\n\n➡️ **Switch modes** when quality drops."
+      }
+    },
+    {
+      "id": "mode-externalization",
+      "type": "markdown",
+      "label": "🌐 Externalization",
+      "position": {
+        "x": 154.43117153202297,
+        "y": 1815.4841677591908
+      },
+      "width": 480,
+      "height": 380,
+      "color": "#4caf50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🌐 Externalization / Web\n\n**Load:** Light  \n**Purpose:** Make the project visible and legible\n\n**Examples:**\n- Website (twilite.zone)\n- Canva layouts\n- README / copy\n- Explaining Twilite in words\n\n**Capacity:** High\n\n**Stop signal:**\n- Boredom (not fatigue)\n\n➡️ Ideal after heavy architectural work."
+      }
+    },
+    {
+      "id": "mode-planning",
+      "type": "markdown",
+      "label": "🗺️ Planning",
+      "position": {
+        "x": 752.772438276787,
+        "y": 1817.1429010144266
+      },
+      "width": 480,
+      "height": 380,
+      "color": "#ff9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🗺️ Planning / Parking\n\n**Load:** Recovery  \n**Purpose:** Relieve pressure without losing progress\n\n**Examples:**\n- TODO graphs\n- Parking future ideas\n- Writing \"later\" notes\n- Cleaning up thoughts\n\n**Capacity:** Very high\n\n**Stop signals:**\n- Calm returns\n- Mental space opens\n\n➡️ This is the *best* way to end a day."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-title-why",
+      "type": "reference",
+      "source": "title-graph-interface-010",
+      "target": "twilite-why-008",
+      "label": "why this works",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-title-not",
+      "type": "reference",
+      "source": "title-graph-interface-010",
+      "target": "twilite-not-009",
+      "label": "what to avoid",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-title-state",
+      "type": "dataFlow",
+      "source": "title-graph-interface-010",
+      "target": "loop-state-001",
+      "label": "implemented as",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e1",
+      "type": "dataFlow",
+      "source": "loop-state-001",
+      "target": "loop-propose-002",
+      "label": "fed to",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e2",
+      "type": "dataFlow",
+      "source": "loop-propose-002",
+      "target": "loop-negotiate-003",
+      "label": "discussed",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e3",
+      "type": "dataFlow",
+      "source": "loop-negotiate-003",
+      "target": "loop-select-004",
+      "label": "results in",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e4",
+      "type": "dataFlow",
+      "source": "loop-select-004",
+      "target": "loop-mutate-005",
+      "label": "executes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e5",
+      "type": "dataFlow",
+      "source": "loop-mutate-005",
+      "target": "loop-trigger-006",
+      "label": "updates",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "loop-e6",
+      "type": "dataFlow",
+      "source": "loop-trigger-006",
+      "target": "loop-state-001",
+      "label": "becomes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-state-modes",
+      "type": "reference",
+      "source": "loop-state-001",
+      "target": "work-modes-root",
+      "label": "managed via",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-modes-arch",
+      "type": "reference",
+      "source": "work-modes-root",
+      "target": "mode-architecture",
+      "label": "",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-modes-impl",
+      "type": "reference",
+      "source": "work-modes-root",
+      "target": "mode-implementation",
+      "label": "",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-modes-ext",
+      "type": "reference",
+      "source": "work-modes-root",
+      "target": "mode-externalization",
+      "label": "",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-modes-plan",
+      "type": "reference",
+      "source": "work-modes-root",
+      "target": "mode-planning",
+      "label": "",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

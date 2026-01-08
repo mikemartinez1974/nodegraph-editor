@@ -1,0 +1,539 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-07T19:50:45.728Z",
+    "modified": "2026-01-07T19:50:45.728Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 59.335875435959,
+      "y": 69.53795590628971
+    },
+    "zoom": 1.0283926179818947
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "root-editor",
+      "type": "markdown",
+      "label": "⚡ The Graph Editor",
+      "position": {
+        "x": 500,
+        "y": 0
+      },
+      "width": 400,
+      "height": 200,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# ⚡ The Graph Editor\n\nJust nodes and edges.\n\nThat's all you start with.\n\nEverything else **emerges**."
+      }
+    },
+    {
+      "id": "emerge-structure",
+      "type": "markdown",
+      "label": "📐 Structure for Any Thought",
+      "position": {
+        "x": 100,
+        "y": 280
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structure for Any Thought\n\nConcepts, relationships, hierarchies.\n\nNo forced format:\n- Not documents\n- Not databases\n- Not timelines\n\nPure topology."
+      }
+    },
+    {
+      "id": "emerge-navigation",
+      "type": "markdown",
+      "label": "🧭 Navigation as Interface",
+      "position": {
+        "x": 480,
+        "y": 280
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Navigation as Interface\n\nYou don't scroll or search.\n\nYou **traverse**.\n\nUnderstanding = knowing the paths."
+      }
+    },
+    {
+      "id": "emerge-identity",
+      "type": "markdown",
+      "label": "🔗 Persistent Identity",
+      "position": {
+        "x": 860,
+        "y": 280
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#2196f3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Persistent Identity\n\nEvery node has a stable ID.\n\nYou can reference it forever.\n\nLinks don't break."
+      }
+    },
+    {
+      "id": "emerge-composability",
+      "type": "markdown",
+      "label": "🧩 Composability",
+      "position": {
+        "x": 100,
+        "y": 540
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#00bcd4",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Composability\n\nGraphs link to graphs.\n\nSub-graphs are first-class.\n\nYou can build up from atoms."
+      }
+    },
+    {
+      "id": "emerge-executable",
+      "type": "markdown",
+      "label": "⚙️ Executability",
+      "position": {
+        "x": 480,
+        "y": 540
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#4caf50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Executability\n\nA graph can **DO** something.\n\nNot just represent—**RUN**.\n\nWorkflows, simulations, applications."
+      }
+    },
+    {
+      "id": "emerge-ai-collab",
+      "type": "markdown",
+      "label": "🤖 AI Collaboration",
+      "position": {
+        "x": 860,
+        "y": 540
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#8bc34a",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## AI Collaboration\n\nAI reads structure.\n\nAI proposes mutations.\n\nHuman approves/rejects.\n\nThe graph evolves."
+      }
+    },
+    {
+      "id": "emerge-version-control",
+      "type": "markdown",
+      "label": "📦 Version Control",
+      "position": {
+        "x": 100,
+        "y": 800
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#ff9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Version Control\n\nGit commits.\n\nDiffs.\n\nBranches.\n\nCollaborative editing."
+      }
+    },
+    {
+      "id": "emerge-reasoning",
+      "type": "markdown",
+      "label": "🧠 Shared Reasoning Substrate",
+      "position": {
+        "x": 483.5412771840443,
+        "y": 798.8195742719852
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#ff5722",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Shared Reasoning Substrate\n\nHuman sees structure.\n\nAI reads relationships.\n\nBoth operate on the same artifact.\n\nNo translation layer."
+      }
+    },
+    {
+      "id": "emerge-memory",
+      "type": "markdown",
+      "label": "💾 Memory Across Sessions",
+      "position": {
+        "x": 860,
+        "y": 800
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#e91e63",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Memory Across Sessions\n\nThe graph persists.\n\nNo context windows.\n\nNo \"starting over.\"\n\nContinuity is default."
+      }
+    },
+    {
+      "id": "emerge-rendering",
+      "type": "markdown",
+      "label": "🎨 Rendering at Any Scale",
+      "position": {
+        "x": 100,
+        "y": 1060
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rendering at Any Scale\n\nSimple graph = markdown nodes.\n\nComplex graph = full application.\n\nSame format, different interpretation."
+      }
+    },
+    {
+      "id": "emerge-file-format",
+      "type": "markdown",
+      "label": "📄 A New File Format",
+      "position": {
+        "x": 480,
+        "y": 1060
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#673ab7",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## A New File Format\n\nNot .doc, not .pdf, not .json.\n\n`.node` = thought artifact.\n\nReadable by anything."
+      }
+    },
+    {
+      "id": "emerge-email",
+      "type": "markdown",
+      "label": "📧 Email as Graphs",
+      "position": {
+        "x": 860,
+        "y": 1060
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Email as Graphs\n\nThreads are already graphs.\n\nJust make the structure visible.\n\nConversations become versionable."
+      }
+    },
+    {
+      "id": "emerge-community",
+      "type": "markdown",
+      "label": "👥 Communities as Graphs",
+      "position": {
+        "x": 100,
+        "y": 1320
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#2196f3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Communities as Graphs\n\nPeople, ideas, projects as nodes.\n\nConversations as edges.\n\nThe community **IS** a graph."
+      }
+    },
+    {
+      "id": "emerge-nodespace",
+      "type": "markdown",
+      "label": "🌌 Node Space Itself",
+      "position": {
+        "x": 480,
+        "y": 1320
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#9c27b0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node Space Itself\n\nAll information has topology.\n\nAll thought has structure.\n\nAll of it navigable, executable, persistent.\n\n**The substrate becomes real.**"
+      }
+    },
+    {
+      "id": "emerge-unknown",
+      "type": "markdown",
+      "label": "❓ What You Haven't Imagined Yet",
+      "position": {
+        "x": 860,
+        "y": 1320
+      },
+      "width": 340,
+      "height": 200,
+      "color": "#607d8b",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What You Haven't Imagined Yet\n\nOnce people start using it, they'll discover capabilities you didn't plan.\n\nThe graph doesn't constrain what's possible.\n\n**That's infrastructure.**"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-structure",
+      "type": "dataFlow",
+      "source": "root-editor",
+      "target": "emerge-structure",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-root-navigation",
+      "type": "dataFlow",
+      "source": "root-editor",
+      "target": "emerge-navigation",
+      "label": "becomes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-root-identity",
+      "type": "dataFlow",
+      "source": "root-editor",
+      "target": "emerge-identity",
+      "label": "provides",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-structure-composability",
+      "type": "dataFlow",
+      "source": "emerge-structure",
+      "target": "emerge-composability",
+      "label": "allows",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-navigation-executable",
+      "type": "dataFlow",
+      "source": "emerge-navigation",
+      "target": "emerge-executable",
+      "label": "extends to",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-identity-ai",
+      "type": "dataFlow",
+      "source": "emerge-identity",
+      "target": "emerge-ai-collab",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-composability-version",
+      "type": "dataFlow",
+      "source": "emerge-composability",
+      "target": "emerge-version-control",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-executable-reasoning",
+      "type": "dataFlow",
+      "source": "emerge-executable",
+      "target": "emerge-reasoning",
+      "label": "creates",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-ai-memory",
+      "type": "dataFlow",
+      "source": "emerge-ai-collab",
+      "target": "emerge-memory",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-version-rendering",
+      "type": "dataFlow",
+      "source": "emerge-version-control",
+      "target": "emerge-rendering",
+      "label": "allows",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-reasoning-format",
+      "type": "dataFlow",
+      "source": "emerge-reasoning",
+      "target": "emerge-file-format",
+      "label": "standardizes as",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-memory-email",
+      "type": "dataFlow",
+      "source": "emerge-memory",
+      "target": "emerge-email",
+      "label": "applies to",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-rendering-community",
+      "type": "dataFlow",
+      "source": "emerge-rendering",
+      "target": "emerge-community",
+      "label": "scales to",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-format-nodespace",
+      "type": "dataFlow",
+      "source": "emerge-file-format",
+      "target": "emerge-nodespace",
+      "label": "realizes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-email-nodespace",
+      "type": "dataFlow",
+      "source": "emerge-email",
+      "target": "emerge-nodespace",
+      "label": "converges on",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-community-nodespace",
+      "type": "dataFlow",
+      "source": "emerge-community",
+      "target": "emerge-nodespace",
+      "label": "becomes",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-nodespace-unknown",
+      "type": "reference",
+      "source": "emerge-nodespace",
+      "target": "emerge-unknown",
+      "label": "leads to",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}
