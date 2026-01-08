@@ -50,7 +50,7 @@ export default function ScriptPanel() {
   
   const [size, setSize] = useLocalStorage('scriptPanelSize', defaultSize);
   const [pos, setPos] = useLocalStorage('scriptPanelPos', defaultPos);
-  const [visible, setVisible] = useLocalStorage('scriptPanelVisible', true);
+  const [visible, setVisible] = useLocalStorage('scriptPanelVisible', false);
 
   // Script options
   const [allowMutations, setAllowMutations] = useLocalStorage('scriptAllowMutations', false);

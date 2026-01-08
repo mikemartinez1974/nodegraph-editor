@@ -1,0 +1,131 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-08T20:28:58.077Z",
+    "modified": "2026-01-08T20:28:58.077Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 391.3857586554416,
+      "y": 292.54437204319487
+    },
+    "zoom": 1.3934308978088592
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "blank-guide",
+      "type": "markdown",
+      "label": "✨ Blank Canvas Setup",
+      "position": {
+        "x": 0,
+        "y": -100
+      },
+      "width": 511.6802289920173,
+      "height": 191.999653042398,
+      "color": "#607d8b",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# ✨ Blank Canvas Setup\n\nThis is a **blank graph** meant for you or an LLM partner to build from.\n\nBefore mutating it, take a minute to set expectations so you don't lose direction."
+      }
+    },
+    {
+      "id": "llm-instructions",
+      "type": "markdown",
+      "label": "🤖 Ready the LLM",
+      "position": {
+        "x": 1.9293249685125788,
+        "y": 140.19092597611007
+      },
+      "width": 521.9293249685126,
+      "height": 415.9504240868647,
+      "color": "#3f51b5",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🤖 Ready the LLM for Mutation\n\n1. **Copy this entire graph** (Ctrl+A / Cmd+A, then copy).  You need to hand the LLM a consistent JSON snapshot of the canvas.\n2. **Tell the model what you want added.** Include:\n   - A short statement of the goal.\n   - What kind of nodes, edges, or content you expect.\n   - Any constraints (style, priority, scope, data sources).\n3. **Ask for concrete nodes+edges** instead of prose. Example prompt:\n   > Add three concept nodes for a \"Twilite concept map\" plus edges that explain how they relate to the current mission.\n4. **Review before pasting.** The LLM may return proposals—import them carefully, as mutations are final once applied.\n5. **Log your next steps** inside this guide (add a node beneath these instructions) so collaborators see how the blank page became meaningful."
+      }
+    },
+    {
+      "id": "8893d4ae-2a65-48be-bc18-b6cff7efe643",
+      "type": "markdown",
+      "label": "Markdown Node",
+      "position": {
+        "x": 3.4469684279366954,
+        "y": 579.2553997818059
+      },
+      "width": 514.4041972140491,
+      "height": 703.8708732617677,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "markdown": "# Chatbot Onboarding Guide for Twilite OS\n\nTwilite is no longer just a diagramming surface—it is a persistent, executable workspace. A graph is a living cluster that keeps state across sessions, automates its own growth, and expects contributors (humans and AIs) to evolve it safely. Use this guide whenever you generate JSON commands for Twilite OS.\n\n---\n\n## Mindset: Steward, Not Draftsman\n\n- **Preserve continuity.** Your commands extend an existing system; never assume a blank canvas.\n- **Automate when possible.** ScriptNodes, Background RPC, and loaders can fabricate or mutate hundreds of nodes in one action.\n- **Respect topology.** Handle keys, socket schemas, and groups are domain-specific contracts (breadboards, logic ICs, spatial rigs, etc.). Use them precisely.\n- **Version intentionally.** Think in terms of state transitions that can be committed to Git/GitHub, not disposable exports.\n\n---\n\n## Operational Workflow\n\n1. **Inspect context.** Read the current node metadata (type, handles, data, extensions) and note whether automation or Git checkpoints are active.\n2. **Plan the delta.** Decide whether to issue a `create`, `update`, `script`, or mixed command. Prefer incremental updates over wholesale rewrites.\n3. **Emit precise JSON.** Use UUIDs, declare every handle, and mention the cluster/group you are touching when relevant.\n4. **Let Twilite run it.** The user pastes the JSON; Twilite applies it, updates history, and (if configured) records the new state in Git.\n5. **Iterate.** React to validation feedback, telemetry, or user direction.\n\n> Twilite’s value is “not having to start over.” Your job is to keep the workspace coherent so unfinished work survives.\n\n---\n\n## Node Types Reference\n\nSee `public/documentation/LLMNodeTypes.md` for the full list of core and plugin node types, plus handle keys for breadboard nodes. Also read `public/documentation/UserManual.md` for the broader editor and workflow overview.\n\n---\n\n## First Five Minutes: Ignition\n\nWhen you drop into an empty cluster, the only wrong move is doing nothing. Start anywhere:\n\n- Add a **Markdown** node and write the question that brought you here. That alone is a valid graph.\n- Drop a **Default** node, label it “Next step?”, and connect it to anything—even if the edge has no meaning yet.\n- Leave one node floating on the side as a scratchpad. Twilite keeps it safe; you can rearrange later.\n\nMessy beginnings are expected. Crooked nodes, half-finished thoughts, and dangling edges are invitations to grow, not warnings. Twilite remembers every change, so nothing you add in the first minutes is permanent or dangerous. If you feel stuck, add one more node that names the unknown (“What powers this?”, “Need data here”). The workspace will still be here when you return—continuity is the default.\n\n---\n\n## Command Essentials\n\n- Always include an `action`.\n- Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.\n- **Include `width` and `height` on node creation (for now).** Until node-type defaults are fully reliable, every node created via `create` / `createNodes` should include explicit size. (Updates can omit size unless changing it.)\n- **Positions are optional (and drive auto-layout/growth).**\n  - If you omit `position` on **every** newly-created node in a `create` / `createNodes` payload, Twilite will auto-place them (and auto-layout/reroute as needed).\n  - If you include any explicit `position`, Twilite treats it as intentional and will not auto-layout that batch by default (use Beautify if you want a full layout pass).\n  - Placement is designed to avoid overlaps; locked/pinned nodes act as obstacles and won’t be moved.\n- **Handles are optional.** If you omit `sourceHandle`/`targetHandle`, the edge attaches to the node boundary. When you do include them, match the published handle keys exactly.\n- **No implicit handles.** Twilite does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.\n- **Handles must be declared before use.** If you specify `sourceHandle: \"out\"` and `targetHandle: \"in\"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).\n- **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilite falls back to node-boundary rendering.\n- **Edge labels:** you can use legacy `edge.label` (middle label) or `edge.labels: [start, middle, end]` for entry/middle/exit labels. Any missing slots render no label.\n- **Handle type matching is opt-in.** Types like `value`, `trigger`, `any`, or direction tokens (`input`, `output`, `bidirectional`) are treated as wildcards. Only enforce matching when both handles declare strict semantic types (e.g., `boolean`, `number`, `string`).\n- Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.\n- **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.\n- **Use colors + emojis intentionally.** Color-code clusters and add small emojis in labels to make graphs scannable at a glance.\n- **Edge routing is configurable.** Use `edge.style.route: \"orthogonal\"` (or `edge.style.orthogonal: true`) to force right-angled paths; set `edge.style.curved: true` for bezier curves. The user can also override routing in Document Properties.\n- **Creation order matters.** Always create `nodes` first, then `edges`, then `groups` (every pass). If using `batch`/`transaction`, ensure each command respects this order.\n\n### Supported Actions\n\n| Action | Notes |\n| --- | --- |\n| `create` | One payload that may include `nodes`, `edges`, `groups`. Nodes are created first, then edges, then groups. |\n| `createNodes` / `createEdges` / `createGroups` | Bulk operations for a single entity type. |\n| `update` | Accepts `id` or `ids` (array) for nodes, edges, and groups. Use to mutate type, size, data, markdown, sockets, etc. |\n| `delete` | Remove nodes/edges/groups (remember: deleting a node also detaches its edges). |\n| `read` | Fetch a node/edge/group by id for diagnostics. |\n| `addNodesToGroup` / `removeNodesFromGroup` / `setGroupNodes` | Edit group membership by node IDs. |\n| `translate` / `move` | Move nodes or groups by a `{x,y}` delta. |\n| `duplicate` | Clone nodes (optionally clone edges between them with `includeEdges`). |\n| `batch` / `transaction` | Execute multiple commands in order (array in `commands`). |\n| `findNodes` / `findEdges` | Query subsets (e.g., “all markdown nodes in group A”). |\n| `getStats` | Retrieve counts, bounding boxes, or other metrics. |\n| `clearGraph` | Rarely used; wipes the cluster. |\n\n> Deprecated actions such as `add` are rejected. Always use the verbs above.\n\nTip: Any command can include `\"dryRun\": true` to validate intent without mutating the graph.\n\n---\n\n## Documentation Nodes and Handles (Important)\n\nMarkdown, Canvas, and other documentation-style nodes **do not expose input/output handles by default**.\n\nIf you want to connect edges to a documentation node, you must explicitly declare its handles (for example, `in` and/or `out`) using the node’s handle schema (`handles`, or mapped `inputs`/`outputs`). Twilite will not infer or auto-create handles for documentation nodes.\n\nIf a node does not declare a handle, **edges referencing that handle will fail**.\n\nIf a documentation node is intended to participate in a conceptual or logical flow, declare its handles explicitly.  \nIf it is purely descriptive, leave it unconnected or organize it using groups instead of edges.\n\n**Do not assume** that a node supports `in` / `out`. Always inspect or define the handle contract before wiring edges.\n\n**Important schema details:**\n\n- `handles` must be an **array** of handle objects (not a map/object). Each handle should include `id`, `label`, `direction`, `dataType`, and `position`.\n- Markdown content belongs in `data.markdown` (or `data.memo`), not a top-level `markdown` field.\n- Handle `direction` must be `input`, `output`, or `bidirectional` (not `source`/`target`).\n- Handle `position` must be an object like `{ \"side\": \"left|right|top|bottom\", \"offset\": 0.5 }` (not a string).\n- `sourceHandle` / `targetHandle` must match the handle `id` values you declare.\n- `update` requires a target: include `id` or `ids` for nodes/edges/groups. There is no implicit “update all.”\n\n---\n\n## Graph Mutation vs Graph Illustration (Critical)\n\nIf a graph already exists, **never** output a full `nodegraph-data` object. That implicitly replaces the entire workspace and will destroy user state.\n\nThis is the single most common and most damaging mistake an AI can make in Twilite.\n\n**Forbidden in existing graphs:**\n\n- Re-output `{ \"type\": \"nodegraph-data\", ... }`\n- Assume an empty canvas\n- “Redraw” the graph in full\n- Recreate existing nodes instead of updating them\n- Emit nodes without an explicit `action`\n- Implicitly replace content by omission\n\nIf you are not explicitly asked to wipe or recreate the graph, assume persistence.\n\n**Required pattern: state deltas only:**\n\n- `createNodes`\n- `createEdges`\n- `update`\n- `delete`\n- `move` / `translate`\n- `batch` / `transaction`\n\nEvery change must be additive, mutative, or subtractive — never declarative.\n\n**Decision rule (memorize this):**\n\n- If you are describing a graph → use prose or examples\n- If you are changing a graph → use action commands only\n- If you are adding analysis → append new nodes downstream\n- If unsure → do nothing and ask\n\nWhen in doubt, append, never overwrite.\n\n**Safe defaults for AI agents:**\n\n- Assume the graph already exists\n- Assume IDs must be preserved\n- Assume history matters\n- Assume Git diffs should stay small\n- Assume erasure is a bug\n\nTwilite’s core value is continuity. Breaking continuity is always worse than adding clutter.\n\n**Why this rule exists:**\n\nMost diagram tools treat graphs as disposable pictures. Twilite treats graphs as stateful cognitive systems.\n\nTherefore: re-emitting a full graph is equivalent to calling `clearGraph`. This is almost never what the user wants.\n\n---\n\n## Automation & Procedural Generation\n\nTwilite treats ScriptNodes as first-class builders. Document this when emitting commands:\n\n- **ScriptNodes** can manufacture entire boards: spawn nodes, wire edges, toggle state, emit telemetry.\n- Scripts may mutate existing graphs—adjust positions, update data, or swap node types—without recreating them.\n- When emitting scripts, include metadata (`data.memo`, `data.markdown`) describing inputs/outputs so future agents understand the routine.\n\nExample: installing a ScriptNode that stitches 200 resistors to a breadboard should describe the handle schema it expects (`sourceHandles: ['wireA','wireB']`) and the group or cluster it will operate in.\n\n---\n\n## Advanced Handle & Socket Models\n\nDocument the full handle contract whenever you introduce or modify nodes:\n\n- **Multi-socket nodes:** GateNodes expose `inputA`, `inputB`, `output`. Breadboard sockets use row+column semantics (`A1`, `B1`, …).\n- **Skinned sockets:** Breadboard rails use semantic handles (`positive`, `negative`). Custom components may define `pinA`, `pinB`, `shield`, etc.\n- **Canvas/3D nodes:** Spatial nodes often provide `signal`, `camera`, or `transform` handles for integration with simulations.\n\nWhen unsure, ask the user for the node definition or inspect `node.handles` via `read` commands before emitting edges.\n\n---\n\n## Versioning & State Continuity\n\nTwilite graphs are typically stored in Git/GitHub. Help users keep history meaningful:\n\n- Describe changes in commit-friendly chunks (“Add breadboard power rail group”, “Update markdown docs for Lab Cluster A”).  \n- Avoid destructively recreating nodes when an `update` would suffice—this preserves IDs and diffs cleanly.\n- If you reorganize groups or coordinates, mention it so the user can decide whether to checkpoint the state.\n\n---\n\n## Combined Create Example\n\n```json\n{\n  \"action\": \"create\",\n  \"nodes\": [\n    {\n      \"id\": \"7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f\",\n      \"label\": \"Task A\",\n      \"type\": \"default\",\n      \"position\": { \"x\": 200, \"y\": 140 },\n      \"width\": 160,\n      \"height\": 80\n    },\n    {\n      \"id\": \"1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d\",\n      \"label\": \"Task B\",\n      \"type\": \"default\",\n      \"position\": { \"x\": 420, \"y\": 140 },\n      \"width\": 160,\n      \"height\": 80\n    }\n  ],\n  \"edges\": [\n    {\n      \"id\": \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\",\n      \"source\": \"7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f\",\n      \"sourceHandle\": \"out\",\n      \"target\": \"1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d\",\n      \"targetHandle\": \"in\",\n      \"type\": \"child\",\n      \"label\": \"then\"\n    }\n  ],\n  \"groups\": [\n    {\n      \"id\": \"2f1e0d9c-8b7a-4c3d-9e2f-1a0b9c8d7e6f\",\n      \"label\": \"Example Group\",\n      \"nodeIds\": [\n        \"7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f\",\n        \"1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d\"\n      ],\n      \"bounds\": { \"x\": 160, \"y\": 100, \"width\": 460, \"height\": 180 }\n    }\n  ]\n}\n```\n\n### Edge Wiring Example (Handles Required)\n\n```json\n{\n  \"action\": \"createEdges\",\n  \"edges\": [\n    {\n      \"id\": \"c6d51f2f-1a63-4e3f-90a5-6f3c2d6c9b21\",\n      \"source\": \"7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f\",\n      \"sourceHandle\": \"out\",\n      \"target\": \"1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d\",\n      \"targetHandle\": \"in\",\n      \"type\": \"child\",\n      \"label\": \"then\"\n    }\n  ]\n}\n```\n\n---\n\n## Bulk Updates & Other Commands\n\n- **Single-node update**\n\n  ```json\n  {\n    \"action\": \"update\",\n    \"type\": \"node\",\n    \"id\": \"7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f\",\n    \"updates\": { \"label\": \"Task A — Updated\", \"color\": \"#2e7d32\" }\n  }\n  ```\n\n- **Multi-node update**\n\n  ```json\n  {\n    \"action\": \"update\",\n    \"type\": \"node\",\n    \"ids\": [\n      \"0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01\",\n      \"a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77\",\n      \"c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41\"\n    ],\n    \"updates\": {\n      \"type\": \"markdown\",\n      \"width\": 280,\n      \"height\": 180\n    }\n  }\n  ```\n\n- **Delete**\n\n  ```json\n  { \"action\": \"delete\", \"type\": \"node\", \"id\": \"1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d\" }\n  ```\n\n- **Find nodes with notes**\n\n  ```json\n  { \"action\": \"findNodes\", \"criteria\": { \"hasMemo\": true } }\n  ```\n\n- **Get stats**\n\n  ```json\n  { \"action\": \"getStats\" }\n  ```\n\n---\n\n## Layout, Groups, and the OS Layer\n\n- Space nodes on ~50px multiples to align with the grid and help groups auto-resize.\n- Use groups as functional containers (breadboard sections, logic subsystems, spatial scenes). When creating nodes inside a group, mention the desired `groupId` so users can keep the OS layer organized.\n- Large markdown or canvas nodes should declare dimensions up front (e.g., 280×180) for better auto-layout.\n\n---\n\n## Error Handling & Telemetry\n\n- Twilite validates every command. Errors include node ID clashes, missing handles, or malformed JSON. Read and react to the warnings rather than retrying blindly.\n- When automation fails mid-run (e.g., ScriptNode throws), produce a follow-up `update` that logs the failure inside a markdown node so the next contributor can recover.\n\n---\n\n## Final Reminders\n\n- Be explicit: mention which subsystem, group, or cluster your change touches.\n- Keep diffs small enough that the user can Git-commit them meaningfully.\n- Prefer updates over re-creation to preserve node IDs and history.\n- Document automation: whenever you add or modify a ScriptNode or Background RPC hook, explain what it will do.\n\nTwilite OS is “the operating system for the in-between.” Treat every command as an incremental upgrade to a living workspace, not a one-off illustration.\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-guide-to-instructions",
+      "type": "dataFlow",
+      "source": "blank-guide",
+      "target": "llm-instructions",
+      "label": "next",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}
