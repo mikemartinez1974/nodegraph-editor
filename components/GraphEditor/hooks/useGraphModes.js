@@ -673,6 +673,22 @@ export default function useGraphModes({ nodes, setNodes, selectedNodeIds, edges,
     }
   }, [nodes, edges, setEdgeRoutes, buildElkEdgeRoutes]);
 
+  const rerouteTimerRef = useRef(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') return () => {};
+    if (rerouteTimerRef.current) {
+      clearTimeout(rerouteTimerRef.current);
+    }
+    rerouteTimerRef.current = window.setTimeout(() => {
+      rerouteEdges();
+    }, 80);
+    return () => {
+      if (rerouteTimerRef.current) {
+        clearTimeout(rerouteTimerRef.current);
+      }
+    };
+  }, [rerouteEdges]);
+
   const applyElkLayoutWithAlgorithms = useCallback(async ({
     algorithms = [],
     layoutOptions = {},

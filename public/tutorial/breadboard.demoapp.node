@@ -1,0 +1,441 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Breadboard Demo App (SVG)",
+    "description": "A compact demo graph that treats the node canvas as a working breadboard with SVG components and rails.",
+    "created": "2026-05-02T12:00:00.000Z",
+    "modified": "2026-05-02T12:00:00.000Z",
+    "author": "",
+    "tags": [
+      "breadboard",
+      "demo",
+      "svg"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1e88e5",
+        "light": "#6ab7ff",
+        "dark": "#005cb2"
+      },
+      "background": {
+        "default": "#f5f8fa",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0a0a0a",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      }
+    },
+    "snapToGrid": true,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#fdd835",
+    "autoSave": false
+  },
+  "extensions": {
+    "io.twilite.breadboardDemo": {
+      "grid": {
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "columns": 12,
+        "rowPitch": 40,
+        "columnPitch": 80
+      },
+      "rails": [
+        {
+          "key": "positive",
+          "label": "+5V"
+        },
+        {
+          "key": "negative",
+          "label": "GND"
+        }
+      ],
+      "version": "v2-svg"
+    }
+  },
+  "viewport": {
+    "pan": {
+      "x": 60,
+      "y": 30
+    },
+    "zoom": 0.76
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "board-surface",
+      "type": "svg",
+      "label": "Breadboard Surface",
+      "position": {
+        "x": -220,
+        "y": -160
+      },
+      "width": 880,
+      "height": 360,
+      "state": {
+        "locked": true
+      },
+      "data": {
+        "svg": "<svg viewBox=\"0 0 880 360\" xmlns=\"http://www.w3.org/2000/svg\">\n  <defs>\n    <pattern id=\"holes\" width=\"40\" height=\"40\" patternUnits=\"userSpaceOnUse\">\n      <circle cx=\"20\" cy=\"20\" r=\"4\" fill=\"#19c0b1\"/>\n    </pattern>\n  </defs>\n  <rect width=\"880\" height=\"360\" rx=\"20\" fill=\"#0d2f3c\"/>\n  <rect x=\"30\" y=\"20\" width=\"820\" height=\"320\" rx=\"12\" fill=\"#0e5868\"/>\n  <rect x=\"40\" y=\"84\" width=\"800\" height=\"200\" fill=\"url(#holes)\" opacity=\"0.35\"/>\n  <rect x=\"40\" y=\"40\" width=\"800\" height=\"24\" fill=\"#1da3ba\"/>\n  <rect x=\"40\" y=\"296\" width=\"800\" height=\"24\" fill=\"#1da3ba\"/>\n  <g stroke=\"#0b1b24\" stroke-width=\"2\">\n    <line x1=\"40\" y1=\"84\" x2=\"840\" y2=\"84\"/>\n    <line x1=\"40\" y1=\"120\" x2=\"840\" y2=\"120\"/>\n    <line x1=\"40\" y1=\"156\" x2=\"840\" y2=\"156\"/>\n    <line x1=\"40\" y1=\"192\" x2=\"840\" y2=\"192\"/>\n    <line x1=\"40\" y1=\"228\" x2=\"840\" y2=\"228\"/>\n    <line x1=\"40\" y1=\"264\" x2=\"840\" y2=\"264\"/>\n    <line x1=\"40\" y1=\"300\" x2=\"840\" y2=\"300\"/>\n  </g>\n  <g stroke=\"#0b1b24\" stroke-width=\"2\">\n    <line x1=\"120\" y1=\"24\" x2=\"120\" y2=\"336\"/>\n    <line x1=\"200\" y1=\"24\" x2=\"200\" y2=\"336\"/>\n    <line x1=\"280\" y1=\"24\" x2=\"280\" y2=\"336\"/>\n    <line x1=\"360\" y1=\"24\" x2=\"360\" y2=\"336\"/>\n    <line x1=\"440\" y1=\"24\" x2=\"440\" y2=\"336\"/>\n    <line x1=\"520\" y1=\"24\" x2=\"520\" y2=\"336\"/>\n    <line x1=\"600\" y1=\"24\" x2=\"600\" y2=\"336\"/>\n    <line x1=\"680\" y1=\"24\" x2=\"680\" y2=\"336\"/>\n    <line x1=\"760\" y1=\"24\" x2=\"760\" y2=\"336\"/>\n  </g>\n  <text x=\"60\" y=\"58\" fill=\"#ffffff\" font-size=\"24\" font-family=\"monospace\">Twilite SVG Breadboard</text>\n  <text x=\"720\" y=\"50\" fill=\"#ffffff\" font-size=\"16\" font-family=\"monospace\">+5V Rail</text>\n  <text x=\"720\" y=\"334\" fill=\"#ffffff\" font-size=\"16\" font-family=\"monospace\">GND Rail</text>\n</svg>",
+        "breadboard": {
+          "rows": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F"
+          ],
+          "columns": 12,
+          "rowPitch": 40,
+          "columnPitch": 80
+        },
+        "memo": "SVG backdrop that defines the grid the demo components understand."
+      }
+    },
+    {
+      "id": "node-power-supply",
+      "type": "default",
+      "label": "Power Supply",
+      "position": {
+        "x": 320,
+        "y": -140
+      },
+      "width": 190,
+      "height": 110,
+      "color": "#ffb74d",
+      "handles": [
+        {
+          "id": "positive",
+          "label": "+5V",
+          "direction": "output",
+          "dataType": "voltage",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "negative",
+          "label": "GND",
+          "direction": "output",
+          "dataType": "voltage",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "memo": "Simulates the +5V and ground rails that feed the demo."
+      }
+    },
+    {
+      "id": "node-resistor-220",
+      "type": "svg",
+      "label": "Resistor 220\u03a9",
+      "position": {
+        "x": -20,
+        "y": -40
+      },
+      "width": 180,
+      "height": 90,
+      "handles": [
+        {
+          "id": "pinA",
+          "label": "Pin A",
+          "direction": "bidirectional",
+          "dataType": "voltage",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "pinB",
+          "label": "Pin B",
+          "direction": "bidirectional",
+          "dataType": "voltage",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "svg": "<svg viewBox=\"0 0 180 90\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect x=\"10\" y=\"44\" width=\"160\" height=\"4\" fill=\"#3e2723\"/>\n  <polyline fill=\"none\" stroke=\"#fdd835\" stroke-width=\"6\" points=\"28,44 42,24 56,64 70,24 84,64 98,24 112,64 126,24 140,64 154,24 168,44\"/>\n  <line x1=\"4\" y1=\"44\" x2=\"28\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <line x1=\"168\" y1=\"44\" x2=\"176\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <text x=\"90\" y=\"80\" fill=\"#ffffff\" font-size=\"14\" font-family=\"monospace\" text-anchor=\"middle\">220\u03a9</text>\n</svg>",
+        "memo": "Limits current before the LED. Components define their own pins so wiring stays flexible."
+      }
+    },
+    {
+      "id": "node-led-3mm",
+      "type": "svg",
+      "label": "LED Indicator",
+      "position": {
+        "x": 180,
+        "y": -30
+      },
+      "width": 160,
+      "height": 110,
+      "handles": [
+        {
+          "id": "anode",
+          "label": "Anode",
+          "direction": "input",
+          "dataType": "voltage",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "cathode",
+          "label": "Cathode",
+          "direction": "output",
+          "dataType": "voltage",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "svg": "<svg viewBox=\"0 0 150 110\" xmlns=\"http://www.w3.org/2000/svg\">\n  <circle cx=\"70\" cy=\"55\" r=\"28\" fill=\"#ff7043\" stroke=\"#b71c1c\" stroke-width=\"4\"/>\n  <circle cx=\"70\" cy=\"55\" r=\"16\" fill=\"#ffa726\"/>\n  <path d=\"M80 45 L110 30 L110 80 L80 65\" fill=\"none\" stroke=\"#ffffff\" stroke-width=\"4\" stroke-linecap=\"round\"/>\n  <line x1=\"20\" y1=\"55\" x2=\"42\" y2=\"55\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <line x1=\"98\" y1=\"55\" x2=\"132\" y2=\"55\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <text x=\"75\" y=\"100\" fill=\"#ffffff\" font-size=\"16\" font-family=\"monospace\" text-anchor=\"middle\">LED</text>\n</svg>",
+        "memo": "Lights when current flows; the cathode is tethered to the switch and logic probe."
+      }
+    },
+    {
+      "id": "node-switch-slide",
+      "type": "svg",
+      "label": "Slide Switch",
+      "position": {
+        "x": 180,
+        "y": 80
+      },
+      "width": 160,
+      "height": 90,
+      "handles": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "voltage",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "voltage",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "svg": "<svg viewBox=\"0 0 160 90\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect x=\"20\" y=\"38\" width=\"120\" height=\"12\" rx=\"6\" fill=\"#263238\"/>\n  <rect x=\"65\" y=\"30\" width=\"30\" height=\"30\" fill=\"#cfd8dc\" stroke=\"#546e7a\" stroke-width=\"2\" rx=\"6\"/>\n  <line x1=\"65\" y1=\"30\" x2=\"95\" y2=\"60\" stroke=\"#37474f\" stroke-width=\"4\" stroke-linecap=\"round\"/>\n  <line x1=\"65\" y1=\"60\" x2=\"95\" y2=\"30\" stroke=\"#37474f\" stroke-width=\"4\" stroke-linecap=\"round\"/>\n  <line x1=\"10\" y1=\"46\" x2=\"40\" y2=\"46\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <line x1=\"120\" y1=\"46\" x2=\"150\" y2=\"46\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <text x=\"80\" y=\"86\" fill=\"#ffffff\" font-size=\"16\" font-family=\"monospace\" text-anchor=\"middle\">Slide</text>\n</svg>",
+        "memo": "Completes the cathode path to the negative rail when toggled."
+      }
+    },
+    {
+      "id": "node-negative-rail",
+      "type": "default",
+      "label": "Negative Rail [GND]",
+      "position": {
+        "x": 360,
+        "y": 200
+      },
+      "width": 180,
+      "height": 110,
+      "color": "#90a4ae",
+      "handles": [
+        {
+          "id": "ground",
+          "label": "GND",
+          "direction": "input",
+          "dataType": "voltage",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "memo": "Shares the reference net between the negative supply rail and the LED switch."
+      }
+    },
+    {
+      "id": "node-logic-probe",
+      "type": "default",
+      "label": "Logic Probe",
+      "position": {
+        "x": 520,
+        "y": 40
+      },
+      "width": 220,
+      "height": 100,
+      "color": "#4dd0e1",
+      "handles": [
+        {
+          "id": "sense",
+          "label": "Sense",
+          "direction": "input",
+          "dataType": "voltage",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "memo": "Observes the LED cathode so you can document when it sees ground."
+      }
+    },
+    {
+      "id": "node-breadboard-notes",
+      "type": "markdown",
+      "label": "Breadboard Guide",
+      "position": {
+        "x": 520,
+        "y": 150
+      },
+      "width": 260,
+      "height": 220,
+      "data": {
+        "markdown": "## SVG Breadboard Demo\n- Drag the switch and watch the LED path highlight on the SVG grid.\n- The logic probe monitors the LED\u2019s cathode so you can capture when the slide switch pulls the rail to ground.\n- Every component node stores its own pin handles so the wiring feels like a real breadboard netlist.\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-power-positive-resistor",
+      "type": "signal",
+      "source": "node-power-supply",
+      "sourceHandle": "positive",
+      "target": "node-resistor-220",
+      "targetHandle": "pinA",
+      "style": {
+        "color": "#ffee58",
+        "width": 3,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "+5V to resistor"
+      }
+    },
+    {
+      "id": "edge-resistor-led",
+      "type": "signal",
+      "source": "node-resistor-220",
+      "sourceHandle": "pinB",
+      "target": "node-led-3mm",
+      "targetHandle": "anode",
+      "style": {
+        "color": "#ffee58",
+        "width": 3,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "Resistor to LED"
+      }
+    },
+    {
+      "id": "edge-led-switch",
+      "type": "signal",
+      "source": "node-led-3mm",
+      "sourceHandle": "cathode",
+      "target": "node-switch-slide",
+      "targetHandle": "in",
+      "style": {
+        "color": "#ffee58",
+        "width": 3,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "LED cathode to switch"
+      }
+    },
+    {
+      "id": "edge-switch-ground",
+      "type": "signal",
+      "source": "node-switch-slide",
+      "sourceHandle": "out",
+      "target": "node-negative-rail",
+      "targetHandle": "ground",
+      "style": {
+        "color": "#ffee58",
+        "width": 3,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "Switch to ground"
+      }
+    },
+    {
+      "id": "edge-led-probe",
+      "type": "signal",
+      "source": "node-led-3mm",
+      "sourceHandle": "cathode",
+      "target": "node-logic-probe",
+      "targetHandle": "sense",
+      "style": {
+        "color": "#81d4fa",
+        "width": 2,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "Probe watches cathode"
+      }
+    },
+    {
+      "id": "edge-power-negative-ground",
+      "type": "signal",
+      "source": "node-power-supply",
+      "sourceHandle": "negative",
+      "target": "node-negative-rail",
+      "targetHandle": "ground",
+      "style": {
+        "color": "#ffee58",
+        "width": 3,
+        "route": "orthogonal"
+      },
+      "data": {
+        "description": "Ground reference"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-breadboard-cluster",
+      "label": "Breadboard Cluster",
+      "nodeIds": [
+        "board-surface",
+        "node-resistor-220",
+        "node-led-3mm",
+        "node-switch-slide",
+        "node-power-supply",
+        "node-negative-rail"
+      ],
+      "bounds": {
+        "x": -260,
+        "y": -200,
+        "width": 780,
+        "height": 460
+      }
+    }
+  ]
+}

@@ -846,7 +846,7 @@ export function createGraphEditorHandlers({
       }
 
   
-      let action = pastedData.action || (pastedNodes.length && pastedEdges.length ? 'replace' : 'add');
+      let action = pastedData.action || 'add';
 
       if (action === 'replace') {
         const nodeIdSet = new Set(pastedNodes.map(n => n.id));

@@ -1,0 +1,294 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-09T07:36:32.643Z",
+    "modified": "2026-01-09T07:36:32.643Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "curved",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 189.5502649179067,
+      "y": -278.4648062945113
+    },
+    "zoom": 1.0000021488835693
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "substrate-root",
+      "type": "markdown",
+      "label": "🧱 Substrate Programming",
+      "position": {
+        "x": 470.7102024773559,
+        "y": 175.08738807089657
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# 🧱 Substrate Programming\n\nDefining **durable structures** that outlive execution.\n\nYou are not telling the system *what to do next*.\nYou are defining **what can exist, what may happen, and what must never break**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cluster-identity",
+      "type": "markdown",
+      "label": "🪪 Identity & Persistence",
+      "position": {
+        "x": 905.1968050787183,
+        "y": 447.0221058179331
+      },
+      "width": 320,
+      "height": 281,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Identity & Persistence\n\nWhat exists **even when nothing is running**.\n\n- **Artifact** — durable object (graph, node, edge)\n- **Identity** — stable IDs, not regenerated labels\n- **State** — observable properties at rest\n- **History** — meaningful past mutations\n- **Continuity** — existence survives time",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cluster-behavior",
+      "type": "markdown",
+      "label": "🧠 Behavior",
+      "position": {
+        "x": 372.17891520002104,
+        "y": 595.330830597657
+      },
+      "width": 326,
+      "height": 282,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Behavior\n\nWhat *may* happen to the substrate.\n\n- **Skill** — predictable behavior over a graph\n- **Interpreter** — engine that applies a skill\n- **Evaluation** — read without mutation\n- **Mutation** — write deltas only\n- **Delta** — the legal unit of change",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cluster-constraints",
+      "type": "markdown",
+      "label": "🛡️ Constraints",
+      "position": {
+        "x": 46.58476135233548,
+        "y": 139.33659309915532
+      },
+      "width": 320,
+      "height": 287,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Constraints\n\nWhat must **never** break.\n\n- **Invariant** — always true\n- **Guardrail** — blocks invalid change\n- **Contract** — promises a skill must honor\n- **Scope** — what a skill may touch\n- **Reversibility** — whether change can be undone",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cluster-semantics",
+      "type": "markdown",
+      "label": "🗣️ Semantics",
+      "position": {
+        "x": 377.780102922766,
+        "y": -309.9582195091337
+      },
+      "width": 323,
+      "height": 285,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantics\n\nHow humans stay oriented.\n\n- **Meaning** — human-legible intent\n- **Affordance** — what the graph invites\n- **Perspective** — a view over the same artifact\n- **Role** — expected behavior of an actor\n- **Narrative** — why this exists",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "cluster-execution",
+      "type": "markdown",
+      "label": "⚙️ Execution (Downstream)",
+      "position": {
+        "x": 924.8939664682157,
+        "y": -145.18059358944444
+      },
+      "width": 323,
+      "height": 273,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Execution (Downstream)\n\nImportant — but **not primary**.\n\n- **Trigger** — what causes interpretation\n- **Scheduler** — when it happens\n- **Agent** — an actor using skills\n- **Tool** — external capability\n- **Side-effect** — something substrates minimize",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-contract",
+      "type": "markdown",
+      "label": "🧾 Skill Contract",
+      "position": {
+        "x": -217.56053467231573,
+        "y": 625.969616527695
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 🧾 Skill Contract\n\nA **Skill Contract** defines the *rules under which a skill may operate*.\n\nIt is **not code**.\nIt is a **promise**.\n\n### A Skill Contract specifies:\n\n- **Reads** — what parts of the graph the skill may inspect\n- **Writes** — what the skill is allowed to mutate\n- **Invariants** — what must remain true after execution\n- **Failure modes** — what happens if constraints are violated\n- **Reversibility** — whether changes can be undone\n\n### Why this exists\n\n- Skills become **predictable**\n- Multiple interpreters can safely coexist\n- Humans can reason about agent behavior\n- Graph continuity is preserved\n\n> A skill without a contract is just a suggestion.\n> A contract makes it *trustworthy*.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-identity",
+      "type": "reference",
+      "source": "substrate-root",
+      "target": "cluster-identity",
+      "label": "exists as",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-behavior",
+      "type": "reference",
+      "source": "substrate-root",
+      "target": "cluster-behavior",
+      "label": "allows",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-constraints",
+      "type": "reference",
+      "source": "substrate-root",
+      "target": "cluster-constraints",
+      "label": "is bounded by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-semantics",
+      "type": "reference",
+      "source": "substrate-root",
+      "target": "cluster-semantics",
+      "label": "is understood through",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-execution",
+      "type": "reference",
+      "source": "substrate-root",
+      "target": "cluster-execution",
+      "label": "may produce",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contract-behavior",
+      "type": "reference",
+      "source": "skill-contract",
+      "target": "cluster-behavior",
+      "label": "governs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contract-constraints",
+      "type": "reference",
+      "source": "skill-contract",
+      "target": "cluster-constraints",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

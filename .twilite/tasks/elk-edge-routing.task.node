@@ -1,0 +1,179 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-08T21:20:38.239Z",
+    "modified": "2026-01-08T21:20:38.239Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 478.2413793103449,
+      "y": 123.84482758620692
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "note-elk-control",
+      "type": "markdown",
+      "label": "All edges by ELK",
+      "position": {
+        "x": -69,
+        "y": -231
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Every edge is ELK’s job\n\nWe ignore pre-existing route data and refuse fallback heuristics. The moment a layout finishes, ELK _alone_ dictates all polyline geometry (and any subsequent adjustments change ELK inputs, not manual overrides).",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "node-routing-pipeline",
+      "type": "markdown",
+      "label": "Routing pipeline",
+      "position": {
+        "x": -319,
+        "y": 55
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Pipeline\n1. Gather nodes + handles (position + size)\n2. Call ELK with `'elk.edgeRouting': 'ORTHOGONAL'` + fixed nodes\n3. Convert each `layout.edges[].sections` into `edgeRoutes[edgeId]`\n4. Skip any earlier bundling heuristics — ELK data is canonical",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "node-graph-ideal",
+      "type": "markdown",
+      "label": "Graph looks clean",
+      "position": {
+        "x": 320,
+        "y": 80
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Outcome\n- No bundling\n- No manual control points\n- All routes come from ELK’s bend points / source/target\n- After layout, `edgeRoutes` gets replaced with the freshly computed ELK polylines",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "node-next-steps",
+      "type": "markdown",
+      "label": "Next steps",
+      "position": {
+        "x": -56,
+        "y": 370
+      },
+      "width": 520,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Next steps\n- Route edges via ELK after every user move or layout\n- Slide routing config inside ELK options (spacing/direction) once canonical polyline pipeline is solid\n- Document the regression: no manual edge routes, no fallbacks, only ELK",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-interpretation",
+      "type": "reference",
+      "source": "note-elk-control",
+      "target": "node-routing-pipeline",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-outcome",
+      "type": "reference",
+      "source": "node-routing-pipeline",
+      "target": "node-graph-ideal",
+      "label": "produces",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-next",
+      "type": "dataFlow",
+      "source": "node-graph-ideal",
+      "target": "node-next-steps",
+      "label": "next",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

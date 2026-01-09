@@ -61,7 +61,12 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
 - **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
 - **Use colors + emojis intentionally.** Color-code clusters and add small emojis in labels to make graphs scannable at a glance.
-- **Edge routing is configurable.** Use `edge.style.route: "orthogonal"` (or `edge.style.orthogonal: true`) to force right-angled paths; set `edge.style.curved: true` for bezier curves. The user can also override routing in Document Properties.
+- **Edge routing is ELK-first.** Twilite now routes edges via ELK with precise node/handle data, so `edgeRoutes` mirrors ELK’s bend points. Don’t remap those points or mix in manual bundling heuristics; adjust ELK options (spacing, algorithm, port constraints) instead if you need different behavior. You can still request `edge.style.route: "orthogonal"` or `edge.style.curved: true`, but the real work happens in ELK’s layout options exposed through Document Properties.
+
+### ELK Routing Notes
+
+- Every layout now rebuilds ELK’s graph with each node’s current size, position, and handle definition. Handles become ELK ports (`elk.port.side` + offsets) so edges snap cleanly to anchors.
+- ELK avoids nodes automatically, so as long as your node bounding boxes and handles are accurate, the resulting `edgeRoutes` never crosses non-target nodes. The renderer simply draws those points.
 - **Creation order matters.** Always create `nodes` first, then `edges`, then `groups` (every pass). If using `batch`/`transaction`, ensure each command respects this order.
 
 ### Supported Actions
@@ -127,6 +132,8 @@ This is the single most common and most damaging mistake an AI can make in Twili
 - Implicitly replace content by omission
 
 If you are not explicitly asked to wipe or recreate the graph, assume persistence.
+
+**Copy/paste caution:** Pressing Ctrl+C on an existing graph dumps a complete `nodegraph-data` snapshot. Pasting that blob into another cluster destroys whatever was already there. When copying, export just the nodes/edges you need and wrap them in a `create`/`createNodes`/`createEdges` command so the receiving graph treats the paste as an addition, not a replacement.
 
 **Required pattern: state deltas only:**
 
