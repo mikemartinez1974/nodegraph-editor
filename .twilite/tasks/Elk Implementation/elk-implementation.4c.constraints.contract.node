@@ -1,0 +1,159 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "ELK Constraints Contract",
+    "description": "Defines post-routing checks & invariant enforcement",
+    "created": "2026-01-11T00:15:00.000Z",
+    "modified": "2026-01-11T00:15:00.000Z",
+    "author": "",
+    "tags": [
+      "edge-routing",
+      "constraints",
+      "compliance"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#0d47a1",
+        "light": "#5472d3",
+        "dark": "#002171",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#c62828",
+        "light": "#ff5f52",
+        "dark": "#8e0000",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#f2f4ff",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "constraints-root",
+      "type": "markdown",
+      "label": "📝 Constraints Contract",
+      "position": {
+        "x": 0,
+        "y": -150
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Constraints Contract\n+\n+After ELK routes edges, the system must verify every edge honors declared handles, ports, and spacing before committing the map."
+      }
+    },
+    {
+      "id": "constraint-checks",
+      "type": "markdown",
+      "label": "✅ Constraint Checks",
+      "position": {
+        "x": -360,
+        "y": 60
+      },
+      "width": 360,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Constraint Checks\n+\n+- Confirm each edge route attaches to declared handles/ports.\n+- Ensure port sides match `input`/`output` expectations.\n+- Validate lane distances (parallel offsets, fan spacing) against document settings.\n+- Detect self-loop adjustments and horizontal/vertical guarantees when straight mode is active."
+      }
+    },
+    {
+      "id": "constraint-reporting",
+      "type": "markdown",
+      "label": "📣 Reporting & Remedies",
+      "position": {
+        "x": 360,
+        "y": 60
+      },
+      "width": 360,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Reporting\n+\n+- Annotate violations with `edge.data.constraints` metadata and snackbar warnings.\n+- Flag edges that drift from handles and rerun ELK with stricter ports when feasible.\n+- Emit a trace note node to the plan graph whenever constraints rerun."
+      }
+    },
+    {
+      "id": "constraint-invariants",
+      "type": "markdown",
+      "label": "🧭 Invariants",
+      "position": {
+        "x": 0,
+        "y": 320
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Invariants\n+\n+- ELK output is authoritative; constraint code only verifies or reruns, but never rewrites paths directly.\n+- Violations either rerun ELK or stay flagged — they do not silently mutate stored edge geometry."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-checks",
+      "type": "dataFlow",
+      "source": "constraints-root",
+      "target": "constraint-checks",
+      "label": "verifies",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-report",
+      "type": "dataFlow",
+      "source": "constraints-root",
+      "target": "constraint-reporting",
+      "label": "reports",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-report-invariants",
+      "type": "dataFlow",
+      "source": "constraint-reporting",
+      "target": "constraint-invariants",
+      "label": "enforces",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

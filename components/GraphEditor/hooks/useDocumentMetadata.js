@@ -1,20 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { themeConfigFromMuiTheme } from '../utils/themeUtils';
-
-const DEFAULT_GRID_SIZE = 20;
-const DEFAULT_LAYOUT_SETTINGS = {
-  mode: 'autoOnMissingPositions', // 'autoOnMissingPositions' | 'manual'
-  defaultLayout: 'hierarchical', // 'hierarchical' | 'serpentine' | 'radial' | 'grid'
-  direction: 'DOWN', // 'DOWN' | 'RIGHT'
-  edgeLaneGapPx: 10,
-  serpentine: {
-    maxPerRow: 6
-  },
-  cycleFallback: {
-    enabled: true
-  }
-};
+import { DEFAULT_GRID_SIZE, DEFAULT_ELK_ROUTING_SETTINGS, DEFAULT_LAYOUT_SETTINGS } from '../layoutSettings';
 
 const createInitialDocumentSettings = (theme) => ({
   url: '',
@@ -24,6 +11,7 @@ const createInitialDocumentSettings = (theme) => ({
   edgeRouting: 'auto',
   layout: {
     ...DEFAULT_LAYOUT_SETTINGS,
+    elk: { ...DEFAULT_ELK_ROUTING_SETTINGS },
     serpentine: { ...(DEFAULT_LAYOUT_SETTINGS.serpentine || {}) },
     cycleFallback: { ...(DEFAULT_LAYOUT_SETTINGS.cycleFallback || {}) }
   },

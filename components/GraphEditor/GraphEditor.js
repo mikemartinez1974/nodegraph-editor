@@ -822,7 +822,9 @@ useEffect(() => {
     selectedNodeIds,
     edges,
     setEdgeRoutes,
-    layoutSettings: documentSettings?.layout
+    layoutSettings: documentSettings?.layout,
+    edgeRouting: documentSettings?.edgeRouting || 'auto',
+    setSnackbar
   });
 
   const pendingAutoLayoutOnPasteRef = useRef(false);

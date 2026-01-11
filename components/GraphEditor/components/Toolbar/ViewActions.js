@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
@@ -11,13 +10,10 @@ import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 export default function ViewActions({ 
   onToggleMinimap,
   onToggleGrid,
-  onAutoLayout,
-  onRerouteEdges,
   onAlignNodes,
   onDistributeNodes,
   showMinimap,
@@ -60,19 +56,6 @@ export default function ViewActions({
         </span>
       </Tooltip>
 
-      <Tooltip title="Auto Layout">
-        <span>
-          <IconButton 
-            onClick={onAutoLayout} 
-            color="inherit"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <AccountTreeIcon fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
-
       <Tooltip title="Alignment Tools">
         <span>
           <IconButton 
@@ -82,19 +65,6 @@ export default function ViewActions({
             disabled={isFreeUser || selectionCount < 2}
           >
             <FormatAlignCenterIcon fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
-
-      <Tooltip title="Reroute Edges (ELK)">
-        <span>
-          <IconButton
-            onClick={onRerouteEdges}
-            color="inherit"
-            size="small"
-            disabled={isFreeUser}
-          >
-            <AltRouteIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>

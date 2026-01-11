@@ -1,0 +1,373 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-10T23:37:13.890Z",
+    "modified": "2026-01-10T23:37:13.890Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#63a4ff",
+        "dark": "#004ba0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#33ab9f",
+        "dark": "#005c4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#eef7ff",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0d1b2a",
+        "secondary": "#1c3d5a"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 324,
+      "y": 774
+    },
+    "zoom": 1
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "plan-root",
+      "type": "markdown",
+      "label": "🎯 ELK Edge Routing Plan",
+      "position": {
+        "x": 275.5,
+        "y": -491.5
+      },
+      "width": 500,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# ELK Edge Routing Implementation Plan\n+\n+Use the orientation + skills graphs as the specification. Each skill becomes a subgraph in this plan with concrete steps. The plan proceeds from intent capture → ELK routing → constraint validation → rendering → persistence, with toolbar and document settings orchestrating the whole flow.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "plan-intent",
+      "type": "markdown",
+      "label": "🖱️ Intent Capture Skill",
+      "position": {
+        "x": 345.5,
+        "y": -221.5
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent Capture Skill\n+\n+- Hook `handleNodeDragEnd`, toolbar reroute buttons, document setting changes, and `edges:reroute` RPCs to a shared intent emitter.\n+- Emit a lightweight `edgeIntent` note node so the plan graph records the trigger before the routing skill runs.\n+- Keep this subsystem purely declarative: it writes only the intent payload."
+      }
+    },
+    {
+      "id": "plan-routing",
+      "type": "markdown",
+      "label": "🦌 Routing Skill Subgraph",
+      "position": {
+        "x": 245.5,
+        "y": 228.5
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeRouting Skill\n+\n+- `rerouteEdges` is the single ELK entry point; all other routing helpers route through it.\n+- Construct ELK ports from node handles (normalize sides, offsets, pin IDs) and include every ELK option we expose (algorithm, edgeRouting, spacing, port constraints).\n+- Allow the toolbar/document settings to override `elk.edgeRouting` (ORTHOGONAL, POLYLINE, possibly curved) and `elk.algorithm` (layered, radial, rectpacking).\n+- If ELK fails, log the failure (via `setSnackbar` or note node) rather than falling back to heuristics; update constraint metadata for retries.\n+- Translate `layout.edges[].sections` into `edgeRoutes[edgeId].points` plus lane offsets & fan spacing so the renderer always sees complete polylines.\n+- At the end, always replace the previous `edgeRoutes` map; do not reuse leftover geometry or manual handles."
+      }
+    },
+    {
+      "id": "plan-constraints",
+      "type": "markdown",
+      "label": "🧠 Constraint Enforcement",
+      "position": {
+        "x": 275.5,
+        "y": 568.5
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Constraint Skill\n+\n+- After routing completes, verify each routed edge still matches declared handles, port sides, and fallbacks from `edge-routing.orientation`.\n+- Annotate violations in `edge.data` or emit warnings via snackbar.\n+- If violation is fixable, rerun ELK with tightened constraints (e.g., port forces)."
+      }
+    },
+    {
+      "id": "plan-rendering",
+      "type": "markdown",
+      "label": "🎨 Rendering Skill",
+      "position": {
+        "x": -174.5,
+        "y": 988.5
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rendering Skill\n+\n+- Respect `edgeRoutes` segments and `edge.style` metadata in `NodeGraph/EdgeLayer`.\n+- Apply rounded corners, arrowheads, gradients, dash animations only at render time.\n+- Do not mutate `edgeRoutes`; instead keep the styling knobs (document settings/toolbar toggles) separate."
+      }
+    },
+    {
+      "id": "plan-toolbar",
+      "type": "markdown",
+      "label": "🧰 Toolbar + Settings",
+      "position": {
+        "x": -194.5,
+        "y": -251.5
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Toolbar + Document Settings\n+\n+- Toolbar keeps layout/routing selectors compact and writes to `documentSettings.edgeRouting`.\n+- Document properties panel exposes ELK parameters (algorithm, spacing, port constraints, cycle fallback) and rendering flags.\n+- Tie the toolbar actions back to the plan graph via intent signals."
+      }
+    },
+    {
+      "id": "plan-persistence",
+      "type": "markdown",
+      "label": "📦 Persistence Skill",
+      "position": {
+        "x": -174.5,
+        "y": 1268.5
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Persistence Skill\n+\n+- Record every reroute in history and, when necessary, log the responsible skill node for traceability.\n+- Add a note node to the plan when a workflow completes so the orientation graph stays in sync."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-plan-root-intent",
+      "type": "dataFlow",
+      "source": "plan-root",
+      "target": "plan-intent",
+      "label": "starts",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-root-orientation",
+      "type": "reference",
+      "source": "plan-root",
+      "target": "elk-root",
+      "label": "specs",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-root-primitives",
+      "type": "reference",
+      "source": "plan-root",
+      "target": "edge-primitives-root",
+      "label": "vocabulary",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-intent-routing-plan",
+      "type": "dataFlow",
+      "source": "plan-intent",
+      "target": "plan-routing",
+      "label": "feeds",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-intent-skill",
+      "type": "reference",
+      "source": "plan-intent",
+      "target": "skill-intent",
+      "label": "implements",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-routing-constraints-plan",
+      "type": "dataFlow",
+      "source": "plan-routing",
+      "target": "plan-constraints",
+      "label": "validates",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-routing-skill",
+      "type": "reference",
+      "source": "plan-routing",
+      "target": "skill-routing",
+      "label": "drives",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-constraints-rendering-plan",
+      "type": "dataFlow",
+      "source": "plan-constraints",
+      "target": "plan-rendering",
+      "label": "decorates",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-constraints-skill",
+      "type": "reference",
+      "source": "plan-constraints",
+      "target": "skill-constraints",
+      "label": "ensures",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-rendering-persistence-plan",
+      "type": "dataFlow",
+      "source": "plan-rendering",
+      "target": "plan-persistence",
+      "label": "records",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-rendering-skill",
+      "type": "reference",
+      "source": "plan-rendering",
+      "target": "skill-rendering",
+      "label": "delegates",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-toolbar-routing-plan",
+      "type": "reference",
+      "source": "plan-toolbar",
+      "target": "plan-routing",
+      "label": "configures",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-toolbar-render-plan",
+      "type": "reference",
+      "source": "plan-toolbar",
+      "target": "plan-rendering",
+      "label": "drives",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-toolbar-skill",
+      "type": "reference",
+      "source": "plan-toolbar",
+      "target": "skill-toolbar-controls",
+      "label": "mirrors",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-toolbar-settings",
+      "type": "reference",
+      "source": "plan-toolbar",
+      "target": "skill-document-settings",
+      "label": "documents",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-plan-persistence-skill",
+      "type": "reference",
+      "source": "plan-persistence",
+      "target": "skill-persistence",
+      "label": "records",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

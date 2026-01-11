@@ -44,8 +44,8 @@ import {
   Refresh as RefreshIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
-  Map as MapIcon,  // NEW: Import minimap icon
-  GridOn as GridOnIcon,  // NEW: Import grid icon
+  Map as MapIcon,
+  GridOn as GridOnIcon,
   FormatAlignLeft as FormatAlignLeftIcon,
   FormatAlignCenter as FormatAlignCenterIcon,
   FormatAlignRight as FormatAlignRightIcon,
@@ -53,7 +53,8 @@ import {
   VerticalAlignCenter as VerticalAlignCenterIcon,
   VerticalAlignBottom as VerticalAlignBottomIcon,
   SwapHoriz as SwapHorizIcon,
-  SwapVert as SwapVertIcon
+  SwapVert as SwapVertIcon,
+  AltRoute as AltRouteIcon
 } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -76,6 +77,7 @@ import HistoryActions from './Toolbar/HistoryActions';
 import NodeActions from './Toolbar/NodeActions';
 import ViewActions from './Toolbar/ViewActions';
 import PanelActions from './Toolbar/PanelActions';
+import { EDGE_ROUTING_OPTIONS } from '../layoutSettings';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -127,6 +129,8 @@ const Toolbar = ({
   onToggleSnapToGrid,  // NEW: Add prop
   gridSize = 20,  // Grid size from document settings
   edgeRouting = 'auto', // Edge routing mode from document settings
+  onEdgeRoutingChange = () => {},
+  onRerouteEdges = () => {},
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null  // GitHub sync target settings
 }) => {
@@ -137,8 +141,9 @@ const Toolbar = ({
   const [pasted, setPasted] = useState(false);
   const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
-  const [autoLayoutMenuAnchor, setAutoLayoutMenuAnchor] = useState(null);
+  const [layoutMenuAnchor, setLayoutMenuAnchor] = useState(null);
   const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
+  const [edgeRoutingMenuAnchor, setEdgeRoutingMenuAnchor] = useState(null);
   const [pluginManagerOpen, setPluginManagerOpen] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -171,6 +176,7 @@ const Toolbar = ({
     grid: 'Grid'
   };
   const autoLayoutLabel = autoLayoutLabelByType[autoLayoutType] || autoLayoutType;
+  const edgeRoutingLabel = EDGE_ROUTING_OPTIONS.find((option) => option.value === edgeRouting)?.label || edgeRouting;
 
   // Retractable drawer state
   const [isExpanded, setIsExpanded] = useState(true);
@@ -829,8 +835,6 @@ const Toolbar = ({
           <ViewActions 
             onToggleMinimap={onToggleMinimap}
             onToggleGrid={() => eventBus.emit('toggleShowGrid')}
-            onAutoLayout={onApplyLayout}
-            onRerouteEdges={() => eventBus.emit('edges:reroute')}
             onAlignNodes={(mode) => {
               const didAlign = onAlignSelection(mode);
               if (didAlign && onShowMessage) {
@@ -924,15 +928,15 @@ const Toolbar = ({
           </ToggleButton>
         </ToggleButtonGroup>
 
-        <ButtonGroup size="small" sx={{ ml: 1 }}>
+        <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
           <Button
-            onClick={(event) => setAutoLayoutMenuAnchor(event.currentTarget)}
+            onClick={(event) => setLayoutMenuAnchor(event.currentTarget)}
             endIcon={<ExpandMoreIcon fontSize="small" />}
             size="small"
             variant="outlined"
             disabled={isFreeUser}
           >
-            {autoLayoutLabel}
+            Layout: {autoLayoutLabel}
           </Button>
           <Button
             onClick={onApplyLayout}
@@ -941,9 +945,27 @@ const Toolbar = ({
             startIcon={<AutoIcon fontSize="small" />}
             disabled={isFreeUser}
           >
-            Apply
+            Apply Layout
           </Button>
-        </ButtonGroup>
+          <Button
+            onClick={(event) => setEdgeRoutingMenuAnchor(event.currentTarget)}
+            endIcon={<ExpandMoreIcon fontSize="small" />}
+            size="small"
+            variant="outlined"
+            disabled={isFreeUser}
+          >
+            Routing: {edgeRoutingLabel}
+          </Button>
+          <Button
+            onClick={onRerouteEdges}
+            size="small"
+            variant="contained"
+            startIcon={<AltRouteIcon fontSize="small" />}
+            disabled={isFreeUser}
+          >
+            Reroute Edges
+          </Button>
+        </Box>
 
         {/* Viewport Indicator */}
         <Box
@@ -976,22 +998,41 @@ const Toolbar = ({
 
       {/* Menus and Dialogs */}
       <Menu
-        anchorEl={autoLayoutMenuAnchor}
-        open={Boolean(autoLayoutMenuAnchor)}
-        onClose={() => setAutoLayoutMenuAnchor(null)}
+        anchorEl={layoutMenuAnchor}
+        open={Boolean(layoutMenuAnchor)}
+        onClose={() => setLayoutMenuAnchor(null)}
       >
-        <MenuItem onClick={() => { onAutoLayoutChange('hierarchical'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'hierarchical'}>
+        <MenuItem onClick={() => { onAutoLayoutChange('hierarchical'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'hierarchical'}>
           Hierarchical
         </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('serpentine'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'serpentine'}>
+        <MenuItem onClick={() => { onAutoLayoutChange('serpentine'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'serpentine'}>
           Serpentine
         </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('radial'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'radial'}>
+        <MenuItem onClick={() => { onAutoLayoutChange('radial'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'radial'}>
           Radial
         </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('grid'); setAutoLayoutMenuAnchor(null); }} selected={autoLayoutType === 'grid'}>
+        <MenuItem onClick={() => { onAutoLayoutChange('grid'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'grid'}>
           Grid
         </MenuItem>
+      </Menu>
+
+      <Menu
+        anchorEl={edgeRoutingMenuAnchor}
+        open={Boolean(edgeRoutingMenuAnchor)}
+        onClose={() => setEdgeRoutingMenuAnchor(null)}
+      >
+        {EDGE_ROUTING_OPTIONS.map((option) => (
+          <MenuItem
+            key={option.value}
+            selected={edgeRouting === option.value}
+            onClick={() => {
+              onEdgeRoutingChange(option.value);
+              setEdgeRoutingMenuAnchor(null);
+            }}
+          >
+            {option.label}
+          </MenuItem>
+        ))}
       </Menu>
 
       <input

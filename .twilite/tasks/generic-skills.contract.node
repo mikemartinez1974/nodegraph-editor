@@ -1,0 +1,231 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-10T03:40:25.893Z",
+    "modified": "2026-01-10T03:40:25.893Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 215,
+      "y": 5.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skills-root",
+      "type": "markdown",
+      "label": "🧠 Runtime Skills",
+      "position": {
+        "x": 119.7881715753283,
+        "y": 391.18525058096134
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Runtime Skills\n\nThis graph defines the **core skill types** used by the Twilite runtime.\n\nA *skill* is a predictable behavior that:\n- reads graph state\n- applies rules or logic\n- emits graph deltas\n\nThis graph is used for **orientation**, not implementation."
+      }
+    },
+    {
+      "id": "skill-routing",
+      "type": "markdown",
+      "label": "🦌 EdgeRoutingSkill",
+      "position": {
+        "x": -592.3982564584117,
+        "y": 678.8378211329394
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeRoutingSkill\n\n**Role:** Domain logic\n\n- Reads nodes, ports, constraints\n- Delegates routing to ELK or other solvers\n- Writes canonical edge geometry (polylines)\n\nDeterministic. No UI concerns."
+      }
+    },
+    {
+      "id": "skill-rendering",
+      "type": "markdown",
+      "label": "🎨 EdgeRenderingSkill",
+      "position": {
+        "x": 309.5521682665493,
+        "y": 740.9224832358084
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeRenderingSkill\n\n**Role:** Visual presentation\n\n- Consumes canonical geometry\n- Applies smoothing, rounding, arrowheads\n- Produces pixels only\n\nNever mutates graph semantics."
+      }
+    },
+    {
+      "id": "skill-interaction",
+      "type": "markdown",
+      "label": "🖱️ InteractionSkill",
+      "position": {
+        "x": -141.30504244154167,
+        "y": 747.0115358569503
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## InteractionSkill\n\n**Role:** Intent capture\n\n- Drag, click, select, hover\n- Emits *intent* (\"node moved\")\n- Never decides outcomes\n\nTriggers other skills."
+      }
+    },
+    {
+      "id": "skill-constraints",
+      "type": "markdown",
+      "label": "🧠 ConstraintEnforcementSkill",
+      "position": {
+        "x": 189.7457436016889,
+        "y": -3.922483235808386
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ConstraintEnforcementSkill\n\n**Role:** Domain rules\n\n- Reads constraints from graph\n- Validates mutations\n- Rejects or amends illegal state\n\nLives in the Twilite runtime."
+      }
+    },
+    {
+      "id": "skill-persistence",
+      "type": "markdown",
+      "label": "📦 PersistenceSkill",
+      "position": {
+        "x": 749.3982564584117,
+        "y": 193.44027252167473
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## PersistenceSkill\n\n**Role:** Durability\n\n- Stores graph state and deltas\n- Manages undo / redo\n- Enables continuity over time\n\nOrthogonal to meaning."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-routing",
+      "type": "reference",
+      "source": "skills-root",
+      "target": "skill-routing",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-rendering",
+      "type": "reference",
+      "source": "skills-root",
+      "target": "skill-rendering",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-interaction",
+      "type": "reference",
+      "source": "skills-root",
+      "target": "skill-interaction",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-constraints",
+      "type": "reference",
+      "source": "skills-root",
+      "target": "skill-constraints",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-persistence",
+      "type": "reference",
+      "source": "skills-root",
+      "target": "skill-persistence",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-interaction-routing",
+      "type": "dataFlow",
+      "source": "skill-interaction",
+      "target": "skill-routing",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-routing-constraints",
+      "type": "dataFlow",
+      "source": "skill-routing",
+      "target": "skill-constraints",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-constraints-persistence",
+      "type": "dataFlow",
+      "source": "skill-constraints",
+      "target": "skill-persistence",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

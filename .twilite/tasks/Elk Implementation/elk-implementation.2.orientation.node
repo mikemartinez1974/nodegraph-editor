@@ -1,0 +1,332 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-10T22:56:19.126Z",
+    "modified": "2026-01-10T22:56:19.126Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "curved",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 641.5744908070255,
+      "y": 256.68849103841546
+    },
+    "zoom": 0.6378213999880177
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "edge-primitives-root",
+      "type": "markdown",
+      "label": "📐 Edge Primitives",
+      "position": {
+        "x": -49.55172264782928,
+        "y": -150.9230997159388
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Primitives\n\nThis graph defines the **primitive vocabulary** for edges in Twilite.\n\nGoal: separate **geometry**, **constraints**, **routing**, and **rendering**.\n\nThis is substrate-level knowledge."
+      }
+    },
+    {
+      "id": "primitive-geometry",
+      "type": "markdown",
+      "label": "🧱 Geometry Primitives",
+      "position": {
+        "x": -330.5484643091562,
+        "y": 188.7993703452358
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Geometry (irreducible)\n\nOnly **three true geometric primitives exist**:\n\n- **Line** — two points\n- **Polyline** — ordered bend points\n- **Curve** — interpolated path\n\nEverything else derives from these."
+      }
+    },
+    {
+      "id": "primitive-constraints",
+      "type": "markdown",
+      "label": "📏 Constraints",
+      "position": {
+        "x": 717.2976070661243,
+        "y": 197.99456441428634
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Constraints\n\nRules applied *to geometry*:\n\n- **Orthogonal** (90° only)\n- **Port-based attachment**\n- **Side / ordering rules**\n- **Self-loop offsets**\n\nConstraints do not create new geometry."
+      }
+    },
+    {
+      "id": "primitive-routing",
+      "type": "markdown",
+      "label": "🧭 Routing Policies",
+      "position": {
+        "x": 184.39647908518498,
+        "y": 194.00082486074004
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Routing\n\nHow a path is *chosen*:\n\n- Direct\n- Obstacle-avoiding\n- Layered / flow-based\n\nRouting **produces polylines**.\n\nELK lives here."
+      }
+    },
+    {
+      "id": "primitive-rendering",
+      "type": "markdown",
+      "label": "🎨 Rendering",
+      "position": {
+        "x": 186.8042478199079,
+        "y": 587.5779435058201
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rendering (visual only)\n\nApplied *after layout*:\n\n- Curving / smoothing\n- Rounded corners\n- Arrowheads\n- Dashes / animation\n- Variable width\n\nRendering never changes semantics."
+      }
+    },
+    {
+      "id": "canonical-form",
+      "type": "markdown",
+      "label": "🧠 Canonical Insight",
+      "position": {
+        "x": -313.82651218509534,
+        "y": 556.363421886451
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Canonical Form\n\n**Polyline is the canonical internal edge form.**\n\n- ELK outputs polylines\n- Constraints shape them\n- Renderers beautify them\n\nThis keeps the system debuggable."
+      }
+    },
+    {
+      "id": "elk-root",
+      "type": "markdown",
+      "label": "🦌 Edge Routing Contract (ELK)",
+      "position": {
+        "x": -1440.0050908912194,
+        "y": -224.21709893223334
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Routing Contract (ELK)\n\nThis graph records a **non-negotiable routing decision** in Twilite.\n\nIts purpose is **constraint**, not explanation."
+      }
+    },
+    {
+      "id": "elk-problem",
+      "type": "markdown",
+      "label": "Problem (Historical)",
+      "position": {
+        "x": -2009.574972984603,
+        "y": -222.12561457024103
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Problem\n\nEdges were visually noisy, inconsistent, and difficult to reason about.\n\nManual routing heuristics increased complexity and reduced debuggability."
+      }
+    },
+    {
+      "id": "elk-decision",
+      "type": "markdown",
+      "label": "Decision",
+      "position": {
+        "x": -821.7197026202988,
+        "y": 192.1120140051834
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision\n\n- **ELK is the sole authority for edge routing**\n- No manual control points are persisted\n- No fallback or bundling heuristics are allowed\n- Any node or handle movement triggers ELK recomputation\n\nThis decision is final."
+      }
+    },
+    {
+      "id": "elk-invariants",
+      "type": "markdown",
+      "label": "Invariants",
+      "position": {
+        "x": -812.8454931023887,
+        "y": 591.0294074625992
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Routing Invariants\n\n- All edge paths originate from ELK output\n- Internal edge geometry is replaced after each layout\n- Twilite does not store or mutate edge paths directly\n- Rendering may beautify, but never re-route"
+      }
+    },
+    {
+      "id": "elk-vocabulary-pointer",
+      "type": "markdown",
+      "label": "Vocabulary Reference",
+      "position": {
+        "x": -1468.479894343612,
+        "y": 210.44764667892986
+      },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Vocabulary Reference\n\nEdge semantics, primitives, constraints, and canonical forms are defined in:\n\n➡ **Edge Primitives / Vocabulary Graph**\n\nThis contract depends on that vocabulary and does not redefine it."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-geometry",
+      "type": "reference",
+      "source": "edge-primitives-root",
+      "target": "primitive-geometry",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-constraints",
+      "type": "reference",
+      "source": "edge-primitives-root",
+      "target": "primitive-constraints",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-routing",
+      "type": "reference",
+      "source": "edge-primitives-root",
+      "target": "primitive-routing",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-routing-rendering",
+      "type": "dataFlow",
+      "source": "primitive-routing",
+      "target": "primitive-rendering",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-geometry-canonical",
+      "type": "reference",
+      "source": "primitive-geometry",
+      "target": "canonical-form",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-root-problem",
+      "type": "reference",
+      "source": "elk-root",
+      "target": "elk-problem",
+      "label": "records",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-decision",
+      "type": "reference",
+      "source": "elk-root",
+      "target": "elk-decision",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-decision-invariants",
+      "type": "dataFlow",
+      "source": "elk-decision",
+      "target": "elk-invariants",
+      "label": "implies",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-vocab",
+      "type": "reference",
+      "source": "elk-root",
+      "target": "elk-vocabulary-pointer",
+      "label": "depends on",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

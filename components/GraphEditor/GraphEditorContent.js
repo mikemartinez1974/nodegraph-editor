@@ -156,6 +156,35 @@ const GraphEditorContent = () => {
   const memoizedSetSelectedEdgeIds = useCallback(setSelectedEdgeIds, [setSelectedEdgeIds]);
   const memoizedSetPan = useCallback(setPan, [setPan]);
   const memoizedSetZoom = useCallback(setZoom, [setZoom]);
+  const emitEdgeIntent = useCallback((trigger, metadata = {}) => {
+    const payload = {
+      trigger,
+      timestamp: new Date().toISOString(),
+      ...metadata
+    };
+    try {
+      eventBus.emit('edgeIntentCaptured', payload);
+    } catch (err) {
+      console.warn('[EdgeIntent] emit failed', err);
+    }
+  }, []);
+
+  const handleEdgeRoutingChange = useCallback((value) => {
+    emitEdgeIntent('edgeRoutingChange', { value });
+    if (typeof setDocumentSettings === 'function') {
+      setDocumentSettings((prev) => ({ ...prev, edgeRouting: value }));
+    }
+  }, [emitEdgeIntent, setDocumentSettings]);
+
+  const handleRerouteEdges = useCallback(() => {
+    emitEdgeIntent('toolbarReroute');
+    eventBus.emit('edges:reroute');
+  }, [emitEdgeIntent]);
+
+  const handleApplyLayout = useCallback(() => {
+    emitEdgeIntent('applyLayout', { layoutType: modesHook.autoLayoutType });
+    modesHook.applyAutoLayout();
+  }, [emitEdgeIntent, modesHook.applyAutoLayout, modesHook.autoLayoutType]);
 
   const documentMuiTheme = useMemo(() => {
     if (documentTheme) {
@@ -167,6 +196,14 @@ const GraphEditorContent = () => {
   const handleToggleMinimap = useCallback(() => {
     eventBus.emit('toggleMinimap');
   }, []);
+
+  useEffect(() => {
+    const handleNodeDragEndIntent = () => {
+      emitEdgeIntent('nodeDragEnd');
+    };
+    eventBus.on('nodeDragEnd', handleNodeDragEndIntent);
+    return () => eventBus.off('nodeDragEnd', handleNodeDragEndIntent);
+  }, [emitEdgeIntent]);
 
   const handleToggleSnapToGrid = useCallback(() => {
     setSnapToGrid(prev => !prev);
@@ -335,7 +372,7 @@ const GraphEditorContent = () => {
           autoLayoutType={modesHook.autoLayoutType}
           onModeChange={modesHook.handleModeChange}
           onAutoLayoutChange={modesHook.setAutoLayoutType}
-          onApplyLayout={modesHook.applyAutoLayout}
+          onApplyLayout={handleApplyLayout}
           onAlignSelection={handleAlignSelection}
           onDistributeSelection={handleDistributeSelection}
           onShowMessage={showSnackbar}
@@ -360,7 +397,9 @@ const GraphEditorContent = () => {
           snapToGrid={snapToGrid}
           onToggleSnapToGrid={handleToggleSnapToGrid}
           gridSize={documentSettings.gridSize}
-          edgeRouting={documentSettings.edgeRouting}
+          edgeRouting={documentSettings.edgeRouting || 'auto'}
+          onEdgeRoutingChange={handleEdgeRoutingChange}
+          onRerouteEdges={handleRerouteEdges}
           githubSettings={documentSettings.github}
           documentTheme={documentTheme}
           addressBarHeight={addressBarHeight}

@@ -1,0 +1,327 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-09T18:03:56.339Z",
+    "modified": "2026-01-09T18:03:56.339Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 25.956022706998965,
+      "y": 559.7486424386198
+    },
+    "zoom": 0.6875362901265849
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "layer-root",
+      "type": "markdown",
+      "label": "🧱 Twilite Layered Architecture",
+      "position": {
+        "x": -19.999750459578493,
+        "y": -418.77684648258037
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Twilite Browser / Editor — Layered Refactor\n\nThis graph describes the **conceptual layers** of Twilite as an operating system for graphs.\n\nGoal:\n- Separate authority\n- Isolate concerns\n- Enable skills, agents, and replay\n- Prevent UI-driven truth\n\nThis is a *structural refactor*, not a rewrite.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-core",
+      "type": "markdown",
+      "label": "1️⃣ Graph Core (Reality Layer)",
+      "position": {
+        "x": 633,
+        "y": -431
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Graph Core\n\n**What exists.**\n\n- Nodes, edges, groups\n- Stable IDs\n- Metadata & state\n- Deltas & history\n- Validation\n- Persistence\n\n🚫 No UI\n🚫 No rendering\n🚫 No React\n\nThis is where **continuity actually lives**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-semantics",
+      "type": "markdown",
+      "label": "2️⃣ Semantics / Contracts Layer",
+      "position": {
+        "x": -4.493430260933557,
+        "y": 57.82261026358263
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantics & Contracts\n\n**What it means.**\n\n- Node types\n- Handle schemas\n- Skill contracts\n- Constraints & guardrails\n- Authority (side of glass)\n\nDefines what is:\n- allowed\n- forbidden\n- promised\n\n📜 This is the *law* layer.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-interpreters",
+      "type": "markdown",
+      "label": "3️⃣ Interpreter Layer",
+      "position": {
+        "x": 612.5964765012957,
+        "y": 59.20750673191691
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Interpreters / Skills\n\n**What happens.**\n\nExamples:\n- VoltagePropagationSkill\n- SwitchStateSkill\n- LayoutSkill\n- ValidationSkill\n\nInterpreters:\n- read graph state\n- respect contracts\n- write deltas\n\n🚫 No drawing\n🚫 No DOM\n\nThis is how **nodes become programs**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-presentation",
+      "type": "markdown",
+      "label": "4️⃣ Presentation Layer",
+      "position": {
+        "x": 1239.2636333315277,
+        "y": 43.50730235486165
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Presentation\n\n**How it appears.**\n\n- SVG renderers\n- Canvas renderers\n- HTML / div nodes\n- Zoom / pan / layout\n\nPresentation:\n- subscribes to graph state\n- never owns truth\n- is replaceable\n\n🎨 Plugin nodes live here.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-interaction",
+      "type": "markdown",
+      "label": "5️⃣ Interaction Layer",
+      "position": {
+        "x": 1251.5279383990394,
+        "y": -426.64423097466823
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Interaction\n\n**How humans poke it.**\n\n- Mouse\n- Keyboard\n- Touch\n- Gestures\n\nConverts intent → proposed deltas\n\n⚠️ Humans must go through the **same mutation gates** as agents.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-agents",
+      "type": "markdown",
+      "label": "6️⃣ Agent / LLM Interface Layer",
+      "position": {
+        "x": 621.13637212547,
+        "y": -830.9481067994242
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Interface\n\n**How non-humans participate.**\n\n- Prompt assembly from graph slices\n- Skill invocation as tools\n- Dry-run validation\n- Delta approval\n- Memory logging\n\n🚫 No direct mutation\n🚫 No rendering access\n\nThis keeps agents **predictable and auditable**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layer-warning",
+      "type": "markdown",
+      "label": "⚠️ Refactor Constraints",
+      "position": {
+        "x": -18.235609231681096,
+        "y": -784.7804547703939
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What NOT to do\n\n- ❌ Don’t rewrite rendering yet\n- ❌ Don’t chase UI polish\n- ❌ Don’t add features\n- ❌ Don’t optimize prematurely\n\nThis refactor is about **separating ownership**, not improving behavior.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-core",
+      "type": "reference",
+      "source": "layer-root",
+      "target": "layer-core",
+      "label": "foundation",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-core-semantics",
+      "type": "reference",
+      "source": "layer-core",
+      "target": "layer-semantics",
+      "label": "interpreted by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-semantics-interpreters",
+      "type": "reference",
+      "source": "layer-semantics",
+      "target": "layer-interpreters",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-interpreters-presentation",
+      "type": "reference",
+      "source": "layer-interpreters",
+      "target": "layer-presentation",
+      "label": "emits state",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-presentation-interaction",
+      "type": "reference",
+      "source": "layer-presentation",
+      "target": "layer-interaction",
+      "label": "receives input",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-interaction-core",
+      "type": "dataFlow",
+      "source": "layer-interaction",
+      "target": "layer-core",
+      "label": "proposes deltas",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-agents-core",
+      "type": "dataFlow",
+      "source": "layer-agents",
+      "target": "layer-core",
+      "label": "validated mutations",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-warning-root",
+      "type": "reference",
+      "source": "layer-warning",
+      "target": "layer-root",
+      "label": "scope guard",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

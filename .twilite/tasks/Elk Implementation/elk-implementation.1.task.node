@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-08T21:20:38.239Z",
-    "modified": "2026-01-08T21:20:38.239Z",
+    "created": "2026-01-11T00:12:04.331Z",
+    "modified": "2026-01-11T00:12:04.331Z",
     "author": "",
     "tags": []
   },
@@ -48,12 +48,14 @@
   },
   "viewport": {
     "pan": {
-      "x": 478.2413793103449,
-      "y": 123.84482758620692
+      "x": 446.19805837258355,
+      "y": 515.4982026725547
     },
-    "zoom": 1
+    "zoom": 1.38308515973161
   },
-  "document": null,
+  "document": {
+    "url": "/tlz/background.html"
+  },
   "scripts": [],
   "nodes": [
     {
@@ -81,8 +83,8 @@
       "type": "markdown",
       "label": "Routing pipeline",
       "position": {
-        "x": -319,
-        "y": 55
+        "x": -345,
+        "y": 50
       },
       "width": 320,
       "height": 200,
@@ -101,8 +103,8 @@
       "type": "markdown",
       "label": "Graph looks clean",
       "position": {
-        "x": 320,
-        "y": 80
+        "x": 356,
+        "y": 60
       },
       "width": 320,
       "height": 200,
@@ -121,8 +123,8 @@
       "type": "markdown",
       "label": "Next steps",
       "position": {
-        "x": -56,
-        "y": 370
+        "x": -80,
+        "y": 330
       },
       "width": 520,
       "height": 180,

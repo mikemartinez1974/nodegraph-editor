@@ -1,0 +1,391 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-10T22:58:29.827Z",
+    "modified": "2026-01-10T22:58:29.827Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#00695c",
+        "light": "#26a69a",
+        "dark": "#004d40",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00838f",
+        "light": "#4fb3bf",
+        "dark": "#005662",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#f5f5f5",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": -74.65845641706335,
+      "y": -350.9032589150543
+    },
+    "zoom": 1.0001602332218182
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "edge-skills-root",
+      "type": "markdown",
+      "label": "🧠 Edge Routing Skills",
+      "position": {
+        "x": 738.8333333333335,
+        "y": -820.7046777360873
+      },
+      "width": 460,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Routing Skill Contract\n\nThis graph captures the *skills* that transform intent into ELK polylines and renderings inside Twilite.\n\nEach skill is a predictable subsystem:\n- **Reads** graph state (nodes, handles, constraints)\n- **Applies** ELK or toolbar choices\n- **Writes** canonical edge geometry + metadata\n\nUse this contract to document every edge-focused task."
+      }
+    },
+    {
+      "id": "skill-intent",
+      "type": "markdown",
+      "label": "🖱️ EdgeIntentCaptureSkill",
+      "position": {
+        "x": 825.8434775908208,
+        "y": -96.21859964427065
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeIntentCaptureSkill\n\n**Role:** Capture changes that should trigger an edge reevaluation.\n\n- Listens for node moves, handle edits, and toolbar routing choices\n- Emits a deterministic intent event (\"reroute edges now\")\n- Never mutates geometry directly; it signals downstream skills"
+      }
+    },
+    {
+      "id": "skill-intent-triggers",
+      "type": "markdown",
+      "label": "📌 Intent Triggers",
+      "position": {
+        "x": 808.8333333333335,
+        "y": -460.7046777360873
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Triggers for EdgeIntentCaptureSkill\n\n- Node drag / handle drag events (`handleNodeDragEnd`)\n- Toolbar layout/routing buttons (`Apply Layout`, `Routing`, `Reroute`)\n- Document settings changes (`documentSettings.edgeRouting` updates)\n- Script or RPC requests that emit `edges:reroute`\n\nEach trigger should add a note or signal node so the next skill knows exactly what intent fired."
+      }
+    },
+    {
+      "id": "skill-routing",
+      "type": "markdown",
+      "label": "🦌 EdgeRoutingSkill",
+      "position": {
+        "x": 324.0974533572837,
+        "y": 272.56620512618775
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeRoutingSkill\n\n**Role:** Run ELK and honor toolbar/document settings.\n\n- Reads nodes, ports, ELK constraints, and `documentSettings.edgeRouting`\n- Delegates layout/routing to ELK, capturing the canonical polyline it returns\n- Updates edge metadata (`edge.style`, `edge.data`) with the new path\n- Records failures/invariants so downstream skills can react"
+      }
+    },
+    {
+      "id": "skill-constraints",
+      "type": "markdown",
+      "label": "🧠 ConstraintEnforcementSkill",
+      "position": {
+        "x": 375.50000000000017,
+        "y": 679.2953222639127
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ConstraintEnforcementSkill\n\n**Role:** Validate ELK output before persistence.\n\n- Confirms every rerouted edge adheres to declared handles/ports\n- Rejects or annotates edges that violate invariants recorded in `edge-routing.orientation` (no manual bends, port-locking, etc.)\n- Emits warnings or re-invokes ELK with adjusted constraints if necessary"
+      }
+    },
+    {
+      "id": "skill-rendering",
+      "type": "markdown",
+      "label": "🎨 EdgeRenderingSkill",
+      "position": {
+        "x": 461.95067897405795,
+        "y": 1051.4446856032332
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgeRenderingSkill\n\n**Role:** Beautify without rerouting.\n\n- Consumes canonical ELK polylines from `edgeRoutes` and hands them to `NodeGraph/EdgeLayer`.\n- Applies rendering-only styling (rounded corners, arrowheads, dash patterns) driven by `edge.style` metadata and `defaultEdgeRouting` overrides.\n- Honours toolbar toggles (curved, orthogonal, dotted) without touching geometry; decorations stay separate."
+      }
+    },
+    {
+      "id": "skill-rendering-params",
+      "type": "markdown",
+      "label": "⚙️ Rendering Parameters",
+      "position": {
+        "x": 860.5,
+        "y": 886.4
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rendering Parameters\n\n- Editor document settings + toolbar flags expose rounded corners, bezier tension, arrowheads, gradient colors, and dash animations.\n- NodeGraph `EdgeLayer` reads `edge.style`, `edge.color`, `edge.style.orthogonal`, and `edge.style.curved` to draw the shapes.\n- Rendering skill keeps those values in sync without overwriting ELK-provided points so the canonical route remains authoritative."
+      }
+    },
+    {
+      "id": "skill-toolbar",
+      "type": "markdown",
+      "label": "🧰 ToolbarEdgeRoutingSkill",
+      "position": {
+        "x": 81.16487017363937,
+        "y": -115.28443153449139
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ToolbarEdgeRoutingSkill\n\n**Role:** Bridge UI settings → ELK inputs.\n\n- Surfaces the new layout/routing buttons and menus on the toolbar\n- Writes preferred routing mode into `documentSettings.edgeRouting`\n- Emits `edges:reroute` so EdgeRoutingSkill re-runs with the chosen constraints\n- Keeps the toolbar in sync with the orientation/skills graphs so the next task is visible"
+      }
+    },
+    {
+      "id": "skill-toolbar-controls",
+      "type": "markdown",
+      "label": "🧰 Toolbar Edge Controls",
+      "position": {
+        "x": -220,
+        "y": 240
+      },
+      "width": 340,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Toolbar Edge Controls\n\n- Layout selector picks `autoLayoutType` (hierarchical, serpentine, radial, grid).\n- Routing selector writes into `documentSettings.edgeRouting` and exposes the reroute action.\n- Compact UI keeps the skill front-and-center while pushing details downstream."
+      }
+    },
+    {
+      "id": "skill-document-settings",
+      "type": "markdown",
+      "label": "🛠️ Edge Layout Settings",
+      "position": {
+        "x": 1002.8206270220027,
+        "y": 287.10381996407466
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Layout Settings\n\n- Document panel exposes ELK algorithm, edge routing style, port constraints, node/edge spacing, serpentine max per row, and cycle fallback.\n- Settings persist under `documentSettings.layout`, allowing reroutes to reuse the exact parameters."
+      }
+    },
+    {
+      "id": "skill-persistence",
+      "type": "markdown",
+      "label": "📦 EdgePersistenceSkill",
+      "position": {
+        "x": 375.50000000000017,
+        "y": 1439.2953222639126
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## EdgePersistenceSkill\n\n**Role:** Record delta + orient future tasks.\n\n- Takes the ELK/constraint outcomes and commits them to history\n- Adds a note node when a routing decision changes (link back to this graph)\n- Marks the next skill that should run (e.g., revalidate constraints after a reroute)"
+      }
+    },
+    {
+      "id": "skill-outputs-canonical-writes",
+      "type": "markdown",
+      "label": "🧾 Skill Outputs (Canonical Writes)",
+      "position": {
+        "x": 974.6656626367062,
+        "y": 667.8428697923939
+      },
+      "width": 527.4825242833004,
+      "height": 847.8159674626359,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skill Outputs (Canonical Writes)\n\nLock in what each skill **writes** (and what it must *not* write) so skills don’t drift.\n\n### EdgeIntentCaptureSkill\n- ✅ writes: `intent` event payload (e.g. `edges:reroute`, reason)\n- ❌ never writes: edge geometry\n\n### ToolbarEdgeRoutingSkill\n- ✅ writes: `documentSettings.edgeRouting` + preset choices\n- ✅ emits: `edges:reroute`\n- ❌ never writes: edge geometry\n\n### EdgeRoutingSkill\n- ✅ writes: canonical route data from ELK (polyline)\n- ✅ writes: minimal edge metadata needed to reproduce routing\n- ❌ never writes: rendering-only cosmetics\n\n### ConstraintEnforcementSkill\n- ✅ writes: violations/warnings + annotations (or status fields)\n- ❌ never writes: geometry unless explicitly in “repair mode”\n\n### EdgeRenderingSkill\n- ✅ writes: rendering-only styling (`edge.style.*` cosmetics)\n- ❌ never writes: routing geometry\n\n### EdgePersistenceSkill\n- ✅ writes: history/telemetry notes + persistent delta record\n- ❌ never computes routes; it records outcomes",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-intent-triggers",
+      "type": "reference",
+      "source": "edge-skills-root",
+      "target": "skill-intent-triggers",
+      "label": "documents",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-toolbar-controls",
+      "type": "reference",
+      "source": "edge-skills-root",
+      "target": "skill-toolbar-controls",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-doc-settings",
+      "type": "reference",
+      "source": "edge-skills-root",
+      "target": "skill-document-settings",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-render-params",
+      "type": "reference",
+      "source": "edge-skills-root",
+      "target": "skill-rendering-params",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-intent-routing",
+      "type": "dataFlow",
+      "source": "skill-intent",
+      "target": "skill-routing",
+      "label": "triggers",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-docsettings-routing",
+      "type": "dataFlow",
+      "source": "skill-document-settings",
+      "target": "skill-routing",
+      "label": "parameterizes",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-triggers-intent",
+      "type": "dataFlow",
+      "source": "skill-intent-triggers",
+      "target": "skill-intent",
+      "label": "feeds",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-routing-constraints",
+      "type": "dataFlow",
+      "source": "skill-routing",
+      "target": "skill-constraints",
+      "label": "feedback",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-constraints-rendering",
+      "type": "dataFlow",
+      "source": "skill-constraints",
+      "target": "skill-rendering",
+      "label": "validates",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-render-params",
+      "type": "dataFlow",
+      "source": "skill-rendering-params",
+      "target": "skill-rendering",
+      "label": "decorates",
+      "style": {
+        "width": 1,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-rendering-persistence",
+      "type": "dataFlow",
+      "source": "skill-rendering",
+      "target": "skill-persistence",
+      "label": "",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-toolbar-routing",
+      "type": "dataFlow",
+      "source": "skill-toolbar",
+      "target": "skill-routing",
+      "label": "configures",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

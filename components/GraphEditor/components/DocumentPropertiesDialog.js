@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -40,43 +40,17 @@ import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
 import eventBus from '../../NodeGraph/eventBus';
 import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
-
-const ROLE_OPTIONS = ['Owner', 'Editor', 'Viewer'];
-const EDGE_ROUTING_OPTIONS = [
-  { value: 'auto', label: 'Auto (use edge style)' },
-  { value: 'orthogonal', label: 'Orthogonal (force)' },
-  { value: 'curved', label: 'Curved (force)' }
-];
-
-const LAYOUT_MODE_OPTIONS = [
-  { value: 'autoOnMissingPositions', label: 'Auto (only when positions omitted)' },
-  { value: 'manual', label: 'Manual (never auto-layout on paste)' }
-];
-
-const LAYOUT_TYPE_OPTIONS = [
-  { value: 'hierarchical', label: 'Hierarchical' },
-  { value: 'serpentine', label: 'Serpentine' },
-  { value: 'grid', label: 'Grid' },
-  { value: 'radial', label: 'Radial' }
-];
-
-const LAYOUT_DIRECTION_OPTIONS = [
-  { value: 'DOWN', label: 'Top-down' },
-  { value: 'RIGHT', label: 'Left-right' }
-];
-
-const DEFAULT_LAYOUT_SETTINGS = {
-  mode: 'autoOnMissingPositions',
-  defaultLayout: 'hierarchical',
-  direction: 'DOWN',
-  edgeLaneGapPx: 10,
-  serpentine: {
-    maxPerRow: 6
-  },
-  cycleFallback: {
-    enabled: true
-  }
-};
+import {
+  DEFAULT_LAYOUT_SETTINGS,
+  EDGE_ROUTING_OPTIONS,
+  ELK_ALGORITHM_OPTIONS,
+  ELK_EDGE_ROUTING_OPTIONS,
+  ELK_PORT_CONSTRAINT_OPTIONS,
+  DEFAULT_ELK_ROUTING_SETTINGS,
+  LAYOUT_DIRECTION_OPTIONS,
+  LAYOUT_MODE_OPTIONS,
+  LAYOUT_TYPE_OPTIONS
+} from '../layoutSettings';
 
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
@@ -176,7 +150,7 @@ export default function DocumentPropertiesDialog({
     if (!open) return;
     setSettings(loadSettings());
     setMeta(mapProjectMeta(projectMeta, defaultShareLink));
-    setDocSettings(documentSettings || {});
+    setDocSettings(normalizeDocSettings(documentSettings || {}));
     setActiveTab('overview');
     setTagInput('');
     setNewCollaborator({ name: '', email: '', role: 'Editor' });
@@ -203,48 +177,106 @@ export default function DocumentPropertiesDialog({
   };
 
   const handleDocSettingsChange = (key, value) => {
+    if (key === 'edgeRouting') {
+      emitEdgeIntent('edgeRoutingChange', { value });
+    }
     setDocSettings((prev) => ({ ...prev, [key]: value }));
   };
 
+  const emitEdgeIntent = useCallback((trigger, metadata = {}) => {
+    try {
+      eventBus.emit('edgeIntentCaptured', {
+        trigger,
+        timestamp: new Date().toISOString(),
+        ...metadata
+      });
+    } catch (err) {
+      console.warn('[EdgeIntent] emit failed', err);
+    }
+  }, []);
+
+  const wrapLayoutWithElk = (layout = {}) => ({
+    ...layout,
+    elk: {
+      ...DEFAULT_ELK_ROUTING_SETTINGS,
+      ...(layout.elk || {})
+    }
+  });
+
+  const normalizeDocSettings = (settings = {}) => ({
+    ...settings,
+    layout: wrapLayoutWithElk(settings.layout || {})
+  });
+
   const handleLayoutSettingsChange = (key, value) => {
-    setDocSettings((prev) => ({
-      ...prev,
-      layout: {
-        ...(prev.layout || {}),
-        [key]: value,
-        serpentine: { ...(prev.layout?.serpentine || {}) },
-        cycleFallback: { ...(prev.layout?.cycleFallback || {}) }
-      }
-    }));
+    emitEdgeIntent('layoutSettingChange', { key, value });
+    setDocSettings((prev) => {
+      const layout = wrapLayoutWithElk(prev.layout || {});
+      return {
+        ...prev,
+        layout: {
+          ...layout,
+          [key]: value,
+          serpentine: { ...(layout.serpentine || {}) },
+          cycleFallback: { ...(layout.cycleFallback || {}) }
+        }
+      };
+    });
+  };
+
+  const handleElkSettingsChange = (key, value) => {
+    emitEdgeIntent('elkSettingChange', { key, value });
+    setDocSettings((prev) => {
+      const layout = wrapLayoutWithElk(prev.layout || {});
+      return {
+        ...prev,
+        layout: {
+          ...layout,
+          elk: {
+            ...layout.elk,
+            [key]: value
+          }
+        }
+      };
+    });
   };
 
   const handleLayoutSerpentineChange = (key, value) => {
-    setDocSettings((prev) => ({
-      ...prev,
-      layout: {
-        ...(prev.layout || {}),
-        serpentine: {
-          ...(prev.layout?.serpentine || {}),
-          [key]: value
-        },
-        cycleFallback: { ...(prev.layout?.cycleFallback || {}) }
-      }
-    }));
+    setDocSettings((prev) => {
+      const layout = wrapLayoutWithElk(prev.layout || {});
+      return {
+        ...prev,
+        layout: {
+          ...layout,
+          serpentine: {
+            ...(layout.serpentine || {}),
+            [key]: value
+          },
+          cycleFallback: { ...(layout.cycleFallback || {}) }
+        }
+      };
+    });
   };
 
   const handleLayoutCycleFallbackChange = (key, value) => {
-    setDocSettings((prev) => ({
-      ...prev,
-      layout: {
-        ...(prev.layout || {}),
-        serpentine: { ...(prev.layout?.serpentine || {}) },
-        cycleFallback: {
-          ...(prev.layout?.cycleFallback || {}),
-          [key]: value
+    setDocSettings((prev) => {
+      const layout = wrapLayoutWithElk(prev.layout || {});
+      return {
+        ...prev,
+        layout: {
+          ...layout,
+          serpentine: { ...(layout.serpentine || {}) },
+          cycleFallback: {
+            ...(layout.cycleFallback || {}),
+            [key]: value
+          }
         }
-      }
-    }));
+      };
+    });
   };
+
+  const currentLayout = wrapLayoutWithElk(docSettings.layout || {});
+  const currentElkSettings = currentLayout.elk || DEFAULT_ELK_ROUTING_SETTINGS;
 
   const handleGithubSettingsChange = (updates = {}) => {
     setDocSettings((prev) => ({
@@ -385,14 +417,15 @@ export default function DocumentPropertiesDialog({
       onResetProjectMeta();
     }
     setMeta(mapProjectMeta({}, meta.shareLink || defaultShareLink));
+    const layout = wrapLayoutWithElk({
+      ...DEFAULT_LAYOUT_SETTINGS,
+      serpentine: { ...(DEFAULT_LAYOUT_SETTINGS.serpentine || {}) },
+      cycleFallback: { ...(DEFAULT_LAYOUT_SETTINGS.cycleFallback || {}) }
+    });
     setDocSettings((prev) => ({
       ...prev,
       edgeRouting: 'auto',
-      layout: {
-        ...DEFAULT_LAYOUT_SETTINGS,
-        serpentine: { ...(DEFAULT_LAYOUT_SETTINGS.serpentine || {}) },
-        cycleFallback: { ...(DEFAULT_LAYOUT_SETTINGS.cycleFallback || {}) }
-      }
+      layout
     }));
   };
 
@@ -424,8 +457,8 @@ export default function DocumentPropertiesDialog({
           sx={{ px: isMobile ? 1 : 3, borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab label="Overview" value="overview" />
-          <Tab label="Collaboration" value="collaboration" />
           <Tab label="Activity" value="activity" />
+          <Tab label="Layout" value="layout" />
           <Tab label="Appearance" value="appearance" />
           <Tab label="GitHub" value="github" />
         </Tabs>
@@ -787,10 +820,7 @@ export default function DocumentPropertiesDialog({
         )}
 
         {activeTab === 'appearance' && (
-          <Stack
-            spacing={sectionSpacing}
-            sx={contentPadding}
-          >
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" gutterBottom>
                 Theme
@@ -831,115 +861,289 @@ export default function DocumentPropertiesDialog({
               <Typography variant="subtitle1" gutterBottom>
                 Canvas & Background
               </Typography>
-              <Stack spacing={2} sx={{ mb: 2 }}>
-                <TextField
-                  select
-                  size="small"
-                  label="Edge routing"
-                  value={docSettings.edgeRouting || 'auto'}
-                  onChange={(event) => handleDocSettingsChange('edgeRouting', event.target.value)}
-                  helperText="Auto respects edge styles; force modes override per-edge routing."
-                  fullWidth
-                >
-                  {EDGE_ROUTING_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+              <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
+            </Paper>
+          </Stack>
+        )}
 
-                <Typography variant="subtitle2" sx={{ mt: 1 }}>
-                  Layout Defaults
-                </Typography>
-                <TextField
-                  select
-                  size="small"
-                  label="Auto-layout mode"
-                  value={docSettings.layout?.mode || DEFAULT_LAYOUT_SETTINGS.mode}
-                  onChange={(event) => handleLayoutSettingsChange('mode', event.target.value)}
-                  helperText="Controls whether Twilite auto-layouts when pasted nodes omit positions."
-                  fullWidth
-                >
-                  {LAYOUT_MODE_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+        {activeTab === 'layout' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Routing defaults
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Edge routing"
+                    value={docSettings.edgeRouting || 'auto'}
+                    onChange={(event) => handleDocSettingsChange('edgeRouting', event.target.value)}
+                  helperText="Auto respects edge styles; force modes override per-edge routing (Straight keeps edges direct)."
+                    fullWidth
+                  >
+                    {EDGE_ROUTING_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Auto-layout mode"
+                    value={docSettings.layout?.mode || DEFAULT_LAYOUT_SETTINGS.mode}
+                    onChange={(event) => handleLayoutSettingsChange('mode', event.target.value)}
+                    helperText="Controls whether Twilite auto-layouts when pasted nodes omit positions."
+                    fullWidth
+                  >
+                    {LAYOUT_MODE_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Default layout"
+                    value={docSettings.layout?.defaultLayout || DEFAULT_LAYOUT_SETTINGS.defaultLayout}
+                    onChange={(event) => handleLayoutSettingsChange('defaultLayout', event.target.value)}
+                    helperText="Used for Auto-on-missing-positions and the Apply button default."
+                    fullWidth
+                  >
+                    {LAYOUT_TYPE_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Direction"
+                    value={docSettings.layout?.direction || DEFAULT_LAYOUT_SETTINGS.direction}
+                    onChange={(event) => handleLayoutSettingsChange('direction', event.target.value)}
+                    helperText="Applies to hierarchical layout."
+                    fullWidth
+                  >
+                    {LAYOUT_DIRECTION_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Edge lane spacing (px)"
+                    value={docSettings.layout?.edgeLaneGapPx ?? DEFAULT_LAYOUT_SETTINGS.edgeLaneGapPx}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const value = raw === '' ? '' : Math.max(0, Math.min(50, Number(raw)));
+                      handleLayoutSettingsChange('edgeLaneGapPx', value);
+                    }}
+                    helperText="Used for multi-edge spacing (fan/slot) near endpoints."
+                    fullWidth
+                    inputProps={{ min: 0, max: 50 }}
+                  />
+                </Grid>
+                <Grid xs={12}>
+                  <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                    Serpentine & fallback
+                  </Typography>
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Serpentine: max nodes per row"
+                    value={docSettings.layout?.serpentine?.maxPerRow ?? DEFAULT_LAYOUT_SETTINGS.serpentine.maxPerRow}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const value = raw === '' ? '' : Math.max(2, Math.min(50, Number(raw)));
+                      handleLayoutSerpentineChange('maxPerRow', value);
+                    }}
+                    helperText="MVP serpentine rule for long chains."
+                    fullWidth
+                    inputProps={{ min: 2, max: 50 }}
+                  />
+                </Grid>
+                <Grid xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={docSettings.layout?.cycleFallback?.enabled ?? DEFAULT_LAYOUT_SETTINGS.cycleFallback.enabled}
+                        onChange={(event) => handleLayoutCycleFallbackChange('enabled', event.target.checked)}
+                      />
+                    }
+                    label="Cycles fallback: allow grid for heavily cyclic graphs"
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
 
-                <TextField
-                  select
-                  size="small"
-                  label="Default layout"
-                  value={docSettings.layout?.defaultLayout || DEFAULT_LAYOUT_SETTINGS.defaultLayout}
-                  onChange={(event) => handleLayoutSettingsChange('defaultLayout', event.target.value)}
-                  helperText="Used for Auto-on-missing-positions and the Apply button default."
-                  fullWidth
-                >
-                  {LAYOUT_TYPE_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                ELK routing parameters
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Elk algorithm"
+                    value={currentElkSettings.algorithm}
+                    onChange={(event) => handleElkSettingsChange('algorithm', event.target.value)}
+                    helperText="Which ELK algorithm should route edges."
+                    fullWidth
+                  >
+                    {ELK_ALGORITHM_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Elk edge routing"
+                    value={currentElkSettings.edgeRouting}
+                    onChange={(event) => handleElkSettingsChange('edgeRouting', event.target.value)}
+                    helperText="Shapes the ELK edge style."
+                    fullWidth
+                  >
+                    {ELK_EDGE_ROUTING_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Elk port constraints"
+                    value={currentElkSettings.portConstraints}
+                    onChange={(event) => handleElkSettingsChange('portConstraints', event.target.value)}
+                    helperText="Anchor edges to declared handle sides."
+                    fullWidth
+                  >
+                    {ELK_PORT_CONSTRAINT_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Node spacing (px)"
+                    value={currentElkSettings.nodeSpacing}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const value = raw === '' ? '' : Math.max(20, Math.min(400, Number(raw)));
+                      handleElkSettingsChange('nodeSpacing', value);
+                    }}
+                    helperText="Spacing used by ELK when routing between nodes."
+                    fullWidth
+                    inputProps={{ min: 20, max: 400 }}
+                  />
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Layered edge spacing (px)"
+                    value={currentElkSettings.layeredEdgeSpacing}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const value = raw === '' ? '' : Math.max(10, Math.min(200, Number(raw)));
+                      handleElkSettingsChange('layeredEdgeSpacing', value);
+                    }}
+                    helperText="Spacing between edge nodes in layered layouts."
+                    fullWidth
+                    inputProps={{ min: 10, max: 200 }}
+                  />
+                </Grid>
+                <Grid xs={12}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Edge curvature bias"
+                    value={currentElkSettings.curveBias ?? 0}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const value = raw === '' ? '' : Math.max(-1, Math.min(1, Number(raw)));
+                      handleElkSettingsChange('curveBias', value);
+                    }}
+                    helperText="Optional tweak for how strongly ELK favors straight vs. curved segments."
+                    fullWidth
+                    inputProps={{ min: -1, max: 1, step: 0.1 }}
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
 
-                <TextField
-                  select
-                  size="small"
-                  label="Direction"
-                  value={docSettings.layout?.direction || DEFAULT_LAYOUT_SETTINGS.direction}
-                  onChange={(event) => handleLayoutSettingsChange('direction', event.target.value)}
-                  helperText="Applies to hierarchical layout."
-                  fullWidth
-                >
-                  {LAYOUT_DIRECTION_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-
-                <TextField
-                  size="small"
-                  type="number"
-                  label="Edge lane spacing (px)"
-                  value={docSettings.layout?.edgeLaneGapPx ?? DEFAULT_LAYOUT_SETTINGS.edgeLaneGapPx}
-                  onChange={(event) => {
-                    const raw = event.target.value;
-                    const value = raw === '' ? '' : Math.max(0, Math.min(50, Number(raw)));
-                    handleLayoutSettingsChange('edgeLaneGapPx', value);
-                  }}
-                  helperText="Used for multi-edge spacing (fan/slot) near endpoints."
-                  fullWidth
-                  inputProps={{ min: 0, max: 50 }}
-                />
-
-                <TextField
-                  size="small"
-                  type="number"
-                  label="Serpentine: max nodes per row"
-                  value={docSettings.layout?.serpentine?.maxPerRow ?? DEFAULT_LAYOUT_SETTINGS.serpentine.maxPerRow}
-                  onChange={(event) => {
-                    const raw = event.target.value;
-                    const value = raw === '' ? '' : Math.max(2, Math.min(50, Number(raw)));
-                    handleLayoutSerpentineChange('maxPerRow', value);
-                  }}
-                  helperText="MVP serpentine rule for long chains."
-                  fullWidth
-                  inputProps={{ min: 2, max: 50 }}
-                />
-
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Rendering controls
+              </Typography>
+              <Stack spacing={1}>
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={docSettings.layout?.cycleFallback?.enabled ?? DEFAULT_LAYOUT_SETTINGS.cycleFallback.enabled}
-                      onChange={(event) => handleLayoutCycleFallbackChange('enabled', event.target.checked)}
+                      checked={docSettings.rendering?.curvedEdges || false}
+                      onChange={(event) => handleDocSettingsChange('rendering', {
+                        ...(docSettings.rendering || {}),
+                        curvedEdges: event.target.checked
+                      })}
                     />
                   }
-                  label="Cycles fallback: allow grid for heavily cyclic graphs"
+                  label="Curved edge decorations"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.rendering?.showArrowheads || false}
+                      onChange={(event) => handleDocSettingsChange('rendering', {
+                        ...(docSettings.rendering || {}),
+                        showArrowheads: event.target.checked
+                      })}
+                    />
+                  }
+                  label="Show arrowheads"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.rendering?.animateDashes || false}
+                      onChange={(event) => handleDocSettingsChange('rendering', {
+                        ...(docSettings.rendering || {}),
+                        animateDashes: event.target.checked
+                      })}
+                    />
+                  }
+                  label="Animate dashes"
                 />
               </Stack>
-              <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Rendering flags stay in `edge.style` so they never rewrite ELK geometry—only the canvas decorations change.
+              </Typography>
             </Paper>
           </Stack>
         )}

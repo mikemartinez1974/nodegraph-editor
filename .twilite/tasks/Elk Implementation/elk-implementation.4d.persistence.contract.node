@@ -1,0 +1,171 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "ELK Persistence Contract",
+    "description": "Defines how routing events land in history and notes",
+    "created": "2026-01-11T00:20:00.000Z",
+    "modified": "2026-01-11T00:20:00.000Z",
+    "author": "",
+    "tags": [
+      "persistence",
+      "history",
+      "traceability"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#004d40",
+        "light": "#26a69a",
+        "dark": "#00251a",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ff6f00",
+        "light": "#ff9e40",
+        "dark": "#c43e00",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#f2f7f1",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "persistence-root",
+      "type": "markdown",
+      "label": "📦 Persistence Contract",
+      "position": {
+        "x": 0,
+        "y": -150
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Persistence Contract\n+\n+Every ELK reroute must be captured in history and traced so future reviewers know which skill produced the update."
+      }
+    },
+    {
+      "id": "persistence-history",
+      "type": "markdown",
+      "label": "🕒 History Recording",
+      "position": {
+        "x": -320,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### History Recording\n+\n+- Snapshot the rerouted nodes/edges once ELK succeeds.\n+- Tag the snapshot with `edge-routing` metadata and the triggering intent label.\n+- Allow rollbacks to replay prior configurations."
+      }
+    },
+    {
+      "id": "persistence-notes",
+      "type": "markdown",
+      "label": "📝 Trace Notes",
+      "position": {
+        "x": 320,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Trace Notes\n+\n+- Append or update a small note node describing the reroute reason (auto layout, toolbar reroute, constraint fix).\n+- Reference the originating skill node so the plan stays synchronized."
+      }
+    },
+    {
+      "id": "persistence-policies",
+      "type": "markdown",
+      "label": "🔐 Policies",
+      "position": {
+        "x": 0,
+        "y": 320
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Policies\n+\n+- Never persist partial reroutes; history entries must reflect complete ELK runs.\n+- Avoid duplicating notes for identical triggers by updating existing entries.\n+- Persistence data must mention the constraint skill when reroute followed a violation."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-persist-history",
+      "type": "dataFlow",
+      "source": "persistence-root",
+      "target": "persistence-history",
+      "label": "captures",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-persist-notes",
+      "type": "dataFlow",
+      "source": "persistence-root",
+      "target": "persistence-notes",
+      "label": "annotates",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-notes-policies",
+      "type": "dataFlow",
+      "source": "persistence-notes",
+      "target": "persistence-policies",
+      "label": "follow",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-history-policies",
+      "type": "reference",
+      "source": "persistence-history",
+      "target": "persistence-policies",
+      "label": "complies",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

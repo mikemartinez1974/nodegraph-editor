@@ -63,6 +63,14 @@ Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangli
 - **Use colors + emojis intentionally.** Color-code clusters and add small emojis in labels to make graphs scannable at a glance.
 - **Edge routing is ELK-first.** Twilite now routes edges via ELK with precise node/handle data, so `edgeRoutes` mirrors ELK’s bend points. Don’t remap those points or mix in manual bundling heuristics; adjust ELK options (spacing, algorithm, port constraints) instead if you need different behavior. You can still request `edge.style.route: "orthogonal"` or `edge.style.curved: true`, but the real work happens in ELK’s layout options exposed through Document Properties.
 
+Document Properties exposes a new **ELK edge controls** section where you can:
+- Switch between algorithms (fixed, layered, radial, rectpacking)
+- Force orthogonal or polyline routing
+- Lock edges to specific handle sides (`elk.portConstraints`)
+- Tune node spacing and layered edge spacing
+
+These settings feed the reroute pipeline, so every paste/layout replays with the same ELK configuration across layouts and graphs.
+
 ### ELK Routing Notes
 
 - Every layout now rebuilds ELK’s graph with each node’s current size, position, and handle definition. Handles become ELK ports (`elk.port.side` + offsets) so edges snap cleanly to anchors.

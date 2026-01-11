@@ -1,0 +1,189 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-10T23:53:28.631Z",
+    "modified": "2026-01-10T23:53:28.631Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#00695c",
+        "light": "#26a69a",
+        "dark": "#004d40",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00838f",
+        "light": "#4fb3bf",
+        "dark": "#005662",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#f5f5f5",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 722.8794750189038,
+      "y": -75.49783681085705
+    },
+    "zoom": 0.96802043717848
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "render-root",
+      "type": "markdown",
+      "label": "🎨 Rendering Contract",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Rendering Contract\n\nRendering is a **pure projection layer**.\n\nIt reveals authoritative geometry without mutating graph state.\n\nRendering decisions must be **deterministic, reversible, and cosmetic only**."
+      }
+    },
+    {
+      "id": "render-affordances",
+      "type": "markdown",
+      "label": "✅ Visual Affordances",
+      "position": {
+        "x": -520,
+        "y": 340
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed: Visual Affordances\n\nPure cosmetics. No semantic meaning.\n\n- Corner radius (local bend rounding only)\n- Arrowhead type\n- Stroke width\n- Dash patterns / animation\n- Gradients / glow\n- Hover emphasis\n\n**Rules:**\n- Must not add or remove bends\n- Must not change path length\n- Must not affect persistence\n- May be disabled for export / headless rendering"
+      }
+    },
+    {
+      "id": "render-interpretation",
+      "type": "markdown",
+      "label": "✅ Visual Interpretation",
+      "position": {
+        "x": 531.3633964506597,
+        "y": 356.52857665550505
+      },
+      "width": 380,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed: Visual Interpretation\n\nInterpret authoritative geometry **without changing it**.\n\n- Lane offsets for parallel edges\n- Fan spacing near ports\n- Hit testing (expanded invisible stroke)\n- Z-ordering for legibility\n\n**Constraints:**\n- Must be deterministic\n- Must be reversible\n- Must never introduce new bends\n- Must collapse cleanly to base geometry"
+      }
+    },
+    {
+      "id": "render-forbidden",
+      "type": "markdown",
+      "label": "❌ Forbidden Responsibilities",
+      "position": {
+        "x": -44.73913511088928,
+        "y": 577.883742652041
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden: Rendering Must NEVER Own\n\nThese are **routing or constraint decisions**.\n\n- Path selection\n- Bend insertion\n- Collision avoidance\n- Port reassignment\n- Fallback logic\n\n**If rendering does any of these:**\n- Determinism is lost\n- Replayability breaks\n- Auditability collapses\n- ELK output becomes untrustworthy"
+      }
+    },
+    {
+      "id": "render-principle",
+      "type": "markdown",
+      "label": "📐 Core Principle",
+      "position": {
+        "x": -10.080719447873705,
+        "y": 1086.2861690332413
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Principle\n\n**Rendering is a projection, not a participant.**\n\n- It does not decide\n- It does not infer\n- It does not correct\n- It does not help\n\nIt reveals upstream truth.\n\nIf routing fails, rendering must show failure — not invent success."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-affordances",
+      "type": "dataFlow",
+      "source": "render-root",
+      "target": "render-affordances",
+      "label": "allows",
+      "style": {
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-root-interpretation",
+      "type": "dataFlow",
+      "source": "render-root",
+      "target": "render-interpretation",
+      "label": "permits",
+      "style": {
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "dataFlow",
+      "source": "render-root",
+      "target": "render-forbidden",
+      "label": "forbids",
+      "style": {
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e-forbidden-principle",
+      "type": "dataFlow",
+      "source": "render-forbidden",
+      "target": "render-principle",
+      "label": "motivates",
+      "style": {
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}
