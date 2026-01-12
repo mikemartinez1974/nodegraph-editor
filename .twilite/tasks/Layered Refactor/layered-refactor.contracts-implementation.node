@@ -1,0 +1,212 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Contracts Implementation Plan",
+    "description": "Concrete steps for codifying handle, edge, and validator contracts",
+    "created": "2026-01-12T10:00:00.000Z",
+    "modified": "2026-01-12T10:00:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "contracts",
+      "implementation"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#0d47a1",
+        "light": "#5472d3",
+        "dark": "#002171",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ff6f00",
+        "light": "#ff9f00",
+        "dark": "#c43e00",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#f5f5f5",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": true,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "contracts-impl-root",
+      "type": "markdown",
+      "label": "🧾 Contracts Implementation",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Contracts Implementation Plan\n+\n+Solidify the schema/contract layer so the interpreter + ELK routes can rely on a single source of truth. Encode handles, edges, validators, tooling, and telemetry while keeping the contracts versioned."
+      }
+    },
+    {
+      "id": "contracts-handle-schema",
+      "type": "markdown",
+      "label": "🧱 Handle + Node Schema Store",
+      "position": {
+        "x": -360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handle Store\n+\n+- Handles are optional metadata stored with the node and must always include an `id` and `side`.\n+- Keep additional attributes such as data type or offsets flexible and separate from this store so experiments stay unfettered.\n+- Version the schema manifest so ELK/validators can reference a contract snapshot in case the structure needs to evolve."
+      }
+    },
+    {
+      "id": "contracts-edge-schema",
+      "type": "markdown",
+      "label": "🧮 Edge/Routing Contracts",
+      "position": {
+        "x": 360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Contracts\n+\n+- Every edge is free to attach to any handle; there are no banned pairings, and edges without handles simply default to the node center.\n+- Include a version tag on the contract manifest so future structural shifts remain traceable without enforcing equality today."
+      }
+    },
+    {
+      "id": "contracts-validator",
+      "type": "markdown",
+      "label": "⚖️ Constraint + Validation Skill",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validator Skill\n+\n+- `ConstraintValidationSkill` should only verify the JSON structure (handles referencing existing IDs and routes that omit forbidden metadata).\n+- Failures surface via the snackbar; no other semantics (no fixation on handle restrictions) are enforced to keep the graph flexible.\n+- The renderer can still surface the violation state using the telemetry/message emitted by the skill, but the graph is otherwise untouched."
+      }
+    },
+    {
+      "id": "contracts-grounding",
+      "type": "markdown",
+      "label": "🧰 Contract Tooling",
+      "position": {
+        "x": 0,
+        "y": 420
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contract Tooling\n+\n+- Keep these contracts available to AI/agents via documentation or error messages; no additional logs are required yet.\n+- Provide helpers to serialize the manifest for prompts so an AI knows which handles exist, but let humans discover the details through docs or validation text.\n+- We're not enforcing logging today—just keep the tooling simple so it can answer questions on demand."
+      }
+    },
+    {
+      "id": "contracts-references",
+      "type": "reference",
+      "source": "contracts-impl-root",
+      "target": "contract-root",
+      "label": "extends plan",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-impl-root-handles",
+      "type": "dataFlow",
+      "source": "contracts-impl-root",
+      "target": "contracts-handle-schema",
+      "label": "build",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-root-edge",
+      "type": "dataFlow",
+      "source": "contracts-impl-root",
+      "target": "contracts-edge-schema",
+      "label": "describe",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-schemas-validator",
+      "type": "dataFlow",
+      "source": "contracts-handle-schema",
+      "target": "contracts-validator",
+      "label": "inform",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-edge-validator",
+      "type": "dataFlow",
+      "source": "contracts-edge-schema",
+      "target": "contracts-validator",
+      "label": "drive",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validator-tooling",
+      "type": "dataFlow",
+      "source": "contracts-validator",
+      "target": "contracts-grounding",
+      "label": "log",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

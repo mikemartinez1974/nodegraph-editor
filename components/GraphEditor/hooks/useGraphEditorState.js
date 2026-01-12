@@ -3,11 +3,18 @@
 // 1. GraphEditor/useGraphEditorState.js
 // All state management in one hook
 // ============================================
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GroupManager from '../GroupManager';
+import {
+  dispatchGraph,
+  getGraphSnapshot,
+  initGraphCore,
+  subscribeGraph
+} from '../core/graphCore';
 
 const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
+
 const loadStoredGraph = () => {
   if (typeof window === 'undefined' || !window.localStorage) return null;
   try {
@@ -29,10 +36,23 @@ const loadStoredGraph = () => {
 
 export function useGraphEditorState() {
   const storedGraph = loadStoredGraph();
-  // Graph data
-  const [nodes, setNodes] = useState(() => storedGraph?.nodes || []);
-  const [edges, setEdges] = useState(() => storedGraph?.edges || []);
-  const [groups, setGroups] = useState(() => storedGraph?.groups || []);
+  const coreInitRef = useRef(false);
+  if (!coreInitRef.current) {
+    initGraphCore(storedGraph || {});
+    coreInitRef.current = true;
+  }
+
+  const [graphSnapshot, setGraphSnapshot] = useState(() => getGraphSnapshot());
+  useEffect(() => {
+    const unsubscribe = subscribeGraph(() => {
+      setGraphSnapshot(getGraphSnapshot());
+    });
+    return unsubscribe;
+  }, []);
+
+  const nodes = graphSnapshot.nodes;
+  const edges = graphSnapshot.edges;
+  const groups = graphSnapshot.groups;
   
   // View state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -91,21 +111,6 @@ export function useGraphEditorState() {
     groupsRef.current = groups;
   }, [groups]);
 
-  // Persist graph data locally
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.localStorage) return;
-    try {
-      const payload = JSON.stringify({
-        nodes: nodesRef.current || [],
-        edges: edgesRef.current || [],
-        groups
-      });
-      window.localStorage.setItem(GRAPH_STORAGE_KEY, payload);
-    } catch (err) {
-      console.warn('Failed to persist graph state:', err);
-    }
-  }, [nodes, edges, groups, nodesRef, edgesRef]);
-  
   // Save color preferences
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -124,6 +129,33 @@ export function useGraphEditorState() {
   // Computed hover edge endpoints
   const hoveredEdgeSource = hoveredEdgeId ? edges.find(e => e.id === hoveredEdgeId)?.source : null;
   const hoveredEdgeTarget = hoveredEdgeId ? edges.find(e => e.id === hoveredEdgeId)?.target : null;
+
+  const setNodes = useCallback((value) => {
+    const currentNodes = getGraphSnapshot().nodes;
+    const next = typeof value === 'function' ? value(currentNodes) : value;
+    dispatchGraph({
+      type: 'setNodes',
+      payload: Array.isArray(next) ? next : currentNodes
+    });
+  }, []);
+
+  const setEdges = useCallback((value) => {
+    const currentEdges = getGraphSnapshot().edges;
+    const next = typeof value === 'function' ? value(currentEdges) : value;
+    dispatchGraph({
+      type: 'setEdges',
+      payload: Array.isArray(next) ? next : currentEdges
+    });
+  }, []);
+
+  const setGroups = useCallback((value) => {
+    const currentGroups = getGraphSnapshot().groups;
+    const next = typeof value === 'function' ? value(currentGroups) : value;
+    dispatchGraph({
+      type: 'setGroups',
+      payload: Array.isArray(next) ? next : currentGroups
+    });
+  }, []);
   
   return {
     // Graph data
@@ -157,7 +189,7 @@ export function useGraphEditorState() {
     // Colors
     defaultNodeColor, setDefaultNodeColor,
     defaultEdgeColor, setDefaultEdgeColor,
-    
+
     // Managers
     groupManager,
     initialGraphLoadedRef

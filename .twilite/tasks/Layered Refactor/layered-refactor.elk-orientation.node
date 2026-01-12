@@ -1,0 +1,156 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Edge Orientation",
+    "description": "Frame the orientation/refactor work for ELK-aware edge routing",
+    "created": "2026-01-12T12:15:00.000Z",
+    "modified": "2026-01-12T12:15:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "contracts",
+      "edge",
+      "orientation"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#3f51b5",
+        "light": "#757de8",
+        "dark": "#002984",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#f50057",
+        "light": "#ff4081",
+        "dark": "#c51162",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#f0f4ff",
+        "paper": "#ffffff"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "edge-orientation-root",
+      "type": "markdown",
+      "label": "🧭 Edge Orientation",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 500,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Orientation\n+\n+Frame the edge/renderer refactor as an orientation task so we can work through the fear of tackling ELK behavior.\n+This graph sets the hypotheses, risks, and non-goals before we touch edge routing code."
+      }
+    },
+    {
+      "id": "edge-orientation-problem",
+      "type": "markdown",
+      "label": "😨 The Frightening Part",
+      "position": {
+        "x": -320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Frightening Part\n+\n+- Edge routing/ELK feels risky because it touches HU master branch of visualization and state.\n+- Mistakes can break renderers or reintroduce animation kit (`GSAP`) conflicts.\n+- The orientation goal is to understand the scope and lock down contracts/telemetry before implementation."
+      }
+    },
+    {
+      "id": "edge-orientation-guidelines",
+      "type": "markdown",
+      "label": "🗺️ Orientation Guidelines",
+      "position": {
+        "x": 320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Orientation Guidelines\n+\n+- Keep ELK settings in Document Properties + toolbar selectors so they stay visible and testable.\n+- Let contracts (handles/edges) remain flexible but document versions and emit summaries before layout.\n+- Treat `ConstraintValidationSkill` as a safeguard: sanitize JSON and report via snackbar rather than blocking creativity."
+      }
+    },
+    {
+      "id": "edge-orientation-nongoals",
+      "type": "markdown",
+      "label": "🚫 Non-Goals",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Non-Goals\n+\n+- We are not replacing the breadboard or bringing back GSAP/animation.\n+- We will not lock down handle/edge semantics beyond optional `id` + `side` or enforce style restrictions.\n+- We keep tooling/lightweight summaries for AI agility instead of heavy logs."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-orientation-problem-edge",
+      "type": "dataFlow",
+      "source": "edge-orientation-root",
+      "target": "edge-orientation-problem",
+      "label": "frames",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-orientation-guidelines-edge",
+      "type": "dataFlow",
+      "source": "edge-orientation-root",
+      "target": "edge-orientation-guidelines",
+      "label": "guides",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-orientation-nongoals-edge",
+      "type": "dataFlow",
+      "source": "edge-orientation-root",
+      "target": "edge-orientation-nongoals",
+      "label": "avoids",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

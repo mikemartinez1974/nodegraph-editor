@@ -414,16 +414,17 @@ export default function NodeGraph({
       
       const initialPositions = {};
       nodesToDrag.forEach(id => {
-        const n = nodes.find(nd => nd.id === id);
+        const n = nodes.find(nd => nd && nd.id === id);
         if (n) {
-          initialPositions[id] = { x: n.position.x, y: n.position.y };
+          const pos = n.position || { x: 0, y: 0 };
+          initialPositions[id] = { x: pos.x ?? 0, y: pos.y ?? 0 };
         }
       });
       lastDragPosition.current = initialPositions;
       
       dragOffset.current = {
-        x: point.x - (node.position.x * zoom + pan.x),
-        y: point.y - (node.position.y * zoom + pan.y)
+        x: point.x - ((node.position?.x ?? 0) * zoom + pan.x),
+        y: point.y - ((node.position?.y ?? 0) * zoom + pan.y)
       };
       lastMousePos.current = { x: point.x, y: point.y };
       
@@ -913,9 +914,10 @@ export default function NodeGraph({
   const nodePositionMap = useMemo(() => {
     const map = {};
     nodes.forEach(node => {
+      const position = node.position || { x: 0, y: 0 };
       map[node.id] = {
-        x: node.position.x * zoom + pan.x,
-        y: node.position.y * zoom + pan.y,
+        x: (position.x ?? 0) * zoom + pan.x,
+        y: (position.y ?? 0) * zoom + pan.y,
         width: node.width,
         height: node.height
       };

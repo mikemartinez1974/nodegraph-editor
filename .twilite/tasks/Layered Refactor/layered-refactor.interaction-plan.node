@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Interaction Layer Plan",
+    "description": "Defines intent capture and human input handling requirements",
+    "created": "2026-01-11T04:15:00.000Z",
+    "modified": "2026-01-11T04:15:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "interaction",
+      "plan"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#3f51b5",
+        "light": "#7986cb",
+        "dark": "#002984",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#009688",
+        "light": "#4db6ac",
+        "dark": "#00695c",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0d1b2a",
+        "secondary": "#1c3d5a"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "interaction-root",
+      "type": "markdown",
+      "label": "🖱️ Interaction Layer Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Interaction Layer Plan\n+\n+Describe how mouse/keyboard/touch intent becomes structured proposals that feed the interpreter layer."
+      }
+    },
+    {
+      "id": "interaction-inputs",
+      "type": "markdown",
+      "label": "🖱️ Input Harness",
+      "position": {
+        "x": -320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Input Harness\n+\n+- Coordinate mouse/touch/keyboard to normalized intents (drag, edit, context menu).\n+- Channel every intent through gesture handlers that emit structured events (e.g., `nodeDragIntent`).\n+- Attach metadata (selection, viewport) so downstream interpreters know context."
+      }
+    },
+    {
+      "id": "interaction-guards",
+      "type": "markdown",
+      "label": "🚦 Guarded Intent Flow",
+      "position": {
+        "x": 320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Guarded Intent Flow\n+\n+- Validate inputs against contracts before dispatch (using schema service).\n+- Allow blockers, e.g., read-only states or locked nodes, to short-circuit intents gracefully.\n+- Emit failure events for UI feedback without mutating graph."
+      }
+    },
+    {
+      "id": "interaction-feedback",
+      "type": "markdown",
+      "label": "🎯 Visual Feedback",
+      "position": {
+        "x": -140,
+        "y": 220
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Visual Feedback\n+\n+- Highlight targets, show dropped previews, and render tooltips purely in the presentation layer.\n+- Trigger snackbar/hud via intent failure events so UI stays responsive."
+      }
+    },
+    {
+      "id": "interaction-ordering",
+      "type": "markdown",
+      "label": "⏱️ Intent Scheduling",
+      "position": {
+        "x": 140,
+        "y": 220
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent Scheduling\n+\n+- Queue rapid interactions (drag+reroute) and replay them deterministically.\n+- Debounce/merge overlapping intents; only dispatch the most recent when busy.\n+- Signal intent completion so UI components can update their state."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-interaction-root-inputs",
+      "type": "dataFlow",
+      "source": "interaction-root",
+      "target": "interaction-inputs",
+      "label": "captures",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-interaction-root-guards",
+      "type": "dataFlow",
+      "source": "interaction-root",
+      "target": "interaction-guards",
+      "label": "validates",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-guards-feedback",
+      "type": "dataFlow",
+      "source": "interaction-guards",
+      "target": "interaction-feedback",
+      "label": "reports",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-guards-ordering",
+      "type": "dataFlow",
+      "source": "interaction-guards",
+      "target": "interaction-ordering",
+      "label": "feeds",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from 'react';
 import Box from '@mui/material/Box';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
@@ -19,6 +20,7 @@ import {
   useGraphEditorLayoutContext,
   useGraphEditorServicesContext
 } from '../providers/GraphEditorContext';
+import useIntentEmitter from '../hooks/useIntentEmitter';
 
 export default function MobileFabToolbar() {
   const {
@@ -47,6 +49,58 @@ export default function MobileFabToolbar() {
   const showNodeList = !!layout?.showNodeList;
   const showGroupList = !!layout?.showGroupList;
 
+  const { emitEdgeIntent } = useIntentEmitter();
+
+  const handleAddNodeIntent = useCallback(() => {
+    emitEdgeIntent('openAddNodeSheet', { source: 'mobile' });
+    onAddNode?.();
+  }, [emitEdgeIntent, onAddNode]);
+
+  const handleUndoIntent = useCallback(() => {
+    emitEdgeIntent('undo', { source: 'mobile' });
+    if (canUndo) handleUndo();
+  }, [emitEdgeIntent, handleUndo, canUndo]);
+
+  const handleRedoIntent = useCallback(() => {
+    emitEdgeIntent('redo', { source: 'mobile' });
+    if (canRedo) handleRedo();
+  }, [emitEdgeIntent, handleRedo, canRedo]);
+
+  const handleFitToNodesIntent = useCallback(() => {
+    emitEdgeIntent('fitToNodes', { source: 'mobile' });
+    onFitToNodes?.();
+  }, [emitEdgeIntent, onFitToNodes]);
+
+  const handleTogglePropertiesIntent = useCallback(() => {
+    emitEdgeIntent('togglePropertiesPanel', { open: !showPropertiesPanel, source: 'mobile' });
+    onToggleProperties?.();
+  }, [emitEdgeIntent, onToggleProperties, showPropertiesPanel]);
+
+  const handleToggleNodeListIntent = useCallback(() => {
+    emitEdgeIntent('toggleNodeList', { open: !showNodeList, source: 'mobile' });
+    onToggleNodeList?.();
+  }, [emitEdgeIntent, onToggleNodeList, showNodeList]);
+
+  const handleToggleGroupListIntent = useCallback(() => {
+    emitEdgeIntent('toggleGroupList', { open: !showGroupList, source: 'mobile' });
+    onToggleGroupList?.();
+  }, [emitEdgeIntent, onToggleGroupList, showGroupList]);
+
+  const handleDeleteSelectedIntent = useCallback(() => {
+    emitEdgeIntent('deleteSelection', {
+      selectedNodeIds: selectedNodeIds.length,
+      selectedEdgeIds: selectedEdgeIds.length,
+      selectedGroupIds: selectedGroupIds.length,
+      source: 'mobile'
+    });
+    onDeleteSelected?.();
+  }, [emitEdgeIntent, onDeleteSelected, selectedNodeIds, selectedEdgeIds, selectedGroupIds]);
+
+  const handleOpenDocumentPropertiesIntent = useCallback(() => {
+    emitEdgeIntent('openDocumentProperties', { source: 'mobile' });
+    onOpenDocumentProperties?.();
+  }, [emitEdgeIntent, onOpenDocumentProperties]);
+
   const hasSelection =
     (selectedNodeIds?.length || 0) +
     (selectedEdgeIds?.length || 0) +
@@ -69,52 +123,52 @@ export default function MobileFabToolbar() {
         <SpeedDialAction
           icon={<PostAddIcon />}
           tooltipTitle="Add node"
-          onClick={() => onAddNode?.()}
+          onClick={handleAddNodeIntent}
         />
         <SpeedDialAction
           icon={<UndoIcon />}
           tooltipTitle={canUndo ? "Undo" : "Nothing to undo"}
           FabProps={{ disabled: !canUndo }}
-          onClick={canUndo ? handleUndo : undefined}
+          onClick={canUndo ? handleUndoIntent : undefined}
         />
         <SpeedDialAction
           icon={<RedoIcon />}
           tooltipTitle={canRedo ? "Redo" : "Nothing to redo"}
           FabProps={{ disabled: !canRedo }}
-          onClick={canRedo ? handleRedo : undefined}
+          onClick={canRedo ? handleRedoIntent : undefined}
         />
         <SpeedDialAction
           icon={<CenterFocusStrongIcon />}
           tooltipTitle="Fit nodes to view"
-          onClick={() => onFitToNodes?.()}
+          onClick={handleFitToNodesIntent}
         />
         {onOpenDocumentProperties && (
           <SpeedDialAction
             icon={<HistoryEduIcon />}
             tooltipTitle="Document properties"
-            onClick={() => onOpenDocumentProperties?.()}
+            onClick={handleOpenDocumentPropertiesIntent}
           />
         )}
         <SpeedDialAction
           icon={<PlumbingIcon color={showPropertiesPanel ? 'primary' : undefined} />}
           tooltipTitle={showPropertiesPanel ? "Hide properties" : "Show properties"}
-          onClick={() => onToggleProperties?.()}
+          onClick={handleTogglePropertiesIntent}
         />
         <SpeedDialAction
           icon={<ListIcon color={showNodeList ? 'primary' : undefined} />}
           tooltipTitle={showNodeList ? "Hide node list" : "Show node list"}
-          onClick={() => onToggleNodeList?.()}
+          onClick={handleToggleNodeListIntent}
         />
         <SpeedDialAction
           icon={<GroupIcon color={showGroupList ? 'primary' : undefined} />}
           tooltipTitle={showGroupList ? "Hide group list" : "Show group list"}
-          onClick={() => onToggleGroupList?.()}
+          onClick={handleToggleGroupListIntent}
         />
         <SpeedDialAction
           icon={<DeleteIcon color={hasSelection ? 'error' : undefined} />}
           tooltipTitle={hasSelection ? "Delete selection" : "Nothing selected"}
           FabProps={{ disabled: !hasSelection }}
-          onClick={hasSelection ? () => onDeleteSelected?.() : undefined}
+          onClick={hasSelection ? handleDeleteSelectedIntent : undefined}
         />
       </SpeedDial>
     </Box>

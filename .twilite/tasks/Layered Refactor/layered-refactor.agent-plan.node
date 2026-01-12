@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Agent Interface Plan",
+    "description": "Spec for how agents/LLMs interact with Twilite through the new layers",
+    "created": "2026-01-11T04:26:00.000Z",
+    "modified": "2026-01-11T04:26:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "agent",
+      "plan"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1a237e",
+        "light": "#283593",
+        "dark": "#000051",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#fdd835",
+        "light": "#ffee58",
+        "dark": "#c6a700",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#ede7f6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0d1b2a",
+        "secondary": "#1c3d5a"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "agent-root",
+      "type": "markdown",
+      "label": "🤖 Agent Interface Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Agent Interface Plan\n+\n+Describe how agents/LLMs call skills and submit intents through the layered stack safely."
+      }
+    },
+    {
+      "id": "agent-prompt",
+      "type": "markdown",
+      "label": "📝 Prompt Assembly",
+      "position": {
+        "x": -320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Prompt Assembly\n+\n+- Agents read schema metadata and core snapshots to build deterministic prompts.\n+- Use contract definitions and intent templates so agents know what mutations are legal.\n+- Provide tooling to capture the ‘why’ for each proposed action."
+      }
+    },
+    {
+      "id": "agent-dryrun",
+      "type": "markdown",
+      "label": "🧪 Dry-Run & Approval",
+      "position": {
+        "x": 320,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry-Run & Approval\n+\n+- Agents submit proposals as dry-run deltas before they mutate the core.\n+- Provide hooks for human/agent approval flows and rollback if anything fails.\n+- Log every proposal in history for traceability."
+      }
+    },
+    {
+      "id": "agent-intents",
+      "type": "markdown",
+      "label": "📡 Intent Channel",
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent Channel\n+\n+- Map agent actions to the same intent bus humans use.\n+- Agents emit explicit metadata (source, confidence) so skills can respond accordingly.\n+- Provide instrumentation to replay agent-driven intents later."
+      }
+    },
+    {
+      "id": "agent-safety",
+      "type": "markdown",
+      "label": "🧭 Safety & Governance",
+      "position": {
+        "x": 0,
+        "y": 440
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Safety & Governance\n+\n+- Enforce read-only behavior until an intent is approved.\n+- Help agents follow policies (no UI bypass, respect contracts) using the orientation layer.\n+- Capture decision rationale in note nodes so humans can audit later."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-agent-root-prompt",
+      "type": "dataFlow",
+      "source": "agent-root",
+      "target": "agent-prompt",
+      "label": "prep",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-agent-root-dryrun",
+      "type": "dataFlow",
+      "source": "agent-root",
+      "target": "agent-dryrun",
+      "label": "previews",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dryrun-intents",
+      "type": "dataFlow",
+      "source": "agent-dryrun",
+      "target": "agent-intents",
+      "label": "replay",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-intents-safety",
+      "type": "dataFlow",
+      "source": "agent-intents",
+      "target": "agent-safety",
+      "label": "governs",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,216 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Interface Intent Emitter",
+    "description": "Map raw user gestures to guarded intents before they hit the interpreter.",
+    "created": "2026-01-11T19:40:00.000Z",
+    "modified": "2026-01-11T19:40:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "interface",
+      "intent"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#006064",
+        "light": "#239da5",
+        "dark": "#00363a",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#f57c00",
+        "light": "#ffad42",
+        "dark": "#bb4d00",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e0f7fa",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0d1b2a",
+        "secondary": "#1c3d5a"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#006064",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "interface-root",
+      "type": "markdown",
+      "label": "🖱️ Interface Intent Emitter",
+      "position": {
+        "x": 0,
+        "y": -200
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Interface Intent Emitter\n+\n+Normalize every gesture into a deterministic intent, guard it using contracts, queue/compress overlapping actions, then emit `edgeIntentCaptured` for the interpreter."
+      }
+    },
+    {
+      "id": "intent-normalize",
+      "type": "markdown",
+      "label": "📐 Normalize Inputs",
+      "position": {
+        "x": -320,
+        "y": 0
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Normalize Inputs\n+\n+- Convert drag, click, toolbar, and document edits into `{ type, payload, metadata }`.\n+- Attach selection, viewport, triggering node/edge IDs, and timestamps so intents are self-describing.\n+- Consider intent fusion (drag + reroute) and emit the highest-priority event."
+      }
+    },
+    {
+      "id": "intent-guard",
+      "type": "markdown",
+      "label": "🛡 Guard Contracts",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Guard Contracts\n+\n+- Check locks, read-only modes, schema invariants before emitting an intent.\n+- Short-circuit and show snackbar/tooltip if the intent violates a contract (e.g., locked node, missing handle).\n+- Emit failure telemetry so the interpreter knows why the intent was blocked."
+      }
+    },
+    {
+      "id": "intent-flow",
+      "type": "markdown",
+      "label": "⏱ Flow Control",
+      "position": {
+        "x": 320,
+        "y": 0
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Flow Control\n+\n+- Queue rapid intents (drag + reroute) and cancel stale ones.\n+- Apply debounce for toolbar/reroute bursts.\n+- Provide cancel tokens so the interpreter never processes outdated gestures."
+      }
+    },
+    {
+      "id": "intent-emit",
+      "type": "markdown",
+      "label": "📢 Emit Guarded Intent",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Emit Guarded Intent\n+\n+- Post the structured intent (`edgeIntentCaptured`) so the interpreter pipeline runs it through telemetry/validation/skills.\n+- Include `intentId`, source, and guard outcome so downstream layers can trace it."
+      }
+    },
+    {
+      "id": "intent-feedback",
+      "type": "markdown",
+      "label": "💬 Visual Feedback",
+      "position": {
+        "x": 320,
+        "y": 220
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Visual Feedback\n+\n+- Highlight blocked handles, show snackbars, or render tooltip reasons when guards trip.\n+- Mirror intent telemetry (received, blocked, canceled) so users can see what happened."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-normalize",
+      "type": "dataFlow",
+      "source": "interface-root",
+      "target": "intent-normalize",
+      "label": "captured by",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-normalize-guard",
+      "type": "dataFlow",
+      "source": "intent-normalize",
+      "target": "intent-guard",
+      "label": "passes through",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-guard-flow",
+      "type": "dataFlow",
+      "source": "intent-guard",
+      "target": "intent-flow",
+      "label": "queues to",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-flow-emit",
+      "type": "dataFlow",
+      "source": "intent-flow",
+      "target": "intent-emit",
+      "label": "emits",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-emit-feedback",
+      "type": "dataFlow",
+      "source": "intent-emit",
+      "target": "intent-feedback",
+      "label": "reports to",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

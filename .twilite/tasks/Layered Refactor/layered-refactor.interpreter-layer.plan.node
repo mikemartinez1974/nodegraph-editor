@@ -1,0 +1,188 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Interpreter Layer Plan",
+    "description": "Concrete roadmap for the skill/interpreter tier",
+    "created": "2026-01-11T03:20:00.000Z",
+    "modified": "2026-01-11T03:20:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "interpreter",
+      "plan"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#283593",
+        "light": "#5c6bc0",
+        "dark": "#001064",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#f4511e",
+        "light": "#ff8a65",
+        "dark": "#c24b1a",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "#0d1b2a",
+        "secondary": "#1c3d5a"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "interpreter-root",
+      "type": "markdown",
+      "label": "🧠 Interpreter Layer Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Interpreter Layer Plan\n+\n+Define the skill/interpreter tier that reads core state, respects contracts, and writes deltas through the new core dispatcher."
+      }
+    },
+    {
+      "id": "interpreter-intents",
+      "type": "markdown",
+      "label": "🎯 Intent Handling",
+      "position": {
+        "x": -360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent Handling\n+\n+- Standardize intents: toolbar actions, node/handle drags, RPCs, script proposals, agent requests.\n+- Emit intent metadata to trace which skill invoked the dispatcher.\n+- Gate interpreter execution via `onIntent` hooks before mutations run."
+      }
+    },
+    {
+      "id": "interpreter-skills",
+      "type": "markdown",
+      "label": "🛠️ Skill Catalog",
+      "position": {
+        "x": 360,
+        "y": -20
+      },
+      "width": 400,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skill Catalog\n+\n+- List interpreter skills (edge routing, constraint validation, layout, voltage, automation) with required inputs/outputs.\n+- Each skill reads core state snapshots and writes delta batches via the core dispatcher.\n+- Keep skill definitions versioned so scenarios can roll forward safely."
+      }
+    },
+    {
+      "id": "interpreter-validation",
+      "type": "markdown",
+      "label": "⚖️ Validation Hooks",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Hooks\n+\n+- Plug contract validators into dispatch pipeline before any mutation.\n+- Allow skills to declare guard conditions and cancel/annotate violations.\n+- Provide `beforeMutation` and `afterMutation` hooks for telemetry and history."
+      }
+    },
+    {
+      "id": "interpreter-backpressure",
+      "type": "markdown",
+      "label": "🧘 Flow Control",
+      "position": {
+        "x": 0,
+        "y": 480
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Flow Control\n+\n+- Debounce overlapping interpretations (drag + reroute).\n+- Provide cancel tokens or dry-run modes so intents can safely queue.\n+- Emit events when intercepting intents so agents can re-plan."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-intents",
+      "type": "dataFlow",
+      "source": "interpreter-root",
+      "target": "interpreter-intents",
+      "label": "starts",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-skills",
+      "type": "dataFlow",
+      "source": "interpreter-root",
+      "target": "interpreter-skills",
+      "label": "drives",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skills-validation",
+      "type": "dataFlow",
+      "source": "interpreter-skills",
+      "target": "interpreter-validation",
+      "label": "passes through",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validation-flow",
+      "type": "dataFlow",
+      "source": "interpreter-validation",
+      "target": "interpreter-backpressure",
+      "label": "feeds",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

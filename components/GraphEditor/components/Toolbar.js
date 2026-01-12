@@ -98,6 +98,8 @@ const Toolbar = ({
   onToggleGroupList,
   showGroupList = true,
   onToggleNodePalette,
+  onToggleProperties = () => eventBus.emit('togglePropertiesPanel'),
+  onToggleScriptPanel = () => eventBus.emit('toggleScriptPanel'),
   mode,
   autoLayoutType,
   onModeChange,
@@ -132,7 +134,8 @@ const Toolbar = ({
   onEdgeRoutingChange = () => {},
   onRerouteEdges = () => {},
   documentTheme = null,  // Document theme (not browser theme)
-  githubSettings = null  // GitHub sync target settings
+  githubSettings = null,  // GitHub sync target settings
+  onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties')
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -859,11 +862,11 @@ const Toolbar = ({
 
         {/* Panel Actions Section */}
         <ButtonGroup variant="contained" size="small">
-          <PanelActions 
+          <PanelActions
             onToggleNodeList={onToggleNodeList}
             onToggleGroupList={onToggleGroupList}
-            onToggleScriptPanel={() => eventBus.emit('toggleScriptPanel')}
-            onToggleProperties={() => eventBus.emit('togglePropertiesPanel')}
+            onToggleScriptPanel={onToggleScriptPanel}
+            onToggleProperties={onToggleProperties}
             showNodeList={showNodeList}
             showGroupList={showGroupList}
             isMobile={false}
@@ -894,7 +897,7 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
-          onClick={() => eventBus.emit('toggleDocumentProperties')}
+          onClick={onOpenDocumentProperties}
             title="Preferences"
             aria-label="Open Preferences"
             size="small"

@@ -18,7 +18,7 @@ import useGraphHistory from './hooks/useGraphHistory';
 import useGraphShortcuts from './hooks/useGraphShortcuts';
 import useGroupManager from './hooks/useGroupManager';
 import useGraphModes from './hooks/useGraphModes';
-import { placeNodesIncrementally } from './utils/growthPlacement';
+import useInterpreterLayer from './hooks/useInterpreterLayer';
 import usePluginRegistry from './hooks/usePluginRegistry';
 import { pasteFromClipboardUnified } from './handlers/pasteHandler';
 import { GraphEditorContextProvider } from './providers/GraphEditorContext';
@@ -27,6 +27,7 @@ import useDocumentMetadata from './hooks/useDocumentMetadata';
 import useProjectMetadata from './hooks/useProjectMetadata';
 import useGraphInteractions from './hooks/useGraphInteractions';
 import usePluginRuntime from './hooks/usePluginRuntime';
+import useIntentEmitter from './hooks/useIntentEmitter';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -228,6 +229,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const backgroundRpcReadyRef = useRef(false);
 
   const state = useGraphEditorState();
+  const { emitEdgeIntent } = useIntentEmitter();
   const [edgeRoutes, setEdgeRoutes] = useState({});
 
 // Destructure editor state immediately so variables like `pan` are available for subsequent effects
@@ -827,99 +829,22 @@ useEffect(() => {
     setSnackbar
   });
 
-  const pendingAutoLayoutOnPasteRef = useRef(false);
-  const pendingAutoLayoutPayloadRef = useRef(null);
   const defaultLayoutSyncRef = useRef(null);
   const pendingRerouteOnLoadRef = useRef(false);
 
-  useEffect(() => {
-    const handleAutoLayoutRequested = (payload) => {
-      pendingAutoLayoutOnPasteRef.current = true;
-      pendingAutoLayoutPayloadRef.current =
-        payload && typeof payload === 'object' ? payload : null;
-    };
-    eventBus.on('layout:autoOnMissingPositions', handleAutoLayoutRequested);
-    return () => eventBus.off('layout:autoOnMissingPositions', handleAutoLayoutRequested);
-  }, []);
-
-  useEffect(() => {
-    if (!pendingAutoLayoutOnPasteRef.current) return;
-    pendingAutoLayoutOnPasteRef.current = false;
-    const layoutMode = documentSettings?.layout?.mode || 'autoOnMissingPositions';
-    if (layoutMode === 'manual') return;
-    const payload = pendingAutoLayoutPayloadRef.current;
-    pendingAutoLayoutPayloadRef.current = null;
-    const nodeIdsRaw = Array.isArray(payload?.nodeIds) ? payload.nodeIds.filter(Boolean) : [];
-    const nodeIds = lockedNodes instanceof Set
-      ? nodeIdsRaw.filter((id) => !lockedNodes.has(id))
-      : nodeIdsRaw;
-
-    // Phase 4 policy: grow without mangling. If we're adding nodes to an existing graph,
-    // place only the incoming nodes (local reflow) and reroute edges. For brand-new graphs,
-    // run a full ELK layout.
-    const shouldTreatAsGrowth =
-      nodeIds.length > 0 && Array.isArray(nodes) && nodes.length > nodeIds.length;
-
-    if (shouldTreatAsGrowth) {
-      try {
-        const result = placeNodesIncrementally({
-          nodes,
-          edges,
-          groups,
-          lockedNodeIds: lockedNodes,
-          nodeIdsToPlace: nodeIds,
-          pointer: lastPointerRef.current,
-          direction: documentSettings?.layout?.direction,
-          paddingPx: 60,
-          gapPx: 80,
-          stepPx: (documentSettings?.gridSize || 20) * 2
-        });
-        setNodes(result.nodes);
-        // Clearing routes avoids stale rendering while reroute runs.
-        setEdgeRoutes?.({});
-        Promise.resolve(modesHook.rerouteEdges?.())
-          .then(() => {
-            setSnackbar({ open: true, message: 'Placed new nodes and rerouted edges', severity: 'success' });
-          })
-          .catch(() => {
-            setSnackbar({ open: true, message: 'Placed new nodes (reroute failed)', severity: 'warning' });
-          });
-      } catch (err) {
-        setSnackbar({
-          open: true,
-          message: 'Incremental placement failed (falling back to auto-layout)',
-          severity: 'warning'
-        });
-        try {
-          modesHook.applyAutoLayout?.();
-          setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
-        } catch (err2) {
-          setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
-        }
-      }
-      return;
-    }
-
-    try {
-      modesHook.applyAutoLayout?.();
-      setSnackbar({ open: true, message: 'Auto-layout applied', severity: 'success' });
-    } catch (err) {
-      setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
-    }
-  }, [
+  useInterpreterLayer({
     nodes,
     edges,
+    edgeRoutes,
     groups,
     lockedNodes,
-    documentSettings?.layout?.mode,
-    documentSettings?.layout?.direction,
-    documentSettings?.gridSize,
-    modesHook.applyAutoLayout,
-    modesHook.rerouteEdges,
-    setEdgeRoutes,
+    documentSettings,
+    modesHook,
     setNodes,
-    setSnackbar
-  ]);
+    setEdgeRoutes,
+    setSnackbar,
+    lastPointerRef
+  });
 
   useEffect(() => {
     const defaultLayout = documentSettings?.layout?.defaultLayout;
@@ -934,39 +859,6 @@ useEffect(() => {
     }
   }, [documentSettings?.layout?.defaultLayout, modesHook.setAutoLayoutType]);
 
-  useEffect(() => {
-    const rerouteEdges = modesHook.rerouteEdges;
-    const handleReroute = async () => {
-      try {
-        await rerouteEdges?.();
-        setSnackbar({ open: true, message: 'Edges rerouted', severity: 'success' });
-      } catch (err) {
-        setSnackbar({ open: true, message: 'Failed to reroute edges', severity: 'error', copyToClipboard: true });
-      }
-    };
-
-    eventBus.on('edges:reroute', handleReroute);
-    return () => eventBus.off('edges:reroute', handleReroute);
-  }, [modesHook.rerouteEdges, setSnackbar]);
-
-  useEffect(() => {
-    const handleNodeDragEnd = () => {
-      if (modesHook.mode === 'auto') {
-        modesHook.applyAutoLayout();
-        return;
-      }
-      if (typeof modesHook.rerouteEdges === 'function') {
-        Promise.resolve(modesHook.rerouteEdges())
-          .catch((err) => {
-            console.warn('[EdgeReroute] Failed after drag end:', err);
-            setSnackbar({ open: true, message: 'Failed to reroute edges', severity: 'error', copyToClipboard: true });
-          });
-      }
-    };
-
-    eventBus.on('nodeDragEnd', handleNodeDragEnd);
-    return () => eventBus.off('nodeDragEnd', handleNodeDragEnd);
-  }, [modesHook, setSnackbar]);
   
   const groupManagerHook = useGroupManager({
     groups, setGroups,
@@ -1486,10 +1378,14 @@ useEffect(() => {
     if (mutated && snapshot) {
       nodesRef.current = snapshot;
       historyHook.saveToHistory(snapshot, edgesRef.current);
+      emitEdgeIntent('alignSelection', {
+        mode,
+        selectionCount: selectedSet.size
+      });
     }
 
     return mutated;
-  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef]);
+  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef, emitEdgeIntent]);
 
   const handleDistributeSelection = useCallback((axis) => {
     const selectedSet = new Set(selectedNodeIds);
@@ -1577,10 +1473,14 @@ useEffect(() => {
     if (mutated && snapshot) {
       nodesRef.current = snapshot;
       historyHook.saveToHistory(snapshot, edgesRef.current);
+      emitEdgeIntent('distributeSelection', {
+        axis,
+        selectionCount: selectedSet.size
+      });
     }
 
     return mutated;
-  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef]);
+  }, [selectedNodeIds, setNodes, nodesRef, historyHook, edgesRef, emitEdgeIntent]);
 
   // Listen for undo/redo events from keyboard shortcuts (placed after historyHook is created)
   useEffect(() => {

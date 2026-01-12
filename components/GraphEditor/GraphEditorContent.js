@@ -3,7 +3,7 @@
 import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
-import NodeGraph from '../NodeGraph';
+import GraphRendererAdapter from './renderers/GraphRendererAdapter';
 import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
 import MobileAddNodeSheet from './components/MobileAddNodeSheet';
@@ -26,6 +26,7 @@ import {
   useGraphEditorHistoryContext,
   useGraphEditorRpcContext
 } from './providers/GraphEditorContext';
+import useIntentEmitter from './hooks/useIntentEmitter';
 
 const GraphEditorContent = () => {
   const theme = useTheme();
@@ -137,6 +138,8 @@ const GraphEditorContent = () => {
     handleScriptRequest
   } = services || {};
 
+  const { emitEdgeIntent } = useIntentEmitter();
+
   const {
     bgRef,
     handleHandshakeComplete
@@ -156,18 +159,6 @@ const GraphEditorContent = () => {
   const memoizedSetSelectedEdgeIds = useCallback(setSelectedEdgeIds, [setSelectedEdgeIds]);
   const memoizedSetPan = useCallback(setPan, [setPan]);
   const memoizedSetZoom = useCallback(setZoom, [setZoom]);
-  const emitEdgeIntent = useCallback((trigger, metadata = {}) => {
-    const payload = {
-      trigger,
-      timestamp: new Date().toISOString(),
-      ...metadata
-    };
-    try {
-      eventBus.emit('edgeIntentCaptured', payload);
-    } catch (err) {
-      console.warn('[EdgeIntent] emit failed', err);
-    }
-  }, []);
 
   const handleEdgeRoutingChange = useCallback((value) => {
     emitEdgeIntent('edgeRoutingChange', { value });
@@ -178,7 +169,6 @@ const GraphEditorContent = () => {
 
   const handleRerouteEdges = useCallback(() => {
     emitEdgeIntent('toolbarReroute');
-    eventBus.emit('edges:reroute');
   }, [emitEdgeIntent]);
 
   const handleApplyLayout = useCallback(() => {
@@ -194,8 +184,36 @@ const GraphEditorContent = () => {
   }, [documentTheme]);
 
   const handleToggleMinimap = useCallback(() => {
+    emitEdgeIntent('toggleMinimap', { enabled: !showMinimap });
     eventBus.emit('toggleMinimap');
-  }, []);
+  }, [emitEdgeIntent, showMinimap]);
+
+  const graphRendererKey = `${backgroundUrl || 'no-background'}-${graphRenderKey}`;
+  const createGraphRenderer = () => (
+    <GraphRendererAdapter
+      graphKey={graphRendererKey}
+      nodeTypes={nodeTypes}
+      edgeTypes={EdgeTypes}
+      edgeRoutes={edgeRoutes}
+      mode={modesHook.mode}
+      backgroundUrl={backgroundUrl}
+      backgroundInteractive={backgroundInteractive}
+      backgroundImage={documentBackgroundImage}
+      setSnackbar={setSnackbar}
+      showMinimap={showMinimap}
+      snapToGrid={snapToGrid}
+      showGrid={showGrid}
+      gridSize={documentSettings.gridSize}
+      defaultEdgeRouting={documentSettings.edgeRouting}
+      edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
+      lockedNodes={lockedNodes}
+      lockedEdges={lockedEdges}
+      onEdgeClick={undefined}
+      onEdgeHover={undefined}
+      hoveredEdgeId={hoveredEdgeId}
+      showAllEdgeLabels={showAllEdgeLabels}
+    />
+  );
 
   useEffect(() => {
     const handleNodeDragEndIntent = () => {
@@ -206,8 +224,12 @@ const GraphEditorContent = () => {
   }, [emitEdgeIntent]);
 
   const handleToggleSnapToGrid = useCallback(() => {
-    setSnapToGrid(prev => !prev);
-  }, [setSnapToGrid]);
+    setSnapToGrid(prev => {
+      const next = !prev;
+      emitEdgeIntent('toggleSnapToGrid', { enabled: next });
+      return next;
+    });
+  }, [setSnapToGrid, emitEdgeIntent]);
 
   const showSnackbar = useCallback((message, severity = 'info', options = {}) => {
     setSnackbar({ open: true, message, severity, ...options });
@@ -318,10 +340,113 @@ const GraphEditorContent = () => {
   }, [setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
 
   const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
+    emitEdgeIntent('loadGraph', {
+      nodes: Array.isArray(nodesToLoad) ? nodesToLoad.length : 0,
+      edges: Array.isArray(edgesToLoad) ? edgesToLoad.length : 0,
+      groups: Array.isArray(groupsToLoad) ? groupsToLoad.length : 0
+    });
     if (typeof handleLoadGraph === 'function') {
       handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
     }
-  }, [handleLoadGraph]);
+  }, [handleLoadGraph, emitEdgeIntent]);
+
+  const handleDeleteSelectedIntent = useCallback(() => {
+    emitEdgeIntent('deleteSelection', {
+      selectedNodeCount: selectedNodeIds?.length || 0,
+      selectedEdgeCount: selectedEdgeIds?.length || 0
+    });
+    handlers?.handleDeleteSelected?.();
+  }, [emitEdgeIntent, handlers, selectedNodeIds, selectedEdgeIds]);
+
+  const handleClearGraphIntent = useCallback(() => {
+    emitEdgeIntent('clearGraph');
+    handlers?.handleClearGraph?.();
+  }, [emitEdgeIntent, handlers]);
+
+  const handleUndoIntent = useCallback(() => {
+    emitEdgeIntent('undo');
+    historyHook.handleUndo();
+  }, [emitEdgeIntent, historyHook.handleUndo]);
+
+  const handleRedoIntent = useCallback(() => {
+    emitEdgeIntent('redo');
+    historyHook.handleRedo();
+  }, [emitEdgeIntent, historyHook.handleRedo]);
+
+  const handleTogglePropertiesPanelIntent = useCallback(() => {
+    emitEdgeIntent('togglePropertiesPanel', { open: !showPropertiesPanel });
+    togglePropertiesPanel?.();
+  }, [emitEdgeIntent, togglePropertiesPanel, showPropertiesPanel]);
+
+  const handleToggleNodeListIntent = useCallback(() => {
+    emitEdgeIntent('toggleNodeList', { open: !showNodeList });
+    toggleNodeList?.();
+  }, [emitEdgeIntent, toggleNodeList, showNodeList]);
+
+  const handleToggleGroupListIntent = useCallback(() => {
+    emitEdgeIntent('toggleGroupList', { open: !showGroupList });
+    toggleGroupList?.();
+  }, [emitEdgeIntent, toggleGroupList, showGroupList]);
+
+  const handleToggleNodePaletteIntent = useCallback(() => {
+    emitEdgeIntent('toggleNodePalette', { open: !showNodePalette });
+    toggleNodePalette?.();
+  }, [emitEdgeIntent, toggleNodePalette, showNodePalette]);
+
+  const handleOpenDocumentPropertiesIntent = useCallback(() => {
+    emitEdgeIntent('openDocumentProperties');
+    handleOpenDocumentProperties?.();
+  }, [emitEdgeIntent, handleOpenDocumentProperties]);
+
+  const handleToggleScriptPanelIntent = useCallback(() => {
+    emitEdgeIntent('toggleScriptPanel');
+    eventBus.emit('toggleScriptPanel');
+  }, [emitEdgeIntent]);
+
+  const handleNodeListSelectIntent = useCallback((nodeId, multiSelect) => {
+    emitEdgeIntent('nodeListSelect', { nodeId, multiSelect });
+    handlers?.handleNodeListSelect?.(nodeId, multiSelect);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleNodeListFocusIntent = useCallback((nodeId) => {
+    emitEdgeIntent('nodeListFocus', { nodeId });
+    handlers?.handleNodeFocus?.(nodeId);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleNodeListCloseIntent = useCallback(() => {
+    emitEdgeIntent('closeNodeList');
+    setShowNodeList(false);
+  }, [emitEdgeIntent]);
+
+  const handleGroupListSelectIntent = useCallback((groupId, multiSelect) => {
+    emitEdgeIntent('groupListSelect', { groupId, multiSelect });
+    handlers?.handleGroupListSelect?.(groupId, multiSelect);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleGroupListFocusIntent = useCallback((groupId) => {
+    emitEdgeIntent('groupListFocus', { groupId });
+    handlers?.handleGroupFocus?.(groupId);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleGroupListDoubleClickIntent = useCallback((groupId) => {
+    emitEdgeIntent('groupListDoubleClick', { groupId });
+    handlers?.handleGroupDoubleClickFromList?.(groupId);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleGroupToggleVisibilityIntent = useCallback((groupId) => {
+    emitEdgeIntent('groupToggleVisibility', { groupId });
+    handlers?.handleGroupToggleVisibility?.(groupId);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleGroupDeleteIntent = useCallback((groupId) => {
+    emitEdgeIntent('groupDelete', { groupId });
+    handlers?.handleGroupDelete?.(groupId);
+  }, [emitEdgeIntent, handlers]);
+
+  const handleGroupListCloseIntent = useCallback(() => {
+    emitEdgeIntent('closeGroupList');
+    setShowGroupList(false);
+  }, [emitEdgeIntent]);
 
   return (
     <div
@@ -350,19 +475,19 @@ const GraphEditorContent = () => {
 
       {!isMobile && (
         <Toolbar
-          onToggleNodeList={toggleNodeList}
+          onToggleNodeList={handleToggleNodeListIntent}
           showNodeList={showNodeList}
-          onToggleGroupList={toggleGroupList}
+          onToggleGroupList={handleToggleGroupListIntent}
           showGroupList={showGroupList}
-          onToggleNodePalette={toggleNodePalette}
+          onToggleNodePalette={handleToggleNodePaletteIntent}
           nodes={nodes}
           edges={edges}
           groups={groups}
-          onLoadGraph={handleLoadGraph}
-          onDeleteSelected={handlers?.handleDeleteSelected}
-          onClearGraph={handlers?.handleClearGraph}
-          onUndo={historyHook.handleUndo}
-          onRedo={historyHook.handleRedo}
+          onLoadGraph={handleImportGraph}
+          onDeleteSelected={handleDeleteSelectedIntent}
+          onClearGraph={handleClearGraphIntent}
+          onUndo={handleUndoIntent}
+          onRedo={handleRedoIntent}
           selectedNodeId={selectedNodeIds[0] || null}
           selectedNodeIds={selectedNodeIds}
           selectedEdgeId={selectedEdgeIds[0] || null}
@@ -401,6 +526,9 @@ const GraphEditorContent = () => {
           onEdgeRoutingChange={handleEdgeRoutingChange}
           onRerouteEdges={handleRerouteEdges}
           githubSettings={documentSettings.github}
+          onToggleProperties={handleTogglePropertiesPanelIntent}
+          onToggleScriptPanel={handleToggleScriptPanelIntent}
+          onOpenDocumentProperties={handleOpenDocumentPropertiesIntent}
           documentTheme={documentTheme}
           addressBarHeight={addressBarHeight}
           isMobile={isMobile}
@@ -420,21 +548,26 @@ const GraphEditorContent = () => {
       />
 
       {showPropertiesPanel && (
-        <PropertiesPanel
-          selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
-          selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
-          selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
-          edges={edges}
-          onUpdateNode={(id, updates, options) => {
-            setNodes(prev => {
-              const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates?.data ? { ...n.data, ...updates.data } : n.data } : n);
-              nodesRef.current = next;
-              // Only save to history if not explicitly skipped
-              if (!options || options !== true) {
-                try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
-              }
-              return next;
-            });
+      <PropertiesPanel
+        selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
+        selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
+        selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
+        edges={edges}
+        onUpdateNode={(id, updates, options) => {
+          emitEdgeIntent('updateNode', {
+            nodeId: id,
+            changeCount: Object.keys(updates || {}).length,
+            selectionCount: selectedNodeIds.length
+          });
+          setNodes(prev => {
+            const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates?.data ? { ...n.data, ...updates.data } : n.data } : n);
+            nodesRef.current = next;
+            // Only save to history if not explicitly skipped
+            if (!options || options !== true) {
+              try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
+            }
+            return next;
+          });
             const hasHandler = handlers && typeof handlers.handleUpdateNodeData === 'function';
             if (!options || options !== true) {
               try {
@@ -452,6 +585,7 @@ const GraphEditorContent = () => {
             }
           }}
           onUpdateEdge={(id, updates) => {
+            emitEdgeIntent('updateEdge', { edgeId: id, changeCount: Object.keys(updates || {}).length });
             setEdges(prev => {
               const next = prev.map(e => e.id === id ? { ...e, ...updates } : e);
               edgesRef.current = next;
@@ -465,6 +599,7 @@ const GraphEditorContent = () => {
             }
           }}
           onUpdateGroup={(id, updates) => {
+            emitEdgeIntent('updateGroup', { groupId: id, changeCount: Object.keys(updates || {}).length });
             setGroups(prev => {
               const next = prev.map(g => g.id === id ? { ...g, ...updates } : g);
               const updatedGroup = next.find(g => g.id === id);
@@ -524,9 +659,9 @@ const GraphEditorContent = () => {
         nodes={nodes}
         selectedNodeId={selectedNodeIds[0] || null}
         selectedNodeIds={selectedNodeIds}
-        onNodeSelect={handlers?.handleNodeListSelect}
-        onNodeFocus={handlers?.handleNodeFocus}
-        onClose={() => setShowNodeList(false)}
+        onNodeSelect={handleNodeListSelectIntent}
+        onNodeFocus={handleNodeListFocusIntent}
+        onClose={handleNodeListCloseIntent}
         isOpen={showNodeList}
         theme={theme}
         propertiesPanelAnchor={nodePanelAnchor}
@@ -538,16 +673,15 @@ const GraphEditorContent = () => {
         groups={groups}
         selectedGroupId={selectedGroupIds[0] || null}
         selectedGroupIds={selectedGroupIds}
-        onGroupSelect={handlers?.handleGroupListSelect}
-        onGroupFocus={handlers?.handleGroupFocus}
-        onGroupDoubleClick={handlers?.handleGroupDoubleClickFromList}
-        onGroupToggleVisibility={handlers?.handleGroupToggleVisibility}
-        onGroupDelete={handlers?.handleGroupDelete}
-        onClose={() => setShowGroupList(false)}
+        onGroupSelect={handleGroupListSelectIntent}
+        onGroupFocus={handleGroupListFocusIntent}
+        onGroupDoubleClick={handleGroupListDoubleClickIntent}
+        onGroupToggleVisibility={handleGroupToggleVisibilityIntent}
+        onGroupDelete={handleGroupDeleteIntent}
+        onClose={handleGroupListCloseIntent}
         isOpen={showGroupList}
         theme={theme}
       />
-
       {showNewTabPage ? (
         <NewTabPage
           onCreateBlank={handleCreateBlankGraph}
@@ -558,90 +692,10 @@ const GraphEditorContent = () => {
         />
       ) : documentMuiTheme ? (
         <MuiThemeProvider theme={documentMuiTheme}>
-          <NodeGraph
-            key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
-            nodes={memoizedNodes}
-            setNodes={memoizedSetNodes}
-            setEdges={memoizedSetEdges}
-            edges={memoizedEdges}
-            groups={memoizedGroups}
-            setGroups={memoizedSetGroups}
-            pan={pan}
-            zoom={zoom}
-            setPan={memoizedSetPan}
-            setZoom={memoizedSetZoom}
-            selectedNodeId={memoizedSelectedNodeIds[0] || null}
-            selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
-            selectedNodeIds={memoizedSelectedNodeIds}
-            selectedEdgeIds={memoizedSelectedEdgeIds}
-            selectedGroupIds={memoizedSelectedGroupIds}
-            setSelectedNodeIds={memoizedSetSelectedNodeIds}
-            setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
-            hoveredNodeId={hoveredNodeId}
-            nodeTypes={nodeTypes}
-            edgeTypes={EdgeTypes}
-            edgeRoutes={edgeRoutes}
-            mode={modesHook.mode}
-            backgroundUrl={backgroundUrl}
-            backgroundInteractive={backgroundInteractive}
-            backgroundImage={documentBackgroundImage}
-            setSnackbar={setSnackbar}
-            showMinimap={showMinimap}
-            snapToGrid={snapToGrid}
-            showGrid={showGrid}
-            gridSize={documentSettings.gridSize}
-            defaultEdgeRouting={documentSettings.edgeRouting}
-            edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
-            lockedNodes={lockedNodes}
-            lockedEdges={lockedEdges}
-            onEdgeClick={undefined}
-            onEdgeHover={undefined}
-            hoveredEdgeId={hoveredEdgeId}
-            showAllEdgeLabels={showAllEdgeLabels}
-          />
+          {createGraphRenderer()}
         </MuiThemeProvider>
       ) : (
-        <NodeGraph
-          key={`${backgroundUrl || 'no-background'}-${graphRenderKey}`}
-          nodes={memoizedNodes}
-          setNodes={memoizedSetNodes}
-          setEdges={memoizedSetEdges}
-          edges={memoizedEdges}
-          groups={memoizedGroups}
-          setGroups={memoizedSetGroups}
-          pan={pan}
-          zoom={zoom}
-          setPan={memoizedSetPan}
-          setZoom={memoizedSetZoom}
-          selectedNodeId={memoizedSelectedNodeIds[0] || null}
-          selectedEdgeId={memoizedSelectedEdgeIds[0] || null}
-          selectedNodeIds={memoizedSelectedNodeIds}
-          selectedEdgeIds={memoizedSelectedEdgeIds}
-          selectedGroupIds={memoizedSelectedGroupIds}
-          setSelectedNodeIds={memoizedSetSelectedNodeIds}
-          setSelectedEdgeIds={memoizedSetSelectedEdgeIds}
-          hoveredNodeId={hoveredNodeId}
-          nodeTypes={nodeTypes}
-          edgeTypes={EdgeTypes}
-          edgeRoutes={edgeRoutes}
-          mode={modesHook.mode}
-          backgroundUrl={backgroundUrl}
-          backgroundInteractive={backgroundInteractive}
-          backgroundImage={documentBackgroundImage}
-          setSnackbar={setSnackbar}
-          showMinimap={showMinimap}
-          snapToGrid={snapToGrid}
-          showGrid={showGrid}
-          gridSize={documentSettings.gridSize}
-          defaultEdgeRouting={documentSettings.edgeRouting}
-          edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
-          lockedNodes={lockedNodes}
-          lockedEdges={lockedEdges}
-          onEdgeClick={undefined}
-          onEdgeHover={undefined}
-          hoveredEdgeId={hoveredEdgeId}
-          showAllEdgeLabels={showAllEdgeLabels}
-        />
+        createGraphRenderer()
       )}
 
       {!isEmbedded && <ScriptRunner onRequest={handleScriptRequest} />}

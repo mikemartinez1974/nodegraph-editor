@@ -51,6 +51,9 @@ import {
   LAYOUT_MODE_OPTIONS,
   LAYOUT_TYPE_OPTIONS
 } from '../layoutSettings';
+import useIntentEmitter from '../hooks/useIntentEmitter';
+import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
+import { summarizeContracts } from '../contracts/contractManager';
 
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
@@ -115,6 +118,18 @@ export default function DocumentPropertiesDialog({
   const [storyMilestoneLabel, setStoryMilestoneLabel] = useState('');
   const [liveStorySnapshots, setLiveStorySnapshots] = useState([]);
   const [liveRecentSnapshots, setLiveRecentSnapshots] = useState([]);
+  const { nodes = [], edges = [] } = useGraphEditorStateContext();
+
+  const contractSummary = useMemo(() => {
+    return summarizeContracts({ nodes, edges, documentSettings });
+  }, [nodes, edges, documentSettings]);
+
+  const handleSideSummary = useMemo(() => {
+    const bySide = contractSummary.handleSummary?.handleBySide || {};
+    const entries = Object.entries(bySide);
+    if (!entries.length) return 'None';
+    return entries.map(([side, count]) => `${side}: ${count}`).join(', ');
+  }, [contractSummary]);
 
   useEffect(() => {
     const handleStorySnapshotsUpdated = ({ snapshots } = {}) => {
@@ -183,17 +198,7 @@ export default function DocumentPropertiesDialog({
     setDocSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const emitEdgeIntent = useCallback((trigger, metadata = {}) => {
-    try {
-      eventBus.emit('edgeIntentCaptured', {
-        trigger,
-        timestamp: new Date().toISOString(),
-        ...metadata
-      });
-    } catch (err) {
-      console.warn('[EdgeIntent] emit failed', err);
-    }
-  }, []);
+  const { emitEdgeIntent } = useIntentEmitter();
 
   const wrapLayoutWithElk = (layout = {}) => ({
     ...layout,
@@ -568,6 +573,36 @@ export default function DocumentPropertiesDialog({
                   <Typography variant="body2">{formatTimestamp(meta.lastModified)}</Typography>
                 </Grid>
               </Grid>
+              <Box
+                sx={{
+                  mt: 2,
+                  px: 2,
+                  py: 1.25,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper'
+                }}
+              >
+                <Typography variant="subtitle2" gutterBottom>
+                  Contract summary
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Version {contractSummary.version}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Handles defined: {contractSummary.handleSummary.total || 0}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Nodes with handles: {contractSummary.handleSummary.withHandles || 0}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Edges: {contractSummary.edgeCount}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Sides: {handleSideSummary}
+                </Typography>
+              </Box>
             </Paper>
           </Stack>
         )}
