@@ -189,6 +189,7 @@ const FixedNode = ({
     }
   };
   
+  const styleOverrides = node?.style || {};
   const computedStyle = {
     position: 'absolute',
     left: baseLeft,
@@ -226,7 +227,7 @@ const FixedNode = ({
     transform: `rotate(${rotation}deg)`,
     transformOrigin: 'center center',
     transition: (isRotating || isDragging || draggingHandle) ? 'none' : 'transform 0.1s ease-out',
-    ...style
+    ...styleOverrides
   };
 
   return (

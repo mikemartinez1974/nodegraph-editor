@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Drawer,
   Box,
@@ -19,7 +19,10 @@ import {
   Select,
   MenuItem,
   Paper,
-  Tooltip
+  Tooltip,
+  Grid,
+  TextField,
+  Slider
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -97,6 +100,10 @@ export default function PropertiesPanel({
   const [preset, setPreset] = useState("default");
 
   const payloadSource = selectedNode?.data || selectedEdge?.data || {};
+  const currentStyle = selectedNode?.style || {};
+  const parsedOpacity = Number(currentStyle.opacity);
+  const opacityPercent = Number.isFinite(parsedOpacity) ? Math.min(Math.max(Math.round(parsedOpacity * 100), 0), 100) : 100;
+  const [styleJsonText, setStyleJsonText] = useState(() => JSON.stringify(currentStyle, null, 2));
   const payloadEntries = useMemo(() => flattenPayloadEntries(payloadSource), [payloadSource]);
   const connectedEdges = useMemo(() => buildConnectedEdges(selectedNode, edges), [selectedNode, edges]);
   const nodeStyle = selectedNode?.style || {};
@@ -111,6 +118,39 @@ export default function PropertiesPanel({
   };
 
   const payloadJson = useMemo(() => sanitizePayloadJSON(payloadSource), [payloadSource]);
+  const [jsonError, setJsonError] = useState("");
+  const isNodeSelected = Boolean(selectedNode);
+
+  useEffect(() => {
+    setStyleJsonText(JSON.stringify(currentStyle || {}, null, 2));
+  }, [currentStyle]);
+
+  const updateStyle = (patch) => {
+    if (!selectedNode) return;
+    onUpdateNode(selectedNode.id, {
+      style: {
+        ...currentStyle,
+        ...patch
+      }
+    });
+  };
+
+  const handleApplyStyleJson = () => {
+    if (!selectedNode) return;
+    try {
+      const parsed = JSON.parse(styleJsonText || "{}");
+      updateStyle(parsed);
+      setJsonError("");
+    } catch (err) {
+      setJsonError("Invalid JSON");
+    }
+  };
+
+  const handleResetStyle = () => {
+    if (!selectedNode) return;
+    onUpdateNode(selectedNode.id, { style: undefined });
+  };
+
 
   return (
     <Drawer
@@ -216,6 +256,138 @@ export default function PropertiesPanel({
             )}
           </Section>
 
+          <Section title="Style controls">
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Background"
+                  type="color"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.background || "#ffffff"}
+                  onChange={(event) => updateStyle({ background: event.target.value })}
+                  disabled={!isNodeSelected}
+                  sx={{ py: 0.5 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Text color"
+                  type="color"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.color || "#000000"}
+                  onChange={(event) => updateStyle({ color: event.target.value })}
+                  disabled={!isNodeSelected}
+                  sx={{ py: 0.5 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Border color"
+                  type="color"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.borderColor || "#000000"}
+                  onChange={(event) => updateStyle({ borderColor: event.target.value })}
+                  disabled={!isNodeSelected}
+                  sx={{ py: 0.5 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Border style</InputLabel>
+                  <Select
+                    value={currentStyle.borderStyle || "solid"}
+                    label="Border style"
+                    onChange={(event) => updateStyle({ borderStyle: event.target.value })}
+                    disabled={!isNodeSelected}
+                  >
+                    {["solid", "dashed", "dotted", "double", "groove"].map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Border width (px)"
+                  type="number"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.borderWidth ?? 0}
+                  onChange={(event) => updateStyle({ borderWidth: Number(event.target.value) })}
+                  disabled={!isNodeSelected}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Border radius (px)"
+                  type="number"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.borderRadius ?? 0}
+                  onChange={(event) => updateStyle({ borderRadius: Number(event.target.value) })}
+                  disabled={!isNodeSelected}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Font weight</InputLabel>
+                  <Select
+                    value={currentStyle.fontWeight || "normal"}
+                    label="Font weight"
+                    onChange={(event) => updateStyle({ fontWeight: event.target.value })}
+                    disabled={!isNodeSelected}
+                  >
+                    {["normal", "bold", "bolder", "lighter"].map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Font size"
+                  placeholder="e.g. 14px"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.fontSize || ""}
+                  onChange={(event) => updateStyle({ fontSize: event.target.value })}
+                  disabled={!isNodeSelected}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Box shadow"
+                  placeholder="e.g. 0px 4px 16px rgba(0,0,0,0.2)"
+                  fullWidth
+                  size="small"
+                  value={currentStyle.boxShadow || ""}
+                  onChange={(event) => updateStyle({ boxShadow: event.target.value })}
+                  disabled={!isNodeSelected}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body2">Opacity</Typography>
+                <Slider
+                  value={opacityPercent}
+                  min={0}
+                  max={100}
+                  onChange={(_, value) => {
+                    if (Array.isArray(value)) return;
+                    updateStyle({ opacity: Number(value) / 100 });
+                  }}
+                  disabled={!isNodeSelected}
+                />
+              </Grid>
+            </Grid>
+          </Section>
+
           <Section title="Formatting">
             <FormControl fullWidth size="small" sx={{ mb: 1 }}>
               <InputLabel>Preset style</InputLabel>
@@ -268,6 +440,37 @@ export default function PropertiesPanel({
                 </Button>
               </Stack>
             </Paper>
+          </Section>
+          <Section title="Advanced style JSON">
+            <TextField
+              fullWidth
+              multiline
+              minRows={4}
+              size="small"
+              value={styleJsonText}
+              onChange={(event) => setStyleJsonText(event.target.value)}
+              disabled={!isNodeSelected}
+              helperText={jsonError || "Edit the raw style JSON and apply safely."}
+              error={Boolean(jsonError)}
+            />
+            <Stack direction="row" spacing={1} mt={1}>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleApplyStyleJson}
+                disabled={!isNodeSelected}
+              >
+                Apply JSON
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleResetStyle}
+                disabled={!isNodeSelected}
+              >
+                Reset style
+              </Button>
+            </Stack>
           </Section>
         </Box>
       </Box>
