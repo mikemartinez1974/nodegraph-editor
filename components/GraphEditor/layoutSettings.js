@@ -1,6 +1,6 @@
 export const DEFAULT_LAYOUT_SETTINGS = {
   mode: 'autoOnMissingPositions',
-  defaultLayout: 'hierarchical',
+  defaultLayout: 'layered',
   direction: 'DOWN',
   edgeLaneGapPx: 10,
   serpentine: {
@@ -24,10 +24,9 @@ export const LAYOUT_MODE_OPTIONS = [
 ];
 
 export const LAYOUT_TYPE_OPTIONS = [
-  { value: 'hierarchical', label: 'Hierarchical' },
-  { value: 'serpentine', label: 'Serpentine' },
-  { value: 'grid', label: 'Grid' },
-  { value: 'radial', label: 'Radial' }
+  { value: 'layered', label: 'Layered / hierarchical' },
+  { value: 'rectpacking', label: 'Rectpacking / compact' },
+  { value: 'radial', label: 'Radial / spoke' }
 ];
 
 export const LAYOUT_DIRECTION_OPTIONS = [

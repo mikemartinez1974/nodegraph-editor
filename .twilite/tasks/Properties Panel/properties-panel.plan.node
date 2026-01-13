@@ -1,0 +1,126 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Properties Panel Implementation Plan",
+    "description": "Tasks to build the user-focused properties panel described in the orientation graph.",
+    "created": "2026-01-14T01:00:00.000Z",
+    "modified": "2026-01-14T01:00:00.000Z",
+    "author": "",
+    "tags": [
+      "properties",
+      "plan"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#0d47a1",
+        "light": "#5472d3",
+        "dark": "#002171",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ff6f00",
+        "light": "#ffa040",
+        "dark": "#c43e00",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#e3f2fd",
+        "paper": "#ffffff"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "nodes": [
+    {
+      "id": "plan-root",
+      "type": "markdown",
+      "label": "📌 Properties Panel Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 220,
+      "data": {
+        "markdown": "# Properties Panel Implementation Plan\n+\n+Break down the orientation’s vision into concrete UI steps, intent wiring, and formatting helpers so the drawer becomes a polished feature."
+      }
+    },
+    {
+      "id": "plan-payload",
+      "type": "markdown",
+      "label": "📦 Payload Viewer",
+      "position": {
+        "x": -360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "data": {
+        "markdown": "## Payload Viewer\n+\n+- Build a selection-aware panel that renders node/edge data in grouped fields (title, description, metadata).\n+- Provide a copy/export button and toggle between friendly view + raw JSON.\n+- Keep this read-only and driven by `selectedNodeIds`/`selectedEdgeIds`."
+      }
+    },
+    {
+      "id": "plan-edges",
+      "type": "markdown",
+      "label": "🔗 Edge Explorer",
+      "position": {
+        "x": 360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "data": {
+        "markdown": "## Edge Explorer\n+\n+- List every connected edge with labels, handle names, and type badges.\n+- Include quick actions (focus edge, toggle handles, reroute or copy style).\n+- Surface routing hints from `edge.style`/`handleMeta` without mutating state."
+      }
+    },
+    {
+      "id": "plan-format",
+      "type": "markdown",
+      "label": "🪄 Formatting Hub",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 260,
+      "data": {
+        "markdown": "## Formatting Hub\n+\n+- Offer presets that map to `node.style` (gradients, borders, shadows, typography).\n+- Provide controls for custom values + favorites + copying sanitized JSON.\n+- Persist only preset/favor flags so the core state remains untouched."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "plan-edge-root-payload",
+      "type": "dataFlow",
+      "source": "plan-root",
+      "target": "plan-payload"
+    },
+    {
+      "id": "plan-edge-root-edges",
+      "type": "dataFlow",
+      "source": "plan-root",
+      "target": "plan-edges"
+    },
+    {
+      "id": "plan-edge-root-format",
+      "type": "dataFlow",
+      "source": "plan-root",
+      "target": "plan-format"
+    }
+  ]
+}

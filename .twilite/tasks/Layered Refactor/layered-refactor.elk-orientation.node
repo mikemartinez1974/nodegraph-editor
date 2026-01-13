@@ -94,7 +94,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Orientation Guidelines\n+\n+- Keep ELK settings in Document Properties + toolbar selectors so they stay visible and testable.\n+- Let contracts (handles/edges) remain flexible but document versions and emit summaries before layout.\n+- Treat `ConstraintValidationSkill` as a safeguard: sanitize JSON and report via snackbar rather than blocking creativity."
+        "markdown": "## Orientation Guidelines\n+\n+- Build a dedicated layout panel (ELK controls) inside the presentation layer so the editor owns the knobs.\n+- Emit layout intents via `useIntentEmitter` so the interpreter/validator pipeline already listens.\n+- Keep contracts flexible, versioned, and summarized (no extra restrictions) while the panel surfaces the important options."
       }
     },
     {

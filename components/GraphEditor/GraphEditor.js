@@ -2039,6 +2039,12 @@ useEffect(() => {
   }, [backgroundUrl, backgroundInteractive, setSnackbar]);
 
   useEffect(() => {
+    if (!isMobile && (selectedNodeIds.length === 1 || selectedEdgeIds.length === 1 || selectedGroupIds.length === 1)) {
+      setShowPropertiesPanel(true);
+    }
+  }, [isMobile, selectedNodeIds, selectedEdgeIds, selectedGroupIds, setShowPropertiesPanel]);
+
+  useEffect(() => {
     if (!isMobile) {
       lastNodeTapRef.current = { id: null, time: 0 };
       return;

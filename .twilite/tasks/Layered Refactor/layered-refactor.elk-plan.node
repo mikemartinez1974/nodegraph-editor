@@ -1,0 +1,184 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "ELK Layout Panel Plan",
+    "description": "Plan for wiring the ELK layout panel into the presentation + interpreter layers.",
+    "created": "2026-01-12T16:40:00.000Z",
+    "modified": "2026-01-12T16:40:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "elk",
+      "plan"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1e88e5",
+        "light": "#6ab7ff",
+        "dark": "#005cb2",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ffb300",
+        "light": "#ffd54f",
+        "dark": "#c68400",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#f5f7fb",
+        "paper": "#ffffff"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "elk-plan-root",
+      "type": "markdown",
+      "label": "\ud83e\udded ELK Layout Panel Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# ELK Layout Panel Plan\n+\n+-Define this drawer as the canonical ELK layout surface, document how it drives intents/telemetry, and keep contract summaries synchronized."
+      }
+    },
+    {
+      "id": "elk-plan-toolbar",
+      "type": "markdown",
+      "label": "\ud83c\udf9b\ufe0f Toolbar Entry",
+      "position": {
+        "x": -360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Toolbar Entry\n+\n+- Add a layout icon/button to the toolbar that toggles the ELK panel.\n+- Emit intents (`layoutPanel/open`/`layoutPanel/close`) so the interpreter knows a layout session started."
+      }
+    },
+    {
+      "id": "elk-plan-panel",
+      "type": "markdown",
+      "label": "\ud83d\udd27 Layout Panel",
+      "position": {
+        "x": 360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Layout Panel\n+\n+- Keep this drawer as the single point for routing defaults, default-layout selection, ELK knobs, rendering toggles, and live/manual reroute control so every setting flows through the intent pipeline.\n+- Surface contract versions/handle counts here and document them in the workflow graph so future work knows where to look."
+      }
+    },
+    {
+      "id": "elk-plan-interpreter",
+      "type": "markdown",
+      "label": "\ud83e\udde0 Interpreter Hooks",
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Interpreter Hooks\n+\n+- Have the panel emit layout setting intents via `useIntentEmitter` so `useInterpreterLayer` validates/records them.\n+- The validator continues to run `validateGraphInvariants`, but now it also sees layout metadata cached in the document settings."
+      }
+    },
+    {
+      "id": "elk-plan-checkin",
+      "type": "markdown",
+      "label": "\u2705 Check-in",
+      "position": {
+        "x": 0,
+        "y": 400
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Check-in\n+\n+- Document the layout panel behavior in the workflow graph so future work inherits the intent path.\n+- Verify contract summaries + ELK settings appear in Document Properties and telemetry."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "elk-plan-edge-toolbar",
+      "type": "dataFlow",
+      "source": "elk-plan-root",
+      "target": "elk-plan-toolbar",
+      "label": "starts with",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "elk-plan-edge-panel",
+      "type": "dataFlow",
+      "source": "elk-plan-toolbar",
+      "target": "elk-plan-panel",
+      "label": "opens",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "elk-plan-edge-interpreter",
+      "type": "dataFlow",
+      "source": "elk-plan-panel",
+      "target": "elk-plan-interpreter",
+      "label": "feeds",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "elk-plan-edge-checkin",
+      "type": "dataFlow",
+      "source": "elk-plan-interpreter",
+      "target": "elk-plan-checkin",
+      "label": "reports",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

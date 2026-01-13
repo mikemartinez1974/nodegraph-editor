@@ -863,10 +863,9 @@ const rerouteEdges = useCallback(async () => {
     if (nodes.length === 0) return;
 
     const algorithmMap = {
-      hierarchical: ['layered', 'org.eclipse.elk.layered'],
-      serpentine: ['serpentine', 'org.eclipse.elk.serpentine'],
-      radial: ['radial', 'org.eclipse.elk.radial'],
-      grid: ['rectpacking', 'org.eclipse.elk.rectpacking', 'box', 'org.eclipse.elk.box']
+      layered: ['layered', 'org.eclipse.elk.layered'],
+      rectpacking: ['rectpacking', 'org.eclipse.elk.rectpacking', 'box', 'org.eclipse.elk.box'],
+      radial: ['radial', 'org.eclipse.elk.radial']
     };
 
     const algorithms = algorithmMap[layoutType] || ['layered'];

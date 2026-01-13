@@ -1,0 +1,153 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Properties Panel Orientation",
+    "description": "Orientation graph for turning the properties drawer into a user-focused experience.",
+    "created": "2026-01-14T00:00:00.000Z",
+    "modified": "2026-01-14T00:00:00.000Z",
+    "author": "",
+    "tags": [
+      "properties",
+      "presentation",
+      "orientation"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#0d47a1",
+        "light": "#5472d3",
+        "dark": "#002171",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ff6f00",
+        "light": "#ffa040",
+        "dark": "#c43e00",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#e3f2fd",
+        "paper": "#ffffff"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "nodes": [
+    {
+      "id": "properties-root",
+      "type": "markdown",
+      "label": "🧩 Properties Panel Orientation",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 540,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Properties Panel Orientation\n+\n+Turn the drawer into a **user-facing control surface** that shows payload data, lists connected edges, and formats structured values instead of dumping developer diagnostics."
+      }
+    },
+    {
+      "id": "properties-payload",
+      "type": "markdown",
+      "label": "📦 Surface Payload Data",
+      "position": {
+        "x": -360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Surface Payload\n+\n+- Render `node.data` / `edge.data` in a human-friendly layout (title, description, JSON preview).\n+- Include copy/export controls so the user can grab graph data without entering developer mode."
+      }
+    },
+    {
+      "id": "properties-edges",
+      "type": "markdown",
+      "label": "🔗 Show Connected Edges",
+      "position": {
+        "x": 360,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Connected Edges\n+\n+- List every edge touching the selection (handles, types, routing hints).\n+- Provide quick navigation or formatting actions for the connected nodes/edges."
+      }
+    },
+    {
+      "id": "properties-format",
+      "type": "markdown",
+      "label": "🪄 Formatting & Templates",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Formatting\n+\n+- Offer presets to map `node.style` payloads to rich presentation looks (gradients, borders, callouts).\n+- Let users pin favorites or copy sanitized JSON via formatting helpers.\n+- Keep formatting metadata separate from core state; persist only the chosen preset name or simple flags."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "properties-edge-root-payload",
+      "type": "dataFlow",
+      "source": "properties-root",
+      "target": "properties-payload",
+      "label": "drives",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "properties-edge-root-edges",
+      "type": "dataFlow",
+      "source": "properties-root",
+      "target": "properties-edges",
+      "label": "documents",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "properties-edge-root-format",
+      "type": "dataFlow",
+      "source": "properties-root",
+      "target": "properties-format",
+      "label": "formats",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    }
+  ]
+}

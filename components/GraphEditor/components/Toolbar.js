@@ -11,8 +11,6 @@ import {
   Divider,
   ToggleButton,
   ToggleButtonGroup,
-  Menu,
-  MenuItem,
   Snackbar,
   Alert,
   ListItemIcon,
@@ -30,7 +28,6 @@ import {
   TouchApp as ManualIcon,
   Navigation as NavIcon,
   GridOn as AutoIcon,
-  ExpandMore as ExpandMoreIcon,
   ContentPasteGo as ContentPasteGoIcon,
   ThumbDownOffAlt as ThumbDownOffAltIcon,
   FolderSpecial as GroupIcon,
@@ -53,8 +50,7 @@ import {
   VerticalAlignCenter as VerticalAlignCenterIcon,
   VerticalAlignBottom as VerticalAlignBottomIcon,
   SwapHoriz as SwapHorizIcon,
-  SwapVert as SwapVertIcon,
-  AltRoute as AltRouteIcon
+  SwapVert as SwapVertIcon
 } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -77,7 +73,6 @@ import HistoryActions from './Toolbar/HistoryActions';
 import NodeActions from './Toolbar/NodeActions';
 import ViewActions from './Toolbar/ViewActions';
 import PanelActions from './Toolbar/PanelActions';
-import { EDGE_ROUTING_OPTIONS } from '../layoutSettings';
 
 const Toolbar = ({ 
   nodes = [], 
@@ -98,13 +93,13 @@ const Toolbar = ({
   onToggleGroupList,
   showGroupList = true,
   onToggleNodePalette,
-  onToggleProperties = () => eventBus.emit('togglePropertiesPanel'),
+  onToggleLayoutPanel = () => {},
+  onTogglePropertiesPanel = () => {},
+  showPropertiesPanel = false,
+  showEdgePanel = false,
   onToggleScriptPanel = () => eventBus.emit('toggleScriptPanel'),
   mode,
-  autoLayoutType,
   onModeChange,
-  onAutoLayoutChange,
-  onApplyLayout,
   onAlignSelection = () => false,
   onDistributeSelection = () => false,
   onShowMessage,
@@ -130,9 +125,6 @@ const Toolbar = ({
   snapToGrid = false,  // NEW: Add prop
   onToggleSnapToGrid,  // NEW: Add prop
   gridSize = 20,  // Grid size from document settings
-  edgeRouting = 'auto', // Edge routing mode from document settings
-  onEdgeRoutingChange = () => {},
-  onRerouteEdges = () => {},
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null,  // GitHub sync target settings
   onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties')
@@ -144,9 +136,7 @@ const Toolbar = ({
   const [pasted, setPasted] = useState(false);
   const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
-  const [layoutMenuAnchor, setLayoutMenuAnchor] = useState(null);
   const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
-  const [edgeRoutingMenuAnchor, setEdgeRoutingMenuAnchor] = useState(null);
   const [pluginManagerOpen, setPluginManagerOpen] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -171,15 +161,6 @@ const Toolbar = ({
   const selectionCount = Array.isArray(selectedNodeIds) ? selectedNodeIds.length : 0;
   const canAlign = selectionCount > 1;
   const canDistribute = selectionCount > 2;
-
-  const autoLayoutLabelByType = {
-    hierarchical: 'Hierarchical',
-    serpentine: 'Serpentine',
-    radial: 'Radial',
-    grid: 'Grid'
-  };
-  const autoLayoutLabel = autoLayoutLabelByType[autoLayoutType] || autoLayoutType;
-  const edgeRoutingLabel = EDGE_ROUTING_OPTIONS.find((option) => option.value === edgeRouting)?.label || edgeRouting;
 
   // Retractable drawer state
   const [isExpanded, setIsExpanded] = useState(true);
@@ -862,13 +843,16 @@ const Toolbar = ({
 
         {/* Panel Actions Section */}
         <ButtonGroup variant="contained" size="small">
-          <PanelActions
+          <PanelActions 
             onToggleNodeList={onToggleNodeList}
             onToggleGroupList={onToggleGroupList}
             onToggleScriptPanel={onToggleScriptPanel}
-            onToggleProperties={onToggleProperties}
+            onToggleLayoutPanel={onToggleLayoutPanel}
+            onTogglePropertiesPanel={onTogglePropertiesPanel}
             showNodeList={showNodeList}
             showGroupList={showGroupList}
+            showPropertiesPanel={showPropertiesPanel}
+            showEdgePanel={showEdgePanel}
             isMobile={false}
             isFreeUser={isFreeUser}
           />
@@ -908,67 +892,28 @@ const Toolbar = ({
         </ButtonGroup>
 
         {/* Mode Toggle */}
-        <ToggleButtonGroup
-          value={mode}
-          exclusive
-          onChange={(event, newMode) => {
-            if (newMode !== null) {
-              onModeChange(newMode);
-            }
-          }}
-          size="small"
-          sx={{ ml: 1 }}
-          disabled={isFreeUser}
-        >
-          <ToggleButton value="manual" title="Manual Mode">
-            <ManualIcon fontSize="small" />
-          </ToggleButton>
-          <ToggleButton value="nav" title="Navigation Mode">
-            <NavIcon fontSize="small" />
-          </ToggleButton>
-          <ToggleButton value="auto" title="Auto Layout Mode">
-            <AutoIcon fontSize="small" />
-          </ToggleButton>
-        </ToggleButtonGroup>
-
-        <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-          <Button
-            onClick={(event) => setLayoutMenuAnchor(event.currentTarget)}
-            endIcon={<ExpandMoreIcon fontSize="small" />}
+          <ToggleButtonGroup
+            value={mode}
+            exclusive
+            onChange={(event, newMode) => {
+              if (newMode !== null) {
+                onModeChange(newMode);
+              }
+            }}
             size="small"
-            variant="outlined"
+            sx={{ ml: 1 }}
             disabled={isFreeUser}
           >
-            Layout: {autoLayoutLabel}
-          </Button>
-          <Button
-            onClick={onApplyLayout}
-            size="small"
-            variant="contained"
-            startIcon={<AutoIcon fontSize="small" />}
-            disabled={isFreeUser}
-          >
-            Apply Layout
-          </Button>
-          <Button
-            onClick={(event) => setEdgeRoutingMenuAnchor(event.currentTarget)}
-            endIcon={<ExpandMoreIcon fontSize="small" />}
-            size="small"
-            variant="outlined"
-            disabled={isFreeUser}
-          >
-            Routing: {edgeRoutingLabel}
-          </Button>
-          <Button
-            onClick={onRerouteEdges}
-            size="small"
-            variant="contained"
-            startIcon={<AltRouteIcon fontSize="small" />}
-            disabled={isFreeUser}
-          >
-            Reroute Edges
-          </Button>
-        </Box>
+            <ToggleButton value="manual" title="Manual Mode">
+              <ManualIcon fontSize="small" />
+            </ToggleButton>
+            <ToggleButton value="nav" title="Navigation Mode">
+              <NavIcon fontSize="small" />
+            </ToggleButton>
+            <ToggleButton value="auto" title="Auto Layout Mode">
+              <AutoIcon fontSize="small" />
+            </ToggleButton>
+          </ToggleButtonGroup>
 
         {/* Viewport Indicator */}
         <Box
@@ -1000,44 +945,6 @@ const Toolbar = ({
       </Box>
 
       {/* Menus and Dialogs */}
-      <Menu
-        anchorEl={layoutMenuAnchor}
-        open={Boolean(layoutMenuAnchor)}
-        onClose={() => setLayoutMenuAnchor(null)}
-      >
-        <MenuItem onClick={() => { onAutoLayoutChange('hierarchical'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'hierarchical'}>
-          Hierarchical
-        </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('serpentine'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'serpentine'}>
-          Serpentine
-        </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('radial'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'radial'}>
-          Radial
-        </MenuItem>
-        <MenuItem onClick={() => { onAutoLayoutChange('grid'); setLayoutMenuAnchor(null); }} selected={autoLayoutType === 'grid'}>
-          Grid
-        </MenuItem>
-      </Menu>
-
-      <Menu
-        anchorEl={edgeRoutingMenuAnchor}
-        open={Boolean(edgeRoutingMenuAnchor)}
-        onClose={() => setEdgeRoutingMenuAnchor(null)}
-      >
-        {EDGE_ROUTING_OPTIONS.map((option) => (
-          <MenuItem
-            key={option.value}
-            selected={edgeRouting === option.value}
-            onClick={() => {
-              onEdgeRoutingChange(option.value);
-              setEdgeRoutingMenuAnchor(null);
-            }}
-          >
-            {option.label}
-          </MenuItem>
-        ))}
-      </Menu>
-
       <input
         ref={fileInputRef}
         type="file"

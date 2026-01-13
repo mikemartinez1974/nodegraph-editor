@@ -4,12 +4,16 @@ import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import ListIcon from '@mui/icons-material/List';
 import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 export default function PanelActions({ 
   onToggleNodeList,
   onToggleGroupList,
   onToggleScriptPanel,
-  onToggleProperties,
+  onToggleLayoutPanel,
+  onTogglePropertiesPanel,
+  showPropertiesPanel,
+  showEdgePanel,
   showNodeList,
   showGroupList,
   isMobile,
@@ -17,16 +21,6 @@ export default function PanelActions({
 }) {
   return (
     <>
-      <Tooltip title="Toggle Properties Panel">
-        <IconButton 
-          onClick={onToggleProperties} 
-          color="primary"
-          size="small"
-        >
-          <PlumbingIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-
       <Tooltip title="Toggle Node List">
         <span>
           <IconButton 
@@ -60,6 +54,24 @@ export default function PanelActions({
           size="small"
         >
           <DeveloperModeIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Properties panel">
+        <IconButton
+          onClick={onTogglePropertiesPanel}
+          color={showPropertiesPanel ? "primary" : "default"}
+          size="small"
+        >
+          <PlumbingIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Layout panel">
+        <IconButton
+          onClick={onToggleLayoutPanel}
+          color={showEdgePanel ? "primary" : "inherit"}
+          size="small"
+        >
+          <AltRouteIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </>

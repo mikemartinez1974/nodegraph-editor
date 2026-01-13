@@ -1,0 +1,171 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Layered Folder Plan",
+    "description": "Plan for reorganizing graph editor code into layer-specific folders.",
+    "created": "2026-01-12T16:00:00.000Z",
+    "modified": "2026-01-12T16:00:00.000Z",
+    "author": "",
+    "tags": [
+      "layered-refactor",
+      "architecture",
+      "foldering"
+    ]
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#66bb6a",
+        "dark": "#1b5e20",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#ff8f00",
+        "light": "#ffc046",
+        "dark": "#c56000",
+        "contrastText": "#000"
+      },
+      "background": {
+        "default": "#fafafa",
+        "paper": "#ffffff"
+      },
+      "divider": "rgba(0,0,0,0.12)"
+    },
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "folder-plan-root",
+      "type": "markdown",
+      "label": "🗂️ Layered Folder Plan",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Folder Plan\n+\n+Split the graph editor repository into layer-specific folders so the architecture matches the layered refactor."
+      }
+    },
+    {
+      "id": "folder-layer-core",
+      "type": "markdown",
+      "label": "🧱 Core Layer Folder",
+      "position": {
+        "x": -380,
+        "y": -20
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Layer\n+\n+- `components/GraphEditor/layers/core/`\n+- House `GraphEditor.js`, context providers, state/hook wiring, history, renderer bootstrap.\n+- Export entry points so presentation/renderer layers import from the core boundary."
+      }
+    },
+    {
+      "id": "folder-layer-presentation",
+      "type": "markdown",
+      "label": "🎨 Presentation Layer Folder",
+      "position": {
+        "x": 0,
+        "y": -20
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Presentation Layer\n+\n+- `components/GraphEditor/layers/presentation/`\n+- Move `GraphEditorContent`, toolbar components, panels, mobile FAB, Document Properties, template gallery helpers.\n+- Provide intent hooks so interpreter layer can subscribe."
+      }
+    },
+    {
+      "id": "folder-layer-interpreter",
+      "type": "markdown",
+      "label": "🧠 Interpreter Layer Folder",
+      "position": {
+        "x": 380,
+        "y": -20
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Interpreter Layer\n+\n+- `components/GraphEditor/layers/interpreter/`\n+- Keep `useIntentEmitter`, `useInterpreterLayer`, validators, contract manager, telemetry helpers.\n+- Export APIs for other layers to consume intent/context data."
+      }
+    },
+    {
+      "id": "folder-layer-elk",
+      "type": "markdown",
+      "label": "🔧 ELK/Renderer Layer",
+      "position": {
+        "x": 0,
+        "y": 220
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## ELK/Renderer Layer\n+\n+- `components/GraphEditor/layers/elk/`\n+- Isolate `GraphRendererAdapter`, renderer props, and future ELK UI toggles.\n+- Makes it easier to swap in YWorks or other renderers later."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "folder-edge-core-presentation",
+      "type": "dataFlow",
+      "source": "folder-plan-root",
+      "target": "folder-layer-core",
+      "label": "starts with",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "folder-edge-presentation-interpreter",
+      "type": "dataFlow",
+      "source": "folder-layer-core",
+      "target": "folder-layer-presentation",
+      "label": "feeds",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "folder-edge-interpreter-elk",
+      "type": "dataFlow",
+      "source": "folder-layer-interpreter",
+      "target": "folder-layer-elk",
+      "label": "aligns",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

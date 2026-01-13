@@ -27,6 +27,8 @@ import {
   useGraphEditorRpcContext
 } from './providers/GraphEditorContext';
 import useIntentEmitter from './hooks/useIntentEmitter';
+import EdgeLayoutPanel from './components/EdgeLayoutPanel';
+import { summarizeContracts } from './contracts/contractManager';
 
 const GraphEditorContent = () => {
   const theme = useTheme();
@@ -79,6 +81,8 @@ const GraphEditorContent = () => {
     lockedEdges,
     setLockedEdges,
     showAllEdgeLabels,
+    showEdgePanel,
+    setShowEdgePanel,
     showPropertiesPanel,
     setShowPropertiesPanel,
     graphRenderKey,
@@ -182,6 +186,11 @@ const GraphEditorContent = () => {
     }
     return null;
   }, [documentTheme]);
+
+  const contractSummary = useMemo(
+    () => summarizeContracts({ nodes, edges, documentSettings }),
+    [nodes, edges, documentSettings]
+  );
 
   const handleToggleMinimap = useCallback(() => {
     emitEdgeIntent('toggleMinimap', { enabled: !showMinimap });
@@ -393,6 +402,19 @@ const GraphEditorContent = () => {
     toggleNodePalette?.();
   }, [emitEdgeIntent, toggleNodePalette, showNodePalette]);
 
+  const handleToggleEdgePanelIntent = useCallback(() => {
+    emitEdgeIntent('toggleEdgePanel', { open: !showEdgePanel });
+    if (typeof setShowEdgePanel === 'function') {
+      setShowEdgePanel(prev => !prev);
+    }
+  }, [emitEdgeIntent, showEdgePanel, setShowEdgePanel]);
+
+  const handleCloseEdgePanel = useCallback(() => {
+    if (typeof setShowEdgePanel === 'function') {
+      setShowEdgePanel(false);
+    }
+  }, [setShowEdgePanel]);
+
   const handleOpenDocumentPropertiesIntent = useCallback(() => {
     emitEdgeIntent('openDocumentProperties');
     handleOpenDocumentProperties?.();
@@ -535,6 +557,10 @@ const GraphEditorContent = () => {
           isSmallScreen={isSmallScreen}
           isPortrait={isPortrait}
           isLandscape={isLandscape}
+          onToggleLayoutPanel={handleToggleEdgePanelIntent}
+          onTogglePropertiesPanel={handleTogglePropertiesPanelIntent}
+          showEdgePanel={showEdgePanel}
+          showPropertiesPanel={showPropertiesPanel}
         />
       )}
 
@@ -547,8 +573,8 @@ const GraphEditorContent = () => {
         onSearchChange={setMobileAddNodeSearch}
       />
 
-      {showPropertiesPanel && (
       <PropertiesPanel
+        open={showPropertiesPanel}
         selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
         selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
         selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
@@ -646,9 +672,8 @@ const GraphEditorContent = () => {
           anchor={nodePanelAnchor}
           onAnchorChange={handlePropertiesPanelAnchorChange}
           isMobile={isMobile}
-          memoAutoExpandToken={memoAutoExpandToken}
-        />
-      )}
+        memoAutoExpandToken={memoAutoExpandToken}
+      />
 
       <NodePalettePanel
         open={showNodePalette}
@@ -714,6 +739,13 @@ const GraphEditorContent = () => {
         graphStats={graphStats}
         recentSnapshots={recentSnapshots}
         storySnapshots={storySnapshots}
+      />
+      <EdgeLayoutPanel
+        open={showEdgePanel}
+        onClose={handleCloseEdgePanel}
+        documentSettings={documentSettings}
+        setDocumentSettings={setDocumentSettings}
+        contractSummary={contractSummary}
       />
 
       <Snackbar
