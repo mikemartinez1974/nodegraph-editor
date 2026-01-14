@@ -2,7 +2,7 @@
   "fileVersion": "1.0",
   "metadata": {
     "title": "Properties Panel Implementation Plan",
-    "description": "Tasks to build the user-focused properties panel described in the orientation graph.",
+    "description": "Break the panel into unified shell + node/edge/group views that respond to selection state.",
     "created": "2026-01-14T01:00:00.000Z",
     "modified": "2026-01-14T01:00:00.000Z",
     "author": "",
@@ -52,75 +52,135 @@
       "label": "📌 Properties Panel Plan",
       "position": {
         "x": 0,
-        "y": -220
+        "y": -240
       },
       "width": 520,
+      "height": 200,
+      "data": {
+        "markdown": "# Unified Properties Panel\n+\n+Ship a single drawer that switches layouts for the current selection type while keeping payload, formatting, and metadata helpers intact."
+      }
+    },
+    {
+      "id": "plan-shell",
+      "type": "markdown",
+      "label": "🪟 Panel Shell",
+      "position": {
+        "x": 0,
+        "y": -40
+      },
+      "width": 480,
       "height": 220,
       "data": {
-        "markdown": "# Properties Panel Implementation Plan\n+\n+Break down the orientation’s vision into concrete UI steps, intent wiring, and formatting helpers so the drawer becomes a polished feature."
+        "markdown": "## Panel Shell\n+\n+- Wire `PropertiesPanel` to show the drawer whenever `showPropertiesPanel` is true.\n+- Keep layout state so the drawer can live left/right and the Entities panel stays opposite.\n+- Render one of three views (Node / Edge / Group) based on `selectedNodeIds`/`selectedEdgeIds`/`selectedGroupIds`.\n+- Provide a compact header that shows the item label, ID, and type badge."
+      }
+    },
+    {
+      "id": "plan-node-view",
+      "type": "markdown",
+      "label": "🟢 Node View",
+      "position": {
+        "x": -400,
+        "y": 160
+      },
+      "width": 360,
+      "height": 280,
+      "data": {
+        "markdown": "## Node View\n+\n+- Group fields into collapsible sections (Data, Connected Edges, Formatting, Style).\n+- Populate styles from `node.style` and keep simple controls for background/text/border/shadow.\n+- Show connected edges list—clicking one selects it and opens the Edge view.\n+- Provide a JSON toggle/export button so the human can copy payloads."
+      }
+    },
+    {
+      "id": "plan-edge-view",
+      "type": "markdown",
+      "label": "🟡 Edge View",
+      "position": {
+        "x": 0,
+        "y": 160
+      },
+      "width": 360,
+      "height": 280,
+      "data": {
+        "markdown": "## Edge View\n+\n+- Surface source/target nodes, handle IDs, and routing hints from `edge.style`/`edge.handleMeta`.\n+- Include quick actions (focus edge, reroute with the layout panel, copy path data).\n+- Expose toggleable fields for labels, strength, and color; sync them with the formatting helpers."
+      }
+    },
+    {
+      "id": "plan-group-view",
+      "type": "markdown",
+      "label": "🟣 Group View",
+      "position": {
+        "x": 400,
+        "y": 160
+      },
+      "width": 360,
+      "height": 240,
+      "data": {
+        "markdown": "## Group View\n+\n+- List members with quick navigation to each node.\n+- Show metadata (collapsed state, lock state, member count).\n+- Offer lock/unlock toggles and a dark/light shading preview.\n+- Clicking a listed node switches the panel back to the Node view."
       }
     },
     {
       "id": "plan-payload",
       "type": "markdown",
-      "label": "📦 Payload Viewer",
+      "label": "📦 Payload Tools",
       "position": {
         "x": -360,
-        "y": -20
+        "y": 420
       },
-      "width": 360,
-      "height": 260,
+      "width": 320,
+      "height": 240,
       "data": {
-        "markdown": "## Payload Viewer\n+\n+- Build a selection-aware panel that renders node/edge data in grouped fields (title, description, metadata).\n+- Provide a copy/export button and toggle between friendly view + raw JSON.\n+- Keep this read-only and driven by `selectedNodeIds`/`selectedEdgeIds`."
+        "markdown": "## Payload Tools\n+\n+- Show a readonly summary of the selected item’s data (title, description, metadata).\n+- Include Copy JSON / Open Raw buttons so humans and agents can sync.\n+- Keep this tethered to the current selection view for context-aware export." 
       }
     },
     {
-      "id": "plan-edges",
+      "id": "plan-formatting",
       "type": "markdown",
-      "label": "🔗 Edge Explorer",
-      "position": {
-        "x": 360,
-        "y": -20
-      },
-      "width": 360,
-      "height": 260,
-      "data": {
-        "markdown": "## Edge Explorer\n+\n+- List every connected edge with labels, handle names, and type badges.\n+- Include quick actions (focus edge, toggle handles, reroute or copy style).\n+- Surface routing hints from `edge.style`/`handleMeta` without mutating state."
-      }
-    },
-    {
-      "id": "plan-format",
-      "type": "markdown",
-      "label": "🪄 Formatting Hub",
+      "label": "🎨 Formatting Hub",
       "position": {
         "x": 0,
-        "y": 220
+        "y": 420
       },
-      "width": 420,
-      "height": 260,
+      "width": 360,
+      "height": 220,
       "data": {
-        "markdown": "## Formatting Hub\n+\n+- Offer presets that map to `node.style` (gradients, borders, shadows, typography).\n+- Provide controls for custom values + favorites + copying sanitized JSON.\n+- Persist only preset/favor flags so the core state remains untouched."
+        "markdown": "## Formatting Hub\n+\n+- Provide presets that update `node.style`/`edge.style` without overwriting the user’s custom values.\n+- Offer UI knobs for gradients, borders, shadows, and text to keep the panel expressive.\n+- Persist only style presets (no sketching of entire graphs) and let the user copy the resulting JSON snippet." 
       }
     }
   ],
   "edges": [
     {
-      "id": "plan-edge-root-payload",
+      "id": "edge-root-shell",
+      "type": "dataFlow",
+      "source": "plan-root",
+      "target": "plan-shell"
+    },
+    {
+      "id": "edge-shell-node",
+      "type": "dataFlow",
+      "source": "plan-shell",
+      "target": "plan-node-view"
+    },
+    {
+      "id": "edge-shell-edge",
+      "type": "dataFlow",
+      "source": "plan-shell",
+      "target": "plan-edge-view"
+    },
+    {
+      "id": "edge-shell-group",
+      "type": "dataFlow",
+      "source": "plan-shell",
+      "target": "plan-group-view"
+    },
+    {
+      "id": "edge-root-payload",
       "type": "dataFlow",
       "source": "plan-root",
       "target": "plan-payload"
     },
     {
-      "id": "plan-edge-root-edges",
+      "id": "edge-root-format",
       "type": "dataFlow",
       "source": "plan-root",
-      "target": "plan-edges"
-    },
-    {
-      "id": "plan-edge-root-format",
-      "type": "dataFlow",
-      "source": "plan-root",
-      "target": "plan-format"
+      "target": "plan-formatting"
     }
   ]
 }

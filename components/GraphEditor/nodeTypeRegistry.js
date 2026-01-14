@@ -162,13 +162,112 @@ export const nodeTypeMetadata = [
     defaultHeight: 120
   },
   {
-    type: '3d',
-    label: '3D View',
-    description: 'Interactive 3D scene with Three.js',
-    icon: 'ViewInAr',
+    type: 'fixed',
+    label: 'Fixed Node',
+    description: 'Node with fixed position',
+    icon: 'PushPin',
+    category: 'basic',
+    defaultWidth: 200,
+    defaultHeight: 120
+  },
+  {
+    type: 'markdown',
+    label: 'Markdown Node',
+    description: 'Node with markdown rendering',
+    icon: 'Article',
+    category: 'content',
+    defaultWidth: 260,
+    defaultHeight: 220
+  },
+  {
+    type: 'svg',
+    label: 'SVG Node',
+    description: 'Node for SVG graphics',
+    icon: 'Image',
     category: 'media',
-    defaultWidth: 300,
-    defaultHeight: 300
+    defaultWidth: 240,
+    defaultHeight: 200
+  },
+  {
+    type: 'div',
+    label: 'Div Node',
+    description: 'Custom HTML div container',
+    icon: 'Code',
+    category: 'advanced',
+    defaultWidth: 220,
+    defaultHeight: 160
+  },
+  {
+    type: 'timer',
+    label: 'Timer Node',
+    description: 'Node that functions as a countdown or stopwatch timer',
+    icon: 'Timer',
+    category: 'utility',
+    defaultWidth: 220,
+    defaultHeight: 180
+  },
+  {
+    type: 'toggle',
+    label: 'Toggle Node',
+    description: 'Node that toggles between two states',
+    icon: 'ToggleOn',
+    category: 'utility',
+    defaultWidth: 220,
+    defaultHeight: 160
+  },
+  {
+    type: 'counter',
+    label: 'Counter Node',
+    description: 'Node that counts up or down',
+    icon: 'AddCircleOutline',
+    category: 'utility',
+    defaultWidth: 220,
+    defaultHeight: 160
+  },
+  {
+    type: 'gate',
+    label: 'Gate',
+    description: 'Logical gate node (AND/OR/NOT/XOR/NAND/NOR)',
+    icon: 'CallSplit',
+    category: 'logic',
+    defaultWidth: 240,
+    defaultHeight: 180
+  },
+  {
+    type: 'delay',
+    label: 'Delay Node',
+    description: 'Schedules a delayed trigger; supports queueing and cancel',
+    icon: 'Timer',
+    category: 'utility',
+    defaultWidth: 240,
+    defaultHeight: 180
+  },
+  {
+    type: 'api',
+    label: 'API Node',
+    description: 'Fetch data from a URL on trigger; supports method, headers, body, cancel',
+    icon: 'CloudDownload',
+    category: 'integration',
+    defaultWidth: 260,
+    defaultHeight: 220
+  },
+  {
+    type: 'script',
+    label: 'Script Node',
+    description: 'Runs a saved session script on trigger; emits result',
+    icon: 'Code',
+    category: 'logic',
+    defaultWidth: 260,
+    defaultHeight: 220
+  },
+  {
+    type: 'backgroundRpc',
+    label: 'Background RPC',
+    description: 'Invoke methods provided by BackgroundFrame RPC',
+    icon: 'Lan',
+    category: 'integration',
+    defaultWidth: 260,
+    defaultHeight: 220
   },
   {
     type: 'canvas',
@@ -189,13 +288,13 @@ export const nodeTypeMetadata = [
     }
   },
   {
-    type: 'backgroundRpc',
-    label: 'Background RPC',
-    description: 'Invoke methods provided by BackgroundFrame RPC',
-    icon: 'Lan',
-    category: 'integration',
-    defaultWidth: 260,
-    defaultHeight: 220
+    type: '3d',
+    label: '3D View',
+    description: 'Interactive 3D scene with Three.js',
+    icon: 'ViewInAr',
+    category: 'media',
+    defaultWidth: 300,
+    defaultHeight: 300
   },
   {
     type: 'valueTrigger',

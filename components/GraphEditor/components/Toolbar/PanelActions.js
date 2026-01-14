@@ -4,11 +4,13 @@ import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import ListIcon from '@mui/icons-material/List';
 import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
+import LinkIcon from '@mui/icons-material/Link';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 export default function PanelActions({ 
   onToggleNodeList,
   onToggleGroupList,
+  onToggleEdgeList,
   onToggleScriptPanel,
   onToggleLayoutPanel,
   onTogglePropertiesPanel,
@@ -16,6 +18,7 @@ export default function PanelActions({
   showEdgePanel,
   showNodeList,
   showGroupList,
+  showEdgeList,
   isMobile,
   isFreeUser
 }) {
@@ -43,6 +46,19 @@ export default function PanelActions({
             disabled={isFreeUser}
           >
             <FolderSpecialIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Tooltip title="Toggle Edge List">
+        <span>
+          <IconButton
+            onClick={onToggleEdgeList}
+            color={showEdgeList ? "primary" : "default"}
+            size="small"
+            disabled={isFreeUser}
+          >
+            <LinkIcon fontSize="small" />
           </IconButton>
         </span>
       </Tooltip>

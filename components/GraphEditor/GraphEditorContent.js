@@ -8,15 +8,14 @@ import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
 import MobileAddNodeSheet from './components/MobileAddNodeSheet';
 import PropertiesPanel from './components/PropertiesPanel';
-import NodeListPanel from './components/NodeListPanel';
 import NodePalettePanel from './components/NodePalettePanel';
-import GroupListPanel from './components/GroupListPanel';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import NewTabPage from './components/NewTabPage';
 import ScriptRunner from './Scripting/ScriptRunner';
 import ScriptPanel from './Scripting/ScriptPanel';
 import BackgroundFrame from './components/BackgroundFrame';
 import EdgeTypes from './edgeTypes';
+import EntitiesPanel from './components/EntitiesPanel';
 import eventBus from '../NodeGraph/eventBus';
 import { createThemeFromConfig } from './utils/themeUtils';
 import {
@@ -106,6 +105,11 @@ const GraphEditorContent = () => {
     setShowNodeList,
     showGroupList,
     setShowGroupList,
+    showEdgeList,
+    setShowEdgeList,
+    showEntitiesPanel,
+    setShowEntitiesPanel,
+    entityView,
     handleOpenDocumentProperties,
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
@@ -113,6 +117,7 @@ const GraphEditorContent = () => {
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
+    toggleEdgeList,
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,
@@ -127,6 +132,9 @@ const GraphEditorContent = () => {
     backgroundImage,
     isFreeUser
   } = layout || {};
+
+  const panelAnchor = nodePanelAnchor || "left";
+  const oppositeAnchor = panelAnchor === "left" ? "right" : "left";
 
   const {
     handlers,
@@ -191,6 +199,18 @@ const GraphEditorContent = () => {
     () => summarizeContracts({ nodes, edges, documentSettings }),
     [nodes, edges, documentSettings]
   );
+  const nodeTypeOptions = useMemo(() => {
+    if (Array.isArray(nodeTypeMetadata) && nodeTypeMetadata.length) {
+      return nodeTypeMetadata.map((meta) => ({
+        value: meta.type,
+        label: meta.label || meta.type
+      }));
+    }
+    if (nodeTypes && typeof nodeTypes === "object") {
+      return Object.keys(nodeTypes).map((type) => ({ value: type, label: type }));
+    }
+    return [];
+  }, [nodeTypeMetadata, nodeTypes]);
 
   const handleToggleMinimap = useCallback(() => {
     emitEdgeIntent('toggleMinimap', { enabled: !showMinimap });
@@ -221,6 +241,7 @@ const GraphEditorContent = () => {
       onEdgeHover={undefined}
       hoveredEdgeId={hoveredEdgeId}
       showAllEdgeLabels={showAllEdgeLabels}
+      onBackgroundClick={handleCanvasBackgroundClick}
     />
   );
 
@@ -397,10 +418,37 @@ const GraphEditorContent = () => {
     toggleGroupList?.();
   }, [emitEdgeIntent, toggleGroupList, showGroupList]);
 
+  const handleToggleEdgeListIntent = useCallback(() => {
+    emitEdgeIntent('toggleEdgeList', { open: !showEdgeList });
+    toggleEdgeList?.();
+  }, [emitEdgeIntent, toggleEdgeList, showEdgeList]);
+
+  const handleSelectEdgeFromList = useCallback((edgeId) => {
+    if (!edgeId) return;
+    emitEdgeIntent('edgeListSelect', { edgeId });
+    if (typeof setSelectedNodeIds === 'function') {
+      setSelectedNodeIds([]);
+    }
+    if (typeof setSelectedEdgeIds === 'function') {
+      setSelectedEdgeIds([edgeId]);
+    }
+    if (typeof setShowPropertiesPanel === 'function') {
+      setShowPropertiesPanel(true);
+    }
+  }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel]);
+
+  const handleCloseEntitiesPanel = useCallback(() => {
+    if (typeof setShowEntitiesPanel === 'function') {
+      setShowEntitiesPanel(false);
+    }
+  }, [setShowEntitiesPanel]);
+
   const handleToggleNodePaletteIntent = useCallback(() => {
     emitEdgeIntent('toggleNodePalette', { open: !showNodePalette });
     toggleNodePalette?.();
   }, [emitEdgeIntent, toggleNodePalette, showNodePalette]);
+
+const skipPropertiesCloseRef = useRef(false);
 
   const handleToggleEdgePanelIntent = useCallback(() => {
     emitEdgeIntent('toggleEdgePanel', { open: !showEdgePanel });
@@ -408,6 +456,30 @@ const GraphEditorContent = () => {
       setShowEdgePanel(prev => !prev);
     }
   }, [emitEdgeIntent, showEdgePanel, setShowEdgePanel]);
+
+  const handleSelectEdgeFromProperties = useCallback((edgeId) => {
+    if (!edgeId) return;
+    emitEdgeIntent('selectEdgeFromProperties', { edgeId });
+    skipPropertiesCloseRef.current = true;
+    if (typeof setSelectedEdgeIds === 'function') {
+      setSelectedEdgeIds([edgeId]);
+    }
+    if (typeof setSelectedNodeIds === 'function') {
+      setSelectedNodeIds([]);
+    }
+    if (typeof setShowPropertiesPanel === 'function') {
+      setShowPropertiesPanel(true);
+    }
+  }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel]);
+
+  const handleCanvasBackgroundClick = useCallback(() => {
+    if (typeof setShowPropertiesPanel === 'function' && showPropertiesPanel) {
+      setShowPropertiesPanel(false);
+    }
+    if (showEntitiesPanel) {
+      handleCloseEntitiesPanel();
+    }
+  }, [setShowPropertiesPanel, showPropertiesPanel, showEntitiesPanel, handleCloseEntitiesPanel]);
 
   const handleCloseEdgePanel = useCallback(() => {
     if (typeof setShowEdgePanel === 'function') {
@@ -420,6 +492,20 @@ const GraphEditorContent = () => {
     handleOpenDocumentProperties?.();
   }, [emitEdgeIntent, handleOpenDocumentProperties]);
 
+  useEffect(() => {
+    const selectionCount =
+      (selectedNodeIds.length || 0) +
+      (selectedEdgeIds.length || 0) +
+      (selectedGroupIds.length || 0);
+    if (selectionCount === 0 && showPropertiesPanel) {
+      if (!skipPropertiesCloseRef.current) {
+        setShowPropertiesPanel(false);
+      }
+    } else if (selectionCount > 0) {
+      skipPropertiesCloseRef.current = false;
+    }
+  }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds, showPropertiesPanel, setShowPropertiesPanel]);
+
   const handleToggleScriptPanelIntent = useCallback(() => {
     emitEdgeIntent('toggleScriptPanel');
     eventBus.emit('toggleScriptPanel');
@@ -429,6 +515,11 @@ const GraphEditorContent = () => {
     emitEdgeIntent('nodeListSelect', { nodeId, multiSelect });
     handlers?.handleNodeListSelect?.(nodeId, multiSelect);
   }, [emitEdgeIntent, handlers]);
+
+  const handleEntitiesPanelSelectNode = useCallback((nodeId) => {
+    handleNodeListSelectIntent(nodeId, false);
+    handlers?.handleNodeFocus?.(nodeId);
+  }, [handleNodeListSelectIntent, handlers]);
 
   const handleNodeListFocusIntent = useCallback((nodeId) => {
     emitEdgeIntent('nodeListFocus', { nodeId });
@@ -501,6 +592,8 @@ const GraphEditorContent = () => {
           showNodeList={showNodeList}
           onToggleGroupList={handleToggleGroupListIntent}
           showGroupList={showGroupList}
+          onToggleEdgeList={handleToggleEdgeListIntent}
+          showEdgeList={showEdgeList}
           onToggleNodePalette={handleToggleNodePaletteIntent}
           nodes={nodes}
           edges={edges}
@@ -559,8 +652,10 @@ const GraphEditorContent = () => {
           isLandscape={isLandscape}
           onToggleLayoutPanel={handleToggleEdgePanelIntent}
           onTogglePropertiesPanel={handleTogglePropertiesPanelIntent}
+          onToggleEdgeList={handleToggleEdgeListIntent}
           showEdgePanel={showEdgePanel}
           showPropertiesPanel={showPropertiesPanel}
+          showEdgeList={showEdgeList}
         />
       )}
 
@@ -579,6 +674,7 @@ const GraphEditorContent = () => {
         selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
         selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
         edges={edges}
+        nodeTypeOptions={nodeTypeOptions}
         onUpdateNode={(id, updates, options) => {
           emitEdgeIntent('updateNode', {
             nodeId: id,
@@ -631,14 +727,15 @@ const GraphEditorContent = () => {
               const updatedGroup = next.find(g => g.id === id);
               if (updatedGroup) {
                 try {
-                  eventBus.emit('groupUpdated', { id, patch: updates || {}, group: updatedGroup });
-                } catch (err) {
-                  // ignore event bus errors
-                }
-              }
-              return next;
-            });
-          }}
+          eventBus.emit('groupUpdated', { id, patch: updates || {}, group: updatedGroup });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
+      return next;
+    });
+  }}
+          onSelectEdge={handleSelectEdgeFromProperties}
           theme={theme}
           defaultNodeColor={defaultNodeColor}
           defaultEdgeColor={defaultEdgeColor}
@@ -669,43 +766,31 @@ const GraphEditorContent = () => {
           }}
           onToggleGroupLock={groupManager?.toggleGroupLock}
           onClose={() => setShowPropertiesPanel(false)}
-          anchor={nodePanelAnchor}
+          anchor={panelAnchor}
           onAnchorChange={handlePropertiesPanelAnchorChange}
           isMobile={isMobile}
         memoAutoExpandToken={memoAutoExpandToken}
       />
 
+          <EntitiesPanel
+            open={showEntitiesPanel}
+            anchor={oppositeAnchor}
+            entityView={entityView}
+            nodes={nodes}
+            edges={edges}
+            groups={groups}
+            selectedNodeId={selectedNodeIds[0] || null}
+            selectedEdgeId={selectedEdgeIds[0] || null}
+            selectedGroupId={selectedGroupIds[0] || null}
+            onSelectNode={handleEntitiesPanelSelectNode}
+            onSelectEdge={handleSelectEdgeFromList}
+            onSelectGroup={handleGroupListSelectIntent}
+            onClose={handleCloseEntitiesPanel}
+          />
+
       <NodePalettePanel
         open={showNodePalette}
         onClose={() => setShowNodePalette(false)}
-      />
-
-      <NodeListPanel
-        nodes={nodes}
-        selectedNodeId={selectedNodeIds[0] || null}
-        selectedNodeIds={selectedNodeIds}
-        onNodeSelect={handleNodeListSelectIntent}
-        onNodeFocus={handleNodeListFocusIntent}
-        onClose={handleNodeListCloseIntent}
-        isOpen={showNodeList}
-        theme={theme}
-        propertiesPanelAnchor={nodePanelAnchor}
-        isMobile={isMobile}
-        graphApiRef={graphAPI}
-      />
-
-      <GroupListPanel
-        groups={groups}
-        selectedGroupId={selectedGroupIds[0] || null}
-        selectedGroupIds={selectedGroupIds}
-        onGroupSelect={handleGroupListSelectIntent}
-        onGroupFocus={handleGroupListFocusIntent}
-        onGroupDoubleClick={handleGroupListDoubleClickIntent}
-        onGroupToggleVisibility={handleGroupToggleVisibilityIntent}
-        onGroupDelete={handleGroupDeleteIntent}
-        onClose={handleGroupListCloseIntent}
-        isOpen={showGroupList}
-        theme={theme}
       />
       {showNewTabPage ? (
         <NewTabPage

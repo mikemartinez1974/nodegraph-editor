@@ -70,6 +70,7 @@ export function useGraphEditorState() {
   // UI state
   const [showNodeList, setShowNodeList] = useState(false);
   const [showGroupList, setShowGroupList] = useState(false);
+  const [showEdgeList, setShowEdgeList] = useState(false);
   const [showGroupProperties, setShowGroupProperties] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [loading, setLoading] = useState(false);
@@ -180,6 +181,7 @@ export function useGraphEditorState() {
     // UI
     showNodeList, setShowNodeList,
     showGroupList, setShowGroupList,
+    showEdgeList, setShowEdgeList,
     showGroupProperties, setShowGroupProperties,
     snackbar, setSnackbar,
     loading, setLoading,

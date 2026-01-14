@@ -92,6 +92,8 @@ const Toolbar = ({
   showNodeList = true,
   onToggleGroupList,
   showGroupList = true,
+  onToggleEdgeList = () => {},
+  showEdgeList = false,
   onToggleNodePalette,
   onToggleLayoutPanel = () => {},
   onTogglePropertiesPanel = () => {},
@@ -846,11 +848,13 @@ const Toolbar = ({
           <PanelActions 
             onToggleNodeList={onToggleNodeList}
             onToggleGroupList={onToggleGroupList}
+            onToggleEdgeList={onToggleEdgeList}
             onToggleScriptPanel={onToggleScriptPanel}
             onToggleLayoutPanel={onToggleLayoutPanel}
             onTogglePropertiesPanel={onTogglePropertiesPanel}
             showNodeList={showNodeList}
             showGroupList={showGroupList}
+            showEdgeList={showEdgeList}
             showPropertiesPanel={showPropertiesPanel}
             showEdgePanel={showEdgePanel}
             isMobile={false}

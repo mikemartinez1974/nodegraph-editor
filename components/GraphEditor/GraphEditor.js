@@ -192,6 +192,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     [plugins]
   );
   const [showEdgePanel, setShowEdgePanel] = useState(false);
+  const [showEdgeList, setShowEdgeList] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const autoSnapInitializedRef = useRef(false);
@@ -206,6 +207,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [mobileAddNodeSearch, setMobileAddNodeSearch] = useState('');
   const [memoAutoExpandToken, setMemoAutoExpandToken] = useState(0);
   const firstGraphLoadHandledRef = useRef(false);
+  const [showEntitiesPanel, setShowEntitiesPanel] = useState(false);
+  const [entityView, setEntityView] = useState('nodes');
 
   const {
     documentSettings,
@@ -1052,13 +1055,32 @@ useEffect(() => {
     setShowPropertiesPanel(prev => !prev);
   }, []);
 
-  const toggleNodeList = useCallback(() => {
-    setShowNodeList(prev => !prev);
-  }, [setShowNodeList]);
+  const openEntitiesPanel = useCallback((view) => {
+    setEntityView(view);
+    setShowEntitiesPanel(true);
+    setShowNodeList(view === 'nodes');
+    setShowEdgeList(view === 'edges');
+    setShowGroupList(view === 'groups');
+  }, [setShowEdgeList, setShowGroupList, setShowNodeList]);
 
-  const toggleGroupList = useCallback(() => {
-    setShowGroupList(prev => !prev);
-  }, [setShowGroupList]);
+  const closeEntitiesPanel = useCallback(() => {
+    setShowEntitiesPanel(false);
+    setShowNodeList(false);
+    setShowEdgeList(false);
+    setShowGroupList(false);
+  }, [setShowEdgeList, setShowGroupList, setShowNodeList]);
+
+  const toggleEntityView = useCallback((view) => {
+    if (showEntitiesPanel && entityView === view) {
+      closeEntitiesPanel();
+      return;
+    }
+    openEntitiesPanel(view);
+  }, [closeEntitiesPanel, entityView, openEntitiesPanel, showEntitiesPanel]);
+
+  const toggleNodeList = useCallback(() => toggleEntityView('nodes'), [toggleEntityView]);
+  const toggleGroupList = useCallback(() => toggleEntityView('groups'), [toggleEntityView]);
+  const toggleEdgeList = useCallback(() => toggleEntityView('edges'), [toggleEntityView]);
 
   const toggleNodePalette = useCallback(() => {
     setShowNodePalette(prev => !prev);
@@ -2688,8 +2710,14 @@ useEffect(() => {
     setShowNodeList,
     showGroupList,
     setShowGroupList,
+    showEdgeList,
+    setShowEdgeList,
     showGroupProperties,
     setShowGroupProperties,
+    showEntitiesPanel,
+    setShowEntitiesPanel,
+    entityView,
+    setEntityView,
     handleOpenDocumentProperties,
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
@@ -2697,6 +2725,7 @@ useEffect(() => {
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
+    toggleEdgeList,
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,
@@ -2757,8 +2786,14 @@ useEffect(() => {
     setShowNodeList,
     showGroupList,
     setShowGroupList,
+    showEdgeList,
+    setShowEdgeList,
     showGroupProperties,
     setShowGroupProperties,
+    showEntitiesPanel,
+    setShowEntitiesPanel,
+    entityView,
+    setEntityView,
     handleOpenDocumentProperties,
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
@@ -2766,6 +2801,7 @@ useEffect(() => {
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
+    toggleEdgeList,
     handlePropertiesPanelAnchorChange,
     graphStats,
     recentSnapshots,

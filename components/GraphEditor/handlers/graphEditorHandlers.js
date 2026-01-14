@@ -424,9 +424,13 @@ export function createGraphEditorHandlers({
   const handleNodeFocus = (nodeId) => {
     const node = nodesRef.current.find(n => n.id === nodeId);
     if (node) {
+      const nodeWidth = node.width || 160;
+      const nodeHeight = node.height || 100;
+      const nodeCenterX = node.position.x + nodeWidth / 2;
+      const nodeCenterY = node.position.y + nodeHeight / 2;
       state.setPan({
-        x: window.innerWidth / 2 - node.position.x * zoom,
-        y: window.innerHeight / 2 - node.position.y * zoom
+        x: window.innerWidth / 2 - nodeCenterX * zoom,
+        y: window.innerHeight / 2 - nodeCenterY * zoom
       });
       setSelectedNodeIds([nodeId]);
       setSelectedEdgeIds([]);
