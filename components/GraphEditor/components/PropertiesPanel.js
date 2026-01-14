@@ -257,123 +257,104 @@ export default function PropertiesPanel({
           </Section>
 
           <Section title="Style controls">
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Background"
-                  type="color"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.background || "#ffffff"}
-                  onChange={(event) => updateStyle({ background: event.target.value })}
-                  disabled={!isNodeSelected}
-                  sx={{ py: 0.5 }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Text color"
-                  type="color"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.color || "#000000"}
-                  onChange={(event) => updateStyle({ color: event.target.value })}
-                  disabled={!isNodeSelected}
-                  sx={{ py: 0.5 }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Border color"
-                  type="color"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.borderColor || "#000000"}
-                  onChange={(event) => updateStyle({ borderColor: event.target.value })}
-                  disabled={!isNodeSelected}
-                  sx={{ py: 0.5 }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Border style</InputLabel>
-                  <Select
-                    value={currentStyle.borderStyle || "solid"}
-                    label="Border style"
-                    onChange={(event) => updateStyle({ borderStyle: event.target.value })}
+            <Stack spacing={1}>
+              {[{
+                label: "Background color",
+                helper: "Color that fills the node canvas.",
+                value: currentStyle.background || "#ffffff",
+                type: "color",
+                onChange: (value) => updateStyle({ background: value })
+              }, {
+                label: "Text color",
+                helper: "Applied to node text.",
+                value: currentStyle.color || "#000000",
+                type: "color",
+                onChange: (value) => updateStyle({ color: value })
+              }, {
+                label: "Border color",
+                helper: "Hue of the stroke.",
+                value: currentStyle.borderColor || "#000000",
+                type: "color",
+                onChange: (value) => updateStyle({ borderColor: value })
+              }, {
+                label: "Border width (px)",
+                helper: "Thickness of the stroke.",
+                type: "number",
+                value: currentStyle.borderWidth ?? 0,
+                onChange: (value) => updateStyle({ borderWidth: Number(value) })
+              }, {
+                label: "Border radius (px)",
+                helper: "Rounded corners.",
+                type: "number",
+                value: currentStyle.borderRadius ?? 0,
+                onChange: (value) => updateStyle({ borderRadius: Number(value) })
+              }].map((config) => (
+                <Stack key={config.label} spacing={0.5}>
+                  <Typography variant="caption">{config.label}</Typography>
+                  <TextField
+                    type={config.type}
+                    fullWidth
+                    size="small"
+                    value={config.value}
+                    onChange={(event) => config.onChange(event.target.value)}
                     disabled={!isNodeSelected}
-                  >
-                    {["solid", "dashed", "dotted", "double", "groove"].map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <TextField
-                  label="Border width (px)"
-                  type="number"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.borderWidth ?? 0}
-                  onChange={(event) => updateStyle({ borderWidth: Number(event.target.value) })}
+                    sx={{ "& input": { height: 40 } }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    {config.helper}
+                  </Typography>
+                </Stack>
+              ))}
+              <FormControl fullWidth size="small">
+                <InputLabel>Border style</InputLabel>
+                <Select
+                  value={currentStyle.borderStyle || "solid"}
+                  label="Border style"
+                  onChange={(event) => updateStyle({ borderStyle: event.target.value })}
                   disabled={!isNodeSelected}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <TextField
-                  label="Border radius (px)"
-                  type="number"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.borderRadius ?? 0}
-                  onChange={(event) => updateStyle({ borderRadius: Number(event.target.value) })}
+                >
+                  {["solid", "dashed", "dotted", "double", "groove"].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel>Font weight</InputLabel>
+                <Select
+                  value={currentStyle.fontWeight || "normal"}
+                  label="Font weight"
+                  onChange={(event) => updateStyle({ fontWeight: event.target.value })}
                   disabled={!isNodeSelected}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Font weight</InputLabel>
-                  <Select
-                    value={currentStyle.fontWeight || "normal"}
-                    label="Font weight"
-                    onChange={(event) => updateStyle({ fontWeight: event.target.value })}
-                    disabled={!isNodeSelected}
-                  >
-                    {["normal", "bold", "bolder", "lighter"].map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <TextField
-                  label="Font size"
-                  placeholder="e.g. 14px"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.fontSize || ""}
-                  onChange={(event) => updateStyle({ fontSize: event.target.value })}
-                  disabled={!isNodeSelected}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Box shadow"
-                  placeholder="e.g. 0px 4px 16px rgba(0,0,0,0.2)"
-                  fullWidth
-                  size="small"
-                  value={currentStyle.boxShadow || ""}
-                  onChange={(event) => updateStyle({ boxShadow: event.target.value })}
-                  disabled={!isNodeSelected}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body2">Opacity</Typography>
+                >
+                  {["normal", "bold", "bolder", "lighter"].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                label="Font size"
+                placeholder="e.g. 14px"
+                fullWidth
+                size="small"
+                value={currentStyle.fontSize || ""}
+                onChange={(event) => updateStyle({ fontSize: event.target.value })}
+                disabled={!isNodeSelected}
+              />
+              <TextField
+                label="Box shadow"
+                placeholder="e.g. 0px 4px 16px rgba(0,0,0,0.2)"
+                fullWidth
+                size="small"
+                value={currentStyle.boxShadow || ""}
+                onChange={(event) => updateStyle({ boxShadow: event.target.value })}
+                disabled={!isNodeSelected}
+              />
+              <Box>
+                <Typography variant="subtitle2">Opacity</Typography>
                 <Slider
                   value={opacityPercent}
                   min={0}
@@ -384,8 +365,8 @@ export default function PropertiesPanel({
                   }}
                   disabled={!isNodeSelected}
                 />
-              </Grid>
-            </Grid>
+              </Box>
+            </Stack>
           </Section>
 
           <Section title="Formatting">
