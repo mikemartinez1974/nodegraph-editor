@@ -457,6 +457,22 @@ const skipPropertiesCloseRef = useRef(false);
     }
   }, [emitEdgeIntent, showEdgePanel, setShowEdgePanel]);
 
+  const focusNodeFromEntities = useCallback(
+    (nodeId) => {
+      emitEdgeIntent('nodeListSelect', { nodeId, multiSelect: false });
+      handlers?.handleNodeListSelect?.(nodeId, false);
+      handlers?.handleNodeFocus?.(nodeId);
+    },
+    [emitEdgeIntent, handlers]
+  );
+
+  const handleEntitiesPanelSelectNode = useCallback(
+    (nodeId) => {
+      focusNodeFromEntities(nodeId);
+    },
+    [focusNodeFromEntities]
+  );
+
   const handleSelectEdgeFromProperties = useCallback((edgeId) => {
     if (!edgeId) return;
     emitEdgeIntent('selectEdgeFromProperties', { edgeId });
@@ -471,6 +487,17 @@ const skipPropertiesCloseRef = useRef(false);
       setShowPropertiesPanel(true);
     }
   }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel]);
+
+  const handleSelectNodeFromProperties = useCallback(
+    (nodeId) => {
+      emitEdgeIntent('selectNodeFromProperties', { nodeId });
+      focusNodeFromEntities(nodeId);
+      if (typeof setShowPropertiesPanel === 'function') {
+        setShowPropertiesPanel(true);
+      }
+    },
+    [emitEdgeIntent, focusNodeFromEntities, setShowPropertiesPanel]
+  );
 
   const handleCanvasBackgroundClick = useCallback(() => {
     if (typeof setShowPropertiesPanel === 'function' && showPropertiesPanel) {
@@ -510,16 +537,6 @@ const skipPropertiesCloseRef = useRef(false);
     emitEdgeIntent('toggleScriptPanel');
     eventBus.emit('toggleScriptPanel');
   }, [emitEdgeIntent]);
-
-  const handleNodeListSelectIntent = useCallback((nodeId, multiSelect) => {
-    emitEdgeIntent('nodeListSelect', { nodeId, multiSelect });
-    handlers?.handleNodeListSelect?.(nodeId, multiSelect);
-  }, [emitEdgeIntent, handlers]);
-
-  const handleEntitiesPanelSelectNode = useCallback((nodeId) => {
-    handleNodeListSelectIntent(nodeId, false);
-    handlers?.handleNodeFocus?.(nodeId);
-  }, [handleNodeListSelectIntent, handlers]);
 
   const handleNodeListFocusIntent = useCallback((nodeId) => {
     emitEdgeIntent('nodeListFocus', { nodeId });
@@ -675,6 +692,7 @@ const skipPropertiesCloseRef = useRef(false);
         selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
         edges={edges}
         nodeTypeOptions={nodeTypeOptions}
+        onSelectNode={handleSelectNodeFromProperties}
         onUpdateNode={(id, updates, options) => {
           emitEdgeIntent('updateNode', {
             nodeId: id,

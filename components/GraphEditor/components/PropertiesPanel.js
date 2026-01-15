@@ -30,6 +30,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import edgeTypes from "../edgeTypes";
 
 const STYLE_PRESETS = [
   {
@@ -127,6 +128,12 @@ export default function PropertiesPanel({
     const list = [];
     if (edgeSourceNode) list.push({ role: "source", node: edgeSourceNode });
     if (edgeTargetNode) list.push({ role: "target", node: edgeTargetNode });
+    if (!edgeSourceNode && selectedEdge.source) {
+      list.push({ role: "source", node: { id: selectedEdge.source, label: selectedEdge.source } });
+    }
+    if (!edgeTargetNode && selectedEdge.target) {
+      list.push({ role: "target", node: { id: selectedEdge.target, label: selectedEdge.target } });
+    }
     return list;
   }, [edgeSourceNode, edgeTargetNode, selectedEdge]);
   const groupMemberNodes = useMemo(() => {
@@ -145,7 +152,7 @@ export default function PropertiesPanel({
   const activeView = isNodeSelected ? "node" : isEdgeSelected ? "edge" : isGroupSelected ? "group" : null;
   const [styleJsonText, setStyleJsonText] = useState(() => JSON.stringify(selectionStyle, null, 2));
   const payloadJson = useMemo(() => sanitizePayloadJSON(payloadSource), [payloadSource]);
-  const selectedType = selectedNode?.type || "";
+const selectedType = selectedNode?.type || "";
 
   const nodeTypeDerivedOptions = useMemo(() => {
     const dataOptions =
@@ -169,8 +176,18 @@ export default function PropertiesPanel({
       })
       .filter(Boolean);
   }, [selectedNode]);
-  const availableNodeTypeOptions =
-    nodeTypeDerivedOptions.length > 0 ? nodeTypeDerivedOptions : nodeTypeOptions;
+const availableNodeTypeOptions =
+  nodeTypeDerivedOptions.length > 0 ? nodeTypeDerivedOptions : nodeTypeOptions;
+
+  const edgeTypeOptions = useMemo(
+    () =>
+      Object.entries(edgeTypes).map(([value, meta]) => ({
+        value,
+        label: meta?.label || value,
+        description: meta?.description || ""
+      })),
+    []
+  );
 
   useEffect(() => {
     setStyleJsonText(JSON.stringify(selectionStyle || {}, null, 2));
@@ -551,6 +568,21 @@ export default function PropertiesPanel({
         disabled={!isEdgeSelected}
       >
         <Stack spacing={1}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="properties-edge-type-label">Edge type</InputLabel>
+            <Select
+              labelId="properties-edge-type-label"
+              label="Edge type"
+              value={selectedEdge?.type || ""}
+              onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { type: event.target.value })}
+            >
+              {edgeTypeOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Typography variant="caption">Type</Typography>
           <Typography variant="body2">{selectedEdge?.type || "edge"}</Typography>
           <Typography variant="caption">Connection</Typography>
