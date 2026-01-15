@@ -67,9 +67,10 @@ const NodeLayer = ({
       return false;
     };
 
+    const visibleNodes = uniqueNodes.filter(node => node.visible !== false);
     return (
         <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, zIndex: 30 }}>
-            {uniqueNodes.map(node => {
+            {visibleNodes.map(node => {
                 let NodeComponent = nodeTypes[node.type];
                 if (!NodeComponent) {
                   if (typeof node?.type === 'string' && node.type.includes(':')) {

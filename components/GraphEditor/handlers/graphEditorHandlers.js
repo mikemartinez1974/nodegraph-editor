@@ -652,6 +652,24 @@ export function createGraphEditorHandlers({
     }
   };
 
+  const handleEdgeFocus = (edgeId) => {
+    const edge = edges.find((candidate) => candidate.id === edgeId);
+    if (!edge) return;
+    const sourceNode = nodesRef.current.find((n) => n.id === edge.source);
+    const targetNode = nodesRef.current.find((n) => n.id === edge.target);
+    if (sourceNode && targetNode) {
+      const centerX = (sourceNode.position.x + targetNode.position.x) / 2;
+      const centerY = (sourceNode.position.y + targetNode.position.y) / 2;
+      state.setPan({
+        x: window.innerWidth / 2 - centerX * zoom,
+        y: window.innerHeight / 2 - centerY * zoom
+      });
+    }
+    setSelectedEdgeIds([edgeId]);
+    setSelectedNodeIds([]);
+    setSelectedGroupIds([]);
+  };
+
   const handleGroupDoubleClickFromList = (groupId) => {
     state.setShowGroupProperties(true);
   };
@@ -987,6 +1005,7 @@ export function createGraphEditorHandlers({
     // Group
     handleGroupListSelect,
     handleGroupFocus,
+    handleEdgeFocus,
     handleGroupDoubleClickFromList,
     handleGroupToggleVisibility,
     handleGroupDelete,

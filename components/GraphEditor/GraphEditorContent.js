@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import GraphRendererAdapter from './renderers/GraphRendererAdapter';
@@ -29,6 +29,11 @@ import useIntentEmitter from './hooks/useIntentEmitter';
 import EdgeLayoutPanel from './components/EdgeLayoutPanel';
 import { summarizeContracts } from './contracts/contractManager';
 
+const PANEL_WIDTHS = {
+  entities: 320,
+  layout: 380
+};
+
 const GraphEditorContent = () => {
   const theme = useTheme();
   const state = useGraphEditorStateContext();
@@ -37,6 +42,7 @@ const GraphEditorContent = () => {
   const historyHook = useGraphEditorHistoryContext();
   const rpc = useGraphEditorRpcContext();
   const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
+  const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
 
   const {
     nodes,
@@ -218,6 +224,27 @@ const GraphEditorContent = () => {
   }, [emitEdgeIntent, showMinimap]);
 
   const graphRendererKey = `${backgroundUrl || 'no-background'}-${graphRenderKey}`;
+  const minimapOffset = useMemo(() => {
+    const offsets = { left: 0, right: 0, top: 0, bottom: 0 };
+    if (showPropertiesPanel) {
+      if (panelAnchor === 'left') {
+        offsets.left = Math.max(offsets.left, propertiesPanelWidth);
+      } else if (panelAnchor === 'right') {
+        offsets.right = Math.max(offsets.right, propertiesPanelWidth);
+      }
+    }
+    if (showEntitiesPanel) {
+      if (oppositeAnchor === 'left') {
+        offsets.left = Math.max(offsets.left, PANEL_WIDTHS.entities);
+      } else if (oppositeAnchor === 'right') {
+        offsets.right = Math.max(offsets.right, PANEL_WIDTHS.entities);
+      }
+    }
+    if (showEdgePanel) {
+      offsets.right = Math.max(offsets.right, PANEL_WIDTHS.layout);
+    }
+    return offsets;
+  }, [oppositeAnchor, panelAnchor, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
   const createGraphRenderer = () => (
     <GraphRendererAdapter
       graphKey={graphRendererKey}
@@ -230,6 +257,7 @@ const GraphEditorContent = () => {
       backgroundImage={documentBackgroundImage}
       setSnackbar={setSnackbar}
       showMinimap={showMinimap}
+      minimapOffset={minimapOffset}
       snapToGrid={snapToGrid}
       showGrid={showGrid}
       gridSize={documentSettings.gridSize}
@@ -432,10 +460,11 @@ const GraphEditorContent = () => {
     if (typeof setSelectedEdgeIds === 'function') {
       setSelectedEdgeIds([edgeId]);
     }
+    handlers?.handleEdgeFocus?.(edgeId);
     if (typeof setShowPropertiesPanel === 'function') {
       setShowPropertiesPanel(true);
     }
-  }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel]);
+  }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel, handlers]);
 
   const handleCloseEntitiesPanel = useCallback(() => {
     if (typeof setShowEntitiesPanel === 'function') {
@@ -462,6 +491,15 @@ const skipPropertiesCloseRef = useRef(false);
       emitEdgeIntent('nodeListSelect', { nodeId, multiSelect: false });
       handlers?.handleNodeListSelect?.(nodeId, false);
       handlers?.handleNodeFocus?.(nodeId);
+    },
+    [emitEdgeIntent, handlers]
+  );
+
+  const focusGroupFromEntities = useCallback(
+    (groupId) => {
+      emitEdgeIntent('groupListSelect', { groupId, multiSelect: false });
+      handlers?.handleGroupListSelect?.(groupId, false);
+      handlers?.handleGroupFocus?.(groupId);
     },
     [emitEdgeIntent, handlers]
   );
@@ -693,14 +731,23 @@ const skipPropertiesCloseRef = useRef(false);
         edges={edges}
         nodeTypeOptions={nodeTypeOptions}
         onSelectNode={handleSelectNodeFromProperties}
-        onUpdateNode={(id, updates, options) => {
-          emitEdgeIntent('updateNode', {
-            nodeId: id,
-            changeCount: Object.keys(updates || {}).length,
-            selectionCount: selectedNodeIds.length
-          });
-          setNodes(prev => {
-            const next = prev.map(n => n.id === id ? { ...n, ...updates, data: updates?.data ? { ...n.data, ...updates.data } : n.data } : n);
+          onUpdateNode={(id, updates, options) => {
+            emitEdgeIntent('updateNode', {
+              nodeId: id,
+              changeCount: Object.keys(updates || {}).length,
+              selectionCount: selectedNodeIds.length
+            });
+            setNodes(prev => {
+            const { data: nextDataPatch, replaceData, ...restUpdates } = updates || {};
+            const next = prev.map(n => {
+              if (n.id !== id) return n;
+              const nextData = nextDataPatch
+                ? (replaceData || options?.replaceData)
+                  ? nextDataPatch
+                  : { ...n.data, ...nextDataPatch }
+                : n.data;
+              return { ...n, ...restUpdates, data: nextData };
+            });
             nodesRef.current = next;
             // Only save to history if not explicitly skipped
             if (!options || options !== true) {
@@ -787,6 +834,7 @@ const skipPropertiesCloseRef = useRef(false);
           anchor={panelAnchor}
           onAnchorChange={handlePropertiesPanelAnchorChange}
           isMobile={isMobile}
+          onResize={setPropertiesPanelWidth}
         memoAutoExpandToken={memoAutoExpandToken}
       />
 
@@ -802,7 +850,7 @@ const skipPropertiesCloseRef = useRef(false);
             selectedGroupId={selectedGroupIds[0] || null}
             onSelectNode={handleEntitiesPanelSelectNode}
             onSelectEdge={handleSelectEdgeFromList}
-            onSelectGroup={handleGroupListSelectIntent}
+            onSelectGroup={focusGroupFromEntities}
             onClose={handleCloseEntitiesPanel}
           />
 

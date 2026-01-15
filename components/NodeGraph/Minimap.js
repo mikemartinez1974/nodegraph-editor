@@ -34,7 +34,8 @@ const Minimap = ({
   containerHeight = window.innerHeight,
   width = 200,
   height = 150,
-  position = 'bottom-right' // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+  position = 'bottom-right', // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+  offset = {}
 }) => {
   const canvasRef = useRef(null);
   const theme = useTheme();
@@ -236,18 +237,22 @@ const Minimap = ({
     };
 
     const margin = 16;
+    const offsetLeft = Number(offset.left || 0);
+    const offsetRight = Number(offset.right || 0);
+    const offsetTop = Number(offset.top || 0);
+    const offsetBottom = Number(offset.bottom || 0);
 
     switch (position) {
       case 'bottom-right':
-        return { ...base, bottom: margin, right: margin };
+        return { ...base, bottom: margin + offsetBottom, right: margin + offsetRight };
       case 'bottom-left':
-        return { ...base, bottom: margin, left: margin };
+        return { ...base, bottom: margin + offsetBottom, left: margin + offsetLeft };
       case 'top-right':
-        return { ...base, top: margin + 70, right: margin }; // +70 for header
+        return { ...base, top: margin + 70 + offsetTop, right: margin + offsetRight }; // +70 for header
       case 'top-left':
-        return { ...base, top: margin + 70, left: margin };
+        return { ...base, top: margin + 70 + offsetTop, left: margin + offsetLeft };
       default:
-        return { ...base, bottom: margin, right: margin };
+        return { ...base, bottom: margin + offsetBottom, right: margin + offsetRight };
     }
   };
 

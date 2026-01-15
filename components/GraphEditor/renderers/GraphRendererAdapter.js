@@ -15,6 +15,7 @@ export default function GraphRendererAdapter({
   backgroundImage,
   setSnackbar,
   showMinimap,
+  minimapOffset,
   snapToGrid,
   showGrid,
   gridSize,
@@ -81,6 +82,7 @@ export default function GraphRendererAdapter({
       backgroundImage={backgroundImage}
       setSnackbar={setSnackbar}
       showMinimap={showMinimap}
+      minimapOffset={minimapOffset}
       snapToGrid={snapToGrid}
       showGrid={showGrid}
       gridSize={gridSize}

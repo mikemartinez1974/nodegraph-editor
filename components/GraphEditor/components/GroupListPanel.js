@@ -65,6 +65,11 @@ export default function GroupListPanel({
 
   const drawerWidth = 300;
 
+  const handleGroupItemClick = (group, isMultiSelect) => {
+    if (onGroupSelect) onGroupSelect(group.id, isMultiSelect);
+    if (onGroupFocus && !isMultiSelect) onGroupFocus(group.id);
+  };
+
   // Virtualized row renderer
   const VirtualRow = ({ index, style }) => {
     const group = groups[index];
@@ -118,7 +123,7 @@ export default function GroupListPanel({
           selected={isSelected}
           onClick={(e) => {
             const isMultiSelect = e.ctrlKey || e.metaKey;
-            if (onGroupSelect) onGroupSelect(group.id, isMultiSelect);
+            handleGroupItemClick(group, isMultiSelect);
           }}
           onDoubleClick={() => {
             if (onGroupDoubleClick) onGroupDoubleClick(group.id);
@@ -221,7 +226,7 @@ export default function GroupListPanel({
                     <ListItemButton
                       onClick={(e) => {
                         const isMultiSelect = e.ctrlKey || e.metaKey;
-                        onGroupSelect(group.id, isMultiSelect);
+                        handleGroupItemClick(group, isMultiSelect);
                       }}
                       onDoubleClick={() => {
                         if (onGroupDoubleClick) {

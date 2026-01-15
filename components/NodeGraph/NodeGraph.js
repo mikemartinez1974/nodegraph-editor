@@ -64,6 +64,7 @@ export default function NodeGraph({
   backgroundImage = '',
   setSnackbar,
   showMinimap = true,
+  minimapOffset = {},
   snapToGrid = false,
   showGrid = false,
   gridSize = 20,
@@ -1308,6 +1309,7 @@ export default function NodeGraph({
           width={220}
           height={165}
           position="bottom-right"
+          offset={minimapOffset}
         />
       )}
     </div>

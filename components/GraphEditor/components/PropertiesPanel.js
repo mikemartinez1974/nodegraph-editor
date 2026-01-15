@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   Drawer,
   Box,
@@ -15,6 +15,7 @@ import {
   Chip,
   Button,
   IconButton,
+  Switch,
   FormControl,
   InputLabel,
   Select,
@@ -30,6 +31,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MarkdownRenderer from "./MarkdownRenderer";
 import edgeTypes from "../edgeTypes";
 
 const STYLE_PRESETS = [
@@ -57,26 +59,44 @@ const describeValue = (value) => {
   return typeof value;
 };
 
-const flattenPayloadEntries = (data = {}) => {
-  if (!data || typeof data !== "object") return [];
-  return Object.entries(data).map(([key, value]) => ({
-    key,
-    value,
-    type: describeValue(value)
-  }));
+const detectType = (value) => {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return "array";
+  return typeof value;
+};
+
+const toDisplayString = (value) => {
+  if (value === null) return "";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+};
+
+const parseValueFromString = (text, type) => {
+  if (type === "number") {
+    const num = Number(text);
+    return Number.isNaN(num) ? text : num;
+  }
+  if (type === "boolean") {
+    if (text === "true") return true;
+    if (text === "false") return false;
+  }
+  if (type === "null") {
+    return text === "" || text === "null" ? null : text;
+  }
+  if (type === "array" || type === "object") {
+    try {
+      const parsed = JSON.parse(text);
+      return parsed;
+    } catch {
+      return text;
+    }
+  }
+  return text;
 };
 
 const buildConnectedEdges = (selectedNode, edges = []) => {
   if (!selectedNode) return [];
   return edges.filter((edge) => edge && (edge.source === selectedNode.id || edge.target === selectedNode.id));
-};
-
-const sanitizePayloadJSON = (payload = {}) => {
-  try {
-    return JSON.stringify(payload, null, 2);
-  } catch {
-    return "{}";
-  }
 };
 
 const copyToClipboard = async (text) => {
@@ -93,6 +113,9 @@ const DEFAULT_EXPANDED_SECTIONS = {
   edge: "details",
   group: "members"
 };
+const DEFAULT_PANEL_WIDTH = 420;
+const MIN_PANEL_WIDTH = 260;
+const MAX_PANEL_WIDTH = 720;
 
 export default function PropertiesPanel({
   open = false,
@@ -110,16 +133,23 @@ export default function PropertiesPanel({
   onSelectGroup,
   nodeTypeOptions = [],
   theme = {},
-  anchor = "right"
+  anchor = "right",
+  onResize
 }) {
   const [payloadView, setPayloadView] = useState("friendly");
   const [preset, setPreset] = useState("default");
+  const [dataEntries, setDataEntries] = useState([]);
+  const [markdownPreviewMode, setMarkdownPreviewMode] = useState({});
   const [expandedSections, setExpandedSections] = useState({ ...DEFAULT_EXPANDED_SECTIONS });
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
+  const [jsonViewRevision, setJsonViewRevision] = useState(0);
+  const resizeStateRef = useRef(null);
+  const dataEntriesRef = useRef([]);
+  const pendingJsonPersistRef = useRef(false);
+  const jsonDraftRef = useRef({ keys: {}, values: {} });
 
   const activeSelection = selectedNode || selectedEdge || selectedGroup;
-  const payloadSource = activeSelection?.data || {};
   const selectionStyle = selectedNode?.style || selectedEdge?.style || {};
-  const payloadEntries = useMemo(() => flattenPayloadEntries(payloadSource), [payloadSource]);
   const connectedEdges = useMemo(() => buildConnectedEdges(selectedNode, edges), [selectedNode, edges]);
   const edgeSourceNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.source) : null), [nodes, selectedEdge]);
   const edgeTargetNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.target) : null), [nodes, selectedEdge]);
@@ -138,9 +168,11 @@ export default function PropertiesPanel({
   }, [edgeSourceNode, edgeTargetNode, selectedEdge]);
   const groupMemberNodes = useMemo(() => {
     if (!selectedGroup?.nodeIds?.length) return [];
-    return selectedGroup.nodeIds
-      .map((nodeId) => nodes.find((node) => node.id === nodeId))
-      .filter(Boolean);
+    return selectedGroup.nodeIds.map((nodeId) => {
+      const node = nodes.find((candidate) => candidate.id === nodeId);
+      if (node) return node;
+      return { id: nodeId, label: `Node ${nodeId}`, type: "unknown" };
+    });
   }, [selectedGroup, nodes]);
   const selectedPreset = STYLE_PRESETS.find((option) => option.value === preset) || STYLE_PRESETS[0];
   const isNodeSelected = Boolean(selectedNode);
@@ -151,8 +183,89 @@ export default function PropertiesPanel({
   const selectionType = isNodeSelected ? "Node" : isEdgeSelected ? "Edge" : isGroupSelected ? "Group" : "Item";
   const activeView = isNodeSelected ? "node" : isEdgeSelected ? "edge" : isGroupSelected ? "group" : null;
   const [styleJsonText, setStyleJsonText] = useState(() => JSON.stringify(selectionStyle, null, 2));
-  const payloadJson = useMemo(() => sanitizePayloadJSON(payloadSource), [payloadSource]);
-const selectedType = selectedNode?.type || "";
+  const payloadJson = useMemo(() => {
+    const data = {};
+    dataEntries.forEach((entry) => {
+      if (entry.key) {
+        data[entry.key] = entry.value;
+      }
+    });
+    try {
+      return JSON.stringify(data, null, 2);
+    } catch {
+      return "{}";
+    }
+  }, [dataEntries]);
+  const selectedType = selectedNode?.type || "";
+
+  const handleResizeMove = useCallback(
+    (event) => {
+      if (!resizeStateRef.current) return;
+      const clientX = event.clientX ?? 0;
+      const { startX, startWidth } = resizeStateRef.current;
+      const delta = clientX - startX;
+      const direction = anchor === "right" ? -1 : 1;
+      const nextWidth = Math.min(MAX_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, startWidth + direction * delta));
+      setPanelWidth(nextWidth);
+    },
+    [anchor]
+  );
+
+  const handleResizeEnd = useCallback(() => {
+    resizeStateRef.current = null;
+    window.removeEventListener("pointermove", handleResizeMove);
+    window.removeEventListener("pointerup", handleResizeEnd);
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  }, [handleResizeMove]);
+
+  const handleResizeStart = useCallback(
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      resizeStateRef.current = {
+        startX: event.clientX ?? 0,
+        startWidth: panelWidth
+      };
+      window.addEventListener("pointermove", handleResizeMove);
+      window.addEventListener("pointerup", handleResizeEnd);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    },
+    [handleResizeEnd, handleResizeMove, panelWidth]
+  );
+
+  useEffect(() => () => handleResizeEnd(), [handleResizeEnd]);
+
+  useEffect(() => {
+    if (isNodeSelected && selectedNode) {
+      const entries = Object.entries(selectedNode.data || {}).map(([key, value]) => ({
+        key,
+        value,
+        type: detectType(value),
+        rawValue: toDisplayString(value)
+      }));
+      setDataEntries(entries);
+      setJsonViewRevision((prev) => prev + 1);
+    } else {
+      setDataEntries([]);
+      setJsonViewRevision((prev) => prev + 1);
+    }
+  }, [isNodeSelected, selectedNode]);
+
+  useEffect(() => {
+    if (typeof onResize === "function") {
+      onResize(panelWidth);
+    }
+  }, [onResize, panelWidth]);
+
+  useEffect(() => {
+    dataEntriesRef.current = dataEntries;
+  }, [dataEntries]);
+
+  useEffect(() => {
+    jsonDraftRef.current = { keys: {}, values: {} };
+  }, [activeSelectionId]);
 
   const nodeTypeDerivedOptions = useMemo(() => {
     const dataOptions =
@@ -251,6 +364,131 @@ const availableNodeTypeOptions =
     [isNodeSelected, onUpdateNode, selectedNode]
   );
 
+  const buildDataObject = useCallback((entries) => {
+    const data = {};
+    entries.forEach((entry) => {
+      if (entry.key) {
+        data[entry.key] = entry.value;
+      }
+    });
+    return data;
+  }, []);
+
+  const pendingPersistRef = useRef(false);
+  const updateDataEntries = useCallback((updater) => {
+    setDataEntries((prev) => updater(prev));
+    pendingPersistRef.current = true;
+  }, []);
+
+  const updateDataEntriesLocal = useCallback((updater) => {
+    setDataEntries((prev) => {
+      const next = updater(prev);
+      dataEntriesRef.current = next;
+      return next;
+    });
+    pendingJsonPersistRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!pendingPersistRef.current) return;
+    pendingPersistRef.current = false;
+    if (!isNodeSelected || !selectedNode) return;
+    const data = buildDataObject(dataEntries);
+    onUpdateNode(selectedNode.id, { data, replaceData: true });
+  }, [dataEntries, isNodeSelected, selectedNode, onUpdateNode, buildDataObject]);
+
+  const persistJsonEntries = useCallback(() => {
+    if (!pendingJsonPersistRef.current) return;
+    pendingJsonPersistRef.current = false;
+    if (!isNodeSelected || !selectedNode) return;
+    const data = buildDataObject(dataEntriesRef.current);
+    onUpdateNode(selectedNode.id, { data, replaceData: true });
+  }, [buildDataObject, isNodeSelected, onUpdateNode, selectedNode]);
+
+  const handleFriendlyValueChange = useCallback(
+    (index, rawValue) => {
+      updateDataEntries((prev) => {
+        const next = [...prev];
+        const entry = next[index];
+        const parsed = parseValueFromString(rawValue, entry.type);
+        next[index] = {
+          ...entry,
+          rawValue,
+          value: parsed,
+          type: detectType(parsed)
+        };
+        return next;
+      });
+    },
+    [updateDataEntries]
+  );
+
+  const handleAddJsonField = useCallback(() => {
+    updateDataEntries((prev) => {
+      const existingKeys = new Set(prev.map((entry) => entry.key).filter(Boolean));
+      let index = 1;
+      let candidate = `field${index}`;
+      while (existingKeys.has(candidate)) {
+        index += 1;
+        candidate = `field${index}`;
+      }
+      return [
+        ...prev,
+        { key: candidate, value: "", rawValue: "", type: "string" }
+      ];
+    });
+  }, [updateDataEntries]);
+
+  const handleJsonKeyDraftChange = useCallback((index, value) => {
+    jsonDraftRef.current.keys[index] = value;
+  }, []);
+
+  const handleJsonValueDraftChange = useCallback((index, value) => {
+    jsonDraftRef.current.values[index] = value;
+  }, []);
+
+  const handleJsonDraftBlur = useCallback(
+    (index) => {
+      const keyDraft = jsonDraftRef.current.keys[index];
+      const valueDraft = jsonDraftRef.current.values[index];
+      if (keyDraft === undefined && valueDraft === undefined) return;
+      updateDataEntriesLocal((prev) => {
+        const next = [...prev];
+        const entry = next[index];
+        if (!entry) return prev;
+        const nextKey = keyDraft !== undefined ? keyDraft : entry.key;
+        const nextRawValue = valueDraft !== undefined ? valueDraft : entry.rawValue;
+        const nextValue =
+          valueDraft !== undefined ? parseValueFromString(nextRawValue, entry.type) : entry.value;
+        const nextType =
+          valueDraft !== undefined ? detectType(nextValue) : entry.type;
+        next[index] = {
+          ...entry,
+          key: nextKey,
+          rawValue: nextRawValue,
+          value: nextValue,
+          type: nextType
+        };
+        return next;
+      });
+      delete jsonDraftRef.current.keys[index];
+      delete jsonDraftRef.current.values[index];
+      persistJsonEntries();
+    },
+    [persistJsonEntries, updateDataEntriesLocal]
+  );
+
+  const handleRemoveJsonField = useCallback(
+    (index) => {
+      updateDataEntries((prev) => {
+        const next = [...prev];
+        next.splice(index, 1);
+        return next;
+      });
+    },
+    [updateDataEntries]
+  );
+
   const handleToggleGroupCollapsed = useCallback(() => {
     if (!selectedGroup) return;
     onUpdateGroup(selectedGroup.id, { collapsed: !selectedGroup.collapsed });
@@ -283,19 +521,65 @@ const availableNodeTypeOptions =
         </Tooltip>
       </Stack>
       {payloadView === "friendly" ? (
-        payloadEntries.length ? (
+        dataEntries.length ? (
           <Stack spacing={1}>
-            {payloadEntries.map((entry) => (
-              <Paper key={entry.key} variant="outlined" sx={{ p: 1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="subtitle2">{entry.key}</Typography>
-                  <Chip size="small" label={entry.type} />
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
-                  {typeof entry.value === "string" ? entry.value : JSON.stringify(entry.value)}
-                </Typography>
-              </Paper>
-            ))}
+            {dataEntries.map((entry, index) => {
+                const isMarkdownField =
+                  entry.type === "string" &&
+                  ((entry.key && entry.key.toLowerCase().includes("markdown")) ||
+                    entry.rawValue?.includes("\n"));
+                const previewMode = markdownPreviewMode[index] ?? false;
+                return (
+                  <Paper key={entry.key || index} variant="outlined" sx={{ p: 1 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={0.5}>
+                      <Typography variant="subtitle2">{entry.key || "(unnamed)"}</Typography>
+                      {isMarkdownField && (
+                        <Stack direction="row" alignItems="center" spacing={0.25}>
+                          <Typography variant="caption" color="text.secondary">
+                            {previewMode ? "Preview" : "Edit"}
+                          </Typography>
+                          <Switch
+                            size="small"
+                            checked={previewMode}
+                            onChange={(event) =>
+                              setMarkdownPreviewMode((prev) => ({ ...prev, [index]: event.target.checked }))
+                            }
+                          />
+                        </Stack>
+                      )}
+                      <Chip size="small" label={entry.type} />
+                    </Stack>
+                    {isMarkdownField && previewMode && (
+                      <Box
+                        sx={{
+                          mt: 1,
+                          p: 1,
+                          border: 1,
+                          borderColor: "divider",
+                          borderRadius: 1,
+                          minHeight: 160,
+                          maxHeight: 320,
+                          overflowY: "auto",
+                          bgcolor: "background.default"
+                        }}
+                      >
+                        <MarkdownRenderer content={entry.rawValue || ""} />
+                      </Box>
+                    )}
+                    {(!isMarkdownField || !previewMode) && (
+                      <TextField
+                        label="Value"
+                        size="small"
+                        fullWidth
+                        multiline={isMarkdownField}
+                        minRows={isMarkdownField ? 4 : 1}
+                        value={entry.rawValue}
+                        onChange={(event) => handleFriendlyValueChange(index, event.target.value)}
+                      />
+                    )}
+                  </Paper>
+                );
+              })}
           </Stack>
         ) : (
           <Typography variant="body2" color="text.secondary">
@@ -303,9 +587,95 @@ const availableNodeTypeOptions =
           </Typography>
         )
       ) : (
-        <Paper variant="outlined" sx={{ p: 1, fontFamily: "Monospace", whiteSpace: "pre-wrap" }}>
-          {payloadJson}
-        </Paper>
+        <Box key={`json-view-${activeSelectionId || "none"}-${jsonViewRevision}`}>
+              <Paper
+                variant="outlined"
+                sx={{ p: 2, fontFamily: "Monospace", whiteSpace: "pre-wrap", mb: 1, maxWidth: "100%", overflowX: "auto" }}
+              >
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="subtitle2">Serialized JSON</Typography>
+              <Tooltip title="Copy current JSON">
+                <IconButton size="small" onClick={() => copyToClipboard(payloadJson)}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Box display="flex" justifyContent="flex-end" mb={1}>
+              <Button size="small" variant="outlined" onClick={handleAddJsonField}>
+                Add field
+              </Button>
+            </Box>
+              <Box component="pre" sx={{ fontFamily: "monospace", p: 0, m: 0 }}>
+                {"{\n"}
+                {dataEntries.map((entry, idx) => {
+                  const isMarkdownField =
+                    entry.type === "string" &&
+                    ((entry.key && entry.key.toLowerCase().includes("markdown")) ||
+                      entry.rawValue?.includes("\n"));
+                  const displayKey = entry.key || (isMarkdownField ? "markdown" : "field");
+                  const rawValue =
+                    typeof entry.value === "string"
+                      ? entry.value
+                      : JSON.stringify(entry.value);
+                  const previewValue = rawValue.split("\n")[0];
+                  const displayValue =
+                    previewValue.length > 60 ? `${previewValue.slice(0, 60)}…` : previewValue;
+                  return (
+                    <Box key={`json-pre-${idx}`} component="div" sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                      <Typography variant="body2" component="span">
+                        "
+                      </Typography>
+                      <TextField
+                        key={`json-key-${activeSelectionId || "none"}-${idx}`}
+                        variant="standard"
+                        defaultValue={entry.key}
+                        placeholder={displayKey}
+                        onChange={(event) => handleJsonKeyDraftChange(idx, event.target.value)}
+                        onBlur={() => handleJsonDraftBlur(idx)}
+                        InputProps={{
+                          disableUnderline: true,
+                          sx: {
+                            fontFamily: "monospace",
+                            fontSize: "0.85rem",
+                            width: 110,
+                            minWidth: 80
+                          }
+                        }}
+                      />
+                      <Typography variant="body2" component="span">
+                        ": "
+                      </Typography>
+                      <TextField
+                        key={`json-value-${activeSelectionId || "none"}-${idx}`}
+                        variant="standard"
+                        defaultValue={entry.rawValue}
+                        placeholder={displayValue}
+                        onChange={(event) => handleJsonValueDraftChange(idx, event.target.value)}
+                        onBlur={() => handleJsonDraftBlur(idx)}
+                        InputProps={{
+                          disableUnderline: true,
+                          sx: {
+                            fontFamily: "monospace",
+                            fontSize: "0.85rem",
+                            width: 180,
+                            minWidth: 100
+                          }
+                        }}
+                      />
+                      <Typography variant="body2" component="span">
+                        "
+                        {idx < dataEntries.length - 1 ? "," : ""}
+                      </Typography>
+                      <IconButton size="small" onClick={() => handleRemoveJsonField(idx)}>
+                        <CloseIcon fontSize="inherit" />
+                      </IconButton>
+                    </Box>
+                  );
+                })}
+                {"}"}
+              </Box>
+          </Paper>
+        </Box>
       )}
     </Section>
   );
@@ -560,36 +930,39 @@ const availableNodeTypeOptions =
 
   const renderEdgeView = () => (
     <>
-      <Section
-        title="Edge details"
-        value="details"
-        expanded={expandedSections.edge === "details"}
-        onToggle={handleAccordionChange("edge", "details")}
-        disabled={!isEdgeSelected}
-      >
-        <Stack spacing={1}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="properties-edge-type-label">Edge type</InputLabel>
-            <Select
-              labelId="properties-edge-type-label"
-              label="Edge type"
-              value={selectedEdge?.type || ""}
-              onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { type: event.target.value })}
-            >
-              {edgeTypeOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Typography variant="caption">Type</Typography>
-          <Typography variant="body2">{selectedEdge?.type || "edge"}</Typography>
-          <Typography variant="caption">Connection</Typography>
-          <Typography variant="body2">
-            {edgeSourceNode?.label || edgeSourceNode?.id || selectedEdge?.source} →{" "}
-            {edgeTargetNode?.label || edgeTargetNode?.id || selectedEdge?.target}
-          </Typography>
+          <Section
+            title="Edge details"
+            value="details"
+            expanded={expandedSections.edge === "details"}
+            onToggle={handleAccordionChange("edge", "details")}
+            disabled={!isEdgeSelected}
+          >
+            <Stack spacing={1}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="properties-edge-type-label">Edge type</InputLabel>
+                <Select
+                  labelId="properties-edge-type-label"
+                  label="Edge type"
+                  value={selectedEdge?.type || ""}
+                  onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { type: event.target.value })}
+                >
+                  {edgeTypeOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                        <Typography variant="subtitle2">{option.label}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {option.description}
+                        </Typography>
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Typography variant="caption">Connection</Typography>
+              <Typography variant="body2">
+                {edgeSourceNode?.label || edgeSourceNode?.id || selectedEdge?.source} →{" "}
+                {edgeTargetNode?.label || edgeTargetNode?.id || selectedEdge?.target}
+              </Typography>
           <Typography variant="caption">Handles</Typography>
           <Typography variant="body2">
             {selectedEdge?.sourceHandle || "out"} → {selectedEdge?.targetHandle || "in"}
@@ -724,7 +1097,19 @@ const availableNodeTypeOptions =
             {groupMemberNodes.map((node) => (
               <ListItem key={node.id} divider disablePadding>
                 <ListItemButton onClick={() => onSelectNode?.(node.id)}>
-                  <ListItemText primary={node.label || node.id} secondary={node.type} />
+                  <ListItemText
+                    primary={
+                      node.label ||
+                      node.data?.label ||
+                      (node.type ? `${node.type}` : `Node ${node.id}`) ||
+                      `Node ${node.id}`
+                    }
+                    secondary={
+                      node.type
+                        ? `${node.type} · ${node.id}`
+                        : node.id
+                    }
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -746,10 +1131,29 @@ const availableNodeTypeOptions =
       variant="persistent"
       ModalProps={{ keepMounted: true }}
       BackdropProps={{ invisible: true }}
+      PaperProps={{
+        sx: {
+          width: panelWidth,
+          position: "relative"
+        }
+      }}
     >
       <Box
+        onPointerDown={handleResizeStart}
         sx={{
-          width: 420,
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          width: 8,
+          cursor: "col-resize",
+          zIndex: 2,
+          ...(anchor === "right" ? { left: 0 } : { right: 0 }),
+          "&:hover": { backgroundColor: "action.hover" }
+        }}
+      />
+      <Box
+        sx={{
+          width: "100%",
           display: "flex",
           flexDirection: "column",
           height: "100%",
