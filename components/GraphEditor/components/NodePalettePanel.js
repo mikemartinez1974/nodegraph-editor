@@ -122,11 +122,16 @@ const NodePaletteSection = ({ title, nodes, onSelect, favorites, onToggleFavorit
   );
 };
 
+const VALID_ANCHORS = new Set(['left', 'right', 'top', 'bottom']);
+
 export default function NodePalettePanel({
   open,
   onClose,
   anchor = 'left'
 }) {
+  const normalizedAnchor = typeof anchor === 'string' ? anchor.toLowerCase() : '';
+  const safeAnchor = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : 'left';
+
   const { plugins } = usePluginRegistry();
   const nodesByCategory = useMemo(() => getNodeTypesByCategory(), [plugins]);
   const orderedCategories = useMemo(() => {
@@ -217,7 +222,7 @@ export default function NodePalettePanel({
 
   return (
     <Drawer
-      anchor={anchor}
+      anchor={safeAnchor}
       open={open}
       onClose={onClose}
       ModalProps={{ keepMounted: true }}

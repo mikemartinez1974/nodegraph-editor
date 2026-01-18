@@ -136,6 +136,9 @@ export default function PropertiesPanel({
   anchor = "right",
   onResize
 }) {
+  const VALID_ANCHORS = useMemo(() => new Set(["left", "right", "top", "bottom"]), []);
+  const normalizedAnchor = typeof anchor === "string" ? anchor.toLowerCase() : "";
+  const anchorValue = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : "right";
   const [payloadView, setPayloadView] = useState("friendly");
   const [preset, setPreset] = useState("default");
   const [dataEntries, setDataEntries] = useState([]);
@@ -206,11 +209,11 @@ export default function PropertiesPanel({
       const clientX = event.clientX ?? 0;
       const { startX, startWidth } = resizeStateRef.current;
       const delta = clientX - startX;
-      const direction = anchor === "right" ? -1 : 1;
+      const direction = anchorValue === "right" ? -1 : 1;
       const nextWidth = Math.min(MAX_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, startWidth + direction * delta));
       setPanelWidth(nextWidth);
     },
-    [anchor]
+    [anchorValue]
   );
 
   const handleResizeEnd = useCallback(() => {
@@ -1173,8 +1176,8 @@ const availableNodeTypeOptions =
   );
 
   return (
-    <Drawer
-      anchor={anchor}
+      <Drawer
+        anchor={anchorValue}
       open={open}
       onClose={onClose}
       variant="persistent"
@@ -1197,7 +1200,7 @@ const availableNodeTypeOptions =
           width: 8,
           cursor: "col-resize",
           zIndex: 2,
-          ...(anchor === "right" ? { left: 0 } : { right: 0 }),
+          ...(anchorValue === "right" ? { left: 0 } : { right: 0 }),
           "&:hover": { backgroundColor: "action.hover" }
         }}
       />

@@ -1,0 +1,217 @@
+# Handle Contract Template
+
+> **Authority:** This document is normative.
+> Any edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to a handle contract defined using this template.
+> Tools and agents may not guess, infer, or invent handle behavior.
+
+---
+
+## 0. Metadata
+
+* **Handle ID:** `<handle-id>`
+* **Node type:** `<node-type>`
+* **Contract version:** `MAJOR.MINOR.PATCH`
+* **Status:** `experimental | stable | deprecated`
+* **Defined in:** `contracts/handles/<node-type>.md`
+
+---
+
+## 1. Semantic Meaning (REQUIRED)
+
+Describe **what this handle represents** in the domain.
+
+This meaning is portable and invariant across editors, renderers, and agents.
+
+* What kind of relationship does this handle express?
+* What does it mean when an edge exists here?
+* What would be false if this handle were misused?
+
+---
+
+## 2. Direction (REQUIRED)
+
+Defines **how meaning flows** through this handle.
+
+Allowed values:
+
+* `input`
+* `output`
+* `bidirectional`
+
+Direction is semantic, not visual.
+
+---
+
+## 3. Semantic Type (REQUIRED)
+
+Defines **what kind of meaning** flows through this handle.
+
+Examples:
+
+* text
+* control
+* data
+* graph_ref
+* voltage
+* constraint
+* event
+
+Semantic types are not programming types; they are conceptual contracts.
+
+---
+
+## 4. Multiplicity (REQUIRED)
+
+Defines how many edges may attach to this handle.
+
+Allowed values:
+
+* `one`
+* `many`
+
+Multiplicity prevents structural ambiguity.
+
+---
+
+## 5. Compatibility Rules (REQUIRED)
+
+Define what this handle may connect to.
+
+### Allowed connections
+
+```yaml
+- nodeType: <other-node-type>
+  handleId: <handle-id>
+  semanticType: <type>
+```
+
+### Forbidden connections
+
+```yaml
+- reason: <why this is invalid>
+  nodeType: <type>
+  handleId: <handle-id>
+```
+
+Rules:
+
+* Compatibility must be explicit
+* Omitted connections are forbidden
+* Wildcards must be declared
+
+---
+
+## 6. Wildcard Policy (REQUIRED)
+
+Defines whether unspecified connections are allowed.
+
+* `forbidden` (default, strict)
+* `allowed` (exploratory)
+
+If wildcards are allowed, validators MUST still enforce semanticType matching.
+
+---
+
+## 7. Structural Constraints
+
+Declare structural rules that must never be violated.
+
+Examples:
+
+* No self-loops
+* No cycles
+* One per group
+* Must connect before execution
+* Must not cross graph boundary
+
+These rules protect meaning and history.
+
+---
+
+## 8. Allowed Mutations
+
+List legal changes to edges attached to this handle.
+
+* add edge: allowed
+* remove edge: allowed
+* rewire edge: forbidden
+* change handle ID: forbidden
+
+Mutations not listed here are forbidden.
+
+---
+
+## 9. Validation Rules
+
+Validators MUST enforce:
+
+* Direction correctness
+* Semantic type compatibility
+* Multiplicity limits
+* Structural constraints
+* Wildcard policy
+
+Validation failure MUST block persistence and execution.
+
+---
+
+## 10. Examples
+
+### Valid example
+
+```json
+{
+  "source": "nodeA",
+  "sourceHandle": "data_out",
+  "target": "nodeB",
+  "targetHandle": "data_in"
+}
+```
+
+### Invalid example (must fail)
+
+```json
+{
+  "source": "nodeA",
+  "sourceHandle": "data_out",
+  "target": "nodeA",
+  "targetHandle": "data_out"
+}
+```
+
+---
+
+## 11. Migration Notes
+
+Document how this handle evolved over time.
+
+### From v0.x → v1.0
+
+* Renamed from `output`
+* Multiplicity changed from many → one
+
+Migrations must be explicit and reversible.
+
+---
+
+## 12. Agent Rules (REQUIRED)
+
+Agents MUST:
+
+* Read handle contracts before connecting nodes
+* Refuse incompatible connections
+* Prefer add/remove over rewire
+* Emit errors instead of guessing
+* Respect multiplicity and structure
+
+---
+
+## 13. Human Notes (OPTIONAL)
+
+Explain intent, edge cases, and design rationale.
+
+Ignored by validators but critical for stewardship.
+
+---
+
+**End of handle contract.**

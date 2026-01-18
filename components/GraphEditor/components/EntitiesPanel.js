@@ -18,6 +18,8 @@ const VIEW_LABELS = {
   groups: "Groups"
 };
 
+const VALID_ANCHORS = new Set(["left", "right", "top", "bottom"]);
+
 export default function EntitiesPanel({
   open = false,
   entityView = "nodes",
@@ -33,6 +35,9 @@ export default function EntitiesPanel({
   onClose = () => {},
   anchor = "left"
 }) {
+  const normalizedAnchor = typeof anchor === "string" ? anchor.toLowerCase() : "";
+  const safeAnchor = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : "left";
+
   const renderNodes = () => {
     if (!nodes?.length) {
       return <Typography variant="body2" color="text.secondary">No nodes found.</Typography>;
@@ -75,7 +80,7 @@ export default function EntitiesPanel({
             >
               <ListItemText
                 primary={edge.label || edge.id}
-                secondary={`${edge.source} → ${edge.target}`}
+                secondary={`${edge.source} -> ${edge.target}`}
               />
             </ListItemButton>
           </ListItem>
@@ -115,7 +120,7 @@ export default function EntitiesPanel({
 
   return (
     <Drawer
-      anchor={anchor}
+      anchor={safeAnchor}
       open={Boolean(open)}
       onClose={onClose}
       variant="persistent"
