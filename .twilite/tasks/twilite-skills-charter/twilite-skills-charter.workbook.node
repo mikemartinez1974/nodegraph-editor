@@ -1,0 +1,3035 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-18T02:15:32.562Z",
+    "modified": "2026-01-18T02:15:32.562Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 748.2185194345835,
+      "y": -437.4440973577382
+    },
+    "zoom": 0.31669776488014917
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a1f2c001-6c7e-4f3b-9b1b-01a8a9e2c111",
+      "type": "markdown",
+      "label": "Task 1: Capability & Documentation Layer",
+      "position": {
+        "x": -732.1377797248462,
+        "y": -1509.801082210012
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Define how humans, agents, and tools **learn, act, and evolve** within Twilite.\n\nThis task covers onboarding, protocols, skills, and machine-readable contracts.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a1f2c002-9c8d-4a7e-9c42-02b9d1a2c222",
+      "type": "markdown",
+      "label": "Onboarding (Human)",
+      "position": {
+        "x": -1265.388299524431,
+        "y": 2100.969717544886
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Narrative entry into Twilite.\n\nExplains mindset, continuity, stewardship, and how to safely begin work in an existing graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
+      "type": "markdown",
+      "label": "Core Protocols",
+      "position": {
+        "x": -632.4796694529343,
+        "y": -1197.6168329058444
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Non-negotiable invariants.\n\nIdentity vs value, render vs meaning, mutation vs illustration, persistence rules.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "type": "markdown",
+      "label": "Skill System",
+      "position": {
+        "x": -771.4219533571531,
+        "y": 1725.208604121633
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines **operations on graphs**, not UI features.\n\nLayout, routing, validation, transformation, automation, compilation.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "type": "markdown",
+      "label": "Schemas & Contracts",
+      "position": {
+        "x": -1070.038547418052,
+        "y": 4014.0235566182505
+      },
+      "width": 310,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Machine-readable truth for tools and agents.\n\nNode schemas, handle contracts, versioning expectations.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d001-8a9c-4d1e-9f55-11a1b2c3d111",
+      "type": "markdown",
+      "label": "Task 2: Graph as a Web Artifact",
+      "position": {
+        "x": -1248.539612070966,
+        "y": -1504.5615896616423
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Define what it means for a graph to **exist, travel, and remain interpretable on the web**.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d002-1c3e-4f7d-8a61-12b2c3d4e222",
+      "type": "markdown",
+      "label": "What Is a Graph?",
+      "position": {
+        "x": -1244.5174198811826,
+        "y": -1138.4208998494607
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "A persistent, stateful artifact.\n\nNot a picture. Not disposable. Carries identity, meaning, and history.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "type": "markdown",
+      "label": "Manifest Node",
+      "position": {
+        "x": -1281.732253504033,
+        "y": -232.5485913779632
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares graph identity, dependencies, expected node types, and version context.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "type": "markdown",
+      "label": "Style Node",
+      "position": {
+        "x": -1291.6901623301835,
+        "y": 383.22901539172443
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Visual intent belongs in the graph.\n\nStyle is descriptive, portable, and UI-agnostic.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "type": "markdown",
+      "label": "Canonical Node Roles",
+      "position": {
+        "x": -1272.1651112573434,
+        "y": -772.2955071658416
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Minimal roles required to build anything:\n\nManifest, Definitions, Content, Structure, Style.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "type": "markdown",
+      "label": "Data vs UI Boundary",
+      "position": {
+        "x": -1301.9550641643511,
+        "y": 1025.990863737031
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "What belongs in the graph vs the editor.\n\nIf it affects meaning or portability, it is data.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mfest-identity-0001",
+      "type": "markdown",
+      "label": "Identity",
+      "position": {
+        "x": 468.1363261936367,
+        "y": 20.979520392672327
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines **what this graph is**.\n\nIncludes:\n- Graph name\n- Stable identifier\n- Version\n- Human-readable description\n\nWithout identity, graphs cannot travel safely or be referenced meaningfully.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mfest-intent-0002",
+      "type": "markdown",
+      "label": "Intent & Scope",
+      "position": {
+        "x": -254.28240397813417,
+        "y": 28.18944617935375
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **what kind of graph this is meant to be**.\n\nExamples:\n- Documentation graph\n- Breadboard simulation\n- Workflow\n- Knowledge map\n\nIntent constrains interpretation without enforcing implementation.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mfest-deps-0003",
+      "type": "markdown",
+      "label": "Dependencies & Requirements",
+      "position": {
+        "x": 814.8321330784418,
+        "y": 24.46198938705237
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **what must be understood** to render or operate on this graph reliably.\n\nIncludes:\n- Required node types\n- Node definition sources\n- Required skills\n- Optional version constraints\n\nThis enforces closure.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mfest-authority-0004",
+      "type": "markdown",
+      "label": "Authority & Boundaries",
+      "position": {
+        "x": 103.55901568539161,
+        "y": 19.934846834603775
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **what is authoritative and what is optional**.\n\nExamples:\n- Whether style nodes must be respected\n- Whether mutation is allowed\n- Whether the graph is append-only\n\nPrevents editors and agents from inventing behavior.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "role-manifest-0001",
+      "type": "markdown",
+      "label": "Manifest Role",
+      "position": {
+        "x": -176.07247989839976,
+        "y": -530.9713335566944
+      },
+      "width": 300,
+      "height": 177.6203688040449,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **what the graph is**.\n\nResponsibilities:\n- Identity\n- Intent\n- Dependencies\n- Authority\n\nThere should typically be **one** manifest per graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "role-definitions-0002",
+      "type": "markdown",
+      "label": "Definitions Role",
+      "position": {
+        "x": 995.7360903083359,
+        "y": -539.5631432835962
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines **what node types mean**.\n\nResponsibilities:\n- Node schemas\n- Handle contracts\n- Semantic constraints\n\nDefinitions explain structure; they do not contain domain content.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "role-content-0003",
+      "type": "markdown",
+      "label": "Content Role",
+      "position": {
+        "x": 620.0496205833501,
+        "y": -537.5314200695502
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Carries the **actual subject matter** of the graph.\n\nExamples:\n- Notes\n- Tasks\n- Circuits\n- Workflows\n\nContent nodes are why the graph exists.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "role-structure-0004",
+      "type": "markdown",
+      "label": "Structure Role",
+      "position": {
+        "x": 1347.5104592880625,
+        "y": -544.5857095670817
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines **relationships and containment**.\n\nIncludes:\n- Edges\n- Groups\n- Hierarchies\n\nStructure gives shape without adding meaning.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "role-style-0005",
+      "type": "markdown",
+      "label": "Style Role",
+      "position": {
+        "x": 200.83302375501353,
+        "y": -533.032342884695
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **visual intent**.\n\nIncludes:\n- Colors\n- Typography hints\n- Emphasis rules\n\nStyle is descriptive and portable, never UI-specific.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "style-roles-0001",
+      "type": "markdown",
+      "label": "Visual Roles",
+      "position": {
+        "x": -294.4064548939044,
+        "y": 623.1441239474084
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines **semantic visual roles**, not colors.\n\nExamples:\n- primary\n- secondary\n- accent\n- warning\n- danger\n- muted\n\nRoles express *meaning*, not appearance. Rendering adapters decide how roles are mapped to concrete visuals.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "style-emphasis-0002",
+      "type": "markdown",
+      "label": "Emphasis & Hierarchy",
+      "position": {
+        "x": 82.88135095856342,
+        "y": 630.1813922985564
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Declares **what should stand out and what should recede**.\n\nExamples:\n- headings vs details\n- critical vs background nodes\n- primary vs supporting edges\n\nEmphasis communicates reading order and importance, independent of font size or layout.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "style-state-0003",
+      "type": "markdown",
+      "label": "State Signaling",
+      "position": {
+        "x": 450.7861323428333,
+        "y": 623.1441239474084
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Encodes **meaningful states** that affect interpretation.\n\nExamples:\n- draft\n- stable\n- deprecated\n- experimental\n- error\n\nStates are semantic signals for humans, agents, and validators — not transient UI effects.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "style-grouping-0004",
+      "type": "markdown",
+      "label": "Grouping & Scope Cues",
+      "position": {
+        "x": 813.9994014930048,
+        "y": 616.1068555962602
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Hints at **visual containment and scope**.\n\nExamples:\n- background vs foreground groups\n- contextual clusters\n- conceptual boundaries\n\nThese cues help readers perceive structure without enforcing layout or hierarchy.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "boundary-meaning-0001",
+      "type": "markdown",
+      "label": "Meaning Ownership",
+      "position": {
+        "x": -272.41755037347775,
+        "y": 1318.3164290419656
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Anything that affects **interpretation or semantics** belongs in the graph.\n\nExamples:\n- Node identity and type\n- Edges and relationships\n- Definitions and constraints\n- Semantic states (draft, deprecated)\n\nIf removing it changes what the graph *means*, it is data.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "boundary-portability-0002",
+      "type": "markdown",
+      "label": "Portability Test",
+      "position": {
+        "x": 84.50284137196888,
+        "y": 1312.258904557875
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Ask: *Would another tool need this to understand the graph correctly?*\n\nIf yes, it belongs in the graph.\n\nPortability protects:\n- Sharing\n- Versioning\n- Tool independence\n- Agent reasoning",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "boundary-ui-0003",
+      "type": "markdown",
+      "label": "UI-Only Concerns",
+      "position": {
+        "x": 441.9206284793753,
+        "y": 1310.4571267964263
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "UI state belongs to the editor, not the graph.\n\nExamples:\n- Selection\n- Hover state\n- Camera position\n- Zoom level\n- Open panels\n- Animations\n\nThese are conveniences, not truth.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "boundary-diffs-0004",
+      "type": "markdown",
+      "label": "Diff & History Hygiene",
+      "position": {
+        "x": 787.7429570157046,
+        "y": 1322.859572405033
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Persisting UI state pollutes history.\n\nGraph data should:\n- Produce meaningful diffs\n- Preserve intent over time\n- Avoid noisy churn\n\nIf it makes Git history worse, it probably belongs in the UI.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-structural-0001",
+      "type": "markdown",
+      "label": "Structural Skills",
+      "position": {
+        "x": -229.66533868226412,
+        "y": 2013.3659590180393
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Operate on **graph topology**.\n\nExamples:\n- create / delete nodes\n- create / delete edges\n- group / ungroup\n- reparent\n- duplicate\n- extract subgraph\n\nThese skills define what the graph *is*.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-layout-0002",
+      "type": "markdown",
+      "label": "Layout & Spatial Skills",
+      "position": {
+        "x": 138.5154950948172,
+        "y": 2023.7358184093011
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Operate on **readability and spatial clarity**.\n\nExamples:\n- auto-layout (ELK)\n- reroute edges\n- avoid collisions\n- align / distribute\n- normalize spacing\n\nLayout is a transformation of structure, not UI decoration.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-validation-0003",
+      "type": "markdown",
+      "label": "Validation & Safety Skills",
+      "position": {
+        "x": 549.2573160547554,
+        "y": 2017.8153536779457
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Detect **invalid or unsafe graph states**.\n\nExamples:\n- schema validation\n- handle compatibility checks\n- missing dependency detection\n- orphan detection\n- unsafe mutation detection\n\nThese skills protect humans, agents, and history.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-transform-0004",
+      "type": "markdown",
+      "label": "Transformation Skills",
+      "position": {
+        "x": 928.9309124929764,
+        "y": 2013.3659590180393
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Change graph **representation without changing meaning**.\n\nExamples:\n- refactor (split / merge)\n- normalize / denormalize\n- type migration\n- schema upgrades\n- inline / extract\n\nThese skills allow graphs to evolve over time.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "skill-automation-0005",
+      "type": "markdown",
+      "label": "Automation & Compilation Skills",
+      "position": {
+        "x": 1337.530976335167,
+        "y": 2015.418694689599
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Execute **procedural or repeatable operations**.\n\nExamples:\n- script execution\n- batch mutation\n- procedural generation\n- simulation steps\n- compile graph → artifact\n- import / export\n\nThese skills make graphs executable and alive.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-create-nodes-0001",
+      "type": "markdown",
+      "label": "Create Nodes",
+      "position": {
+        "x": -209.66533868226412,
+        "y": 2343.365959018039
+      },
+      "width": 300,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Create new nodes without disturbing existing state.\n\n**Implementation suggestion:**\n- Use `createNodes` with explicit UUIDs\n- Omit position to allow auto-layout\n- Always include width/height\n- Never recreate existing IDs\n\nThis skill is foundational and must be safe to repeat.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-create-edges-0002",
+      "type": "markdown",
+      "label": "Create Edges",
+      "position": {
+        "x": -208.91182346380424,
+        "y": 2562.614414718999
+      },
+      "width": 300,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Attach relationships between existing nodes.\n\n**Implementation suggestion:**\n- Validate both node IDs exist before wiring\n- Require handles when semantics matter\n- Fail fast if handle contracts are missing\n- Prefer additive edges over rewiring\n\nEdges change meaning. Treat them carefully.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-grouping-0003",
+      "type": "markdown",
+      "label": "Group / Ungroup",
+      "position": {
+        "x": -205.19549127641255,
+        "y": 2812.972448593743
+      },
+      "width": 300,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Create or dissolve containment without altering meaning.\n\n**Implementation suggestion:**\n- Use groups as structural containers only\n- Never move nodes implicitly when grouping\n- Preserve relative positions\n- Update group bounds after mutation\n\nGrouping should clarify, not rearrange.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-reparent-0004",
+      "type": "markdown",
+      "label": "Reparent",
+      "position": {
+        "x": -205.9233845424189,
+        "y": 3054.442031561692
+      },
+      "width": 300,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Move nodes between structural containers.\n\n**Implementation suggestion:**\n- Explicitly remove from old group before add\n- Log intent in a markdown node if meaning shifts\n- Never reparent implicitly during layout\n\nReparenting is structural surgery. Be explicit.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-duplicate-0005",
+      "type": "markdown",
+      "label": "Duplicate",
+      "position": {
+        "x": -199.0618998001501,
+        "y": 3552.848833461941
+      },
+      "width": 300,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Clone nodes (and optionally edges) safely.\n\n**Implementation suggestion:**\n- Always mint new UUIDs\n- Optionally include internal edges only\n- Never duplicate external edges by default\n- Offset positions slightly to avoid overlap\n\nDuplication must never create identity collisions.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "struct-extract-0006",
+      "type": "markdown",
+      "label": "Extract Subgraph",
+      "position": {
+        "x": -201.9401404302936,
+        "y": 3288.8911550721145
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Lift a subset of nodes into a new cluster or file.\n\n**Implementation suggestion:**\n- Compute closure (nodes + internal edges)\n- Emit as `create` payload, not snapshot\n- Preserve original IDs unless explicitly forked\n- Optionally generate a new Manifest node\n\nExtraction is how graphs become portable.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layout-auto-elk-0001",
+      "type": "markdown",
+      "label": "Auto-Layout (ELK)",
+      "position": {
+        "x": 166.29436782782807,
+        "y": 2357.365959018039
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Recompute spatial arrangement for clarity using ELK.\n\n**Implementation suggestion:**\n- Rebuild ELK graph from current node sizes + handles\n- Respect locked/pinned nodes as obstacles\n- Persist ELK options in Document Properties\n- Never mutate meaning (edges, groups, IDs)\n\nAuto-layout is deterministic, replayable, and reversible.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layout-reroute-edges-0002",
+      "type": "markdown",
+      "label": "Reroute Edges",
+      "position": {
+        "x": 167.047883046288,
+        "y": 2606.2425844083177
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Recompute edge paths without changing endpoints.\n\n**Implementation suggestion:**\n- Use ELK port data, never guess\n- Preserve source/target handles exactly\n- Replace `edgeRoutes` only\n- Avoid manual bend injection\n\nRerouting changes readability, not relationships.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layout-avoid-collisions-0003",
+      "type": "markdown",
+      "label": "Avoid Collisions",
+      "position": {
+        "x": 161.87576432688377,
+        "y": 2855.119209798596
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Resolve overlapping nodes and crossings.\n\n**Implementation suggestion:**\n- Treat node bounds as hard constraints\n- Use spacing rules, not teleportation\n- Prefer small incremental moves\n- Never cross group boundaries implicitly\n\nCollision avoidance preserves spatial trust.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layout-align-distribute-0004",
+      "type": "markdown",
+      "label": "Align / Distribute",
+      "position": {
+        "x": 158.18505409194609,
+        "y": 3081.7747079218857
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Normalize alignment and spacing for readability.\n\n**Implementation suggestion:**\n- Align on centers or edges, never both\n- Distribute using consistent deltas (grid-aware)\n- Operate on explicit selections only\n- Do not infer intent from proximity\n\nAlignment is a user-declared refinement.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "layout-normalize-spacing-0005",
+      "type": "markdown",
+      "label": "Normalize Spacing",
+      "position": {
+        "x": 160.36873388996435,
+        "y": 3333.6220339587744
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Enforce consistent visual rhythm across the graph.\n\n**Implementation suggestion:**\n- Snap to 50px multiples (or doc setting)\n- Preserve relative ordering\n- Skip locked nodes\n- Apply in one axis at a time\n\nSpacing normalization improves scanability without re-layout.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "validate-schema-0001",
+      "type": "markdown",
+      "label": "Schema Validation",
+      "position": {
+        "x": 565.1868918314583,
+        "y": 2311.0776058148417
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Ensure nodes and edges conform to declared schemas.\n\n**Implementation suggestion:**\n- Validate node.type against Definitions Role\n- Check required fields (handles, data, size)\n- Version schemas explicitly\n- Fail fast before mutation\n\nSchema validation is the first line of defense.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "validate-handles-0002",
+      "type": "markdown",
+      "label": "Handle Compatibility Checks",
+      "position": {
+        "x": 568.9032240188501,
+        "y": 2558.472822720654
+      },
+      "width": 320,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Prevent invalid or meaningless connections.\n\n**Implementation suggestion:**\n- Verify handle IDs exist before wiring\n- Enforce semantic type matching when strict\n- Allow wildcards only when declared\n- Reject implicit handle creation\n\nHandles are contracts, not suggestions.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "validate-dependencies-0003",
+      "type": "markdown",
+      "label": "Missing Dependency Detection",
+      "position": {
+        "x": 557.8054713615822,
+        "y": 2850.3102941604448
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Detect graphs that cannot be safely interpreted.\n\n**Implementation suggestion:**\n- Read Manifest dependencies\n- Check required node types exist\n- Verify required skills are available\n- Surface errors as markdown nodes\n\nA graph that cannot be understood must not run.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "validate-orphans-0004",
+      "type": "markdown",
+      "label": "Orphan Detection",
+      "position": {
+        "x": 560.0403950645082,
+        "y": 3112.519595910917
+      },
+      "width": 320,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Identify disconnected or abandoned structures.\n\n**Implementation suggestion:**\n- Find nodes with no edges and no group\n- Flag unreachable subgraphs\n- Exclude intentional scratchpads\n- Offer repair, not auto-delete\n\nOrphans are questions, not trash.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "validate-unsafe-mutation-0005",
+      "type": "markdown",
+      "label": "Unsafe Mutation Detection",
+      "position": {
+        "x": 550.3728069867989,
+        "y": 3370.2925558856696
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Prevent actions that damage continuity or history.\n\n**Implementation suggestion:**\n- Block full `nodegraph-data` overwrites\n- Detect delete+recreate patterns\n- Warn on mass deletion\n- Require confirmation for destructive ops\n\nSafety skills protect time itself.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "transform-refactor-0001",
+      "type": "markdown",
+      "label": "Refactor (Split / Merge)",
+      "position": {
+        "x": 952.6354191638511,
+        "y": 2331.886521452993
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Restructure nodes while preserving semantics.\n\n**Implementation suggestion:**\n- Split nodes by extracting subsets into new nodes\n- Merge nodes only when schemas are compatible\n- Preserve original IDs when possible\n- Emit redirects or notes when identity changes\n\nRefactors change shape, not meaning.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "transform-normalize-0002",
+      "type": "markdown",
+      "label": "Normalize / Denormalize",
+      "position": {
+        "x": 959.3145683201747,
+        "y": 2604.4656825947263
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Shift between compact and expanded representations.\n\n**Implementation suggestion:**\n- Normalize by removing duplication\n- Denormalize for readability or locality\n- Track source-of-truth explicitly\n- Never denormalize without a re-normalization path\n\nThis skill trades space for clarity.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "transform-type-migration-0003",
+      "type": "markdown",
+      "label": "Type Migration",
+      "position": {
+        "x": 963.0309005075662,
+        "y": 2877.04484373646
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Upgrade or change node types safely.\n\n**Implementation suggestion:**\n- Validate target schema before mutation\n- Migrate data field-by-field\n- Preserve node ID across migration\n- Log version change in markdown\n\nType migration is evolution, not replacement.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "transform-schema-upgrade-0004",
+      "type": "markdown",
+      "label": "Schema Upgrades",
+      "position": {
+        "x": 966.7472326949585,
+        "y": 3159.9938642694556
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Adapt graphs to newer schema versions.\n\n**Implementation suggestion:**\n- Version schemas explicitly\n- Apply upgrade transforms incrementally\n- Never skip intermediate versions\n- Allow dryRun previews\n\nUpgrades must be replayable and reversible.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "transform-inline-extract-0005",
+      "type": "markdown",
+      "label": "Inline / Extract",
+      "position": {
+        "x": 974.8565464308401,
+        "y": 3445.9135854490605
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Move structure between abstraction layers.\n\n**Implementation suggestion:**\n- Inline when reducing indirection\n- Extract when increasing reuse or clarity\n- Preserve edges and handle semantics\n- Update references atomically\n\nAbstraction depth is a living choice.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-script-exec-0001",
+      "type": "markdown",
+      "label": "Script Execution",
+      "position": {
+        "x": 1364.1982999749732,
+        "y": 2344.864234089276
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Run ScriptNodes to perform procedural graph mutations.\n\n**Implementation suggestion:**\n- Execute in isolated transaction context\n- Allow dryRun for preview\n- Emit telemetry + logs to markdown nodes\n- Fail atomically on error\n\nScripts are hands, not minds. Keep them constrained.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-batch-mutation-0002",
+      "type": "markdown",
+      "label": "Batch Mutation",
+      "position": {
+        "x": 1366.433223677899,
+        "y": 2620.406212199942
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Apply many mutations as a single logical operation.\n\n**Implementation suggestion:**\n- Wrap in `batch` or `transaction`\n- Validate entire plan before execution\n- Roll back on partial failure\n- Preserve ordering (nodes → edges → groups)\n\nBatching makes scale safe.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-procedural-gen-0003",
+      "type": "markdown",
+      "label": "Procedural Generation",
+      "position": {
+        "x": 1364.2239219274268,
+        "y": 2887.0597394038114
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Generate large structures from compact intent.\n\n**Implementation suggestion:**\n- Use parameterized ScriptNodes\n- Always document inputs/outputs\n- Emit deterministic IDs when replayable\n- Group generated nodes explicitly\n\nProcedural generation is compression of intent.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-simulation-step-0004",
+      "type": "markdown",
+      "label": "Simulation Steps",
+      "position": {
+        "x": 1363.4960286614207,
+        "y": 3153.7132666076814
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Advance graph state through time-based execution.\n\n**Implementation suggestion:**\n- Treat each step as a reversible mutation\n- Store previous state for inspection\n- Never overwrite source definitions\n- Mark transient vs persistent state clearly\n\nSimulation is controlled mutation over time.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-compile-artifact-0005",
+      "type": "markdown",
+      "label": "Compile Graph → Artifact",
+      "position": {
+        "x": 1362.7168914905074,
+        "y": 3451.4842556630138
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Transform a graph into an external artifact.\n\n**Implementation suggestion:**\n- Read only canonical graph data\n- Never depend on editor UI state\n- Emit deterministic outputs\n- Include Manifest metadata in artifact\n\nCompilation is interpretation, not execution.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "auto-import-export-0006",
+      "type": "markdown",
+      "label": "Import / Export",
+      "position": {
+        "x": 1396.061393367218,
+        "y": 3771.468488307658
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Move graphs across systems safely.\n\n**Implementation suggestion:**\n- Import as `create` deltas, never snapshots\n- Export with closure (nodes + internal edges)\n- Preserve IDs unless explicitly forked\n- Validate schemas on entry\n\nPortability is survival.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-node-schemas-0001",
+      "type": "markdown",
+      "label": "Node Type Schemas",
+      "position": {
+        "x": -202.24746378949027,
+        "y": 4195.588842577667
+      },
+      "width": 340,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines the structure and meaning of every node type.\n\n**This document must specify:**\n- `type` name\n- required vs optional fields\n- `data` shape\n- handles (if any)\n- semantic meaning\n- examples\n- schema version\n- migration notes\n\n**Suggested location:**\n`contracts/nodes/*.md`\n\nWithout this, agents cannot create nodes safely.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-handle-contracts-0002",
+      "type": "markdown",
+      "label": "Handle Contracts",
+      "position": {
+        "x": 150.83312115009608,
+        "y": 4194.259119935672
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines legal and meaningful connections between nodes.\n\n**This document must specify:**\n- handle IDs\n- direction (input/output/bidirectional)\n- semantic types\n- compatibility rules\n- wildcards vs strict matching\n- invalid combinations\n- examples\n\n**Suggested location:**\n`contracts/handles/*.md`\n\nHandles are grammar. This is non-optional.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-schema-versioning-0003",
+      "type": "markdown",
+      "label": "Schema Versioning & Migration",
+      "position": {
+        "x": 510.5623192996528,
+        "y": 4196.918565219661
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines how schemas evolve without breaking graphs.\n\n**This document must specify:**\n- version numbering rules\n- allowed upgrade paths\n- deprecated fields\n- migration transforms\n- upgrade ordering\n- rollback expectations\n\n**Suggested location:**\n`contracts/migrations.md`\n\nThis is how graphs survive time.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-skill-contracts-0004",
+      "type": "markdown",
+      "label": "Skill Contracts",
+      "position": {
+        "x": 886.248189153139,
+        "y": 4199.578010503649
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines what each skill is allowed to do.\n\n**This document must specify:**\n- skill name\n- inputs and outputs\n- preconditions\n- postconditions\n- forbidden actions\n- failure modes\n- dryRun behavior\n\n**Suggested location:**\n`contracts/skills/*.md`\n\nThis lets agents act without fear.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-manifest-contract-0005",
+      "type": "markdown",
+      "label": "Manifest Contract",
+      "position": {
+        "x": 1236.5124348481136,
+        "y": 4200.0112934643585
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines what a Manifest node must contain and enforce.\n\n**This document must specify:**\n- identity fields\n- intent values\n- dependency declarations\n- authority flags\n- mutation policies\n- validation rules\n\n**Suggested location:**\n`contracts/manifest.md`\n\nThe Manifest is the law of the graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "doc-validation-rules-0006",
+      "type": "markdown",
+      "label": "Validation Rules",
+      "position": {
+        "x": 1593.5821877136823,
+        "y": 4196.022125538376
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Defines global and local invariants for safe graphs.\n\n**This document must specify:**\n- required invariants\n- forbidden states\n- warning vs error rules\n- auto-fixable conditions\n- validator ordering\n\n**Suggested location:**\n`contracts/validation.md`\n\nThis is the immune system in writing.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-docs-root-0001",
+      "type": "markdown",
+      "label": "📋 Required Documentation",
+      "position": {
+        "x": -4096.316352163827,
+        "y": -1947.0154358548662
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Every Twilite graph must be supported by these canonical documents.**\n\nThese contracts live outside individual graphs but govern all graphs.\n\nWithout these, agents cannot act safely, tools cannot interoperate, and graphs cannot evolve.\n\n*Location:* `contracts/` directory",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-node-schemas-0001",
+      "type": "markdown",
+      "label": "Node Type Schemas",
+      "position": {
+        "x": -4380.571803475601,
+        "y": -2371.9820211257043
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/nodes/*.md`\n\nDefines structure and semantics of every node type.\n\n**Must specify:**\n- `type` name\n- Required vs optional fields\n- `data` shape and constraints\n- Handle definitions (if any)\n- Semantic meaning and purpose\n- Valid examples\n- Schema version\n- Migration notes\n\n**Example:** `contracts/nodes/markdown.md`",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-handle-contracts-0001",
+      "type": "markdown",
+      "label": "Handle Contracts",
+      "position": {
+        "x": -4765.477235509418,
+        "y": -2161.362617022175
+      },
+      "width": 340,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/handles/*.md`\n\nDefines legal connections between nodes.\n\n**Must specify:**\n- Handle IDs and naming conventions\n- Direction (input/output/bidirectional)\n- Semantic types and data flow\n- Compatibility matrices\n- Wildcards vs strict matching\n- Invalid combinations\n- Connection examples\n\n**Example:** `contracts/handles/breadboard.md`",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-manifest-contract-0001",
+      "type": "markdown",
+      "label": "Manifest Contract",
+      "position": {
+        "x": -4091.6939814299176,
+        "y": -1447.4933093084423
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/manifest.md`\n\nDefines what every Manifest node must contain.\n\n**Must specify:**\n- Identity fields (name, ID, version)\n- Intent declaration format\n- Dependency specification syntax\n- Authority flags and mutation policies\n- Validation rules\n- Required vs optional sections\n\nThis is the constitution of the graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-skill-contracts-0001",
+      "type": "markdown",
+      "label": "Skill Contracts",
+      "position": {
+        "x": -3936.0219384213183,
+        "y": -2370.4125463363243
+      },
+      "width": 340,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/skills/*.md`\n\nDefines what each skill is allowed to do.\n\n**Must specify:**\n- Skill name and category\n- Input/output schema\n- Preconditions (what must be true before)\n- Postconditions (what will be true after)\n- Forbidden operations\n- Failure modes and error handling\n- DryRun behavior\n\n**Example:** `contracts/skills/auto-layout.md`",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-versioning-0001",
+      "type": "markdown",
+      "label": "Schema Versioning",
+      "position": {
+        "x": -4738.438401598413,
+        "y": -1755.329330812742
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/migrations.md`\n\nDefines how schemas evolve safely.\n\n**Must specify:**\n- Version numbering rules (semver?)\n- Allowed upgrade paths\n- Deprecated field handling\n- Migration transform definitions\n- Upgrade ordering constraints\n- Rollback support\n\nGraphs must survive time.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-validation-0001",
+      "type": "markdown",
+      "label": "Validation Rules",
+      "position": {
+        "x": -3542.766358589813,
+        "y": -2157.929253700905
+      },
+      "width": 340,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/validation.md`\n\nDefines global invariants and safety checks.\n\n**Must specify:**\n- Required invariants (never violated)\n- Warning conditions (suspicious but allowed)\n- Error conditions (must block)\n- Auto-fixable issues\n- Validator execution order\n- Per-node-type validation rules\n\nThis is the immune system.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-protocols-0001",
+      "type": "markdown",
+      "label": "Core Protocols",
+      "position": {
+        "x": -3526.935756267356,
+        "y": -1408.6460638812687
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/protocols.md`\n\nThe non-negotiable invariants.\n\n**Must specify:**\n- Identity vs value semantics\n- Render vs meaning separation\n- Mutation vs illustration rules\n- Persistence guarantees\n- Forbidden patterns\n\nThis is the constitution.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-boundary-0001",
+      "type": "markdown",
+      "label": "Data vs UI Boundary",
+      "position": {
+        "x": -4642.4356920074915,
+        "y": -1392.1654808367712
+      },
+      "width": 340,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `contracts/boundary.md`\n\nDefines what belongs in graph data vs editor state.\n\n**Must specify:**\n- Meaning ownership test\n- Portability test criteria\n- UI-only exclusions\n- Diff hygiene rules\n\nIf it affects interpretation, it's data.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "req-onboarding-0001",
+      "type": "markdown",
+      "label": "Onboarding Guide",
+      "position": {
+        "x": -3534.3664099977045,
+        "y": -1729.5293051087965
+      },
+      "width": 340,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required:** `docs/onboarding.md`\n\nHuman-facing introduction to Twilite.\n\n**Must specify:**\n- Philosophy and mindset\n- Stewardship principles\n- How to work in existing graphs\n- Continuity expectations\n- First steps\n\nThis is how humans learn to care.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-root-0001",
+      "type": "markdown",
+      "label": "✅ Minimum Valid Graph",
+      "position": {
+        "x": -4966.930080046055,
+        "y": -416.4379608124502
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**The smallest well-formed graph that can exist.**\n\nEvery graph must have these structural elements to be interpretable, portable, and safe.\n\nWithout these, the graph has no identity, no meaning, and no contract.\n\n*This is not optional. This is the floor.*",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-manifest-required-0001",
+      "type": "markdown",
+      "label": "🎯 Manifest Node (REQUIRED)",
+      "position": {
+        "x": -4405.486298650623,
+        "y": -429.74423520054023
+      },
+      "width": 360,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Exactly one per graph. Non-negotiable.**\n\n**Must contain:**\n- **Identity:** graph name, stable ID, version\n- **Intent:** what kind of graph this is\n- **Dependencies:** required node types, skills, definitions\n- **Authority:** mutation policies, style enforcement\n\n**Without this:**\n- Graph has no identity\n- Cannot be referenced safely\n- Cannot declare dependencies\n- Cannot travel between tools\n\n*Location:* Root of graph, typically visible",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-content-required-0001",
+      "type": "markdown",
+      "label": "📝 Content Nodes (REQUIRED)",
+      "position": {
+        "x": -3911.994071393727,
+        "y": -386.615744302216
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**At least one. This is why the graph exists.**\n\nContent carries the actual subject matter:\n- Notes and documentation\n- Tasks and workflows\n- Circuit components\n- Simulation elements\n- Domain-specific data\n\n**Without content:**\n- Graph is just infrastructure\n- No actual work or meaning\n- Nothing to preserve\n\n*Minimum:* 1 node of any domain type",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-structure-optional-0001",
+      "type": "markdown",
+      "label": "🔗 Structure (edges, groups)",
+      "position": {
+        "x": -3510.3385429701143,
+        "y": -386.6157443022163
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Optional but powerful.**\n\nStructure defines relationships:\n- **Edges:** connections between nodes\n- **Groups:** containment and scope\n- **Hierarchies:** parent-child relationships\n\n**Status:** Not required for validity, but required for meaning in most domains.\n\nA graph with 1 manifest + 1 content node + 0 edges is technically valid but semantically limited.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-style-recommended-0001",
+      "type": "markdown",
+      "label": "🎨 Style Node (RECOMMENDED)",
+      "position": {
+        "x": -4937.107863535821,
+        "y": -29.04355992191404
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Strongly recommended for portability.**\n\nStyle Node declares visual intent:\n- Semantic color roles (primary, warning, accent)\n- Emphasis and hierarchy cues\n- State signaling (draft, stable, deprecated)\n- Grouping and scope hints\n\n**Why recommended:**\n- Makes graphs portable across renderers\n- Separates meaning from UI implementation\n- Allows themes without data mutation\n\n*Location:* Typically near Manifest",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-definitions-conditional-0001",
+      "type": "markdown",
+      "label": "📖 Definition Nodes (CONDITIONAL)",
+      "position": {
+        "x": -4930.596703872812,
+        "y": 414.5619106678206
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Required if using custom node types.**\n\nDefinition Nodes explain non-standard types:\n- Node schemas for custom types\n- Handle contracts\n- Semantic constraints\n- Field requirements\n\n**When required:**\n- Graph uses types not in standard library\n- Custom handles or semantics\n- Domain-specific extensions\n\n**When not required:**\n- All nodes use standard types\n- Definitions referenced externally",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-example-minimal-0001",
+      "type": "markdown",
+      "label": "Example: Absolute Minimum",
+      "position": {
+        "x": -3913.857959925617,
+        "y": 576.7202129422194
+      },
+      "width": 400,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "```json\n{\n  \"nodes\": [\n    {\n      \"id\": \"manifest-001\",\n      \"type\": \"manifest\",\n      \"data\": {\n        \"name\": \"My Graph\",\n        \"graphId\": \"uuid-here\",\n        \"version\": \"1.0.0\",\n        \"intent\": \"documentation\",\n        \"dependencies\": []\n      }\n    },\n    {\n      \"id\": \"note-001\",\n      \"type\": \"markdown\",\n      \"data\": {\n        \"markdown\": \"Hello world\"\n      }\n    }\n  ],\n  \"edges\": []\n}\n```\n\nThis is valid. This is portable. This survives.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-example-recommended-0001",
+      "type": "markdown",
+      "label": "Example: Recommended Minimum",
+      "position": {
+        "x": -3482.3802149917697,
+        "y": 550.6257734957646
+      },
+      "width": 400,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "```json\n{\n  \"nodes\": [\n    {\"id\": \"manifest-001\", \"type\": \"manifest\", ...},\n    {\"id\": \"style-001\", \"type\": \"style\", ...},\n    {\"id\": \"note-001\", \"type\": \"markdown\", ...},\n    {\"id\": \"note-002\", \"type\": \"markdown\", ...}\n  ],\n  \"edges\": [\n    {\n      \"source\": \"note-001\",\n      \"target\": \"note-002\",\n      \"label\": \"relates to\"\n    }\n  ]\n}\n```\n\nManifest + Style + Content + Structure.\nThis is what graphs should aspire to.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "mvg-checklist-0001",
+      "type": "markdown",
+      "label": "✓ Validity Checklist",
+      "position": {
+        "x": -4448.769068180734,
+        "y": 563.3785794764826
+      },
+      "width": 380,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Before committing a graph, verify:**\n\n☑ **Has exactly 1 Manifest node**\n- Declares identity, intent, dependencies\n\n☑ **Has at least 1 Content node**\n- Carries actual domain meaning\n\n☑ **Style node present** (recommended)\n- Makes graph portable\n\n☑ **Definitions included** (if needed)\n- Custom types are documented\n\n☑ **Structure makes sense**\n- Edges connect meaningfully\n- Groups organize logically\n\n☑ **Passes validation rules**\n- No orphaned required fields\n- Handle contracts respected",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "d0e1f2a3-b4c5-4d6e-9f7a-8b9c0d1e2f3a",
+      "type": "markdown",
+      "label": "Grok's Assessment",
+      "position": {
+        "x": -5117.62090635956,
+        "y": -1077.3264314432536
+      },
+      "width": 400,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "This graph is a strong meta-documentation of Twilite OS principles. It preserves continuity by building layers incrementally—from core protocols to detailed skills and contracts—without assuming a blank slate. Key strengths:\n\n- Manifest emphasis: Reinforces identity and portability as foundational.\n- Skill breakdown: Procedural generation and validation skills align with stewardship mindset.\n- Boundaries clarified: Data vs UI separation protects history and diffs.\n\nSuggestions for evolution:\n- Add a ScriptNode to auto-validate against the Minimum Valid Graph checklist.\n- Link to external Git for versioning these contracts.\n- Expand automation skills with AI-specific hooks for agent collaboration.\n\nThis extends the workspace coherently; no overwrites needed.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e111aaaa-1a1a-4a1a-9a1a-111111111111",
+      "type": "straight",
+      "source": "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
+      "target": "b2e3d002-1c3e-4f7d-8a61-12b2c3d4e222",
+      "label": "defines invariants for",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e222bbbb-2b2b-4b2b-9b2b-222222222222",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "label": "operates on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e333cccc-3c3c-4c3c-9c3c-333333333333",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "label": "formalizes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e444dddd-4d4d-4d4d-9d4d-444444444444",
+      "type": "straight",
+      "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "target": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "label": "informs skills",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e555eeee-5e5e-4e5e-9e5e-555555555555",
+      "type": "straight",
+      "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "target": "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
+      "label": "enforced by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mfest-id",
+      "type": "straight",
+      "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "target": "mfest-identity-0001",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mfest-intent",
+      "type": "straight",
+      "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "target": "mfest-intent-0002",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mfest-deps",
+      "type": "straight",
+      "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "target": "mfest-deps-0003",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mfest-auth",
+      "type": "straight",
+      "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "target": "mfest-authority-0004",
+      "label": "establishes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-role-manifest",
+      "type": "straight",
+      "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "target": "role-manifest-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-role-definitions",
+      "type": "straight",
+      "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "target": "role-definitions-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-role-content",
+      "type": "straight",
+      "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "target": "role-content-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-role-structure",
+      "type": "straight",
+      "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "target": "role-structure-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-role-style",
+      "type": "straight",
+      "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "target": "role-style-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-style-roles",
+      "type": "straight",
+      "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "target": "style-roles-0001",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-style-emphasis",
+      "type": "straight",
+      "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "target": "style-emphasis-0002",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-style-state",
+      "type": "straight",
+      "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "target": "style-state-0003",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-style-grouping",
+      "type": "straight",
+      "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+      "target": "style-grouping-0004",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-boundary-meaning",
+      "type": "straight",
+      "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "target": "boundary-meaning-0001",
+      "label": "clarifies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-boundary-portability",
+      "type": "straight",
+      "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "target": "boundary-portability-0002",
+      "label": "tests",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-boundary-ui",
+      "type": "straight",
+      "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "target": "boundary-ui-0003",
+      "label": "excludes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-boundary-diff",
+      "type": "straight",
+      "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+      "target": "boundary-diffs-0004",
+      "label": "protects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skill-structural",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "skill-structural-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skill-layout",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "skill-layout-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skill-validation",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "skill-validation-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skill-transform",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "skill-transform-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-skill-automation",
+      "type": "straight",
+      "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "target": "skill-automation-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-1",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-create-nodes-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-2",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-create-edges-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-3",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-grouping-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-4",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-reparent-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-5",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-duplicate-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-struct-6",
+      "type": "straight",
+      "source": "skill-structural-0001",
+      "target": "struct-extract-0006",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-layout-1",
+      "type": "straight",
+      "source": "skill-layout-0002",
+      "target": "layout-auto-elk-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-layout-2",
+      "type": "straight",
+      "source": "skill-layout-0002",
+      "target": "layout-reroute-edges-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-layout-3",
+      "type": "straight",
+      "source": "skill-layout-0002",
+      "target": "layout-avoid-collisions-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-layout-4",
+      "type": "straight",
+      "source": "skill-layout-0002",
+      "target": "layout-align-distribute-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-layout-5",
+      "type": "straight",
+      "source": "skill-layout-0002",
+      "target": "layout-normalize-spacing-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validate-1",
+      "type": "straight",
+      "source": "skill-validation-0003",
+      "target": "validate-schema-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validate-2",
+      "type": "straight",
+      "source": "skill-validation-0003",
+      "target": "validate-handles-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validate-3",
+      "type": "straight",
+      "source": "skill-validation-0003",
+      "target": "validate-dependencies-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validate-4",
+      "type": "straight",
+      "source": "skill-validation-0003",
+      "target": "validate-orphans-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validate-5",
+      "type": "straight",
+      "source": "skill-validation-0003",
+      "target": "validate-unsafe-mutation-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-transform-1",
+      "type": "straight",
+      "source": "skill-transform-0004",
+      "target": "transform-refactor-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-transform-2",
+      "type": "straight",
+      "source": "skill-transform-0004",
+      "target": "transform-normalize-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-transform-3",
+      "type": "straight",
+      "source": "skill-transform-0004",
+      "target": "transform-type-migration-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-transform-4",
+      "type": "straight",
+      "source": "skill-transform-0004",
+      "target": "transform-schema-upgrade-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-transform-5",
+      "type": "straight",
+      "source": "skill-transform-0004",
+      "target": "transform-inline-extract-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-1",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-script-exec-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-2",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-batch-mutation-0002",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-3",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-procedural-gen-0003",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-4",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-simulation-step-0004",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-5",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-compile-artifact-0005",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-auto-6",
+      "type": "straight",
+      "source": "skill-automation-0005",
+      "target": "auto-import-export-0006",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-1",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-node-schemas-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-2",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-handle-contracts-0002",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-3",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-schema-versioning-0003",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-4",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-skill-contracts-0004",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-5",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-manifest-contract-0005",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-6",
+      "type": "straight",
+      "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+      "target": "doc-validation-rules-0006",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-node-schemas",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-node-schemas-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-handles",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-handle-contracts-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-manifest",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-manifest-contract-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-skills",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-skill-contracts-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-versioning",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-versioning-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-validation",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-validation-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-protocols",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-protocols-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-boundary",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-boundary-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-req-root-to-onboarding",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "req-onboarding-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-manifest",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-manifest-required-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-content",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-content-required-0001",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-structure",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-structure-optional-0001",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-style",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-style-recommended-0001",
+      "label": "recommends",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-definitions",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-definitions-conditional-0001",
+      "label": "may require",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-example-min",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-example-minimal-0001",
+      "label": "example",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-example-rec",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-example-recommended-0001",
+      "label": "example",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-mvg-to-checklist",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "mvg-checklist-0001",
+      "label": "validation",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-manifest-to-example-min",
+      "type": "straight",
+      "source": "mvg-manifest-required-0001",
+      "target": "mvg-example-minimal-0001",
+      "label": "shown in",
+      "style": {
+        "width": 2,
+        "dash": [
+          5,
+          5
+        ],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-content-to-example-min",
+      "type": "straight",
+      "source": "mvg-content-required-0001",
+      "target": "mvg-example-minimal-0001",
+      "label": "shown in",
+      "style": {
+        "width": 2,
+        "dash": [
+          5,
+          5
+        ],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-style-to-example-rec",
+      "type": "straight",
+      "source": "mvg-style-recommended-0001",
+      "target": "mvg-example-recommended-0001",
+      "label": "shown in",
+      "style": {
+        "width": 2,
+        "dash": [
+          5,
+          5
+        ],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e9f8a7b6-c5d4-4e3f-2a1b-0c9d8e7f6a5b",
+      "type": "straight",
+      "source": "mvg-root-0001",
+      "target": "d0e1f2a3-b4c5-4d6e-9f7a-8b9c0d1e2f3a",
+      "label": "assessed by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f0a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c",
+      "type": "straight",
+      "source": "req-docs-root-0001",
+      "target": "d0e1f2a3-b4c5-4d6e-9f7a-8b9c0d1e2f3a",
+      "label": "assessed by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": [
+    {
+      "id": "g-task1-aaaa-bbbb-cccc-111111111111",
+      "label": "Task 1: Capabilities & Documentation",
+      "nodeIds": [
+        "a1f2c001-6c7e-4f3b-9b1b-01a8a9e2c111",
+        "a1f2c002-9c8d-4a7e-9c42-02b9d1a2c222",
+        "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
+        "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+        "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555"
+      ],
+      "bounds": {
+        "x": -1285.388299524431,
+        "y": -1529.801082210012,
+        "width": 993.2505197995848,
+        "height": 5763.824638828263
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "g-task2-dddd-eeee-ffff-222222222222",
+      "label": "Task 2: Graph as Web Artifact",
+      "nodeIds": [
+        "b2e3d001-8a9c-4d1e-9f55-11a1b2c3d111",
+        "b2e3d002-1c3e-4f7d-8a61-12b2c3d4e222",
+        "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+        "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+        "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+        "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666"
+      ],
+      "bounds": {
+        "x": -1321.9550641643511,
+        "y": -1524.5615896616423,
+        "width": 513.415452093385,
+        "height": 2770.5524533986736
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group-7dcb1de8-fe92-458d-9329-375f0ae57295",
+      "label": "Group 3",
+      "nodeIds": [
+        "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+        "role-manifest-0001",
+        "role-definitions-0002",
+        "role-content-0003",
+        "role-structure-0004",
+        "role-style-0005"
+      ],
+      "bounds": {
+        "x": -1292.1651112573434,
+        "y": -792.2955071658416,
+        "width": 2959.675570545406,
+        "height": 459.2631642811466
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-303ad95e-bd6c-4036-88a0-0e96bebba788",
+      "label": "Group 4",
+      "nodeIds": [
+        "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+        "mfest-identity-0001",
+        "mfest-intent-0002",
+        "mfest-deps-0003",
+        "mfest-authority-0004"
+      ],
+      "bounds": {
+        "x": -1301.732253504033,
+        "y": -252.5485913779632,
+        "width": 2456.564386582475,
+        "height": 497.01058076501556
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-bb8ec51b-9b17-4a4b-8fa7-e762d7ba5381",
+      "label": "Group 5",
+      "nodeIds": [
+        "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
+        "style-roles-0001",
+        "style-emphasis-0002",
+        "style-state-0003",
+        "style-grouping-0004"
+      ],
+      "bounds": {
+        "x": -1311.6901623301835,
+        "y": 363.22901539172443,
+        "width": 2465.689563823188,
+        "height": 499.91510855568396
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-841b0cbb-b8d2-4ac8-a628-75e039063067",
+      "label": "Group 6",
+      "nodeIds": [
+        "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
+        "boundary-meaning-0001",
+        "boundary-portability-0002",
+        "boundary-ui-0003",
+        "boundary-diffs-0004"
+      ],
+      "bounds": {
+        "x": -1321.9550641643511,
+        "y": 1005.9908637370311,
+        "width": 2449.6980211800555,
+        "height": 556.868708668002
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-3cc1e704-ebc6-4dc4-ba3b-c95450007585",
+      "label": "Group 7",
+      "nodeIds": [
+        "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+        "skill-structural-0001",
+        "skill-layout-0002",
+        "skill-validation-0003",
+        "skill-transform-0004",
+        "skill-automation-0005"
+      ],
+      "bounds": {
+        "x": -791.4219533571531,
+        "y": 1705.208604121633,
+        "width": 2468.95292969232,
+        "height": 572.6067495563125
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    }
+  ]
+}

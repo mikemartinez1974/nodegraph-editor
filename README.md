@@ -2,7 +2,7 @@
 
 A production-grade, AI-first visual graph editor/browser built with React, Next.js, and Material-UI. Design, organize, and think visually by collaborating with AI assistants (ChatGPT, Claude, Grok, etc.) through a simple copy/paste workflow.
 
-**Live Demo:** [cpwith.me](https://cpwith.me)
+**Live Demo:** [Twilite.zone](https://twilite.zone)
 
 ---
 

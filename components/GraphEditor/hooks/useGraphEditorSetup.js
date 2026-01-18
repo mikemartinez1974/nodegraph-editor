@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GraphCRUD from '../GraphCrud';
+import { attachSkills } from '../../../hooks/skills/index.js';
 
 export function useGraphEditorSetup(state, handlers, historyHook) {
   const graphAPI = useRef(null);
@@ -33,6 +34,8 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       groupsRef,
       groupManager
     );
+    
+    attachSkills({ graphAPI: graphAPI.current, context: { eventBus } });
     
     const emitEvent = (name, payload) => {
       try {

@@ -143,10 +143,12 @@ export default function PropertiesPanel({
   const [expandedSections, setExpandedSections] = useState({ ...DEFAULT_EXPANDED_SECTIONS });
   const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
   const [jsonViewRevision, setJsonViewRevision] = useState(0);
+  const [dataEntriesRevision, setDataEntriesRevision] = useState(0);
   const resizeStateRef = useRef(null);
   const dataEntriesRef = useRef([]);
   const pendingJsonPersistRef = useRef(false);
   const jsonDraftRef = useRef({ keys: {}, values: {} });
+  const friendlyDraftRef = useRef({});
 
   const activeSelection = selectedNode || selectedEdge || selectedGroup;
   const selectionStyle = selectedNode?.style || selectedEdge?.style || {};
@@ -247,9 +249,11 @@ export default function PropertiesPanel({
       }));
       setDataEntries(entries);
       setJsonViewRevision((prev) => prev + 1);
+      setDataEntriesRevision((prev) => prev + 1);
     } else {
       setDataEntries([]);
       setJsonViewRevision((prev) => prev + 1);
+      setDataEntriesRevision((prev) => prev + 1);
     }
   }, [isNodeSelected, selectedNode]);
 
@@ -266,6 +270,14 @@ export default function PropertiesPanel({
   useEffect(() => {
     jsonDraftRef.current = { keys: {}, values: {} };
   }, [activeSelectionId]);
+
+  useEffect(() => {
+    friendlyDraftRef.current = {};
+  }, [activeSelectionId]);
+
+  useEffect(() => {
+    friendlyDraftRef.current = {};
+  }, [dataEntriesRevision]);
 
   const nodeTypeDerivedOptions = useMemo(() => {
     const dataOptions =
@@ -423,6 +435,20 @@ const availableNodeTypeOptions =
     [updateDataEntries]
   );
 
+  const handleFriendlyDraftChange = useCallback((index, value) => {
+    friendlyDraftRef.current[index] = value;
+  }, []);
+
+  const handleFriendlyDraftBlur = useCallback(
+    (index) => {
+      const draftValue = friendlyDraftRef.current[index];
+      if (draftValue === undefined) return;
+      handleFriendlyValueChange(index, draftValue);
+      delete friendlyDraftRef.current[index];
+    },
+    [handleFriendlyValueChange]
+  );
+
   const handleAddJsonField = useCallback(() => {
     updateDataEntries((prev) => {
       const existingKeys = new Set(prev.map((entry) => entry.key).filter(Boolean));
@@ -499,6 +525,15 @@ const availableNodeTypeOptions =
     onUpdateGroup(selectedGroup.id, { locked: !selectedGroup.locked });
   }, [onUpdateGroup, selectedGroup]);
 
+  const applyGroupStylePatch = useCallback(
+    (patch) => {
+      if (!selectedGroup) return;
+      const nextStyle = { ...(selectedGroup.style || {}), ...patch };
+      onUpdateGroup(selectedGroup.id, { style: nextStyle });
+    },
+    [onUpdateGroup, selectedGroup]
+  );
+
   const renderPayloadSection = () => (
     <Section
       title="Data"
@@ -568,13 +603,15 @@ const availableNodeTypeOptions =
                     )}
                     {(!isMarkdownField || !previewMode) && (
                       <TextField
+                        key={`friendly-edit-${activeSelectionId || "none"}-${dataEntriesRevision}-${index}`}
                         label="Value"
                         size="small"
                         fullWidth
                         multiline={isMarkdownField}
                         minRows={isMarkdownField ? 4 : 1}
-                        value={entry.rawValue}
-                        onChange={(event) => handleFriendlyValueChange(index, event.target.value)}
+                        defaultValue={entry.rawValue}
+                        onChange={(event) => handleFriendlyDraftChange(index, event.target.value)}
+                        onBlur={() => handleFriendlyDraftBlur(index)}
                       />
                     )}
                   </Paper>
@@ -922,6 +959,25 @@ const availableNodeTypeOptions =
   const renderNodeView = () => (
     <>
       {renderPayloadSection()}
+      {availableNodeTypeOptions.length > 0 && isNodeSelected && (
+        <Box sx={{ mt: 2 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="properties-node-type-label">Node Type</InputLabel>
+            <Select
+              labelId="properties-node-type-label"
+              label="Node Type"
+              value={selectedType}
+              onChange={(event) => handleNodeTypeChange(event.target.value)}
+            >
+              {availableNodeTypeOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label || option.value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      )}
       {renderNodeEdgesSection()}
       {renderFormattingSection()}
       {renderStyleSection()}
@@ -1025,37 +1081,6 @@ const availableNodeTypeOptions =
           </Typography>
         )}
       </Section>
-      <Section
-        title="Edge formatting"
-        value="formatting"
-        expanded={expandedSections.edge === "formatting"}
-        onToggle={handleAccordionChange("edge", "formatting")}
-        disabled={!isEdgeSelected}
-      >
-        <Stack spacing={1}>
-          <TextField
-            label="Stroke color"
-            size="small"
-            fullWidth
-            value={selectionStyle.stroke || selectionStyle.borderColor || ""}
-            onChange={(event) => applyStylePatch({ stroke: event.target.value, borderColor: event.target.value })}
-          />
-          <TextField
-            label="Stroke width"
-            size="small"
-            fullWidth
-            value={selectionStyle.strokeWidth || selectionStyle.borderWidth || 1}
-            onChange={(event) => applyStylePatch({ strokeWidth: Number(event.target.value), borderWidth: Number(event.target.value) })}
-          />
-          <TextField
-            label="Label color"
-            size="small"
-            fullWidth
-            value={selectionStyle.color || ""}
-            onChange={(event) => applyStylePatch({ color: event.target.value })}
-          />
-        </Stack>
-      </Section>
     </>
   );
 
@@ -1120,6 +1145,30 @@ const availableNodeTypeOptions =
           </Typography>
         )}
       </Section>
+      <Section
+        title="Style"
+        value="style"
+        expanded={expandedSections.group === "style"}
+        onToggle={handleAccordionChange("group", "style")}
+        disabled={!isGroupSelected}
+      >
+        <Stack spacing={1}>
+          <TextField
+            label="Background color"
+            size="small"
+            fullWidth
+            value={selectionStyle.backgroundColor || ""}
+            onChange={(event) => applyGroupStylePatch({ backgroundColor: event.target.value })}
+          />
+          <TextField
+            label="Border color"
+            size="small"
+            fullWidth
+            value={selectionStyle.borderColor || ""}
+            onChange={(event) => applyGroupStylePatch({ borderColor: event.target.value })}
+          />
+        </Stack>
+      </Section>
     </>
   );
 
@@ -1134,7 +1183,8 @@ const availableNodeTypeOptions =
       PaperProps={{
         sx: {
           width: panelWidth,
-          position: "relative"
+          position: "relative",
+          height: "100vh"
         }
       }}
     >
@@ -1175,23 +1225,6 @@ const availableNodeTypeOptions =
             <CloseIcon fontSize="small" />
           </IconButton>
         </Stack>
-        {availableNodeTypeOptions.length > 0 && isNodeSelected && (
-          <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-            <InputLabel id="properties-node-type-label">Node Type</InputLabel>
-            <Select
-              labelId="properties-node-type-label"
-              label="Node Type"
-              value={selectedType}
-              onChange={(event) => handleNodeTypeChange(event.target.value)}
-            >
-              {availableNodeTypeOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label || option.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
         <Divider sx={{ my: 2 }} />
         <Box sx={{ flex: "1 1 auto", overflowY: "auto" }}>
           {activeView === "node" && renderNodeView()}

@@ -12,7 +12,7 @@ const maybeAugmentHandleError = (message) => {
  * Execute CRUD commands from pasted JSON
  * Supported actions: create, update, delete, read, createNodes, createEdges, createGroups,
  * addNodesToGroup, removeNodesFromGroup, setGroupNodes, clearGraph, findNodes, findEdges,
- * getStats, translate, duplicate, batch
+ * getStats, translate, duplicate, batch, skill
  */
 const estimateCrudImpact = (command = {}) => {
   const { action } = command;
@@ -39,6 +39,8 @@ const estimateCrudImpact = (command = {}) => {
       if (command.type === 'group') return { nodes: 0, edges: 0, groups: count };
       return { nodes: count, edges: 0, groups: 0 };
     }
+    case 'skill':
+      return { nodes: 0, edges: 0, groups: 0 };
     case 'batch':
     case 'transaction': {
       const commands = Array.isArray(command.commands) ? command.commands : [];
@@ -224,6 +226,32 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     let result;
 
     switch (action) {
+      case 'skill': {
+        if (typeof graphCRUD.executeSkill !== 'function') {
+          result = { success: false, error: 'Skill execution is not supported in this context' };
+          break;
+        }
+        const skillName = command.name || command.skill || command.id;
+        if (!skillName || typeof skillName !== 'string') {
+          result = { success: false, error: 'Skill commands require a name field (name/skill/id)' };
+          break;
+        }
+        const params = {
+          ...(command.params || {}),
+          dryRun: command.dryRun === true ? true : (command.params && command.params.dryRun) === true
+        };
+        result = await graphCRUD.executeSkill(skillName, params);
+        if (onShowMessage && command.silent !== true) {
+          if (result?.success) {
+            const label = command.toastLabel || `Skill "${skillName}" executed`;
+            onShowMessage(label, 'success');
+          } else {
+            onShowMessage(result?.error || `Skill "${skillName}" failed`, 'error');
+          }
+        }
+        break;
+      }
+
       case 'createNodes':
         if (nodes && Array.isArray(nodes)) {
           const shouldAutoLayout = positionsOmitted(nodes);

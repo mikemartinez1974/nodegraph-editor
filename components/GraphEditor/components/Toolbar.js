@@ -127,6 +127,7 @@ const Toolbar = ({
   snapToGrid = false,  // NEW: Add prop
   onToggleSnapToGrid,  // NEW: Add prop
   gridSize = 20,  // Grid size from document settings
+  edgeRouting = 'auto',
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null,  // GitHub sync target settings
   onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties')

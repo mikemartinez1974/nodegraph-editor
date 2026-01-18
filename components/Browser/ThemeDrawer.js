@@ -3,7 +3,7 @@ import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import themeMap, { themeNames } from './themes';
+import themeMap, { themeCategories } from './themes';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -170,6 +170,8 @@ export default function ThemeDrawer(props) {
     pb: isMobile ? 1 : 0
   };
 
+  const formatThemeLabel = (name) => name.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+
   // Safe toggle for script panel to avoid silent failures and stop event propagation
   const safeToggleScriptPanel = (e) => {
     if (e && typeof e.stopPropagation === 'function') {
@@ -233,25 +235,38 @@ export default function ThemeDrawer(props) {
               <Typography variant="h6" sx={{ color: activeTheme.palette.text?.primary }}>Theme Options</Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ width: '100%', overflowX: 'hidden', p: 0 }}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, width: '100%', maxWidth: '100%', color: activeTheme.palette.text?.primary, fontSize: '1rem' }}>
-                {themeNames.map((name) => (
-                  <Button
-                    key={name}
-                    onClick={() => handleClick(name)}
-                    onMouseEnter={() => handleMouseEnter(name)}
-                    sx={{
-                      flex: '1 1 80px',
-                      background: themeMap[name].palette.primary.main,
-                      color: themeMap[name].palette.mode === 'dark' ? '#fff' : '#222',
-                      border: themeName === name ? '2px solid #fff' : undefined,
-                      minWidth: 80,
-                      height: 40,
-                      marginBottom: 1,
-                      maxWidth: '100%'
-                    }}
-                  >
-                    {name.charAt(0).toUpperCase() + name.slice(1)}
-                  </Button>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', maxWidth: '100%' }}>
+                {Object.entries(themeCategories).map(([category, names]) => (
+                  <Box key={category}>
+                    <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: activeTheme.palette.text?.secondary }}>
+                      {category}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                      {names.map((name) => {
+                        const palette = themeMap[name]?.palette;
+                        const swatch = palette?.primary?.main || '#888';
+                        const textColor = palette?.mode === 'dark' ? '#fff' : '#222';
+                        return (
+                          <Button
+                            key={name}
+                            onClick={() => handleClick(name)}
+                            onMouseEnter={() => handleMouseEnter(name)}
+                            sx={{
+                              flex: '1 1 0',
+                              background: swatch,
+                              color: textColor,
+                              border: themeName === name ? '2px solid #fff' : '1px solid transparent',
+                              height: 40,
+                              maxWidth: '100%',
+                              textTransform: 'none'
+                            }}
+                          >
+                            {formatThemeLabel(name)}
+                          </Button>
+                        );
+                      })}
+                    </Box>
+                  </Box>
                 ))}
               </Box>
             </AccordionDetails>
