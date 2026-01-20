@@ -21,25 +21,6 @@ const edgeTypes = {
     }
   },
 
-  parent: {
-    label: 'Parent',
-    description: 'Reverse parent relationship',
-    style: {
-      color: undefined,
-      width: 2,
-      dash: [],
-      curved: true,
-      route: 'orthogonal',
-      curveDirection: 'vertical',
-      opacity: 1,
-      arrowSize: 8,
-      showArrow: true,
-      arrowPosition: 'start',
-      animation: null,
-      gradient: null
-    }
-  },
-
   peer: {
     label: 'Peer',
     description: 'Peer-to-peer relationship',
@@ -212,6 +193,140 @@ const edgeTypes = {
       animation: 'flow',
       animationSpeed: 1.5,
       gradient: { start: '#ffeb3b', end: '#ff5722' } // Yellow to red
+    }
+  },
+
+  // Canonical structure relationships
+  contains: {
+    label: 'Contains',
+    description: 'Structural containment relationship',
+    style: {
+      color: '#6d4c41', // Brown
+      width: 2,
+      dash: [],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'auto',
+      opacity: 0.9,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  requires: {
+    label: 'Requires',
+    description: 'Requirement dependency relationship',
+    style: {
+      color: '#ef6c00', // Deep orange
+      width: 2,
+      dash: [6, 4],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'auto',
+      opacity: 0.95,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  precedes: {
+    label: 'Precedes',
+    description: 'Sequential ordering relationship',
+    style: {
+      color: '#00695c', // Teal
+      width: 2,
+      dash: [4, 4],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'horizontal',
+      opacity: 0.9,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  derives: {
+    label: 'Derives',
+    description: 'Derived-from relationship',
+    style: {
+      color: '#5e35b1', // Deep purple
+      width: 2,
+      dash: [8, 3],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'auto',
+      opacity: 0.9,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  constrains: {
+    label: 'Constrains',
+    description: 'Constraint relationship',
+    style: {
+      color: '#d32f2f', // Red
+      width: 2,
+      dash: [2, 6],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'auto',
+      opacity: 0.85,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  governs: {
+    label: 'Governs',
+    description: 'Authority or governance relationship',
+    style: {
+      color: '#283593', // Indigo
+      width: 2,
+      dash: [],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'vertical',
+      opacity: 0.95,
+      arrowSize: 8,
+      showArrow: true,
+      arrowPosition: 'end',
+      animation: null,
+      gradient: null
+    }
+  },
+
+  equivalentTo: {
+    label: 'Equivalent To',
+    description: 'Equivalence relationship',
+    style: {
+      color: '#37474f', // Blue gray
+      width: 2,
+      dash: [3, 3],
+      curved: true,
+      route: 'orthogonal',
+      curveDirection: 'auto',
+      opacity: 0.85,
+      arrowSize: 7,
+      showArrow: false,
+      arrowPosition: 'both',
+      animation: null,
+      gradient: null
     }
   }
 };

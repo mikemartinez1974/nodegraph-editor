@@ -1,0 +1,306 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T04:03:55.629Z",
+    "modified": "2026-01-20T05:12:43.201Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 436.5487564772342,
+      "y": -2090.805490231873
+    },
+    "zoom": 1.5901970904721763
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "structure-root",
+      "type": "markdown",
+      "label": "📐 Structure Role Specification",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 480,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Structure Role (v0.1)\n\nStructure defines meaning through relationships.\n\nIt is **semantic physics**, not presentation.\n\nChanging structure changes meaning, even if content is unchanged."
+      }
+    },
+    {
+      "id": "structure-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -600,
+        "y": 320
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nStructure expresses:\n- dependency\n- order\n- containment\n- scope\n- identity\n- reference\n\nIt answers *how things relate*, not *what things are*."
+      }
+    },
+    {
+      "id": "structure-is-not",
+      "type": "markdown",
+      "label": "What It Is / Is Not",
+      "position": {
+        "x": 0,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structure IS\n- relationships\n- adjacency semantics\n- scope & boundaries\n\n## Structure is NOT\n- content\n- style\n- layout\n- annotation\n\nIf content disappears and meaning remains → structure."
+      }
+    },
+    {
+      "id": "structure-elements",
+      "type": "markdown",
+      "label": "Canonical Elements",
+      "position": {
+        "x": 600,
+        "y": 320
+      },
+      "width": 400,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Canonical Elements\n\n**Edges (primary)**\n- contains\n- requires\n- precedes\n- derives\n- references\n- constrains\n- governs\n- equivalentTo\n\n**Structure Nodes (when edges need identity)**\n- Group\n- Sequence\n- Boundary\n- DependencyGraph\n- EquivalenceSet"
+      }
+    },
+    {
+      "id": "structure-mutation",
+      "type": "markdown",
+      "label": "Mutation Rules",
+      "position": {
+        "x": -600,
+        "y": 720
+      },
+      "width": 360,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Mutation Rules\n\n**Allowed:**\n- add/remove edge\n- retype edge\n- reorder sequence\n- reparent group\n\n**Forbidden:**\n- implicit content edits\n- layout-as-meaning\n- delete+recreate identity\n- untyped edges"
+      }
+    },
+    {
+      "id": "structure-validation",
+      "type": "markdown",
+      "label": "Validation Rules",
+      "position": {
+        "x": 0,
+        "y": 720
+      },
+      "width": 380,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation\n\n**Hard errors:**\n- untyped edges\n- broken references\n- forbidden cycles\n- manifest contradiction\n\n**Warnings:**\n- redundancy\n- ambiguous order\n- unused structure nodes\n\nMeaning change → validation required."
+      }
+    },
+    {
+      "id": "structure-interactions",
+      "type": "markdown",
+      "label": "Role Interactions",
+      "position": {
+        "x": 600,
+        "y": 720
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Role Interactions\n\n**Manifest**: governs allowed structure edits\n\n**Definitions**: defines legal edge types\n\n**Content**: interpreted by structure\n\n**Style**: may render structure, never define it"
+      }
+    },
+    {
+      "id": "structure-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1100
+      },
+      "width": 480,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Invariant\n\n**If structure changes, meaning changes.**\n\n**If meaning changes, validation must run.**\n\nThis is the line that keeps agents honest."
+      }
+    },
+    {
+      "id": "structure-next-steps",
+      "type": "markdown",
+      "label": "Next Steps",
+      "position": {
+        "x": 0,
+        "y": 1400
+      },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Next Steps\n\n1. Define edge schemas for each structure edge type\n2. Add Structure node types to Definitions graph\n3. Write Structure Validation Skill\n4. Enforce Manifest authority over structure edits\n5. Add structure-diff visualization\n6. Create test graphs that only change structure\n\nWhen this is done, **graphs will behave, not just display**."
+      }
+    },
+    {
+      "id": "structure-edge-types-report",
+      "type": "markdown",
+      "label": "Edge Types Report",
+      "position": {
+        "x": 620,
+        "y": 1400
+      },
+      "width": 440,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Supported Edge Types\n\nSource: `components/GraphEditor/edgeTypes.js`\n\n- `child` (Child)\n- `peer` (Peer)\n- `dataFlow` (Data Flow)\n- `dependency` (Dependency)\n- `reference` (Reference)\n- `bidirectional` (Bidirectional)\n- `weak` (Weak Link)\n- `strong` (Strong Link)\n- `temporal` (Temporal)\n- `energyFlow` (Energy Flow)\n- `contains` (Contains)\n- `requires` (Requires)\n- `precedes` (Precedes)\n- `derives` (Derives)\n- `constrains` (Constrains)\n- `governs` (Governs)\n- `equivalentTo` (Equivalent To)\n\nIf this list changes, update here and the edge contract."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-isnot",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-is-not",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-elements",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-elements",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-mutation",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-mutation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-validation",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-validation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-interactions",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-interactions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-next",
+      "type": "dataFlow",
+      "source": "structure-root",
+      "target": "structure-next-steps",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-next-edge-types",
+      "type": "dataFlow",
+      "source": "structure-next-steps",
+      "target": "structure-edge-types-report",
+      "label": "reports",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}
