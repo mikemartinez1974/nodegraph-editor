@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { assertMutationAllowed } from './manifestPolicy.js';
 
 const deepClone = (value) => {
   if (value === undefined || value === null) return value;
@@ -49,6 +50,46 @@ const ensureUniqueId = (existingIds, proposed) => {
     return candidate;
   }
   return proposed;
+};
+
+const assertMutationPlan = (graphAPI, plan) => {
+  const warnings = [];
+  if (plan.create) {
+    const result = assertMutationAllowed(graphAPI, 'create');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  if (plan.update) {
+    const result = assertMutationAllowed(graphAPI, 'update');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  if (plan.delete) {
+    const result = assertMutationAllowed(graphAPI, 'delete');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  return warnings.length ? { warning: warnings.join(' ') } : {};
+};
+
+const getMutationPlanForCommands = (commands = []) => {
+  const plan = { create: false, update: false, delete: false };
+  commands.forEach((command) => {
+    const action = command?.action;
+    if (action === 'create' || action === 'createNodes' || action === 'createEdges' || action === 'createGroups') {
+      plan.create = true;
+    }
+    if (action === 'update' || action === 'updateNode' || action === 'updateNodes' || action === 'updateEdge' || action === 'updateEdges') {
+      plan.update = true;
+    }
+    if (action === 'delete') {
+      plan.delete = true;
+    }
+    if (action === 'addNodesToGroup' || action === 'removeNodesFromGroup' || action === 'setGroupNodes' || action === 'translate' || action === 'move') {
+      plan.update = true;
+    }
+  });
+  return plan;
 };
 
 const applyCreates = (graphAPI, nodes, edges, groups, dryRun, summary) => {
@@ -319,6 +360,13 @@ const applyCommandsSequentially = async (graphAPI, commands, dryRun, summary) =>
 };
 
 const runScriptExecution = async (_ctx, params = {}) => {
+  const mutationIntent = params.readOnly === true ? null : 'update';
+  if (mutationIntent) {
+    const policy = assertMutationAllowed(_ctx?.graphAPI, mutationIntent);
+    if (policy.error) {
+      return { success: false, error: policy.error };
+    }
+  }
   const script = params.script || params.source || '';
   if (!script || typeof script !== 'string') {
     return { success: false, data: { errors: ['Script text is required'] } };
@@ -360,10 +408,18 @@ const runBatchMutation = async ({ graphAPI }, params = {}) => {
   if (!commands.length) {
     return { success: false, data: { errors: ['commands array is required'] } };
   }
+  const plan = getMutationPlanForCommands(commands);
+  const policy = assertMutationPlan(graphAPI, plan);
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
   const dryRun = params.dryRun === true;
   const summary = {};
   try {
     await applyCommandsSequentially(graphAPI, commands, dryRun, summary);
+    if (policy.warning) {
+      summary.manifestWarning = policy.warning;
+    }
     return { success: true, data: summary };
   } catch (error) {
     return {
@@ -374,6 +430,10 @@ const runBatchMutation = async ({ graphAPI }, params = {}) => {
 };
 
 const runProceduralGeneration = ({ graphAPI }, params = {}) => {
+  const policy = assertMutationPlan(graphAPI, { create: true });
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
   const blueprint = params.blueprint || {};
   const nodesTemplate = Array.isArray(blueprint.nodes) ? blueprint.nodes : [];
   const edgesTemplate = Array.isArray(blueprint.edges) ? blueprint.edges : [];
@@ -456,6 +516,9 @@ const runProceduralGeneration = ({ graphAPI }, params = {}) => {
   const summary = {};
   try {
     applyCreates(graphAPI, createdNodes, createdEdges, createdGroups, dryRun, summary);
+    if (policy.warning) {
+      summary.manifestWarning = policy.warning;
+    }
     return { success: true, data: summary };
   } catch (error) {
     return {
@@ -469,6 +532,11 @@ const runSimulationStep = async ({ graphAPI }, params = {}) => {
   const mutations = Array.isArray(params.mutations) ? params.mutations : [];
   if (!mutations.length) {
     return { success: false, data: { errors: ['mutations array is required'] } };
+  }
+  const plan = getMutationPlanForCommands(mutations);
+  const policy = assertMutationPlan(graphAPI, plan);
+  if (policy.error) {
+    return { success: false, error: policy.error };
   }
   const dryRun = params.dryRun === true;
   const recordPrevious = params.recordPrevious !== false;
@@ -508,6 +576,9 @@ const runSimulationStep = async ({ graphAPI }, params = {}) => {
       summary.after = afterMap;
     }
     summary.stepId = params.stepId || null;
+    if (policy.warning) {
+      summary.manifestWarning = policy.warning;
+    }
     return { success: true, data: summary };
   } catch (error) {
     return {
@@ -620,6 +691,10 @@ const runImportExport = ({ graphAPI }, params = {}) => {
   }
 
   if (direction === 'import') {
+    const policy = assertMutationPlan(graphAPI, { create: true });
+    if (policy.error) {
+      return { success: false, error: policy.error };
+    }
     let payload = params.payload || params.data || null;
     if (!payload && typeof params.source === 'string') {
       try {
@@ -677,6 +752,9 @@ const runImportExport = ({ graphAPI }, params = {}) => {
     try {
       applyCreates(graphAPI, finalNodes, finalEdges, finalGroups, dryRun, summary);
       summary.nodeIdMap = Object.fromEntries(nodeIdMap.entries());
+      if (policy.warning) {
+        summary.manifestWarning = policy.warning;
+      }
       return { success: true, data: summary };
     } catch (error) {
       return {

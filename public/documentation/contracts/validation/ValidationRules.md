@@ -18,12 +18,15 @@ Define global and local invariants that guarantee graph safety and interpretabil
 - missing dependency
 - forbidden mutation
 - identity loss
+- intent/content mismatch (semantic contradiction)
 
 ## Warning Conditions
 - orphaned nodes
 - deprecated schema usage
 - unused handles
 - redundant structures
+- missing position or size (presentation gaps)
+- missing optional handles (inferred)
 
 ## Auto-fixable Conditions
 - spacing normalization
@@ -40,3 +43,4 @@ Define global and local invariants that guarantee graph safety and interpretabil
 Validation never changes meaning.
 Validation never creates structure.
 Validation only reports.
+Semantic coherence beats presentation polish.

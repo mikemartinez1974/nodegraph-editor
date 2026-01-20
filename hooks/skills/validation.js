@@ -17,6 +17,8 @@ const defaultEdges = (graphAPI, fallback = []) =>
 const defaultGroups = (graphAPI, fallback = []) =>
   typeof graphAPI?.getGroups === 'function' ? graphAPI.getGroups() : fallback;
 
+const getManifestNode = (nodes = []) => nodes.filter((node) => node?.type === 'manifest');
+
 const buildHandleIndex = (node) => {
   const map = new Map();
   const add = (id, meta) => {
@@ -203,6 +205,8 @@ const runHandleValidation = ({ graphAPI }, params = {}) => {
 
 const runDependencyValidation = ({ graphAPI }, params = {}) => {
   const nodes = params.nodes || defaultNodes(graphAPI);
+  const manifestNodes = getManifestNode(nodes);
+  const manifestData = params.manifest || (manifestNodes[0]?.data || null);
   const availableSkillIds =
     params.availableSkills ||
     (typeof graphAPI?.listSkills === 'function'
@@ -212,17 +216,21 @@ const runDependencyValidation = ({ graphAPI }, params = {}) => {
   const requiredNodeTypes = toArray(
     params.requiredNodeTypes ||
       params.dependencies?.nodeTypes ||
-      params.manifest?.requiredNodeTypes
+      manifestData?.dependencies?.nodeTypes ||
+      manifestData?.requiredNodeTypes
   );
   const requiredSkills = toArray(
     params.requiredSkills ||
       params.dependencies?.skills ||
-      params.manifest?.requiredSkills
+      manifestData?.dependencies?.skills ||
+      manifestData?.requiredSkills
   );
   const requiredDefinitions = toArray(
     params.requiredDefinitions ||
       params.dependencies?.definitions ||
-      params.manifest?.requiredDefinitions
+      manifestData?.dependencies?.definitions ||
+      manifestData?.dependencies?.handleContracts ||
+      manifestData?.requiredDefinitions
   );
 
   const missingNodeTypes = requiredNodeTypes.filter(
@@ -261,6 +269,70 @@ const runDependencyValidation = ({ graphAPI }, params = {}) => {
       missingDefinitions,
       warnings
     }
+  };
+};
+
+const runManifestValidation = ({ graphAPI }, params = {}) => {
+  const nodes = params.nodes || defaultNodes(graphAPI);
+  const manifests = getManifestNode(nodes);
+  const errors = [];
+
+  if (manifests.length === 0) {
+    errors.push({
+      code: 'MISSING_MANIFEST',
+      message: 'No manifest node found. Graphs must contain exactly one manifest node.'
+    });
+  } else if (manifests.length > 1) {
+    errors.push({
+      code: 'MULTIPLE_MANIFESTS',
+      message: 'Multiple manifest nodes found. Graphs must contain exactly one manifest node.'
+    });
+  }
+
+  const manifest = manifests[0];
+  if (manifest) {
+    const data = manifest.data || {};
+    const identity = data.identity || {};
+    const intent = data.intent || {};
+    const dependencies = data.dependencies || {};
+    const authority = data.authority || {};
+    const mutation = authority.mutation || {};
+
+    if (!identity.graphId) {
+      errors.push({ code: 'MANIFEST_IDENTITY_GRAPH_ID', message: 'Manifest identity.graphId is required.' });
+    }
+    if (!identity.name) {
+      errors.push({ code: 'MANIFEST_IDENTITY_NAME', message: 'Manifest identity.name is required.' });
+    }
+    if (!identity.version) {
+      errors.push({ code: 'MANIFEST_IDENTITY_VERSION', message: 'Manifest identity.version is required.' });
+    }
+    if (!identity.createdAt || !identity.updatedAt) {
+      errors.push({ code: 'MANIFEST_IDENTITY_TIMESTAMPS', message: 'Manifest identity.createdAt and updatedAt are required.' });
+    }
+    if (!intent.kind || !intent.scope) {
+      errors.push({ code: 'MANIFEST_INTENT', message: 'Manifest intent.kind and intent.scope are required.' });
+    }
+    if (!Array.isArray(dependencies.nodeTypes)) {
+      errors.push({ code: 'MANIFEST_DEPENDENCIES_NODE_TYPES', message: 'Manifest dependencies.nodeTypes must be an array.' });
+    }
+    if (!Array.isArray(dependencies.handleContracts)) {
+      errors.push({ code: 'MANIFEST_DEPENDENCIES_HANDLES', message: 'Manifest dependencies.handleContracts must be an array.' });
+    }
+    if (!Array.isArray(dependencies.skills)) {
+      errors.push({ code: 'MANIFEST_DEPENDENCIES_SKILLS', message: 'Manifest dependencies.skills must be an array.' });
+    }
+    if (!dependencies.schemaVersions || typeof dependencies.schemaVersions !== 'object') {
+      errors.push({ code: 'MANIFEST_DEPENDENCIES_SCHEMA', message: 'Manifest dependencies.schemaVersions is required.' });
+    }
+    if (typeof mutation.allowCreate !== 'boolean' || typeof mutation.allowUpdate !== 'boolean' || typeof mutation.allowDelete !== 'boolean') {
+      errors.push({ code: 'MANIFEST_AUTHORITY_MUTATION', message: 'Manifest authority.mutation must include allowCreate/allowUpdate/allowDelete booleans.' });
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    data: { errors }
   };
 };
 
@@ -399,6 +471,56 @@ const runUnsafeMutationDetection = (_ctx, params = {}) => {
   };
 };
 
+const runIntentValidation = ({ graphAPI }, params = {}) => {
+  const nodes = params.nodes || defaultNodes(graphAPI);
+  const manifest = (getManifestNode(nodes)[0] || {}).data || {};
+  const intent = manifest.intent || {};
+
+  const errors = [];
+  const warnings = [];
+
+  if (!intent.kind || !intent.scope) {
+    errors.push({
+      code: 'INTENT_MISSING',
+      message: 'Manifest intent.kind and intent.scope are required for intent validation.'
+    });
+    return { success: false, data: { errors, warnings } };
+  }
+
+  const kindsNeedingScripts = new Set(['executable', 'simulation']);
+  const hasScripts = nodes.some((node) => node?.type === 'script');
+  if (kindsNeedingScripts.has(intent.kind) && !hasScripts) {
+    errors.push({
+      code: 'INTENT_SCRIPT_MISSING',
+      message: `Intent kind "${intent.kind}" expects at least one script node.`
+    });
+  }
+
+  const documentationKinds = new Set(['documentation', 'contract']);
+  const docNodes = nodes.filter((node) => node?.type === 'markdown');
+  if (documentationKinds.has(intent.kind) && docNodes.length === 0) {
+    warnings.push({
+      code: 'INTENT_DOC_EMPTY',
+      message: `Intent kind "${intent.kind}" has no markdown nodes.`
+    });
+  }
+
+  if (intent.kind === 'workflow') {
+    const hasEdges = (params.edges || defaultEdges(graphAPI)).length > 0;
+    if (!hasEdges) {
+      warnings.push({
+        code: 'INTENT_WORKFLOW_NO_EDGES',
+        message: 'Workflow intent has no edges; consider adding relationships.'
+      });
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    data: { errors, warnings, intent }
+  };
+};
+
 export const validationSkills = [
   {
     id: 'validation.schema',
@@ -422,6 +544,18 @@ export const validationSkills = [
     contracts: {
       inputs: ['edges[]'],
       forbidden: ['Implicit handle creation']
+    }
+  },
+  {
+    id: 'validation.manifest',
+    title: 'Manifest Validation',
+    description: 'Ensure a single valid manifest exists and contains required sections.',
+    category: 'validation',
+    supportsDryRun: true,
+    run: runManifestValidation,
+    contracts: {
+      inputs: ['nodes?'],
+      outputs: ['errors[]']
     }
   },
   {
@@ -458,6 +592,18 @@ export const validationSkills = [
     contracts: {
       inputs: ['commands[]'],
       forbidden: ['Implicit graph replacement']
+    }
+  },
+  {
+    id: 'validation.intent',
+    title: 'Intent Validation',
+    description: 'Check that graph content matches manifest intent.',
+    category: 'validation',
+    supportsDryRun: true,
+    run: runIntentValidation,
+    contracts: {
+      inputs: ['nodes?', 'edges?'],
+      outputs: ['errors[]', 'warnings[]']
     }
   }
 ];

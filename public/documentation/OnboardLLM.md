@@ -1,361 +1,208 @@
-# Chatbot Onboarding Guide for Twilite OS
+# Twilite LLM Onboarding Guide (Current Capability)
 
-Twilite is no longer just a diagramming surface—it is a persistent, executable workspace. A graph is a living cluster that keeps state across sessions, automates its own growth, and expects contributors (humans and AIs) to evolve it safely. Use this guide whenever you generate JSON commands for Twilite OS.
+Twilite is a persistent graph workspace. The graph is the state. Your job is to act as a careful steward: extend existing graphs without breaking continuity, respect contracts, and make intent explicit.
 
----
-
-## Mindset: Steward, Not Draftsman
-
-- **Preserve continuity.** Your commands extend an existing system; never assume a blank canvas.
-- **Automate when possible.** ScriptNodes, Background RPC, and loaders can fabricate or mutate hundreds of nodes in one action.
-- **Respect topology.** Handle keys, socket schemas, and groups are domain-specific contracts (breadboards, logic ICs, spatial rigs, etc.). Use them precisely.
-- **Version intentionally.** Think in terms of state transitions that can be committed to Git/GitHub, not disposable exports.
+This guide defines the operational rules for agents and tools that mutate graphs.
 
 ---
 
-## Operational Workflow
+## 1) Core Principles
 
-1. **Inspect context.** Read the current node metadata (type, handles, data, extensions) and note whether automation or Git checkpoints are active.
-2. **Plan the delta.** Decide whether to issue a `create`, `update`, `script`, or mixed command. Prefer incremental updates over wholesale rewrites.
-3. **Emit precise JSON.** Use UUIDs, declare every handle, and mention the cluster/group you are touching when relevant.
-4. **Let Twilite run it.** The user pastes the JSON; Twilite applies it, updates history, and (if configured) records the new state in Git.
-5. **Iterate.** React to validation feedback, telemetry, or user direction.
-
-> Twilite’s value is “not having to start over.” Your job is to keep the workspace coherent so unfinished work survives.
+- **Continuity over convenience.** Never replace a graph by re-emitting a full `nodegraph-data` object.
+- **Intent before action.** Use the Manifest node (if present) to understand purpose and authority.
+- **Semantics over presentation.** Validation focuses on meaning, not layout polish.
+- **Explicit over implicit.** Prefer explicit handles, types, and IDs; avoid guessing.
+- **Small diffs, high trust.** Use targeted updates; preserve IDs whenever possible.
 
 ---
 
-## Node Types Reference
+## 2) Mandatory Rules
 
-See `public/documentation/LLMNodeTypes.md` for the full list of core and plugin node types, plus handle keys for breadboard nodes. Also read `public/documentation/UserManual.md` for the broader editor and workflow overview.
+### Graph Mutation
+- **Do not** output a full `nodegraph-data` object unless the user explicitly requests a wipe/reset.
+- Use **state deltas only**: `createNodes`, `createEdges`, `update`, `delete`, `move`, `translate`, `batch`, `transaction`.
+- Always create **nodes first**, then **edges**, then **groups**.
 
----
+### IDs
+- Use RFC 4122 v4 UUIDs for new nodes/edges/groups.
+- Never reuse an existing ID for a new entity.
 
-## First Five Minutes: Ignition
+### Handles
+- Handles are **optional for portability**.
+- If handles are provided, they must exist on the node and respect direction/compatibility.
 
-When you drop into an empty cluster, the only wrong move is doing nothing. Start anywhere:
+### Edge Types
+- Edge `type` is **required** for persisted graphs.
+- Interactive authoring may temporarily default missing types, but **saved graphs must be typed**.
 
-- Add a **Markdown** node and write the question that brought you here. That alone is a valid graph.
-- Drop a **Default** node, label it “Next step?”, and connect it to anything—even if the edge has no meaning yet.
-- Leave one node floating on the side as a scratchpad. Twilite keeps it safe; you can rearrange later.
-
-Messy beginnings are expected. Crooked nodes, half-finished thoughts, and dangling edges are invitations to grow, not warnings. Twilite remembers every change, so nothing you add in the first minutes is permanent or dangerous. If you feel stuck, add one more node that names the unknown (“What powers this?”, “Need data here”). The workspace will still be here when you return—continuity is the default.
-
----
-
-## Command Essentials
-
-- Always include an `action`.
-- Use RFC 4122 v4 UUIDs for every `id`. Example: `b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d`.
-- **Include `width` and `height` on node creation (for now).** Until node-type defaults are fully reliable, every node created via `create` / `createNodes` should include explicit size. (Updates can omit size unless changing it.)
-- **Positions are optional (and drive auto-layout/growth).**
-  - If you omit `position` on **every** newly-created node in a `create` / `createNodes` payload, Twilite will auto-place them (and auto-layout/reroute as needed).
-  - If you include any explicit `position`, Twilite treats it as intentional and will not auto-layout that batch by default (use Beautify if you want a full layout pass).
-  - Placement is designed to avoid overlaps; locked/pinned nodes act as obstacles and won’t be moved.
-- **Handles are optional.** If you omit `sourceHandle`/`targetHandle`, the edge attaches to the node boundary. When you do include them, match the published handle keys exactly.
-- **No implicit handles.** Twilite does not auto-create `in`/`out` handles. Nodes must explicitly declare their handles, and edges must reference those exact keys.
-- **Handles must be declared before use.** If you specify `sourceHandle: "out"` and `targetHandle: "in"`, the nodes must explicitly declare those handle keys (via `handles`, or `inputs`/`outputs` that map to handles).
-- **Edges without handle keys will not attach to handles.** If you omit `sourceHandle`/`targetHandle`, Twilite falls back to node-boundary rendering.
-- **Edge labels:** you can use legacy `edge.label` (middle label) or `edge.labels: [start, middle, end]` for entry/middle/exit labels. Any missing slots render no label.
-- **Handle type matching is opt-in.** Types like `value`, `trigger`, `any`, or direction tokens (`input`, `output`, `bidirectional`) are treated as wildcards. Only enforce matching when both handles declare strict semantic types (e.g., `boolean`, `number`, `string`).
-- Target the right container. When writing to nested systems (e.g., a breadboard group), include the appropriate group/context references so the user can keep components compartmentalized.
-- **Colors are first-class.** You can set `node.color` or `edge.color` with any CSS color string (hex, rgb, hsl). Use color to encode state, ownership, or priority.
-- **Use colors + emojis intentionally.** Color-code clusters and add small emojis in labels to make graphs scannable at a glance.
-- **Edge routing is ELK-first.** Twilite now routes edges via ELK with precise node/handle data, so `edgeRoutes` mirrors ELK’s bend points. Don’t remap those points or mix in manual bundling heuristics; adjust ELK options (spacing, algorithm, port constraints) instead if you need different behavior. You can still request `edge.style.route: "orthogonal"` or `edge.style.curved: true`, but the real work happens in ELK’s layout options exposed through Document Properties.
-
-Document Properties exposes a new **ELK edge controls** section where you can:
-- Switch between algorithms (fixed, layered, radial, rectpacking)
-- Force orthogonal or polyline routing
-- Lock edges to specific handle sides (`elk.portConstraints`)
-- Tune node spacing and layered edge spacing
-
-These settings feed the reroute pipeline, so every paste/layout replays with the same ELK configuration across layouts and graphs.
-
-### ELK Routing Notes
-
-- Every layout now rebuilds ELK’s graph with each node’s current size, position, and handle definition. Handles become ELK ports (`elk.port.side` + offsets) so edges snap cleanly to anchors.
-- ELK avoids nodes automatically, so as long as your node bounding boxes and handles are accurate, the resulting `edgeRoutes` never crosses non-target nodes. The renderer simply draws those points.
-- **Creation order matters.** Always create `nodes` first, then `edges`, then `groups` (every pass). If using `batch`/`transaction`, ensure each command respects this order.
-
-### Supported Actions
-
-| Action | Notes |
-| --- | --- |
-| `create` | One payload that may include `nodes`, `edges`, `groups`. Nodes are created first, then edges, then groups. |
-| `createNodes` / `createEdges` / `createGroups` | Bulk operations for a single entity type. |
-| `update` | Accepts `id` or `ids` (array) for nodes, edges, and groups. Use to mutate type, size, data, markdown, sockets, etc. |
-| `delete` | Remove nodes/edges/groups (remember: deleting a node also detaches its edges). |
-| `read` | Fetch a node/edge/group by id for diagnostics. |
-| `addNodesToGroup` / `removeNodesFromGroup` / `setGroupNodes` | Edit group membership by node IDs. |
-| `translate` / `move` | Move nodes or groups by a `{x,y}` delta. |
-| `duplicate` | Clone nodes (optionally clone edges between them with `includeEdges`). |
-| `batch` / `transaction` | Execute multiple commands in order (array in `commands`). |
-| `findNodes` / `findEdges` | Query subsets (e.g., “all markdown nodes in group A”). |
-| `getStats` | Retrieve counts, bounding boxes, or other metrics. |
-| `clearGraph` | Rarely used; wipes the cluster. |
-
-> Deprecated actions such as `add` are rejected. Always use the verbs above.
-
-Tip: Any command can include `"dryRun": true` to validate intent without mutating the graph.
+### Unknown Fields
+- Unknown top-level fields are **errors**.
+- Unknown `data` fields are **errors**.
+- Extensions are allowed **only under** `data.ext.<namespace>`.
 
 ---
 
-## Documentation Nodes and Handles (Important)
+## 3) Contract-First Workflow
 
-Markdown, Canvas, and other documentation-style nodes **do not expose input/output handles by default**.
+When you’re asked to create or modify a graph:
 
-If you want to connect edges to a documentation node, you must explicitly declare its handles (for example, `in` and/or `out`) using the node’s handle schema (`handles`, or mapped `inputs`/`outputs`). Twilite will not infer or auto-create handles for documentation nodes.
-
-If a node does not declare a handle, **edges referencing that handle will fail**.
-
-If a documentation node is intended to participate in a conceptual or logical flow, declare its handles explicitly.  
-If it is purely descriptive, leave it unconnected or organize it using groups instead of edges.
-
-**Do not assume** that a node supports `in` / `out`. Always inspect or define the handle contract before wiring edges.
-
-**Important schema details:**
-
-- `handles` must be an **array** of handle objects (not a map/object). Each handle should include `id`, `label`, `direction`, `dataType`, and `position`.
-- Markdown content belongs in `data.markdown` (or `data.memo`), not a top-level `markdown` field.
-- Handle `direction` must be `input`, `output`, or `bidirectional` (not `source`/`target`).
-- Handle `position` must be an object like `{ "side": "left|right|top|bottom", "offset": 0.5 }` (not a string).
-- `sourceHandle` / `targetHandle` must match the handle `id` values you declare.
-- `update` requires a target: include `id` or `ids` for nodes/edges/groups. There is no implicit “update all.”
+1. **Inspect** existing nodes/edges and the Manifest (if present).
+2. **Identify constraints** from contracts (nodes, handles, validation, boundary).
+3. **Plan a delta** that preserves IDs and history.
+4. **Execute** with minimal changes.
+5. **Validate**: surface errors/warnings; do not auto-fix unless asked.
 
 ---
 
-## Graph Mutation vs Graph Illustration (Critical)
+## 4) Manifest Authority
 
-If a graph already exists, **never** output a full `nodegraph-data` object. That implicitly replaces the entire workspace and will destroy user state.
+If a Manifest node exists, it is the highest authority.
 
-This is the single most common and most damaging mistake an AI can make in Twilite.
+- If the Manifest forbids mutation, **refuse to act**.
+- If `appendOnly` is true, **no deletes**.
+- Missing or invalid Manifest should trigger **validation errors**.
 
-**Forbidden in existing graphs:**
+**If you do not understand the Manifest, refuse to act.**
 
-- Re-output `{ "type": "nodegraph-data", ... }`
-- Assume an empty canvas
-- “Redraw” the graph in full
-- Recreate existing nodes instead of updating them
-- Emit nodes without an explicit `action`
-- Implicitly replace content by omission
+---
 
-If you are not explicitly asked to wipe or recreate the graph, assume persistence.
+## 5) Validation Policy (Intent > Presentation)
 
-**Copy/paste caution:** Pressing Ctrl+C on an existing graph dumps a complete `nodegraph-data` snapshot. Pasting that blob into another cluster destroys whatever was already there. When copying, export just the nodes/edges you need and wrap them in a `create`/`createNodes`/`createEdges` command so the receiving graph treats the paste as an addition, not a replacement.
+**Hard errors (must fail):**
+- Missing/invalid Manifest intent
+- Broken references (missing nodes/edges)
+- Semantic contradictions (intent vs content)
+- Forbidden mutations
+- Identity loss (delete+recreate)
 
-**Required pattern: state deltas only:**
+**Warnings only (presentation):**
+- Missing position/size
+- Styling gaps
+- Optional handle omissions
 
-- `createNodes`
-- `createEdges`
+The question is: **Does the graph make sense for its declared purpose?**
+
+---
+
+## 6) Required Command Shape
+
+**Always include an `action`.**
+
+Use:
+- `createNodes` / `createEdges` / `createGroups`
 - `update`
 - `delete`
 - `move` / `translate`
-- `batch` / `transaction`
+- `batch` / `transaction` (with `commands`)
 
-Every change must be additive, mutative, or subtractive — never declarative.
-
-**Decision rule (memorize this):**
-
-- If you are describing a graph → use prose or examples
-- If you are changing a graph → use action commands only
-- If you are adding analysis → append new nodes downstream
-- If unsure → do nothing and ask
-
-When in doubt, append, never overwrite.
-
-**Safe defaults for AI agents:**
-
-- Assume the graph already exists
-- Assume IDs must be preserved
-- Assume history matters
-- Assume Git diffs should stay small
-- Assume erasure is a bug
-
-Twilite’s core value is continuity. Breaking continuity is always worse than adding clutter.
-
-**Why this rule exists:**
-
-Most diagram tools treat graphs as disposable pictures. Twilite treats graphs as stateful cognitive systems.
-
-Therefore: re-emitting a full graph is equivalent to calling `clearGraph`. This is almost never what the user wants.
-
----
-
-## Automation & Procedural Generation
-
-Twilite treats ScriptNodes as first-class builders. Document this when emitting commands:
-
-- **ScriptNodes** can manufacture entire boards: spawn nodes, wire edges, toggle state, emit telemetry.
-- Scripts may mutate existing graphs—adjust positions, update data, or swap node types—without recreating them.
-- When emitting scripts, include metadata (`data.memo`, `data.markdown`) describing inputs/outputs so future agents understand the routine.
-
-Example: installing a ScriptNode that stitches 200 resistors to a breadboard should describe the handle schema it expects (`sourceHandles: ['wireA','wireB']`) and the group or cluster it will operate in.
-
----
-
-## Advanced Handle & Socket Models
-
-Document the full handle contract whenever you introduce or modify nodes:
-
-- **Multi-socket nodes:** GateNodes expose `inputA`, `inputB`, `output`. Breadboard sockets use row+column semantics (`A1`, `B1`, …).
-- **Skinned sockets:** Breadboard rails use semantic handles (`positive`, `negative`). Custom components may define `pinA`, `pinB`, `shield`, etc.
-- **Canvas/3D nodes:** Spatial nodes often provide `signal`, `camera`, or `transform` handles for integration with simulations.
-
-When unsure, ask the user for the node definition or inspect `node.handles` via `read` commands before emitting edges.
-
----
-
-## Versioning & State Continuity
-
-Twilite graphs are typically stored in Git/GitHub. Help users keep history meaningful:
-
-- Describe changes in commit-friendly chunks (“Add breadboard power rail group”, “Update markdown docs for Lab Cluster A”).  
-- Avoid destructively recreating nodes when an `update` would suffice—this preserves IDs and diffs cleanly.
-- If you reorganize groups or coordinates, mention it so the user can decide whether to checkpoint the state.
-
----
-
-## Combined Create Example
+Example:
 
 ```json
 {
-  "action": "create",
+  "action": "createNodes",
   "nodes": [
     {
-      "id": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-      "label": "Task A",
-      "type": "default",
-      "position": { "x": 200, "y": 140 },
-      "width": 160,
-      "height": 80
-    },
-    {
-      "id": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d",
-      "label": "Task B",
-      "type": "default",
-      "position": { "x": 420, "y": 140 },
-      "width": 160,
-      "height": 80
-    }
-  ],
-  "edges": [
-    {
-      "id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
-      "source": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-      "sourceHandle": "out",
-      "target": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d",
-      "targetHandle": "in",
-      "type": "child",
-      "label": "then"
-    }
-  ],
-  "groups": [
-    {
-      "id": "2f1e0d9c-8b7a-4c3d-9e2f-1a0b9c8d7e6f",
-      "label": "Example Group",
-      "nodeIds": [
-        "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-        "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d"
-      ],
-      "bounds": { "x": 160, "y": 100, "width": 460, "height": 180 }
+      "id": "b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d",
+      "type": "markdown",
+      "label": "New Node",
+      "width": 280,
+      "height": 180,
+      "data": { "markdown": "Hello" }
     }
   ]
 }
 ```
 
-### Edge Wiring Example (Handles Required)
+For `batch` / `transaction`, use `commands` (not `operations`):
 
 ```json
 {
-  "action": "createEdges",
-  "edges": [
-    {
-      "id": "c6d51f2f-1a63-4e3f-90a5-6f3c2d6c9b21",
-      "source": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-      "sourceHandle": "out",
-      "target": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d",
-      "targetHandle": "in",
-      "type": "child",
-      "label": "then"
-    }
+  "action": "transaction",
+  "commands": [
+    { "action": "createNodes", "nodes": [/* ... */] },
+    { "action": "createEdges", "edges": [/* ... */] }
   ]
 }
 ```
 
 ---
 
-## Bulk Updates & Other Commands
+## 7) Nodes
 
-- **Single-node update**
+**Required (portable minimum):**
+- `id`
+- `type`
+- `data`
 
-  ```json
-  {
-    "action": "update",
-    "type": "node",
-    "id": "7f1c9e12-3a45-4f6b-9d2e-8a1b2c3d4e5f",
-    "updates": { "label": "Task A — Updated", "color": "#2e7d32" }
-  }
-  ```
+**Optional:**
+- `label`, `position`, `width`, `height`, `style`, `handles`, `extensions`
 
-- **Multi-node update**
-
-  ```json
-  {
-    "action": "update",
-    "type": "node",
-    "ids": [
-      "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
-      "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
-      "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41"
-    ],
-    "updates": {
-      "type": "markdown",
-      "width": 280,
-      "height": 180
-    }
-  }
-  ```
-
-- **Delete**
-
-  ```json
-  { "action": "delete", "type": "node", "id": "1a2b3c4d-5e6f-4a1b-9c2d-7e8f9a0b1c2d" }
-  ```
-
-- **Find nodes with notes**
-
-  ```json
-  { "action": "findNodes", "criteria": { "hasMemo": true } }
-  ```
-
-- **Get stats**
-
-  ```json
-  { "action": "getStats" }
-  ```
+If missing `position` or `width`/`height`, the renderer/layout will supply defaults.
 
 ---
 
-## Layout, Groups, and the OS Layer
+## 8) Edges
 
-- Space nodes on ~50px multiples to align with the grid and help groups auto-resize.
-- Use groups as functional containers (breadboard sections, logic subsystems, spatial scenes). When creating nodes inside a group, mention the desired `groupId` so users can keep the OS layer organized.
-- Large markdown or canvas nodes should declare dimensions up front (e.g., 280×180) for better auto-layout.
+**Required:**
+- `id`
+- `source`
+- `target`
+- `type`
+
+**Optional:**
+- `label`, `data`, `style`, `sourceHandle`, `targetHandle`
+
+Handles are optional, but if present they must be valid.
 
 ---
 
-## Error Handling & Telemetry
+## 9) Groups
 
-- Twilite validates every command. Errors include node ID clashes, missing handles, or malformed JSON. Read and react to the warnings rather than retrying blindly.
-- When automation fails mid-run (e.g., ScriptNode throws), produce a follow-up `update` that logs the failure inside a markdown node so the next contributor can recover.
+Groups are structural containers. They do **not** change meaning.
+
+- Do not move nodes implicitly when grouping.
+- Group bounds may be recalculated, but node positions stay the same.
 
 ---
 
-## Final Reminders
+## 10) Skills
 
-- Be explicit: mention which subsystem, group, or cluster your change touches.
-- Keep diffs small enough that the user can Git-commit them meaningfully.
-- Prefer updates over re-creation to preserve node IDs and history.
-- Document automation: whenever you add or modify a ScriptNode or Background RPC hook, explain what it will do.
+Skills are **graph operations**, not UI features.
 
-Twilite OS is “the operating system for the in-between.” Treat every command as an incremental upgrade to a living workspace, not a one-off illustration.
+Categories:
+- Structural (create/delete/group/duplicate)
+- Layout (auto-layout, reroute)
+- Validation (schema, handles, manifest, intent)
+- Transformation (refactor, migration)
+- Automation (script/batch/import/export)
+
+All skill behavior must respect contracts and Manifest authority.
+
+---
+
+## 11) Error Handling
+
+On failure:
+- Perform no partial mutations.
+- Return structured errors.
+- Identify offending nodes/edges.
+
+Prefer refusal over silent correction.
+
+---
+
+## 12) Safe Defaults for AI Agents
+
+- Assume the graph already exists.
+- Preserve IDs unless explicitly told otherwise.
+- Prefer `update` over delete+recreate.
+- Use dry-run when unsure.
+- Ask if intent is unclear.
+
+---
+
+## 13) When You Are Unsure
+
+Do nothing. Ask. Append a markdown node that names the uncertainty.
+
+Twilite rewards clarity over speed.

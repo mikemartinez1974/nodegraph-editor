@@ -234,7 +234,7 @@ export class ValidationGuard {
         }
       }
 
-      // Position validation
+      // Position validation (optional)
       if (!sanitized.position) {
         if (this.options.allowAutoFix) {
           sanitized.position = { x: 0, y: 0 };
@@ -243,12 +243,6 @@ export class ValidationGuard {
             message: 'Set default position (0, 0)',
             field: 'position',
             autoFixed: true
-          });
-        } else {
-          result.errors.push({
-            type: VALIDATION_ERRORS.MISSING_POSITION,
-            message: 'Node must have a position',
-            field: 'position'
           });
         }
       } else {
@@ -294,7 +288,7 @@ export class ValidationGuard {
         }
       }
 
-      // Validate dimensions
+      // Validate dimensions (optional)
       if (sanitized.width !== undefined) {
         if (typeof sanitized.width !== 'number' || sanitized.width < 0) {
           if (this.options.allowAutoFix) {
@@ -313,6 +307,12 @@ export class ValidationGuard {
             });
           }
         }
+      } else {
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Width missing; renderer will apply a default',
+          field: 'width'
+        });
       }
 
       if (sanitized.height !== undefined) {
@@ -333,6 +333,12 @@ export class ValidationGuard {
             });
           }
         }
+      } else {
+        result.warnings.push({
+          type: VALIDATION_ERRORS.INVALID_DATA,
+          message: 'Height missing; renderer will apply a default',
+          field: 'height'
+        });
       }
 
       // Sanitize data object
@@ -350,6 +356,24 @@ export class ValidationGuard {
             type: VALIDATION_ERRORS.INVALID_DATA,
             message: 'Data must be an object',
             field: 'data'
+          });
+        }
+      }
+
+      if (sanitized.data && typeof sanitized.data === 'object' && !Array.isArray(sanitized.data)) {
+        const ext = sanitized.data.ext;
+        if (ext && typeof ext === 'object' && !Array.isArray(ext)) {
+          const allowedNamespaces = Array.isArray(this.options.allowedExtensionNamespaces)
+            ? this.options.allowedExtensionNamespaces
+            : ['twilite'];
+          Object.keys(ext).forEach((namespace) => {
+            if (!allowedNamespaces.includes(namespace)) {
+              result.warnings.push({
+                type: VALIDATION_ERRORS.INVALID_DATA,
+                message: `Unknown extension namespace '${namespace}' in data.ext`,
+                field: `data.ext.${namespace}`
+              });
+            }
           });
         }
       }

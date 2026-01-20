@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-18T02:15:32.562Z",
-    "modified": "2026-01-18T02:15:32.562Z",
+    "created": "2026-01-20T00:02:15.438Z",
+    "modified": "2026-01-20T00:02:15.438Z",
     "author": "",
     "tags": []
   },
@@ -48,10 +48,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 748.2185194345835,
-      "y": -437.4440973577382
+      "x": 807.023862215301,
+      "y": -473.06369915244954
     },
-    "zoom": 0.31669776488014917
+    "zoom": 1.3927981418114899
   },
   "document": {
     "url": "/tlz/background.html"
@@ -76,8 +76,8 @@
       "type": "markdown",
       "label": "Task 1: Capability & Documentation Layer",
       "position": {
-        "x": -732.1377797248462,
-        "y": -1509.801082210012
+        "x": -763.9484134637289,
+        "y": -1503.9622393776121
       },
       "width": 420,
       "height": 220,
@@ -96,8 +96,8 @@
       "type": "markdown",
       "label": "Onboarding (Human)",
       "position": {
-        "x": -1265.388299524431,
-        "y": 2100.969717544886
+        "x": -725.6361602589975,
+        "y": 4502.805347164244
       },
       "width": 320,
       "height": 200,
@@ -116,8 +116,8 @@
       "type": "markdown",
       "label": "Core Protocols",
       "position": {
-        "x": -632.4796694529343,
-        "y": -1197.6168329058444
+        "x": -684.5785660849658,
+        "y": -1198.5407443711608
       },
       "width": 320,
       "height": 200,
@@ -136,8 +136,8 @@
       "type": "markdown",
       "label": "Skill System",
       "position": {
-        "x": -771.4219533571531,
-        "y": 1725.208604121633
+        "x": -728.8508428841028,
+        "y": 2028.5830034120754
       },
       "width": 320,
       "height": 200,
@@ -156,8 +156,8 @@
       "type": "markdown",
       "label": "Schemas & Contracts",
       "position": {
-        "x": -1070.038547418052,
-        "y": 4014.0235566182505
+        "x": -747.2597332999239,
+        "y": 277.6230656757396
       },
       "width": 310,
       "height": 200,
@@ -196,8 +196,8 @@
       "type": "markdown",
       "label": "What Is a Graph?",
       "position": {
-        "x": -1244.5174198811826,
-        "y": -1138.4208998494607
+        "x": -1203.5588278673501,
+        "y": -1191.5054002660875
       },
       "width": 320,
       "height": 200,
@@ -216,8 +216,8 @@
       "type": "markdown",
       "label": "Manifest Node",
       "position": {
-        "x": -1281.732253504033,
-        "y": -232.5485913779632
+        "x": -1226.0440371052955,
+        "y": 861.5167613524179
       },
       "width": 320,
       "height": 200,
@@ -236,8 +236,8 @@
       "type": "markdown",
       "label": "Style Node",
       "position": {
-        "x": -1291.6901623301835,
-        "y": 383.22901539172443
+        "x": -1222.6590180468365,
+        "y": 1396.6513940293967
       },
       "width": 320,
       "height": 200,
@@ -256,8 +256,8 @@
       "type": "markdown",
       "label": "Canonical Node Roles",
       "position": {
-        "x": -1272.1651112573434,
-        "y": -772.2955071658416
+        "x": -1218.981492406796,
+        "y": -194.78299311078672
       },
       "width": 320,
       "height": 200,
@@ -276,8 +276,8 @@
       "type": "markdown",
       "label": "Data vs UI Boundary",
       "position": {
-        "x": -1301.9550641643511,
-        "y": 1025.990863737031
+        "x": -1213.110806270121,
+        "y": -835.7291781914615
       },
       "width": 320,
       "height": 200,
@@ -296,8 +296,8 @@
       "type": "markdown",
       "label": "Identity",
       "position": {
-        "x": 468.1363261936367,
-        "y": 20.979520392672327
+        "x": 523.8245425923733,
+        "y": 1115.044873123054
       },
       "width": 300,
       "height": 180,
@@ -316,8 +316,8 @@
       "type": "markdown",
       "label": "Intent & Scope",
       "position": {
-        "x": -254.28240397813417,
-        "y": 28.18944617935375
+        "x": -198.59418757939775,
+        "y": 1122.2547989097357
       },
       "width": 300,
       "height": 180,
@@ -336,8 +336,8 @@
       "type": "markdown",
       "label": "Dependencies & Requirements",
       "position": {
-        "x": 814.8321330784418,
-        "y": 24.46198938705237
+        "x": 870.5203494771788,
+        "y": 1118.5273421174343
       },
       "width": 320,
       "height": 200,
@@ -356,8 +356,8 @@
       "type": "markdown",
       "label": "Authority & Boundaries",
       "position": {
-        "x": 103.55901568539161,
-        "y": 19.934846834603775
+        "x": 159.24723208412811,
+        "y": 1114.0001995649855
       },
       "width": 320,
       "height": 200,
@@ -376,8 +376,8 @@
       "type": "markdown",
       "label": "Manifest Role",
       "position": {
-        "x": -176.07247989839976,
-        "y": -530.9713335566944
+        "x": -122.88886104785317,
+        "y": 46.54118049836009
       },
       "width": 300,
       "height": 177.6203688040449,
@@ -396,8 +396,8 @@
       "type": "markdown",
       "label": "Definitions Role",
       "position": {
-        "x": 995.7360903083359,
-        "y": -539.5631432835962
+        "x": 1048.9197091588824,
+        "y": 37.949370771458234
       },
       "width": 300,
       "height": 180,
@@ -416,8 +416,8 @@
       "type": "markdown",
       "label": "Content Role",
       "position": {
-        "x": 620.0496205833501,
-        "y": -537.5314200695502
+        "x": 673.2332394338966,
+        "y": 39.98109398550423
       },
       "width": 300,
       "height": 180,
@@ -436,8 +436,8 @@
       "type": "markdown",
       "label": "Structure Role",
       "position": {
-        "x": 1347.5104592880625,
-        "y": -544.5857095670817
+        "x": 1400.6940781386093,
+        "y": 32.92680448797273
       },
       "width": 300,
       "height": 180,
@@ -456,8 +456,8 @@
       "type": "markdown",
       "label": "Style Role",
       "position": {
-        "x": 200.83302375501353,
-        "y": -533.032342884695
+        "x": 254.01664260556018,
+        "y": 44.480171170359455
       },
       "width": 300,
       "height": 180,
@@ -476,8 +476,8 @@
       "type": "markdown",
       "label": "Visual Roles",
       "position": {
-        "x": -294.4064548939044,
-        "y": 623.1441239474084
+        "x": -225.3753106105581,
+        "y": 1636.5665025850806
       },
       "width": 320,
       "height": 200,
@@ -496,8 +496,8 @@
       "type": "markdown",
       "label": "Emphasis & Hierarchy",
       "position": {
-        "x": 82.88135095856342,
-        "y": 630.1813922985564
+        "x": 151.91249524190968,
+        "y": 1643.6037709362292
       },
       "width": 320,
       "height": 200,
@@ -516,8 +516,8 @@
       "type": "markdown",
       "label": "State Signaling",
       "position": {
-        "x": 450.7861323428333,
-        "y": 623.1441239474084
+        "x": 519.8172766261799,
+        "y": 1636.5665025850806
       },
       "width": 320,
       "height": 220,
@@ -536,8 +536,8 @@
       "type": "markdown",
       "label": "Grouping & Scope Cues",
       "position": {
-        "x": 813.9994014930048,
-        "y": 616.1068555962602
+        "x": 883.0305457763515,
+        "y": 1629.5292342339328
       },
       "width": 320,
       "height": 220,
@@ -556,8 +556,8 @@
       "type": "markdown",
       "label": "Meaning Ownership",
       "position": {
-        "x": -272.41755037347775,
-        "y": 1318.3164290419656
+        "x": -183.57329247924682,
+        "y": -543.4036128865271
       },
       "width": 320,
       "height": 200,
@@ -576,8 +576,8 @@
       "type": "markdown",
       "label": "Portability Test",
       "position": {
-        "x": 84.50284137196888,
-        "y": 1312.258904557875
+        "x": 173.34709926620016,
+        "y": -549.4611373706176
       },
       "width": 320,
       "height": 200,
@@ -596,8 +596,8 @@
       "type": "markdown",
       "label": "UI-Only Concerns",
       "position": {
-        "x": 441.9206284793753,
-        "y": 1310.4571267964263
+        "x": 530.7648863736063,
+        "y": -551.2629151320663
       },
       "width": 320,
       "height": 220,
@@ -616,8 +616,8 @@
       "type": "markdown",
       "label": "Diff & History Hygiene",
       "position": {
-        "x": 787.7429570157046,
-        "y": 1322.859572405033
+        "x": 876.5872149099349,
+        "y": -538.8604695234596
       },
       "width": 320,
       "height": 220,
@@ -636,8 +636,8 @@
       "type": "markdown",
       "label": "Structural Skills",
       "position": {
-        "x": -229.66533868226412,
-        "y": 2013.3659590180393
+        "x": -155.28359447033142,
+        "y": 2310.9015154760827
       },
       "width": 320,
       "height": 220,
@@ -656,8 +656,8 @@
       "type": "markdown",
       "label": "Layout & Spatial Skills",
       "position": {
-        "x": 138.5154950948172,
-        "y": 2023.7358184093011
+        "x": 212.89723930674995,
+        "y": 2321.271374867344
       },
       "width": 320,
       "height": 220,
@@ -676,8 +676,8 @@
       "type": "markdown",
       "label": "Validation & Safety Skills",
       "position": {
-        "x": 549.2573160547554,
-        "y": 2017.8153536779457
+        "x": 623.6390602666881,
+        "y": 2315.3509101359887
       },
       "width": 320,
       "height": 240,
@@ -696,8 +696,8 @@
       "type": "markdown",
       "label": "Transformation Skills",
       "position": {
-        "x": 928.9309124929764,
-        "y": 2013.3659590180393
+        "x": 1003.3126567049092,
+        "y": 2310.9015154760827
       },
       "width": 320,
       "height": 240,
@@ -716,8 +716,8 @@
       "type": "markdown",
       "label": "Automation & Compilation Skills",
       "position": {
-        "x": 1337.530976335167,
-        "y": 2015.418694689599
+        "x": 1411.9127205470995,
+        "y": 2312.954251147642
       },
       "width": 320,
       "height": 240,
@@ -736,8 +736,8 @@
       "type": "markdown",
       "label": "Create Nodes",
       "position": {
-        "x": -209.66533868226412,
-        "y": 2343.365959018039
+        "x": -135.28359447033142,
+        "y": 2640.9015154760827
       },
       "width": 300,
       "height": 200,
@@ -756,8 +756,8 @@
       "type": "markdown",
       "label": "Create Edges",
       "position": {
-        "x": -208.91182346380424,
-        "y": 2562.614414718999
+        "x": -134.5300792518716,
+        "y": 2860.149971177042
       },
       "width": 300,
       "height": 220,
@@ -776,8 +776,8 @@
       "type": "markdown",
       "label": "Group / Ungroup",
       "position": {
-        "x": -205.19549127641255,
-        "y": 2812.972448593743
+        "x": -130.8137470644799,
+        "y": 3110.5080050517863
       },
       "width": 300,
       "height": 220,
@@ -796,8 +796,8 @@
       "type": "markdown",
       "label": "Reparent",
       "position": {
-        "x": -205.9233845424189,
-        "y": 3054.442031561692
+        "x": -131.5416403304862,
+        "y": 3351.977588019736
       },
       "width": 300,
       "height": 220,
@@ -816,8 +816,8 @@
       "type": "markdown",
       "label": "Duplicate",
       "position": {
-        "x": -199.0618998001501,
-        "y": 3552.848833461941
+        "x": -124.68015558821742,
+        "y": 3850.384389919986
       },
       "width": 300,
       "height": 220,
@@ -836,8 +836,8 @@
       "type": "markdown",
       "label": "Extract Subgraph",
       "position": {
-        "x": -201.9401404302936,
-        "y": 3288.8911550721145
+        "x": -127.55839621836094,
+        "y": 3586.4267115301586
       },
       "width": 320,
       "height": 240,
@@ -856,8 +856,8 @@
       "type": "markdown",
       "label": "Auto-Layout (ELK)",
       "position": {
-        "x": 166.29436782782807,
-        "y": 2357.365959018039
+        "x": 240.6761120397607,
+        "y": 2654.9015154760827
       },
       "width": 320,
       "height": 240,
@@ -876,8 +876,8 @@
       "type": "markdown",
       "label": "Reroute Edges",
       "position": {
-        "x": 167.047883046288,
-        "y": 2606.2425844083177
+        "x": 241.42962725822076,
+        "y": 2903.7781408663614
       },
       "width": 320,
       "height": 240,
@@ -896,8 +896,8 @@
       "type": "markdown",
       "label": "Avoid Collisions",
       "position": {
-        "x": 161.87576432688377,
-        "y": 2855.119209798596
+        "x": 236.2575085388164,
+        "y": 3152.654766256639
       },
       "width": 320,
       "height": 220,
@@ -916,8 +916,8 @@
       "type": "markdown",
       "label": "Align / Distribute",
       "position": {
-        "x": 158.18505409194609,
-        "y": 3081.7747079218857
+        "x": 232.56679830387884,
+        "y": 3379.3102643799293
       },
       "width": 320,
       "height": 220,
@@ -936,8 +936,8 @@
       "type": "markdown",
       "label": "Normalize Spacing",
       "position": {
-        "x": 160.36873388996435,
-        "y": 3333.6220339587744
+        "x": 234.750478101897,
+        "y": 3631.1575904168185
       },
       "width": 320,
       "height": 220,
@@ -956,8 +956,8 @@
       "type": "markdown",
       "label": "Schema Validation",
       "position": {
-        "x": 565.1868918314583,
-        "y": 2311.0776058148417
+        "x": 639.568636043391,
+        "y": 2608.6131622728853
       },
       "width": 320,
       "height": 240,
@@ -976,8 +976,8 @@
       "type": "markdown",
       "label": "Handle Compatibility Checks",
       "position": {
-        "x": 568.9032240188501,
-        "y": 2558.472822720654
+        "x": 643.2849682307829,
+        "y": 2856.0083791786974
       },
       "width": 320,
       "height": 260,
@@ -996,8 +996,8 @@
       "type": "markdown",
       "label": "Missing Dependency Detection",
       "position": {
-        "x": 557.8054713615822,
-        "y": 2850.3102941604448
+        "x": 632.187215573515,
+        "y": 3147.845850618488
       },
       "width": 320,
       "height": 240,
@@ -1016,8 +1016,8 @@
       "type": "markdown",
       "label": "Orphan Detection",
       "position": {
-        "x": 560.0403950645082,
-        "y": 3112.519595910917
+        "x": 634.4221392764409,
+        "y": 3410.05515236896
       },
       "width": 320,
       "height": 240,
@@ -1036,8 +1036,8 @@
       "type": "markdown",
       "label": "Unsafe Mutation Detection",
       "position": {
-        "x": 550.3728069867989,
-        "y": 3370.2925558856696
+        "x": 624.7545511987316,
+        "y": 3667.8281123437137
       },
       "width": 340,
       "height": 260,
@@ -1056,8 +1056,8 @@
       "type": "markdown",
       "label": "Refactor (Split / Merge)",
       "position": {
-        "x": 952.6354191638511,
-        "y": 2331.886521452993
+        "x": 1027.0171633757839,
+        "y": 2629.4220779110365
       },
       "width": 340,
       "height": 260,
@@ -1076,8 +1076,8 @@
       "type": "markdown",
       "label": "Normalize / Denormalize",
       "position": {
-        "x": 959.3145683201747,
-        "y": 2604.4656825947263
+        "x": 1033.6963125321074,
+        "y": 2902.00123905277
       },
       "width": 340,
       "height": 260,
@@ -1096,8 +1096,8 @@
       "type": "markdown",
       "label": "Type Migration",
       "position": {
-        "x": 963.0309005075662,
-        "y": 2877.04484373646
+        "x": 1037.4126447194988,
+        "y": 3174.5804001945035
       },
       "width": 340,
       "height": 260,
@@ -1116,8 +1116,8 @@
       "type": "markdown",
       "label": "Schema Upgrades",
       "position": {
-        "x": 966.7472326949585,
-        "y": 3159.9938642694556
+        "x": 1041.1289769068908,
+        "y": 3457.529420727499
       },
       "width": 340,
       "height": 260,
@@ -1136,8 +1136,8 @@
       "type": "markdown",
       "label": "Inline / Extract",
       "position": {
-        "x": 974.8565464308401,
-        "y": 3445.9135854490605
+        "x": 1049.2382906427724,
+        "y": 3743.4491419071055
       },
       "width": 340,
       "height": 260,
@@ -1156,8 +1156,8 @@
       "type": "markdown",
       "label": "Script Execution",
       "position": {
-        "x": 1364.1982999749732,
-        "y": 2344.864234089276
+        "x": 1438.580044186906,
+        "y": 2642.3997905473198
       },
       "width": 340,
       "height": 260,
@@ -1176,8 +1176,8 @@
       "type": "markdown",
       "label": "Batch Mutation",
       "position": {
-        "x": 1366.433223677899,
-        "y": 2620.406212199942
+        "x": 1440.8149678898317,
+        "y": 2917.9417686579854
       },
       "width": 340,
       "height": 260,
@@ -1196,8 +1196,8 @@
       "type": "markdown",
       "label": "Procedural Generation",
       "position": {
-        "x": 1364.2239219274268,
-        "y": 2887.0597394038114
+        "x": 1438.6056661393595,
+        "y": 3184.5952958618545
       },
       "width": 340,
       "height": 260,
@@ -1216,8 +1216,8 @@
       "type": "markdown",
       "label": "Simulation Steps",
       "position": {
-        "x": 1363.4960286614207,
-        "y": 3153.7132666076814
+        "x": 1437.8777728733535,
+        "y": 3451.2488230657245
       },
       "width": 340,
       "height": 260,
@@ -1236,8 +1236,8 @@
       "type": "markdown",
       "label": "Compile Graph → Artifact",
       "position": {
-        "x": 1362.7168914905074,
-        "y": 3451.4842556630138
+        "x": 1437.0986357024403,
+        "y": 3749.019812121058
       },
       "width": 360,
       "height": 280,
@@ -1256,8 +1256,8 @@
       "type": "markdown",
       "label": "Import / Export",
       "position": {
-        "x": 1396.061393367218,
-        "y": 3771.468488307658
+        "x": 1470.443137579151,
+        "y": 4069.0040447657034
       },
       "width": 360,
       "height": 260,
@@ -1276,8 +1276,8 @@
       "type": "markdown",
       "label": "Node Type Schemas",
       "position": {
-        "x": -202.24746378949027,
-        "y": 4195.588842577667
+        "x": -226.58284379855235,
+        "y": 529.1344743759703
       },
       "width": 340,
       "height": 240,
@@ -1296,8 +1296,8 @@
       "type": "markdown",
       "label": "Handle Contracts",
       "position": {
-        "x": 150.83312115009608,
-        "y": 4194.259119935672
+        "x": 126.49774114103423,
+        "y": 536.2253034643331
       },
       "width": 340,
       "height": 260,
@@ -1316,8 +1316,8 @@
       "type": "markdown",
       "label": "Schema Versioning & Migration",
       "position": {
-        "x": 510.5623192996528,
-        "y": 4196.918565219661
+        "x": 486.2269392905906,
+        "y": 530.4641970179648
       },
       "width": 360,
       "height": 280,
@@ -1336,8 +1336,8 @@
       "type": "markdown",
       "label": "Skill Contracts",
       "position": {
-        "x": 886.248189153139,
-        "y": 4199.578010503649
+        "x": 861.912809144075,
+        "y": 533.1236423019529
       },
       "width": 340,
       "height": 260,
@@ -1356,8 +1356,8 @@
       "type": "markdown",
       "label": "Manifest Contract",
       "position": {
-        "x": 1236.5124348481136,
-        "y": 4200.0112934643585
+        "x": 1212.1770548390493,
+        "y": 533.5569252626624
       },
       "width": 340,
       "height": 260,
@@ -1376,8 +1376,8 @@
       "type": "markdown",
       "label": "Validation Rules",
       "position": {
-        "x": 1593.5821877136823,
-        "y": 4196.022125538376
+        "x": 1569.2468077046235,
+        "y": 529.5677573366795
       },
       "width": 360,
       "height": 260,
@@ -1617,7 +1617,7 @@
       "label": "🎯 Manifest Node (REQUIRED)",
       "position": {
         "x": -4405.486298650623,
-        "y": -429.74423520054023
+        "y": -427.2577679191082
       },
       "width": 360,
       "height": 320,
@@ -1676,8 +1676,8 @@
       "type": "markdown",
       "label": "🎨 Style Node (RECOMMENDED)",
       "position": {
-        "x": -4937.107863535821,
-        "y": -29.04355992191404
+        "x": -4987.828520768693,
+        "y": 69.01637739497274
       },
       "width": 360,
       "height": 300,
@@ -1696,8 +1696,8 @@
       "type": "markdown",
       "label": "📖 Definition Nodes (CONDITIONAL)",
       "position": {
-        "x": -4930.596703872812,
-        "y": 414.5619106678206
+        "x": -4940.740835319387,
+        "y": 573.4866366641543
       },
       "width": 360,
       "height": 300,
@@ -1736,8 +1736,8 @@
       "type": "markdown",
       "label": "Example: Recommended Minimum",
       "position": {
-        "x": -3482.3802149917697,
-        "y": 550.6257734957646
+        "x": -3428.278180610039,
+        "y": 567.5326592400554
       },
       "width": 400,
       "height": 340,
@@ -2881,10 +2881,10 @@
         "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555"
       ],
       "bounds": {
-        "x": -1285.388299524431,
-        "y": -1529.801082210012,
-        "width": 993.2505197995848,
-        "height": 5763.824638828263
+        "x": -783.9484134637289,
+        "y": -1523.9622393776121,
+        "width": 460,
+        "height": 6246.767586541857
       },
       "visible": true,
       "style": {}
@@ -2901,10 +2901,10 @@
         "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666"
       ],
       "bounds": {
-        "x": -1321.9550641643511,
+        "x": -1268.539612070966,
         "y": -1524.5615896616423,
-        "width": 513.415452093385,
-        "height": 2770.5524533986736
+        "width": 460,
+        "height": 3141.212983691039
       },
       "visible": true,
       "style": {}
@@ -2921,9 +2921,9 @@
         "role-style-0005"
       ],
       "bounds": {
-        "x": -1292.1651112573434,
-        "y": -792.2955071658416,
-        "width": 2959.675570545406,
+        "x": -1238.981492406796,
+        "y": -214.78299311078675,
+        "width": 2959.675570545405,
         "height": 459.2631642811466
       },
       "visible": true,
@@ -2945,10 +2945,10 @@
         "mfest-authority-0004"
       ],
       "bounds": {
-        "x": -1301.732253504033,
-        "y": -252.5485913779632,
+        "x": -1246.0440371052955,
+        "y": 841.5167613524179,
         "width": 2456.564386582475,
-        "height": 497.01058076501556
+        "height": 497.0105807650158
       },
       "visible": true,
       "style": {
@@ -2969,10 +2969,10 @@
         "style-grouping-0004"
       ],
       "bounds": {
-        "x": -1311.6901623301835,
-        "y": 363.22901539172443,
+        "x": -1242.6590180468365,
+        "y": 1376.6513940293967,
         "width": 2465.689563823188,
-        "height": 499.91510855568396
+        "height": 499.9151085556839
       },
       "visible": true,
       "style": {
@@ -2993,8 +2993,8 @@
         "boundary-diffs-0004"
       ],
       "bounds": {
-        "x": -1321.9550641643511,
-        "y": 1005.9908637370311,
+        "x": -1233.110806270121,
+        "y": -855.7291781914615,
         "width": 2449.6980211800555,
         "height": 556.868708668002
       },
@@ -3018,10 +3018,88 @@
         "skill-automation-0005"
       ],
       "bounds": {
-        "x": -791.4219533571531,
-        "y": 1705.208604121633,
-        "width": 2468.95292969232,
-        "height": 572.6067495563125
+        "x": -748.8508428841028,
+        "y": 2008.5830034120754,
+        "width": 2500.7635634312023,
+        "height": 566.7679067239133
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-de64e39f-9519-41bf-9a63-52920ad2955d",
+      "label": "Group 8",
+      "nodeIds": [
+        "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
+        "doc-node-schemas-0001",
+        "doc-handle-contracts-0002",
+        "doc-schema-versioning-0003",
+        "doc-skill-contracts-0004",
+        "doc-manifest-contract-0005",
+        "doc-validation-rules-0006"
+      ],
+      "bounds": {
+        "x": -767.2597332999239,
+        "y": 257.6230656757396,
+        "width": 2716.506541004547,
+        "height": 572.8411313422251
+      },
+      "visible": true,
+      "style": {
+        "backgroundColor": "rgba(25, 118, 210, 0.1)",
+        "borderColor": "#1976d2",
+        "borderWidth": 2,
+        "borderRadius": 8
+      }
+    },
+    {
+      "id": "group-b663b02c-74dc-45ea-8541-d9858e6d3f2e",
+      "label": "Group 9",
+      "nodeIds": [
+        "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+        "skill-structural-0001",
+        "skill-layout-0002",
+        "skill-validation-0003",
+        "skill-transform-0004",
+        "skill-automation-0005",
+        "struct-create-nodes-0001",
+        "struct-create-edges-0002",
+        "struct-grouping-0003",
+        "struct-reparent-0004",
+        "struct-duplicate-0005",
+        "struct-extract-0006",
+        "layout-auto-elk-0001",
+        "layout-reroute-edges-0002",
+        "layout-avoid-collisions-0003",
+        "layout-align-distribute-0004",
+        "layout-normalize-spacing-0005",
+        "validate-schema-0001",
+        "validate-handles-0002",
+        "validate-dependencies-0003",
+        "validate-orphans-0004",
+        "validate-unsafe-mutation-0005",
+        "transform-refactor-0001",
+        "transform-normalize-0002",
+        "transform-type-migration-0003",
+        "transform-schema-upgrade-0004",
+        "transform-inline-extract-0005",
+        "auto-script-exec-0001",
+        "auto-batch-mutation-0002",
+        "auto-procedural-gen-0003",
+        "auto-simulation-step-0004",
+        "auto-compile-artifact-0005",
+        "auto-import-export-0006"
+      ],
+      "bounds": {
+        "x": -748.8508428841028,
+        "y": 2008.5830034120754,
+        "width": 2599.293980463254,
+        "height": 2340.4210413536275
       },
       "visible": true,
       "style": {

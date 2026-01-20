@@ -1,3 +1,5 @@
+import { assertMutationAllowed } from './manifestPolicy.js';
+
 const DEFAULT_NODE_WIDTH = 160;
 const DEFAULT_NODE_HEIGHT = 80;
 const DEFAULT_GROUP_PADDING = 32;
@@ -133,10 +135,14 @@ const sanitizeEdgeForCreation = (edge, resolution, index) => {
   const resolvedTargetHandle = resolveHandle(targetNode, 'input', targetHandle);
 
   if (!sourceHandle && collectHandles(sourceNode, 'output').length > 1 && !resolvedSourceHandle) {
-    throw new Error(`edges[${index}] must specify sourceHandle because source node exposes multiple outputs`);
+    if (!resolution.allowHandleInference) {
+      throw new Error(`edges[${index}] must specify sourceHandle because source node exposes multiple outputs`);
+    }
   }
   if (!targetHandle && collectHandles(targetNode, 'input').length > 1 && !resolvedTargetHandle) {
-    throw new Error(`edges[${index}] must specify targetHandle because target node exposes multiple inputs`);
+    if (!resolution.allowHandleInference) {
+      throw new Error(`edges[${index}] must specify targetHandle because target node exposes multiple inputs`);
+    }
   }
 
   sourceHandle = sourceHandle || resolvedSourceHandle || null;
@@ -187,6 +193,10 @@ const buildAddRemoveSummary = (results) => {
 };
 
 const runCreateNodes = async ({ graphAPI }, params = {}) => {
+  const mutationCheck = assertMutationAllowed(graphAPI, 'create');
+  if (mutationCheck.error) {
+    return { success: false, error: mutationCheck.error };
+  }
   const nodesInput = ensureArray(params.nodes, 'nodes');
   const allowPositions = params.preservePositions === true;
   const existingNodes = graphAPI.getNodes ? graphAPI.getNodes() : [];
@@ -245,27 +255,41 @@ const runCreateNodes = async ({ graphAPI }, params = {}) => {
     success: true,
     data: {
       ...result.data,
-      warnings: mergedWarnings.length ? mergedWarnings : undefined
+      warnings: mergedWarnings.length ? mergedWarnings : undefined,
+      manifestWarning: mutationCheck.warning
     }
   };
 };
 
 const runCreateEdges = async ({ graphAPI }, params = {}) => {
+  const mutationCheck = assertMutationAllowed(graphAPI, 'create');
+  if (mutationCheck.error) {
+    return { success: false, error: mutationCheck.error };
+  }
   const edgesInput = ensureArray(params.edges || params.connections, 'edges');
   const nodes = graphAPI.getNodes ? graphAPI.getNodes() : [];
   const edges = graphAPI.getEdges ? graphAPI.getEdges() : [];
   const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+  const edgeIdSet = new Set(edges.map((edge) => edge?.id).filter(Boolean));
+  const allowHandleInference =
+    params.allowHandleInference === true ||
+    ['import', 'automation', 'transformation', 'auto', 'inferred'].includes(String(params.mode || '').toLowerCase());
 
   const seen = new Set(edges.map((edge) => `${edge.source}|${edge.sourceHandle || ''}|${edge.target}|${edge.targetHandle || ''}`));
   const duplicates = [];
+  const duplicateIds = [];
 
   const resolution = {
     nodeMap,
-    defaultEdgeType: params.defaultType || 'straight'
+    defaultEdgeType: params.defaultType || 'straight',
+    allowHandleInference
   };
 
   const sanitizedEdges = edgesInput.map((edge, index) => {
     const normalized = sanitizeEdgeForCreation(edge, resolution, index);
+    if (normalized.id && edgeIdSet.has(normalized.id)) {
+      duplicateIds.push({ index, id: normalized.id });
+    }
     const key = `${normalized.source}|${normalized.sourceHandle || ''}|${normalized.target}|${normalized.targetHandle || ''}`;
     if (seen.has(key)) {
       duplicates.push({
@@ -281,6 +305,14 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
     return normalized;
   });
 
+  if (duplicateIds.length > 0) {
+    return {
+      success: false,
+      error: 'One or more edge ids already exist',
+      data: { duplicateIds }
+    };
+  }
+
   if (duplicates.length > 0 && params.failOnDuplicate !== false) {
     return {
       success: false,
@@ -293,6 +325,22 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
   if (duplicates.length > 0) {
     warnings.push(`${duplicates.length} edge(s) already exist and were ignored`);
   }
+
+  sanitizedEdges.forEach((edge, index) => {
+    const sourceNode = nodeMap.get(edge.source);
+    const targetNode = nodeMap.get(edge.target);
+    if (!sourceNode || !targetNode) return;
+    if (!edge.sourceHandle && collectHandles(sourceNode, 'output').length > 1) {
+      if (allowHandleInference) {
+        warnings.push(`edges[${index}] omitted sourceHandle on multi-handle node "${edge.source}"`);
+      }
+    }
+    if (!edge.targetHandle && collectHandles(targetNode, 'input').length > 1) {
+      if (allowHandleInference) {
+        warnings.push(`edges[${index}] omitted targetHandle on multi-handle node "${edge.target}"`);
+      }
+    }
+  });
 
   if (params.dryRun) {
     return {
@@ -344,13 +392,22 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
     success: true,
     data: {
       ...result.data,
-      warnings: mergedWarnings.length ? mergedWarnings : undefined
+      warnings: mergedWarnings.length ? mergedWarnings : undefined,
+      manifestWarning: mutationCheck.warning
     }
   };
 };
 
 const runGrouping = async ({ graphAPI }, params = {}) => {
   const action = (params.action || 'create').toLowerCase();
+  const mutationIntent =
+    action === 'dissolve' || action === 'delete'
+      ? 'delete'
+      : 'update';
+  const mutationCheck = assertMutationAllowed(graphAPI, mutationIntent);
+  if (mutationCheck.error) {
+    return { success: false, error: mutationCheck.error };
+  }
   const padding = params.padding ?? DEFAULT_GROUP_PADDING;
   const nodes = graphAPI.getNodes ? graphAPI.getNodes() : [];
   const groups = graphAPI.getGroups ? graphAPI.getGroups() : [];
@@ -369,6 +426,20 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     }
     if (nodeIds.length < 2) {
       return { success: false, error: 'Groups must reference at least two nodes' };
+    }
+    if (params.allowRegroup !== true) {
+      const grouped = groups
+        .filter((group) => Array.isArray(group.nodeIds))
+        .flatMap((group) => group.nodeIds)
+        .filter((id) => nodeIds.includes(id));
+      const uniqueGrouped = Array.from(new Set(grouped));
+      if (uniqueGrouped.length > 0) {
+        return {
+          success: false,
+          error: 'One or more nodes already belong to a group',
+          data: { groupedNodeIds: uniqueGrouped }
+        };
+      }
     }
     const targetNodes = nodeIds.map((id) => nodeMap.get(id));
     const bounds = computeBounds(targetNodes, padding);
@@ -395,7 +466,8 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
       data: {
         action: 'create',
         group: Array.isArray(result?.data?.created) ? result.data.created[0] : undefined,
-        warnings: result?.data?.failed
+        warnings: result?.data?.failed,
+        manifestWarning: mutationCheck.warning
       }
     };
   }
@@ -417,7 +489,7 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     }
     return {
       success: true,
-      data: { action: 'dissolve', result: result.data }
+      data: { action: 'dissolve', result: result.data, manifestWarning: mutationCheck.warning }
     };
   }
 
@@ -426,6 +498,20 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
     if (!groupMap.has(groupId)) {
       return { success: false, error: `Group ${groupId} not found` };
+    }
+    if (params.allowRegroup !== true) {
+      const alreadyGrouped = groups
+        .filter((group) => group.id !== groupId && Array.isArray(group.nodeIds))
+        .flatMap((group) => group.nodeIds)
+        .filter((id) => nodeIds.includes(id));
+      const uniqueGrouped = Array.from(new Set(alreadyGrouped));
+      if (uniqueGrouped.length > 0) {
+        return {
+          success: false,
+          error: 'One or more nodes already belong to another group',
+          data: { groupedNodeIds: uniqueGrouped }
+        };
+      }
     }
     const missing = nodeIds.filter((id) => !nodeMap.has(id));
     if (missing.length > 0) {
@@ -448,7 +534,7 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     }
     return {
       success: true,
-      data: { action: 'add', group: addResult.data }
+      data: { action: 'add', group: addResult.data, manifestWarning: mutationCheck.warning }
     };
   }
 
@@ -467,7 +553,7 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     }
     return {
       success: true,
-      data: { action: 'remove', result: removeResult.data }
+      data: { action: 'remove', result: removeResult.data, manifestWarning: mutationCheck.warning }
     };
   }
 
@@ -493,13 +579,17 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
       const bounds = computeBounds(refreshedNodes, padding);
       graphAPI.updateGroup(groupId, { bounds });
     }
-    return { success: true, data: { action: 'set', group: result.data } };
+    return { success: true, data: { action: 'set', group: result.data, manifestWarning: mutationCheck.warning } };
   }
 
   return { success: false, error: `Unsupported grouping action "${action}"` };
 };
 
 const runReparent = async ({ graphAPI }, params = {}) => {
+  const mutationCheck = assertMutationAllowed(graphAPI, 'update');
+  if (mutationCheck.error) {
+    return { success: false, error: mutationCheck.error };
+  }
   const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
   const nodes = graphAPI.getNodes ? graphAPI.getNodes() : [];
   const groups = graphAPI.getGroups ? graphAPI.getGroups() : [];
@@ -581,12 +671,17 @@ const runReparent = async ({ graphAPI }, params = {}) => {
     success: true,
     data: {
       operations,
-      summary: buildAddRemoveSummary(results)
+      summary: buildAddRemoveSummary(results),
+      manifestWarning: mutationCheck.warning
     }
   };
 };
 
 const runDuplicateNodes = async ({ graphAPI }, params = {}) => {
+  const mutationCheck = assertMutationAllowed(graphAPI, 'create');
+  if (mutationCheck.error) {
+    return { success: false, error: mutationCheck.error };
+  }
   const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
   const nodes = graphAPI.getNodes ? graphAPI.getNodes() : [];
   const nodeSet = new Set(nodes.map((node) => node.id));
@@ -624,7 +719,10 @@ const runDuplicateNodes = async ({ graphAPI }, params = {}) => {
 
   return {
     success: true,
-    data: result.data
+    data: {
+      ...result.data,
+      manifestWarning: mutationCheck.warning
+    }
   };
 };
 
@@ -656,6 +754,10 @@ const runExtractSubgraph = async ({ graphAPI }, params = {}) => {
   };
 
   if (params.createGroup) {
+    const mutationCheck = assertMutationAllowed(graphAPI, 'create');
+    if (mutationCheck.error) {
+      return { success: false, error: mutationCheck.error };
+    }
     const nodesForBounds = nodeIds.map((id) => nodeMap.get(id));
     const bounds = computeBounds(nodesForBounds, params.padding ?? DEFAULT_GROUP_PADDING);
     const groupPayload = {
@@ -689,7 +791,8 @@ const runExtractSubgraph = async ({ graphAPI }, params = {}) => {
       success: true,
       data: {
         payload,
-        group: Array.isArray(result?.data?.created) ? result.data.created[0] : null
+        group: Array.isArray(result?.data?.created) ? result.data.created[0] : null,
+        manifestWarning: mutationCheck.warning
       }
     };
   }
@@ -779,4 +882,3 @@ export const structuralSkills = [
     }
   }
 ];
-

@@ -1,0 +1,268 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-19T23:23:34.038Z",
+    "modified": "2026-01-19T23:23:34.038Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 839.9482329995069,
+      "y": 191.91899054405246
+    },
+    "zoom": 1.5613813340167768
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "contract-review-root",
+      "type": "markdown",
+      "label": "📋 Contract Review",
+      "position": {
+        "x": -84.3375445234202,
+        "y": 96.8116954670885
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Contract Review\n\nTrack contract/code mismatches one at a time.\n\nThis graph enumerates the current disagreements so we can decide which to change (contract vs code)."
+      }
+    },
+    {
+      "id": "contract-path-mismatch",
+      "type": "markdown",
+      "label": "📁 Edge Contract Path",
+      "position": {
+        "x": 337.1060004149949,
+        "y": 364.34104175651316
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Contract Path\n\n**Issue:**\n- Requested: `documentation/contracts/edges.md`\n- Current: `public/documentation/contracts/edges/edges.md`\n\n**Decision needed:**\n- Move or duplicate to the canonical path?\n\n**ANSWER:**\n- Make the canonical path point the current location."
+      }
+    },
+    {
+      "id": "node-contract-vs-validation",
+      "type": "markdown",
+      "label": "🧱 Node Required Fields",
+      "position": {
+        "x": -168.45925753895585,
+        "y": 547.0032149656553
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node Contract vs Validation\n\n**Contract says:**\n- `width` + `height` required\n- `position` optional\n\n**Code says (now):**\n- `position` optional (auto-layout/renderer default)\n- `width` + `height` optional (warnings only)\n\n**Decision needed:**\n- Which is the authority?\n\n**ANSWER:**\n- Portability takes priority\n- `type` is required; layout can infer missing spatial fields\n\n**Rule:**\n- Missing `position` → ✅ allowed (auto-layout/defaults)\n- Missing `width` / `height` → ⚠️ warning (renderer defaults)\n- Invalid numeric values → ❌ error\n\n**Rationale:**\n- Graphs must remain portable\n- Rendering can supply spatial defaults\n- Validation should not block on layout concerns"
+      }
+    },
+    {
+      "id": "edge-contract-vs-validation",
+      "type": "markdown",
+      "label": "🔗 Edge Required Fields",
+      "position": {
+        "x": -575.5058110329271,
+        "y": 110.81530537788252
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Contract vs Validation\n\n**Issue:**\n- Contract requires `type` on edges\n- Code does not validate `type`\n- Editor defaults `type` only during create\n\n**Decision needed:**\n- Enforce `type` or loosen contract?\n\n**ANSWER:**\n- Enforce `type` as required for persisted graphs\n- Allow defaulting only during interactive creation\n\n**Rule:**\n- During interactive authoring:\n  - Missing `type` → allowed temporarily (editor default may apply)\n- During persistence (save/export/commit):\n  - Missing `type` → ❌ error\n- During import / migration:\n  - Missing `type` → ⚠️ warning + auto-repair (default or inferred)\n\n**Rationale:**\n- Edges are semantic objects, not just geometry\n- Typed edges preserve meaning, portability, and intent\n- Agents and tools require explicit relationship semantics\n- Defaulting is a UX convenience, not a data guarantee\n\n**Validation notes:**\n- Validators must fail persisted graphs with untyped edges\n- Importers may infer or apply default types but must annotate repairs\n- Editors must surface edge type selection affordances when ambiguous\n\nEdges are verbs. Verbs must be named. Silence is not allowed."
+      }
+    },
+    {
+      "id": "handles-optional-vs-create-edges",
+      "type": "markdown",
+      "label": "🎚️ Handles Optional",
+      "position": {
+        "x": -255.66089251375445,
+        "y": -347.0032149656553
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handles Optional vs CreateEdges\n\n**Issue:**\n- Contract says handles are optional for portability\n- Code errors when a node has multiple handles and none is specified\n\n**Decision needed:**\n- Downgrade to warning?\n- Keep strict for authored graphs?\n\n**ANSWER:**\n- Handles are optional in serialized graph artifacts\n- Handles are required during authoring when multiple handles exist\n\n**Rule:**\n- During interactive authoring:\n  - If a node has multiple handles and none is specified → ❌ error (ambiguous intent)\n- During import / automation / transformation:\n  - Missing handles → ⚠️ warning (inference allowed)\n- When only one handle exists:\n  - Handle may be omitted safely\n\n**Rationale:**\n- Prevents intent guessing during human authoring\n- Preserves portability for headless tools and agents\n- Allows legacy and external graphs to load without failure\n- Keeps semantic meaning explicit where humans expect precision\n\n**Optional extension (future):**\n- Introduce edge intent modes:\n  - `explicit` (default, human-authored)\n  - `inferred` (agents/imports)\n  - `wildcard` (declared, rare, loud)\n\n**Validation notes:**\n- Validators must treat ambiguous authoring as errors\n- Validators must treat inferred edges as warnings\n- Editors should surface handle choice affordances when required\n\nHonesty for humans. Politeness for artifacts. Silence is never allowed."
+      }
+    },
+    {
+      "id": "unknown-fields-policy",
+      "type": "markdown",
+      "label": "🧩 Unknown Fields",
+      "position": {
+        "x": 286.1905039247581,
+        "y": -200.28836451264627
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Unknown Optional Fields\n\n**Issue:**\n- Contract forbids unknown optional fields\n- Code currently allows them silently\n\n**Decision needed:**\n- Add strict validation?\n- Allow extensions?\n\n**ANSWER:**\n- Forbid unknown fields in core schema\n- Allow extensions only under explicit namespaces\n\n**Rule:**\n- Unknown top-level fields → ❌ error\n- Unknown fields in `data` → ❌ error\n- Unknown fields under `data.ext.*` → ⚠️ warning\n- Known namespaces under `data.ext.<namespace>` → ✅ allowed\n\n**Canonical extension container:**\n```json\n{\n  \"data\": {\n    \"ext\": {\n      \"twilite\": {},\n      \"toolName\": {},\n      \"agentName\": {}\n    }\n  }\n}\n```\n\n**Rationale:**\n- Preserves portability and schema integrity\n- Prevents silent semantic drift\n- Allows safe evolution without breaking readers\n- Enables forward compatibility for tools and agents\n\n**Enforcement notes:**\n- Schemas may whitelist allowed extension namespaces\n- Validators must surface unknown namespaces as warnings\n- Editors and agents must preserve `ext` blocks verbatim\n\nCore stays strict. Edges stay flexible. Nothing is accidental."
+      }
+    },
+    {
+      "id": "validation-policy",
+      "type": "markdown",
+      "label": "🧭 Validation Policy",
+      "position": {
+        "x": 160.4029989046436,
+        "y": 746.1209650328126
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Policy (Intent > Presentation)\n\n**Goal:**\n- A graph is valid if its *intent* and *content* align.\n\n**Hard errors (must fail):**\n- Missing/invalid Manifest intent\n- Broken references (missing nodes/edges)\n- Semantic contradictions (intent vs content)\n- Forbidden mutations (authority)\n\n**Warnings only (presentation):**\n- Missing position/size\n- Styling gaps\n- Optional handle omissions\n\n**Principle:**\n- Judge the *graph*, not the author.\n- Semantic coherence > layout polish."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-path",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "contract-path-mismatch",
+      "label": "check",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-node",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "node-contract-vs-validation",
+      "label": "check",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-edge",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "edge-contract-vs-validation",
+      "label": "check",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-handles",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "handles-optional-vs-create-edges",
+      "label": "check",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-unknowns",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "unknown-fields-policy",
+      "label": "check",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-policy",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "validation-policy",
+      "label": "define",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

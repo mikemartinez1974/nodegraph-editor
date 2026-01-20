@@ -235,8 +235,72 @@ export function validateNode(node) {
     errors.push('Node must have a string id');
   }
   
-  if (!node.position || typeof node.position.x !== 'number' || typeof node.position.y !== 'number') {
-    errors.push('Node must have position with numeric x and y');
+  if (node.position !== undefined) {
+    if (!node.position || typeof node.position.x !== 'number' || typeof node.position.y !== 'number') {
+      errors.push('Node position must include numeric x and y');
+    }
+  }
+
+  if (node.width !== undefined && (typeof node.width !== 'number' || node.width < 0)) {
+    errors.push('Node width must be a positive number when provided');
+  }
+
+  if (node.height !== undefined && (typeof node.height !== 'number' || node.height < 0)) {
+    errors.push('Node height must be a positive number when provided');
+  }
+
+  const allowedNodeKeys = new Set([
+    'id',
+    'type',
+    'label',
+    'position',
+    'width',
+    'height',
+    'data',
+    'visible',
+    'showLabel',
+    'color',
+    'style',
+    'handles',
+    'inputs',
+    'outputs',
+    'groupId',
+    'extensions',
+    'state',
+    'resizable',
+    'handlePosition'
+  ]);
+
+  Object.keys(node).forEach((key) => {
+    if (!allowedNodeKeys.has(key)) {
+      errors.push(`Node has unknown field '${key}'`);
+    }
+  });
+
+  if (node.data !== undefined) {
+    if (!node.data || typeof node.data !== 'object' || Array.isArray(node.data)) {
+      errors.push('Node data must be an object');
+    } else {
+      const allowedDataKeys = new Set([
+        'memo',
+        'link',
+        'html',
+        'svg',
+        'width',
+        'height',
+        'pins',
+        'footprint',
+        'breadboard',
+        'metadata',
+        'markdown',
+        'ext'
+      ]);
+      Object.keys(node.data).forEach((key) => {
+        if (!allowedDataKeys.has(key)) {
+          errors.push(`Node data has unknown field '${key}'`);
+        }
+      });
+    }
   }
 
   if (node.handles !== undefined) {

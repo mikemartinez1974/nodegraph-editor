@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { assertMutationAllowed } from './manifestPolicy.js';
 
 const deepClone = (value) => {
   if (value === undefined || value === null) return value;
@@ -91,6 +92,26 @@ const ensureUniqueId = (existingIds, proposed) => {
   return proposed;
 };
 
+const assertMutationPlan = (graphAPI, plan) => {
+  const warnings = [];
+  if (plan.create) {
+    const result = assertMutationAllowed(graphAPI, 'create');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  if (plan.update) {
+    const result = assertMutationAllowed(graphAPI, 'update');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  if (plan.delete) {
+    const result = assertMutationAllowed(graphAPI, 'delete');
+    if (result.error) return result;
+    if (result.warning) warnings.push(result.warning);
+  }
+  return warnings.length ? { warning: warnings.join(' ') } : {};
+};
+
 const applyCreates = (graphAPI, nodes, dryRun, summary) => {
   if (!nodes.length) return;
   if (dryRun) {
@@ -172,6 +193,29 @@ const applyGroupAdds = (graphAPI, pairs, dryRun, summary) => {
 };
 
 const runRefactor = ({ graphAPI }, params = {}) => {
+  const plan = {
+    create: Boolean(params.split) || (Array.isArray(params.splits) && params.splits.length > 0),
+    update: Boolean(params.merge) || (Array.isArray(params.merges) && params.merges.length > 0),
+    delete: false
+  };
+  const splitList = []
+    .concat(params.split || [])
+    .concat(Array.isArray(params.splits) ? params.splits : []);
+  plan.delete = splitList.some((split) => split?.removeOriginal);
+  const mergeList = []
+    .concat(params.merge || [])
+    .concat(Array.isArray(params.merges) ? params.merges : []);
+  if (mergeList.length) {
+    plan.update = true;
+    if (mergeList.some((merge) => merge?.deleteSources !== false)) {
+      plan.delete = true;
+    }
+  }
+  const policy = assertMutationPlan(graphAPI, plan);
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
+
   const dryRun = params.dryRun === true;
   const nodes = defaultNodes(graphAPI);
   const edges = defaultEdges(graphAPI);
@@ -406,10 +450,18 @@ const runRefactor = ({ graphAPI }, params = {}) => {
   }
 
   summary.warnings = warnings;
+  if (policy.warning) {
+    summary.manifestWarning = policy.warning;
+  }
   return { success: true, data: summary };
 };
 
 const runNormalize = ({ graphAPI }, params = {}) => {
+  const plan = { update: true };
+  const policy = assertMutationPlan(graphAPI, plan);
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
   const dryRun = params.dryRun === true;
   const operations = Array.isArray(params.operations) ? params.operations : [];
   const nodeUpdates = new Map();
@@ -493,10 +545,17 @@ const runNormalize = ({ graphAPI }, params = {}) => {
   }
 
   summary.warnings = warnings;
+  if (policy.warning) {
+    summary.manifestWarning = policy.warning;
+  }
   return { success: true, data: summary };
 };
 
 const runTypeMigration = ({ graphAPI }, params = {}) => {
+  const policy = assertMutationPlan(graphAPI, { update: true });
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
   const dryRun = params.dryRun === true;
   const migrations = Array.isArray(params.migrations) ? params.migrations : [];
   const nodes = defaultNodes(graphAPI);
@@ -566,10 +625,17 @@ const runTypeMigration = ({ graphAPI }, params = {}) => {
   }
 
   summary.warnings = warnings;
+  if (policy.warning) {
+    summary.manifestWarning = policy.warning;
+  }
   return { success: true, data: summary };
 };
 
 const runSchemaUpgrade = ({ graphAPI }, params = {}) => {
+  const policy = assertMutationPlan(graphAPI, { update: true });
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
   const dryRun = params.dryRun === true;
   const patches = Array.isArray(params.patches) ? params.patches : [];
   const nodeUpdates = new Map();
@@ -613,6 +679,9 @@ const runSchemaUpgrade = ({ graphAPI }, params = {}) => {
   }
 
   summary.warnings = warnings;
+  if (policy.warning) {
+    summary.manifestWarning = policy.warning;
+  }
   if (params.targetVersion) {
     summary.contractVersion = params.targetVersion;
   }
@@ -620,8 +689,17 @@ const runSchemaUpgrade = ({ graphAPI }, params = {}) => {
 };
 
 const runInlineExtract = ({ graphAPI }, params = {}) => {
-  const dryRun = params.dryRun === true;
   const operations = Array.isArray(params.operations) ? params.operations : [];
+  const plan = {
+    create: operations.some((op) => op?.type === 'extract'),
+    update: operations.some((op) => op?.type === 'inline' || op?.type === 'extract'),
+    delete: operations.some((op) => op?.type === 'inline' && op?.deleteSource)
+  };
+  const policy = assertMutationPlan(graphAPI, plan);
+  if (policy.error) {
+    return { success: false, error: policy.error };
+  }
+  const dryRun = params.dryRun === true;
   const nodes = defaultNodes(graphAPI);
   const nodeMap = new Map(nodes.map((node) => [node.id, deepClone(node)]));
   const nodeUpdates = new Map();
@@ -709,6 +787,9 @@ const runInlineExtract = ({ graphAPI }, params = {}) => {
   }
 
   summary.warnings = warnings;
+  if (policy.warning) {
+    summary.manifestWarning = policy.warning;
+  }
   return { success: true, data: summary };
 };
 

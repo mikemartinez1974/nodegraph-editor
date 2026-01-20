@@ -36,8 +36,6 @@ These fields MUST be present on every node of this type.
   "id": "string (uuid)",
   "type": "<type>",
   "label": "string",
-  "width": "number",
-  "height": "number",
   "data": {}
 }
 ```
@@ -49,8 +47,6 @@ Field definitions:
 | id     | string | Stable, immutable identifier |
 | type   | string | Node type (immutable)        |
 | label  | string | Human-readable name          |
-| width  | number | Canonical width for layout   |
-| height | number | Canonical height for layout  |
 | data   | object | Type-specific payload        |
 
 ---
@@ -60,13 +56,10 @@ Field definitions:
 These fields MAY be present but MUST conform if used.
 
 * `position`
-* `color`
+* `size`
 * `handles`
 * `inputs / outputs`
 * `groupId`
-* `extensions`
-
-Unknown optional fields are forbidden.
 
 ---
 
@@ -131,7 +124,6 @@ List mutations that are legal for this node type.
 
 * label: allowed
 * data.<field>: allowed
-* width/height: allowed
 * type: forbidden
 * id: forbidden
 
@@ -173,25 +165,7 @@ Validation failures MUST block execution.
 {
   "id": "uuid",
   "type": "<type>",
-  "label": "Example",
-  "width": 300,
-  "height": 200,
   "data": {}
-}
-```
-
-### Full valid example
-
-```json
-{
-  "id": "uuid",
-  "type": "<type>",
-  "label": "Example",
-  "width": 320,
-  "height": 220,
-  "position": {"x": 0, "y": 0},
-  "data": {},
-  "handles": []
 }
 ```
 
@@ -200,7 +174,6 @@ Validation failures MUST block execution.
 ```json
 {
   "id": "uuid",
-  "type": "<type>",
   "data": {}
 }
 ```

@@ -412,6 +412,27 @@ const Toolbar = ({
         // ignore emit failures
       }
     };
+
+    const edgesMissingType = edges.filter((edge) => !edge?.type);
+    if (edgesMissingType.length > 0) {
+      setSnackbar({
+        open: true,
+        message: `Cannot save: ${edgesMissingType.length} edge(s) are missing a type.`,
+        severity: 'error'
+      });
+      return;
+    }
+
+    const nodesMissingSize = nodes.filter(
+      (node) => typeof node?.width !== 'number' || typeof node?.height !== 'number'
+    );
+    if (nodesMissingSize.length > 0) {
+      setSnackbar({
+        open: true,
+        message: `${nodesMissingSize.length} node(s) are missing width/height. Defaults will be applied by the renderer.`,
+        severity: 'warning'
+      });
+    }
     
     // Save document theme (not browser theme)
     const themeToSave = documentTheme || null;
