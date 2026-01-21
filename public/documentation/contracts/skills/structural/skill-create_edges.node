@@ -1,0 +1,329 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:21:05.726Z",
+    "modified": "2026-01-20T22:21:05.726Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 378.54614009915696,
+      "y": 86.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-createedges-root",
+      "type": "markdown",
+      "label": "🧱 Skill: createEdges (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: createEdges\n\n**Category:** Structural Skill\n\nSafely create new relationships between existing nodes without altering existing meaning.\n\nEdges are semantic commitments.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-createedges-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -820,
+        "y": 380
+      },
+      "width": 620,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nCreate meaning-bearing relationships.\n\nEdges are grammar, not decoration.\n\nCreation must not rewrite interpretation."
+      }
+    },
+    {
+      "id": "skill-createedges-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 620,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n- Create new edges only\n- Never mutate existing nodes, edges, or groups\n- Never infer semantics\n- Never rewire relationships\n\nCreation is strictly additive."
+      }
+    },
+    {
+      "id": "skill-createedges-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 580,
+        "y": 380
+      },
+      "width": 680,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n1. Source and target nodes exist\n2. Handle contracts respected (if used)\n3. Edge ID is unique\n4. No implicit rewiring\n5. Graph is mutable under Manifest\n\nAny violation → hard failure"
+      }
+    },
+    {
+      "id": "skill-createedges-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": 1340,
+        "y": 380
+      },
+      "width": 640,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Inputs\n\n```\n{\n  edges: [{\n    id,\n    source,\n    target,\n    sourceHandle?,\n    targetHandle?,\n    type?,\n    label?,\n    data?\n  }]\n}\n```\n\nAll fields are validated. None are inferred."
+      }
+    },
+    {
+      "id": "skill-createedges-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": -820,
+        "y": 860
+      },
+      "width": 620,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n- All edges exist exactly once\n- Meaning is strictly additive\n- Ordering is preserved\n- No layout or routing triggered\n- Operation is auditable\n\nInterpretation remains valid."
+      }
+    },
+    {
+      "id": "skill-createedges-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": -120,
+        "y": 860
+      },
+      "width": 620,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Delete or modify edges\n- Guess or invent handles\n- Auto-connect nearby nodes\n- Infer intent from position\n- Create nodes implicitly\n- Change layout, routes, or grouping\n- Create edges with missing endpoints"
+      }
+    },
+    {
+      "id": "skill-createedges-failure",
+      "type": "markdown",
+      "label": "Failure Behavior",
+      "position": {
+        "x": 580,
+        "y": 860
+      },
+      "width": 680,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Behavior\n\n- No partial mutations\n- Structured errors required\n- Identify failing edges\n- Prefer rejection over correction\n\nOptional: emit validation markdown node"
+      }
+    },
+    {
+      "id": "skill-createedges-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": 1340,
+        "y": 860
+      },
+      "width": 640,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- Validate everything\n- Create nothing\n- Report success/failure\n- Mutate nothing\n\nDry run is a promise, not a preview."
+      }
+    },
+    {
+      "id": "skill-createedges-agentrules",
+      "type": "markdown",
+      "label": "Agent Safety",
+      "position": {
+        "x": 0,
+        "y": 1240
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Idempotency & Agent Safety\n\nThis skill is not idempotent.\n\nAgents MUST:\n- generate stable IDs\n- check for prior existence\n- re-plan on failure\n- never retry blindly"
+      }
+    },
+    {
+      "id": "skill-createedges-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 920,
+        "y": 1240
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Edges are sentences.**\n\nIf nodes are words,\nedges are grammar.\n\nGrammar must be boring,\nstrict,\nand trustworthy."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agentrules",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-agentrules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-createedges-root",
+      "target": "skill-createedges-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

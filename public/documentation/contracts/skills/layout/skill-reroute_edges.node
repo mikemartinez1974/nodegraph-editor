@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:14:41.333Z",
+    "modified": "2026-01-20T22:14:41.333Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 388.54614009915696,
+      "y": 96.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-rerouteedges-root",
+      "type": "markdown",
+      "label": "🧵 Skill: RerouteEdges (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 720,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: RerouteEdges\n\n**Authority:** Normative\n\nImprove readability by recomputing edge paths without altering relationships.\n\nEdges carry meaning through space.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-reroute-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -760,
+        "y": 360
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nImprove edge readability without changing relationships.\n\nRouting is visual clarity, not semantic change."
+      }
+    },
+    {
+      "id": "skill-reroute-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].handles\n- node bounds\n- group bounds\n- routingOptions\n\nReads define geometry and constraints only."
+      }
+    },
+    {
+      "id": "skill-reroute-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 640,
+        "y": 360
+      },
+      "width": 600,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- edges[].edgeRoutes\n- edges[].waypoints\n- routingMetadata\n\nOnly path geometry may change."
+      }
+    },
+    {
+      "id": "skill-reroute-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1360,
+        "y": 360
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- node positions\n- edge endpoints\n- edge IDs\n- semantic labels\n\nRelationships are immutable under routing."
+      }
+    },
+    {
+      "id": "skill-reroute-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -760,
+        "y": 760
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic given same inputs.\n\nSame graph + same options = same routes."
+      }
+    },
+    {
+      "id": "skill-reroute-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n- selected edges\n- all edges\n\nScope must be explicitly declared."
+      }
+    },
+    {
+      "id": "skill-reroute-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 640,
+        "y": 760
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If routing fails → preserve previous routes\n- If ports missing → abort\n\nNever degrade meaning for aesthetics."
+      }
+    },
+    {
+      "id": "skill-reroute-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1360,
+        "y": 760
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- respect declared ports\n- never guess handles\n- preserve endpoints\n- rebuild routes deterministically\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-reroute-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 860,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Paths may bend. Truth may not.**\n\nIf routing changes meaning,\nit is corruption.\n\nNot layout."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-rerouteedges-root",
+      "target": "skill-reroute-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

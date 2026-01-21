@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:04:36.243Z",
+    "modified": "2026-01-20T22:04:36.243Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 449.54614009915696,
+      "y": 139.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-procgen-root",
+      "type": "markdown",
+      "label": "🌿 Skill: ProceduralGeneration (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 660,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: ProceduralGeneration\n\n**Authority:** Normative\n\nGenerate large graph structures from compact, parameterized intent.\n\nGeneration is constrained creation, not free invention.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-procgen-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nGenerate large structures from small intent.\n\nGeneration expands meaning, it does not invent it.\n\nAll structure must be attributable to inputs."
+      }
+    },
+    {
+      "id": "skill-procgen-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- generation parameters\n- templates\n- seed values\n\nAll reads MUST be documented."
+      }
+    },
+    {
+      "id": "skill-procgen-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 560,
+        "y": 360
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- nodes\n- edges\n- groups\n- generationMetadata\n\nGenerated elements must be attributable."
+      }
+    },
+    {
+      "id": "skill-procgen-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1200,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- existing semantic structures unless declared\n\nImplicit overwrite is forbidden."
+      }
+    },
+    {
+      "id": "skill-procgen-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -720,
+        "y": 760
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic when seed is fixed.\n\nSame seed + same inputs = same graph."
+      }
+    },
+    {
+      "id": "skill-procgen-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\nOnly declared generation targets may be affected.\n\nImplicit expansion is forbidden."
+      }
+    },
+    {
+      "id": "skill-procgen-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 560,
+        "y": 760
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If template invalid → abort\n- If ID collision → regenerate deterministically\n\nPartial generation is forbidden."
+      }
+    },
+    {
+      "id": "skill-procgen-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1200,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- document inputs and outputs\n- preserve determinism\n- never invent templates\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-procgen-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 760,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Creation must be replayable.**\n\nIf it cannot be replayed,\nit was not generated.\n\nIt was guessed."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-procgen-root",
+      "target": "skill-procgen-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

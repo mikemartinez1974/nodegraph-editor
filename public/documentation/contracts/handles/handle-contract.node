@@ -1,0 +1,429 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T21:44:44.861Z",
+    "modified": "2026-01-20T21:44:44.861Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 657,
+      "y": 206.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "handle-contract-root",
+      "type": "markdown",
+      "label": "🔌 Handle Contract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Handle Contract Template\n\n**Authority:** Normative\n\nAny edge created, mutated, rendered, or interpreted **MUST** conform to a handle contract defined by this graph.\n\nTools and agents may not guess, infer, or invent handle behavior.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "handle-metadata",
+      "type": "markdown",
+      "label": "0. Metadata",
+      "position": {
+        "x": -700,
+        "y": 360
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Metadata\n\n- Handle ID\n- Node type\n- Contract version (MAJOR.MINOR.PATCH)\n- Status: experimental | stable | deprecated\n- Defined in: contracts/handles/<node-type>.md"
+      }
+    },
+    {
+      "id": "handle-meaning",
+      "type": "markdown",
+      "label": "1. Semantic Meaning",
+      "position": {
+        "x": -350,
+        "y": 360
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantic Meaning (REQUIRED)\n\nDefines what this handle represents in the domain.\n\nMeaning is portable and invariant.\n\nMisuse must make something false."
+      }
+    },
+    {
+      "id": "handle-direction",
+      "type": "markdown",
+      "label": "2. Direction",
+      "position": {
+        "x": 0,
+        "y": 360
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Direction (REQUIRED)\n\nDefines how meaning flows:\n- input\n- output\n- bidirectional\n\nDirection is semantic, not visual."
+      }
+    },
+    {
+      "id": "handle-semantic-type",
+      "type": "markdown",
+      "label": "3. Semantic Type",
+      "position": {
+        "x": 400,
+        "y": 360
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantic Type (REQUIRED)\n\nDefines what kind of meaning flows:\n\ntext, control, data, graph_ref, voltage, constraint, event\n\nThese are conceptual, not programming types."
+      }
+    },
+    {
+      "id": "handle-multiplicity",
+      "type": "markdown",
+      "label": "4. Multiplicity",
+      "position": {
+        "x": 800,
+        "y": 360
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Multiplicity (REQUIRED)\n\nAllowed values:\n- one\n- many\n\nPrevents structural ambiguity."
+      }
+    },
+    {
+      "id": "handle-compatibility",
+      "type": "markdown",
+      "label": "5. Compatibility Rules",
+      "position": {
+        "x": -700,
+        "y": 760
+      },
+      "width": 520,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Compatibility Rules (REQUIRED)\n\nAllowed connections must be explicitly declared.\n\nOmitted connections are forbidden.\n\nWildcards must be declared."
+      }
+    },
+    {
+      "id": "handle-wildcards",
+      "type": "markdown",
+      "label": "6. Wildcard Policy",
+      "position": {
+        "x": -150,
+        "y": 760
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Wildcard Policy (REQUIRED)\n\n- forbidden (default)\n- allowed (exploratory)\n\nSemantic type matching is always enforced."
+      }
+    },
+    {
+      "id": "handle-structure-constraints",
+      "type": "markdown",
+      "label": "7. Structural Constraints",
+      "position": {
+        "x": 300,
+        "y": 760
+      },
+      "width": 460,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structural Constraints\n\nRules that must never be violated:\n- no self-loops\n- no cycles\n- one per group\n- must connect before execution\n- must not cross boundary\n\nThese protect meaning and history."
+      }
+    },
+    {
+      "id": "handle-mutations",
+      "type": "markdown",
+      "label": "8. Allowed Mutations",
+      "position": {
+        "x": 820,
+        "y": 760
+      },
+      "width": 460,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed Mutations\n\n- add edge: allowed\n- remove edge: allowed\n- rewire edge: forbidden\n- change handle ID: forbidden\n\nAnything not listed is forbidden."
+      }
+    },
+    {
+      "id": "handle-validation",
+      "type": "markdown",
+      "label": "9. Validation Rules",
+      "position": {
+        "x": -350,
+        "y": 1180
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- direction correctness\n- semantic type compatibility\n- multiplicity limits\n- structural constraints\n- wildcard policy\n\nFailure blocks persistence and execution."
+      }
+    },
+    {
+      "id": "handle-examples",
+      "type": "markdown",
+      "label": "10. Examples",
+      "position": {
+        "x": 250,
+        "y": 1180
+      },
+      "width": 520,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out → nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out → nodeA.data_out"
+      }
+    },
+    {
+      "id": "handle-migrations",
+      "type": "markdown",
+      "label": "11. Migration Notes",
+      "position": {
+        "x": 820,
+        "y": 1180
+      },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Migration Notes\n\nDocument explicit, reversible evolution:\n\n- renames\n- multiplicity changes\n- semantic shifts\n\nHistory must be preserved."
+      }
+    },
+    {
+      "id": "handle-agent-rules",
+      "type": "markdown",
+      "label": "12. Agent Rules",
+      "position": {
+        "x": 0,
+        "y": 1580
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read handle contracts\n- refuse incompatible connections\n- prefer add/remove over rewire\n- emit errors, never guess\n- respect multiplicity & structure"
+      }
+    },
+    {
+      "id": "handle-human-notes",
+      "type": "markdown",
+      "label": "13. Human Notes",
+      "position": {
+        "x": 600,
+        "y": 1580
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Human Notes (OPTIONAL)\n\nDesign intent, rationale, and edge cases.\n\nIgnored by validators but critical for stewardship."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-meta",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-metadata",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-meaning",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-meaning",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-direction",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-direction",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-type",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-semantic-type",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-multiplicity",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-multiplicity",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-compat",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-compatibility",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-wild",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-wildcards",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-constraints",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-structure-constraints",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-mutations",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-mutations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-validate",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-validation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-examples",
+      "type": "references",
+      "source": "handle-contract-root",
+      "target": "handle-examples",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-migrate",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-migrations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-human",
+      "type": "references",
+      "source": "handle-contract-root",
+      "target": "handle-human-notes",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

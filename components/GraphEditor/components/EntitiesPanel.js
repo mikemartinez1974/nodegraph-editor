@@ -15,7 +15,7 @@ import {
 const VIEW_LABELS = {
   nodes: "Nodes",
   edges: "Edges",
-  groups: "Groups"
+  groups: "Clusters"
 };
 
 const VALID_ANCHORS = new Set(["left", "right", "top", "bottom"]);
@@ -91,7 +91,7 @@ export default function EntitiesPanel({
 
   const renderGroups = () => {
     if (!groups?.length) {
-      return <Typography variant="body2" color="text.secondary">No groups created.</Typography>;
+      return <Typography variant="body2" color="text.secondary">No clusters created.</Typography>;
     }
     return (
       <List dense sx={{ p: 0 }}>
@@ -103,7 +103,7 @@ export default function EntitiesPanel({
             >
               <ListItemText
                 primary={group.label || group.id}
-                secondary={`${group.nodeIds?.length || 0} nodes`}
+                secondary={`${group.nodeIds?.length || 0} members`}
               />
             </ListItemButton>
             {group.collapsed ? <Chip label="collapsed" size="small" /> : null}

@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:30:35.175Z",
+    "modified": "2026-01-20T22:30:35.175Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 393.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-reparent-root",
+      "type": "markdown",
+      "label": "🧬 Skill: reparentNodes (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 920,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: reparentNodes\n\n**Category:** Structural Skill\n\n**Intent:** Move nodes between structural containers explicitly, without implicit meaning change.\n\nReparenting changes scope, not semantics.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-reparent-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1020,
+        "y": 380
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nPerform structural surgery safely.\n\nReparenting changes where a node lives, not what it means.\n\nContainment implies scope and reading context, so this operation must be explicit and auditable."
+      }
+    },
+    {
+      "id": "skill-reparent-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 760,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Removes nodes from a parent\n- Adds nodes to a new parent\n- Preserves identity, data, edges, type\n- Preserves spatial position\n- Updates group bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change data or type\n- Trigger layout or routing\n- Infer intent"
+      }
+    },
+    {
+      "id": "skill-reparent-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 760,
+        "y": 380
+      },
+      "width": 960,
+      "height": 560,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n1. Nodes exist\n2. Target parent exists (or null explicitly)\n3. Source parent is known\n4. No-op reparenting rejected\n5. Graph mutable per Manifest\n6. No cycles introduced\n\nContainment DAG must remain acyclic."
+      }
+    },
+    {
+      "id": "skill-reparent-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": -1020,
+        "y": 840
+      },
+      "width": 760,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Inputs\n\n```\n{\n  nodes: string[],\n  fromParentId: string | null,\n  toParentId: string | null\n}\n```"
+      }
+    },
+    {
+      "id": "skill-reparent-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": -120,
+        "y": 840
+      },
+      "width": 760,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n- Parentage updated explicitly\n- Spatial positions unchanged\n- Source + target bounds updated\n- No edges or data altered\n- Meaning unchanged\n- Diff shows parent change only"
+      }
+    },
+    {
+      "id": "skill-reparent-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": 760,
+        "y": 840
+      },
+      "width": 960,
+      "height": 460,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Move nodes implicitly\n- Change positions\n- Create/delete nodes\n- Create/delete edges\n- Implicit reparenting\n- Layout-driven reparenting\n- Cascade to children implicitly\n- Infer structure from proximity"
+      }
+    },
+    {
+      "id": "skill-reparent-failure",
+      "type": "markdown",
+      "label": "Failure Behavior",
+      "position": {
+        "x": -620,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Behavior\n\n- No partial mutations\n- Machine-readable errors\n- Identify offending IDs\n- Prefer rejection over silent correction\n\nOptional: emit validation markdown node"
+      }
+    },
+    {
+      "id": "skill-reparent-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": 360,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- Execute all validations\n- No mutations occur\n- Report success/failure\n- Parent graph unchanged"
+      }
+    },
+    {
+      "id": "skill-reparent-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1340,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Reparenting is a declaration of scope.**\n\nScope changes reading.\nReading changes meaning.\n\nTherefore this skill must be explicit, slow, and boring."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-reparent-root",
+      "target": "skill-reparent-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

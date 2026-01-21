@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:10:28.673Z",
+    "modified": "2026-01-20T22:10:28.673Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 423.54614009915696,
+      "y": 96.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-autolayoutelk-root",
+      "type": "markdown",
+      "label": "🕸️ Skill: AutoLayoutELK (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 720,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: AutoLayoutELK\n\n**Authority:** Normative\n\nRecompute spatial arrangement for global readability without altering meaning.\n\nLayout is a view transformation, not a semantic mutation.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-elk-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -760,
+        "y": 360
+      },
+      "width": 600,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nImprove global readability.\n\nLayout expresses structure, it does not define it.\n\nMeaning must survive reflow unchanged."
+      }
+    },
+    {
+      "id": "skill-elk-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 600,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- nodes[].position\n- nodes[].width / height\n- edges[].source / target / handles\n- groups[].bounds\n- document.layoutOptions\n\nReads define geometry only."
+      }
+    },
+    {
+      "id": "skill-elk-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 640,
+        "y": 360
+      },
+      "width": 600,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- nodes[].position\n- layoutMetadata.elkGraph\n\nOnly spatial data may change."
+      }
+    },
+    {
+      "id": "skill-elk-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1360,
+        "y": 360
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- node IDs\n- edge IDs\n- edges[].source / target\n- group membership\n- semantic labels\n\nMeaning is immutable under layout."
+      }
+    },
+    {
+      "id": "skill-elk-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -760,
+        "y": 760
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nSame graph + same options = same layout.\n\nNon-deterministic layout is forbidden."
+      }
+    },
+    {
+      "id": "skill-elk-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n- whole graph\n- selected subgraph\n\nScope must be explicitly declared."
+      }
+    },
+    {
+      "id": "skill-elk-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 640,
+        "y": 760
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If ELK fails → preserve previous layout\n- If constraints conflict → relax spacing only\n\nSemantic integrity must always win."
+      }
+    },
+    {
+      "id": "skill-elk-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1360,
+        "y": 760
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- rebuild ELK graph from scratch\n- never mutate semantic fields\n- treat layout as view-only\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-elk-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 840,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Space may change. Meaning may not.**\n\nIf layout alters interpretation,\nit is a bug.\n\nNot a feature."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-autolayoutelk-root",
+      "target": "skill-elk-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,398 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Documentation Root",
+    "description": "",
+    "created": "2026-01-20T18:05:00.000Z",
+    "modified": "2026-01-21T23:17:43.836Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "doc-root",
+      "type": "markdown",
+      "label": "\ud83d\udcda Documentation Root",
+      "position": {
+        "x": -320,
+        "y": -220
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Documentation Root\n\nThis graph is the **canonical index** for all official Twilite documentation.\n\nOnboarding should start here and resolve all required contracts from this root."
+      }
+    },
+    {
+      "id": "doc-onboarding",
+      "type": "markdown",
+      "label": "Onboarding Guide",
+      "position": {
+        "x": -820,
+        "y": 140
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Onboarding\n\nEntry point for humans + agents.\n\nMust link to this root and the required contracts."
+      }
+    },
+    {
+      "id": "doc-contracts",
+      "type": "markdown",
+      "label": "Contracts Index",
+      "position": {
+        "x": -360,
+        "y": 140
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contracts Index\n\nAll canonical contracts live under:\n`public/documentation/contracts/**`\n\nThis index should enumerate required contracts."
+      }
+    },
+    {
+      "id": "doc-validation",
+      "type": "markdown",
+      "label": "Validation",
+      "position": {
+        "x": 100,
+        "y": 140
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation\n\nGlobal invariants and error policies.\n\nLocation: `public/documentation/contracts/validation/`"
+      }
+    },
+    {
+      "id": "doc-boundary",
+      "type": "markdown",
+      "label": "Boundary",
+      "position": {
+        "x": 460,
+        "y": 140
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data vs UI Boundary\n\nDefines what belongs in graph data vs editor state.\n\nLocation: `public/documentation/contracts/boundary/`"
+      }
+    },
+    {
+      "id": "doc-graph-primitives",
+      "type": "markdown",
+      "label": "Graph Primitives",
+      "position": {
+        "x": 820,
+        "y": 140
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Graph Primitives\n\nNodes, edges, clusters and their contracts."
+      }
+    },
+    {
+      "id": "doc-contract-nodes",
+      "type": "markdown",
+      "label": "Node Contracts",
+      "position": {
+        "x": -820,
+        "y": 460
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node Contracts\n\nLocation: `public/documentation/contracts/nodes/`"
+      }
+    },
+    {
+      "id": "doc-contract-edges",
+      "type": "markdown",
+      "label": "Edge Contracts",
+      "position": {
+        "x": -360,
+        "y": 460
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Contracts\n\nLocation: `public/documentation/contracts/edges/`"
+      }
+    },
+    {
+      "id": "doc-contract-handles",
+      "type": "markdown",
+      "label": "Handle Contracts",
+      "position": {
+        "x": 100,
+        "y": 460
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handle Contracts\n\nLocation: `public/documentation/contracts/handles/`"
+      }
+    },
+    {
+      "id": "doc-contract-manifest",
+      "type": "markdown",
+      "label": "Manifest Contract",
+      "position": {
+        "x": 460,
+        "y": 460
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Manifest Contract\n\nLocation: `public/documentation/contracts/manifest/`"
+      }
+    },
+    {
+      "id": "doc-contract-skills",
+      "type": "markdown",
+      "label": "Skill Contracts",
+      "position": {
+        "x": 820,
+        "y": 460
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skill Contracts\n\nLocation: `public/documentation/contracts/skills/`"
+      }
+    },
+    {
+      "id": "doc-contract-dictionaries",
+      "type": "markdown",
+      "label": "Dictionary Contracts",
+      "position": {
+        "x": -360,
+        "y": 740
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dictionary Contracts\n\nLocation: `public/documentation/contracts/dictionaries/`"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-doc-root-onboarding",
+      "type": "dataFlow",
+      "source": "doc-root",
+      "target": "doc-onboarding",
+      "label": "entry",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-doc-root-contracts",
+      "type": "dataFlow",
+      "source": "doc-root",
+      "target": "doc-contracts",
+      "label": "indexes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-nodes",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-nodes",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-edges",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-edges",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-handles",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-handles",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-manifest",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-manifest",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-skills",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-skills",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-doc-root-validation",
+      "type": "dataFlow",
+      "source": "doc-root",
+      "target": "doc-validation",
+      "label": "requires",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-doc-root-boundary",
+      "type": "dataFlow",
+      "source": "doc-root",
+      "target": "doc-boundary",
+      "label": "requires",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-doc-root-primitives",
+      "type": "dataFlow",
+      "source": "doc-root",
+      "target": "doc-graph-primitives",
+      "label": "defines",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contracts-dictionaries",
+      "type": "dataFlow",
+      "source": "doc-contracts",
+      "target": "doc-contract-dictionaries",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -33,6 +33,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MarkdownRenderer from "./MarkdownRenderer";
 import edgeTypes from "../edgeTypes";
+import { getNodeTypeList } from "../nodeTypeRegistry";
 
 const STYLE_PRESETS = [
   {
@@ -185,7 +186,7 @@ export default function PropertiesPanel({
   const isGroupSelected = Boolean(selectedGroup) && !isNodeSelected && !isEdgeSelected;
   const activeSelectionId = activeSelection?.id;
   const selectionLabel = selectedNode?.label || selectedEdge?.label || selectedGroup?.label || "Properties";
-  const selectionType = isNodeSelected ? "Node" : isEdgeSelected ? "Edge" : isGroupSelected ? "Group" : "Item";
+  const selectionType = isNodeSelected ? "Node" : isEdgeSelected ? "Edge" : isGroupSelected ? "Cluster" : "Item";
   const activeView = isNodeSelected ? "node" : isEdgeSelected ? "edge" : isGroupSelected ? "group" : null;
   const [styleJsonText, setStyleJsonText] = useState(() => JSON.stringify(selectionStyle, null, 2));
   const payloadJson = useMemo(() => {
@@ -304,8 +305,29 @@ export default function PropertiesPanel({
       })
       .filter(Boolean);
   }, [selectedNode]);
-const availableNodeTypeOptions =
-  nodeTypeDerivedOptions.length > 0 ? nodeTypeDerivedOptions : nodeTypeOptions;
+
+  const registryNodeTypeOptions = useMemo(
+    () =>
+      getNodeTypeList().map((meta) => ({
+        value: meta.type,
+        label: meta.label || meta.type
+      })),
+    []
+  );
+
+  const mergedNodeTypeOptions = useMemo(() => {
+    const all = [...nodeTypeOptions, ...registryNodeTypeOptions];
+    const seen = new Set();
+    return all.filter((option) => {
+      if (!option || !option.value) return false;
+      if (seen.has(option.value)) return false;
+      seen.add(option.value);
+      return true;
+    });
+  }, [nodeTypeOptions, registryNodeTypeOptions]);
+
+  const availableNodeTypeOptions =
+    nodeTypeDerivedOptions.length > 0 ? nodeTypeDerivedOptions : mergedNodeTypeOptions;
 
   const edgeTypeOptions = useMemo(
     () =>
@@ -1090,7 +1112,7 @@ const availableNodeTypeOptions =
   const renderGroupView = () => (
     <>
       <Section
-        title="Group details"
+        title="Cluster details"
         value="details"
         expanded={expandedSections.group === "details"}
         onToggle={handleAccordionChange("group", "details")}
@@ -1098,7 +1120,7 @@ const availableNodeTypeOptions =
       >
         <Stack spacing={1}>
           <Typography variant="caption">Members</Typography>
-          <Typography variant="body2">{selectedGroup?.nodeIds?.length || 0} nodes</Typography>
+          <Typography variant="body2">{selectedGroup?.nodeIds?.length || 0} members</Typography>
           <Typography variant="caption">Collapsed</Typography>
           <Typography variant="body2">{selectedGroup?.collapsed ? "Yes" : "No"}</Typography>
           <Typography variant="caption">Locked</Typography>

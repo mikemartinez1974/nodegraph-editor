@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:43:56.953Z",
+    "modified": "2026-01-20T22:43:56.953Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 390.54614009915696,
+      "y": 156.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-schema-root",
+      "type": "markdown",
+      "label": "🧱 Skill: SchemaValidation (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 980,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: SchemaValidation\n\n**Category:** Validation / Safety Skill\n\n**Intent:** Ensure graph structures conform to declared and versioned schemas before any mutation or execution.\n\nIf structure is untrue, nothing may proceed.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-schema-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1080,
+        "y": 380
+      },
+      "width": 780,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nGuarantee that nodes and edges match their declared schemas.\n\nPrevents silent corruption and enforces shared meaning across tools and agents."
+      }
+    },
+    {
+      "id": "skill-schema-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 780,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Validates node types and data shape\n- Validates handles and directions\n- Validates required fields\n- Validates width/height constraints\n- Emits blocking errors\n\n### This skill does NOT:\n- Mutate structure\n- Fix schema violations\n- Guess defaults"
+      }
+    },
+    {
+      "id": "skill-schema-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 780,
+        "y": 380
+      },
+      "width": 1020,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Schema registry available\n- Schema versions resolvable\n- Node types declared\n- Edge references resolvable"
+      }
+    },
+    {
+      "id": "skill-schema-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -1080,
+        "y": 820
+      },
+      "width": 780,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- nodes[].type\n- nodes[].data\n- nodes[].handles\n- nodes[].width / height\n- edges[].source / target / handles\n- schema registry\n- schema versions"
+      }
+    },
+    {
+      "id": "skill-schema-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 780,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- validationResults.schema\n- errorNodes (markdown)"
+      }
+    },
+    {
+      "id": "skill-schema-forbidden",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 780,
+        "y": 820
+      },
+      "width": 1020,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- graph structure\n- node positions\n- edges\n- IDs\n- meaning"
+      }
+    },
+    {
+      "id": "skill-schema-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -660,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- Missing schema → error\n- Schema version mismatch → warn + block mutation\n- Invalid data shape → error\n- Handle mismatch → error\n\nFailure blocks progress."
+      }
+    },
+    {
+      "id": "skill-schema-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nPure validation.\n\nSame graph + same schemas = same result."
+      }
+    },
+    {
+      "id": "skill-schema-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1380,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Schemas define reality.**\n\nIf structure is false, execution is forbidden."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-schema-root",
+      "target": "skill-schema-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:39:23.129Z",
+    "modified": "2026-01-20T22:39:23.129Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 390.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-handlecheck-root",
+      "type": "markdown",
+      "label": "🔒 Skill: HandleCompatibilityChecks (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 960,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: HandleCompatibilityChecks\n\n**Category:** Validation Skill\n\n**Intent:** Prevent invalid or meaningless connections between nodes.\n\nHandles are contracts. This skill enforces them.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-handlecheck-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1060,
+        "y": 380
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nEnsure all edges respect declared handle semantics.\n\nPrevents meaningless, invalid, or unsafe connections before they become history."
+      }
+    },
+    {
+      "id": "skill-handlecheck-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Validates proposed or existing edges\n- Checks handle existence\n- Checks direction and semantic compatibility\n- Emits validation results\n\n### This skill does NOT:\n- Mutate graph topology\n- Modify handles\n- Modify edges\n- Guess intent"
+      }
+    },
+    {
+      "id": "skill-handlecheck-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 760,
+        "y": 380
+      },
+      "width": 1000,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Edge endpoints exist\n- Node handle declarations available\n- Handle semantic types declared\n- Strictness flags resolved"
+      }
+    },
+    {
+      "id": "skill-handlecheck-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -1060,
+        "y": 820
+      },
+      "width": 760,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].handles\n- nodes[].handles\n- handle semantic types\n- strictness flags"
+      }
+    },
+    {
+      "id": "skill-handlecheck-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 760,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- validationResults.handles\n- errorNodes (markdown)"
+      }
+    },
+    {
+      "id": "skill-handlecheck-forbidden",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 760,
+        "y": 820
+      },
+      "width": 1000,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- graph topology\n- nodes\n- edges\n- handles\n- meaning"
+      }
+    },
+    {
+      "id": "skill-handlecheck-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -640,
+        "y": 1240
+      },
+      "width": 880,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- Missing handle → reject edge\n- Direction mismatch → reject edge\n- Semantic type mismatch (strict) → reject edge\n\nFailures must be explicit."
+      }
+    },
+    {
+      "id": "skill-handlecheck-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 880,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic.\n\nSame graph + same rules = same result."
+      }
+    },
+    {
+      "id": "skill-handlecheck-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1360,
+        "y": 1240
+      },
+      "width": 880,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Handles are contracts, not suggestions.**\n\nIf compatibility is unclear, the answer is no."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-handlecheck-root",
+      "target": "skill-handlecheck-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,229 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:45:44.647Z",
+    "modified": "2026-01-20T22:45:44.647Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 429.54614009915696,
+      "y": 174.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "validation-root",
+      "type": "markdown",
+      "label": "🛡️ Validation Rules Contract",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 900,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Contract: Validation Rules\n\nThis graph defines **global and local invariants** that guarantee safety, interpretability, and trust.\n\nValidation is observation, not correction.\n\nThis graph is normative."
+      }
+    },
+    {
+      "id": "validation-order",
+      "type": "markdown",
+      "label": "Validation Order",
+      "position": {
+        "x": -1100,
+        "y": 420
+      },
+      "width": 720,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Order\n\n1. Schema validation\n2. Handle compatibility\n3. Manifest validation\n4. Dependency validation\n5. Structural integrity\n6. Safety & mutation rules\n7. Intent validation\n\nOrder is mandatory.\nLater stages assume earlier truth."
+      }
+    },
+    {
+      "id": "validation-errors",
+      "type": "markdown",
+      "label": "Hard Stop Errors",
+      "position": {
+        "x": -120,
+        "y": 420
+      },
+      "width": 720,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Error Conditions (Hard Stop)\n\n- schema violation\n- invalid handle reference\n- missing dependency\n- forbidden mutation\n- identity loss\n- intent/content mismatch\n\nAny error aborts execution and persistence."
+      }
+    },
+    {
+      "id": "validation-warnings",
+      "type": "markdown",
+      "label": "Warnings",
+      "position": {
+        "x": 860,
+        "y": 420
+      },
+      "width": 720,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Warning Conditions\n\n- orphaned nodes\n- deprecated schema usage\n- unused handles\n- redundant structures\n- missing position or size\n- missing optional handles\n\nWarnings never block. They inform."
+      }
+    },
+    {
+      "id": "validation-autofix",
+      "type": "markdown",
+      "label": "Auto-fixable",
+      "position": {
+        "x": -1100,
+        "y": 920
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Auto-fixable Conditions\n\n- spacing normalization\n- missing optional defaults\n- ordering normalization\n\nAuto-fix is **presentation-only**.\nNever semantic."
+      }
+    },
+    {
+      "id": "validation-guarantees",
+      "type": "markdown",
+      "label": "Validator Guarantees",
+      "position": {
+        "x": -120,
+        "y": 920
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validator Guarantees\n\n- deterministic order\n- no mutation during validation\n- idempotent\n- replayable\n\nValidation is pure."
+      }
+    },
+    {
+      "id": "validation-principle",
+      "type": "markdown",
+      "label": "Design Principle",
+      "position": {
+        "x": 860,
+        "y": 920
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Prime Directive\n\nValidation never changes meaning.\nValidation never creates structure.\nValidation only reports.\n\n**Semantic coherence beats presentation polish.**"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-order",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-order",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-errors",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-errors",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-warnings",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-warnings",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-autofix",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-autofix",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-guarantees",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-guarantees",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-principle",
+      "type": "governs",
+      "source": "validation-root",
+      "target": "validation-principle",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

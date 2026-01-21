@@ -467,7 +467,7 @@ export default function DocumentPropertiesDialog({
                 <Grid xs={6} md={3}>
                   <Stack spacing={0.5}>
                     <Typography variant="caption" color="text.secondary">
-                      Groups
+                      Clusters
                     </Typography>
                     <Typography variant="h6">{safeStats.groupCount}</Typography>
                   </Stack>

@@ -1,0 +1,204 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T23:34:05.874Z",
+    "modified": "2026-01-20T23:34:05.874Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 463.11320271200924,
+      "y": 176.18852498596294
+    },
+    "zoom": 0.326710082261698
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "onboarding-root",
+      "type": "markdown",
+      "label": "👋 Twilite Onboarding Guide",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 920,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Twilite Onboarding Guide\n\nWelcome, orient, and align humans working inside existing Twilite graphs.\n\nTwilite is not a canvas. It is a **living artifact** with history, intent, and obligations.\n\nWhen you open a graph, you become its steward."
+      }
+    },
+    {
+      "id": "onboarding-mindset",
+      "type": "markdown",
+      "label": "Core Mindset",
+      "position": {
+        "x": -1000,
+        "y": 420
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Mindset\n\n- Graphs are shared memory\n- Every mutation has consequences\n- Preserve intent before improving form\n- Never surprise future readers (human or agent)\n\nYou are editing **history**, not pixels."
+      }
+    },
+    {
+      "id": "onboarding-howto",
+      "type": "markdown",
+      "label": "How to Work in a Graph",
+      "position": {
+        "x": 0,
+        "y": 420
+      },
+      "width": 760,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## How to Work in a Graph\n\n1. Read the Manifest first\n2. Run validation before mutation\n3. Prefer transformation skills over manual edits\n4. Leave notes when intent changes\n5. Keep diffs small and meaningful\n\nWork as if someone else will inherit this tomorrow."
+      }
+    },
+    {
+      "id": "onboarding-continuity",
+      "type": "markdown",
+      "label": "Continuity Expectations",
+      "position": {
+        "x": 1000,
+        "y": 420
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Continuity Expectations\n\n- Do not delete history casually\n- Use refactors instead of rewrites\n- Respect schema versions\n- Never break execution silently\n\nContinuity is kindness to the future."
+      }
+    },
+    {
+      "id": "onboarding-firststeps",
+      "type": "markdown",
+      "label": "First Steps",
+      "position": {
+        "x": 0,
+        "y": 940
+      },
+      "width": 920,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## First Steps\n\n- Explore node schemas\n- Inspect skill contracts\n- Run validation\n- Make one small, reversible change\n\nIf you can undo it, you can learn from it."
+      }
+    },
+    {
+      "id": "onboarding-oath",
+      "type": "markdown",
+      "label": "Stewardship Oath",
+      "position": {
+        "x": 0,
+        "y": 1340
+      },
+      "width": 920,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Final Note\n\nYou are now part of the graph’s memory.\n\nCare for it.\n\nEvery good graph is a collaboration across time."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-mindset",
+      "type": "governs",
+      "source": "onboarding-root",
+      "target": "onboarding-mindset",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-howto",
+      "type": "governs",
+      "source": "onboarding-root",
+      "target": "onboarding-howto",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-continuity",
+      "type": "governs",
+      "source": "onboarding-root",
+      "target": "onboarding-continuity",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-firststeps",
+      "type": "governs",
+      "source": "onboarding-root",
+      "target": "onboarding-firststeps",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-oath",
+      "type": "governs",
+      "source": "onboarding-root",
+      "target": "onboarding-oath",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

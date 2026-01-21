@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:29:06.389Z",
+    "modified": "2026-01-20T22:29:06.389Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 387.54614009915696,
+      "y": 156.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-group-root",
+      "type": "markdown",
+      "label": "📦 Skill: Group / Ungroup (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 900,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: groupNodes / ungroupNodes\n\n**Category:** Structural Skill\n\n**Intent:** Create or dissolve structural containment without changing graph meaning.\n\nGroups define containment and scope, never semantics.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-group-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1000,
+        "y": 380
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nManage structural grouping.\n\nGroups help humans and tools perceive organization without altering meaning.\n\nGrouping must never change interpretation, data, or relationships."
+      }
+    },
+    {
+      "id": "skill-group-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Creates groups\n- Adds/removes nodes from groups\n- Preserves identity, edges, data\n- Preserves spatial positions\n- Updates group bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change layout or routing\n- Infer semantics\n- Reparent implicitly"
+      }
+    },
+    {
+      "id": "skill-group-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 760,
+        "y": 380
+      },
+      "width": 900,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n### Grouping\n- Nodes exist\n- Nodes not implicitly removed from prior groups\n- Group container explicit (new or existing)\n- Graph mutable per Manifest\n\n### Ungrouping\n- Group exists\n- Group contains nodes\n- Ungrouping is explicit (partial allowed)"
+      }
+    },
+    {
+      "id": "skill-group-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": -1000,
+        "y": 820
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Inputs\n\n```\n{\n  mode: \"group\" | \"ungroup\",\n  groupId?,\n  nodes[],\n  createGroup?,\n  groupData?\n}\n```"
+      }
+    },
+    {
+      "id": "skill-group-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n### Grouping\n- Nodes are members of target group\n- Positions unchanged\n- Bounds updated\n- No data or edges modified\n\n### Ungrouping\n- Nodes removed from group\n- Group persists unless explicitly deleted\n- Positions unchanged"
+      }
+    },
+    {
+      "id": "skill-group-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": 760,
+        "y": 820
+      },
+      "width": 900,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Move nodes implicitly\n- Delete nodes or edges\n- Reparent implicitly\n- Merge/split groups automatically\n- Infer grouping from proximity\n- Trigger layout or reroute\n- Alter node data or type"
+      }
+    },
+    {
+      "id": "skill-group-failure",
+      "type": "markdown",
+      "label": "Failure Behavior",
+      "position": {
+        "x": -620,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Behavior\n\n- No partial mutations\n- Structured machine-readable errors\n- Identify offending IDs\n- Prefer rejection over silent correction\n\nOptional: emit validation markdown node"
+      }
+    },
+    {
+      "id": "skill-group-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- Execute validations\n- Simulate group creation\n- No mutation\n- Report success/failure"
+      }
+    },
+    {
+      "id": "skill-group-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1340,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Groups are scaffolding, not structure.**\n\nThey help minds, not meaning.\n\nThis skill must remain conservative and boring."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-group-root",
+      "target": "skill-group-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -183,7 +183,7 @@ export default function GroupPropertiesPanel({
       onMouseDown={onMouseDown}
       >
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-          Group Properties
+          Cluster Properties
         </Typography>
         <IconButton 
           size="small" 
@@ -203,7 +203,7 @@ export default function GroupPropertiesPanel({
         </Typography>
 
         <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
-          Contains {selectedGroup.nodeIds?.length || 0} nodes
+          Contains {selectedGroup.nodeIds?.length || 0} members
         </Typography>
 
         <TextField
@@ -283,7 +283,7 @@ export default function GroupPropertiesPanel({
         <Divider sx={{ my: 2 }} />
 
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-          Nodes in Group ({selectedGroup.nodeIds?.length || 0})
+          Members ({selectedGroup.nodeIds?.length || 0})
         </Typography>
 
         <List dense sx={{ maxHeight: 200, overflow: 'auto', mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1, backgroundColor: theme.palette.background.paper }}>
@@ -303,7 +303,7 @@ export default function GroupPropertiesPanel({
                     edge="end"
                     size="small"
                     onClick={() => onRemoveNodes(selectedGroup.id, [nodeId])}
-                    title="Remove from group"
+                    title="Remove from cluster"
                   >
                     <RemoveIcon fontSize="small" />
                   </IconButton>
@@ -333,7 +333,7 @@ export default function GroupPropertiesPanel({
                     edge="end"
                     size="small"
                     onClick={() => onAddNodes(selectedGroup.id, [node.id])}
-                    title="Add to group"
+                    title="Add to cluster"
                   >
                     <AddIcon fontSize="small" />
                   </IconButton>
@@ -351,7 +351,7 @@ export default function GroupPropertiesPanel({
           onClick={handleUngroup}
           sx={{ mt: 1 }}
         >
-          Ungroup
+          Ungroup Cluster
         </Button>
       </Box>
     </Paper>

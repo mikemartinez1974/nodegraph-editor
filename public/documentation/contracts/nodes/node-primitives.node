@@ -1,0 +1,205 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Required Node Roles",
+    "description": "",
+    "created": "2026-01-20T18:40:00.000Z",
+    "modified": "2026-01-20T18:40:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "required-node-roles-root",
+      "type": "markdown",
+      "label": "📌 Required Node Roles",
+      "position": { "x": -320, "y": -220 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Required Node Roles\n\nThis contract tells agents what node **roles** must exist in a complete graph.\n\nThese are not UI panels. They are semantic anchors." 
+      }
+    },
+    {
+      "id": "role-manifest-node",
+      "type": "markdown",
+      "label": "Manifest Node",
+      "position": { "x": -820, "y": 140 },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Manifest\n\n**Type:** `manifest`\n\nDeclares identity, intent, dependencies, authority.\n\nExactly one per graph." 
+      }
+    },
+    {
+      "id": "role-definitions-node",
+      "type": "markdown",
+      "label": "Definitions Node",
+      "position": { "x": -360, "y": 140 },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Definitions\n\n**Type:** `definitions`\n\nLists node schemas, edge schemas, handle contracts, validation rules." 
+      }
+    },
+    {
+      "id": "role-legend-node",
+      "type": "markdown",
+      "label": "Legend Node",
+      "position": { "x": 100, "y": 140 },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Legend\n\n**Type:** `legend`\n\nDefines symbols, visual conventions, and mapping to meaning." 
+      }
+    },
+    {
+      "id": "role-style-node",
+      "type": "markdown",
+      "label": "Style Node",
+      "position": { "x": 460, "y": 140 },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Style\n\n**Type:** `style`\n\nDeclares portable visual intent (colors, emphasis, hints)." 
+      }
+    },
+    {
+      "id": "role-content-node",
+      "type": "markdown",
+      "label": "Content Nodes",
+      "position": { "x": 820, "y": 140 },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Content\n\n**Types:** initial content nodes\n\n- `markdown`\n- `default`\n\nThese carry the subject matter of the graph." 
+      }
+    },
+    {
+      "id": "role-initial-types",
+      "type": "markdown",
+      "label": "Initial Supported Types",
+      "position": { "x": -320, "y": 440 },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Initial Node Types (Core)\n\n- `manifest`\n- `definitions`\n- `legend`\n- `style`\n- `markdown`\n- `default`\n\nAnything else is optional or plugin-defined." 
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-roles-manifest",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-manifest-node",
+      "label": "requires",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-roles-definitions",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-definitions-node",
+      "label": "requires",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-roles-legend",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-legend-node",
+      "label": "requires",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-roles-style",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-style-node",
+      "label": "requires",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-roles-content",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-content-node",
+      "label": "requires",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-roles-types",
+      "type": "dataFlow",
+      "source": "required-node-roles-root",
+      "target": "role-initial-types",
+      "label": "enumerates",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

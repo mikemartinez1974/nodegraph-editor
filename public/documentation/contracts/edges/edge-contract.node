@@ -1,0 +1,329 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T21:46:56.855Z",
+    "modified": "2026-01-20T21:46:56.855Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 208,
+      "y": 93.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "edge-contract-root",
+      "type": "markdown",
+      "label": "🔗 Edge Contract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Contract\n\n**Authority:** Normative\n\nEvery edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to this contract.\n\nEdges express relationships.\nHandles are optional for portability.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "edge-meta",
+      "type": "markdown",
+      "label": "0. Metadata",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 440,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Metadata\n\n- Contract ID: edge-contract\n- Version: MAJOR.MINOR.PATCH\n- Status: experimental | stable | deprecated\n- Scope: all persisted edges\n- Defined in: contracts/edges.md"
+      }
+    },
+    {
+      "id": "edge-required",
+      "type": "markdown",
+      "label": "1. Required Fields",
+      "position": {
+        "x": -360,
+        "y": 360
+      },
+      "width": 460,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Fields (REQUIRED)\n\nEvery edge MUST include:\n\n```json\n{\n  \"id\": \"uuid-v4\",\n  \"source\": \"node-id\",\n  \"target\": \"node-id\",\n  \"type\": \"string\"\n}\n```\n\n- `id` must be unique\n- `source` and `target` must reference existing nodes\n- `type` expresses semantic intent"
+      }
+    },
+    {
+      "id": "edge-optional",
+      "type": "markdown",
+      "label": "2. Optional Fields",
+      "position": {
+        "x": 140,
+        "y": 360
+      },
+      "width": 460,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- label is human-readable only\n- data/style/state are metadata\n- handles are optional"
+      }
+    },
+    {
+      "id": "edge-handle-policy",
+      "type": "markdown",
+      "label": "3. Handle Policy",
+      "position": {
+        "x": 640,
+        "y": 360
+      },
+      "width": 440,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handle Policy (REQUIRED)\n\n- Handles are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to node boundary\n\nTools and agents MUST NOT invent handles"
+      }
+    },
+    {
+      "id": "edge-types",
+      "type": "markdown",
+      "label": "4. Edge Type Contract",
+      "position": {
+        "x": -720,
+        "y": 760
+      },
+      "width": 480,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Type Contract (REQUIRED)\n\n`type` MUST be a string.\n\nRecommended core types:\n- dataFlow\n- reference\n- straight\n- child\n\nProjects may add types, but semantics MUST be defined in Definitions."
+      }
+    },
+    {
+      "id": "edge-forbidden",
+      "type": "markdown",
+      "label": "5. Forbidden States",
+      "position": {
+        "x": -160,
+        "y": 760
+      },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden States (HARD ERROR)\n\nEdges must never:\n- reference missing nodes\n- reuse an existing edge id\n- implicitly create handles\n- violate handle contracts\n- contradict manifest authority"
+      }
+    },
+    {
+      "id": "edge-validation",
+      "type": "markdown",
+      "label": "6. Validation Rules",
+      "position": {
+        "x": 360,
+        "y": 760
+      },
+      "width": 480,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. handle rules are respected\n4. handle contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
+      }
+    },
+    {
+      "id": "edge-mutations",
+      "type": "markdown",
+      "label": "7. Allowed Mutations",
+      "position": {
+        "x": 900,
+        "y": 760
+      },
+      "width": 460,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed Mutations\n\n- add edge: allowed\n- remove edge: allowed (unless appendOnly)\n- retype edge: allowed if compatible\n- rewire edge: forbidden\n\nMutations not listed are forbidden."
+      }
+    },
+    {
+      "id": "edge-agent-rules",
+      "type": "markdown",
+      "label": "8. Agent Rules",
+      "position": {
+        "x": 0,
+        "y": 1160
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read edge + handle contracts\n- refuse incompatible edges\n- prefer add/remove over rewire\n- emit errors, never guess\n- preserve edge identity"
+      }
+    },
+    {
+      "id": "edge-portability",
+      "type": "markdown",
+      "label": "9. Portability Guarantee",
+      "position": {
+        "x": 600,
+        "y": 1160
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Portability Guarantee\n\nEdges remain valid when:\n- handles are omitted\n- styles are ignored\n- editors differ\n- renderers change\n\nMeaning must survive transport."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-meta",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-meta",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-required",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-required",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-optional",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-optional",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-handle",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-handle-policy",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-types",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-types",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-validate",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-validation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-mutations",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-mutations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-portable",
+      "type": "governs",
+      "source": "edge-contract-root",
+      "target": "edge-portability",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

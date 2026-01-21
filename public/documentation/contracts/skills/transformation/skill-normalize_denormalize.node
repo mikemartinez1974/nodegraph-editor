@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:33:58.020Z",
+    "modified": "2026-01-20T22:33:58.020Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 391.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-norm-root",
+      "type": "markdown",
+      "label": "🔁 Skill: NormalizeDenormalize (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 940,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: NormalizeDenormalize\n\n**Category:** Structural / Transformational Skill\n\n**Intent:** Shift between compact and expanded representations without semantic loss.\n\nNormalization changes *form*, not *meaning*.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-norm-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1040,
+        "y": 380
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nAllow graphs to move between normalized (compact) and denormalized (expanded) forms.\n\nSupports readability, performance, reuse, and editing ergonomics.\n\nThis is structural equivalence, not rewriting."
+      }
+    },
+    {
+      "id": "skill-norm-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Collapses duplicated structures\n- Expands shared references\n- Updates references explicitly\n- Emits normalization metadata\n\n### This skill does NOT:\n- Change semantic meaning\n- Implicitly reorder structure\n- Affect unrelated subgraphs"
+      }
+    },
+    {
+      "id": "skill-norm-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 760,
+        "y": 380
+      },
+      "width": 980,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Target subgraph declared\n- Source-of-truth annotations exist\n- Rules explicit and complete\n- Renormalization path defined if denormalizing\n- Atomic update possible"
+      }
+    },
+    {
+      "id": "skill-norm-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -1040,
+        "y": 820
+      },
+      "width": 760,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- nodes\n- duplicated structures\n- source-of-truth annotations"
+      }
+    },
+    {
+      "id": "skill-norm-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- nodes (added or removed)\n- references (updated)\n- normalizationMetadata"
+      }
+    },
+    {
+      "id": "skill-norm-forbidden",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 760,
+        "y": 820
+      },
+      "width": 980,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- semantic meaning\n- interpretation\n- ordering unless explicit\n- unrelated structure"
+      }
+    },
+    {
+      "id": "skill-norm-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -620,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- Missing source-of-truth → abort\n- Missing renormalization path → abort\n- Atomic update failure → rollback\n\nPartial states are forbidden."
+      }
+    },
+    {
+      "id": "skill-norm-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic when rules are explicit.\n\nSame graph + same rules = same result."
+      }
+    },
+    {
+      "id": "skill-norm-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1340,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Form may change. Meaning may not.**\n\nIf meaning changes, this skill has failed."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-norm-root",
+      "target": "skill-norm-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

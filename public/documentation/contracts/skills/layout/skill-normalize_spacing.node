@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:13:16.856Z",
+    "modified": "2026-01-20T22:13:16.856Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 402.54614009915696,
+      "y": 85.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-normalizespacing-root",
+      "type": "markdown",
+      "label": "📏 Skill: NormalizeSpacing (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 720,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: NormalizeSpacing\n\n**Authority:** Normative\n\nEnforce consistent visual rhythm without full re-layout.\n\nSpacing is cadence, not structure.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-spacing-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -760,
+        "y": 360
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nNormalize spacing while preserving order.\n\nThis skill polishes rhythm without altering meaning."
+      }
+    },
+    {
+      "id": "skill-spacing-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 600,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- node positions\n- spacing rules\n- axis selection\n\nReads define measurement, not authority."
+      }
+    },
+    {
+      "id": "skill-spacing-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 640,
+        "y": 360
+      },
+      "width": 600,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- nodes[].position\n\nOnly position along selected axis may change."
+      }
+    },
+    {
+      "id": "skill-spacing-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1360,
+        "y": 360
+      },
+      "width": 600,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- ordering\n- locked nodes\n- edges\n\nRhythm must not reorder meaning."
+      }
+    },
+    {
+      "id": "skill-spacing-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -760,
+        "y": 720
+      },
+      "width": 600,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic given same inputs.\n\nSame axis + same rules = same spacing."
+      }
+    },
+    {
+      "id": "skill-spacing-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 720
+      },
+      "width": 600,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\nOne axis at a time.\n\nTwo-axis normalization is forbidden."
+      }
+    },
+    {
+      "id": "skill-spacing-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 640,
+        "y": 720
+      },
+      "width": 600,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If constraints conflict → skip node\n\nPartial normalization is allowed."
+      }
+    },
+    {
+      "id": "skill-spacing-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1360,
+        "y": 720
+      },
+      "width": 600,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- preserve relative ordering\n- respect locks\n- act on one axis only\n- skip conflicting nodes\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-spacing-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1040
+      },
+      "width": 860,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Rhythm is refinement, not rearrangement.**\n\nIf order changes,\nthe skill has failed."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-normalizespacing-root",
+      "target": "skill-spacing-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

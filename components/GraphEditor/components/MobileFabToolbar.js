@@ -161,7 +161,7 @@ export default function MobileFabToolbar() {
         />
         <SpeedDialAction
           icon={<GroupIcon color={showGroupList ? 'primary' : undefined} />}
-          tooltipTitle={showGroupList ? "Hide group list" : "Show group list"}
+          tooltipTitle={showGroupList ? "Hide cluster list" : "Show cluster list"}
           onClick={handleToggleGroupListIntent}
         />
         <SpeedDialAction

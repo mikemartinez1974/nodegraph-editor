@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:41:05.409Z",
+    "modified": "2026-01-20T22:41:05.409Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 390.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-deps-root",
+      "type": "markdown",
+      "label": "🚨 Skill: MissingDependencyDetection (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 980,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: MissingDependencyDetection\n\n**Category:** Validation / Safety Skill\n\n**Intent:** Detect graphs that cannot be safely interpreted or executed.\n\nIf a graph cannot be understood, it must not run.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-deps-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1080,
+        "y": 380
+      },
+      "width": 780,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nPrevent execution or interpretation of incomplete graphs.\n\nEnsures all required dependencies, schemas, and skills exist before action is allowed."
+      }
+    },
+    {
+      "id": "skill-deps-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 780,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Validates declared dependencies\n- Checks available node types\n- Checks skill registry\n- Emits blocking errors\n\n### This skill does NOT:\n- Mutate graph structure\n- Modify execution state\n- Guess missing pieces"
+      }
+    },
+    {
+      "id": "skill-deps-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 780,
+        "y": 380
+      },
+      "width": 1020,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Manifest exists and is readable\n- Dependencies declared\n- Skill registry available\n- Node types resolvable"
+      }
+    },
+    {
+      "id": "skill-deps-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -1080,
+        "y": 820
+      },
+      "width": 780,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- graph manifest\n- declared dependencies\n- node types present\n- available skills registry"
+      }
+    },
+    {
+      "id": "skill-deps-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 780,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- validationResults.dependencies\n- errorNodes (markdown)"
+      }
+    },
+    {
+      "id": "skill-deps-forbidden",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 780,
+        "y": 820
+      },
+      "width": 1020,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- graph structure\n- nodes\n- edges\n- execution state\n- history"
+      }
+    },
+    {
+      "id": "skill-deps-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -660,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- Missing dependency → block execution\n- Missing skill → block execution\n- Unknown node type → block execution\n\nFailure is safety."
+      }
+    },
+    {
+      "id": "skill-deps-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic.\n\nSame graph + same registry = same result."
+      }
+    },
+    {
+      "id": "skill-deps-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1380,
+        "y": 1240
+      },
+      "width": 900,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**A graph that cannot be understood must not run.**\n\nRefusal is safety.\nSilence is corruption."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-deps-root",
+      "target": "skill-deps-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

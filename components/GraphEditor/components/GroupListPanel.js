@@ -86,7 +86,7 @@ export default function GroupListPanel({
             <IconButton
               edge="end"
               size="small"
-              aria-label="toggle group visibility"
+              aria-label="toggle cluster visibility"
               onClick={(e) => {
                 e.stopPropagation();
                 if (onGroupToggleVisibility) onGroupToggleVisibility(group.id);
@@ -97,7 +97,7 @@ export default function GroupListPanel({
             <IconButton
               edge="end"
               size="small"
-              aria-label="focus on group"
+              aria-label="focus on cluster"
               onClick={(e) => {
                 e.stopPropagation();
                 if (onGroupFocus) onGroupFocus(group.id);
@@ -108,7 +108,7 @@ export default function GroupListPanel({
             <IconButton
               edge="end"
               size="small"
-              aria-label="delete group"
+              aria-label="delete cluster"
               onClick={(e) => {
                 e.stopPropagation();
                 if (onGroupDelete) onGroupDelete(group.id);
@@ -131,7 +131,7 @@ export default function GroupListPanel({
         >
           <ListItemText
             primary={group.label || group.id}
-            secondary={`${group.nodeIds?.length || 0} nodes • ${group.collapsed ? 'Collapsed' : 'Expanded'}`}
+            secondary={`${group.nodeIds?.length || 0} members • ${group.collapsed ? 'Collapsed' : 'Expanded'}`}
           />
         </ListItemButton>
       </ListItem>
@@ -172,7 +172,7 @@ export default function GroupListPanel({
         color: theme?.palette?.primary?.contrastText || '#fff'
       }}>
         <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-          Groups ({groups.length})
+          Clusters ({groups.length})
         </Typography>
         <IconButton
           size="small"
@@ -183,7 +183,7 @@ export default function GroupListPanel({
         </IconButton>
       </Box>
 
-      {/* Group List */}
+      {/* Cluster List */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 0 }}>
         {useVirtualization ? (
           <Box sx={{ flex: 1, overflow: 'hidden' }}>
@@ -202,10 +202,10 @@ export default function GroupListPanel({
             {groups.length === 0 ? (
               <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  No groups in this graph.
+                  No clusters in this graph.
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                  Select 2+ nodes and press Ctrl+G to create a group.
+                  Select 2+ nodes and press Ctrl+G to create a cluster.
                 </Typography>
               </Box>
             ) : (
@@ -239,7 +239,7 @@ export default function GroupListPanel({
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Typography variant="body2" sx={{ fontWeight: isSelected ? 600 : 400 }}>
-                              {group.label || `Group ${group.id}`}
+                              {group.label || `Cluster ${group.id}`}
                             </Typography>
                             <Chip
                               label={group.nodeIds?.length || 0}
@@ -271,7 +271,7 @@ export default function GroupListPanel({
                             e.stopPropagation();
                             onGroupDelete(group.id);
                           }}
-                          title="Delete Group"
+                          title="Delete Cluster"
                           color="error"
                         >
                           <DeleteIcon fontSize="small" />

@@ -1,0 +1,354 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:27:25.635Z",
+    "modified": "2026-01-20T22:27:25.635Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 389.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-extract-root",
+      "type": "markdown",
+      "label": "🪶 Skill: extract-subgraph (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 860,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: extract-subgraph\n\n**Category:** Structural Skill\n\nLift a subset of a graph into a new portable graph without losing meaning, identity, or closure.\n\nExtraction is controlled graph birth.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-extract-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -960,
+        "y": 380
+      },
+      "width": 720,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nCreate new graph artifacts from existing graphs.\n\nEnables travel, forking, reuse, and sharing.\n\nTurns sessions into durable artifacts."
+      }
+    },
+    {
+      "id": "skill-extract-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": -140,
+        "y": 380
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeInternalEdges,\n  fork,\n  newManifest,\n  target\n}\n```\n\nTarget defines destination, not semantics."
+      }
+    },
+    {
+      "id": "skill-extract-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 660,
+        "y": 380
+      },
+      "width": 820,
+      "height": 460,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Nodes exist\n- Read access granted\n- Selection non-empty\n- Edge closure computable\n- ID rules satisfied\n- Manifest schema available if requested"
+      }
+    },
+    {
+      "id": "skill-extract-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": 1520,
+        "y": 380
+      },
+      "width": 820,
+      "height": 460,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n### Original Graph\n- Unchanged\n- History preserved\n\n### New Graph\n- Selected nodes only\n- Internal edges only\n- No external references\n- Manifest included if requested\n- Self-contained and interpretable"
+      }
+    },
+    {
+      "id": "skill-extract-identity",
+      "type": "markdown",
+      "label": "Identity Rules",
+      "position": {
+        "x": -960,
+        "y": 900
+      },
+      "width": 720,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Identity Rules\n\n- fork=false → IDs preserved\n- fork=true → new IDs minted\n- newManifest=true → new graph identity\n- newManifest=false → caller supplies identity"
+      }
+    },
+    {
+      "id": "skill-extract-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": -140,
+        "y": 900
+      },
+      "width": 720,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Partial edge extraction\n- Silent ID remapping\n- Including external edges\n- Mutating source graph\n- Implicit manifest generation\n- Inferring dependencies"
+      }
+    },
+    {
+      "id": "skill-extract-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 660,
+        "y": 900
+      },
+      "width": 820,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- NODE_NOT_FOUND\n- EMPTY_SUBGRAPH\n- EDGE_CLOSURE_VIOLATION\n- MANIFEST_INVALID\n- ACCESS_DENIED\n\nFailure must abort extraction."
+      }
+    },
+    {
+      "id": "skill-extract-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": 1520,
+        "y": 900
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- Compute closure\n- Report node/edge counts\n- Report manifest requirements\n- No artifact written"
+      }
+    },
+    {
+      "id": "skill-extract-idempotency",
+      "type": "markdown",
+      "label": "Idempotency",
+      "position": {
+        "x": -420,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Idempotency\n\n- fork=false → idempotent\n- fork=true → not idempotent\n\nIdentity behavior must be explicit."
+      }
+    },
+    {
+      "id": "skill-extract-implementer",
+      "type": "markdown",
+      "label": "Implementer Notes",
+      "position": {
+        "x": 520,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Notes for Implementers\n\n- Treat extraction as serialization\n- Always compute closure explicitly\n- Emit create-deltas, not snapshots\n- Support file, cluster, and export targets\n- Emit dependency list in new manifest"
+      }
+    },
+    {
+      "id": "skill-extract-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1480,
+        "y": 1320
+      },
+      "width": 860,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Birth must preserve meaning.**\n\nA graph may leave its parent,\nbut it must carry its truth.\n\nAlways."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-identity",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-identity",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-idempotency",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-idempotency",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-implementer",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-implementer",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-extract-root",
+      "target": "skill-extract-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

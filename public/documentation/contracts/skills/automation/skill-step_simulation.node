@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:07:13.385Z",
+    "modified": "2026-01-20T22:07:13.385Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 423.54614009915696,
+      "y": 96.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-simstep-root",
+      "type": "markdown",
+      "label": "⏱️ Skill: SimulationStep (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 700,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: SimulationStep\n\n**Authority:** Normative\n\nAdvance graph state through reversible, time-based execution.\n\nSimulation is controlled motion through time.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-simstep-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nAdvance state one step at a time.\n\nTime must be explicit, reversible, and auditable.\n\nSimulation is evolution, not mutation."
+      }
+    },
+    {
+      "id": "skill-simstep-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- simulation rules\n- current state\n- previous state snapshot\n\nAll reads MUST be declared."
+      }
+    },
+    {
+      "id": "skill-simstep-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 560,
+        "y": 360
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- updated state\n- state history\n- simulationMetadata\n\nState transitions MUST be logged."
+      }
+    },
+    {
+      "id": "skill-simstep-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1200,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- source definitions\n- schemas\n\nSimulation may not redefine meaning."
+      }
+    },
+    {
+      "id": "skill-simstep-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -720,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic if rules are pure.\n\nSame state + same rules = same next state.\n\nImpure rules MUST be declared."
+      }
+    },
+    {
+      "id": "skill-simstep-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\nOnly declared simulation scope may advance.\n\nImplicit scope expansion is forbidden."
+      }
+    },
+    {
+      "id": "skill-simstep-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 560,
+        "y": 760
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If step invalid → rollback\n- If state corrupt → halt simulation\n\nTime must never continue on invalid state."
+      }
+    },
+    {
+      "id": "skill-simstep-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1200,
+        "y": 760
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- mark transient vs persistent state\n- preserve reversibility\n- refuse implicit state changes\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-simstep-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 800,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Time must be reversible.**\n\nIf a step cannot be undone,\nit was not a simulation.\n\nIt was destruction."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-simstep-root",
+      "target": "skill-simstep-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

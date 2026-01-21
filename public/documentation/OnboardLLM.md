@@ -156,12 +156,11 @@ Handles are optional, but if present they must be valid.
 
 ---
 
-## 9) Groups
+## 9) Clusters
 
-Groups are structural containers. They do **not** change meaning.
+Clusters are logical groupings. They do **not** change meaning.
 
-- Do not move nodes implicitly when grouping.
-- Group bounds may be recalculated, but node positions stay the same.
+- Do not move nodes implicitly based on membership alone.
 
 ---
 

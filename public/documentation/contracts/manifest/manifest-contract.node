@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T21:50:06.266Z",
+    "modified": "2026-01-20T21:50:06.266Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 781,
+      "y": -137.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "manifest-contract-root",
+      "type": "markdown",
+      "label": "📜 Manifest Contract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Manifest Contract\n\n**Authority:** Absolute\n\nEvery Twilite graph MUST contain exactly one Manifest node that conforms to this contract.\n\nGraphs without a valid Manifest are **not portable, not safe, and not executable**.\n\nIf a tool or agent does not understand the Manifest, it MUST refuse to act.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "manifest-required-type",
+      "type": "markdown",
+      "label": "1. Required Node Type",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 460,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Node Type\n\n```json\n{ \"type\": \"manifest\" }\n```\n\n- Exactly one Manifest per graph\n- Duplication is forbidden\n- Absence invalidates the graph"
+      }
+    },
+    {
+      "id": "manifest-identity",
+      "type": "markdown",
+      "label": "2. Identity Section",
+      "position": {
+        "x": -360,
+        "y": 360
+      },
+      "width": 520,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Identity (REQUIRED)\n\nDefines what this graph **is**.\n\n- graphId (immutable UUID v4)\n- name\n- version (semver)\n- description\n- createdAt\n- updatedAt\n\nTools may read identity but may only update `updatedAt`."
+      }
+    },
+    {
+      "id": "manifest-intent",
+      "type": "markdown",
+      "label": "3. Intent & Scope",
+      "position": {
+        "x": 240,
+        "y": 360
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent & Scope (REQUIRED)\n\nDeclares how the graph is interpreted.\n\n- kind: documentation | workflow | simulation | circuit | knowledge-map | contract | executable | other\n- scope: human | agent | tool | mixed\n\nEditors MUST NOT guess intent.\nAgents MUST respect it.\nUnknown kinds are opaque."
+      }
+    },
+    {
+      "id": "manifest-dependencies",
+      "type": "markdown",
+      "label": "4. Dependencies & Requirements",
+      "position": {
+        "x": 840,
+        "y": 360
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\nMissing dependencies invalidate execution.\nOptional dependencies must never be assumed."
+      }
+    },
+    {
+      "id": "manifest-authority",
+      "type": "markdown",
+      "label": "5. Authority & Mutation Policy",
+      "position": {
+        "x": -720,
+        "y": 820
+      },
+      "width": 560,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Authority & Mutation Policy (REQUIRED)\n\nDefines what may change and by whom.\n\n- mutation rules\n- allowed actors\n- styleAuthority\n- history rules\n\nIf appendOnly = true, deletes are forbidden.\nHistory rules MUST be enforced."
+      }
+    },
+    {
+      "id": "manifest-validation",
+      "type": "markdown",
+      "label": "6. Validation Rules",
+      "position": {
+        "x": -80,
+        "y": 820
+      },
+      "width": 520,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Rules\n\nManifest is valid only if:\n\n- exactly one exists\n- all required sections exist\n- dependencies are closed\n- mutation policy is consistent\n- version is valid semver\n- UUIDs are valid v4\n\nInvalid Manifest invalidates the graph."
+      }
+    },
+    {
+      "id": "manifest-forbidden",
+      "type": "markdown",
+      "label": "7. Forbidden Patterns",
+      "position": {
+        "x": 520,
+        "y": 820
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Patterns\n\nManifest MUST NOT:\n- be duplicated\n- be deleted\n- be silently modified\n- be inferred\n- be auto-generated without intent\n- be ignored by tools"
+      }
+    },
+    {
+      "id": "manifest-example",
+      "type": "markdown",
+      "label": "8. Minimal Example",
+      "position": {
+        "x": 1120,
+        "y": 820
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Example Minimal Manifest\n\nA minimal valid manifest includes:\n\n- identity\n- intent\n- dependencies\n- authority\n\nAbsence of any section is a hard failure."
+      }
+    },
+    {
+      "id": "manifest-final-rule",
+      "type": "markdown",
+      "label": "Final Rule",
+      "position": {
+        "x": 0,
+        "y": 1280
+      },
+      "width": 640,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Final Rule (Non-Negotiable)\n\nIf a tool or agent does not understand this Manifest,\nit MUST refuse to act.\n\nSilence is corruption.\nRefusal is safety."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-type",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-required-type",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-identity",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-identity",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-deps",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-dependencies",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-auth",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-authority",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-validate",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-validation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-example",
+      "type": "references",
+      "source": "manifest-contract-root",
+      "target": "manifest-example",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-final",
+      "type": "governs",
+      "source": "manifest-contract-root",
+      "target": "manifest-final-rule",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

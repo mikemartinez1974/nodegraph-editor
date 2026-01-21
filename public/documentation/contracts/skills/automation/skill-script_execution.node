@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:05:47.193Z",
+    "modified": "2026-01-20T22:05:47.193Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 447.54614009915696,
+      "y": 140.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-scriptexec-root",
+      "type": "markdown",
+      "label": "🧠 Skill: ScriptExecution (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 680,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: ScriptExecution\n\n**Authority:** Normative\n\nExecute ScriptNodes to perform constrained, procedural graph mutations safely.\n\nScripts are hands, not minds.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-scriptexec-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nAllow controlled procedural mutation.\n\nScripts execute intent, they do not decide intent.\n\nAuthority always comes from the graph."
+      }
+    },
+    {
+      "id": "skill-scriptexec-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- ScriptNodes\n- script parameters\n- current graph state\n\nScripts may read only what is declared."
+      }
+    },
+    {
+      "id": "skill-scriptexec-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 560,
+        "y": 360
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- graph mutations (transactional)\n- execution logs (markdown)\n- telemetry metadata\n\nAll writes MUST occur inside a transaction."
+      }
+    },
+    {
+      "id": "skill-scriptexec-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1200,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- schema definitions\n- history log\n- editor UI state\n\nScripts must not escape their sandbox."
+      }
+    },
+    {
+      "id": "skill-scriptexec-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -720,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nScripts MUST declare whether they are deterministic.\n\n- deterministic\n- nondeterministic\n\nUndeclared determinism is forbidden."
+      }
+    },
+    {
+      "id": "skill-scriptexec-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\nOnly the declared ScriptNode may execute.\n\nScripts may not expand their authority.\n\nImplicit scope is forbidden."
+      }
+    },
+    {
+      "id": "skill-scriptexec-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 560,
+        "y": 760
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- On error → rollback entire transaction\n- If script exceeds limits → abort\n\nPartial execution is forbidden."
+      }
+    },
+    {
+      "id": "skill-scriptexec-agent-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1200,
+        "y": 760
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- treat scripts as constrained tools\n- never grant scripts new authority\n- enforce limits strictly\n- abort on ambiguity\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-scriptexec-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 780,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Execution is permissioned motion.**\n\nScripts move the graph,\nbut the graph decides where it may move.\n\nHands, not minds."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-scriptexec-root",
+      "target": "skill-scriptexec-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

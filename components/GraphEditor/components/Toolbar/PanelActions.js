@@ -37,7 +37,7 @@ export default function PanelActions({
         </span>
       </Tooltip>
 
-      <Tooltip title="Toggle Group List">
+      <Tooltip title="Toggle Cluster List">
         <span>
           <IconButton 
             onClick={onToggleGroupList} 

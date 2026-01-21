@@ -18,6 +18,7 @@ import BackgroundRpcNode from './Nodes/BackgroundRpcNode.js';
 import ValueTriggerNode from './Nodes/ValueTriggerNode.js';
 import PluginNodeRenderer from './Nodes/PluginNodeRenderer.js';
 import CanvasNode from './Nodes/CanvasNode.js';
+import ManifestNode from './Nodes/ManifestNode.js';
 import { getInstalledPlugins } from './plugins/pluginRegistry.js';
 import { convertHandlesObjectToArray } from './utils/handleUtils.js';
 
@@ -43,6 +44,18 @@ const baseNodeTypeRegistry = {
     description: 'Node with markdown rendering',
     icon: 'Article',
     category: 'content'
+  },
+  dictionary: {
+    component: MarkdownNode,
+    label: 'Dictionary',
+    description: 'Glossary of terms and definitions (markdown-based)',
+    icon: 'MenuBook',
+    category: 'content',
+    defaultWidth: 320,
+    defaultHeight: 260,
+    defaultData: {
+      markdown: '## Dictionary\\n\\n- term: definition\\n'
+    }
   },
   svg: {
     component: SvgNode,
@@ -147,6 +160,58 @@ const baseNodeTypeRegistry = {
     category: 'media',
     defaultWidth: 300,
     defaultHeight: 300
+  },
+  manifest: {
+    component: ManifestNode,
+    label: 'Manifest',
+    description: 'Graph manifest (identity, intent, dependencies, authority)',
+    icon: 'Verified',
+    category: 'core',
+    defaultWidth: 420,
+    defaultHeight: 320,
+    defaultData: {
+      identity: {
+        graphId: '',
+        name: '',
+        version: '0.1.0',
+        description: '',
+        createdAt: '',
+        updatedAt: ''
+      },
+      intent: {
+        kind: 'documentation',
+        scope: 'mixed',
+        description: ''
+      },
+      dependencies: {
+        nodeTypes: [],
+        handleContracts: ['core'],
+        skills: [],
+        schemaVersions: {
+          nodes: '>=1.0.0',
+          handles: '>=1.0.0'
+        },
+        optional: []
+      },
+      authority: {
+        mutation: {
+          allowCreate: true,
+          allowUpdate: true,
+          allowDelete: false,
+          appendOnly: true
+        },
+        actors: {
+          humans: true,
+          agents: true,
+          tools: true
+        },
+        styleAuthority: 'descriptive',
+        history: {
+          rewriteAllowed: false,
+          squashAllowed: false
+        }
+      }
+    }
   }
 };
 
@@ -178,6 +243,18 @@ export const nodeTypeMetadata = [
     category: 'content',
     defaultWidth: 260,
     defaultHeight: 220
+  },
+  {
+    type: 'dictionary',
+    label: 'Dictionary',
+    description: 'Glossary of terms and definitions (markdown-based)',
+    icon: 'MenuBook',
+    category: 'content',
+    defaultWidth: 320,
+    defaultHeight: 260,
+    defaultData: {
+      markdown: '## Dictionary\\n\\n- term: definition\\n'
+    }
   },
   {
     type: 'svg',
@@ -295,6 +372,58 @@ export const nodeTypeMetadata = [
     category: 'media',
     defaultWidth: 300,
     defaultHeight: 300
+  },
+  {
+    type: 'manifest',
+    label: 'Manifest',
+    description: 'Graph manifest (identity, intent, dependencies, authority)',
+    icon: 'Verified',
+    category: 'core',
+    defaultWidth: 420,
+    defaultHeight: 320,
+    defaultData: {
+      identity: {
+        graphId: '',
+        name: '',
+        version: '0.1.0',
+        description: '',
+        createdAt: '',
+        updatedAt: ''
+      },
+      intent: {
+        kind: 'documentation',
+        scope: 'mixed',
+        description: ''
+      },
+      dependencies: {
+        nodeTypes: [],
+        handleContracts: ['core'],
+        skills: [],
+        schemaVersions: {
+          nodes: '>=1.0.0',
+          handles: '>=1.0.0'
+        },
+        optional: []
+      },
+      authority: {
+        mutation: {
+          allowCreate: true,
+          allowUpdate: true,
+          allowDelete: false,
+          appendOnly: true
+        },
+        actors: {
+          humans: true,
+          agents: true,
+          tools: true
+        },
+        styleAuthority: 'descriptive',
+        history: {
+          rewriteAllowed: false,
+          squashAllowed: false
+        }
+      }
+    }
   },
   {
     type: 'valueTrigger',

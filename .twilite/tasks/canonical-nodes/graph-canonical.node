@@ -1,0 +1,575 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Graph Primitives",
+    "description": "",
+    "created": "2026-01-20T17:32:00.000Z",
+    "modified": "2026-01-20T19:33:19.045Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "graph-prim-root",
+      "type": "markdown",
+      "label": "\ud83e\udde9 Graph Primitives",
+      "position": {
+        "x": -280,
+        "y": -220
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph Primitives\n\nA Twilite graph is composed of **nodes**, **edges**, and **clusters**.\n\nEverything else is either data on these primitives or a rendering choice."
+      }
+    },
+    {
+      "id": "graph-prim-nodes",
+      "type": "markdown",
+      "label": "\ud83d\udd37 Nodes",
+      "position": {
+        "x": -820,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Nodes (Primitive)\n\n**What they are:**\n- identity + content container\n- typed semantic unit\n\n**Carry:**\n- data payload\n- optional handles\n- optional style hints\n\n**Rules:**\n- must be addressable by `id`\n- meaning lives in `type` + `data`"
+      }
+    },
+    {
+      "id": "graph-prim-edges",
+      "type": "markdown",
+      "label": "\u2194\ufe0f Edges",
+      "position": {
+        "x": -280,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edges (Primitive)\n\n**What they are:**\n- typed relationships\n- directional by default\n\n**Carry:**\n- type + endpoints\n- optional handles\n- optional label\n\n**Rules:**\n- must reference existing nodes\n- changes in edges change meaning"
+      }
+    },
+    {
+      "id": "graph-prim-clusters",
+      "type": "markdown",
+      "label": "\ud83d\udce6 Clusters",
+      "position": {
+        "x": 260,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Clusters (Primitive)\n\n**What they are:**\n- logical grouping + identity\n- no authority\n\n**Carry:**\n- membership set\n- optional metadata\n\n**Rules:**\n- membership never rewires nodes\n- clusters organize meaning without adding it"
+      }
+    },
+    {
+      "id": "graph-prim-nonprimitives",
+      "type": "markdown",
+      "label": "Not Primitives",
+      "position": {
+        "x": 800,
+        "y": 120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Not Primitives\n\nThese are **representations**, not primitives:\n- Groups (node type that renders a cluster)\n- Layout / routing\n- Viewport + editor state\n- Stylesheets\n\nThey may change appearance without changing meaning."
+      }
+    },
+    {
+      "id": "graph-prim-invariant",
+      "type": "markdown",
+      "label": "Invariant",
+      "position": {
+        "x": -280,
+        "y": 460
+      },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Invariant\n\nIf nodes, edges, or clusters change, the **graph meaning changes**.\n\nRendering changes do not alter meaning."
+      }
+    },
+    {
+      "id": "graph-minimum-root",
+      "type": "markdown",
+      "label": "\u2705 Minimum Graph",
+      "position": {
+        "x": -820,
+        "y": 760
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Minimum Viable Graph\n\nA graph is valid if it contains:\n\n1) **At least one node**\n2) **A manifest** (identity + intent)\n\nEdges and clusters are optional at minimum."
+      }
+    },
+    {
+      "id": "graph-minimum-node",
+      "type": "markdown",
+      "label": "1) Node",
+      "position": {
+        "x": -360,
+        "y": 760
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node\n\nMinimum unit of content.\n\nMust include:\n- `id`\n- `type`\n- `data`"
+      }
+    },
+    {
+      "id": "graph-minimum-manifest",
+      "type": "markdown",
+      "label": "2) Manifest",
+      "position": {
+        "x": 40,
+        "y": 760
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Manifest\n\nDeclares:\n- identity\n- intent\n- dependencies (optional)\n- authority\n\nGraph without a manifest is invalid."
+      }
+    },
+    {
+      "id": "graph-minimum-optional",
+      "type": "markdown",
+      "label": "Optional At Minimum",
+      "position": {
+        "x": 480,
+        "y": 760
+      },
+      "width": 360,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Optional\n\n- Edges\n- Clusters\n- Styles\n- Layout settings\n\nThese enrich meaning but are not required for validity."
+      }
+    },
+    {
+      "id": "graph-ideal-root",
+      "type": "markdown",
+      "label": "\u2b50 Ideal Complete Graph",
+      "position": {
+        "x": -820,
+        "y": 1040
+      },
+      "width": 460,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Ideal Complete Graph\n\nA complete graph declares the required **node roles** explicitly.\n\nEvery required role should be represented by a node."
+      }
+    },
+    {
+      "id": "graph-ideal-manifest",
+      "type": "markdown",
+      "label": "Manifest",
+      "position": {
+        "x": -360,
+        "y": 1040
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Manifest\n\nDeclares identity, intent, authority, and dependencies."
+      }
+    },
+    {
+      "id": "graph-ideal-definitions",
+      "type": "markdown",
+      "label": "Definitions",
+      "position": {
+        "x": 40,
+        "y": 1040
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Definitions\n\nDefines node types, handle contracts, edge schemas, and validation."
+      }
+    },
+    {
+      "id": "graph-ideal-content",
+      "type": "markdown",
+      "label": "Content",
+      "position": {
+        "x": 440,
+        "y": 1040
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Content\n\nCarries the subject matter of the graph."
+      }
+    },
+    {
+      "id": "graph-ideal-structure",
+      "type": "markdown",
+      "label": "Structure",
+      "position": {
+        "x": 820,
+        "y": 1040
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structure\n\nEdges + clusters with validated semantics."
+      }
+    },
+    {
+      "id": "graph-ideal-style",
+      "type": "markdown",
+      "label": "Style",
+      "position": {
+        "x": 40,
+        "y": 1320
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Style\n\nDeclares portable visual intent (colors, emphasis, hints)."
+      }
+    },
+    {
+      "id": "graph-ideal-settings",
+      "type": "markdown",
+      "label": "Document Settings",
+      "position": {
+        "x": 440,
+        "y": 1320
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Document Settings\n\nLayout/routing preferences and editor defaults."
+      }
+    },
+    {
+      "id": "graph-ideal-skills",
+      "type": "markdown",
+      "label": "Skills + Scripts",
+      "position": {
+        "x": 820,
+        "y": 1320
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skills + Scripts\n\nValidated operations that mutate or interpret the graph."
+      }
+    },
+    {
+      "id": "graph-ideal-legend",
+      "type": "markdown",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": 1320
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Legend\n\nDefines symbols, colors, and conventions used in this graph."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-prim-root-nodes",
+      "type": "dataFlow",
+      "source": "graph-prim-root",
+      "target": "graph-prim-nodes",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-prim-root-edges",
+      "type": "dataFlow",
+      "source": "graph-prim-root",
+      "target": "graph-prim-edges",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-prim-root-clusters",
+      "type": "dataFlow",
+      "source": "graph-prim-root",
+      "target": "graph-prim-clusters",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-prim-root-nonprimitives",
+      "type": "dataFlow",
+      "source": "graph-prim-root",
+      "target": "graph-prim-nonprimitives",
+      "label": "excludes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-prim-root-invariant",
+      "type": "dataFlow",
+      "source": "graph-prim-root",
+      "target": "graph-prim-invariant",
+      "label": "implies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-min-root-node",
+      "type": "dataFlow",
+      "source": "graph-minimum-root",
+      "target": "graph-minimum-node",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-min-root-manifest",
+      "type": "dataFlow",
+      "source": "graph-minimum-root",
+      "target": "graph-minimum-manifest",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-min-root-optional",
+      "type": "dataFlow",
+      "source": "graph-minimum-root",
+      "target": "graph-minimum-optional",
+      "label": "allows",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-manifest",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-manifest",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-definitions",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-definitions",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-content",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-content",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-structure",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-structure",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-style",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-style",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-settings",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-settings",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-skills",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-skills",
+      "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ideal-root-legend",
+      "type": "dataFlow",
+      "source": "graph-ideal-root",
+      "target": "graph-ideal-legend",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:01:02.735Z",
+    "modified": "2026-01-20T22:01:02.735Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 448.54614009915696,
+      "y": 140.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-compile-root",
+      "type": "markdown",
+      "label": "🏗️ Skill: CompileGraphArtifact (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 640,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: CompileGraphArtifact\n\n**Authority:** Normative\n\nTransform a graph into an external, deterministic artifact.\n\nCompilation is interpretation, not execution.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-compile-intent",
+      "type": "markdown",
+      "label": "Intent",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Intent\n\nTransform graph meaning into an external artifact.\n\nNo state change is allowed.\n\nInterpretation must be pure."
+      }
+    },
+    {
+      "id": "skill-compile-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -80,
+        "y": 360
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- canonical graph data\n- manifest metadata\n- compilation options\n\nReads MUST be complete before compilation."
+      }
+    },
+    {
+      "id": "skill-compile-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": 560,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- external artifact\n- artifact metadata\n\nArtifacts must be self-describing."
+      }
+    },
+    {
+      "id": "skill-compile-never",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 1200,
+        "y": 360
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- graph state\n- editor state\n\nCompilation MUST be side-effect free."
+      }
+    },
+    {
+      "id": "skill-compile-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": -720,
+        "y": 760
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nSame graph + same options = same artifact.\n\nNon-deterministic output is forbidden."
+      }
+    },
+    {
+      "id": "skill-compile-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -80,
+        "y": 760
+      },
+      "width": 560,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n- whole graph\n- declared subgraph\n\nImplicit scope expansion is forbidden."
+      }
+    },
+    {
+      "id": "skill-compile-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 560,
+        "y": 760
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- If compilation fails → emit error artifact\n- Never partially emit\n\nExternal systems must receive a complete result or a complete failure."
+      }
+    },
+    {
+      "id": "skill-compile-ai-rules",
+      "type": "markdown",
+      "label": "Agent Rules",
+      "position": {
+        "x": 1200,
+        "y": 760
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- treat compilation as interpretation\n- never execute compiled artifacts\n- never mutate graph during compile\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "skill-compile-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1120
+      },
+      "width": 720,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Compilation is a boundary, not a bridge.**\n\nMeaning flows outward.\nState never flows back."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-intent",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-intent",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-never",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-never",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-ai-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-compile-root",
+      "target": "skill-compile-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

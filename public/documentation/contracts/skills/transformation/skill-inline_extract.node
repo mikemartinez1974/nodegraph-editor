@@ -1,0 +1,304 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:32:18.008Z",
+    "modified": "2026-01-20T22:32:18.008Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 391.54614009915696,
+      "y": 155.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-inline-root",
+      "type": "markdown",
+      "label": "🧩 Skill: InlineExtract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 940,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: InlineExtract\n\n**Category:** Structural / Transformational Skill\n\n**Intent:** Move structure between abstraction layers to optimize clarity or reuse.\n\nInlineExtract changes *where structure lives*, not *what it means*.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-inline-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -1040,
+        "y": 380
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nMove structure across abstraction layers.\n\nSupports clarity, reuse, and refactoring without semantic drift.\n\nThis is abstraction surgery, not rewriting."
+      }
+    },
+    {
+      "id": "skill-inline-scope",
+      "type": "markdown",
+      "label": "Scope",
+      "position": {
+        "x": -120,
+        "y": 380
+      },
+      "width": 760,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Scope\n\n### This skill:\n- Inlines referenced structures\n- Extracts repeated structures\n- Updates references explicitly\n- Preserves semantic relationships\n\n### This skill does NOT:\n- Change meaning\n- Reorder unless explicit\n- Touch unrelated structure"
+      }
+    },
+    {
+      "id": "skill-inline-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 760,
+        "y": 380
+      },
+      "width": 980,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Target nodes exist\n- Abstraction markers resolvable\n- Reference graph computable\n- No ambiguous references\n- Atomic update possible"
+      }
+    },
+    {
+      "id": "skill-inline-reads",
+      "type": "markdown",
+      "label": "Reads",
+      "position": {
+        "x": -1040,
+        "y": 820
+      },
+      "width": 760,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Reads\n\n- nodes\n- edges\n- abstraction markers\n- reference counts"
+      }
+    },
+    {
+      "id": "skill-inline-writes",
+      "type": "markdown",
+      "label": "Writes",
+      "position": {
+        "x": -120,
+        "y": 820
+      },
+      "width": 760,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Writes\n\n- nodes (inlined or extracted)\n- edges (updated)\n- abstractionMetadata"
+      }
+    },
+    {
+      "id": "skill-inline-forbidden",
+      "type": "markdown",
+      "label": "Never Touches",
+      "position": {
+        "x": 760,
+        "y": 820
+      },
+      "width": 980,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Never Touches\n\n- semantic relationships\n- meaning\n- ordering unless explicit\n- unrelated structure"
+      }
+    },
+    {
+      "id": "skill-inline-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -620,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- Ambiguous references → abort\n- Atomic update failure → rollback\n\nPartial states are forbidden."
+      }
+    },
+    {
+      "id": "skill-inline-determinism",
+      "type": "markdown",
+      "label": "Determinism",
+      "position": {
+        "x": 360,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Determinism\n\nDeterministic when inputs are fixed.\n\nSame graph + same markers = same result."
+      }
+    },
+    {
+      "id": "skill-inline-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1340,
+        "y": 1240
+      },
+      "width": 860,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Abstraction may move. Meaning may not.**\n\nIf meaning changes, this skill has failed."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-scope",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-scope",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-reads",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-reads",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-writes",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-writes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-determinism",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-determinism",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-inline-root",
+      "target": "skill-inline-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

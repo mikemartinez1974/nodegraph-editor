@@ -1,0 +1,139 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Edge Schemas",
+    "description": "",
+    "created": "2026-01-20T17:05:00.000Z",
+    "modified": "2026-01-20T17:05:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": { "x": 0, "y": 0 },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "edge-schema-root",
+      "type": "markdown",
+      "label": "🧩 Edge Schemas",
+      "position": { "x": -320, "y": -220 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Schemas\n\nDefine what each edge type *means* and how it must validate.\n\nThis is about **semantics + safety**, not rendering."
+      }
+    },
+    {
+      "id": "edge-schema-checklist",
+      "type": "markdown",
+      "label": "✅ Schema Checklist",
+      "position": { "x": -720, "y": 140 },
+      "width": 420,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Fields\n\n1. Meaning (one sentence)\n2. Directionality (directed/undirected)\n3. Endpoints (allowed node types)\n4. Handles (required/optional/forbidden)\n5. Multiplicity (duplicates allowed?)\n6. Validation (errors vs warnings)\n7. Labels (required/optional + meaning)\n8. Compatibility (conflicts/overrides)\n9. Examples (1 valid, 1 invalid)"
+      }
+    },
+    {
+      "id": "edge-schema-template",
+      "type": "markdown",
+      "label": "📝 Edge Schema Template",
+      "position": { "x": -160, "y": 140 },
+      "width": 520,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Type: <typeName>\n\n**Meaning:**\n- \n\n**Directionality:**\n- directed | undirected\n\n**Endpoints:**\n- allowed node types: \n\n**Handles:**\n- required | optional | forbidden\n- allowed handle IDs: \n\n**Multiplicity:**\n- duplicates allowed? (yes/no)\n\n**Validation:**\n- errors: \n- warnings: \n\n**Labels:**\n- required? \n- meaning: \n\n**Compatibility:**\n- conflicts: \n- overrides: \n\n**Examples:**\n- valid: \n- invalid: "
+      }
+    },
+    {
+      "id": "edge-schema-next",
+      "type": "markdown",
+      "label": "Next Steps",
+      "position": { "x": 420, "y": 140 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Next Steps\n\n1. Create one schema node per edge type\n2. Attach schemas to Definitions Role\n3. Add validation rules to Validation Contract\n4. Update skills to enforce schema checks\n\nWhen complete, structure becomes enforceable."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-root-checklist",
+      "type": "dataFlow",
+      "source": "edge-schema-root",
+      "target": "edge-schema-checklist",
+      "label": "uses",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-root-template",
+      "type": "dataFlow",
+      "source": "edge-schema-root",
+      "target": "edge-schema-template",
+      "label": "defines",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-root-next",
+      "type": "dataFlow",
+      "source": "edge-schema-root",
+      "target": "edge-schema-next",
+      "label": "plans",
+      "style": { "width": 2, "dash": [], "curved": true },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,329 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:24:41.668Z",
+    "modified": "2026-01-20T22:24:41.668Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 389.54614009915696,
+      "y": 154.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-duplicate-root",
+      "type": "markdown",
+      "label": "🪞 Skill: duplicate (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: duplicate\n\n**Category:** Structural Skill\n\nClone nodes (and optionally internal edges) without identity collision or semantic drift.\n\nDuplication is identity minting.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-duplicate-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -900,
+        "y": 380
+      },
+      "width": 680,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nCreate new nodes that are structurally and semantically equivalent to existing nodes.\n\nOriginal identity is preserved.\n\nNew identity is minted."
+      }
+    },
+    {
+      "id": "skill-duplicate-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": -140,
+        "y": 380
+      },
+      "width": 680,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeEdges,\n  offset,\n  groupId?\n}\n```\n\nOffsets must be explicit.\n\nGroup membership is intentional."
+      }
+    },
+    {
+      "id": "skill-duplicate-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 620,
+        "y": 380
+      },
+      "width": 740,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n- Nodes exist\n- Nodes readable (not locked)\n- Caller has mutation authority\n- Graph is mutable\n- Only internal edges eligible\n- Target group exists if provided"
+      }
+    },
+    {
+      "id": "skill-duplicate-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": 1420,
+        "y": 380
+      },
+      "width": 720,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n- New nodes created with new UUIDs\n- Originals unchanged\n- Type, data, handles, size preserved\n- Positions offset\n- External edges excluded\n- Group membership explicit"
+      }
+    },
+    {
+      "id": "skill-duplicate-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": -900,
+        "y": 860
+      },
+      "width": 680,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Reusing IDs\n- Duplicating external edges by default\n- Mutating originals\n- Inferring group membership\n- Auto-layout\n- Copying transient UI state"
+      }
+    },
+    {
+      "id": "skill-duplicate-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": -140,
+        "y": 860
+      },
+      "width": 680,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\n- NODE_NOT_FOUND\n- ID_COLLISION\n- INVALID_GROUP\n- NODE_LOCKED\n- INVALID_EDGE_SCOPE\n\nFailure must abort mutation."
+      }
+    },
+    {
+      "id": "skill-duplicate-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": 620,
+        "y": 860
+      },
+      "width": 740,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- Validate all inputs\n- Compute closure if edges included\n- Report resulting counts\n- No mutation occurs"
+      }
+    },
+    {
+      "id": "skill-duplicate-idempotency",
+      "type": "markdown",
+      "label": "Idempotency",
+      "position": {
+        "x": 1420,
+        "y": 860
+      },
+      "width": 720,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Idempotency\n\nNot idempotent.\n\nEach execution produces new identities.\n\nRetry requires re-planning."
+      }
+    },
+    {
+      "id": "skill-duplicate-implementer-notes",
+      "type": "markdown",
+      "label": "Implementer Notes",
+      "position": {
+        "x": -420,
+        "y": 1328.2339999815906
+      },
+      "width": 840,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Notes for Implementers\n\n- Prefer deterministic offsets\n- Emit mapping oldId → newId\n- Duplicate is minting, not cloning\n- Must be safe for agent invocation"
+      }
+    },
+    {
+      "id": "skill-duplicate-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 522.8462580639223,
+        "y": 1302.61767740629
+      },
+      "width": 840,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Identity must never fork silently.**\n\nIf you duplicate meaning,\nyou must mint identity.\n\nAlways."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-idempotency",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-idempotency",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-implementer",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-implementer-notes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-duplicate-root",
+      "target": "skill-duplicate-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,229 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:51:07.704Z",
+    "modified": "2026-01-20T22:51:07.704Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 374.54614009915696,
+      "y": 145.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "protocols-root",
+      "type": "markdown",
+      "label": "⚖️ Core Protocols",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 900,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Core Protocols\n\nThese rules define **non-negotiable invariants** for all Twilite graphs, tools, and agents.\n\nThey are above preference, convenience, and optimization.\n\nThis graph is normative."
+      }
+    },
+    {
+      "id": "protocol-identity",
+      "type": "markdown",
+      "label": "Identity vs Value",
+      "position": {
+        "x": -1000,
+        "y": 420
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Identity vs Value\n\n- Node IDs represent **identity**\n- Data represents **value**\n- Identity must persist across transformations\n\nBreaking identity breaks history."
+      }
+    },
+    {
+      "id": "protocol-meaning",
+      "type": "markdown",
+      "label": "Meaning vs Rendering",
+      "position": {
+        "x": 0,
+        "y": 420
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Meaning vs Rendering\n\n- Meaning lives in graph data\n- Rendering is a view, not truth\n- UI state must never alter meaning\n\nEditors are interpreters, not authors."
+      }
+    },
+    {
+      "id": "protocol-mutation",
+      "type": "markdown",
+      "label": "Mutation Rules",
+      "position": {
+        "x": 1000,
+        "y": 420
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Mutation Rules\n\n- All mutations must be explicit\n- All mutations must be reversible\n- Destructive mutations require confirmation\n- Batch > scatter\n\nImplicit change is corruption."
+      }
+    },
+    {
+      "id": "protocol-persistence",
+      "type": "markdown",
+      "label": "Persistence Guarantees",
+      "position": {
+        "x": -500,
+        "y": 900
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Persistence Guarantees\n\n- Graphs must load without tools\n- Graphs must survive version drift\n- Graphs must remain interpretable by agents\n\nIf it can’t survive time, it’s not real."
+      }
+    },
+    {
+      "id": "protocol-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Patterns",
+      "position": {
+        "x": 500,
+        "y": 900
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Patterns\n\n- snapshot overwrites\n- delete+recreate masquerading as edit\n- UI-only fields in graph data\n- silent schema drift\n\nThese destroy trust silently."
+      }
+    },
+    {
+      "id": "protocol-law",
+      "type": "markdown",
+      "label": "Civilizational Law",
+      "position": {
+        "x": 0,
+        "y": 1320
+      },
+      "width": 900,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Final Statement\n\nThese protocols define **civilization inside the graph**.\n\nWithout them, tools become tyrants and history dissolves.\n\nWith them, meaning persists."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-identity",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-identity",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-meaning",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-meaning",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-mutation",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-mutation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-persistence",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-persistence",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-law",
+      "type": "governs",
+      "source": "protocols-root",
+      "target": "protocol-law",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,224 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Dictionary Node Contract",
+    "description": "",
+    "created": "2026-01-20T18:52:00.000Z",
+    "modified": "2026-01-20T18:52:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "dictionary-contract-root",
+      "type": "markdown",
+      "label": "\ud83d\udcd6 Dictionary Node Contract",
+      "position": {
+        "x": -320,
+        "y": -220
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Dictionary Node Contract\n\nDefines the **Definitions/Dictionary** role.\n\nThis node explains the terms used by the graph and aligns meaning across agents and humans."
+      }
+    },
+    {
+      "id": "dictionary-role",
+      "type": "markdown",
+      "label": "Role",
+      "position": {
+        "x": -820,
+        "y": 140
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Role\n\n- Defines terms, concepts, and mappings\n- Acts as Definitions node\n- Optional but recommended\n\nIf present, tools should prefer it over guessing."
+      }
+    },
+    {
+      "id": "dictionary-required",
+      "type": "markdown",
+      "label": "Required Fields",
+      "position": {
+        "x": -360,
+        "y": 140
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required\n\n```json\n{\n  \"type\": \"dictionary\",\n  \"data\": { \"markdown\": \"...\" }\n}\n```\n\n- `type` must be `dictionary`\n- `data.markdown` is required"
+      }
+    },
+    {
+      "id": "dictionary-optional",
+      "type": "markdown",
+      "label": "Optional Fields",
+      "position": {
+        "x": 100,
+        "y": 140
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Optional\n\n- `label`\n- `position`, `width`, `height`\n- `style`\n- `handles` (rare)\n- `data.ext.*` namespaces"
+      }
+    },
+    {
+      "id": "dictionary-format",
+      "type": "markdown",
+      "label": "Data Format",
+      "position": {
+        "x": 560,
+        "y": 140
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Format\n\nFor now: **markdown-first**.\n\nRecommended structure:\n```\n## Dictionary\n- term: definition\n- term: definition\n```\n\nFuture structured fields may be added under `data.ext.twilite`."
+      }
+    },
+    {
+      "id": "dictionary-rules",
+      "type": "markdown",
+      "label": "Rules",
+      "position": {
+        "x": -320,
+        "y": 460
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-dict-role",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-role",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dict-required",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-required",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dict-optional",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-optional",
+      "label": "allows",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dict-format",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-format",
+      "label": "formats",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dict-rules",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-rules",
+      "label": "governs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -1,0 +1,354 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T22:23:05.736Z",
+    "modified": "2026-01-20T22:23:05.736Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 386.54614009915696,
+      "y": 89.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "skill-createnodes-root",
+      "type": "markdown",
+      "label": "🪜 Skill: createNodes (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 820,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Skill: createNodes\n\n**Category:** Structural Skill\n\nCreate new nodes at any stage of graph maturity.\n\nCreation must never be blocked by incompleteness.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "skill-createnodes-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -900,
+        "y": 380
+      },
+      "width": 660,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nSupport creation from sketches to systems.\n\nGraphs are allowed to be broken while becoming.\n\nCorrectness is layered, not enforced upfront."
+      }
+    },
+    {
+      "id": "skill-createnodes-acts",
+      "type": "markdown",
+      "label": "Acts On",
+      "position": {
+        "x": -140,
+        "y": 380
+      },
+      "width": 660,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Acts On\n\n- Graph node list\n- Node identity (new IDs only)\n- Structural fields (type, size, position)\n- Initial data payload only"
+      }
+    },
+    {
+      "id": "skill-createnodes-modes",
+      "type": "markdown",
+      "label": "Operating Modes",
+      "position": {
+        "x": 620,
+        "y": 380
+      },
+      "width": 740,
+      "height": 440,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Operating Modes\n\n### Bootstrap Mode (default)\n- No Manifest or schemas\n- Minimal validation\n- Creation always allowed\n- Missing contracts tolerated\n\n### Operational Mode\n- Manifest exists\n- Schemas available\n- Graph validates\n- Full guarantees enforced"
+      }
+    },
+    {
+      "id": "skill-createnodes-preconditions",
+      "type": "markdown",
+      "label": "Preconditions",
+      "position": {
+        "x": 1420,
+        "y": 380
+      },
+      "width": 720,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Preconditions\n\n### Always\n- IDs unique\n- Size provided or derivable\n- Valid JSON\n\n### Conditional\n- Schema valid if present\n- Manifest authority respected\n- Transaction rules apply\n\nConditional failure downgrades mode unless forbidden."
+      }
+    },
+    {
+      "id": "skill-createnodes-postconditions",
+      "type": "markdown",
+      "label": "Postconditions",
+      "position": {
+        "x": -900,
+        "y": 860
+      },
+      "width": 660,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Postconditions\n\n### Always\n- Nodes exist\n- IDs stable\n- Existing nodes unchanged\n- Existing edges unchanged\n\n### Operational Mode\n- Graph remains valid\n- Version incremented\n- updatedAt updated\n- Validation refreshed"
+      }
+    },
+    {
+      "id": "skill-createnodes-inputs",
+      "type": "markdown",
+      "label": "Inputs",
+      "position": {
+        "x": -140,
+        "y": 860
+      },
+      "width": 660,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Inputs\n\n```\n{\n  nodes: [{\n    id,\n    type,\n    position?,\n    width,\n    height,\n    data\n  }]\n}\n```\n\nOptional: label, groupId\n\nAuto-layout allowed if position omitted."
+      }
+    },
+    {
+      "id": "skill-createnodes-forbidden",
+      "type": "markdown",
+      "label": "Forbidden Actions",
+      "position": {
+        "x": 620,
+        "y": 860
+      },
+      "width": 740,
+      "height": 400,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Actions\n\n- Modify existing nodes\n- Modify edges or groups\n- Delete nodes\n- Reuse IDs\n- Guess schema fields\n- Auto-generate handles\n- Mutate other semantic data\n- Apply layout to existing nodes\n- Create edges"
+      }
+    },
+    {
+      "id": "skill-createnodes-failure",
+      "type": "markdown",
+      "label": "Failure Behavior",
+      "position": {
+        "x": 1420,
+        "y": 860
+      },
+      "width": 720,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Behavior\n\n- Bootstrap: report but proceed when safe\n- Operational: abort mutation\n- Errors explicit and machine-readable\n- Silent failure forbidden\n\nRollback must be used if available."
+      }
+    },
+    {
+      "id": "skill-createnodes-dryrun",
+      "type": "markdown",
+      "label": "Dry Run",
+      "position": {
+        "x": -420,
+        "y": 1300
+      },
+      "width": 820,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dry Run Behavior\n\n- No mutation\n- All validations run\n- Mode reported\n- Diff preview optional"
+      }
+    },
+    {
+      "id": "skill-createnodes-agents",
+      "type": "markdown",
+      "label": "Agent Safety",
+      "position": {
+        "x": 520,
+        "y": 1300
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Safety Rules\n\nAgents MUST:\n- supply explicit IDs\n- read schemas if present\n- respect manifest authority\n- tolerate bootstrap downgrade\n- never assume creation implies validity"
+      }
+    },
+    {
+      "id": "skill-createnodes-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 1460,
+        "y": 1300
+      },
+      "width": 820,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**Creation precedes correctness.**\n\nA graph may exist before it is ready.\n\nBecoming comes first.\n\nValidation comes later."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-acts",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-acts",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-modes",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-modes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-preconditions",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-preconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-postconditions",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-postconditions",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-inputs",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-inputs",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-forbidden",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-failure",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-failure",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-dryrun",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-dryrun",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-agents",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "skill-createnodes-root",
+      "target": "skill-createnodes-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-19T23:23:34.038Z",
-    "modified": "2026-01-19T23:23:34.038Z",
+    "created": "2026-01-21T22:29:53.778Z",
+    "modified": "2026-01-21T22:49:45.058Z",
     "author": "",
     "tags": []
   },
@@ -48,14 +48,12 @@
   },
   "viewport": {
     "pan": {
-      "x": 839.9482329995069,
-      "y": 191.91899054405246
+      "x": -1305.2233982939965,
+      "y": -1645.22036569221
     },
-    "zoom": 1.5613813340167768
+    "zoom": 1.4339062961344162
   },
-  "document": {
-    "url": "/tlz/background.html"
-  },
+  "document": null,
   "scripts": [
     {
       "id": "script_1761684730975",
@@ -74,7 +72,7 @@
     {
       "id": "contract-review-root",
       "type": "markdown",
-      "label": "📋 Contract Review",
+      "label": "\ud83d\udccb Contract Review",
       "position": {
         "x": -84.3375445234202,
         "y": 96.8116954670885
@@ -90,7 +88,7 @@
     {
       "id": "contract-path-mismatch",
       "type": "markdown",
-      "label": "📁 Edge Contract Path",
+      "label": "\ud83d\udcc1 Edge Contract Path",
       "position": {
         "x": 337.1060004149949,
         "y": 364.34104175651316
@@ -106,7 +104,7 @@
     {
       "id": "node-contract-vs-validation",
       "type": "markdown",
-      "label": "🧱 Node Required Fields",
+      "label": "\ud83e\uddf1 Node Required Fields",
       "position": {
         "x": -168.45925753895585,
         "y": 547.0032149656553
@@ -116,13 +114,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Node Contract vs Validation\n\n**Contract says:**\n- `width` + `height` required\n- `position` optional\n\n**Code says (now):**\n- `position` optional (auto-layout/renderer default)\n- `width` + `height` optional (warnings only)\n\n**Decision needed:**\n- Which is the authority?\n\n**ANSWER:**\n- Portability takes priority\n- `type` is required; layout can infer missing spatial fields\n\n**Rule:**\n- Missing `position` → ✅ allowed (auto-layout/defaults)\n- Missing `width` / `height` → ⚠️ warning (renderer defaults)\n- Invalid numeric values → ❌ error\n\n**Rationale:**\n- Graphs must remain portable\n- Rendering can supply spatial defaults\n- Validation should not block on layout concerns"
+        "markdown": "## Node Contract vs Validation\n\n**Contract says:**\n- `width` + `height` required\n- `position` optional\n\n**Code says (now):**\n- `position` optional (auto-layout/renderer default)\n- `width` + `height` optional (warnings only)\n\n**Decision needed:**\n- Which is the authority?\n\n**ANSWER:**\n- Portability takes priority\n- `type` is required; layout can infer missing spatial fields\n\n**Rule:**\n- Missing `position` \u2192 \u2705 allowed (auto-layout/defaults)\n- Missing `width` / `height` \u2192 \u26a0\ufe0f warning (renderer defaults)\n- Invalid numeric values \u2192 \u274c error\n\n**Rationale:**\n- Graphs must remain portable\n- Rendering can supply spatial defaults\n- Validation should not block on layout concerns"
       }
     },
     {
       "id": "edge-contract-vs-validation",
       "type": "markdown",
-      "label": "🔗 Edge Required Fields",
+      "label": "\ud83d\udd17 Edge Required Fields",
       "position": {
         "x": -575.5058110329271,
         "y": 110.81530537788252
@@ -132,13 +130,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edge Contract vs Validation\n\n**Issue:**\n- Contract requires `type` on edges\n- Code does not validate `type`\n- Editor defaults `type` only during create\n\n**Decision needed:**\n- Enforce `type` or loosen contract?\n\n**ANSWER:**\n- Enforce `type` as required for persisted graphs\n- Allow defaulting only during interactive creation\n\n**Rule:**\n- During interactive authoring:\n  - Missing `type` → allowed temporarily (editor default may apply)\n- During persistence (save/export/commit):\n  - Missing `type` → ❌ error\n- During import / migration:\n  - Missing `type` → ⚠️ warning + auto-repair (default or inferred)\n\n**Rationale:**\n- Edges are semantic objects, not just geometry\n- Typed edges preserve meaning, portability, and intent\n- Agents and tools require explicit relationship semantics\n- Defaulting is a UX convenience, not a data guarantee\n\n**Validation notes:**\n- Validators must fail persisted graphs with untyped edges\n- Importers may infer or apply default types but must annotate repairs\n- Editors must surface edge type selection affordances when ambiguous\n\nEdges are verbs. Verbs must be named. Silence is not allowed."
+        "markdown": "## Edge Contract vs Validation\n\n**Issue:**\n- Contract requires `type` on edges\n- Code does not validate `type`\n- Editor defaults `type` only during create\n\n**Decision needed:**\n- Enforce `type` or loosen contract?\n\n**ANSWER:**\n- Enforce `type` as required for persisted graphs\n- Allow defaulting only during interactive creation\n\n**Rule:**\n- During interactive authoring:\n  - Missing `type` \u2192 allowed temporarily (editor default may apply)\n- During persistence (save/export/commit):\n  - Missing `type` \u2192 \u274c error\n- During import / migration:\n  - Missing `type` \u2192 \u26a0\ufe0f warning + auto-repair (default or inferred)\n\n**Rationale:**\n- Edges are semantic objects, not just geometry\n- Typed edges preserve meaning, portability, and intent\n- Agents and tools require explicit relationship semantics\n- Defaulting is a UX convenience, not a data guarantee\n\n**Validation notes:**\n- Validators must fail persisted graphs with untyped edges\n- Importers may infer or apply default types but must annotate repairs\n- Editors must surface edge type selection affordances when ambiguous\n\nEdges are verbs. Verbs must be named. Silence is not allowed."
       }
     },
     {
       "id": "handles-optional-vs-create-edges",
       "type": "markdown",
-      "label": "🎚️ Handles Optional",
+      "label": "\ud83c\udf9a\ufe0f Handles Optional",
       "position": {
         "x": -255.66089251375445,
         "y": -347.0032149656553
@@ -148,13 +146,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handles Optional vs CreateEdges\n\n**Issue:**\n- Contract says handles are optional for portability\n- Code errors when a node has multiple handles and none is specified\n\n**Decision needed:**\n- Downgrade to warning?\n- Keep strict for authored graphs?\n\n**ANSWER:**\n- Handles are optional in serialized graph artifacts\n- Handles are required during authoring when multiple handles exist\n\n**Rule:**\n- During interactive authoring:\n  - If a node has multiple handles and none is specified → ❌ error (ambiguous intent)\n- During import / automation / transformation:\n  - Missing handles → ⚠️ warning (inference allowed)\n- When only one handle exists:\n  - Handle may be omitted safely\n\n**Rationale:**\n- Prevents intent guessing during human authoring\n- Preserves portability for headless tools and agents\n- Allows legacy and external graphs to load without failure\n- Keeps semantic meaning explicit where humans expect precision\n\n**Optional extension (future):**\n- Introduce edge intent modes:\n  - `explicit` (default, human-authored)\n  - `inferred` (agents/imports)\n  - `wildcard` (declared, rare, loud)\n\n**Validation notes:**\n- Validators must treat ambiguous authoring as errors\n- Validators must treat inferred edges as warnings\n- Editors should surface handle choice affordances when required\n\nHonesty for humans. Politeness for artifacts. Silence is never allowed."
+        "markdown": "## Handles Optional vs CreateEdges\n\n**Issue:**\n- Contract says handles are optional for portability\n- Code errors when a node has multiple handles and none is specified\n\n**Decision needed:**\n- Downgrade to warning?\n- Keep strict for authored graphs?\n\n**ANSWER:**\n- Handles are optional in serialized graph artifacts\n- Handles are required during authoring when multiple handles exist\n\n**Rule:**\n- During interactive authoring:\n  - If a node has multiple handles and none is specified \u2192 \u274c error (ambiguous intent)\n- During import / automation / transformation:\n  - Missing handles \u2192 \u26a0\ufe0f warning (inference allowed)\n- When only one handle exists:\n  - Handle may be omitted safely\n\n**Rationale:**\n- Prevents intent guessing during human authoring\n- Preserves portability for headless tools and agents\n- Allows legacy and external graphs to load without failure\n- Keeps semantic meaning explicit where humans expect precision\n\n**Optional extension (future):**\n- Introduce edge intent modes:\n  - `explicit` (default, human-authored)\n  - `inferred` (agents/imports)\n  - `wildcard` (declared, rare, loud)\n\n**Validation notes:**\n- Validators must treat ambiguous authoring as errors\n- Validators must treat inferred edges as warnings\n- Editors should surface handle choice affordances when required\n\nHonesty for humans. Politeness for artifacts. Silence is never allowed."
       }
     },
     {
       "id": "unknown-fields-policy",
       "type": "markdown",
-      "label": "🧩 Unknown Fields",
+      "label": "\ud83e\udde9 Unknown Fields",
       "position": {
         "x": 286.1905039247581,
         "y": -200.28836451264627
@@ -164,16 +162,16 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Unknown Optional Fields\n\n**Issue:**\n- Contract forbids unknown optional fields\n- Code currently allows them silently\n\n**Decision needed:**\n- Add strict validation?\n- Allow extensions?\n\n**ANSWER:**\n- Forbid unknown fields in core schema\n- Allow extensions only under explicit namespaces\n\n**Rule:**\n- Unknown top-level fields → ❌ error\n- Unknown fields in `data` → ❌ error\n- Unknown fields under `data.ext.*` → ⚠️ warning\n- Known namespaces under `data.ext.<namespace>` → ✅ allowed\n\n**Canonical extension container:**\n```json\n{\n  \"data\": {\n    \"ext\": {\n      \"twilite\": {},\n      \"toolName\": {},\n      \"agentName\": {}\n    }\n  }\n}\n```\n\n**Rationale:**\n- Preserves portability and schema integrity\n- Prevents silent semantic drift\n- Allows safe evolution without breaking readers\n- Enables forward compatibility for tools and agents\n\n**Enforcement notes:**\n- Schemas may whitelist allowed extension namespaces\n- Validators must surface unknown namespaces as warnings\n- Editors and agents must preserve `ext` blocks verbatim\n\nCore stays strict. Edges stay flexible. Nothing is accidental."
+        "markdown": "## Unknown Optional Fields\n\n**Issue:**\n- Contract forbids unknown optional fields\n- Code currently allows them silently\n\n**Decision needed:**\n- Add strict validation?\n- Allow extensions?\n\n**ANSWER:**\n- Forbid unknown fields in core schema\n- Allow extensions only under explicit namespaces\n\n**Rule:**\n- Unknown top-level fields \u2192 \u274c error\n- Unknown fields in `data` \u2192 \u274c error\n- Unknown fields under `data.ext.*` \u2192 \u26a0\ufe0f warning\n- Known namespaces under `data.ext.<namespace>` \u2192 \u2705 allowed\n\n**Canonical extension container:**\n```json\n{\n  \"data\": {\n    \"ext\": {\n      \"twilite\": {},\n      \"toolName\": {},\n      \"agentName\": {}\n    }\n  }\n}\n```\n\n**Rationale:**\n- Preserves portability and schema integrity\n- Prevents silent semantic drift\n- Allows safe evolution without breaking readers\n- Enables forward compatibility for tools and agents\n\n**Enforcement notes:**\n- Schemas may whitelist allowed extension namespaces\n- Validators must surface unknown namespaces as warnings\n- Editors and agents must preserve `ext` blocks verbatim\n\nCore stays strict. Edges stay flexible. Nothing is accidental."
       }
     },
     {
       "id": "validation-policy",
       "type": "markdown",
-      "label": "🧭 Validation Policy",
+      "label": "\ud83e\udded Validation Policy",
       "position": {
-        "x": 160.4029989046436,
-        "y": 746.1209650328126
+        "x": 262.3088204908283,
+        "y": 775.3296400097445
       },
       "width": 420,
       "height": 260,
@@ -181,6 +179,118 @@
       "showLabel": true,
       "data": {
         "markdown": "## Validation Policy (Intent > Presentation)\n\n**Goal:**\n- A graph is valid if its *intent* and *content* align.\n\n**Hard errors (must fail):**\n- Missing/invalid Manifest intent\n- Broken references (missing nodes/edges)\n- Semantic contradictions (intent vs content)\n- Forbidden mutations (authority)\n\n**Warnings only (presentation):**\n- Missing position/size\n- Styling gaps\n- Optional handle omissions\n\n**Principle:**\n- Judge the *graph*, not the author.\n- Semantic coherence > layout polish."
+      }
+    },
+    {
+      "id": "definitions-contract-readiness",
+      "type": "markdown",
+      "label": "\ud83d\udcd8 Definitions Contract Readiness",
+      "position": {
+        "x": 760,
+        "y": 96
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Definitions Contract Inputs\n\nWe cannot finalize `definitions` until these are settled:\n\n1. Required node roles (manifest/definitions/legend/style/content)\n2. Core node type list (initial types)\n3. Canonical edge type list\n4. Cluster vs group primitive decision\n5. Handle optionality rules\n6. Extension namespace policy\n\n**Note:** Dictionary node will need a dedicated implementation, but may render as markdown for now."
+      }
+    },
+    {
+      "id": "definitions-required-roles",
+      "type": "markdown",
+      "label": "Required Roles \u2705",
+      "position": {
+        "x": 1240,
+        "y": -120
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Roles\n\n**Required:**\n- Manifest\n- Content (e.g., markdown/default)\n\n**Optional:**\n- Dictionary\n- Legend\n"
+      }
+    },
+    {
+      "id": "definitions-core-types",
+      "type": "markdown",
+      "label": "Core Node Types \u2705",
+      "position": {
+        "x": 1246.4081454196817,
+        "y": 128.46569425266873
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Node Types\n\n**Confirmed core types:**\n- `manifest`\n- `dictionary`\n- `legend`\n- `markdown`\n- `default`\n\nDefined edge types are handled in the edge type list."
+      }
+    },
+    {
+      "id": "definitions-edge-types",
+      "type": "markdown",
+      "label": "Edge Types",
+      "position": {
+        "x": 1240,
+        "y": 400
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Canonical Edge Types\n\n- child\n- peer\n- dependency\n- reference\n- bidirectional\n- contains\n- requires\n- precedes\n- derives\n- constrains\n- governs\n- equivalentTo\n\nConfirm list.\n\nThis will be the confirmed list of native edge types.  We will keep all of the styles in the editor and allow for custom edge types."
+      }
+    },
+    {
+      "id": "definitions-cluster-decision",
+      "type": "markdown",
+      "label": "Cluster Primitive \u2705",
+      "position": {
+        "x": 1240,
+        "y": 660
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Cluster vs Group\n\n**Decision:** file format uses clusters as a primitive.\n\n**File shape:** `nodes`, `edges`, `clusters`.\n\nRoles are satisfied via node types (manifest, dictionary, legend, markdown).\n\nGroups are a node type that *represents* a cluster."
+      }
+    },
+    {
+      "id": "definitions-handle-policy",
+      "type": "markdown",
+      "label": "Handle Policy \u2705",
+      "position": {
+        "x": 1239.3029918014083,
+        "y": 919.3029918014083
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handles Optionality\n\n**Decision (from Handles Optional node):**\n- Optional for portability\n- Required during authoring when ambiguous\n- Inferred allowed for import/automation\n"
+      }
+    },
+    {
+      "id": "definitions-extension-policy",
+      "type": "markdown",
+      "label": "Extension Policy \u2705",
+      "position": {
+        "x": 1240,
+        "y": 1180
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Extensions\n\n**Decision (from Unknown Fields node):**\n- Unknown top-level fields \u2192 error\n- Unknown `data` fields \u2192 error\n- Extensions only under `data.ext.<namespace>`\n- Unknown namespaces warn\n- Known namespaces allowed (e.g., `twilite`)\n"
       }
     }
   ],
@@ -258,6 +368,97 @@
       "label": "define",
       "style": {
         "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-contract-definitions-readiness",
+      "type": "dataFlow",
+      "source": "contract-review-root",
+      "target": "definitions-contract-readiness",
+      "label": "prepare",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-roles",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-required-roles",
+      "label": "needs",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-core-types",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-core-types",
+      "label": "needs",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-edge-types",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-edge-types",
+      "label": "needs",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-clusters",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-cluster-decision",
+      "label": "needs",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-handles",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-handle-policy",
+      "label": "needs",
+      "style": {
+        "width": 1,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definitions-extensions",
+      "type": "dataFlow",
+      "source": "definitions-contract-readiness",
+      "target": "definitions-extension-policy",
+      "label": "needs",
+      "style": {
+        "width": 1,
         "dash": [],
         "curved": true
       },

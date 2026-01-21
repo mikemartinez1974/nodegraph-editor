@@ -1,0 +1,279 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T21:51:44.082Z",
+    "modified": "2026-01-20T21:51:44.082Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 449,
+      "y": 86.5
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "schema-migration-root",
+      "type": "markdown",
+      "label": "🔁 Schema Versioning & Migration Contract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 620,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Schema Versioning & Migration Contract\n\n**Authority:** Normative\n\nDefines how schemas evolve without breaking graphs, agents, or history.\n\nAll schema evolution MUST conform to this contract.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "schema-purpose",
+      "type": "markdown",
+      "label": "Purpose",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Purpose\n\nEnsure schema evolution preserves:\n- portability\n- safety\n- history\n- agent correctness\n\nEvolution must be explicit and reversible."
+      }
+    },
+    {
+      "id": "schema-versioning",
+      "type": "markdown",
+      "label": "1. Versioning Rules",
+      "position": {
+        "x": -160,
+        "y": 360
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Versioning Rules (REQUIRED)\n\n- Use semantic versioning: MAJOR.MINOR.PATCH\n- MAJOR: breaking structural change\n- MINOR: additive, backward-compatible\n- PATCH: clarifications only\n- Every node schema MUST declare its version"
+      }
+    },
+    {
+      "id": "schema-upgrade-paths",
+      "type": "markdown",
+      "label": "2. Allowed Upgrade Paths",
+      "position": {
+        "x": 400,
+        "y": 360
+      },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed Upgrade Paths (REQUIRED)\n\n- Only forward upgrades are allowed\n- Never skip MAJOR versions\n- MINOR upgrades may be batched\n- PATCH upgrades are implicit\n\nDowngrades are forbidden."
+      }
+    },
+    {
+      "id": "schema-migration-units",
+      "type": "markdown",
+      "label": "3. Migration Units",
+      "position": {
+        "x": 960,
+        "y": 360
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Migration Units (REQUIRED)\n\n- One transform per version step\n- Pure functions only\n- graph@vN → graph@vN+1\n- Must emit migration metadata\n\nSide effects are forbidden."
+      }
+    },
+    {
+      "id": "schema-execution",
+      "type": "markdown",
+      "label": "4. Execution Rules",
+      "position": {
+        "x": -720,
+        "y": 780
+      },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Execution Rules (REQUIRED)\n\n- dryRun required before commit\n- atomic commit required\n- rollback on failure required\n- never mutate source snapshot\n\nMigrations must be safe by construction."
+      }
+    },
+    {
+      "id": "schema-deprecation",
+      "type": "markdown",
+      "label": "5. Deprecation Policy",
+      "position": {
+        "x": -80,
+        "y": 780
+      },
+      "width": 560,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Deprecation Policy (REQUIRED)\n\n- Mark deprecated fields explicitly\n- Warn for at least one MINOR version\n- Remove only on MAJOR bump\n\nSilent removal is forbidden."
+      }
+    },
+    {
+      "id": "schema-ai-rules",
+      "type": "markdown",
+      "label": "6. Agent Rules",
+      "position": {
+        "x": 560,
+        "y": 780
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- never invent migrations\n- never skip versions\n- never drop data silently\n- refuse unsafe upgrades\n- emit explicit errors"
+      }
+    },
+    {
+      "id": "schema-invariant",
+      "type": "markdown",
+      "label": "Design Invariant",
+      "position": {
+        "x": 0,
+        "y": 1180
+      },
+      "width": 640,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Invariant\n\n**History is sacred.**\n\nSchemas may evolve,\nbut meaning and data must survive.\n\nMigration is translation, not rewriting."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-purpose",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-purpose",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-versioning",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-versioning",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-paths",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-upgrade-paths",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-units",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-migration-units",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-execution",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-execution",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-deprecation",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-deprecation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-ai",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-ai-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-invariant",
+      "type": "governs",
+      "source": "schema-migration-root",
+      "target": "schema-invariant",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

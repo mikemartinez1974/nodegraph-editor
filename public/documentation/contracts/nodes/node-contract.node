@@ -1,0 +1,404 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-20T21:53:58.068Z",
+    "modified": "2026-01-20T21:53:58.068Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 498.54614009915696,
+      "y": 127.70313852224928
+    },
+    "zoom": 0.35133848637110354
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "node-schema-contract-root",
+      "type": "markdown",
+      "label": "🧩 Node Type Schema Contract (Normative)",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 620,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Node Type Schema Contract Template\n\n**Authority:** Normative\n\nAny node created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to a schema defined using this contract.\n\nEditors and agents may not invent fields, infer structure, or guess missing data.\n\nThis graph is the contract."
+      }
+    },
+    {
+      "id": "node-schema-meta",
+      "type": "markdown",
+      "label": "0. Metadata",
+      "position": {
+        "x": -720,
+        "y": 360
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Metadata\n\n- Type name\n- Schema version (MAJOR.MINOR.PATCH)\n- Status: experimental | stable | deprecated\n- Defined in: contracts/nodes/<type>.md\n\nEvery schema MUST declare version and status."
+      }
+    },
+    {
+      "id": "node-schema-meaning",
+      "type": "markdown",
+      "label": "1. Semantic Meaning",
+      "position": {
+        "x": -200,
+        "y": 360
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantic Meaning (REQUIRED)\n\nDefines what this node represents everywhere.\n\n- Domain concept embodied\n- Reason this node exists\n- Meaning lost if node is absent\n\nMeaning is portable and invariant."
+      }
+    },
+    {
+      "id": "node-schema-required-fields",
+      "type": "markdown",
+      "label": "2. Required Fields",
+      "position": {
+        "x": 360,
+        "y": 360
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Fields (REQUIRED)\n\n```json\n{\n  \"id\": \"uuid\",\n  \"type\": \"<type>\",\n  \"label\": \"string\",\n  \"data\": {}\n}\n```\n\n- id: immutable\n- type: immutable\n- label: human-readable\n- data: schema-defined payload"
+      }
+    },
+    {
+      "id": "node-schema-optional-fields",
+      "type": "markdown",
+      "label": "3. Optional Fields",
+      "position": {
+        "x": 980,
+        "y": 360
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Optional Fields (OPTIONAL)\n\n- position\n- size\n- handles\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
+      }
+    },
+    {
+      "id": "node-schema-data-shape",
+      "type": "markdown",
+      "label": "4. Data Shape",
+      "position": {
+        "x": -720,
+        "y": 800
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Shape (REQUIRED)\n\nDefine exact structure of `data`.\n\nRules:\n- All keys documented\n- No free-form blobs\n- Defaults explicit\n- Nullability explicit\n\nUndocumented keys are forbidden."
+      }
+    },
+    {
+      "id": "node-schema-handles",
+      "type": "markdown",
+      "label": "5. Handles",
+      "position": {
+        "x": -80,
+        "y": 800
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handles (IF APPLICABLE)\n\nEvery handle MUST be declared:\n\n- id\n- direction\n- semanticType\n- multiplicity\n- wildcard\n\nUndeclared handles are forbidden."
+      }
+    },
+    {
+      "id": "node-schema-allowed-mutations",
+      "type": "markdown",
+      "label": "6. Allowed Mutations",
+      "position": {
+        "x": 560,
+        "y": 800
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Allowed Mutations\n\nExamples:\n- label: allowed\n- data.<field>: allowed\n- type: forbidden\n- id: forbidden\n\nMutations not listed are forbidden."
+      }
+    },
+    {
+      "id": "node-schema-forbidden-mutations",
+      "type": "markdown",
+      "label": "7. Forbidden Mutations",
+      "position": {
+        "x": 1200,
+        "y": 800
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Forbidden Mutations\n\n- change node type\n- delete required fields\n- add undocumented fields\n- modify handle IDs\n- recreate node instead of update"
+      }
+    },
+    {
+      "id": "node-schema-validation",
+      "type": "markdown",
+      "label": "8. Validation Rules",
+      "position": {
+        "x": -360,
+        "y": 1240
+      },
+      "width": 560,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- required fields present\n- data shape valid\n- handles valid\n- schema version compatible\n- no forbidden mutations\n\nFailure blocks execution."
+      }
+    },
+    {
+      "id": "node-schema-examples",
+      "type": "markdown",
+      "label": "9. Examples",
+      "position": {
+        "x": 280,
+        "y": 1240
+      },
+      "width": 560,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Examples\n\n**Minimal valid:**\n\n```json\n{ \"id\": \"uuid\", \"type\": \"<type>\", \"data\": {} }\n```\n\n**Invalid (must fail):**\n\n```json\n{ \"id\": \"uuid\", \"data\": {} }\n```"
+      }
+    },
+    {
+      "id": "node-schema-migrations",
+      "type": "markdown",
+      "label": "10. Migration Notes",
+      "position": {
+        "x": 920,
+        "y": 1240
+      },
+      "width": 560,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Migration Notes\n\nDocument all prior versions and upgrades.\n\nMigrations must be deterministic and reversible.\n\nHistory must survive."
+      }
+    },
+    {
+      "id": "node-schema-agent-rules",
+      "type": "markdown",
+      "label": "11. Agent Rules",
+      "position": {
+        "x": 1,
+        "y": 1620
+      },
+      "width": 620,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read schema before creating nodes\n- refuse unknown types\n- refuse undocumented fields\n- prefer update over recreate\n- emit errors instead of guessing"
+      }
+    },
+    {
+      "id": "node-schema-human-notes",
+      "type": "markdown",
+      "label": "12. Human Notes",
+      "position": {
+        "x": 720,
+        "y": 1620
+      },
+      "width": 560,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Human Notes (OPTIONAL)\n\nDesign rationale and edge cases.\n\nIgnored by validators but critical for stewardship."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-root-meta",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-meta",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-meaning",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-meaning",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-required",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-required-fields",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-optional",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-optional-fields",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-data",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-data-shape",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-handles",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-handles",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-allowed",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-allowed-mutations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-forbidden",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-forbidden-mutations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-validation",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-validation",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-examples",
+      "type": "references",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-examples",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-migrate",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-migrations",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-agents",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-agent-rules",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-human",
+      "type": "references",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-human-notes",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}
