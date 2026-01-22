@@ -3,7 +3,7 @@
 // 1. GraphEditor/useGraphEditorState.js
 // All state management in one hook
 // ============================================
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GroupManager from '../GroupManager';
 import {
@@ -12,6 +12,88 @@ import {
   initGraphCore,
   subscribeGraph
 } from '../core/graphCore';
+
+const isPlainObject = (value) =>
+  value !== null &&
+  typeof value === 'object' &&
+  !Array.isArray(value);
+
+const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj || {}, key);
+
+const validateManifestNodes = (nodes = []) => {
+  const manifestNodes = Array.isArray(nodes)
+    ? nodes.filter((node) => node?.type === 'manifest')
+    : [];
+
+  if (manifestNodes.length !== 1) {
+    return {
+      ok: false,
+      errors: [
+        manifestNodes.length === 0
+          ? 'Missing Manifest node'
+          : 'Graph must contain exactly one Manifest node'
+      ]
+    };
+  }
+
+  const manifest = manifestNodes[0];
+  const data = isPlainObject(manifest?.data) ? manifest.data : null;
+  if (!data) {
+    return { ok: false, errors: ['Manifest data must be an object'] };
+  }
+
+  const requiredIdentity = ['graphId', 'name', 'version', 'description', 'createdAt', 'updatedAt'];
+  const requiredIntent = ['kind', 'scope'];
+  const requiredDependencies = ['nodeTypes', 'handleContracts', 'skills', 'schemaVersions'];
+  const requiredAuthority = ['mutation', 'actors', 'styleAuthority', 'history'];
+
+  const errors = [];
+  if (!isPlainObject(data.identity)) {
+    errors.push('Manifest.identity is required');
+  } else {
+    requiredIdentity.forEach((key) => {
+      if (!hasOwn(data.identity, key)) {
+        errors.push(`Manifest.identity.${key} is required`);
+      }
+    });
+  }
+
+  if (!isPlainObject(data.intent)) {
+    errors.push('Manifest.intent is required');
+  } else {
+    requiredIntent.forEach((key) => {
+      if (!hasOwn(data.intent, key)) {
+        errors.push(`Manifest.intent.${key} is required`);
+      }
+    });
+  }
+
+  if (!isPlainObject(data.dependencies)) {
+    errors.push('Manifest.dependencies is required');
+  } else {
+    requiredDependencies.forEach((key) => {
+      if (!hasOwn(data.dependencies, key)) {
+        errors.push(`Manifest.dependencies.${key} is required`);
+      }
+    });
+  }
+
+  if (!isPlainObject(data.authority)) {
+    errors.push('Manifest.authority is required');
+  } else {
+    requiredAuthority.forEach((key) => {
+      if (!hasOwn(data.authority, key)) {
+        errors.push(`Manifest.authority.${key} is required`);
+      }
+    });
+  }
+
+  if (errors.length) {
+    return { ok: false, errors };
+  }
+
+  return { ok: true, errors: [] };
+};
 
 const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
 
@@ -53,6 +135,7 @@ export function useGraphEditorState() {
   const nodes = graphSnapshot.nodes;
   const edges = graphSnapshot.edges;
   const groups = graphSnapshot.groups;
+  const manifestStatus = useMemo(() => validateManifestNodes(nodes), [nodes]);
   
   // View state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -131,38 +214,80 @@ export function useGraphEditorState() {
   const hoveredEdgeSource = hoveredEdgeId ? edges.find(e => e.id === hoveredEdgeId)?.source : null;
   const hoveredEdgeTarget = hoveredEdgeId ? edges.find(e => e.id === hoveredEdgeId)?.target : null;
 
+  const blockMutationForManifest = useCallback((errors = []) => {
+    const message = errors.length
+      ? `Manifest required: ${errors[0]}`
+      : 'Manifest required before mutating graph';
+    setSnackbar({ open: true, message, severity: 'error' });
+  }, [setSnackbar]);
+
   const setNodes = useCallback((value) => {
     const currentNodes = getGraphSnapshot().nodes;
     const next = typeof value === 'function' ? value(currentNodes) : value;
+    const nextNodes = Array.isArray(next) ? next : currentNodes;
+    const validation = validateManifestNodes(nextNodes);
+    if (!validation.ok) {
+      blockMutationForManifest(validation.errors);
+      return;
+    }
     dispatchGraph({
       type: 'setNodes',
-      payload: Array.isArray(next) ? next : currentNodes
+      payload: nextNodes
+    });
+  }, [blockMutationForManifest]);
+
+  const loadGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
+    dispatchGraph({
+      type: 'setNodes',
+      payload: Array.isArray(nodesToLoad) ? nodesToLoad : []
+    });
+    dispatchGraph({
+      type: 'setEdges',
+      payload: Array.isArray(edgesToLoad) ? edgesToLoad : []
+    });
+    dispatchGraph({
+      type: 'setGroups',
+      payload: Array.isArray(groupsToLoad) ? groupsToLoad : []
     });
   }, []);
 
   const setEdges = useCallback((value) => {
     const currentEdges = getGraphSnapshot().edges;
+    const currentNodes = getGraphSnapshot().nodes;
+    const manifestCheck = validateManifestNodes(currentNodes);
+    if (!manifestCheck.ok) {
+      blockMutationForManifest(manifestCheck.errors);
+      return;
+    }
     const next = typeof value === 'function' ? value(currentEdges) : value;
     dispatchGraph({
       type: 'setEdges',
       payload: Array.isArray(next) ? next : currentEdges
     });
-  }, []);
+  }, [blockMutationForManifest]);
 
   const setGroups = useCallback((value) => {
     const currentGroups = getGraphSnapshot().groups;
+    const currentNodes = getGraphSnapshot().nodes;
+    const manifestCheck = validateManifestNodes(currentNodes);
+    if (!manifestCheck.ok) {
+      blockMutationForManifest(manifestCheck.errors);
+      return;
+    }
     const next = typeof value === 'function' ? value(currentGroups) : value;
     dispatchGraph({
       type: 'setGroups',
       payload: Array.isArray(next) ? next : currentGroups
     });
-  }, []);
+  }, [blockMutationForManifest]);
   
   return {
     // Graph data
     nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
     groups, setGroups, groupsRef,
+    manifestStatus,
+    loadGraph,
     
     // View
     pan, setPan,

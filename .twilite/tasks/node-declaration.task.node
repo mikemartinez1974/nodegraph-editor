@@ -1,0 +1,192 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-22T20:15:51.867Z",
+    "modified": "2026-01-22T20:15:51.867Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f5e9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 415,
+      "y": -566.9
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "graph-node",
+      "type": "markdown",
+      "label": "Graph",
+      "position": {
+        "x": -600,
+        "y": 450
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**A graph is a container of nodes and edges.**\n\nA graph has no obligation to be renderable as a node. It may represent anything: document, workspace, world, scratchpad, or specification."
+      }
+    },
+    {
+      "id": "node-declaration-node",
+      "type": "markdown",
+      "label": "Node Declaration",
+      "position": {
+        "x": 0,
+        "y": 450
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**A Node Declaration is a graph with obligations.**\n\nIt declares a node type and defines one or more Views that describe how it renders when referenced as a node."
+      }
+    },
+    {
+      "id": "view-node",
+      "type": "markdown",
+      "label": "View Node",
+      "position": {
+        "x": 600,
+        "y": 450
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**A View is a rendering contract.**\n\nIt defines how a Node Declaration appears at a given zoom level or context. Views are declarative and validated."
+      }
+    },
+    {
+      "id": "renderer-node",
+      "type": "markdown",
+      "label": "Renderer Rule",
+      "position": {
+        "x": 300,
+        "y": 800
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Rendering Logic**\n\n- Open graph normally → render full graph\n- Reference graph as node → render its View\n- Missing View on Node Declaration → validation error\n\nRenderers never guess. They only read Views."
+      }
+    },
+    {
+      "id": "validator-node",
+      "type": "markdown",
+      "label": "Validator Rule",
+      "position": {
+        "x": -300,
+        "y": 800
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "**Validation Invariant**\n\nIf a graph declares itself a Node Declaration:\n- It must define ≥ 1 View node\n\nIf not a Node Declaration:\n- Views are ignored or forbidden\n\nNo implicit promotion. No guessing."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "type": "concept",
+      "source": "graph-node",
+      "target": "node-declaration-node",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e2",
+      "type": "concept",
+      "source": "node-declaration-node",
+      "target": "view-node",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e3",
+      "type": "governs",
+      "source": "view-node",
+      "target": "renderer-node",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e4",
+      "type": "governs",
+      "source": "node-declaration-node",
+      "target": "validator-node",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "groups": []
+}

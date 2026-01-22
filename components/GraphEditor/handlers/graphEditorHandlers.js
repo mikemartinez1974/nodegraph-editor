@@ -26,6 +26,7 @@ export function createGraphEditorHandlers({
     nodes, setNodes, nodesRef,
     edges, setEdges, edgesRef,
     groups, setGroups,
+    loadGraph,
     pan, zoom,
     selectedNodeIds, setSelectedNodeIds,
     selectedEdgeIds, setSelectedEdgeIds,
@@ -610,15 +611,21 @@ export function createGraphEditorHandlers({
     });
     const normalizedEdges = Array.from(edgeMap.values());
 
-    setNodes(prev => {
+    if (typeof loadGraph === 'function') {
+      loadGraph(loadedNodes, normalizedEdges, loadedGroups);
       nodesRef.current = loadedNodes;
-      return loadedNodes;
-    });
-    setEdges(prev => {
       edgesRef.current = normalizedEdges;
-      return normalizedEdges;
-    });
-    setGroups(loadedGroups);
+    } else {
+      setNodes(prev => {
+        nodesRef.current = loadedNodes;
+        return loadedNodes;
+      });
+      setEdges(prev => {
+        edgesRef.current = normalizedEdges;
+        return normalizedEdges;
+      });
+      setGroups(loadedGroups);
+    }
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);

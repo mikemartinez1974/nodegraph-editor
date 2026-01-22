@@ -19,6 +19,8 @@ import ValueTriggerNode from './Nodes/ValueTriggerNode.js';
 import PluginNodeRenderer from './Nodes/PluginNodeRenderer.js';
 import CanvasNode from './Nodes/CanvasNode.js';
 import ManifestNode from './Nodes/ManifestNode.js';
+import DictionaryNode from './Nodes/DictionaryNode.js';
+import LegendNode from './Nodes/LegendNode.js';
 import { getInstalledPlugins } from './plugins/pluginRegistry.js';
 import { convertHandlesObjectToArray } from './utils/handleUtils.js';
 
@@ -46,15 +48,31 @@ const baseNodeTypeRegistry = {
     category: 'content'
   },
   dictionary: {
-    component: MarkdownNode,
+    component: DictionaryNode,
     label: 'Dictionary',
-    description: 'Glossary of terms and definitions (markdown-based)',
+    description: 'Definitions node with entry + script bindings',
     icon: 'MenuBook',
     category: 'content',
     defaultWidth: 320,
     defaultHeight: 260,
     defaultData: {
-      markdown: '## Dictionary\\n\\n- term: definition\\n'
+      entries: [
+        { key: 'term', value: 'definition' }
+      ]
+    }
+  },
+  legend: {
+    component: LegendNode,
+    label: 'Legend',
+    description: 'Legend entries that map intent to meaning',
+    icon: 'Map',
+    category: 'content',
+    defaultWidth: 340,
+    defaultHeight: 260,
+    defaultData: {
+      entries: [
+        { key: 'concept', intent: 'what it means', implementation: 'how it appears', dictionaryKey: 'concept' }
+      ]
     }
   },
   svg: {
@@ -247,13 +265,29 @@ export const nodeTypeMetadata = [
   {
     type: 'dictionary',
     label: 'Dictionary',
-    description: 'Glossary of terms and definitions (markdown-based)',
+    description: 'Definitions node with entry + script bindings',
     icon: 'MenuBook',
     category: 'content',
     defaultWidth: 320,
     defaultHeight: 260,
     defaultData: {
-      markdown: '## Dictionary\\n\\n- term: definition\\n'
+      entries: [
+        { key: 'term', value: 'definition' }
+      ]
+    }
+  },
+  {
+    type: 'legend',
+    label: 'Legend',
+    description: 'Legend entries that map intent to meaning',
+    icon: 'Map',
+    category: 'content',
+    defaultWidth: 340,
+    defaultHeight: 260,
+    defaultData: {
+      entries: [
+        { key: 'concept', intent: 'what it means', implementation: 'how it appears', dictionaryKey: 'concept' }
+      ]
     }
   },
   {

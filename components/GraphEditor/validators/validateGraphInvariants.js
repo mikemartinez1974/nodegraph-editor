@@ -59,6 +59,60 @@ export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {
   const errors = [];
   const warnings = [];
 
+  const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
+  if (manifestNodes.length !== 1) {
+    errors.push({
+      code: 'MANIFEST_COUNT_INVALID',
+      message: manifestNodes.length === 0
+        ? 'Manifest missing: graph mutations are blocked.'
+        : 'Manifest must be unique: multiple manifest nodes found.'
+    });
+  } else {
+    const manifest = manifestNodes[0];
+    const dependencyTypes = Array.isArray(manifest?.data?.dependencies?.nodeTypes)
+      ? manifest.data.dependencies.nodeTypes.filter((value) => typeof value === 'string' && value.trim())
+      : [];
+
+    if (dependencyTypes.length > 0) {
+      const dictionaryNodes = nodes.filter((node) => node?.type === 'dictionary');
+      if (dictionaryNodes.length === 0) {
+        errors.push({
+          code: 'DICTIONARY_REQUIRED',
+          message: 'Dictionary required: manifest declares node type dependencies.'
+        });
+      } else {
+        const entries = dictionaryNodes.flatMap((node) => (
+          Array.isArray(node?.data?.entries) ? node.data.entries : []
+        ));
+        const entryByKey = new Map();
+        entries.forEach((entry) => {
+          const key = entry?.key || entry?.type || entry?.nodeType;
+          if (typeof key === 'string' && key.trim()) {
+            entryByKey.set(key.trim(), entry);
+          }
+        });
+
+        dependencyTypes.forEach((nodeType) => {
+          const entry = entryByKey.get(nodeType);
+          if (!entry) {
+            errors.push({
+              code: 'DICTIONARY_MISSING_ENTRY',
+              message: `Dictionary missing entry for required node type "${nodeType}".`
+            });
+            return;
+          }
+          const filePath = entry?.file || entry?.path;
+          if (typeof filePath !== 'string' || filePath.trim().length === 0) {
+            errors.push({
+              code: 'DICTIONARY_MISSING_FILE',
+              message: `Dictionary entry "${nodeType}" must reference a .node file.`
+            });
+          }
+        });
+      }
+    }
+  }
+
   const findHandle = (node, handleId) => {
     if (!handleId || !node) return undefined;
     const handles = Array.isArray(node.handles) ? node.handles : [];

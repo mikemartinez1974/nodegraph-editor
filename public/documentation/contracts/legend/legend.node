@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Dictionary Node Contract",
+    "title": "Legend Node Contract",
     "description": "",
-    "created": "2026-01-20T18:52:00.000Z",
-    "modified": "2026-01-20T18:52:00.000Z",
+    "created": "2026-01-21T19:20:00.000Z",
+    "modified": "2026-01-21T19:20:00.000Z",
     "author": "",
     "tags": []
   },
@@ -57,9 +57,9 @@
   "scripts": [],
   "nodes": [
     {
-      "id": "dictionary-contract-root",
+      "id": "legend-contract-root",
       "type": "markdown",
-      "label": "\ud83d\udcd6 Dictionary Node Contract",
+      "label": "Legend Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -69,11 +69,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Dictionary Node Contract\n\nDefines the **Definitions/Dictionary** role.\n\nThis node explains the terms used by the graph and aligns meaning across agents and humans."
+        "markdown": "# Legend Node Contract\n\nDefines the **Legend** role.\n\nThe Legend explains how to read the graph at a glance: colors, symbols, edge meanings, and visual conventions."
       }
     },
     {
-      "id": "dictionary-role",
+      "id": "legend-role",
       "type": "markdown",
       "label": "Role",
       "position": {
@@ -85,11 +85,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Role\n\n- Defines terms, concepts, and mappings\n- Acts as Definitions node\n- Optional but recommended\n\nIf present, tools should prefer it over guessing."
+        "markdown": "## Role\n\n- Defines how to interpret visuals\n- Explains color, icon, and edge semantics\n- Optional but recommended\n\nIf present, tools and humans should prefer it over guessing."
       }
     },
     {
-      "id": "dictionary-required",
+      "id": "legend-required",
       "type": "markdown",
       "label": "Required Fields",
       "position": {
@@ -101,11 +101,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required\n\n```json\n{\n  \"type\": \"dictionary\",\n  \"data\": { \"entries\": [ { \"key\": \"term\", \"value\": \"definition\" } ] }\n}\n```\n\n- `type` must be `dictionary`\n- `data.entries` is required"
+        "markdown": "## Required\n\n```json\n{ \"type\": \"legend\", \"data\": { \"markdown\": \"...\" } }\n```\n\n- `type` must be `legend`\n- `data.markdown` is required"
       }
     },
     {
-      "id": "dictionary-optional",
+      "id": "legend-optional",
       "type": "markdown",
       "label": "Optional Fields",
       "position": {
@@ -117,11 +117,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional\n\n- `label`\n- `position`, `width`, `height`\n- `style`\n- `handles` (rare)\n- `data.markdown` (human-readable)\n- `data.ext.*` namespaces"
+        "markdown": "## Optional\n\n- `label`\n- `position`, `width`, `height`\n- `style`\n- `handles` (rare)\n- `data.ext.*` namespaces"
       }
     },
     {
-      "id": "dictionary-format",
+      "id": "legend-format",
       "type": "markdown",
       "label": "Data Format",
       "position": {
@@ -129,36 +129,52 @@
         "y": 140
       },
       "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Format\n\nFor now: **markdown-first**.\n\nRecommended structure:\n```\n## Legend\n- Colors: meaning\n- Edge types: meaning\n- Icons: meaning\n- Labels: meaning\n```\n\nFuture structured fields may be added under `data.ext.twilite`."
+      }
+    },
+    {
+      "id": "legend-mapping",
+      "type": "markdown",
+      "label": "Mapping Rule",
+      "position": {
+        "x": 560,
+        "y": 480
+      },
+      "width": 520,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data Format\n\nPrimary format: **structured entries**.\n\nRecommended structure:\n```json\n{\n  \"entries\": [\n    { \"key\": \"term\", \"value\": \"definition\", \"kind\": \"value\" },\n    { \"key\": \"action\", \"value\": \"does a thing\", \"kind\": \"function\" }\n  ]\n}\n```\n\nOptional `data.markdown` may mirror the entries for humans.\nFuture structured fields may be added under `data.ext.twilite`."
+        "markdown": "## Mapping Rule\n\n- (primitive + intent) => legend key\n- (intent + implementation) => legend value\n- key + value resolves to a Dictionary entry\n- Dictionary returns value/object or function\n- Execution is gated by declared namespaces/skills"
       }
     },
     {
-      "id": "dictionary-rules",
+      "id": "legend-rules",
       "type": "markdown",
       "label": "Rules",
       "position": {
         "x": -320,
-        "y": 460
+        "y": 480
       },
       "width": 520,
-      "height": 220,
+      "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- Entries may resolve to value/object or function (conceptual)\n- Execution is gated by declared namespaces/skills\n- Script bindings are expressed by edges from Dictionary -> Script nodes"
+        "markdown": "## Rules\n\n- Legend does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- May reference Dictionary for term definitions"
       }
     }
   ],
   "edges": [
     {
-      "id": "edge-dict-role",
+      "id": "edge-legend-role",
       "type": "dataFlow",
-      "source": "dictionary-contract-root",
-      "target": "dictionary-role",
+      "source": "legend-contract-root",
+      "target": "legend-role",
       "label": "defines",
       "style": {
         "width": 2,
@@ -168,10 +184,10 @@
       "data": {}
     },
     {
-      "id": "edge-dict-required",
+      "id": "edge-legend-required",
       "type": "dataFlow",
-      "source": "dictionary-contract-root",
-      "target": "dictionary-required",
+      "source": "legend-contract-root",
+      "target": "legend-required",
       "label": "requires",
       "style": {
         "width": 2,
@@ -181,10 +197,10 @@
       "data": {}
     },
     {
-      "id": "edge-dict-optional",
+      "id": "edge-legend-optional",
       "type": "dataFlow",
-      "source": "dictionary-contract-root",
-      "target": "dictionary-optional",
+      "source": "legend-contract-root",
+      "target": "legend-optional",
       "label": "allows",
       "style": {
         "width": 2,
@@ -194,10 +210,10 @@
       "data": {}
     },
     {
-      "id": "edge-dict-format",
+      "id": "edge-legend-format",
       "type": "dataFlow",
-      "source": "dictionary-contract-root",
-      "target": "dictionary-format",
+      "source": "legend-contract-root",
+      "target": "legend-format",
       "label": "formats",
       "style": {
         "width": 2,
@@ -207,10 +223,23 @@
       "data": {}
     },
     {
-      "id": "edge-dict-rules",
+      "id": "edge-legend-mapping",
       "type": "dataFlow",
-      "source": "dictionary-contract-root",
-      "target": "dictionary-rules",
+      "source": "legend-contract-root",
+      "target": "legend-mapping",
+      "label": "maps",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-legend-rules",
+      "type": "dataFlow",
+      "source": "legend-contract-root",
+      "target": "legend-rules",
       "label": "governs",
       "style": {
         "width": 2,

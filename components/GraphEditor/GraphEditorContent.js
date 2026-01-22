@@ -53,6 +53,7 @@ const GraphEditorContent = () => {
     edgesRef,
     groups,
     setGroups,
+    loadGraph,
     pan,
     setPan,
     zoom,
@@ -68,6 +69,7 @@ const GraphEditorContent = () => {
     hoveredNodeId,
     snackbar,
     setSnackbar,
+    manifestStatus,
     loading,
     nodePanelAnchor,
     defaultNodeColor,
@@ -295,6 +297,7 @@ const GraphEditorContent = () => {
 
   const lastClipboardMessageRef = useRef('');
   const wasSnackbarOpenRef = useRef(false);
+  const lastManifestNoticeRef = useRef('');
 
   useEffect(() => {
     const isOpen = Boolean(snackbar?.open);
@@ -318,6 +321,30 @@ const GraphEditorContent = () => {
   }, [snackbar?.open, snackbar?.message, snackbar?.copyToClipboard]);
 
   useEffect(() => {
+    if (!manifestStatus) return;
+    if (manifestStatus.ok) {
+      lastManifestNoticeRef.current = '';
+      if (snackbar?.manifestNotice) {
+        setSnackbar({ ...snackbar, open: false, manifestNotice: false });
+      }
+      return;
+    }
+    const firstError = Array.isArray(manifestStatus.errors) && manifestStatus.errors.length
+      ? manifestStatus.errors[0]
+      : 'Missing or invalid Manifest';
+    const message = `Read-only: ${firstError}`;
+    if (message === lastManifestNoticeRef.current) return;
+    if (snackbar?.open && !snackbar?.manifestNotice) return;
+    lastManifestNoticeRef.current = message;
+    setSnackbar({
+      open: true,
+      message,
+      severity: 'warning',
+      manifestNotice: true
+    });
+  }, [manifestStatus, snackbar, setSnackbar]);
+
+  useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const applyGraph = (data) => {
@@ -328,6 +355,13 @@ const GraphEditorContent = () => {
 
       if (typeof handleLoadGraph === 'function') {
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+        return;
+      }
+
+      if (typeof loadGraph === 'function') {
+        loadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+        if (nodesRef) nodesRef.current = nodesToLoad;
+        if (edgesRef) edgesRef.current = edgesToLoad;
         return;
       }
 
