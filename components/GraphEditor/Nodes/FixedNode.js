@@ -34,6 +34,7 @@ const FixedNode = ({
   onTouchStart,
   onClick,
   onDoubleClick,
+  onContextMenu,
   children,
   draggingHandle,
   nodeRefs,
@@ -284,6 +285,9 @@ const FixedNode = ({
       onDoubleClick={e => {
         e.stopPropagation();
         if (typeof onDoubleClick === 'function') onDoubleClick(e);
+      }}
+      onContextMenu={e => {
+        if (typeof onContextMenu === 'function') onContextMenu(e);
       }}
       onMouseEnter={e => {
         eventBus.emit('nodeMouseEnter', { id: node.id, event: e });

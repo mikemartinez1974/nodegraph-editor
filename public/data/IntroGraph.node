@@ -1,57 +1,38 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Intro Graph",
-    "description": "Quick start walkthrough for Twilite Node Browser.",
-    "created": "2025-11-10T08:32:27.411Z",
-    "modified": "2025-12-30T21:50:49.318Z",
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-23T22:30:48.467Z",
+    "modified": "2026-01-23T22:30:48.467Z",
     "author": "",
-    "tags": [
-      "intro",
-      "onboarding"
-    ]
+    "tags": []
   },
   "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
+    "theme": null,
     "backgroundImage": null,
-    "defaultNodeColor": "#42a5f5",
-    "defaultEdgeColor": "#546e7a",
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
     "snapToGrid": false,
     "gridSize": 20,
-    "edgeRouting": "curved",
+    "edgeRouting": "auto",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
     "autoSave": false
   },
   "viewport": {
     "pan": {
-      "x": 360,
-      "y": -80
+      "x": 1734.2679158794754,
+      "y": 390.76808912932665
     },
-    "zoom": 0.9
+    "zoom": 1
   },
-  "document": null,
+  "document": {
+    "url": "/tlz/background.html"
+  },
   "scripts": [],
   "nodes": [
     {
@@ -158,19 +139,81 @@
     },
     {
       "id": "intro_manual_link",
-      "type": "default",
+      "type": "markdown",
       "label": "📖 Full Manual",
       "position": {
         "x": 640,
         "y": 40
       },
-      "width": 200,
-      "height": 80,
+      "width": 315,
+      "height": 144,
       "color": "#26A69A",
       "visible": true,
       "showLabel": true,
       "data": {
         "link": "tlz:///data/IntroManual.node"
+      }
+    },
+    {
+      "id": "af14f25f-4bee-43e8-a9ea-afefc3ddf68b",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -645.8521012931035,
+        "y": -84.89951508620697
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": ""
       }
     }
   ],

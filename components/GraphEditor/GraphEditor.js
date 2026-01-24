@@ -28,6 +28,12 @@ import useProjectMetadata from './hooks/useProjectMetadata';
 import useGraphInteractions from './hooks/useGraphInteractions';
 import usePluginRuntime from './hooks/usePluginRuntime';
 import useIntentEmitter from './hooks/useIntentEmitter';
+import {
+  getManifestSettings,
+  getManifestDocumentUrl,
+  setManifestDocumentUrl,
+  setManifestSettings
+} from './utils/manifestUtils';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -340,21 +346,22 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       if (!payload || typeof payload !== 'object') return;
       const nextNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
       const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
-      const nextGroups = Array.isArray(payload.groups) ? payload.groups : [];
+      const nextGroups = Array.isArray(payload.clusters)
+        ? payload.clusters
+        : Array.isArray(payload.groups)
+        ? payload.groups
+        : [];
       setNodes(nextNodes);
       setEdges(nextEdges);
       setGroups(nextGroups);
       setSelectedNodeIds([]);
       setSelectedEdgeIds([]);
       setSelectedGroupIds([]);
-      if (payload.viewport?.pan) {
-        setPan(payload.viewport.pan);
-      }
-      if (typeof payload.viewport?.zoom === 'number') {
-        setZoom(payload.viewport.zoom);
-      }
       try {
-        eventBus.emit('loadSaveFile', payload);
+        const manifestSettings = getManifestSettings(nextNodes);
+        const settings = manifestSettings || payload.settings || {};
+        const documentUrl = getManifestDocumentUrl(nextNodes) || payload.document?.url || null;
+        eventBus.emit('loadSaveFile', { ...payload, settings, documentUrl });
       } catch (err) {
         console.warn('Failed to emit loadSaveFile from loadGraph message:', err);
       }
@@ -571,21 +578,28 @@ useEffect(() => {
     return () => window.clearInterval(interval);
   }, [captureStorySnapshot]);
 
-  const readLocalScripts = useCallback(() => {
-    try {
-      if (typeof window === 'undefined') return [];
-      const raw = localStorage.getItem('scripts');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  }, []);
-
   const buildGraphSaveData = useCallback(() => {
     const now = new Date().toISOString();
     const nodeList = nodesRef.current || nodes;
     const edgeList = edgesRef.current || edges;
     const groupsList = groups || [];
+    const manifestSettings = {
+      theme: documentTheme || documentSettings?.theme || null,
+      backgroundImage: documentBackgroundImage || null,
+      defaultNodeColor: defaultNodeColor,
+      defaultEdgeColor: defaultEdgeColor,
+      snapToGrid: snapToGrid,
+      gridSize: documentSettings?.gridSize || 20,
+      edgeRouting: documentSettings?.edgeRouting || 'auto',
+      layout: documentSettings?.layout || null,
+      github: documentSettings?.github || null,
+      autoSave: false
+    };
+    const nodesWithManifestSettings = setManifestSettings(nodeList, manifestSettings);
+    const nodesWithManifestData = setManifestDocumentUrl(
+      nodesWithManifestSettings,
+      backgroundUrl || ''
+    );
     return {
       fileVersion: '1.0',
       metadata: {
@@ -596,25 +610,7 @@ useEffect(() => {
         author: '',
         tags: Array.isArray(projectMeta?.tags) ? projectMeta.tags : []
       },
-      settings: {
-        theme: documentTheme || documentSettings?.theme || null,
-        backgroundImage: documentBackgroundImage || null,
-        defaultNodeColor: defaultNodeColor,
-        defaultEdgeColor: defaultEdgeColor,
-        snapToGrid: snapToGrid,
-        gridSize: documentSettings?.gridSize || 20,
-        edgeRouting: documentSettings?.edgeRouting || 'auto',
-        layout: documentSettings?.layout || null,
-        github: documentSettings?.github || null,
-        autoSave: false
-      },
-      viewport: {
-        pan: pan || { x: 0, y: 0 },
-        zoom: zoom || 1
-      },
-      document: backgroundUrl ? { url: backgroundUrl } : null,
-      scripts: readLocalScripts(),
-      nodes: nodeList.map((node) => ({
+      nodes: nodesWithManifestData.map((node) => ({
         id: node.id,
         type: node.type,
         label: node.label,
@@ -648,7 +644,7 @@ useEffect(() => {
           data: edge.data || {}
         };
       }),
-      groups: groupsList.map((group) => ({
+      clusters: groupsList.map((group) => ({
         id: group.id,
         label: group.label || '',
         nodeIds: group.nodeIds || [],
@@ -673,7 +669,6 @@ useEffect(() => {
     pan,
     zoom,
     backgroundUrl,
-    readLocalScripts
   ]);
 
   useEffect(() => {
@@ -1264,15 +1259,22 @@ useEffect(() => {
         const data = JSON.parse(decoded);
         const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
         const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
-        const groupsToLoad = Array.isArray(data.groups) ? data.groups : [];
+        const groupsToLoad = Array.isArray(data.clusters)
+          ? data.clusters
+          : Array.isArray(data.groups)
+          ? data.groups
+          : [];
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
 
         try {
+          const manifestSettings = getManifestSettings(nodesToLoad);
+          const documentUrl = getManifestDocumentUrl(nodesToLoad) || data.document?.url || null;
           eventBus.emit('loadSaveFile', {
-            settings: data.settings || {},
+            settings: manifestSettings || data.settings || {},
             viewport: data.viewport || {},
             scripts: data.scripts || null,
-            filename: path.split('/').pop() || path
+            filename: path.split('/').pop() || path,
+            documentUrl
           });
         } catch (err) {
           console.warn('Failed to emit loadSaveFile after GitHub load:', err);
@@ -1891,7 +1893,7 @@ useEffect(() => {
           if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
-            const groupsToLoadFromJson = jsonData.groups || [];
+            const groupsToLoadFromJson = jsonData.clusters || jsonData.groups || [];
             handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             try { eventBus.emit('forceRedraw'); } catch (e) { /* ignore */ }
             setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
@@ -1997,7 +1999,7 @@ useEffect(() => {
         if (data.nodes && Array.isArray(data.nodes)) {
           const nodesToLoad = data.nodes;
           const edgesToLoad = data.edges || [];
-          const groupsToLoad = data.groups || [];
+          const groupsToLoad = data.clusters || data.groups || [];
           if (handlers && typeof handlers.handleLoadGraph === 'function') {
             handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
             try { eventBus.emit('forceRedraw'); } catch (e) { }
@@ -2025,12 +2027,12 @@ useEffect(() => {
         }
 
         // If only groups present
-        if (data.groups && Array.isArray(data.groups) && setGroups) {
+        if ((data.clusters || data.groups) && Array.isArray(data.clusters || data.groups) && setGroups) {
           setGroups(prev => {
-            const next = [...prev, ...data.groups];
+            const next = [...prev, ...(data.clusters || data.groups)];
             return next;
           });
-          setSnackbar({ open: true, message: 'Pasted groups', severity: 'success', copyToClipboard: true });
+          setSnackbar({ open: true, message: 'Pasted clusters', severity: 'success', copyToClipboard: true });
         }
       } catch (err) {
         console.warn('Failed to apply pasted data:', err);

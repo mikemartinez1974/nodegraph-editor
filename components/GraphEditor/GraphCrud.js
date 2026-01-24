@@ -1133,19 +1133,19 @@ export default class GraphCRUD {
       for (let i = 0; i < groupsArray.length; i++) {
         const opts = groupsArray[i];
         if (!opts || typeof opts !== 'object') {
-          failed.push(`Group ${i}: must be an object`);
+          failed.push(`Cluster ${i}: must be an object`);
           continue;
         }
 
         const gid = opts.id || this._generateId();
         if (existingGroupIds.has(gid)) {
-          failed.push(`Group ${gid}: already exists`);
+          failed.push(`Cluster ${gid}: already exists`);
           continue;
         }
 
         const nodeIds = Array.isArray(opts.nodeIds) ? opts.nodeIds.filter(id => nodeIdSet.has(id)) : [];
         if (nodeIds.length < 2) {
-          failed.push(`Group ${gid}: must reference at least two existing nodes`);
+          failed.push(`Cluster ${gid}: must reference at least two existing nodes`);
           continue;
         }
 
@@ -1165,7 +1165,7 @@ export default class GraphCRUD {
       }
 
       if (createdGroups.length === 0) {
-        return { success: false, error: failed.join('; ') || 'No valid groups to create' };
+        return { success: false, error: failed.join('; ') || 'No valid clusters to create' };
       }
 
       const updatedGroups = [...(currentGroups || []), ...createdGroups];
@@ -1196,7 +1196,7 @@ export default class GraphCRUD {
       const groups = this.getGroups();
       if (id) {
         const group = groups.find(g => g.id === id);
-        if (!group) return { success: false, error: `Group ${id} not found` };
+        if (!group) return { success: false, error: `Cluster ${id} not found` };
         return { success: true, data: group };
       }
       return { success: true, data: groups };
@@ -1207,7 +1207,7 @@ export default class GraphCRUD {
 
   /**
    * Update a group
-   * @param {string} id - Group ID
+   * @param {string} id - Cluster ID
    * @param {Object} updates - Properties to update
    * @returns {Object} Result with updated group
    */
@@ -1216,7 +1216,7 @@ export default class GraphCRUD {
       const currentGroups = this.getGroups();
       const groupIndex = currentGroups.findIndex(g => g.id === id);
       if (groupIndex === -1) {
-        return { success: false, error: `Group ${id} not found` };
+        return { success: false, error: `Cluster ${id} not found` };
       }
       const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
       const updatedGroups = currentGroups.map(group => {
@@ -1237,7 +1237,7 @@ export default class GraphCRUD {
           }
           const filtered = updates.nodeIds.filter(nodeId => nodeIdSet.has(nodeId));
           if (filtered.length < 2) {
-            throw new Error(`Group ${id}: must reference at least two existing nodes`);
+            throw new Error(`Cluster ${id}: must reference at least two existing nodes`);
           }
           nextGroup.nodeIds = filtered;
         }
@@ -1296,7 +1296,7 @@ export default class GraphCRUD {
           }
           const filtered = updates.nodeIds.filter(nodeId => nodeIdSet.has(nodeId));
           if (filtered.length < 2) {
-            throw new Error(`Group ${group.id}: must reference at least two existing nodes`);
+            throw new Error(`Cluster ${group.id}: must reference at least two existing nodes`);
           }
           nextGroup.nodeIds = filtered;
         }
@@ -1321,7 +1321,7 @@ export default class GraphCRUD {
 
   /**
    * Delete a group
-   * @param {string} id - Group ID
+   * @param {string} id - Cluster ID
    * @returns {Object} Result
    */
   deleteGroup(id) {
@@ -1329,7 +1329,7 @@ export default class GraphCRUD {
       const currentGroups = this.getGroups();
       const groupExists = currentGroups.some(g => g.id === id);
       if (!groupExists) {
-        return { success: false, error: `Group ${id} not found` };
+        return { success: false, error: `Cluster ${id} not found` };
       }
 
       const updatedGroups = currentGroups.filter(g => g.id !== id);
@@ -1344,7 +1344,7 @@ export default class GraphCRUD {
 
   /**
    * Add nodes to an existing group
-   * @param {string} groupId - Group ID
+   * @param {string} groupId - Cluster ID
    * @param {string[]} nodeIds - Node IDs to add
    */
   addNodesToGroup(groupId, nodeIds) {
@@ -1355,7 +1355,7 @@ export default class GraphCRUD {
       const currentGroups = this.getGroups();
       const groupIndex = currentGroups.findIndex(g => g.id === groupId);
       if (groupIndex === -1) {
-        return { success: false, error: `Group ${groupId} not found` };
+        return { success: false, error: `Cluster ${groupId} not found` };
       }
 
       const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
@@ -1368,7 +1368,7 @@ export default class GraphCRUD {
         if (group.id !== groupId) return group;
         const nextNodeIds = Array.from(new Set([...(group.nodeIds || []), ...additions]));
         if (nextNodeIds.length < 2) {
-          throw new Error(`Group ${groupId}: must reference at least two existing nodes`);
+          throw new Error(`Cluster ${groupId}: must reference at least two existing nodes`);
         }
         return { ...group, nodeIds: nextNodeIds };
       });
@@ -1384,7 +1384,7 @@ export default class GraphCRUD {
 
   /**
    * Remove nodes from an existing group
-   * @param {string} groupId - Group ID
+   * @param {string} groupId - Cluster ID
    * @param {string[]} nodeIds - Node IDs to remove
    */
   removeNodesFromGroup(groupId, nodeIds) {
@@ -1395,7 +1395,7 @@ export default class GraphCRUD {
       const currentGroups = this.getGroups();
       const groupIndex = currentGroups.findIndex(g => g.id === groupId);
       if (groupIndex === -1) {
-        return { success: false, error: `Group ${groupId} not found` };
+        return { success: false, error: `Cluster ${groupId} not found` };
       }
 
       let removedGroup = false;
@@ -1425,7 +1425,7 @@ export default class GraphCRUD {
 
   /**
    * Replace a group's nodeIds
-   * @param {string} groupId - Group ID
+   * @param {string} groupId - Cluster ID
    * @param {string[]} nodeIds - New node IDs
    */
   setGroupNodes(groupId, nodeIds) {
@@ -1436,13 +1436,13 @@ export default class GraphCRUD {
       const currentGroups = this.getGroups();
       const groupIndex = currentGroups.findIndex(g => g.id === groupId);
       if (groupIndex === -1) {
-        return { success: false, error: `Group ${groupId} not found` };
+        return { success: false, error: `Cluster ${groupId} not found` };
       }
 
       const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
       const filtered = nodeIds.filter(id => nodeIdSet.has(id));
       if (filtered.length < 2) {
-        return { success: false, error: `Group ${groupId}: must reference at least two existing nodes` };
+        return { success: false, error: `Cluster ${groupId}: must reference at least two existing nodes` };
       }
 
       const updatedGroups = currentGroups.map(group =>

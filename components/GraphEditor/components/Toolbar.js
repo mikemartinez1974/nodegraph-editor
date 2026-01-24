@@ -66,6 +66,7 @@ import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import PluginManagerPanel from './PluginManagerPanel';
+import { getManifestSettings, getManifestDocumentUrl, setManifestDocumentUrl, setManifestSettings } from '../utils/manifestUtils';
 
 // Import toolbar section components
 import FileActions from './Toolbar/FileActions';
@@ -81,6 +82,7 @@ const Toolbar = ({
   onLoadGraph, 
   onDeleteSelected, 
   onClearGraph,
+  onCreateBlankGraph = null,
   onUndo,
   onRedo,
   selectedNodeId,
@@ -316,6 +318,13 @@ const Toolbar = ({
   const handleNewFile = () => {
     const confirmed = window.confirm('Create a new file? Any unsaved changes will be lost.');
     if (confirmed) {
+      if (typeof onCreateBlankGraph === 'function') {
+        try {
+          onCreateBlankGraph();
+        } catch (err) {
+          console.warn('onCreateBlankGraph failed:', err);
+        }
+      } else {
       // Clear via CRUD API if available for immediate ref sync
       let cleared = false;
       if (graphCRUDRef?.current && typeof graphCRUDRef.current.clearGraph === 'function') {
@@ -337,6 +346,7 @@ const Toolbar = ({
       if (!cleared) {
         // Fallback: broadcast an event for any listeners to handle clearing
         try { eventBus.emit('clearGraph'); } catch {}
+      }
       }
 
       // Update address bar to show local file
@@ -365,11 +375,11 @@ const Toolbar = ({
         if (jsonData.fileVersion && jsonData.nodes) {
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
-          groupsToLoad = jsonData.groups || [];
+          groupsToLoad = jsonData.clusters || jsonData.groups || [];
         } else if (jsonData.nodes && jsonData.edges) {
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
-          groupsToLoad = jsonData.groups || [];
+          groupsToLoad = jsonData.clusters || jsonData.groups || [];
         } else {
           if (onShowMessage) onShowMessage('Invalid graph file format. Missing nodes or edges.', 'error');
           return;
@@ -383,11 +393,12 @@ const Toolbar = ({
           eventBus.emit('setAddress', `local://${file.name}`);
 
           try {
+            const manifestSettings = getManifestSettings(nodesToLoad);
+            const documentUrl = getManifestDocumentUrl(nodesToLoad) || jsonData.document?.url || null;
             eventBus.emit('loadSaveFile', { 
-              settings: jsonData.settings || {}, 
-              viewport: jsonData.viewport || {}, 
-              scripts: jsonData.scripts || null,
-              filename: file.name
+              settings: manifestSettings || jsonData.settings || {}, 
+              filename: file.name,
+              documentUrl
             });
           } catch (err) {
             console.warn('Failed to emit loadSaveFile event:', err);
@@ -437,6 +448,22 @@ const Toolbar = ({
     // Save document theme (not browser theme)
     const themeToSave = documentTheme || null;
     console.log('[Toolbar] Saving document theme:', themeToSave);
+    const manifestSettings = {
+      theme: themeToSave,
+      backgroundImage: backgroundImage || null,
+      defaultNodeColor: defaultNodeColor,
+      defaultEdgeColor: defaultEdgeColor,
+      snapToGrid: snapToGrid,
+      gridSize: gridSize,
+      edgeRouting: edgeRouting,
+      github: githubSettings || null,
+      autoSave: false
+    };
+    const nodesWithManifestSettings = setManifestSettings(nodes, manifestSettings);
+    const nodesWithManifestData = setManifestDocumentUrl(
+      nodesWithManifestSettings,
+      backgroundUrl || (typeof window !== 'undefined' ? localStorage.getItem('document') || '' : '')
+    );
 
     const saveData = {
       fileVersion: "1.0",
@@ -448,26 +475,7 @@ const Toolbar = ({
         author: "",
         tags: []
       },
-      settings: {
-        theme: themeToSave,
-        backgroundImage: backgroundImage || null,
-        defaultNodeColor: defaultNodeColor,
-        defaultEdgeColor: defaultEdgeColor,
-        snapToGrid: snapToGrid,
-        gridSize: gridSize,
-        edgeRouting: edgeRouting,
-        github: githubSettings || null,
-        autoSave: false
-      },
-      viewport: {
-        pan: pan || { x: 0, y: 0 },
-        zoom: zoom || 1
-      },
-      // NEW: include document/top-level document URL from localStorage if present
-      document: (typeof window !== 'undefined') ? (localStorage.getItem('document') ? { url: localStorage.getItem('document') } : null) : null,
-      // NEW: include user scripts stored in localStorage
-      scripts: (function(){ try { if (typeof window === 'undefined') return []; const raw = localStorage.getItem('scripts'); return raw ? JSON.parse(raw) : []; } catch { return []; } })(),
-      nodes: nodes.map(node => ({
+      nodes: nodesWithManifestData.map(node => ({
         id: node.id,
         type: node.type,
         label: node.label,
@@ -501,7 +509,7 @@ const Toolbar = ({
           data: edge.data || {}
         };
       }),
-      groups: groups.map(group => ({
+      clusters: groups.map(group => ({
         id: group.id,
         label: group.label || "",
         nodeIds: group.nodeIds || [],

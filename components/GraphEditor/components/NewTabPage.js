@@ -16,11 +16,12 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import HistoryIcon from '@mui/icons-material/History';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import eventBus from '../../NodeGraph/eventBus';
+import { getManifestSettings, getManifestDocumentUrl } from '../utils/manifestUtils';
 
 const formatSnapshotLabel = (snapshot) => {
   if (!snapshot) return 'Snapshot';
   const { nodeCount = 0, edgeCount = 0, groupCount = 0 } = snapshot;
-  return `${nodeCount} nodes • ${edgeCount} edges${groupCount ? ` • ${groupCount} groups` : ''}`;
+  return `${nodeCount} nodes • ${edgeCount} edges${groupCount ? ` • ${groupCount} clusters` : ''}`;
 };
 
 export default function NewTabPage({
@@ -63,7 +64,7 @@ export default function NewTabPage({
         const jsonData = JSON.parse(e.target.result);
         const nodesToLoad = jsonData.nodes || [];
         const edgesToLoad = jsonData.edges || [];
-        const groupsToLoad = jsonData.groups || [];
+        const groupsToLoad = jsonData.clusters || jsonData.groups || [];
 
         if (nodesToLoad.length === 0 && edgesToLoad.length === 0) {
           throw new Error('File does not contain any nodes or edges.');
@@ -73,11 +74,12 @@ export default function NewTabPage({
         onShowMessage?.(`Loaded ${file.name}`, 'success');
 
         eventBus.emit('setAddress', `local://${file.name}`);
+        const manifestSettings = getManifestSettings(nodesToLoad);
+        const documentUrl = getManifestDocumentUrl(nodesToLoad) || jsonData.document?.url || null;
         eventBus.emit('loadSaveFile', {
-          settings: jsonData.settings || {},
-          viewport: jsonData.viewport || {},
-          scripts: jsonData.scripts || null,
-          filename: file.name
+          settings: manifestSettings || jsonData.settings || {},
+          filename: file.name,
+          documentUrl
         });
       } catch (err) {
         console.error('Failed to import graph', err);

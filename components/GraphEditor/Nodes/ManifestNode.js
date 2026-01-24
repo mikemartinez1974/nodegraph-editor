@@ -29,6 +29,8 @@ const ManifestNode = (props) => {
   const intent = manifest.intent || {};
   const dependencies = manifest.dependencies || {};
   const authority = manifest.authority || {};
+  const settings = manifest.settings || {};
+  const documentInfo = manifest.document || {};
 
   const sections = useMemo(
     () => [
@@ -74,9 +76,30 @@ const ManifestNode = (props) => {
           ['Style Authority', authority.styleAuthority],
           ['History', authority.history ? JSON.stringify(authority.history) : '—']
         ]
+      },
+      {
+        title: 'Document',
+        rows: [
+          ['URL', documentInfo.url]
+        ]
+      },
+      {
+        title: 'Settings',
+        rows: [
+          ['Theme', settings.theme ? JSON.stringify(settings.theme) : '—'],
+          ['Background Image', settings.backgroundImage],
+          ['Default Node Color', settings.defaultNodeColor],
+          ['Default Edge Color', settings.defaultEdgeColor],
+          ['Snap To Grid', typeof settings.snapToGrid === 'boolean' ? String(settings.snapToGrid) : '—'],
+          ['Grid Size', settings.gridSize],
+          ['Edge Routing', settings.edgeRouting],
+          ['Layout', settings.layout ? JSON.stringify(settings.layout) : '—'],
+          ['GitHub', settings.github ? JSON.stringify(settings.github) : '—'],
+          ['Auto Save', typeof settings.autoSave === 'boolean' ? String(settings.autoSave) : '—']
+        ]
       }
     ],
-    [identity, intent, dependencies, authority]
+    [identity, intent, dependencies, authority, settings, documentInfo]
   );
 
   const getPointerPosition = (event) => {

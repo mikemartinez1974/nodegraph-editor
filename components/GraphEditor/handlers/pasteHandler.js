@@ -151,7 +151,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     if (command.dryRun === true) {
       const estimate = estimateCrudImpact(command);
       if (onShowMessage) {
-        onShowMessage(`Dry run: ${action} would affect ${estimate.nodes} nodes, ${estimate.edges} edges, ${estimate.groups} groups`, 'info');
+        onShowMessage(`Dry run: ${action} would affect ${estimate.nodes} nodes, ${estimate.edges} edges, ${estimate.groups} clusters`, 'info');
       }
       return { ...estimate, dryRun: true };
     }
@@ -198,7 +198,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       if (groups.length > 0 && typeof graphCRUD.createGroups === 'function') {
         const groupResult = await graphCRUD.createGroups(groups);
         if (!groupResult || !groupResult.success) {
-          const err = groupResult?.error || 'Failed to create groups';
+          const err = groupResult?.error || 'Failed to create clusters';
           if (onShowMessage) onShowMessage(err, 'error');
           // Return counts so far
           return { nodes: createdNodes, edges: createdEdges, groups: 0 };
@@ -206,7 +206,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         createdGroups = Array.isArray(groupResult.data?.created) ? groupResult.data.created.length : groups.length;
       }
 
-      if (onShowMessage) onShowMessage(`Created ${createdNodes} nodes, ${createdEdges} edges, ${createdGroups} groups`, 'success');
+      if (onShowMessage) onShowMessage(`Created ${createdNodes} nodes, ${createdEdges} edges, ${createdGroups} clusters`, 'success');
       if (shouldAutoLayout && createdNodes > 0) {
         try {
           eventBus.emit('layout:autoOnMissingPositions', {
@@ -656,7 +656,7 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         const nodeCount = pastedNodes.length;
         const edgeCount = pastedEdges.length;
         const groupCount = pastedGroups.length;
-        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes, ${edgeCount} edges, ${groupCount} groups`, 'success');
+        if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes, ${edgeCount} edges, ${groupCount} clusters`, 'success');
         return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
       }
 
@@ -672,7 +672,7 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
 
         if (validGroups.length > 0) {
           setGroups(prev => [...prev, ...validGroups]);
-          if (onShowMessage) onShowMessage(`Pasted ${validGroups.length} groups`, 'success');
+          if (onShowMessage) onShowMessage(`Pasted ${validGroups.length} clusters`, 'success');
           return { nodes: 0, edges: 0, groups: validGroups.length };
         }
 

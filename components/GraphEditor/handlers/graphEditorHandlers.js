@@ -763,7 +763,7 @@ export function createGraphEditorHandlers({
     if (selectedNodeIds.length < 2) return;
     const result = groupManager.current.createGroup(selectedNodeIds, {
       nodes: nodes,
-      label: `Group ${groups.length + 1}`
+      label: `Cluster ${groups.length + 1}`
     });
     if (result.success) {
       setGroups([...groups, result.data]);

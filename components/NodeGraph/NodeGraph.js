@@ -48,6 +48,7 @@ export default function NodeGraph({
   setSelectedEdgeIds, 
   onNodeClick, 
   onNodeDoubleClick,
+  onNodeContextMenu,
   onEdgeDoubleClick,
   onGroupClick, 
   onBackgroundClick, 
@@ -1262,6 +1263,7 @@ export default function NodeGraph({
             onNodeDoubleClick(id);
           }
         }}
+        onNodeContextMenu={onNodeContextMenu}
         onNodeMouseEnter={(id) => {
           eventBus.emit('nodeHover', { id });
         }}

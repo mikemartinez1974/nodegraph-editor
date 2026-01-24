@@ -1,0 +1,201 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-23T01:39:12.996Z",
+    "modified": "2026-01-23T01:39:12.996Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#6d4c41",
+        "light": "#9c786c",
+        "dark": "#40241a",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#efebe9",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "github": {
+      "repo": "",
+      "path": "",
+      "branch": "main"
+    },
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 1615.578351255273,
+      "y": 473.64808761835366
+    },
+    "zoom": 0.9931759298278694
+  },
+  "document": {
+    "url": "/tlz/background.html"
+  },
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "min-def-root",
+      "type": "markdown",
+      "label": "✅ Minimum Node Definition",
+      "position": {
+        "x": -322.01374191614434,
+        "y": -221.00687095807217
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Minimum Node Definition Contract\n\nA node definition is the **smallest graph** that can render a node instance.\n\n**Definition status is declared by the dictionary.**\n\nThe definition graph must include a View node."
+      }
+    },
+    {
+      "id": "min-def-required",
+      "type": "markdown",
+      "label": "Required",
+      "position": {
+        "x": -320,
+        "y": 80
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required\n\n- **At least one View node**\n\nIf a graph contains only a View node, it is still a valid node definition."
+      }
+    },
+    {
+      "id": "min-def-declared",
+      "type": "markdown",
+      "label": "Declared By Dictionary",
+      "position": {
+        "x": -320,
+        "y": 330
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Declared By Dictionary\n\nA graph becomes a **node definition** only when a dictionary entry points to it.\n\nThe dictionary declares the **node type name**."
+      }
+    },
+    {
+      "id": "f4a8e023-d0bc-4690-896b-4386e55fdefb",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -1248.095442133911,
+        "y": -275.52831215490744
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-min-def-required",
+      "type": "dataFlow",
+      "source": "min-def-root",
+      "target": "min-def-required",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-min-def-declared",
+      "type": "dataFlow",
+      "source": "min-def-root",
+      "target": "min-def-declared",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "groups": []
+}

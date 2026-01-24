@@ -1,0 +1,154 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-24T05:11:46.867Z",
+    "modified": "2026-01-24T05:11:46.867Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "fa1a2ef7-3ce5-4cd6-8fff-7505bcc17e2f",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "2316568b-0da4-414e-89f2-0680e3b47ffd",
+          "name": "Untitled Graph",
+          "version": "0.1.0",
+          "description": "New graph",
+          "createdAt": "2026-01-24T05:11:34.646Z",
+          "updatedAt": "2026-01-24T05:11:34.646Z"
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "default",
+            "markdown",
+            "manifest"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": "/tlz/background.html"
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "8f31a183-658d-44ca-88da-0e17f7f494b0",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -260,
+        "y": 100
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "default",
+            "value": "Default Node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4dc9c277-3dbc-4fde-ba76-e0b68af8d77c",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": 140,
+        "y": 100
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "default",
+            "intent": "placeholder",
+            "implementation": "default renderer",
+            "dictionaryKey": "default"
+          }
+        ]
+      }
+    },
+    {
+      "id": "2bcfcb97-8c3e-4e31-b55d-d536c0cc81e9",
+      "type": "default",
+      "label": "New Node",
+      "position": {
+        "x": 0,
+        "y": 360
+      },
+      "width": 200,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": ""
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-23T05:26:14.145Z",
-    "modified": "2026-01-23T05:26:14.145Z",
+    "created": "2026-01-23T00:41:59.435Z",
+    "modified": "2026-01-23T00:41:59.435Z",
     "author": "",
     "tags": []
   },
@@ -12,19 +12,19 @@
     "theme": {
       "mode": "light",
       "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
+        "main": "#1565c0",
+        "light": "#5e92f3",
+        "dark": "#003c8f",
         "contrastText": "#fff"
       },
       "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
+        "main": "#00838f",
+        "light": "#4fb3bf",
+        "dark": "#005662",
         "contrastText": "#fff"
       },
       "background": {
-        "default": "#e8f5e9",
+        "default": "#e3f2fd",
         "paper": "#ffffff"
       },
       "text": {
@@ -48,10 +48,10 @@
   },
   "viewport": {
     "pan": {
-      "x": 1618,
-      "y": 409
+      "x": 1490.8585297296001,
+      "y": 356.33612257519485
     },
-    "zoom": 1
+    "zoom": 1.1741789708254555
   },
   "document": {
     "url": "/tlz/background.html"
@@ -59,9 +59,9 @@
   "scripts": [],
   "nodes": [
     {
-      "id": "required-node-roles-root",
+      "id": "view-contract-root",
       "type": "markdown",
-      "label": "📌 Required Node Roles",
+      "label": "👁️ View Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -71,112 +71,96 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Required Node Roles\n\nThis contract tells agents what node **roles** must exist in a complete graph.\n\nThese are not UI panels. They are semantic anchors."
+        "markdown": "# View Node Contract\n\nDefines how a **node definition** exposes renderable output.\n\nA View node declares **what to render** for a given host + datatype."
       }
     },
     {
-      "id": "role-manifest-node",
+      "id": "view-role",
       "type": "markdown",
-      "label": "Manifest Node",
+      "label": "Role",
       "position": {
-        "x": -820,
-        "y": 140
-      },
-      "width": 360,
-      "height": 240,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Manifest\n\n**Type:** `manifest`\n\nDeclares identity, intent, dependencies, authority.\n\nExactly one per graph."
-      }
-    },
-    {
-      "id": "role-definitions-node",
-      "type": "markdown",
-      "label": "Definitions Node",
-      "position": {
-        "x": -360,
-        "y": 140
-      },
-      "width": 360,
-      "height": 240,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Definitions\n\n**Type:** `definitions`\n\nLists node schemas, edge schemas, handle contracts, validation rules."
-      }
-    },
-    {
-      "id": "role-legend-node",
-      "type": "markdown",
-      "label": "Legend Node",
-      "position": {
-        "x": 100,
-        "y": 140
+        "x": -746.4014266736584,
+        "y": 57.00520902616846
       },
       "width": 320,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Legend\n\n**Type:** `legend`\n\nDefines symbols, visual conventions, and mapping to meaning."
+        "markdown": "## Role\n\n- Provides the **render target** for a node definition.\n- Describes representation, not meaning.\n- Is referenced by dictionary entries that resolve node types."
       }
     },
     {
-      "id": "role-style-node",
+      "id": "view-required",
       "type": "markdown",
-      "label": "Style Node",
+      "label": "Required Fields",
       "position": {
-        "x": 460,
-        "y": 140
+        "x": -320,
+        "y": 80
       },
-      "width": 320,
+      "width": 360,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Style\n\n**Type:** `style`\n\nDeclares portable visual intent (colors, emphasis, hints)."
+        "markdown": "## Required\n\n- `type: \"view\"`\n- `data.host.datatype` (string)\n\n`data.host.datatype` declares the primary render target."
       }
     },
     {
-      "id": "role-content-node",
+      "id": "view-hosts",
       "type": "markdown",
-      "label": "Content Nodes",
+      "label": "Host + Datatype",
       "position": {
-        "x": 820,
-        "y": 140
+        "x": 80,
+        "y": 80
       },
-      "width": 360,
+      "width": 380,
       "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Content\n\n**Types:** initial content nodes\n\n- `markdown`\n- `default`\n\nThese carry the subject matter of the graph."
+        "markdown": "## Host + Datatype\n\n`data.host.datatype` uses namespaced identifiers.\n\nExamples:\n- `data.twilite.web`\n- `data.twilite.object`\n- `data.twilite.canvas`\n\nThe host namespace declares the runtime that can render it."
       }
     },
     {
-      "id": "role-initial-types",
+      "id": "view-format",
       "type": "markdown",
-      "label": "Initial Supported Types",
+      "label": "Data Payload",
       "position": {
-        "x": 466,
-        "y": 475
+        "x": 520,
+        "y": 80
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Payload\n\n- View payload lives under the host namespace.\n- Example: `data.twilite.web` contains the HTML/CSS/props for the web renderer.\n\nThe payload is **portable**, not UI state."
+      }
+    },
+    {
+      "id": "view-rules",
+      "type": "markdown",
+      "label": "Rules",
+      "position": {
+        "x": 17.80092900519317,
+        "y": 392.77488387435085
       },
       "width": 520,
-      "height": 260,
+      "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Initial Node Types (Core)\n\n- `manifest`\n- `definitions`\n- `legend`\n- `style`\n- `markdown`\n- `default`\n\nAnything else is optional or plugin-defined."
+        "markdown": "## Rules\n\n- A node definition must include **at least one** View node.\n- View nodes are descriptive, not executable.\n- Multiple View nodes can exist for multiple hosts.\n- Renderers choose the best compatible host/datatype."
       }
     },
     {
-      "id": "6ae0e877-cdfc-4a63-b2d0-38d03fb7c9cd",
+      "id": "f28bc64f-347a-4a94-81cf-9401f58390c6",
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -1457,
-        "y": -290
+        "x": -1394.8968346607119,
+        "y": -173.17302355725906
       },
       "width": 420,
       "height": 320,
@@ -235,10 +219,23 @@
   ],
   "edges": [
     {
-      "id": "edge-roles-manifest",
+      "id": "edge-view-role",
       "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-manifest-node",
+      "source": "view-contract-root",
+      "target": "view-role",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-view-required",
+      "type": "dataFlow",
+      "source": "view-contract-root",
+      "target": "view-required",
       "label": "requires",
       "style": {
         "width": 2,
@@ -248,11 +245,11 @@
       "data": {}
     },
     {
-      "id": "edge-roles-definitions",
+      "id": "edge-view-hosts",
       "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-definitions-node",
-      "label": "requires",
+      "source": "view-contract-root",
+      "target": "view-hosts",
+      "label": "targets",
       "style": {
         "width": 2,
         "dash": [],
@@ -261,11 +258,11 @@
       "data": {}
     },
     {
-      "id": "edge-roles-legend",
+      "id": "edge-view-format",
       "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-legend-node",
-      "label": "requires",
+      "source": "view-contract-root",
+      "target": "view-format",
+      "label": "encodes",
       "style": {
         "width": 2,
         "dash": [],
@@ -274,37 +271,11 @@
       "data": {}
     },
     {
-      "id": "edge-roles-style",
+      "id": "edge-view-rules",
       "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-style-node",
-      "label": "requires",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-roles-content",
-      "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-content-node",
-      "label": "requires",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-roles-types",
-      "type": "dataFlow",
-      "source": "required-node-roles-root",
-      "target": "role-initial-types",
-      "label": "enumerates",
+      "source": "view-contract-root",
+      "target": "view-rules",
+      "label": "governs",
       "style": {
         "width": 2,
         "dash": [],

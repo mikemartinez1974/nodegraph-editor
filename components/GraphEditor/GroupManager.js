@@ -11,7 +11,7 @@ export class GroupManager {
   // Create a new group from selected nodes
   createGroup(nodeIds, options = {}) {
     if (!nodeIds || nodeIds.length < 2) {
-      return { success: false, error: 'At least 2 nodes required to create a group' };
+      return { success: false, error: 'At least 2 nodes required to create a cluster' };
     }
 
     const groupId = options.id || `group-${uuidv4()}`;
@@ -21,7 +21,7 @@ export class GroupManager {
     
     const group = {
       id: groupId,
-      label: options.label || `Group ${this.groups.size + 1}`,
+      label: options.label || `Cluster ${this.groups.size + 1}`,
       nodeIds: [...nodeIds],
       bounds,
       style: {
@@ -50,7 +50,7 @@ export class GroupManager {
   removeGroup(groupId) {
     const group = this.groups.get(groupId);
     if (!group) {
-      return { success: false, error: 'Group not found' };
+      return { success: false, error: 'Cluster not found' };
     }
 
     // Remove node mappings
@@ -71,7 +71,7 @@ export class GroupManager {
   addNodesToGroup(groupId, nodeIds) {
     const group = this.groups.get(groupId);
     if (!group) {
-      return { success: false, error: 'Group not found' };
+      return { success: false, error: 'Cluster not found' };
     }
 
     // Add new nodes
@@ -89,7 +89,7 @@ export class GroupManager {
   removeNodesFromGroup(groupId, nodeIds) {
     const group = this.groups.get(groupId);
     if (!group) {
-      return { success: false, error: 'Group not found' };
+      return { success: false, error: 'Cluster not found' };
     }
 
     // Remove nodes
@@ -145,7 +145,7 @@ export class GroupManager {
   // Update group bounds when nodes move
   updateGroupBounds(groupId, allNodes) {
     const group = this.groups.get(groupId);
-    if (!group) return { success: false, error: 'Group not found' };
+    if (!group) return { success: false, error: 'Cluster not found' };
 
     group.bounds = this.calculateGroupBounds(group.nodeIds, allNodes);
     return { success: true, data: group };
@@ -165,7 +165,7 @@ export class GroupManager {
   // Collapse/expand group
   toggleGroupCollapse(groupId) {
     const group = this.groups.get(groupId);
-    if (!group) return { success: false, error: 'Group not found' };
+    if (!group) return { success: false, error: 'Cluster not found' };
 
     group.collapsed = !group.collapsed;
     return { success: true, data: group };
@@ -175,7 +175,7 @@ export class GroupManager {
   moveGroup(groupId, deltaX, deltaY, allNodes) {
     const group = this.groups.get(groupId);
     if (!group || group.collapsed) {
-      return { success: false, error: 'Group not found or collapsed' };
+      return { success: false, error: 'Cluster not found or collapsed' };
     }
 
     // Update group bounds

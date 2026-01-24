@@ -68,14 +68,18 @@ export default function useGraphInteractions({
 
   useEffect(() => {
     function handleLoadSaveFile(payload = {}) {
-      const { settings = {}, viewport = {}, scripts: topLevelScripts } = payload || {};
+      const { settings = {}, documentUrl } = payload || {};
       try {
-        if (viewport.pan) setPan(viewport.pan);
-        if (typeof viewport.zoom === 'number') setZoom(viewport.zoom);
         if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
-        if (settings.document && settings.document.url) {
-          setDocumentUrl(settings.document.url);
-          setBackgroundUrl(settings.document.url);
+        const resolvedDocumentUrl =
+          (typeof documentUrl === 'string' && documentUrl.trim())
+            ? documentUrl
+            : (settings.document && settings.document.url)
+            ? settings.document.url
+            : null;
+        if (resolvedDocumentUrl) {
+          setDocumentUrl(resolvedDocumentUrl);
+          setBackgroundUrl(resolvedDocumentUrl);
         } else {
           setDocumentUrl('');
           setBackgroundUrl('');
@@ -117,18 +121,6 @@ export default function useGraphInteractions({
             }
           }));
         }
-        try {
-          const scriptsToLoad = Array.isArray(topLevelScripts)
-            ? topLevelScripts
-            : Array.isArray(settings.scripts)
-            ? settings.scripts
-            : null;
-          if (scriptsToLoad) {
-            localStorage.setItem('scripts', JSON.stringify(scriptsToLoad));
-          }
-        } catch (err) {
-          // ignore
-        }
         if (settings.theme) {
           setDocumentTheme(settings.theme);
         }
@@ -140,8 +132,6 @@ export default function useGraphInteractions({
     eventBus.on('loadSaveFile', handleLoadSaveFile);
     return () => eventBus.off('loadSaveFile', handleLoadSaveFile);
   }, [
-    setPan,
-    setZoom,
     state,
     setDocumentUrl,
     setBackgroundUrl,

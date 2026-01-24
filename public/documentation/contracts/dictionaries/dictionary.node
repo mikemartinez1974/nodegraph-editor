@@ -4,7 +4,7 @@
     "title": "Dictionary Node Contract",
     "description": "",
     "created": "2026-01-20T18:52:00.000Z",
-    "modified": "2026-01-20T18:52:00.000Z",
+    "modified": "2026-01-22T23:35:17.520Z",
     "author": "",
     "tags": []
   },
@@ -59,7 +59,7 @@
     {
       "id": "dictionary-contract-root",
       "type": "markdown",
-      "label": "\ud83d\udcd6 Dictionary Node Contract",
+      "label": "📖 Dictionary Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -151,6 +151,22 @@
       "data": {
         "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- Entries may resolve to value/object or function (conceptual)\n- Execution is gated by declared namespaces/skills\n- Script bindings are expressed by edges from Dictionary -> Script nodes"
       }
+    },
+    {
+      "id": "dictionary-skills",
+      "type": "markdown",
+      "label": "🧠 Skill Requirements",
+      "position": {
+        "x": 200,
+        "y": 420
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary entries map node type → definition file; definition declares skills.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
+      }
     }
   ],
   "edges": [
@@ -212,6 +228,19 @@
       "source": "dictionary-contract-root",
       "target": "dictionary-rules",
       "label": "governs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dict-skills",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-skills",
+      "label": "declares",
       "style": {
         "width": 2,
         "dash": [],

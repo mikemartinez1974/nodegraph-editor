@@ -23,6 +23,7 @@ const NodeLayer = ({
     draggingNodeId, 
     onNodeEvent, 
     onNodeDoubleClick,
+    onNodeContextMenu,
     onNodeDragStart, 
     onNodeMouseEnter, // Add this
     onNodeMouseLeave, // Add this
@@ -139,6 +140,11 @@ const NodeLayer = ({
                         onDoubleClick={onNodeDoubleClick ? (e) => {
                             e.stopPropagation();
                             onNodeDoubleClick(node.id);
+                        } : undefined}
+                        onContextMenu={onNodeContextMenu ? (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onNodeContextMenu(node.id, e);
                         } : undefined}
                         onMouseEnter={() => {
                             const nodeId = node.id;

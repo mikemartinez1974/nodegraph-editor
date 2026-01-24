@@ -699,11 +699,11 @@ export default function DocumentPropertiesDialog({
                         </Typography>
                       )}
                       <Typography variant="body2" color="text.secondary">
-                        {resolvedStorySnapshots[storySnapshotIndex].nodeCount} nodes • {resolvedStorySnapshots[storySnapshotIndex].edgeCount} edges • {resolvedStorySnapshots[storySnapshotIndex].groupCount} groups
+                        {resolvedStorySnapshots[storySnapshotIndex].nodeCount} nodes • {resolvedStorySnapshots[storySnapshotIndex].edgeCount} edges • {resolvedStorySnapshots[storySnapshotIndex].groupCount} clusters
                       </Typography>
                       {storySnapshotIndex > 0 && (
                         <Typography variant="body2" color="text.secondary">
-                          Δ {resolvedStorySnapshots[storySnapshotIndex].nodeCount - resolvedStorySnapshots[storySnapshotIndex - 1].nodeCount} nodes • Δ {resolvedStorySnapshots[storySnapshotIndex].edgeCount - resolvedStorySnapshots[storySnapshotIndex - 1].edgeCount} edges • Δ {resolvedStorySnapshots[storySnapshotIndex].groupCount - resolvedStorySnapshots[storySnapshotIndex - 1].groupCount} groups
+                          Δ {resolvedStorySnapshots[storySnapshotIndex].nodeCount - resolvedStorySnapshots[storySnapshotIndex - 1].nodeCount} nodes • Δ {resolvedStorySnapshots[storySnapshotIndex].edgeCount - resolvedStorySnapshots[storySnapshotIndex - 1].edgeCount} edges • Δ {resolvedStorySnapshots[storySnapshotIndex].groupCount - resolvedStorySnapshots[storySnapshotIndex - 1].groupCount} clusters
                         </Typography>
                       )}
                     </Box>
@@ -743,7 +743,7 @@ export default function DocumentPropertiesDialog({
                     <ListItem key={snapshot.id} disableGutters sx={{ mb: 1.25 }}>
                       <ListItemText
                         primary={`Snapshot #${snapshot.id}`}
-                        secondary={`${snapshot.nodeCount} nodes • ${snapshot.edgeCount} edges • ${snapshot.groupCount} groups`}
+                        secondary={`${snapshot.nodeCount} nodes • ${snapshot.edgeCount} edges • ${snapshot.groupCount} clusters`}
                       />
                     </ListItem>
                   ))

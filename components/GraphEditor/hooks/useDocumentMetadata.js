@@ -1,13 +1,11 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTheme } from '@mui/material/styles';
-import { themeConfigFromMuiTheme } from '../utils/themeUtils';
 import { DEFAULT_GRID_SIZE, DEFAULT_ELK_ROUTING_SETTINGS, DEFAULT_LAYOUT_SETTINGS } from '../layoutSettings';
 
-const createInitialDocumentSettings = (theme) => ({
+const createInitialDocumentSettings = () => ({
   url: '',
   backgroundImage: '',
   gridSize: DEFAULT_GRID_SIZE,
-  theme: themeConfigFromMuiTheme(theme),
+  theme: null,
   edgeRouting: 'auto',
   layout: {
     ...DEFAULT_LAYOUT_SETTINGS,
@@ -23,9 +21,8 @@ const createInitialDocumentSettings = (theme) => ({
 });
 
 export default function useDocumentMetadata() {
-  const theme = useTheme();
   const [documentSettings, setDocumentSettings] = useState(() =>
-    createInitialDocumentSettings(theme)
+    createInitialDocumentSettings()
   );
 
   const setDocumentUrl = useCallback((url) => {

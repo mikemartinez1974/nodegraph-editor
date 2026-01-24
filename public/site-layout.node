@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-08T20:34:45.579Z",
-    "modified": "2026-01-08T20:34:45.579Z",
+    "created": "2026-01-23T17:19:12.947Z",
+    "modified": "2026-01-23T17:19:12.947Z",
     "author": "",
     "tags": []
   },
@@ -12,19 +12,19 @@
     "theme": {
       "mode": "light",
       "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
+        "main": "#2e7d32",
+        "light": "#60ad5e",
+        "dark": "#005005",
         "contrastText": "#fff"
       },
       "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
+        "main": "#00897b",
+        "light": "#4ebaaa",
+        "dark": "#005b4f",
         "contrastText": "#fff"
       },
       "background": {
-        "default": "#e8eaf6",
+        "default": "#e8f5e9",
         "paper": "#ffffff"
       },
       "text": {
@@ -48,12 +48,14 @@
   },
   "viewport": {
     "pan": {
-      "x": 432,
-      "y": 62.5
+      "x": 650,
+      "y": 305
     },
     "zoom": 1
   },
-  "document": null,
+  "document": {
+    "url": "/tlz/background.html"
+  },
   "scripts": [],
   "nodes": [
     {
@@ -207,6 +209,68 @@
       "showLabel": true,
       "data": {
         "markdown": "## Status & Invitation\n\nTwilite is **under active development.** The format is real. The editor works. The examples are growing.\n\nIf you're the kind of person who wants durable thinking artifacts (and doesn't mind sharp edges), **you're invited.**\n\n---\n\n**Get started:**\n- Full browser: [/browser/](/browser/)\n- Editor only: [/editor/](/editor/)\n\n**Talk to the builder:**\n- Email: [admin@twilite.zone](mailto:admin@twilite.zone)\n\n**This page is a graph.** Copy it. Paste it to an AI. Evolve it. That's the point."
+      }
+    },
+    {
+      "id": "d7bb2e8d-a8b0-4652-af5a-927a34d900cb",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -539,
+        "y": -162
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": ""
       }
     }
   ],

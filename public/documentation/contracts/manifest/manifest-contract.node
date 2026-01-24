@@ -4,7 +4,7 @@
     "title": "Untitled Graph",
     "description": "",
     "created": "2026-01-20T21:50:06.266Z",
-    "modified": "2026-01-20T21:50:06.266Z",
+    "modified": "2026-01-22T23:56:40.194Z",
     "author": "",
     "tags": []
   },
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\nMissing dependencies invalidate execution.\nOptional dependencies must never be assumed."
+        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\n**Skill dependencies are mandatory.**\n- If a node definition declares a skill, it **must** appear here.\n- Missing skills invalidate execution.\n\nOptional dependencies must never be assumed."
       }
     },
     {
@@ -171,7 +171,7 @@
     {
       "id": "manifest-forbidden",
       "type": "markdown",
-      "label": "7. Forbidden Patterns",
+      "label": "9. Forbidden Patterns",
       "position": {
         "x": 520,
         "y": 820
@@ -187,7 +187,7 @@
     {
       "id": "manifest-example",
       "type": "markdown",
-      "label": "8. Minimal Example",
+      "label": "10. Minimal Example",
       "position": {
         "x": 1120,
         "y": 820
@@ -214,6 +214,38 @@
       "showLabel": true,
       "data": {
         "markdown": "## Final Rule (Non-Negotiable)\n\nIf a tool or agent does not understand this Manifest,\nit MUST refuse to act.\n\nSilence is corruption.\nRefusal is safety."
+      }
+    },
+    {
+      "id": "manifest-settings",
+      "type": "markdown",
+      "label": "8. Document Settings",
+      "position": {
+        "x": 520,
+        "y": 1120
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Document Settings (OPTIONAL)\n\nSettings define the default presentation for a graph.\n\nStored in the Manifest as `data.settings`.\n\nIf omitted, renderers must fall back to their own defaults.\n\nFields may include:\n- theme (optional)\n- backgroundImage\n- defaultNodeColor / defaultEdgeColor\n- gridSize, snapToGrid\n- edgeRouting + layout\n- github settings\n- autoSave"
+      }
+    },
+    {
+      "id": "manifest-document",
+      "type": "markdown",
+      "label": "7. Document Reference",
+      "position": {
+        "x": 520,
+        "y": 1060
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Document Reference (OPTIONAL)\n\nDocument URL is part of the portable graph definition.\n\nStored at `manifest.data.document.url`.\n\nIf omitted, no external document is associated."
       }
     }
   ],
@@ -297,6 +329,32 @@
       "target": "manifest-final-rule",
       "label": "",
       "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-manifest-settings",
+      "source": "manifest-contract-root",
+      "target": "manifest-settings",
+      "type": "straight",
+      "label": "specifies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-manifest-document",
+      "source": "manifest-contract-root",
+      "target": "manifest-document",
+      "type": "straight",
+      "label": "specifies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     }
   ],

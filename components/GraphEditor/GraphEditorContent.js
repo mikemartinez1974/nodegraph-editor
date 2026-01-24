@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
+import { Snackbar, Alert, Backdrop, CircularProgress, Menu, MenuItem } from '@mui/material';
 import GraphRendererAdapter from './renderers/GraphRendererAdapter';
 import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
@@ -43,6 +43,7 @@ const GraphEditorContent = () => {
   const rpc = useGraphEditorRpcContext();
   const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
   const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
+  const [nodeContextMenu, setNodeContextMenu] = useState(null);
 
   const {
     nodes,
@@ -247,6 +248,30 @@ const GraphEditorContent = () => {
     }
     return offsets;
   }, [oppositeAnchor, panelAnchor, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
+  const resolveDefinitionUrl = useCallback((nodeId) => {
+    if (!nodeId) return null;
+    const node = nodes?.find((candidate) => candidate.id === nodeId);
+    if (!node) return null;
+    const dictionary = nodes?.find((candidate) => candidate.type === 'dictionary');
+    const entries = Array.isArray(dictionary?.data?.entries) ? dictionary.data.entries : [];
+    const match = entries.find((entry) => {
+      if (!entry) return false;
+      return entry.nodeType === node.type || entry.type === node.type || entry.key === node.type;
+    });
+    return match?.file || match?.path || null;
+  }, [nodes]);
+
+  const handleNodeContextMenu = useCallback((nodeId, event) => {
+    if (!nodeId || !event) return;
+    setSelectedNodeIds([nodeId]);
+    setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
+    setNodeContextMenu({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4,
+      nodeId
+    });
+  }, [setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds]);
   const createGraphRenderer = () => (
     <GraphRendererAdapter
       graphKey={graphRendererKey}
@@ -269,6 +294,7 @@ const GraphEditorContent = () => {
       lockedEdges={lockedEdges}
       onEdgeClick={undefined}
       onEdgeHover={undefined}
+      onNodeContextMenu={handleNodeContextMenu}
       hoveredEdgeId={hoveredEdgeId}
       showAllEdgeLabels={showAllEdgeLabels}
       onBackgroundClick={handleCanvasBackgroundClick}
@@ -351,7 +377,11 @@ const GraphEditorContent = () => {
       if (!data || typeof data !== 'object') return;
       const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
       const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
-      const groupsToLoad = Array.isArray(data.groups) ? data.groups : [];
+      const groupsToLoad = Array.isArray(data.clusters)
+        ? data.clusters
+        : Array.isArray(data.groups)
+        ? data.groups
+        : [];
 
       if (typeof handleLoadGraph === 'function') {
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
@@ -404,32 +434,124 @@ const GraphEditorContent = () => {
   const showNewTabPage = false;
 
   const handleCreateBlankGraph = useCallback(() => {
+    const makeId = () => {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return `node_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+    };
+    const now = new Date().toISOString();
+    const manifestNode = {
+      id: makeId(),
+      label: 'Manifest',
+      type: 'manifest',
+      position: { x: -260, y: -160 },
+      width: 360,
+      height: 220,
+      data: {
+        identity: {
+          graphId: makeId(),
+          name: 'Untitled Graph',
+          version: '0.1.0',
+          description: 'New graph',
+          createdAt: now,
+          updatedAt: now
+        },
+        intent: {
+          kind: 'documentation',
+          scope: 'mixed'
+        },
+        dependencies: {
+          nodeTypes: ['default', 'markdown', 'manifest'],
+          handleContracts: ['core'],
+          skills: [],
+          schemaVersions: {
+            nodes: '>=1.0.0',
+            handles: '>=1.0.0'
+          },
+          optional: []
+        },
+        authority: {
+          mutation: {
+            allowCreate: true,
+            allowUpdate: true,
+            allowDelete: true,
+            appendOnly: false
+          },
+          actors: {
+            humans: true,
+            agents: true,
+            tools: true
+          },
+          styleAuthority: 'descriptive',
+          history: {
+            rewriteAllowed: false,
+            squashAllowed: false
+          }
+        },
+        document: {
+          url: ''
+        }
+      }
+    };
+    const dictionaryNode = {
+      id: makeId(),
+      label: 'Dictionary',
+      type: 'dictionary',
+      position: { x: -260, y: 100 },
+      width: 320,
+      height: 220,
+      data: {
+        entries: [
+          { key: 'default', value: 'Default Node' }
+        ]
+      }
+    };
+    const legendNode = {
+      id: makeId(),
+      label: 'Legend',
+      type: 'legend',
+      position: { x: 140, y: 100 },
+      width: 340,
+      height: 220,
+      data: {
+        entries: [
+          {
+            key: 'default',
+            intent: 'placeholder',
+            implementation: 'default renderer',
+            dictionaryKey: 'default'
+          }
+        ]
+      }
+    };
     const newNode = {
-      id: `node_${Date.now()}`,
+      id: makeId(),
       label: 'New Node',
       type: 'default',
-      position: { x: 0, y: 0 },
+      position: { x: 0, y: 360 },
       width: 200,
       height: 120,
       data: { memo: '' }
     };
-
-    setNodes(() => {
-      const next = [newNode];
-      nodesRef.current = next;
-      return next;
-    });
-
-    setEdges(() => {
-      const next = [];
-      edgesRef.current = next;
-      return next;
-    });
-
-    setGroups(() => []);
-    historyHook.saveToHistory([newNode], []);
+    const nextNodes = [manifestNode, dictionaryNode, legendNode, newNode];
+    if (typeof loadGraph === 'function') {
+      loadGraph(nextNodes, [], []);
+    } else {
+      setNodes(() => {
+        nodesRef.current = nextNodes;
+        return nextNodes;
+      });
+      setEdges(() => {
+        const next = [];
+        edgesRef.current = next;
+        return next;
+      });
+      setGroups(() => []);
+    }
+    historyHook.saveToHistory(nextNodes, []);
     setSelectedNodeIds([newNode.id]);
-  }, [setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
+  }, [loadGraph, setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
 
   const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
     emitEdgeIntent('loadGraph', {
@@ -688,6 +810,7 @@ const skipPropertiesCloseRef = useRef(false);
           edges={edges}
           groups={groups}
           onLoadGraph={handleImportGraph}
+          onCreateBlankGraph={handleCreateBlankGraph}
           onDeleteSelected={handleDeleteSelectedIntent}
           onClearGraph={handleClearGraphIntent}
           onUndo={handleUndoIntent}
@@ -948,6 +1071,31 @@ const skipPropertiesCloseRef = useRef(false);
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <Menu
+        open={Boolean(nodeContextMenu)}
+        onClose={() => setNodeContextMenu(null)}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          nodeContextMenu
+            ? { top: nodeContextMenu.mouseY, left: nodeContextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem
+          onClick={() => {
+            const definitionUrl = resolveDefinitionUrl(nodeContextMenu?.nodeId);
+            if (!definitionUrl) {
+              showSnackbar('No definition found for this node type.', 'warning');
+              setNodeContextMenu(null);
+              return;
+            }
+            eventBus.emit('fetchUrl', { url: definitionUrl, source: 'node-definition' });
+            setNodeContextMenu(null);
+          }}
+        >
+          Open Definition
+        </MenuItem>
+      </Menu>
 
       <Backdrop sx={{ color: '#fff', zIndex: (muiTheme) => muiTheme.zIndex.drawer + 1 }} open={Boolean(loading)}>
         <CircularProgress color="inherit" />

@@ -25,6 +25,7 @@ export default function GraphRendererAdapter({
   lockedEdges,
   onEdgeClick,
   onEdgeHover,
+  onNodeContextMenu,
   onBackgroundClick,
   hoveredEdgeId,
   showAllEdgeLabels
@@ -92,6 +93,7 @@ export default function GraphRendererAdapter({
       lockedEdges={lockedEdges}
       onEdgeClick={onEdgeClick}
       onEdgeHover={onEdgeHover}
+      onNodeContextMenu={onNodeContextMenu}
       onBackgroundClick={onBackgroundClick}
       showAllEdgeLabels={showAllEdgeLabels}
     />

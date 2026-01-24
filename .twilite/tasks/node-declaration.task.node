@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-22T20:15:51.867Z",
-    "modified": "2026-01-22T20:15:51.867Z",
+    "created": "2026-01-23T00:09:47.297Z",
+    "modified": "2026-01-23T00:09:47.297Z",
     "author": "",
     "tags": []
   },
@@ -48,12 +48,14 @@
   },
   "viewport": {
     "pan": {
-      "x": 415,
-      "y": -566.9
+      "x": 2109,
+      "y": -105.89999999999998
     },
     "zoom": 1
   },
-  "document": null,
+  "document": {
+    "url": "/tlz/background.html"
+  },
   "scripts": [
     {
       "id": "script_1761684730975",
@@ -147,6 +149,68 @@
       "showLabel": true,
       "data": {
         "markdown": "**Validation Invariant**\n\nIf a graph declares itself a Node Declaration:\n- It must define ≥ 1 View node\n\nIf not a Node Declaration:\n- Views are ignored or forbidden\n\nNo implicit promotion. No guessing."
+      }
+    },
+    {
+      "id": "1e311a6c-424e-4bd1-b7ae-ebca7b53c096",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -2009,
+        "y": 276.9
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": ""
       }
     }
   ],
