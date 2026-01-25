@@ -7,6 +7,7 @@ import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
 export default function GraphRendererAdapter({
   graphKey,
   nodeTypes,
+  resolveNodeComponent,
   edgeTypes,
   edgeRoutes,
   mode,
@@ -75,6 +76,7 @@ export default function GraphRendererAdapter({
       hoveredNodeId={hoveredNodeId}
       hoveredEdgeId={hoveredEdgeId}
       nodeTypes={nodeTypes}
+      resolveNodeComponent={resolveNodeComponent}
       edgeTypes={edgeTypes}
       edgeRoutes={edgeRoutes}
       mode={mode}

@@ -139,6 +139,11 @@ For `batch` / `transaction`, use `commands` (not `operations`):
 
 If missing `position` or `width`/`height`, the renderer/layout will supply defaults.
 
+### Node Definitions (Minimum)
+- A node definition graph is valid if it contains **at least one View node**.
+- A definition graph **may contain only View nodes** and still be valid.
+- The **dictionary** assigns the node type name to that definition.
+
 ---
 
 ## 8) Edges

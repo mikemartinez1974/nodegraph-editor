@@ -1,0 +1,811 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Loose Ends",
+    "description": "Checkpoint list of formalized items vs open questions",
+    "created": "2026-01-24T00:00:00.000Z",
+    "modified": "2026-01-24T00:00:00.000Z",
+    "author": "",
+    "tags": [
+      "checkpoint",
+      "planning",
+      "loose-ends"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "75face35-30ba-4690-9a9a-cd537f22c9fd",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "8556f8e7-2a85-45d5-b432-e10fec355262",
+          "name": "Loose Ends",
+          "version": "0.1.0",
+          "description": "Checkpoint list of formalized items vs open questions",
+          "createdAt": "2026-01-24T00:00:00.000Z",
+          "updatedAt": "2026-01-24T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "planning",
+          "scope": "graph-system"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "markdown"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": null,
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
+      "type": "markdown",
+      "label": "Loose Ends Checkpoint",
+      "position": {
+        "x": -80,
+        "y": -360
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Loose Ends Checkpoint\n\nTwo buckets:\n- **Formalized (locked in)**\n- **Open / loose (needs decisions or implementation)**\n\nThis graph is a living checklist for the graph system."
+      },
+      "handles": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "type": "markdown",
+      "label": "Formalized",
+      "position": {
+        "x": -420,
+        "y": -40
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Formalized (locked in)\n\nThese items are agreed and reflected in code or contracts."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "type": "markdown",
+      "label": "Open / Loose",
+      "position": {
+        "x": 300,
+        "y": -40
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open / Loose\n\nThese items need decisions, contracts, or implementation."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "911db1eb-89fb-4dbe-bd7d-0c76ccfecd0a",
+      "type": "markdown",
+      "label": "File metadata vs Manifest",
+      "position": {
+        "x": -740,
+        "y": 200
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "File metadata (provenance) is top-level.\nGraph semantics live in Manifest.\n\nNo cross-pollination."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "4e7f7a68-5ab2-45dd-b72b-9ff251d91370",
+      "type": "markdown",
+      "label": "Manifest settings",
+      "position": {
+        "x": -420,
+        "y": 200
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Document URL + settings are stored in Manifest.\nSave/load uses manifest helpers."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "428a6fd7-9d9f-4fe8-9a67-413c7c5e9148",
+      "type": "markdown",
+      "label": "Clusters (save/load)",
+      "position": {
+        "x": -100,
+        "y": 200
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Save writes clusters, load reads clusters first.\nLegacy groups still accepted."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "6495492a-218d-499e-a4ed-21752b31a285",
+      "type": "markdown",
+      "label": "Contracts aligned",
+      "position": {
+        "x": -740,
+        "y": 420
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Manifest/nodes/edges/handles + dictionary/view/legend updated to match schema direction."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "020ef689-2bc6-4ea2-983d-03a265901ab3",
+      "type": "markdown",
+      "label": "New-file validity",
+      "position": {
+        "x": -420,
+        "y": 420
+      },
+      "width": 300,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "New file generates a manifest-anchored graph.\nValid by default."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "f4b6daf8-2e80-48b1-8a13-947fd35bff6d",
+      "type": "markdown",
+      "label": "Dictionary schema + implementation",
+      "position": {
+        "x": -100,
+        "y": 420
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Dictionary schema updated to nodeDefs/skills/views.\nUI + validation wired up.\nMarked complete."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "d31a0951-c137-4e57-aa7f-ac5d6781e081",
+      "type": "markdown",
+      "label": "Next steps (open)",
+      "position": {
+        "x": 980,
+        "y": 200
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "- Manifest dependency semantics (types/files/skills)\n- Legend \u2194 dictionary examples\n- Open-node / graph-as-site navigation\n- Migration for no-manifest graphs"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "86275018-6d47-43de-b270-29fb99e782f0",
+      "type": "markdown",
+      "label": "View node contract",
+      "position": {
+        "x": -420,
+        "y": 660
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "View node contract exists.\nRuntime resolution implemented for dictionary-based views."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "16b80542-efa9-4aa1-ad28-080f69dda265",
+      "type": "markdown",
+      "label": "Manifest dependency semantics",
+      "position": {
+        "x": 620,
+        "y": 430
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Cluster-scoped manifest resolution in place.\nMissing node type/view/file now warn (fallback).\nDictionary required only if dependencies exist.\n\nVersion mismatch rule still open."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "905b1f82-e42e-40e6-90ee-35585fddcdf7",
+      "type": "markdown",
+      "label": "Legend \u2194 Dictionary",
+      "position": {
+        "x": 980,
+        "y": 430
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Hybrid rule chosen:\n- `dictionaryKey` routes to dictionary entry\n- no key = descriptive only\n\nNeed examples."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "96fafb2b-99b3-4d1a-b80c-2ff60b01013b",
+      "type": "markdown",
+      "label": "Minimum node definition",
+      "position": {
+        "x": -100,
+        "y": 660
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Minimum node definition locked.\nAt least one View node is sufficient."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "0b8fa558-d2b8-4b2b-be05-f73a36ceeb50",
+      "type": "markdown",
+      "label": "Graph-as-site navigation",
+      "position": {
+        "x": 620,
+        "y": 660
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Open node vs open graph behavior not implemented.\nContext menu + focus-to-graph still open."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "e17f3ce2-a5ef-4997-a111-09f03f5e2676",
+      "type": "markdown",
+      "label": "Script residency",
+      "position": {
+        "x": 260,
+        "y": 660
+      },
+      "width": 320,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Scripts live **only** in Script nodes.\nNo top-level script library."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "f5a51566-d45f-44c4-a068-cfcea509422c",
+      "type": "markdown",
+      "label": "Migration for no-manifest graphs",
+      "position": {
+        "x": 980,
+        "y": 660
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Policy + tooling for older graphs without manifests.\nHow to upgrade, when to block."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "2eaf262e-85a4-4f59-9d80-2e2856b562a1",
+      "type": "dataFlow",
+      "source": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
+      "sourceHandle": "out",
+      "target": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "targetHandle": "in",
+      "label": "bucket",
+      "style": {
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "65e7c39b-4c22-4a45-8afc-1cf6a85a85f8",
+      "type": "dataFlow",
+      "source": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
+      "sourceHandle": "out",
+      "target": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "targetHandle": "in",
+      "label": "bucket",
+      "style": {
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "911db1eb-89fb-4dbe-bd7d-0c76ccfecd0a",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "4e7f7a68-5ab2-45dd-b72b-9ff251d91370",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "911db1eb-89fb-4dbe-bd7d-0c76ccfecd0a",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "428a6fd7-9d9f-4fe8-9a67-413c7c5e9148",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "4e7f7a68-5ab2-45dd-b72b-9ff251d91370",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "6495492a-218d-499e-a4ed-21752b31a285",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "428a6fd7-9d9f-4fe8-9a67-413c7c5e9148",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "020ef689-2bc6-4ea2-983d-03a265901ab3",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "6495492a-218d-499e-a4ed-21752b31a285",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "f4b6daf8-2e80-48b1-8a13-947fd35bff6d",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "c0cb520c-3c26-4f31-99b0-d151543870f1",
+      "type": "dataFlow",
+      "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "sourceHandle": "out",
+      "target": "d31a0951-c137-4e57-aa7f-ac5d6781e081",
+      "targetHandle": "in",
+      "label": "next",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "f4b6daf8-2e80-48b1-8a13-947fd35bff6d",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "16b80542-efa9-4aa1-ad28-080f69dda265",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "701ef98f-5771-41a4-b743-775e8a5008ba",
+      "type": "dataFlow",
+      "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "sourceHandle": "out",
+      "target": "16b80542-efa9-4aa1-ad28-080f69dda265",
+      "targetHandle": "in",
+      "label": "status",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "2f4f3a9f-5e1d-4ac8-9f5f-0f54f3b4f5d8",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "86275018-6d47-43de-b270-29fb99e782f0",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "6a6297c8-65db-4ee9-a5b6-5d3f0f43a4d0",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "96fafb2b-99b3-4d1a-b80c-2ff60b01013b",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "86275018-6d47-43de-b270-29fb99e782f0",
+      "type": "dataFlow",
+      "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "sourceHandle": "out",
+      "target": "905b1f82-e42e-40e6-90ee-35585fddcdf7",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "905b1f82-e42e-40e6-90ee-35585fddcdf7",
+      "type": "dataFlow",
+      "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "sourceHandle": "out",
+      "target": "0b8fa558-d2b8-4b2b-be05-f73a36ceeb50",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "9e8f1c2e-43c5-4b8d-9a3c-17b2c4d2e1a9",
+      "type": "dataFlow",
+      "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
+      "sourceHandle": "out",
+      "target": "e17f3ce2-a5ef-4997-a111-09f03f5e2676",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "0b8fa558-d2b8-4b2b-be05-f73a36ceeb50",
+      "type": "dataFlow",
+      "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
+      "sourceHandle": "out",
+      "target": "f5a51566-d45f-44c4-a068-cfcea509422c",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": {
+        "width": 1
+      },
+      "data": {}
+    }
+  ]
+}

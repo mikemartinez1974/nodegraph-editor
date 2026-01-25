@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data Format\n\nFor now: **markdown-first**.\n\nRecommended structure:\n```\n## Legend\n- Colors: meaning\n- Edge types: meaning\n- Icons: meaning\n- Labels: meaning\n```\n\nFuture structured fields may be added under `data.ext.twilite`."
+        "markdown": "## Data Format\n\nFor now: **markdown-first**.\n\nRecommended structure:\n```\n## Legend\n- Colors: meaning\n- Edge types: meaning\n- Icons: meaning\n- Labels: meaning\n```\n\nHybrid support:\n- `data.ext.twilite.entries[]` may include `dictionaryKey` to resolve definitions.\n- Entries without a dictionaryKey remain purely descriptive."
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mapping Rule\n\n- (primitive + intent) => legend key\n- (intent + implementation) => legend value\n- key + value resolves to a Dictionary entry\n- Dictionary returns value/object or function\n- Execution is gated by declared namespaces/skills"
+        "markdown": "## Mapping Rule (Hybrid)\n\n- (primitive + intent) => legend key\n- (intent + implementation) => legend value\n- If a legend entry declares `dictionaryKey`, it **routes** to a Dictionary entry.\n- If no `dictionaryKey`, the entry is **descriptive only**.\n- Dictionary returns value/object or function\n- Execution is gated by declared namespaces/skills"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- Legend does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- May reference Dictionary for term definitions"
+        "markdown": "## Rules\n\n- Legend does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- Entries **may** reference Dictionary via `dictionaryKey`"
       }
     }
   ],

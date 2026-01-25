@@ -71,7 +71,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Minimum Node Definition Contract\n\nA node definition is the **smallest graph** that can render a node instance.\n\n**Definition status is declared by the dictionary.**\n\nThe definition graph must include a View node."
+        "markdown": "# Minimum Node Definition Contract\n\nA node definition is the **smallest graph** that can render a node instance.\n\n**Definition status is declared by the dictionary.**\n\nThe definition graph must include a View node. No other nodes are required."
       }
     },
     {
@@ -87,7 +87,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required\n\n- **At least one View node**\n\nIf a graph contains only a View node, it is still a valid node definition."
+        "markdown": "## Required\n\n- **At least one View node**\n\nIf a graph contains only a View node, it is still a valid node definition.\n\nNo Manifest, Dictionary, or Legend is required for a *definition* graph to be valid."
       }
     },
     {

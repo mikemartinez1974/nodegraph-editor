@@ -24,7 +24,9 @@ const DictionaryNode = (props) => {
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
 
-  const entries = Array.isArray(node?.data?.entries) ? node.data.entries : [];
+  const nodeDefs = Array.isArray(node?.data?.nodeDefs) ? node.data.nodeDefs : [];
+  const skills = Array.isArray(node?.data?.skills) ? node.data.skills : [];
+  const views = Array.isArray(node?.data?.views) ? node.data.views : [];
 
   const scriptNodesById = useRef(new Map());
   scriptNodesById.current = new Map(
@@ -135,10 +137,10 @@ const DictionaryNode = (props) => {
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', paddingRight: 4 }}>
-          <div style={{ fontWeight: 600, marginBottom: 6 }}>Entries</div>
-          {entries.length ? (
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Node Definitions</div>
+          {nodeDefs.length ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {entries.map((entry, index) => (
+              {nodeDefs.map((entry, index) => (
                 <div
                   key={entry?.key || `${node.id}-entry-${index}`}
                   style={{
@@ -149,17 +151,106 @@ const DictionaryNode = (props) => {
                   }}
                 >
                   <div style={{ fontWeight: 600 }}>
-                    {entry?.key || `entry-${index + 1}`}
+                    {entry?.key || `node-${index + 1}`}
                   </div>
                   <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
-                    {entry?.value || entry?.definition || entry?.summary || 'No value'}
+                    {entry?.ref || entry?.path || entry?.file || 'No reference'}
                   </div>
+                  {entry?.version ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.version}
+                    </div>
+                  ) : null}
+                  {entry?.source ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.source}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
           ) : (
             <div style={{ opacity: 0.6, fontStyle: 'italic' }}>
-              No entries defined.
+              No node definitions defined.
+            </div>
+          )}
+
+          <div style={{ fontWeight: 600, margin: '12px 0 6px' }}>Skills</div>
+          {skills.length ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {skills.map((entry, index) => (
+                <div
+                  key={entry?.key || `${node.id}-skill-${index}`}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: 6,
+                    border: `1px solid ${theme.palette.divider}`,
+                    background: theme.palette.background.paper
+                  }}
+                >
+                  <div style={{ fontWeight: 600 }}>
+                    {entry?.key || `skill-${index + 1}`}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                    {entry?.ref || entry?.path || entry?.file || 'No reference'}
+                  </div>
+                  {entry?.version ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.version}
+                    </div>
+                  ) : null}
+                  {entry?.source ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.source}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ opacity: 0.6, fontStyle: 'italic' }}>
+              No skills defined.
+            </div>
+          )}
+
+          <div style={{ fontWeight: 600, margin: '12px 0 6px' }}>Views</div>
+          {views.length ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {views.map((entry, index) => (
+                <div
+                  key={`${entry?.key || `view-${index}`}::${entry?.view || 'view'}`}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: 6,
+                    border: `1px solid ${theme.palette.divider}`,
+                    background: theme.palette.background.paper
+                  }}
+                >
+                  <div style={{ fontWeight: 600 }}>
+                    {entry?.key || `view-${index + 1}`}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                    {entry?.view || 'twilite.web'}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                    {entry?.ref || entry?.path || entry?.file || 'No reference'}
+                  </div>
+                  {entry?.version ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.version}
+                    </div>
+                  ) : null}
+                  {entry?.source ? (
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                      {entry.source}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ opacity: 0.6, fontStyle: 'italic' }}>
+              No views defined.
             </div>
           )}
 

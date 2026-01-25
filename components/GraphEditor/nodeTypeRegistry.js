@@ -57,8 +57,12 @@ const baseNodeTypeRegistry = {
     defaultWidth: 320,
     defaultHeight: 260,
     defaultData: {
-      entries: [
-        { key: 'term', value: 'definition' }
+      nodeDefs: [
+        { key: 'default', ref: '', source: 'local', version: '>=1.0.0' }
+      ],
+      skills: [],
+      views: [
+        { key: 'default', view: 'twilite.web', ref: '', source: 'local', version: '>=1.0.0' }
       ]
     }
   },
@@ -285,14 +289,18 @@ export const nodeTypeMetadata = [
   {
     type: 'dictionary',
     label: 'Dictionary',
-    description: 'Definitions node with entry + script bindings',
+    description: 'Definitions node with nodeDefs, skills, and views',
     icon: 'MenuBook',
     category: 'content',
     defaultWidth: 320,
     defaultHeight: 260,
     defaultData: {
-      entries: [
-        { key: 'term', value: 'definition' }
+      nodeDefs: [
+        { key: 'markdown', ref: '/documentation/contracts/nodes/markdown.node', source: 'external', version: '>=1.0.0' }
+      ],
+      skills: [],
+      views: [
+        { key: 'markdown', view: 'twilite.web', ref: '/documentation/contracts/view/view.node', source: 'external', version: '>=1.0.0' }
       ]
     }
   },

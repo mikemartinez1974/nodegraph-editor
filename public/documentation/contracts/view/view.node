@@ -151,7 +151,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- A node definition must include **at least one** View node.\n- View nodes are descriptive, not executable.\n- Multiple View nodes can exist for multiple hosts.\n- Renderers choose the best compatible host/datatype."
+        "markdown": "## Rules\n\n- A node definition must include **at least one** View node.\n- A definition graph **may contain only View nodes** and still be valid.\n- View nodes are descriptive, not executable.\n- Multiple View nodes can exist for multiple hosts.\n- Renderers choose the best compatible host/datatype."
       }
     },
     {

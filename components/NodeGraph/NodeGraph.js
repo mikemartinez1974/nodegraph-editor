@@ -38,6 +38,7 @@ export default function NodeGraph({
   groups = [], 
   setGroups,
   nodeTypes = {}, 
+  resolveNodeComponent,
   edgeTypes = {}, 
   selectedNodeId, 
   selectedNodeIds = [], 
@@ -1235,6 +1236,7 @@ export default function NodeGraph({
         draggingNodeId={draggingNodeId}
         theme={theme}
         nodeTypes={nodeTypes}
+        resolveNodeComponent={resolveNodeComponent}
         lockedNodes={lockedNodes}
         suppressClickRef={suppressClickRef}
         onNodeEvent={(id, e) => {

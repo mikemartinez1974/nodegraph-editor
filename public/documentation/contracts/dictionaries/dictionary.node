@@ -1,60 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Dictionary Node Contract",
+    "title": "Untitled Graph",
     "description": "",
-    "created": "2026-01-20T18:52:00.000Z",
-    "modified": "2026-01-22T23:35:17.520Z",
+    "created": "2026-01-24T15:47:27.696Z",
+    "modified": "2026-01-24T15:47:27.696Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 0,
-      "y": 0
-    },
-    "zoom": 1
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "dictionary-contract-root",
@@ -101,7 +54,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required\n\n```json\n{\n  \"type\": \"dictionary\",\n  \"data\": { \"entries\": [ { \"key\": \"term\", \"value\": \"definition\" } ] }\n}\n```\n\n- `type` must be `dictionary`\n- `data.entries` is required"
+        "markdown": "## Required\n\n```json\n{\n  \"type\": \"dictionary\",\n  \"data\": { \"nodeDefs\": [ { \"key\": \"node-type\", \"ref\": \"/path/to/definition.node\" } ] }\n}\n```\n\n- `type` must be `dictionary`\n- `data.nodeDefs` is required"
       }
     },
     {
@@ -133,7 +86,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data Format\n\nPrimary format: **structured entries**.\n\nRecommended structure:\n```json\n{\n  \"entries\": [\n    { \"key\": \"term\", \"value\": \"definition\", \"kind\": \"value\" },\n    { \"key\": \"action\", \"value\": \"does a thing\", \"kind\": \"function\" }\n  ]\n}\n```\n\nOptional `data.markdown` may mirror the entries for humans.\nFuture structured fields may be added under `data.ext.twilite`."
+        "markdown": "## Data Format\n\nPrimary format: **structured tables**.\n\nRecommended structure:\n```json\n{\n  \"nodeDefs\": [\n    { \"key\": \"markdown\", \"ref\": \"/documentation/contracts/nodes/markdown.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"skills\": [\n    { \"key\": \"auto-layout\", \"ref\": \"/documentation/contracts/skills/layout/skill-autolayout.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"views\": [\n    { \"key\": \"markdown\", \"view\": \"twilite.web\", \"ref\": \"/documentation/contracts/view/view.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ]\n}\n```\n\nOptional `data.markdown` may mirror the entries for humans.\nFuture structured fields may be added under `data.ext.twilite`."
       }
     },
     {
@@ -149,7 +102,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- Entries may resolve to value/object or function (conceptual)\n- Execution is gated by declared namespaces/skills\n- Script bindings are expressed by edges from Dictionary -> Script nodes"
+        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- `nodeDefs` map node types to definition graphs\n- `skills` list dependency references (not execution)\n- `views` map node types to renderable view definitions"
       }
     },
     {
@@ -165,7 +118,147 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary entries map node type → definition file; definition declares skills.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
+        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary `nodeDefs` map node type → definition file; definition declares skills.\n- Dictionary `skills` provides the dependency reference list used by the manifest.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
+      }
+    },
+    {
+      "id": "29f94cee-a477-43c7-ae31-1f237f9137c2",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -1903,
+        "y": -131.5
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": "",
+        "settings": {
+          "theme": {
+            "mode": "light",
+            "primary": {
+              "main": "#2e7d32",
+              "light": "#60ad5e",
+              "dark": "#005005",
+              "contrastText": "#fff"
+            },
+            "secondary": {
+              "main": "#00897b",
+              "light": "#4ebaaa",
+              "dark": "#005b4f",
+              "contrastText": "#fff"
+            },
+            "background": {
+              "default": "#e8f5e9",
+              "paper": "#ffffff"
+            },
+            "text": {
+              "primary": "rgba(0, 0, 0, 0.87)",
+              "secondary": "rgba(0, 0, 0, 0.6)"
+            },
+            "divider": "rgba(0, 0, 0, 0.12)"
+          },
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "orthogonal",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
+      }
+    },
+    {
+      "id": "81b3bb87-3df5-4ec7-85e7-71fbee8d0cb6",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -1958,
+        "y": 223.5
+      },
+      "width": 320,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "nodeDefs": [
+          {
+            "key": "default",
+            "ref": "/documentation/contracts/nodes/node-definition.minimum.node",
+            "version": ">=1.0.0",
+            "source": "external"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "default",
+            "view": "twilite.web",
+            "ref": "/documentation/contracts/view/view.node",
+            "version": ">=1.0.0",
+            "source": "external"
+          }
+        ],
+        "html": "",
+        "svg": ""
       }
     }
   ],
@@ -249,5 +342,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

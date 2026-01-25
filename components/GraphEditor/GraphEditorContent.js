@@ -16,6 +16,7 @@ import ScriptPanel from './Scripting/ScriptPanel';
 import BackgroundFrame from './components/BackgroundFrame';
 import EdgeTypes from './edgeTypes';
 import EntitiesPanel from './components/EntitiesPanel';
+import DynamicViewNode from './Nodes/DynamicViewNode';
 import eventBus from '../NodeGraph/eventBus';
 import { createThemeFromConfig } from './utils/themeUtils';
 import {
@@ -44,6 +45,8 @@ const GraphEditorContent = () => {
   const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
   const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
+  const [viewDefinitions, setViewDefinitions] = useState({});
+  const viewDefinitionsRef = useRef({});
 
   const {
     nodes,
@@ -221,6 +224,91 @@ const GraphEditorContent = () => {
     return [];
   }, [nodeTypeMetadata, nodeTypes]);
 
+  useEffect(() => {
+    viewDefinitionsRef.current = viewDefinitions;
+  }, [viewDefinitions]);
+
+  const resolveDictionaryForNode = useCallback((node) => {
+    if (!node || !Array.isArray(nodes)) return null;
+    const clusterList = Array.isArray(groups) ? groups : [];
+    const nodeClusterId = clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(node.id))?.id || null;
+    const dictionaryInCluster = nodeClusterId
+      ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+      : null;
+    const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+    return dictionaryInCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
+  }, [nodes, groups]);
+
+  const resolveViewEntry = useCallback((node) => {
+    if (!node) return null;
+    const dictionary = resolveDictionaryForNode(node);
+    const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
+    const lookupKey = node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
+    return views.find((entry) => {
+      if (!entry) return false;
+      return entry.key === lookupKey || entry.nodeType === lookupKey || entry.type === lookupKey;
+    }) || null;
+  }, [resolveDictionaryForNode]);
+
+  const requestViewDefinition = useCallback((ref) => {
+    if (!ref) return;
+    const current = viewDefinitionsRef.current[ref];
+    if (current && (current.status === 'loading' || current.status === 'ready')) return;
+    setViewDefinitions((prev) => ({ ...prev, [ref]: { status: 'loading' } }));
+    fetch(ref)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.text();
+      })
+      .then((text) => {
+        const parsed = JSON.parse(text);
+        const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
+        const viewNode = parsedNodes.find((candidate) => candidate?.type === 'view') || null;
+        if (!viewNode) {
+          throw new Error('No view node found');
+        }
+        setViewDefinitions((prev) => ({
+          ...prev,
+          [ref]: { status: 'ready', viewNode }
+        }));
+      })
+      .catch((err) => {
+        setViewDefinitions((prev) => ({
+          ...prev,
+          [ref]: { status: 'error', error: err?.message || 'Failed to load view' }
+        }));
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!Array.isArray(nodes)) return;
+    const refs = new Set();
+    nodes.forEach((node) => {
+      if (!node || nodeTypes?.[node.type]) return;
+      if (typeof node?.type === 'string' && node.type.includes(':')) return;
+      const entry = resolveViewEntry(node);
+      if (entry?.ref) refs.add(entry.ref);
+    });
+    refs.forEach((ref) => requestViewDefinition(ref));
+  }, [nodes, nodeTypes, resolveViewEntry, requestViewDefinition]);
+
+  const resolveNodeComponent = useCallback((node) => {
+    if (!node || nodeTypes?.[node.type]) return null;
+    if (typeof node?.type === 'string' && node.type.includes(':')) return null;
+    const entry = resolveViewEntry(node);
+    if (!entry || !entry.ref) return null;
+    const viewDefinition = viewDefinitionsRef.current[entry.ref] || null;
+    return {
+      component: DynamicViewNode,
+      props: {
+        viewEntry: entry,
+        viewDefinition
+      }
+    };
+  }, [nodeTypes, resolveViewEntry]);
+
   const handleToggleMinimap = useCallback(() => {
     emitEdgeIntent('toggleMinimap', { enabled: !showMinimap });
     eventBus.emit('toggleMinimap');
@@ -252,14 +340,22 @@ const GraphEditorContent = () => {
     if (!nodeId) return null;
     const node = nodes?.find((candidate) => candidate.id === nodeId);
     if (!node) return null;
-    const dictionary = nodes?.find((candidate) => candidate.type === 'dictionary');
-    const entries = Array.isArray(dictionary?.data?.entries) ? dictionary.data.entries : [];
+
+    const clusterList = Array.isArray(groups) ? groups : [];
+    const nodeClusterId = clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(node.id))?.id || null;
+    const dictionaryInCluster = nodeClusterId
+      ? nodes?.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+      : null;
+    const rootDictionary = nodes?.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+    const dictionary = dictionaryInCluster || rootDictionary || nodes?.find((candidate) => candidate.type === 'dictionary');
+
+    const entries = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
     const match = entries.find((entry) => {
       if (!entry) return false;
       return entry.nodeType === node.type || entry.type === node.type || entry.key === node.type;
     });
-    return match?.file || match?.path || null;
-  }, [nodes]);
+    return match?.ref || match?.file || match?.path || null;
+  }, [nodes, groups]);
 
   const handleNodeContextMenu = useCallback((nodeId, event) => {
     if (!nodeId || !event) return;
@@ -276,6 +372,7 @@ const GraphEditorContent = () => {
     <GraphRendererAdapter
       graphKey={graphRendererKey}
       nodeTypes={nodeTypes}
+      resolveNodeComponent={resolveNodeComponent}
       edgeTypes={EdgeTypes}
       edgeRoutes={edgeRoutes}
       mode={modesHook.mode}
@@ -502,8 +599,12 @@ const GraphEditorContent = () => {
       width: 320,
       height: 220,
       data: {
-        entries: [
-          { key: 'default', value: 'Default Node' }
+        nodeDefs: [
+          { key: 'default', ref: '/documentation/contracts/nodes/node-definition.minimum.node', source: 'external', version: '>=1.0.0' }
+        ],
+        skills: [],
+        views: [
+          { key: 'default', view: 'twilite.web', ref: '/documentation/contracts/view/view.node', source: 'external', version: '>=1.0.0' }
         ]
       }
     };

@@ -29,6 +29,7 @@ const NodeLayer = ({
     onNodeMouseLeave, // Add this
     onNodeHover,
     nodeTypes = { default: DefaultNode },
+    resolveNodeComponent,
     suppressClickRef
 }) => {
     // Deduplicate nodes before rendering
@@ -73,6 +74,18 @@ const NodeLayer = ({
         <div ref={containerRef} style={{ pointerEvents: 'none', width: '100vw', height: '100vh', position: 'absolute', left: 0, top: 0, zIndex: 30 }}>
             {visibleNodes.map(node => {
                 let NodeComponent = nodeTypes[node.type];
+                let resolvedProps = null;
+                if (!NodeComponent && typeof resolveNodeComponent === 'function') {
+                  const resolved = resolveNodeComponent(node);
+                  if (resolved) {
+                    if (typeof resolved === 'function') {
+                      NodeComponent = resolved;
+                    } else if (resolved.component) {
+                      NodeComponent = resolved.component;
+                      resolvedProps = resolved.props || null;
+                    }
+                  }
+                }
                 if (!NodeComponent) {
                   if (typeof node?.type === 'string' && node.type.includes(':')) {
                     NodeComponent = PluginNodeRenderer;
@@ -99,6 +112,7 @@ const NodeLayer = ({
                     >
                       <NodeComponent
                         node={node}
+                        {...(resolvedProps || {})}
                         pan={pan}
                         zoom={zoom}
                         isSelected={isSelected}

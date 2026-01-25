@@ -48,7 +48,7 @@ const BANNED_ROUTE_KEYS = [
   "decorations"
 ];
 
-export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {} }) {
+export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {}, clusters = [] }) {
   const nodeMap = new Map();
   nodes.forEach((node) => {
     if (node?.id) {
@@ -59,59 +59,134 @@ export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {
   const errors = [];
   const warnings = [];
 
+  const clusterList = Array.isArray(clusters) ? clusters : [];
+  const nodeClusterMap = new Map();
+  clusterList.forEach((cluster) => {
+    if (!cluster?.id || !Array.isArray(cluster.nodeIds)) return;
+    cluster.nodeIds.forEach((nodeId) => {
+      if (!nodeClusterMap.has(nodeId)) {
+        nodeClusterMap.set(nodeId, cluster.id);
+      }
+    });
+  });
+
   const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
-  if (manifestNodes.length !== 1) {
+  if (manifestNodes.length === 0) {
     errors.push({
       code: 'MANIFEST_COUNT_INVALID',
-      message: manifestNodes.length === 0
-        ? 'Manifest missing: graph mutations are blocked.'
-        : 'Manifest must be unique: multiple manifest nodes found.'
+      message: 'Manifest missing: graph mutations are blocked.'
     });
-  } else {
-    const manifest = manifestNodes[0];
+  }
+
+  const manifestByCluster = new Map();
+  const rootManifests = [];
+  manifestNodes.forEach((manifest) => {
+    const clusterId = nodeClusterMap.get(manifest.id) || null;
+    if (clusterId) {
+      if (manifestByCluster.has(clusterId)) {
+        warnings.push({
+          code: 'MANIFEST_MULTIPLE_IN_CLUSTER',
+          message: `Multiple manifest nodes found in cluster "${clusterId}". Using the first one.`
+        });
+        return;
+      }
+      manifestByCluster.set(clusterId, manifest);
+    } else {
+      rootManifests.push(manifest);
+    }
+  });
+  if (rootManifests.length > 1) {
+    warnings.push({
+      code: 'MANIFEST_MULTIPLE_ROOT',
+      message: 'Multiple root manifest nodes found. Using the first one.'
+    });
+  }
+
+  const dictionaryNodes = nodes.filter((node) => node?.type === 'dictionary');
+  const dictionaryByCluster = new Map();
+  const rootDictionaries = [];
+  dictionaryNodes.forEach((dictionary) => {
+    const clusterId = nodeClusterMap.get(dictionary.id) || null;
+    if (clusterId) {
+      if (!dictionaryByCluster.has(clusterId)) dictionaryByCluster.set(clusterId, dictionary);
+    } else {
+      rootDictionaries.push(dictionary);
+    }
+  });
+
+  const resolveDictionaryForManifest = (manifest) => {
+    if (!manifest) return null;
+    const clusterId = nodeClusterMap.get(manifest.id) || null;
+    if (clusterId && dictionaryByCluster.has(clusterId)) {
+      return dictionaryByCluster.get(clusterId);
+    }
+    return rootDictionaries[0] || null;
+  };
+
+  const resolveEntries = (dictionary) => {
+    const nodeDefs = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
+    const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
+    const entryByKey = new Map();
+    nodeDefs.forEach((entry) => {
+      const key = entry?.key || entry?.type || entry?.nodeType;
+      if (typeof key === 'string' && key.trim()) {
+        entryByKey.set(key.trim(), entry);
+      }
+    });
+    const viewByKey = new Map();
+    views.forEach((entry) => {
+      const key = entry?.key || entry?.type || entry?.nodeType;
+      if (typeof key === 'string' && key.trim()) {
+        const list = viewByKey.get(key.trim()) || [];
+        list.push(entry);
+        viewByKey.set(key.trim(), list);
+      }
+    });
+    return { entryByKey, viewByKey };
+  };
+
+  const manifestsToValidate = manifestNodes.length ? manifestNodes : [];
+  manifestsToValidate.forEach((manifest) => {
     const dependencyTypes = Array.isArray(manifest?.data?.dependencies?.nodeTypes)
       ? manifest.data.dependencies.nodeTypes.filter((value) => typeof value === 'string' && value.trim())
       : [];
+    if (dependencyTypes.length === 0) return;
 
-    if (dependencyTypes.length > 0) {
-      const dictionaryNodes = nodes.filter((node) => node?.type === 'dictionary');
-      if (dictionaryNodes.length === 0) {
-        errors.push({
-          code: 'DICTIONARY_REQUIRED',
-          message: 'Dictionary required: manifest declares node type dependencies.'
-        });
-      } else {
-        const entries = dictionaryNodes.flatMap((node) => (
-          Array.isArray(node?.data?.entries) ? node.data.entries : []
-        ));
-        const entryByKey = new Map();
-        entries.forEach((entry) => {
-          const key = entry?.key || entry?.type || entry?.nodeType;
-          if (typeof key === 'string' && key.trim()) {
-            entryByKey.set(key.trim(), entry);
-          }
-        });
+    const dictionary = resolveDictionaryForManifest(manifest);
+    if (!dictionary) {
+      warnings.push({
+        code: 'DICTIONARY_REQUIRED',
+        message: 'Dictionary required: manifest declares node type dependencies.'
+      });
+      return;
+    }
 
-        dependencyTypes.forEach((nodeType) => {
-          const entry = entryByKey.get(nodeType);
-          if (!entry) {
-            errors.push({
-              code: 'DICTIONARY_MISSING_ENTRY',
-              message: `Dictionary missing entry for required node type "${nodeType}".`
-            });
-            return;
-          }
-          const filePath = entry?.file || entry?.path;
-          if (typeof filePath !== 'string' || filePath.trim().length === 0) {
-            errors.push({
-              code: 'DICTIONARY_MISSING_FILE',
-              message: `Dictionary entry "${nodeType}" must reference a .node file.`
-            });
-          }
+    const { entryByKey, viewByKey } = resolveEntries(dictionary);
+    dependencyTypes.forEach((nodeType) => {
+      const entry = entryByKey.get(nodeType);
+      if (!entry) {
+        warnings.push({
+          code: 'DICTIONARY_MISSING_ENTRY',
+          message: `Dictionary missing entry for required node type "${nodeType}".`
+        });
+        return;
+      }
+      const filePath = entry?.ref || entry?.file || entry?.path;
+      if (typeof filePath !== 'string' || filePath.trim().length === 0) {
+        warnings.push({
+          code: 'DICTIONARY_MISSING_FILE',
+          message: `Dictionary entry "${nodeType}" should reference a .node file.`
         });
       }
-    }
-  }
+      const views = viewByKey.get(nodeType) || [];
+      if (!views.length) {
+        warnings.push({
+          code: 'DICTIONARY_MISSING_VIEW',
+          message: `Dictionary missing view entry for node type "${nodeType}".`
+        });
+      }
+    });
+  });
 
   const findHandle = (node, handleId) => {
     if (!handleId || !node) return undefined;
