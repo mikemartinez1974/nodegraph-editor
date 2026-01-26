@@ -191,6 +191,13 @@ const FixedNode = ({
   };
   
   const styleOverrides = node?.style || {};
+  const baseBorderWidth = disableChrome ? 0 : isSelected ? 2 : 1;
+  const baseBorderStyle = disableChrome ? 'none' : 'solid';
+  const baseBorderColor = disableChrome
+    ? 'transparent'
+    : isSelected
+    ? theme.palette.secondary.main
+    : theme.palette.primary.main;
   const computedStyle = {
     position: 'absolute',
     left: baseLeft,
@@ -198,11 +205,9 @@ const FixedNode = ({
     width,
     height,
     cursor: isRotating ? 'grabbing' : (draggingHandle ? 'grabbing' : 'grab'),
-    border: disableChrome
-      ? 'none'
-      : isSelected
-      ? `2px solid ${theme.palette.secondary.main}`
-      : `1px solid ${theme.palette.primary.main}`,
+    borderWidth: baseBorderWidth,
+    borderStyle: baseBorderStyle,
+    borderColor: baseBorderColor,
     background: disableChrome
       ? 'transparent'
       : isSelected

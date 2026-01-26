@@ -16,6 +16,20 @@
 
 ---
 
+## 0.1 Default Root Handle (REQUIRED)
+
+Every node exposes a default handle named **`root`**, even when no handles are explicitly declared.
+
+Implications:
+
+* Edges without handles attach to `root`.
+* `root` provides a portable attachment point for minimal graphs.
+* If a node declares handles, `root` still exists unless explicitly forbidden by that node’s contract.
+
+Handle contracts apply to declared handles. A dedicated `root` contract is optional but recommended for node types that need strict semantics.
+
+---
+
 ## 1. Semantic Meaning (REQUIRED)
 
 Describe **what this handle represents** in the domain.
@@ -152,6 +166,8 @@ Validators MUST enforce:
 * Wildcard policy
 
 Validation failure MUST block persistence and execution.
+
+If no handle is specified, validators must treat the attachment as `root` (no error).
 
 ---
 

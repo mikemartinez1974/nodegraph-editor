@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\n**Skill dependencies are mandatory.**\n- If a node definition declares a skill, it **must** appear here.\n- Missing skills invalidate execution.\n\nOptional dependencies must never be assumed."
+        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\n**Skill dependencies are mandatory.**\n- If a node definition declares a skill, it **must** appear here.\n- Missing skills invalidate execution.\n\n**Version mismatches are warnings only (for now).**\n- Version conflicts MUST surface as warnings.\n- They MUST NOT block loading until a stricter policy is adopted.\n\nOptional dependencies must never be assumed."
       }
     },
     {

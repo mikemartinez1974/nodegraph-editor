@@ -56,6 +56,17 @@ const getNodeHandleDefs = (node) => {
   if (!node) return [];
   const result = [];
   const seen = new Set();
+  const ensureRoot = () => {
+    if (seen.has('root')) return;
+    seen.add('root');
+    result.push({
+      key: 'root',
+      label: 'root',
+      type: 'any',
+      direction: 'bidirectional',
+      position: { side: 'left', offset: 0.5 }
+    });
+  };
   if (Array.isArray(node.handles) && node.handles.length > 0) {
     node.handles.forEach((handle) => {
       const key = handle.id || handle.key;
@@ -100,6 +111,11 @@ const getNodeHandleDefs = (node) => {
       metadata: handle.metadata
     });
   });
+  if (result.length === 0) {
+    ensureRoot();
+  } else {
+    ensureRoot();
+  }
   return result;
 };
 
@@ -129,6 +145,7 @@ function getHandlePositions(node) {
   const outputs = defs.filter(handle => handle.direction === 'output' || handle.direction === 'bidirectional');
 
   inputs.forEach((h, i) => {
+    const defaultSide = h.key === 'root' ? 'left' : 'left';
     handles.push({
       id: `${node.id}-input-${h.key}`,
       nodeId: node.id,
@@ -138,12 +155,13 @@ function getHandlePositions(node) {
       label: h.label,
       handleType: h.type,
       allowedEdgeTypes: h.allowedEdgeTypes,
-      position: computeHandlePosition(frame, extension, h, i, inputs.length, 'left'),
+      position: computeHandlePosition(frame, extension, h, i, inputs.length, defaultSide),
       color: '#0288d1'
     });
   });
 
   outputs.forEach((h, i) => {
+    const defaultSide = h.key === 'root' ? 'left' : 'right';
     handles.push({
       id: `${node.id}-output-${h.key}`,
       nodeId: node.id,
@@ -153,7 +171,7 @@ function getHandlePositions(node) {
       label: h.label,
       handleType: h.type,
       allowedEdgeTypes: h.allowedEdgeTypes,
-      position: computeHandlePosition(frame, extension, h, i, outputs.length, 'right'),
+      position: computeHandlePosition(frame, extension, h, i, outputs.length, defaultSide),
       color: '#43a047'
     });
   });
@@ -291,15 +309,17 @@ const HandleLayer = forwardRef(({
     if (sourceNode && targetNode) {
       const sourceHandles = getHandlePositions(sourceNode);
       const targetHandles = getHandlePositions(targetNode);
-      if (direction === 'source' && sourceHandleKey) {
+      const resolvedSourceHandle = sourceHandleKey || 'root';
+      const resolvedTargetHandle = targetHandleKey || 'root';
+      if (direction === 'source' && resolvedSourceHandle) {
         const handle = sourceHandles.find(
-          h => h.key === sourceHandleKey && (h.type === 'output' || h.type === 'bidirectional')
+          h => h.key === resolvedSourceHandle && (h.type === 'output' || h.type === 'bidirectional')
         );
         if (handle) return { ...handle.position, fromHandle: true };
       }
-      if (direction === 'target' && targetHandleKey) {
+      if (direction === 'target' && resolvedTargetHandle) {
         const handle = targetHandles.find(
-          h => h.key === targetHandleKey && (h.type === 'input' || h.type === 'bidirectional')
+          h => h.key === resolvedTargetHandle && (h.type === 'input' || h.type === 'bidirectional')
         );
         if (handle) return { ...handle.position, fromHandle: true };
       }

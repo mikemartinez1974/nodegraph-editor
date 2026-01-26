@@ -118,7 +118,13 @@ export default function useInterpreterLayer({
     }
 
     emitTelemetry('validator', intent);
-    const validation = validateGraphInvariants({ nodes, edges, edgeRoutes, clusters: groups });
+    const validation = validateGraphInvariants({
+      nodes,
+      edges,
+      edgeRoutes,
+      clusters: groups,
+      mode: 'mutation'
+    });
     if (!validation.ok) {
       setSnackbar({
         open: true,

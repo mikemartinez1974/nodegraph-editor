@@ -148,6 +148,7 @@ export default function PropertiesPanel({
   const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
   const [jsonViewRevision, setJsonViewRevision] = useState(0);
   const [dataEntriesRevision, setDataEntriesRevision] = useState(0);
+  const [handleEntries, setHandleEntries] = useState([]);
   const resizeStateRef = useRef(null);
   const dataEntriesRef = useRef([]);
   const pendingJsonPersistRef = useRef(false);
@@ -159,6 +160,30 @@ export default function PropertiesPanel({
   const connectedEdges = useMemo(() => buildConnectedEdges(selectedNode, edges), [selectedNode, edges]);
   const edgeSourceNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.source) : null), [nodes, selectedEdge]);
   const edgeTargetNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.target) : null), [nodes, selectedEdge]);
+  const edgeSourceHandles = useMemo(() => {
+    if (!edgeSourceNode) return [{ id: "root", label: "root" }];
+    const handles = Array.isArray(edgeSourceNode.handles) ? edgeSourceNode.handles : [];
+    const mapped = handles.map((handle) => ({
+      id: handle?.id || handle?.key || "",
+      label: handle?.label || handle?.id || handle?.key || ""
+    })).filter((handle) => handle.id);
+    if (!mapped.some((handle) => handle.id === "root")) {
+      mapped.unshift({ id: "root", label: "root" });
+    }
+    return mapped.length ? mapped : [{ id: "root", label: "root" }];
+  }, [edgeSourceNode]);
+  const edgeTargetHandles = useMemo(() => {
+    if (!edgeTargetNode) return [{ id: "root", label: "root" }];
+    const handles = Array.isArray(edgeTargetNode.handles) ? edgeTargetNode.handles : [];
+    const mapped = handles.map((handle) => ({
+      id: handle?.id || handle?.key || "",
+      label: handle?.label || handle?.id || handle?.key || ""
+    })).filter((handle) => handle.id);
+    if (!mapped.some((handle) => handle.id === "root")) {
+      mapped.unshift({ id: "root", label: "root" });
+    }
+    return mapped.length ? mapped : [{ id: "root", label: "root" }];
+  }, [edgeTargetNode]);
   const edgeConnectedNodes = useMemo(() => {
     if (!selectedEdge) return [];
     const list = [];
@@ -203,6 +228,50 @@ export default function PropertiesPanel({
     }
   }, [dataEntries]);
   const selectedType = selectedNode?.type || "";
+  const handleEntriesRef = useRef([]);
+
+  useEffect(() => {
+    handleEntriesRef.current = handleEntries;
+  }, [handleEntries]);
+
+  useEffect(() => {
+    if (!selectedNode) {
+      setHandleEntries([]);
+      return;
+    }
+    const next = Array.isArray(selectedNode.handles)
+      ? selectedNode.handles.map((handle) => ({
+          id: handle?.id || handle?.key || "",
+          label: handle?.label || "",
+          direction: handle?.direction || "output",
+          dataType: handle?.dataType || handle?.type || "any",
+          position: handle?.position || { side: "right", offset: 0.5 }
+        }))
+      : [];
+    if (next.length === 0) {
+      setHandleEntries([
+        {
+          id: "root",
+          label: "root",
+          direction: "bidirectional",
+          dataType: "any",
+          position: { side: "left", offset: 0.5 }
+        }
+      ]);
+      return;
+    }
+    const hasRoot = next.some((entry) => entry.id === "root");
+    if (!hasRoot) {
+      next.push({
+        id: "root",
+        label: "root",
+        direction: "bidirectional",
+        dataType: "any",
+        position: { side: "left", offset: 0.5 }
+      });
+    }
+    setHandleEntries(next);
+  }, [selectedNode?.id]);
 
   const handleResizeMove = useCallback(
     (event) => {
@@ -331,11 +400,13 @@ export default function PropertiesPanel({
 
   const edgeTypeOptions = useMemo(
     () =>
-      Object.entries(edgeTypes).map(([value, meta]) => ({
-        value,
-        label: meta?.label || value,
-        description: meta?.description || ""
-      })),
+      Object.entries(edgeTypes)
+        .filter(([, meta]) => !meta?.deprecated)
+        .map(([value, meta]) => ({
+          value,
+          label: meta?.label || value,
+          description: meta?.description || ""
+        })),
     []
   );
 
@@ -392,6 +463,15 @@ export default function PropertiesPanel({
       onUpdateEdge(selectedEdge.id, { style: undefined });
     }
   }, [isEdgeSelected, isNodeSelected, onUpdateEdge, onUpdateNode, selectedEdge, selectedNode]);
+
+  const handleEdgeDataChange = useCallback(
+    (patch) => {
+      if (!selectedEdge) return;
+      const nextData = { ...(selectedEdge.data || {}), ...patch };
+      onUpdateEdge(selectedEdge.id, { data: nextData });
+    },
+    [onUpdateEdge, selectedEdge]
+  );
 
   const handleNodeTypeChange = useCallback(
     (value) => {
@@ -549,6 +629,27 @@ export default function PropertiesPanel({
     if (!selectedGroup) return;
     onUpdateGroup(selectedGroup.id, { locked: !selectedGroup.locked });
   }, [onUpdateGroup, selectedGroup]);
+
+  const isPortNode = Boolean(isNodeSelected && selectedNode?.type === "port");
+  const portData = selectedNode?.data || {};
+  const portTarget = portData?.target || {};
+
+  const updatePortTarget = useCallback(
+    (patch) => {
+      if (!selectedNode) return;
+      const nextTarget = { ...(portTarget || {}), ...patch };
+      onUpdateNode(selectedNode.id, { data: { target: nextTarget } });
+    },
+    [onUpdateNode, portTarget, selectedNode]
+  );
+
+  const updatePortDataField = useCallback(
+    (patch) => {
+      if (!selectedNode) return;
+      onUpdateNode(selectedNode.id, { data: patch });
+    },
+    [onUpdateNode, selectedNode]
+  );
 
   const applyGroupStylePatch = useCallback(
     (patch) => {
@@ -780,6 +881,244 @@ export default function PropertiesPanel({
     </Section>
   );
 
+  const commitHandleEntries = useCallback(
+    (nextEntries) => {
+      setHandleEntries(nextEntries);
+      if (!selectedNode) return;
+      const sanitized = nextEntries
+        .map((entry) => ({
+          id: entry.id?.trim() || undefined,
+          label: entry.label?.trim() || undefined,
+          direction: entry.direction || "output",
+          dataType: entry.dataType || "any",
+          position: entry.position || { side: "right", offset: 0.5 }
+        }))
+        .filter((entry) => entry.id);
+      const hasRoot = sanitized.some((entry) => entry.id === "root");
+      const rootHandle = {
+        id: "root",
+        label: "root",
+        direction: "bidirectional",
+        dataType: "any",
+        position: { side: "left", offset: 0.5 }
+      };
+      const nextHandles = hasRoot ? sanitized : [...sanitized, rootHandle];
+      onUpdateNode(selectedNode.id, { handles: nextHandles });
+    },
+    [onUpdateNode, selectedNode]
+  );
+
+  const handleHandleChange = useCallback(
+    (index, patch) => {
+      const next = handleEntriesRef.current.map((entry, idx) =>
+        idx === index ? { ...entry, ...patch } : entry
+      );
+      commitHandleEntries(next);
+    },
+    [commitHandleEntries]
+  );
+
+  const handleHandlePositionChange = useCallback(
+    (index, patch) => {
+      const next = handleEntriesRef.current.map((entry, idx) =>
+        idx === index ? { ...entry, position: { ...(entry.position || {}), ...patch } } : entry
+      );
+      commitHandleEntries(next);
+    },
+    [commitHandleEntries]
+  );
+
+  const handleAddHandle = useCallback(() => {
+    const next = [
+      ...handleEntriesRef.current,
+      { id: "", label: "", direction: "output", dataType: "any", position: { side: "right", offset: 0.5 } }
+    ];
+    commitHandleEntries(next);
+  }, [commitHandleEntries]);
+
+  const handleRemoveHandle = useCallback(
+    (index) => {
+      const target = handleEntriesRef.current[index];
+      if (target?.id === "root") return;
+      const next = handleEntriesRef.current.filter((_, idx) => idx !== index);
+      commitHandleEntries(next);
+    },
+    [commitHandleEntries]
+  );
+
+  const renderHandlesSection = () => (
+    <Section
+      title="Handles"
+      value="handles"
+      expanded={expandedSections.node === "handles"}
+      onToggle={handleAccordionChange("node", "handles")}
+      disabled={!isNodeSelected}
+    >
+      <Stack spacing={1}>
+        <Button size="small" variant="outlined" onClick={handleAddHandle}>
+          Add handle
+        </Button>
+        {handleEntries.length ? (
+          handleEntries.map((handle, index) => (
+            <Paper key={`handle-${index}`} variant="outlined" sx={{ p: 1 }}>
+              <Stack spacing={1}>
+                <Stack direction="row" spacing={1}>
+                  <TextField
+                    label="ID"
+                    size="small"
+                    fullWidth
+                    value={handle.id}
+                    onChange={(event) => handleHandleChange(index, { id: event.target.value })}
+                  />
+                  <TextField
+                    label="Label"
+                    size="small"
+                    fullWidth
+                    value={handle.label}
+                    onChange={(event) => handleHandleChange(index, { label: event.target.value })}
+                  />
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id={`handle-direction-${index}`}>Direction</InputLabel>
+                    <Select
+                      labelId={`handle-direction-${index}`}
+                      label="Direction"
+                      value={handle.direction}
+                      onChange={(event) => handleHandleChange(index, { direction: event.target.value })}
+                    >
+                      <MenuItem value="input">input</MenuItem>
+                      <MenuItem value="output">output</MenuItem>
+                      <MenuItem value="bidirectional">bidirectional</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id={`handle-type-${index}`}>Type</InputLabel>
+                    <Select
+                      labelId={`handle-type-${index}`}
+                      label="Type"
+                      value={handle.dataType}
+                      onChange={(event) => handleHandleChange(index, { dataType: event.target.value })}
+                    >
+                      <MenuItem value="any">any</MenuItem>
+                      <MenuItem value="value">value</MenuItem>
+                      <MenuItem value="trigger">trigger</MenuItem>
+                      <MenuItem value="string">string</MenuItem>
+                      <MenuItem value="number">number</MenuItem>
+                      <MenuItem value="boolean">boolean</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id={`handle-side-${index}`}>Side</InputLabel>
+                    <Select
+                      labelId={`handle-side-${index}`}
+                      label="Side"
+                      value={handle.position?.side || "right"}
+                      onChange={(event) => handleHandlePositionChange(index, { side: event.target.value })}
+                    >
+                      <MenuItem value="left">left</MenuItem>
+                      <MenuItem value="right">right</MenuItem>
+                      <MenuItem value="top">top</MenuItem>
+                      <MenuItem value="bottom">bottom</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    label="Offset"
+                    size="small"
+                    fullWidth
+                    value={handle.position?.offset ?? 0.5}
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      handleHandlePositionChange(index, { offset: Number.isFinite(value) ? value : 0.5 });
+                    }}
+                  />
+                  <IconButton size="small" onClick={() => handleRemoveHandle(index)}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </Paper>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No handles declared. Handles are optional unless declared.
+          </Typography>
+        )}
+      </Stack>
+    </Section>
+  );
+
+  const renderPortSection = () => (
+    <Section
+      title="Port target"
+      value="port"
+      expanded={expandedSections.node === "port"}
+      onToggle={handleAccordionChange("node", "port")}
+      disabled={!isPortNode}
+    >
+      <Stack spacing={1}>
+        <TextField
+          label="Target URL"
+          size="small"
+          fullWidth
+          value={portTarget.url || ""}
+          onChange={(event) => updatePortTarget({ url: event.target.value })}
+        />
+        <TextField
+          label="Target graphId"
+          size="small"
+          fullWidth
+          value={portTarget.graphId || ""}
+          onChange={(event) => updatePortTarget({ graphId: event.target.value })}
+        />
+        <TextField
+          label="Target nodeId"
+          size="small"
+          fullWidth
+          value={portTarget.nodeId || ""}
+          onChange={(event) => updatePortTarget({ nodeId: event.target.value })}
+        />
+        <TextField
+          label="Target handleId"
+          size="small"
+          fullWidth
+          value={portTarget.handleId || ""}
+          onChange={(event) => updatePortTarget({ handleId: event.target.value })}
+        />
+        <TextField
+          label="Target label"
+          size="small"
+          fullWidth
+          value={portTarget.label || ""}
+          onChange={(event) => updatePortTarget({ label: event.target.value })}
+        />
+        <TextField
+          label="Intent"
+          size="small"
+          fullWidth
+          value={portData.intent || ""}
+          onChange={(event) => updatePortDataField({ intent: event.target.value })}
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Security</InputLabel>
+          <Select
+            value={portData.security || "prompt"}
+            label="Security"
+            onChange={(event) => updatePortDataField({ security: event.target.value })}
+          >
+            {["prompt", "allow", "deny"].map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+    </Section>
+  );
+
   const renderFormattingSection = () => (
     <Section
       title="Formatting"
@@ -983,9 +1322,8 @@ export default function PropertiesPanel({
 
   const renderNodeView = () => (
     <>
-      {renderPayloadSection()}
       {availableNodeTypeOptions.length > 0 && isNodeSelected && (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1, mb: 2 }}>
           <FormControl fullWidth size="small">
             <InputLabel id="properties-node-type-label">Node Type</InputLabel>
             <Select
@@ -1003,6 +1341,9 @@ export default function PropertiesPanel({
           </FormControl>
         </Box>
       )}
+      {renderPayloadSection()}
+      {isPortNode && renderPortSection()}
+      {renderHandlesSection()}
       {renderNodeEdgesSection()}
       {renderFormattingSection()}
       {renderStyleSection()}
@@ -1045,15 +1386,89 @@ export default function PropertiesPanel({
                 {edgeTargetNode?.label || edgeTargetNode?.id || selectedEdge?.target}
               </Typography>
           <Typography variant="caption">Handles</Typography>
-          <Typography variant="body2">
-            {selectedEdge?.sourceHandle || "out"} → {selectedEdge?.targetHandle || "in"}
-          </Typography>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Source handle</InputLabel>
+              <Select
+                label="Source handle"
+                value={selectedEdge?.sourceHandle || "root"}
+                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { sourceHandle: event.target.value })}
+              >
+                {edgeSourceHandles.map((handle) => (
+                  <MenuItem key={handle.id} value={handle.id}>
+                    {handle.label || handle.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel>Target handle</InputLabel>
+              <Select
+                label="Target handle"
+                value={selectedEdge?.targetHandle || "root"}
+                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { targetHandle: event.target.value })}
+              >
+                {edgeTargetHandles.map((handle) => (
+                  <MenuItem key={handle.id} value={handle.id}>
+                    {handle.label || handle.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
           <TextField
             label="Label"
             size="small"
             fullWidth
             value={selectedEdge?.label || ""}
             onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { label: event.target.value })}
+          />
+          <FormControl fullWidth size="small">
+            <InputLabel id="edge-strength-label">Strength</InputLabel>
+            <Select
+              labelId="edge-strength-label"
+              label="Strength"
+              value={selectedEdge?.data?.strength || "normal"}
+              onChange={(event) => handleEdgeDataChange({ strength: event.target.value })}
+            >
+              <MenuItem value="weak">Weak</MenuItem>
+              <MenuItem value="normal">Normal</MenuItem>
+              <MenuItem value="strong">Strong</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <InputLabel id="edge-flow-label">Flow</InputLabel>
+            <Select
+              labelId="edge-flow-label"
+              label="Flow"
+              value={selectedEdge?.data?.flow || "none"}
+              onChange={(event) => handleEdgeDataChange({ flow: event.target.value })}
+            >
+              <MenuItem value="none">None</MenuItem>
+              <MenuItem value="data">Data</MenuItem>
+              <MenuItem value="energy">Energy</MenuItem>
+              <MenuItem value="control">Control</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <InputLabel id="edge-direction-label">Direction</InputLabel>
+            <Select
+              labelId="edge-direction-label"
+              label="Direction"
+              value={selectedEdge?.data?.direction || "forward"}
+              onChange={(event) => handleEdgeDataChange({ direction: event.target.value })}
+            >
+              <MenuItem value="forward">Forward</MenuItem>
+              <MenuItem value="reverse">Reverse</MenuItem>
+              <MenuItem value="bidirectional">Bidirectional</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Intent"
+            size="small"
+            fullWidth
+            value={selectedEdge?.data?.intent || ""}
+            onChange={(event) => handleEdgeDataChange({ intent: event.target.value })}
           />
           <Stack direction="row" spacing={1}>
             <Button size="small" variant="text" onClick={() => onSelectEdge?.(selectedEdge.id)}>

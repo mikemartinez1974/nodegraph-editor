@@ -22,6 +22,7 @@ import ManifestNode from './Nodes/ManifestNode.js';
 import DictionaryNode from './Nodes/DictionaryNode.js';
 import LegendNode from './Nodes/LegendNode.js';
 import ViewNode from './Nodes/ViewNode.js';
+import PortNode from './Nodes/PortNode.js';
 import { getInstalledPlugins } from './plugins/pluginRegistry.js';
 import { convertHandlesObjectToArray } from './utils/handleUtils.js';
 
@@ -96,6 +97,24 @@ const baseNodeTypeRegistry = {
         web: {
           html: '<div>View payload</div>'
         }
+      }
+    }
+  },
+  port: {
+    component: PortNode,
+    label: 'Port',
+    description: 'External endpoint connector node',
+    icon: 'Link',
+    category: 'structure',
+    defaultWidth: 220,
+    defaultHeight: 140,
+    defaultData: {
+      intent: 'external',
+      target: {
+        url: '',
+        graphId: '',
+        nodeId: '',
+        label: ''
       }
     }
   },
@@ -316,6 +335,24 @@ export const nodeTypeMetadata = [
       entries: [
         { key: 'concept', intent: 'what it means', implementation: 'how it appears', dictionaryKey: 'concept' }
       ]
+    }
+  },
+  {
+    type: 'port',
+    label: 'Port',
+    description: 'External endpoint connector node',
+    icon: 'Link',
+    category: 'structure',
+    defaultWidth: 220,
+    defaultHeight: 140,
+    defaultData: {
+      intent: 'external',
+      target: {
+        url: '',
+        graphId: '',
+        nodeId: '',
+        label: ''
+      }
     }
   },
   {

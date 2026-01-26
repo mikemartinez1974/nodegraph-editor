@@ -41,7 +41,8 @@
         "dependencies": {
           "nodeTypes": [
             "demo.min",
-            "demo.svg"
+            "demo.svg",
+            "demo.text"
           ],
           "handleContracts": [
             "core"
@@ -101,6 +102,12 @@
             "ref": "/tlz/nodes/minimum-node-definition-svg.node",
             "source": "local",
             "version": ">=1.0.0"
+          },
+          {
+            "key": "demo.text",
+            "ref": "/tlz/nodes/text-node-definition.node",
+            "source": "local",
+            "version": ">=1.0.0"
           }
         ],
         "skills": [],
@@ -116,6 +123,13 @@
             "key": "demo.svg",
             "view": "twilite.web",
             "ref": "/tlz/nodes/minimum-node-definition-svg.node",
+            "source": "local",
+            "version": ">=1.0.0"
+          },
+          {
+            "key": "demo.text",
+            "view": "twilite.web",
+            "ref": "/tlz/nodes/text-node-definition.node",
             "source": "local",
             "version": ">=1.0.0"
           }
@@ -152,6 +166,56 @@
       "showLabel": true,
       "data": {
         "memo": "Rendered via SVG view"
+      }
+    },
+    {
+      "id": "demo-node-text-0001",
+      "type": "demo.text",
+      "label": "Text Node",
+      "position": {
+        "x": 120,
+        "y": 460
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "text": "This is a **custom text node** rendered via a view definition."
+      }
+    },
+    {
+      "id": "legend-0001",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": 520,
+        "y": -120
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "demo.min",
+            "intent": "render a minimal definition",
+            "implementation": "view-only HTML payload",
+            "dictionaryKey": "demo.min"
+          },
+          {
+            "key": "demo.svg",
+            "intent": "render an SVG card",
+            "implementation": "SVG gradient + icon",
+            "dictionaryKey": "demo.svg"
+          },
+          {
+            "key": "note",
+            "intent": "descriptive only",
+            "implementation": "annotation with no dictionary link"
+          }
+        ]
       }
     }
   ],

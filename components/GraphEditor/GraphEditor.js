@@ -34,6 +34,7 @@ import {
   setManifestDocumentUrl,
   setManifestSettings
 } from './utils/manifestUtils';
+import { validateGraphInvariants } from './validators/validateGraphInvariants';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
@@ -1894,9 +1895,32 @@ useEffect(() => {
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
             const groupsToLoadFromJson = jsonData.clusters || jsonData.groups || [];
+            const { errors, warnings } = validateGraphInvariants({
+              nodes: nodesToLoad,
+              edges: edgesToLoadFromJson,
+              clusters: groupsToLoadFromJson,
+              mode: 'load'
+            });
+            if (errors.length > 0) {
+              const message = errors[0]?.message || 'Manifest validation failed.';
+              setSnackbar({
+                open: true,
+                message: `Load blocked: ${message}`,
+                severity: 'error'
+              });
+              return;
+            }
             handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             try { eventBus.emit('forceRedraw'); } catch (e) { /* ignore */ }
-            setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
+            if (warnings.length > 0) {
+              setSnackbar({
+                open: true,
+                message: `Graph loaded with ${warnings.length} warning${warnings.length === 1 ? '' : 's'}.`,
+                severity: 'warning'
+              });
+            } else {
+              setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
+            }
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
             return;
           }
@@ -2201,9 +2225,12 @@ useEffect(() => {
       return source.find(n => n.id === id) || null;
     };
 
-    const fallbackHandle = (kind) => kind === 'inputs'
-      ? { key: 'in', label: 'In', type: 'trigger' }
-      : { key: 'out', label: 'Out', type: 'trigger' };
+    const fallbackHandle = () => ({
+      key: 'root',
+      label: 'Root',
+      type: 'value',
+      position: { side: 'left', offset: 0.5 }
+    });
 
     const sanitizeHandle = (handle, kind, index = 0) => {
       if (handle && typeof handle === 'object') {
@@ -2273,9 +2300,9 @@ useEffect(() => {
           return;
         }
 
-        const startHandleKey = handle?.key || handle?.handleKey || (direction === 'source' ? 'out' : 'in');
+      const startHandleKey = handle?.key || handle?.handleKey || 'root';
         const startHandleType = handle?.handleType || 'trigger';
-        const resolvedEdgeType = edgeType || 'default';
+        const resolvedEdgeType = edgeType || 'relates';
         const edgeStyle = EdgeTypes[resolvedEdgeType]?.style || {};
         const sourceNodeObj = getNodeById(sourceNode);
         const isBreadboardComponent =

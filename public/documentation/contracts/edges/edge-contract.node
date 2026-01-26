@@ -59,7 +59,7 @@
     {
       "id": "edge-contract-root",
       "type": "markdown",
-      "label": "🔗 Edge Contract (Normative)",
+      "label": "\ud83d\udd17 Edge Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required Fields (REQUIRED)\n\nEvery edge MUST include:\n\n```json\n{\n  \"id\": \"uuid-v4\",\n  \"source\": \"node-id\",\n  \"target\": \"node-id\",\n  \"type\": \"string\"\n}\n```\n\n- `id` must be unique\n- `source` and `target` must reference existing nodes\n- `type` expresses semantic intent"
+        "markdown": "## Required Fields (REQUIRED)\n\nEvery edge MUST include:\n\n```json\n{\n  \"id\": \"uuid-v4\",\n  \"source\": \"node-id\",\n  \"target\": \"node-id\",\n  \"type\": \"string\"\n}\n```\n\n- `id` must be unique\n- `source` and `target` must reference existing nodes\n- `type` is a canonical semantic primitive (see Edge Types)"
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- label is human-readable only\n- data/style/state are metadata\n- handles are optional"
+        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- `label` is human-readable only\n- `data` holds semantic attributes (strength/flow/direction/intent)\n- `style` and `state` are metadata\n- handles are optional"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handle Policy (REQUIRED)\n\n- Handles are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to node boundary\n\nTools and agents MUST NOT invent handles"
+        "markdown": "## Handle Policy (REQUIRED)\n\n- Handles are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to the default **root** handle\n\nTools and agents MUST NOT invent handles"
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edge Type Contract (REQUIRED)\n\n`type` MUST be a string.\n\nRecommended core types:\n- dataFlow\n- reference\n- straight\n- child\n\nProjects may add types, but semantics MUST be defined in Definitions."
+        "markdown": "## Edge Type Contract (REQUIRED)\n\n`type` MUST be a string semantic primitive.\n\nCanonical core types:\n- relates\n- contains\n- dependsOn\n- requires\n- precedes\n- derivesFrom\n- constrains\n- governs\n- equivalentTo\n- transformsTo\n- conflictsWith\n- references\n\nProjects may add types, but semantics MUST be defined in Dictionary."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. handle rules are respected\n4. handle contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. handle rules are respected (default `root` if omitted)\n4. handle contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
       }
     },
     {

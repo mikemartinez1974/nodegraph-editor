@@ -152,16 +152,31 @@ const toHandleMeta = (handle) => ({
 const getHandleList = (node, field) => {
   if (!node) return [];
   const unified = extractHandlesFromUnified(node, field);
+  const rootHandle = {
+    key: 'root',
+    label: 'root',
+    type: 'value',
+    direction: field === 'outputs' ? 'output' : 'input',
+    position: { side: 'left', offset: 0.5 }
+  };
   if (unified.length > 0) {
-    return unified.map(handle => cloneHandleDescriptor(handle));
+    const list = unified.map(handle => cloneHandleDescriptor(handle));
+    if (!list.some(handle => handle.key === 'root')) {
+      list.push(rootHandle);
+    }
+    return list;
   }
   const handles = Array.isArray(node[field]) ? node[field].filter(Boolean) : [];
   if (handles.length === 0) {
-    return [];
+    return [rootHandle];
   }
-  return handles
+  const list = handles
     .map((handle, index) => toHandleDescriptor(handle, field === 'outputs' ? 'output' : 'input', index))
     .filter(Boolean);
+  if (!list.some(handle => handle.key === 'root')) {
+    list.push(rootHandle);
+  }
+  return list;
 };
 
 const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
@@ -378,7 +393,7 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
     return { error: `Target node ${normalizedTarget} not found` };
   }
 
-  const edgeType = edgeInput.type || defaultType || 'child';
+  const edgeType = edgeInput.type || defaultType || 'relates';
   const handleValidation = validateHandlePair(
     sourceNode,
     targetNode,
@@ -731,7 +746,7 @@ export default class GraphCRUD {
    * @param {string} options.id - Optional custom ID
    * @param {string} options.source - Source node ID
    * @param {string} options.target - Target node ID
-   * @param {string} options.type - Edge type (child, peer, etc)
+   * @param {string} options.type - Edge type (relates, contains, dependsOn, etc)
    * @param {string} options.label - Edge label
    * @param {Object} options.style - {width, dash, curved, color}
    * @returns {Object} Result with created edge
@@ -746,7 +761,7 @@ export default class GraphCRUD {
         nodeMap,
         existingEdgeIds,
         generateId: () => this._generateId(),
-        defaultType: edgeInput.type || 'child'
+        defaultType: edgeInput.type || 'relates'
       });
 
       if (error) {
@@ -1623,7 +1638,7 @@ export default class GraphCRUD {
             nodeMap,
             existingEdgeIds,
             generateId: () => this._generateId(),
-            defaultType: newEdge.type || edge.type || 'child'
+            defaultType: newEdge.type || edge.type || 'relates'
           });
           if (error) {
             edgeErrors.push(`Edge ${index}: ${error}`);
@@ -1854,7 +1869,7 @@ crud.createEdge({
   target: "node2",
   sourceHandle: "out",
   targetHandle: "in",
-  type: "child"
+  type: "relates"
 });
 
 // Update node

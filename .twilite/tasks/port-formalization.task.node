@@ -1,0 +1,429 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Port Formalization",
+    "description": "Port endpoint node semantics + schema + runtime behavior",
+    "created": "2026-01-26T17:49:28Z",
+    "modified": "2026-01-26T17:49:28Z",
+    "author": "",
+    "tags": [
+      "port",
+      "edges",
+      "external",
+      "contracts"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "be82db23-04d4-4bdb-adc0-5d7a9359b5b8",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "4617a050-cbf7-4b3c-bd47-56aefc6f061a",
+          "name": "Port Formalization",
+          "version": "0.1.0",
+          "description": "Port endpoint node semantics + schema + runtime behavior",
+          "createdAt": "2026-01-26T17:49:28Z",
+          "updatedAt": "2026-01-26T17:49:28Z"
+        },
+        "intent": {
+          "kind": "planning",
+          "scope": "graph-system"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "markdown",
+            "port"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": null,
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "75cf726a-5424-403e-96be-e7dec039ca18",
+      "type": "markdown",
+      "label": "Port Node Formalization",
+      "position": {
+        "x": -80,
+        "y": -360
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Port Node Formalization\n\nGoal: define the **port** node as an external edge endpoint.\n\nPorts are nodes that stand in for external endpoints, keeping all edges local and valid."
+      },
+      "handles": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "0f3ad6b7-9c43-4a48-8d68-7f6a6d4b3d3b",
+      "type": "port",
+      "label": "Port → Edge Formalization",
+      "position": {
+        "x": 520,
+        "y": -360
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "task-link",
+        "target": {
+          "graphId": "66ad7ccf-01aa-4709-8013-6c86f81cb4a0",
+          "url": "/twilite/tasks/edge-formalization.task.node",
+          "label": "Edge Formalization"
+        }
+      }
+    },
+    {
+      "id": "3cebae35-4cc6-4f97-90b6-bf7864d664a5",
+      "type": "markdown",
+      "label": "Semantics",
+      "position": {
+        "x": -520,
+        "y": -40
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantics\n\n- A **port** is a node that represents an external endpoint.\n- Edges stay local: `node \u2192 port`.\n- The port declares where the connection leads (graph/node/handle).\n- Missing target is a warning, not an error."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "ce9bad2a-87bc-419e-86a6-fc6e0a88de42",
+      "type": "markdown",
+      "label": "Schema (Minimum)",
+      "position": {
+        "x": -80,
+        "y": -40
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Schema (Minimum)\n\n```json\n{\n  \"type\": \"port\",\n  \"data\": {\n    \"direction\": \"in|out|bidirectional\",\n    \"target\": {\n      \"graphId\": \"uuid?\",\n      \"url\": \"string?\",\n      \"nodeId\": \"uuid?\",\n      \"handleId\": \"string?\"\n    },\n    \"label\": \"string?\",\n    \"intent\": \"string?\",\n    \"security\": \"prompt|allow|deny\"\n  }\n}\n```\n\n- `target` may include graphId, url, or both (both preferred).\n- Missing target is a warning.\n- Handles optional \u2192 default `root`."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "a1ee89bb-2b77-4064-9342-2321f069a191",
+      "type": "markdown",
+      "label": "Runtime Behavior",
+      "position": {
+        "x": 360,
+        "y": -40
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Runtime Behavior\n\n- Render as connector/portal glyph.\n- Show target summary (graphId/url).\n- Click \u2192 prompt then navigate.\n- Never auto-execute external scripts.\n- Warnings for unresolved targets."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "0f03100f-4ca9-4dc3-8444-aa75eaf3ee46",
+      "type": "markdown",
+      "label": "Implementation Path",
+      "position": {
+        "x": -160,
+        "y": 320
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implementation Path\n\n1) Add `port` node type in registry\n2) Create PortNode renderer\n3) Properties panel editor for target\n4) Validation warnings for missing target\n5) Navigation action (prompted)"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "1981fad7-e383-4f15-87aa-3bcf7b5c74fa",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 260,
+        "y": 320
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n- Native node vs definition+view?\n- Default direction? (proposed: out)\n- Always prompt vs allowlist?"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "6750ee6a-f2c5-4d2f-baef-29d6781d87e0",
+      "type": "straight",
+      "source": "75cf726a-5424-403e-96be-e7dec039ca18",
+      "target": "3cebae35-4cc6-4f97-90b6-bf7864d664a5",
+      "label": "define",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "0bc8b783-9d80-4058-9387-8d486880cd4c",
+      "type": "straight",
+      "source": "75cf726a-5424-403e-96be-e7dec039ca18",
+      "target": "ce9bad2a-87bc-419e-86a6-fc6e0a88de42",
+      "label": "schema",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "42814f63-d502-487d-a6b1-bca49a6fb0d0",
+      "type": "straight",
+      "source": "75cf726a-5424-403e-96be-e7dec039ca18",
+      "target": "a1ee89bb-2b77-4064-9342-2321f069a191",
+      "label": "runtime",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "9650216b-fe8e-45b4-b125-2979718cf748",
+      "type": "straight",
+      "source": "ce9bad2a-87bc-419e-86a6-fc6e0a88de42",
+      "target": "0f03100f-4ca9-4dc3-8444-aa75eaf3ee46",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "2bedaad4-69cf-414a-bfd2-dddfa6bb3f14",
+      "type": "straight",
+      "source": "a1ee89bb-2b77-4064-9342-2321f069a191",
+      "target": "0f03100f-4ca9-4dc3-8444-aa75eaf3ee46",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "35d68b59-a449-448b-9fb8-8a9a8c8e17ed",
+      "type": "straight",
+      "source": "0f03100f-4ca9-4dc3-8444-aa75eaf3ee46",
+      "target": "1981fad7-e383-4f15-87aa-3bcf7b5c74fa",
+      "label": "decisions",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "0e0a8c5e-6b97-4f0b-8c24-7a1c3e6d2a11",
+      "type": "references",
+      "source": "75cf726a-5424-403e-96be-e7dec039ca18",
+      "target": "0f3ad6b7-9c43-4a48-8d68-7f6a6d4b3d3b",
+      "label": "edge task",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

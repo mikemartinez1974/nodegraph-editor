@@ -59,7 +59,7 @@
     {
       "id": "handle-contract-root",
       "type": "markdown",
-      "label": "🔌 Handle Contract (Normative)",
+      "label": "\ud83d\udd0c Handle Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Handle Contract Template\n\n**Authority:** Normative\n\nAny edge created, mutated, rendered, or interpreted **MUST** conform to a handle contract defined by this graph.\n\nTools and agents may not guess, infer, or invent handle behavior.\n\nThis graph is the contract."
+        "markdown": "# Handle Contract Template\n\n**Authority:** Normative\n\nAny edge created, mutated, rendered, or interpreted **MUST** conform to a handle contract defined by this graph.\n\nTools and agents may not guess, infer, or invent handle behavior.\n\nAll nodes expose a default `root` handle (see 0.1).\n\nThis graph is the contract."
       }
     },
     {
@@ -229,7 +229,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- direction correctness\n- semantic type compatibility\n- multiplicity limits\n- structural constraints\n- wildcard policy\n\nFailure blocks persistence and execution."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- direction correctness\n- semantic type compatibility\n- multiplicity limits\n- structural constraints\n- wildcard policy\n\nIf no handle is specified, treat it as `root` (no error).\n\nFailure blocks persistence and execution."
       }
     },
     {
@@ -245,7 +245,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out → nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out → nodeA.data_out"
+        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out \u2192 nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out \u2192 nodeA.data_out"
       }
     },
     {
@@ -294,6 +294,22 @@
       "showLabel": true,
       "data": {
         "markdown": "## Human Notes (OPTIONAL)\n\nDesign intent, rationale, and edge cases.\n\nIgnored by validators but critical for stewardship."
+      }
+    },
+    {
+      "id": "handle-default-root",
+      "type": "markdown",
+      "label": "0.1 Default Root Handle",
+      "position": {
+        "x": -900,
+        "y": 160
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Default Root Handle (REQUIRED)\n\nEvery node exposes a default handle named **root**.\n\n- Edges without handles attach to `root`\n- `root` preserves portability for minimal graphs\n- `root` exists even when other handles are declared\n\nA dedicated `root` contract is optional unless a node type needs strict semantics."
       }
     }
   ],
@@ -420,6 +436,15 @@
       "type": "references",
       "source": "handle-contract-root",
       "target": "handle-human-notes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-default",
+      "type": "governs",
+      "source": "handle-contract-root",
+      "target": "handle-default-root",
       "label": "",
       "style": {},
       "data": {}

@@ -35,7 +35,6 @@ These fields MUST be present on every node of this type.
 {
   "id": "string (uuid)",
   "type": "<type>",
-  "label": "string",
   "data": {}
 }
 ```
@@ -46,7 +45,6 @@ Field definitions:
 | ------ | ------ | ---------------------------- |
 | id     | string | Stable, immutable identifier |
 | type   | string | Node type (immutable)        |
-| label  | string | Human-readable name          |
 | data   | object | Type-specific payload        |
 
 ---
@@ -55,11 +53,20 @@ Field definitions:
 
 These fields MAY be present but MUST conform if used.
 
+* `label`
 * `position`
 * `size`
 * `handles`
 * `inputs / outputs`
 * `groupId`
+
+---
+
+## 3.1 View Requirement (REQUIRED)
+
+Every node must resolve to **at least one View** for rendering.
+
+Definition graphs may be view-only; instance nodes must still resolve a view via dictionary lookup.
 
 ---
 
@@ -95,6 +102,8 @@ Rules:
 ## 5. Handles (IF APPLICABLE)
 
 If this node exposes handles, each must be declared here.
+
+Every node also exposes a default handle named **root** for portability.
 
 ### Handle definition
 

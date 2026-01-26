@@ -1,0 +1,33 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Text Node Definition",
+    "description": "Custom text node that renders markdown-like content via view-only definition.",
+    "created": "2026-01-24T00:00:00.000Z",
+    "modified": "2026-01-24T00:00:00.000Z",
+    "author": "",
+    "tags": ["definition", "text", "markdown"]
+  },
+  "nodes": [
+    {
+      "id": "text-view-0001",
+      "type": "view",
+      "label": "View",
+      "position": { "x": 0, "y": 0 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "host": { "datatype": "data.twilite.web" },
+        "twilite": {
+          "web": {
+            "markdown": "# {{label}}\n\n{{data.text}}"
+          }
+        }
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

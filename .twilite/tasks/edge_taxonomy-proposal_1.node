@@ -1,0 +1,408 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Edge Taxonomy Proposal 1",
+    "description": "Proposed canonical edge types and attributes",
+    "created": "2026-01-26T02:16:32Z",
+    "modified": "2026-01-26T02:16:32Z",
+    "author": "",
+    "tags": [
+      "edges",
+      "taxonomy",
+      "contracts"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "3e684509-4547-46b8-9f4c-05b1761af119",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "048d272b-0b1b-45e7-9518-738be5f07423",
+          "name": "Edge Taxonomy Proposal 1",
+          "version": "0.1.0",
+          "description": "Proposed canonical edge types and attributes",
+          "createdAt": "2026-01-26T02:16:32Z",
+          "updatedAt": "2026-01-26T02:16:32Z"
+        },
+        "intent": {
+          "kind": "planning",
+          "scope": "graph-system"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "markdown"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": null,
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "0097e220-1968-433e-81a7-227b17692b95",
+      "type": "markdown",
+      "label": "Edge Taxonomy Proposal (v1)",
+      "position": {
+        "x": -80,
+        "y": -360
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Taxonomy Proposal (v1)\n\nGoal: define a **canonical, minimal semantic set** of edge types,\nwith additional meaning expressed as **attributes** (strength, direction, flow, etc.).\n\nThis keeps the taxonomy precise but not over\u2011specific."
+      },
+      "handles": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "4b11d4f1-1bcd-4253-86b5-7e5586acee24",
+      "type": "markdown",
+      "label": "Canonical Edge Types (Semantics)",
+      "position": {
+        "x": -520,
+        "y": -40
+      },
+      "width": 420,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Canonical Types\n\n1. relates (generic association)\n2. contains (structural containment)\n3. dependsOn (soft dependency)\n4. requires (hard dependency)\n5. precedes (sequence/order)\n6. derivesFrom (lineage/derivation)\n7. constrains (restriction/guard)\n8. governs (authority/ownership)\n9. equivalentTo (semantic equivalence)\n10. transformsTo (change of form)\n11. conflictsWith (contradiction/competition)\n12. references (graph\u2011internal citation)"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "63786c03-c469-4d74-9f35-1878af860cd7",
+      "type": "markdown",
+      "label": "Edge Attributes (Not Types)",
+      "position": {
+        "x": -80,
+        "y": -40
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Attributes\n\n- direction: forward | reverse | bidirectional\n- strength: weak | normal | strong\n- flow: none | data | energy | control\n- temporal: none | precedes (or use type)\n- style: color, route, arrows, etc. (presentation only)"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "d0824b6a-46c9-4e02-bd94-763a1fda6aaa",
+      "type": "markdown",
+      "label": "Mapping from Current Types",
+      "position": {
+        "x": 360,
+        "y": -40
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Current \u2192 Canonical\n\n- child \u2192 contains\n- peer \u2192 relates + direction=bidirectional\n- dataFlow \u2192 relates + flow=data\n- dependency \u2192 dependsOn\n- reference \u2192 references\n- bidirectional \u2192 relates + direction=bidirectional\n- weak/strong \u2192 relates + strength=weak/strong\n- temporal \u2192 precedes\n- energyFlow \u2192 relates + flow=energy\n- requires \u2192 requires\n- precedes \u2192 precedes\n- derives \u2192 derivesFrom\n- constrains \u2192 constrains\n- governs \u2192 governs\n- equivalentTo \u2192 equivalentTo"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "9c9d68ce-d851-412c-b1f7-1da081f4350d",
+      "type": "markdown",
+      "label": "Implications",
+      "position": {
+        "x": -220,
+        "y": 360
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implications\n\n- Types express semantics only.\n- Styling/strength/flow are attributes.\n- Fewer types \u2192 better portability and validation.\n- Rendering can still honor attributes for UX."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "ab80816b-37ad-48c2-902f-659f700ee118",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 260,
+        "y": 360
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n1. Edge vs link: **no difference**. A node link is the edge as seen from inside the node (handle definition / exit).\n2. TransformsTo / ConflictsWith: clarify whether they belong in canonical types now or later.\n3. Flow/Strength are **always attributes**, never types."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "97729734-cbf9-4240-898e-c328719b2446",
+      "type": "straight",
+      "source": "0097e220-1968-433e-81a7-227b17692b95",
+      "target": "4b11d4f1-1bcd-4253-86b5-7e5586acee24",
+      "label": "define",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "9aa9a778-701c-4fd7-8f8a-dc165b8ce44d",
+      "type": "straight",
+      "source": "0097e220-1968-433e-81a7-227b17692b95",
+      "target": "63786c03-c469-4d74-9f35-1878af860cd7",
+      "label": "separate",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "e7ca108a-e805-4a82-89f1-289073a99a79",
+      "type": "straight",
+      "source": "0097e220-1968-433e-81a7-227b17692b95",
+      "target": "d0824b6a-46c9-4e02-bd94-763a1fda6aaa",
+      "label": "map",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "ca6eb913-f2b8-4199-80d4-6110e6627207",
+      "type": "straight",
+      "source": "4b11d4f1-1bcd-4253-86b5-7e5586acee24",
+      "target": "9c9d68ce-d851-412c-b1f7-1da081f4350d",
+      "label": "implies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "1388922b-2975-498c-91c3-17387b344670",
+      "type": "straight",
+      "source": "63786c03-c469-4d74-9f35-1878af860cd7",
+      "target": "9c9d68ce-d851-412c-b1f7-1da081f4350d",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "937efc0a-f3ab-4f3a-b2c6-adbe7a48f46c",
+      "type": "straight",
+      "source": "d0824b6a-46c9-4e02-bd94-763a1fda6aaa",
+      "target": "9c9d68ce-d851-412c-b1f7-1da081f4350d",
+      "label": "migration",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "00b5555a-b00c-4854-b23f-928309ee41a5",
+      "type": "straight",
+      "source": "9c9d68ce-d851-412c-b1f7-1da081f4350d",
+      "target": "ab80816b-37ad-48c2-902f-659f700ee118",
+      "label": "questions",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {},
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    }
+  ],
+  "clusters": []
+}

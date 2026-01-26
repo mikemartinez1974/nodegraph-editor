@@ -21,7 +21,7 @@ Every edge must include:
 
 - `id` must be unique within the graph.
 - `source` and `target` must reference existing nodes.
-- `type` identifies semantic intent (e.g., `dataFlow`, `reference`, `straight`).
+- `type` identifies semantic intent and MUST be a canonical primitive (see Edge Types).
 
 ---
 
@@ -39,7 +39,8 @@ Every edge must include:
 ```
 
 - `label` is human-readable, not semantic logic.
-- `data`, `style`, and `state` are optional metadata.
+- `data` is where semantic attributes live (strength/flow/direction/intent).
+- `style` and `state` are optional metadata.
 - `sourceHandle` / `targetHandle` are optional **and may be omitted**.
 
 ---
@@ -48,7 +49,7 @@ Every edge must include:
 
 - Handles are **optional** for portability.
 - If handles are provided, they must match declared handles on the node.
-- If handles are omitted, the edge is still valid and must attach to the node boundary.
+- If handles are omitted, the edge is still valid and must attach to the default `root` handle.
 
 ---
 
@@ -56,12 +57,39 @@ Every edge must include:
 
 Edge `type` must be a string. Recommended core types:
 
-- `dataFlow`
-- `reference`
-- `straight`
-- `child`
+- `relates`
+- `contains`
+- `dependsOn`
+- `requires`
+- `precedes`
+- `derivesFrom`
+- `constrains`
+- `governs`
+- `equivalentTo`
+- `transformsTo`
+- `conflictsWith`
+- `references`
 
-Projects may add their own types, but they must remain strings.
+Projects may add their own types, but they must remain strings and be defined in the Dictionary.
+
+---
+
+## Semantic Attributes (Recommended)
+
+Use `edge.data` to express attributes without creating new types:
+
+```json
+{
+  "data": {
+    "strength": "weak | normal | strong",
+    "flow": "none | data | energy | control",
+    "direction": "forward | reverse | bidirectional",
+    "intent": "string"
+  }
+}
+```
+
+Attributes modify meaning without changing `type`.
 
 ---
 

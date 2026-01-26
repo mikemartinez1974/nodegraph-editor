@@ -94,6 +94,7 @@ Declares what must exist for this graph to be valid.
 - Agents must refuse to act if dependencies are unmet
 - Skill dependencies are mandatory and must include any skills declared by node definitions
 - Optional dependencies must never be assumed
+- Version mismatches MUST warn only unless explicitly marked as blocking in the Manifest
 
 ---
 

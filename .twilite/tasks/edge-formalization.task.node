@@ -1,0 +1,930 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-01-26T02:00:00.991Z",
+    "modified": "2026-01-26T02:00:00.991Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "77e3bc44-9411-49b2-bd33-6c9051c81e4f",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -892.7381717992685,
+        "y": -1775.3341120212476
+      },
+      "width": 365.86073915171403,
+      "height": 347.2617644372195,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "66ad7ccf-01aa-4709-8013-6c86f81cb4a0",
+          "name": "Edge Formalization",
+          "version": "0.1.0",
+          "description": "Formalize external edges, edge endpoint nodes, and external handles",
+          "createdAt": "2026-01-25T20:38:00Z",
+          "updatedAt": "2026-01-25T20:38:00Z"
+        },
+        "intent": {
+          "kind": "planning",
+          "scope": "graph-system"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "markdown",
+            "port"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": "/tlz/background.html"
+        },
+        "settings": {
+          "theme": {
+            "primary": "#3949ab",
+            "primaryContrast": "#fff",
+            "secondary": "#5e35b1",
+            "secondaryContrast": "#fff",
+            "background": "#0a0e27",
+            "paper": "#1a1f3a",
+            "textPrimary": "#fff",
+            "textSecondary": "rgba(255, 255, 255, 0.7)",
+            "divider": "rgba(255, 255, 255, 0.12)"
+          },
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
+      "type": "markdown",
+      "label": "Edge Formalization",
+      "position": {
+        "x": -902.8973504185155,
+        "y": 598.5929250951998
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Formalization\n\nGoal: define **external edges** (edge endpoints that cross graph boundaries),\n**external handles**, and the validation/rendering rules that keep graphs portable.\n\nThis graph is the working plan for the edge/handle split between web links and Twilite edges."
+      },
+      "handles": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "2a06f2b6-2b8e-40f0-be87-df593e1da568",
+      "type": "markdown",
+      "label": "Links vs Edges",
+      "position": {
+        "x": -172.73817179926846,
+        "y": 651.3325546454189
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Links vs Edges\n\n- **Links**: web navigation (URL), belong in node data.\n- **Edges**: graph topology, belong in edges[].\n- Edges never point to URLs; links never affect layout."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "2320f41c-c15b-484b-9525-1c6131ce404c",
+      "type": "markdown",
+      "label": "External Edge Endpoint Node",
+      "position": {
+        "x": -202.73817179926846,
+        "y": 271.3325546454189
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## External Edge Endpoint\n\nIntroduce a **proxy node** to represent an external endpoint.\n\nLocal edge: `nodeA \u2192 edgeEndpoint`\n\nThe endpoint node stores:\n- target graph (URL or graphId)\n- target nodeId + optional handleId\n- direction (in/out/bidirectional)\n- intent / label / security\n\nThis keeps routing local while preserving cross-graph semantics."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
+      "type": "markdown",
+      "label": "External Handle Model",
+      "position": {
+        "x": 377.26182820073154,
+        "y": 967.9992213120854
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## External Handles\n\nExternal handles are declared on the endpoint node:\n- `target.handleId` optional\n- if missing, attach to default **root** handle\n\nContract must define:\n- how to validate handle IDs remotely (optional)\n- warnings vs errors for missing handles\n- fallback render behavior\n"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
+      "type": "markdown",
+      "label": "Contracts + Dictionary",
+      "position": {
+        "x": 377.26182820073154,
+        "y": 587.9992213120854
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contracts + Dictionary\n\n- Edge contract defines endpoint node type + schema.\n- Dictionary can map endpoint types to views.\n- Manifest dependencies should list endpoint node types.\n- Missing endpoint definitions \u2192 warning, render unknown."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "6a3d5d78-7e3a-4e2e-8c8f-9f4a8b2f3d21",
+      "type": "port",
+      "label": "Port → Port Formalization",
+      "position": {
+        "x": 833.2618282007315,
+        "y": 967.9992213120854
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "task-link",
+        "target": {
+          "graphId": "4617a050-cbf7-4b3c-bd47-56aefc6f061a",
+          "url": "/twilite/tasks/port-formalization.task.node",
+          "label": "Port Formalization"
+        }
+      }
+    },
+    {
+      "id": "386e69a2-32b1-4675-a0aa-980d396d2731",
+      "type": "markdown",
+      "label": "Validation Rules",
+      "position": {
+        "x": 957.2618282007315,
+        "y": 597.9992213120854
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation\n\n- Edge endpoints must reference valid target graph identity.\n- Missing dictionary entry \u2192 warning only.\n- Missing view \u2192 warning only; render unknown.\n- Version mismatch \u2192 warning only."
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "5dae206d-bee7-4423-b1e7-1881eb968258",
+      "type": "markdown",
+      "label": "Rendering + UX",
+      "position": {
+        "x": 1537.2618282007315,
+        "y": 557.9992213120854
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rendering + UX\n\n- Endpoint node renders as portal/connector glyph.\n- Edge styling is local; endpoint shows external badge.\n- Click behavior: open target graph or show details.\n- Default `root` handle makes endpoints connectable without extra UI.\n"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "abb0cbf0-0e99-4ea7-be3b-4d29018bafee",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 2156.4674668454436,
+        "y": 589.4239067616321
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n1. Endpoint node type name \u2192 **port**\n2. Target addressing \u2192 **both** URL + graphId (graphId for validation, URL for resolution)\n3. Security policy \u2192 warn on external targets; prompt before navigation; never auto-execute external scripts\n4. Endpoints live in clusters with their sources \u2192 **yes** (ports are nodes)"
+      },
+      "handles": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "edge-root",
+      "type": "markdown",
+      "label": "Edge Taxonomy",
+      "position": {
+        "x": -506.87743264755443,
+        "y": -1715.3341120212476
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Edge Taxonomy\n\nEdges are **relationships with obligations**, not lines.\n\nEvery edge declares:\n- meaning\n- authority\n- failure mode\n- category\n\nEdge type determines what *must* be true for a graph to be valid."
+      }
+    },
+    {
+      "id": "edge-semantic",
+      "type": "markdown",
+      "label": "Semantic Edges (Truth)",
+      "position": {
+        "x": 183.12256735244546,
+        "y": -1415.3341120212476
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Semantic Edges\n\nDefine meaning and correctness.\n\nExamples:\n- dependsOn\n- defines\n- declares\n- implements\n- resolves\n- requires\n\n**Missing = hard error**\n\nThese edges affect:\n- validation\n- loading\n- dependency resolution\n- graph correctness"
+      }
+    },
+    {
+      "id": "edge-dataflow",
+      "type": "markdown",
+      "label": "Dataflow Edges (Movement)",
+      "position": {
+        "x": 183.12256735244546,
+        "y": -1055.3341120212476
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dataflow Edges\n\nDefine movement and execution order.\n\nExamples:\n- dataFlow\n- input\n- output\n- signal\n- event\n\n**Missing = warning or noop**\n\nThese edges affect:\n- skills\n- scripts\n- execution\n- ordering"
+      }
+    },
+    {
+      "id": "edge-presentation",
+      "type": "markdown",
+      "label": "Presentation Edges (Human)",
+      "position": {
+        "x": 183.12256735244546,
+        "y": -1775.3341120212476
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Presentation Edges\n\nDefine readability and narrative.\n\nExamples:\n- groupedWith\n- annotates\n- explains\n- references\n\n**Missing = ignored**\n\nThese edges affect:\n- layout\n- comprehension\n- onboarding\n- documentation"
+      }
+    },
+    {
+      "id": "edge-authority",
+      "type": "markdown",
+      "label": "Authority Rules",
+      "position": {
+        "x": 703.1225673524455,
+        "y": -1455.3341120212476
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Authority\n\nEach edge type declares who may create it:\n- human\n- agent\n- tool\n- validator\n- script\n\nSome edges are *implied*, not authored.\n\nValidator enforces authority rules."
+      }
+    },
+    {
+      "id": "edge-failure",
+      "type": "markdown",
+      "label": "Failure Modes",
+      "position": {
+        "x": 703.1225673524455,
+        "y": -1095.3341120212476
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Failure Modes\n\nEdge category determines outcome:\n\n- Semantic missing \u2192 graph invalid\n- Dataflow missing \u2192 degraded execution\n- Presentation missing \u2192 no effect\n\nNo heuristics. No guessing. Only rules."
+      }
+    },
+    {
+      "id": "8d2d9a42-6d1a-4e91-9b30-5b44b3f7b7d1",
+      "type": "markdown",
+      "label": "Edge Type Registry",
+      "position": {
+        "x": -792.7381717992685,
+        "y": -178.6674453545811
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Type Registry (Legend)\n\nRegistry entries map **semantic primitives** to human meaning.\n\n- `edge.type` = canonical primitive (strict)\n- `edge.label` = human-facing name (freeform)\n- `edge.data.intent` = optional intent/context\n\nLegend explains meaning; it never overrides type.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "2f87d94c-0c31-4f8b-9df4-0d6b3f2bcb62",
+      "type": "markdown",
+      "label": "Edge Registry Contract",
+      "position": {
+        "x": -755.6352668282755,
+        "y": -517.1086411585519
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Registry Contract (Dictionary)\n\nDictionary entries define the **contract** for each `edge.type`:\n\n- allowed attributes: `strength`, `flow`, `direction`, `intent`\n- validation expectations\n- optional view hints for display\n\nLabels are not validated; they are presentation only.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "9f7d1d4a-7e4f-4e52-9b9b-7f9f3b8b5c01",
+      "type": "markdown",
+      "label": "Handle Contract",
+      "position": {
+        "x": -202.73817179926846,
+        "y": -108.6674453545811
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handle Contract (Default Root)\n\n- Every node exposes a **default handle**: `root`.\n- Nodes may declare additional handles, but **root always exists**.\n- If no handles are declared, edges attach to `root` by default.\n\nThis preserves portability while keeping explicit handle schemas optional.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a61c8c3d-1d41-4b9a-b2a4-4b6c17d79a02",
+      "type": "markdown",
+      "label": "Minimum Node Invariant",
+      "position": {
+        "x": 1542.737359499156,
+        "y": -435.3373604577846
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Minimum Node Invariant\n\nA node is valid if it has a resolvable View.\n\nHandles are optional because every node exposes a default **root** handle.\nAdditional handles may be declared, but `root` always exists.\n\nThis keeps nodes interface\u2011first and portable.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "c2b27df7-8e49-4e91-b6f5-92c6e7e0a403",
+      "type": "markdown",
+      "label": "View Requirement",
+      "position": {
+        "x": 1547.455443910453,
+        "y": 25.064169751996303
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## View Requirement\n\nHandles require geometry.\nGeometry requires a View.\n\nTherefore:\n- All nodes must resolve to at least one View\n- Definition graphs may be view-only\n- Missing view = validation error\n\nRendering is structural; it enables handles (including default `root`).",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "f41c8c8e-54d6-4e6f-bf89-2c55dfe31c04",
+      "type": "markdown",
+      "label": "Edge Creation Rule",
+      "position": {
+        "x": 376.4690272020717,
+        "y": 44.5588138098972
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Edge Creation Rule\n\nEdges attach to handles, not nodes.\nIf a handle is not declared, the edge attaches to the default **root** handle.\n\n### Implications\n- Edge menus require handle discovery when present\n- Agents/tools must refuse edges to non-existent handles\n- External endpoints do **not** need special proxy handles; `root` is sufficient\n\nThis preserves portability while avoiding ambiguous topology.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "e9c8b88b-6e54-4c44-9d89-2c6e6d90e505",
+      "type": "markdown",
+      "label": "Validator Updates (Handles)",
+      "position": {
+        "x": -184.8340798491235,
+        "y": -512.3041554996706
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validator Updates\n\n### New hard errors\n- Edge target handle missing\n- Node with zero handles\n- Node with no resolvable view\n\n### New warnings\n- Synthesized default handles\n- View version mismatch\n\nNo guessing. No fallback edges. Only declared surfaces.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "cfe78d3c-fbe1-4c20-bcc0-e34e24dd5a62",
+      "type": "straight",
+      "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
+      "target": "2a06f2b6-2b8e-40f0-be87-df593e1da568",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "separate concepts",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "5bc0e880-424c-43a4-a56d-1789ff71843b",
+      "type": "straight",
+      "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
+      "target": "2320f41c-c15b-484b-9525-1c6131ce404c",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "define",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "8040258b-e801-4754-ba7c-93e30304d3ee",
+      "type": "straight",
+      "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
+      "target": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "define",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "0a6005ec-35c4-48a7-8273-2d2a379c9787",
+      "type": "straight",
+      "source": "2a06f2b6-2b8e-40f0-be87-df593e1da568",
+      "target": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "2054294e-5dd7-49ad-a636-58b20040715f",
+      "type": "straight",
+      "source": "2320f41c-c15b-484b-9525-1c6131ce404c",
+      "target": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f20f2ab5-4fb1-4e49-a3b0-a8d57d6e6360",
+      "type": "straight",
+      "source": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
+      "target": "386e69a2-32b1-4675-a0aa-980d396d2731",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "informs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "988c47a8-d170-4904-bb29-c95a0fb87001",
+      "type": "straight",
+      "source": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
+      "target": "386e69a2-32b1-4675-a0aa-980d396d2731",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "validates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "7bb91c13-3956-46c4-a82c-e935e0198287",
+      "type": "straight",
+      "source": "386e69a2-32b1-4675-a0aa-980d396d2731",
+      "target": "5dae206d-bee7-4423-b1e7-1881eb968258",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "fb066e1b-dbad-413a-85f0-b2194b15afcd",
+      "type": "straight",
+      "source": "5dae206d-bee7-4423-b1e7-1881eb968258",
+      "target": "abb0cbf0-0e99-4ea7-be3b-4d29018bafee",
+      "sourceHandle": "out",
+      "targetHandle": "in",
+      "label": "questions",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e1",
+      "type": "dataFlow",
+      "source": "edge-root",
+      "target": "edge-semantic",
+      "label": "classifies",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e2",
+      "type": "dataFlow",
+      "source": "edge-root",
+      "target": "edge-dataflow",
+      "label": "classifies",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e3",
+      "type": "dataFlow",
+      "source": "edge-root",
+      "target": "edge-presentation",
+      "label": "classifies",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e4",
+      "type": "dataFlow",
+      "source": "edge-semantic",
+      "target": "edge-authority",
+      "label": "governedBy",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e5",
+      "type": "dataFlow",
+      "source": "edge-semantic",
+      "target": "edge-failure",
+      "label": "failsAs",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "b72a7a18-98b6-4c9a-8c61-9a4c1a1c6c2f",
+      "type": "dataFlow",
+      "source": "8d2d9a42-6d1a-4e91-9b30-5b44b3f7b7d1",
+      "target": "2f87d94c-0c31-4f8b-9df4-0d6b3f2bcb62",
+      "label": "documents",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e61d5dcb-94f3-4e5b-b9c6-1f7cfa3a2001",
+      "type": "dataFlow",
+      "source": "8d2d9a42-6d1a-4e91-9b30-5b44b3f7b7d1",
+      "target": "9f7d1d4a-7e4f-4e52-9b9b-7f9f3b8b5c01",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e7c91c4f-cc48-4c66-9d8a-1f4d2a1c3002",
+      "type": "dataFlow",
+      "source": "9f7d1d4a-7e4f-4e52-9b9b-7f9f3b8b5c01",
+      "target": "f41c8c8e-54d6-4e6f-bf89-2c55dfe31c04",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e82bcb39-9d3c-4b0a-8b1b-5f7caa5c3003",
+      "type": "dataFlow",
+      "source": "f41c8c8e-54d6-4e6f-bf89-2c55dfe31c04",
+      "target": "386e69a2-32b1-4675-a0aa-980d396d2731",
+      "label": "validatedBy",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e9d0e3a2-7a31-4f3b-92b5-6a1c7f0c3004",
+      "type": "dataFlow",
+      "source": "a61c8c3d-1d41-4b9a-b2a4-4b6c17d79a02",
+      "target": "c2b27df7-8e49-4e91-b6f5-92c6e7e0a403",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "ea2f5e61-7c4e-4b0a-9c14-1cfa30053005",
+      "type": "dataFlow",
+      "source": "c2b27df7-8e49-4e91-b6f5-92c6e7e0a403",
+      "target": "5dae206d-bee7-4423-b1e7-1881eb968258",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "eb3a5e77-89f5-4f91-bb3b-2a6f30063006",
+      "type": "dataFlow",
+      "source": "9f7d1d4a-7e4f-4e52-9b9b-7f9f3b8b5c01",
+      "target": "e9c8b88b-6e54-4c44-9d89-2c6e6d90e505",
+      "label": "enforcedBy",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "5f2d0e3d-6f7a-41c2-9b86-8c6d2a4b9b2a",
+      "type": "references",
+      "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
+      "target": "6a3d5d78-7e3a-4e2e-8c8f-9f4a8b2f3d21",
+      "label": "port task",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

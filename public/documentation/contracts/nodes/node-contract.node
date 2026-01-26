@@ -59,7 +59,7 @@
     {
       "id": "node-schema-contract-root",
       "type": "markdown",
-      "label": "🧩 Node Type Schema Contract (Normative)",
+      "label": "\ud83e\udde9 Node Type Schema Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required Fields (REQUIRED)\n\n```json\n{\n  \"id\": \"uuid\",\n  \"type\": \"<type>\",\n  \"label\": \"string\",\n  \"data\": {}\n}\n```\n\n- id: immutable\n- type: immutable\n- label: human-readable\n- data: schema-defined payload"
+        "markdown": "## Required Fields (REQUIRED)\n\n```json\n{\n  \"id\": \"uuid\",\n  \"type\": \"<type>\",\n  \"data\": {}\n}\n```\n\n- id: immutable\n- type: immutable\n- data: schema-defined payload"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields (OPTIONAL)\n\n- position\n- size\n- handles\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
+        "markdown": "## Optional Fields (OPTIONAL)\n\n- label\n- position\n- size\n- handles\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handles (IF APPLICABLE)\n\nEvery handle MUST be declared:\n\n- id\n- direction\n- semanticType\n- multiplicity\n- wildcard\n\nUndeclared handles are forbidden."
+        "markdown": "## Handles (IF APPLICABLE)\n\nEvery declared handle MUST be specified:\n\n- id\n- direction\n- semanticType\n- multiplicity\n- wildcard\n\nUndeclared handles are forbidden.\n\nEvery node also exposes a default **root** handle for portability."
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- required fields present\n- data shape valid\n- handles valid\n- schema version compatible\n- no forbidden mutations\n\nFailure blocks execution."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- required fields present\n- data shape valid\n- handles valid (default `root` if omitted)\n- schema version compatible\n- no forbidden mutations\n- node resolves at least one View\n\nFailure blocks execution."
       }
     },
     {
@@ -278,6 +278,22 @@
       "showLabel": true,
       "data": {
         "markdown": "## Human Notes (OPTIONAL)\n\nDesign rationale and edge cases.\n\nIgnored by validators but critical for stewardship."
+      }
+    },
+    {
+      "id": "node-schema-view-requirement",
+      "type": "markdown",
+      "label": "3.1 View Requirement",
+      "position": {
+        "x": 980,
+        "y": 680
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## View Requirement (REQUIRED)\n\nEvery node must resolve to at least one View for rendering.\n\n- Definition graphs may be view-only\n- Instance nodes resolve views via dictionary\n\nRendering is structural, not optional."
       }
     }
   ],
@@ -395,6 +411,15 @@
       "type": "references",
       "source": "node-schema-contract-root",
       "target": "node-schema-human-notes",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-root-view",
+      "type": "governs",
+      "source": "node-schema-contract-root",
+      "target": "node-schema-view-requirement",
       "label": "",
       "style": {},
       "data": {}

@@ -48,7 +48,13 @@ const BANNED_ROUTE_KEYS = [
   "decorations"
 ];
 
-export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {}, clusters = [] }) {
+export function validateGraphInvariants({
+  nodes = [],
+  edges = [],
+  edgeRoutes = {},
+  clusters = [],
+  mode = 'mutation'
+}) {
   const nodeMap = new Map();
   nodes.forEach((node) => {
     if (node?.id) {
@@ -72,10 +78,15 @@ export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {
 
   const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
   if (manifestNodes.length === 0) {
-    errors.push({
+    const entry = {
       code: 'MANIFEST_COUNT_INVALID',
       message: 'Manifest missing: graph mutations are blocked.'
-    });
+    };
+    if (mode === 'load') {
+      warnings.push(entry);
+    } else {
+      errors.push(entry);
+    }
   }
 
   const manifestByCluster = new Map();
@@ -190,6 +201,9 @@ export function validateGraphInvariants({ nodes = [], edges = [], edgeRoutes = {
 
   const findHandle = (node, handleId) => {
     if (!handleId || !node) return undefined;
+    if (handleId === 'root') {
+      return { id: 'root' };
+    }
     const handles = Array.isArray(node.handles) ? node.handles : [];
     return handles.find((handle) => handle?.id === handleId);
   };
