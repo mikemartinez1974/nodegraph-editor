@@ -149,6 +149,15 @@ export default function BackgroundRpcNode({
     return () => eventBus.off('nodeInput', handleInput);
   }, [selectedMethod]);
 
+  useEffect(() => {
+    const handleExecute = ({ nodeId } = {}) => {
+      if (nodeId !== node.id) return;
+      invokeRpc();
+    };
+    eventBus.on('executeNode', handleExecute);
+    return () => eventBus.off('executeNode', handleExecute);
+  }, [node.id, selectedMethod, isReady, argsText]);
+
   const parseArgs = () => {
     try {
       if (!argsText || argsText.trim() === '') {

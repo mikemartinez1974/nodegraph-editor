@@ -79,6 +79,7 @@ const GraphEditorContent = () => {
     defaultNodeColor,
     defaultEdgeColor,
     edgeRoutes,
+    setEdgeRoutes,
     groupManager
   } = state || {};
 
@@ -228,6 +229,29 @@ const GraphEditorContent = () => {
     viewDefinitionsRef.current = viewDefinitions;
   }, [viewDefinitions]);
 
+  const [resolvedDictionary, setResolvedDictionary] = useState(null);
+  const definitionDictionaryCacheRef = useRef({});
+
+  const getDictionaryEntryKey = useCallback((entry) => {
+    if (!entry) return null;
+    return entry.key || entry.nodeType || entry.type || entry.view || null;
+  }, []);
+
+  const mergeDictionaryEntries = useCallback((hostEntries = [], importedEntries = []) => {
+    const merged = new Map();
+    importedEntries.forEach((entry) => {
+      const key = getDictionaryEntryKey(entry);
+      if (!key) return;
+      merged.set(key, entry);
+    });
+    hostEntries.forEach((entry) => {
+      const key = getDictionaryEntryKey(entry);
+      if (!key) return;
+      merged.set(key, entry);
+    });
+    return Array.from(merged.values());
+  }, [getDictionaryEntryKey]);
+
   const resolveDictionaryForNode = useCallback((node) => {
     if (!node || !Array.isArray(nodes)) return null;
     const clusterList = Array.isArray(groups) ? groups : [];
@@ -236,8 +260,111 @@ const GraphEditorContent = () => {
       ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
       : null;
     const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-    return dictionaryInCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
-  }, [nodes, groups]);
+    return resolvedDictionary || dictionaryInCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
+  }, [nodes, groups, resolvedDictionary]);
+
+  useEffect(() => {
+    let active = true;
+    const hostDictionary = (() => {
+      if (!Array.isArray(nodes)) return null;
+      const clusterList = Array.isArray(groups) ? groups : [];
+      const manifestNode = nodes.find((candidate) => candidate?.type === 'manifest');
+      const manifestClusterId = manifestNode
+        ? clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(manifestNode.id))?.id || null
+        : null;
+      const dictionaryInManifestCluster = manifestClusterId
+        ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === manifestClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+        : null;
+      const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+      return dictionaryInManifestCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
+    })();
+
+    if (!hostDictionary) {
+      setResolvedDictionary(null);
+      return undefined;
+    }
+
+    const hostData = hostDictionary.data || {};
+    const hostNodeDefs = Array.isArray(hostData.nodeDefs) ? hostData.nodeDefs : [];
+    const hostViews = Array.isArray(hostData.views) ? hostData.views : [];
+    const hostSkills = Array.isArray(hostData.skills) ? hostData.skills : [];
+
+    const refs = hostNodeDefs
+      .map((entry) => entry?.ref || entry?.path || entry?.file)
+      .filter(Boolean);
+
+    const loadDefinitions = async () => {
+      const importedNodeDefs = [];
+      const importedViews = [];
+      const importedSkills = [];
+      const warnings = [];
+      for (const ref of refs) {
+        if (!ref) continue;
+        if (!definitionDictionaryCacheRef.current[ref]) {
+          try {
+            const response = await fetch(ref);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            const parsed = JSON.parse(text);
+            const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
+            const dictNode = parsedNodes.find((candidate) => candidate?.type === 'dictionary') || null;
+            definitionDictionaryCacheRef.current[ref] = dictNode?.data || null;
+            if (!dictNode) {
+              warnings.push(`No dictionary found in ${ref}`);
+            }
+          } catch (err) {
+            definitionDictionaryCacheRef.current[ref] = null;
+            warnings.push(`Failed to load ${ref}`);
+          }
+        }
+        const dictData = definitionDictionaryCacheRef.current[ref];
+        if (!dictData) continue;
+        if (Array.isArray(dictData.nodeDefs)) importedNodeDefs.push(...dictData.nodeDefs);
+        if (Array.isArray(dictData.views)) importedViews.push(...dictData.views);
+        if (Array.isArray(dictData.skills)) importedSkills.push(...dictData.skills);
+      }
+
+      if (!active) return;
+      const mergedNodeDefs = mergeDictionaryEntries(hostNodeDefs, importedNodeDefs);
+      const mergedViews = mergeDictionaryEntries(hostViews, importedViews);
+      const mergedSkills = mergeDictionaryEntries(hostSkills, importedSkills);
+      setResolvedDictionary({
+        ...hostDictionary,
+        data: {
+          ...hostData,
+          nodeDefs: mergedNodeDefs,
+          views: mergedViews,
+          skills: mergedSkills
+        }
+      });
+
+      if (warnings.length > 0) {
+        try {
+          setSnackbar((prev) => ({
+            ...prev,
+            open: true,
+            message: `Dictionary load: ${warnings[0]}${warnings.length > 1 ? ` (+${warnings.length - 1} more)` : ''}`,
+            severity: 'warning'
+          }));
+        } catch (err) {
+          // ignore snackbar failures
+        }
+      }
+    };
+
+    loadDefinitions();
+    return () => {
+      active = false;
+    };
+  }, [nodes, groups, mergeDictionaryEntries]);
+
+  useEffect(() => {
+    try {
+      eventBus.emit('dictionaryResolved', { dictionary: resolvedDictionary || null });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [resolvedDictionary]);
 
   const resolveViewEntry = useCallback((node) => {
     if (!node) return null;
@@ -314,6 +441,34 @@ const GraphEditorContent = () => {
     eventBus.emit('toggleMinimap');
   }, [emitEdgeIntent, showMinimap]);
 
+  useEffect(() => {
+    const handleNodeOutput = ({ nodeId, outputName, value } = {}) => {
+      if (!nodeId) return;
+      const sourceHandle = outputName || 'root';
+      const currentEdges = edgesRef?.current || [];
+      currentEdges.forEach((edge) => {
+        if (!edge) return;
+        if (edge.source !== nodeId) return;
+        const edgeSourceHandle = edge.sourceHandle || 'root';
+        if (edgeSourceHandle !== sourceHandle) return;
+        const targetHandle = edge.targetHandle || 'root';
+        eventBus.emit('nodeInput', {
+          targetNodeId: edge.target,
+          handleId: targetHandle,
+          value,
+          source: 'edge',
+          meta: {
+            edgeId: edge.id,
+            sourceNodeId: nodeId,
+            sourceHandle: edgeSourceHandle
+          }
+        });
+      });
+    };
+    eventBus.on('nodeOutput', handleNodeOutput);
+    return () => eventBus.off('nodeOutput', handleNodeOutput);
+  }, [edgesRef]);
+
   const graphRendererKey = `${backgroundUrl || 'no-background'}-${graphRenderKey}`;
   const minimapOffset = useMemo(() => {
     const offsets = { left: 0, right: 0, top: 0, bottom: 0 };
@@ -347,7 +502,7 @@ const GraphEditorContent = () => {
       ? nodes?.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
       : null;
     const rootDictionary = nodes?.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-    const dictionary = dictionaryInCluster || rootDictionary || nodes?.find((candidate) => candidate.type === 'dictionary');
+    const dictionary = resolvedDictionary || dictionaryInCluster || rootDictionary || nodes?.find((candidate) => candidate.type === 'dictionary');
 
     const entries = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
     const match = entries.find((entry) => {
@@ -355,7 +510,16 @@ const GraphEditorContent = () => {
       return entry.nodeType === node.type || entry.type === node.type || entry.key === node.type;
     });
     return match?.ref || match?.file || match?.path || null;
-  }, [nodes, groups]);
+  }, [nodes, groups, resolvedDictionary]);
+
+  const isNodeExecutable = useCallback((node) => {
+    if (!node) return false;
+    if (Array.isArray(nodeTypeMetadata) && nodeTypeMetadata.length) {
+      const meta = nodeTypeMetadata.find((entry) => entry.type === node.type);
+      if (meta && meta.executable) return true;
+    }
+    return ['script', 'api', 'backgroundRpc'].includes(node.type);
+  }, [nodeTypeMetadata]);
 
   const handleNodeContextMenu = useCallback((nodeId, event) => {
     if (!nodeId || !event) return;
@@ -537,82 +701,11 @@ const GraphEditorContent = () => {
       }
       return `node_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
     };
-    const now = new Date().toISOString();
-    const manifestNode = {
-      id: makeId(),
-      label: 'Manifest',
-      type: 'manifest',
-      position: { x: -260, y: -160 },
-      width: 360,
-      height: 220,
-      data: {
-        identity: {
-          graphId: makeId(),
-          name: 'Untitled Graph',
-          version: '0.1.0',
-          description: 'New graph',
-          createdAt: now,
-          updatedAt: now
-        },
-        intent: {
-          kind: 'documentation',
-          scope: 'mixed'
-        },
-        dependencies: {
-          nodeTypes: ['default', 'markdown', 'manifest'],
-          handleContracts: ['core'],
-          skills: [],
-          schemaVersions: {
-            nodes: '>=1.0.0',
-            handles: '>=1.0.0'
-          },
-          optional: []
-        },
-        authority: {
-          mutation: {
-            allowCreate: true,
-            allowUpdate: true,
-            allowDelete: true,
-            appendOnly: false
-          },
-          actors: {
-            humans: true,
-            agents: true,
-            tools: true
-          },
-          styleAuthority: 'descriptive',
-          history: {
-            rewriteAllowed: false,
-            squashAllowed: false
-          }
-        },
-        document: {
-          url: ''
-        }
-      }
-    };
-    const dictionaryNode = {
-      id: makeId(),
-      label: 'Dictionary',
-      type: 'dictionary',
-      position: { x: -260, y: 100 },
-      width: 320,
-      height: 220,
-      data: {
-        nodeDefs: [
-          { key: 'default', ref: '/documentation/contracts/nodes/node-definition.minimum.node', source: 'external', version: '>=1.0.0' }
-        ],
-        skills: [],
-        views: [
-          { key: 'default', view: 'twilite.web', ref: '/documentation/contracts/view/view.node', source: 'external', version: '>=1.0.0' }
-        ]
-      }
-    };
     const legendNode = {
       id: makeId(),
       label: 'Legend',
       type: 'legend',
-      position: { x: 140, y: 100 },
+      position: { x: -180, y: -120 },
       width: 340,
       height: 220,
       data: {
@@ -626,16 +719,7 @@ const GraphEditorContent = () => {
         ]
       }
     };
-    const newNode = {
-      id: makeId(),
-      label: 'New Node',
-      type: 'default',
-      position: { x: 0, y: 360 },
-      width: 200,
-      height: 120,
-      data: { memo: '' }
-    };
-    const nextNodes = [manifestNode, dictionaryNode, legendNode, newNode];
+    const nextNodes = [legendNode];
     if (typeof loadGraph === 'function') {
       loadGraph(nextNodes, [], []);
     } else {
@@ -651,7 +735,7 @@ const GraphEditorContent = () => {
       setGroups(() => []);
     }
     historyHook.saveToHistory(nextNodes, []);
-    setSelectedNodeIds([newNode.id]);
+    setSelectedNodeIds([legendNode.id]);
   }, [loadGraph, setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
 
   const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
@@ -1037,6 +1121,16 @@ const skipPropertiesCloseRef = useRef(false);
               try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
               return next;
             });
+            if (updates?.sourceHandle !== undefined || updates?.targetHandle !== undefined) {
+              if (typeof setEdgeRoutes === 'function') {
+                setEdgeRoutes((prev) => {
+                  if (!prev || !prev[id]) return prev;
+                  const next = { ...prev };
+                  delete next[id];
+                  return next;
+                });
+              }
+            }
             try {
               eventBus.emit('edgeUpdated', { id, patch: updates || {} });
             } catch (err) {
@@ -1182,6 +1276,30 @@ const skipPropertiesCloseRef = useRef(false);
             : undefined
         }
       >
+        <MenuItem
+          onClick={() => {
+            const node = nodes?.find((candidate) => candidate.id === nodeContextMenu?.nodeId);
+            if (!node) {
+              showSnackbar('No node selected.', 'warning');
+              setNodeContextMenu(null);
+              return;
+            }
+            if (!isNodeExecutable(node)) {
+              showSnackbar('This node type is not executable.', 'warning');
+              setNodeContextMenu(null);
+              return;
+            }
+            const result = graphCRUD?.executeNode?.(node.id, { source: 'context-menu' });
+            if (!result || result.success === false) {
+              showSnackbar(result?.error || 'Failed to run node.', 'error');
+            } else {
+              showSnackbar('Node execution requested.', 'success');
+            }
+            setNodeContextMenu(null);
+          }}
+        >
+          Run Node
+        </MenuItem>
         <MenuItem
           onClick={() => {
             const definitionUrl = resolveDefinitionUrl(nodeContextMenu?.nodeId);

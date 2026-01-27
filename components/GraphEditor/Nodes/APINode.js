@@ -168,6 +168,15 @@ export default function APINode({
     return () => eventBus.off('nodeInput', handler);
   }, [url, method, headersText, bodyText]);
 
+  useEffect(() => {
+    const handleExecute = ({ nodeId } = {}) => {
+      if (nodeId !== node.id) return;
+      doFetch({ source: 'executeNode' });
+    };
+    eventBus.on('executeNode', handleExecute);
+    return () => eventBus.off('executeNode', handleExecute);
+  }, [node.id, url, method, headersText, bodyText]);
+
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 

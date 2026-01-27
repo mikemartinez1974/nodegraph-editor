@@ -53,7 +53,8 @@ export function validateGraphInvariants({
   edges = [],
   edgeRoutes = {},
   clusters = [],
-  mode = 'mutation'
+  mode = 'mutation',
+  resolvedDictionary = null
 }) {
   const nodeMap = new Map();
   nodes.forEach((node) => {
@@ -127,6 +128,7 @@ export function validateGraphInvariants({
 
   const resolveDictionaryForManifest = (manifest) => {
     if (!manifest) return null;
+    if (resolvedDictionary) return resolvedDictionary;
     const clusterId = nodeClusterMap.get(manifest.id) || null;
     if (clusterId && dictionaryByCluster.has(clusterId)) {
       return dictionaryByCluster.get(clusterId);

@@ -102,7 +102,39 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- `nodeDefs` map node types to definition graphs\n- `skills` list dependency references (not execution)\n- `views` map node types to renderable view definitions"
+        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- `nodeDefs` map node types to definition graphs\n- `skills` list dependency references (not execution)\n- `views` map node types to renderable view definitions\n- **Host dictionary is authoritative** (class dictionaries may exist but must be merged explicitly)"
+      }
+    },
+    {
+      "id": "dictionary-precedence",
+      "type": "markdown",
+      "label": "Dictionary Precedence",
+      "position": {
+        "x": 240,
+        "y": 700
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Precedence\n\n- Host graph dictionary is the source of truth\n- Definition graphs may include dictionaries for inheritance\n- Host may import/merge definition dictionaries\n- Conflicts resolve in favor of host"
+      }
+    },
+    {
+      "id": "dictionary-runtime-merge",
+      "type": "markdown",
+      "label": "Runtime Merge Behavior",
+      "position": {
+        "x": 760,
+        "y": 700
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Runtime Merge (Current Behavior)\n\n- Loader builds a **runtime merged** dictionary\n- Imported definition dictionaries are **defaults only**\n- Host entries override imported entries\n- **No persistence** back to the graph\n\nThis keeps inheritance while preserving host authority."
       }
     },
     {
@@ -334,6 +366,34 @@
       "source": "dictionary-contract-root",
       "target": "dictionary-skills",
       "label": "declares",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+    ,
+    {
+      "id": "edge-dict-precedence",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-precedence",
+      "label": "orders",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+    ,
+    {
+      "id": "edge-dict-runtime-merge",
+      "type": "dataFlow",
+      "source": "dictionary-contract-root",
+      "target": "dictionary-runtime-merge",
+      "label": "implements",
       "style": {
         "width": 2,
         "dash": [],

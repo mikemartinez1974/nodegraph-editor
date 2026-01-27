@@ -179,21 +179,24 @@ const baseNodeTypeRegistry = {
     label: 'API Node',
     description: 'Fetch data from a URL on trigger; supports method, headers, body, cancel',
     icon: 'CloudDownload',
-    category: 'integration'
+    category: 'integration',
+    executable: true
   },
   script: {
     component: ScriptNode,
     label: 'Script Node',
     description: 'Runs a saved session script on trigger; emits result',
     icon: 'Code',
-    category: 'logic'
+    category: 'logic',
+    executable: true
   },
   backgroundRpc: {
     component: BackgroundRpcNode,
     label: 'Background RPC',
     description: 'Call methods exposed by the embedded background frame',
     icon: 'Lan',
-    category: 'integration'
+    category: 'integration',
+    executable: true
   },
   canvas: {
     component: CanvasNode,
@@ -425,7 +428,8 @@ export const nodeTypeMetadata = [
     icon: 'CloudDownload',
     category: 'integration',
     defaultWidth: 260,
-    defaultHeight: 220
+    defaultHeight: 220,
+    executable: true
   },
   {
     type: 'script',
@@ -434,7 +438,8 @@ export const nodeTypeMetadata = [
     icon: 'Code',
     category: 'logic',
     defaultWidth: 260,
-    defaultHeight: 220
+    defaultHeight: 220,
+    executable: true
   },
   {
     type: 'backgroundRpc',
@@ -443,7 +448,8 @@ export const nodeTypeMetadata = [
     icon: 'Lan',
     category: 'integration',
     defaultWidth: 260,
-    defaultHeight: 220
+    defaultHeight: 220,
+    executable: true
   },
   {
     type: 'canvas',

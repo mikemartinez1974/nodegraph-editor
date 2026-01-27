@@ -2,8 +2,8 @@
 
 This document defines the **required structure, meaning, and authority** of a Manifest node.
 
-Every Twilite graph **must** contain exactly one Manifest node that conforms to this contract.  
-Graphs without a valid Manifest are **not portable, not safe, and not executable**.
+Every portable Twilite graph **must** contain exactly one Manifest node that conforms to this contract.  
+Graphs without a valid Manifest are **non-portable, unsafe, and non-executable** (draft-only).
 
 The Manifest is the highest authority in a graph.  
 No editor, agent, or tool may override it.
@@ -18,7 +18,9 @@ No editor, agent, or tool may override it.
 }
 ```
 
-There MUST be exactly **one** Manifest node per graph.
+There MUST be exactly **one authoritative** Manifest node per graph.
+Draft graphs may temporarily have zero Manifests, but they are not portable and must warn.
+Files may contain multiple Manifests; **the first Manifest in file order is authoritative**.
 
 ---
 
@@ -95,6 +97,7 @@ Declares what must exist for this graph to be valid.
 - Skill dependencies are mandatory and must include any skills declared by node definitions
 - Optional dependencies must never be assumed
 - Version mismatches MUST warn only unless explicitly marked as blocking in the Manifest
+- Dictionary precedence: host graph dictionary is authoritative; imported definitions may include dictionaries but must be merged explicitly
 
 ---
 
@@ -116,6 +119,7 @@ Defines **what is allowed to change** and by whom.
       "agents": true,
       "tools": true
     },
+    "graphBoundary": "none | root | cluster",
     "styleAuthority": "descriptive | authoritative | ignored",
     "history": {
       "rewriteAllowed": false,
@@ -131,6 +135,10 @@ Defines **what is allowed to change** and by whom.
 - If agents are disabled, they may only read
 - History rules must be enforced by editors and agents
 - Style authority controls whether renderers must obey style nodes
+- `graphBoundary` controls how much of the file is treated as the active graph
+  - `none`: load full file (no boundary)
+  - `root`: load only the manifest-rooted subgraph (stop at other Manifests)
+  - `cluster`: load only the cluster containing the Manifest node (if any)
 
 ---
 
@@ -200,8 +208,8 @@ These are editor-facing defaults and may be overridden by a renderer.
 ## 9. Forbidden Patterns
 
 Manifest nodes MUST NOT:
-- Be duplicated
-- Be deleted
+- Be duplicated within a single authoritative graph
+- Be deleted in portable graphs
 - Be silently modified
 - Be inferred
 - Be auto-generated without explicit user intent
@@ -248,6 +256,7 @@ Manifest nodes MUST NOT:
         "agents": true,
         "tools": true
       },
+      "graphBoundary": "none",
       "styleAuthority": "descriptive",
       "history": {
         "rewriteAllowed": false,

@@ -2,6 +2,7 @@
 // LLM-friendly CRUD API for graph manipulation
 import { v4 as uuidv4 } from 'uuid';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils.js';
+import eventBus from '../NodeGraph/eventBus.js';
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -1833,6 +1834,62 @@ export default class GraphCRUD {
   }
 
   // ==================== HELPER METHODS ====================
+
+  executeNode(nodeId, meta = {}) {
+    try {
+      if (!nodeId) return { success: false, error: 'nodeId required' };
+      eventBus.emit('nodeInput', {
+        targetNodeId: nodeId,
+        handleId: 'root',
+        value: meta || {},
+        source: 'user',
+        meta: { requestedBy: 'executeNode' }
+      });
+      eventBus.emit('executeNode', { nodeId, meta });
+      return { success: true, data: { nodeId } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  executeNodes(nodeIds = [], meta = {}) {
+    try {
+      if (!Array.isArray(nodeIds)) {
+        return { success: false, error: 'nodeIds must be an array' };
+      }
+      nodeIds.forEach(nodeId => {
+        if (nodeId) {
+          eventBus.emit('nodeInput', {
+            targetNodeId: nodeId,
+            handleId: 'root',
+            value: meta || {},
+            source: 'user',
+            meta: { requestedBy: 'executeNodes' }
+          });
+          eventBus.emit('executeNode', { nodeId, meta });
+        }
+      });
+      return { success: true, data: { count: nodeIds.length } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  sendInput(nodeId, handleId = 'root', value = {}, meta = {}) {
+    try {
+      if (!nodeId) return { success: false, error: 'nodeId required' };
+      eventBus.emit('nodeInput', {
+        targetNodeId: nodeId,
+        handleId: handleId || 'root',
+        value,
+        source: meta?.source || 'api',
+        meta
+      });
+      return { success: true, data: { nodeId, handleId } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
 
   _generateId() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {

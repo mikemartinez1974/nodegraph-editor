@@ -1888,6 +1888,99 @@ useEffect(() => {
         const text = await response.text();
         const contentType = response.headers.get('content-type') || '';
 
+        const applyManifestBoundary = (nodes, edges, clusters) => {
+          const manifestNodes = Array.isArray(nodes)
+            ? nodes.filter(node => node && node.type === 'manifest')
+            : [];
+          const manifestNode = manifestNodes[0] || null;
+
+          const boundary = manifestNode?.data?.authority?.graphBoundary || 'none';
+          if (!manifestNode || boundary === 'none') {
+            const boundaryWarnings = [];
+            if (manifestNodes.length > 1) {
+              boundaryWarnings.push({
+                code: 'manifest-order',
+                message: `Multiple manifests found (${manifestNodes.length}). Using the first in file order.`
+              });
+            }
+            return { nodes, edges, clusters, boundaryWarnings };
+          }
+
+          const nodeMap = new Map(nodes.map(node => [node.id, node]));
+          const clusterList = Array.isArray(clusters) ? clusters : [];
+          const boundaryWarnings = [];
+          let includedNodeIds = new Set();
+
+          if (boundary === 'cluster') {
+            const manifestCluster = clusterList.find(cluster => Array.isArray(cluster?.nodeIds) && cluster.nodeIds.includes(manifestNode.id));
+            if (!manifestCluster) {
+              return { nodes, edges, clusters, boundaryWarnings };
+            }
+            includedNodeIds = new Set(manifestCluster.nodeIds);
+          } else if (boundary === 'root') {
+            const adjacency = new Map();
+            edges.forEach(edge => {
+              if (!edge?.source || !edge?.target) return;
+              if (!adjacency.has(edge.source)) adjacency.set(edge.source, []);
+              if (!adjacency.has(edge.target)) adjacency.set(edge.target, []);
+              adjacency.get(edge.source).push(edge.target);
+              adjacency.get(edge.target).push(edge.source);
+            });
+
+            const queue = [manifestNode.id];
+            while (queue.length > 0) {
+              const currentId = queue.shift();
+              if (includedNodeIds.has(currentId)) continue;
+              const currentNode = nodeMap.get(currentId);
+              if (!currentNode) continue;
+              if (currentId !== manifestNode.id && currentNode.type === 'manifest') {
+                continue;
+              }
+              includedNodeIds.add(currentId);
+              const neighbors = adjacency.get(currentId) || [];
+              neighbors.forEach(nextId => {
+                if (includedNodeIds.has(nextId)) return;
+                const nextNode = nodeMap.get(nextId);
+                if (nextNode && nextNode.type === 'manifest' && nextId !== manifestNode.id) return;
+                queue.push(nextId);
+              });
+            }
+          }
+
+          if (manifestNodes.length > 1) {
+            boundaryWarnings.push({
+              code: 'manifest-order',
+              message: `Multiple manifests found (${manifestNodes.length}). Using the first in file order.`
+            });
+          }
+          if (includedNodeIds.size === 0) {
+            return { nodes, edges, clusters, boundaryWarnings };
+          }
+
+          const filteredNodes = nodes.filter(node => includedNodeIds.has(node.id));
+          const filteredEdges = edges.filter(edge => includedNodeIds.has(edge.source) && includedNodeIds.has(edge.target));
+          const filteredClusters = clusterList
+            .map(cluster => {
+              const nodeIds = (cluster.nodeIds || []).filter(nodeId => includedNodeIds.has(nodeId));
+              return nodeIds.length > 0 ? { ...cluster, nodeIds } : null;
+            })
+            .filter(Boolean);
+
+          if (filteredNodes.length !== nodes.length) {
+            boundaryWarnings.push({
+              code: 'manifest-boundary',
+              message: `Manifest boundary "${boundary}" filtered ${nodes.length - filteredNodes.length} nodes.`
+            });
+          }
+
+          return {
+            nodes: filteredNodes,
+            edges: filteredEdges,
+            clusters: filteredClusters,
+            boundaryWarnings
+          };
+        };
+
         // Try to parse as JSON (graph data)
         try {
           const jsonData = JSON.parse(text);
@@ -1895,10 +1988,14 @@ useEffect(() => {
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
             const groupsToLoadFromJson = jsonData.clusters || jsonData.groups || [];
+            const boundaryResult = applyManifestBoundary(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
+            const filteredNodes = boundaryResult.nodes;
+            const filteredEdges = boundaryResult.edges;
+            const filteredClusters = boundaryResult.clusters;
             const { errors, warnings } = validateGraphInvariants({
-              nodes: nodesToLoad,
-              edges: edgesToLoadFromJson,
-              clusters: groupsToLoadFromJson,
+              nodes: filteredNodes,
+              edges: filteredEdges,
+              clusters: filteredClusters,
               mode: 'load'
             });
             if (errors.length > 0) {
@@ -1910,18 +2007,62 @@ useEffect(() => {
               });
               return;
             }
-            handleLoadGraph(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
+            handleLoadGraph(filteredNodes, filteredEdges, filteredClusters);
             try { eventBus.emit('forceRedraw'); } catch (e) { /* ignore */ }
-            if (warnings.length > 0) {
+            const combinedWarnings = [...(warnings || []), ...(boundaryResult.boundaryWarnings || [])];
+            if (combinedWarnings.length > 0) {
               setSnackbar({
                 open: true,
-                message: `Graph loaded with ${warnings.length} warning${warnings.length === 1 ? '' : 's'}.`,
+                message: `Graph loaded with ${combinedWarnings.length} warning${combinedWarnings.length === 1 ? '' : 's'}.`,
                 severity: 'warning'
               });
             } else {
               setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             }
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
+
+            try {
+              const parsedUrl = new URL(fullUrl, typeof window !== 'undefined' ? window.location.origin : undefined);
+              const params = parsedUrl.searchParams;
+              const targetNodeId = params.get('node') || params.get('nodeId');
+              if (targetNodeId) {
+                const handleId = params.get('handle') || 'root';
+                const rawValue = params.get('value');
+                let value = rawValue;
+                if (rawValue !== null) {
+                  try {
+                    value = JSON.parse(rawValue);
+                  } catch (err) {
+                    value = rawValue;
+                  }
+                }
+                eventBus.emit('nodeInput', {
+                  targetNodeId,
+                  handleId,
+                  value,
+                  source: 'url',
+                  meta: { query: parsedUrl.search }
+                });
+              }
+            } catch (err) {
+              // ignore query parsing errors
+            }
+
+            try {
+              filteredNodes
+                .filter((node) => node?.data?.autoRunOnLoad)
+                .forEach((node) => {
+                  eventBus.emit('nodeInput', {
+                    targetNodeId: node.id,
+                    handleId: 'root',
+                    value: node.data?.autoRunPayload || {},
+                    source: 'autoRun',
+                    meta: { reason: 'autoRunOnLoad' }
+                  });
+                });
+            } catch (err) {
+              // ignore auto-run errors
+            }
             return;
           }
         } catch (e) {

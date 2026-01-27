@@ -19,6 +19,8 @@ const isPlainObject = (value) =>
   !Array.isArray(value);
 
 const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj || {}, key);
+const isMissingManifestError = (errors = []) =>
+  errors.some((err) => String(err || '').toLowerCase().includes('missing manifest'));
 
 const validateManifestNodes = (nodes = []) => {
   const manifestNodes = Array.isArray(nodes)
@@ -227,6 +229,30 @@ export function useGraphEditorState() {
     const nextNodes = Array.isArray(next) ? next : currentNodes;
     const validation = validateManifestNodes(nextNodes);
     if (!validation.ok) {
+      if (isMissingManifestError(validation.errors)) {
+        dispatchGraph({
+          type: 'setNodes',
+          payload: nextNodes
+        });
+        return;
+      }
+      const currentManifestIds = currentNodes.filter((node) => node?.type === 'manifest').map((node) => node.id);
+      const nextManifestIds = nextNodes.filter((node) => node?.type === 'manifest').map((node) => node.id);
+      const removedIds = currentNodes.filter((node) => !nextNodes.some((nextNode) => nextNode.id === node.id)).map((node) => node.id);
+      const addedNodes = nextNodes.some((node) => !currentNodes.some((currentNode) => currentNode.id === node.id));
+      const removedOnlyManifests =
+        currentManifestIds.length > 0 &&
+        nextManifestIds.length === 0 &&
+        removedIds.length > 0 &&
+        removedIds.every((id) => currentManifestIds.includes(id)) &&
+        !addedNodes;
+      if (removedOnlyManifests) {
+        dispatchGraph({
+          type: 'setNodes',
+          payload: nextNodes
+        });
+        return;
+      }
       blockMutationForManifest(validation.errors);
       return;
     }
@@ -234,7 +260,7 @@ export function useGraphEditorState() {
       type: 'setNodes',
       payload: nextNodes
     });
-  }, [blockMutationForManifest]);
+  }, [blockMutationForManifest, setSnackbar]);
 
   const loadGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
     dispatchGraph({
@@ -256,6 +282,14 @@ export function useGraphEditorState() {
     const currentNodes = getGraphSnapshot().nodes;
     const manifestCheck = validateManifestNodes(currentNodes);
     if (!manifestCheck.ok) {
+      if (isMissingManifestError(manifestCheck.errors)) {
+        const next = typeof value === 'function' ? value(currentEdges) : value;
+        dispatchGraph({
+          type: 'setEdges',
+          payload: Array.isArray(next) ? next : currentEdges
+        });
+        return;
+      }
       blockMutationForManifest(manifestCheck.errors);
       return;
     }
@@ -271,6 +305,14 @@ export function useGraphEditorState() {
     const currentNodes = getGraphSnapshot().nodes;
     const manifestCheck = validateManifestNodes(currentNodes);
     if (!manifestCheck.ok) {
+      if (isMissingManifestError(manifestCheck.errors)) {
+        const next = typeof value === 'function' ? value(currentGroups) : value;
+        dispatchGraph({
+          type: 'setGroups',
+          payload: Array.isArray(next) ? next : currentGroups
+        });
+        return;
+      }
       blockMutationForManifest(manifestCheck.errors);
       return;
     }

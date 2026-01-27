@@ -39,6 +39,15 @@ export default function useInterpreterLayer({
   const pendingAutoLayoutRef = useRef(false);
   const pendingAutoLayoutPayloadRef = useRef(null);
   const currentTokenRef = useRef(null);
+  const resolvedDictionaryRef = useRef(null);
+
+  useEffect(() => {
+    const handleDictionaryResolved = (payload = {}) => {
+      resolvedDictionaryRef.current = payload?.dictionary || null;
+    };
+    eventBus.on('dictionaryResolved', handleDictionaryResolved);
+    return () => eventBus.off('dictionaryResolved', handleDictionaryResolved);
+  }, []);
 
   const handleAutoLayoutRequested = useCallback((payload) => {
     pendingAutoLayoutRef.current = true;
@@ -123,7 +132,8 @@ export default function useInterpreterLayer({
       edges,
       edgeRoutes,
       clusters: groups,
-      mode: 'mutation'
+      mode: 'mutation',
+      resolvedDictionary: resolvedDictionaryRef.current
     });
     if (!validation.ok) {
       setSnackbar({

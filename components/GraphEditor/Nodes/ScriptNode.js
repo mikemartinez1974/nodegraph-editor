@@ -214,6 +214,16 @@ export default function ScriptNode({
   }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, scriptSource, node.id]);
 
   useEffect(() => {
+    if (isEmbedded) return undefined;
+    const handleExecute = ({ nodeId, meta } = {}) => {
+      if (nodeId !== node.id) return;
+      runScriptRef.current?.(meta || {});
+    };
+    eventBus.on('executeNode', handleExecute);
+    return () => eventBus.off('executeNode', handleExecute);
+  }, [isEmbedded, node.id]);
+
+  useEffect(() => {
     if (isEmbedded) return;
     if (node?.data?.autoRun && !autoRunTriggered.current && scriptSource) {
       console.log('[ScriptNode] initial autoRun trigger', node.id);

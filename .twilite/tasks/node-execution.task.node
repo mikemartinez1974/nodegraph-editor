@@ -1,0 +1,514 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "exec-root",
+      "type": "markdown",
+      "label": "⚙️ Node Execution Pipeline",
+      "position": { "x": 80, "y": 60 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goal\n\nDefine how nodes **execute** (not just render).\n\nThis graph outlines the trigger → resolution → policy → execution → commit loop."
+      },
+      "handles": [
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-trigger",
+      "type": "markdown",
+      "label": "1) Trigger Sources",
+      "position": { "x": 560, "y": 40 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Trigger Sources\n\n- User action (button, context menu)\n- Script node\n- Background RPC\n- Agent intent\n- Scheduled/looped execution"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-resolve",
+      "type": "markdown",
+      "label": "2) Resolve Node Type",
+      "position": { "x": 980, "y": 40 },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Type Resolution\n\n- Node → type key\n- Dictionary resolves definition\n- Definition exposes views + skills\n- Missing definition → warning + fallback"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-policy",
+      "type": "markdown",
+      "label": "3) Manifest + Policy Gate",
+      "position": { "x": 1400, "y": 40 },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Policy Gate\n\n- Manifest authority\n- Allowed actors\n- Skill dependencies satisfied\n- Version checks (warn only)\n\nIf blocked → refuse execution"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-context",
+      "type": "markdown",
+      "label": "4) Execution Context",
+      "position": { "x": 560, "y": 320 },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Context\n\n- Graph snapshot (read-only)\n- Selected node/edge/group\n- User/agent identity\n- Cursor / viewport / selection (optional)\n\nContext is input; it is not mutated."
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-skill",
+      "type": "markdown",
+      "label": "5) Skill Invocation",
+      "position": { "x": 980, "y": 320 },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Skill Invocation\n\n- Call skill with context\n- Skill returns mutations or refusal\n- Must be deterministic if declared\n- No direct UI writes"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-validate",
+      "type": "markdown",
+      "label": "6) Validation + Diff",
+      "position": { "x": 1400, "y": 320 },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation + Diff\n\n- Validate mutations (schema, handles, manifest)\n- Produce warnings/errors\n- Build diff for audit\n\nIf invalid → refuse commit"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-commit",
+      "type": "markdown",
+      "label": "7) Commit + Telemetry",
+      "position": { "x": 1820, "y": 200 },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Commit + Telemetry\n\n- Apply mutations\n- Save history snapshot\n- Emit telemetry + logs\n- Update UI state"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-input-routing",
+      "type": "markdown",
+      "label": "Input Routing (Core)",
+      "position": { "x": 560, "y": 880 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Input Routing\\n\\nExecution triggers should resolve to `nodeInput` events.\\n\\nSources:\\n- Edge output → target input\\n- Manual Run → `nodeInput` on root handle\\n- Query string → `nodeInput` on load\\n- API calls → `nodeInput`\\n\\nHandles default to `root` when missing."
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-nodeinput-schema",
+      "type": "markdown",
+      "label": "nodeInput Event Schema",
+      "position": { "x": 1040, "y": 880 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## nodeInput Payload\\n\\n```json\\n{\\n  \"targetNodeId\": \"node-id\",\\n  \"handleId\": \"root\",\\n  \"value\": {},\\n  \"source\": \"edge|user|url|script\",\\n  \"meta\": { \"runId\": \"uuid\", \"timestamp\": \"ISO\" }\\n}\\n```"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-dictionary-precedence",
+      "type": "markdown",
+      "label": "✅ Dictionary Precedence (Hybrid)",
+      "position": { "x": 1500, "y": 1140 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Dictionary Precedence\\n\\n- **Host dictionary is authoritative**\\n- Class graphs may include dictionaries\\n- Host may import/merge entries explicitly\\n- Conflicts resolve in favor of host\\n\\nThis preserves inheritance while keeping host authority."
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-query-input",
+      "type": "markdown",
+      "label": "URL Query Input",
+      "position": { "x": 1500, "y": 880 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Query String Trigger\\n\\nExample:\\n`/graph.node?node=abc&handle=root&value=hello`\\n\\nOn load:\\n- decode `value` (JSON if possible)\\n- emit `nodeInput` once\\n- optional `run=1` or `auto=1`"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    },
+    {
+      "id": "exec-open-questions",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": { "x": 80, "y": 360 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n1. Sync vs async skills? **Answered: Hybrid**\n2. Where do skills live? **Answered: Node refs → node classes**\n3. Sandboxing policy for script nodes? **Answered: Local only**\n4. Should view-only nodes ever execute? **Answered: Yes (limited)**\n5. Can multiple manifests coexist in one file? **Answered: Yes, first wins**\n6. Can node references ever target instances? **Answered: Local only**"
+      },
+      "handles": [
+        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-sync-async",
+      "type": "markdown",
+      "label": "✅ Sync vs Async: Hybrid",
+      "position": { "x": 560, "y": 600 },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Hybrid Execution\n\n- **Sync by default** for fast, deterministic skills\n- **Async for heavy/IO** (layout, imports, scripts)\n- Skills may declare `executionMode: sync | async | auto`\n- Dispatcher chooses when `auto`"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-skill-location",
+      "type": "markdown",
+      "label": "✅ References Resolve to Class Graphs",
+      "position": { "x": 1020, "y": 600 },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: References Resolve to Classes\n\n- File references resolve to a **node class** (definition graph)\n- Instances live only inside the host graph\n- Skills live in the class graph; instances supply data\n- A reference may *name* an instance ID, but it still resolves its **class**"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-instance-scope",
+      "type": "markdown",
+      "label": "✅ Instances Are Local Only",
+      "position": { "x": 1460, "y": 600 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Instances Are Local\n\n- File references **must** resolve to node classes\n- Instance IDs are valid **only within the host graph**\n- Cross-file instance references are invalid\n- Execution can target instances only in local context"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-script-sandbox",
+      "type": "markdown",
+      "label": "✅ Script Nodes: Local Only",
+      "position": { "x": 1880, "y": 600 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Script Sandboxing (Local)\n\n- Scripts execute **only** in the host graph\n- No cross-graph execution or network access by default\n- Scripts may only mutate local graph state\n- External calls require explicit skill + manifest approval"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-view-only-exec",
+      "type": "markdown",
+      "label": "✅ View-Only Nodes Can Execute",
+      "position": { "x": 1880, "y": 880 },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: View-Only Execution (Limited)\n\n- View-only nodes **may execute**\n- Execution is limited to view-scoped tasks (render prep, UI-only behaviors)\n- They must not mutate graph structure or state\n- Any mutation requires a skill node"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+    ,
+    {
+      "id": "exec-manifest-order",
+      "type": "markdown",
+      "label": "✅ Manifests: First Wins",
+      "position": { "x": 1460, "y": 880 },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision: Multiple Manifests Allowed\n\n- Files may contain multiple manifests\n- **Only the first manifest in file order is authoritative**\n- Others are inert unless explicitly opened\n- Tools should warn if extra manifests exist"
+      },
+      "handles": [
+        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-exec-root-trigger",
+      "type": "dataFlow",
+      "source": "exec-root",
+      "sourceHandle": "out",
+      "target": "exec-trigger",
+      "targetHandle": "in",
+      "label": "begins",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-trigger-resolve",
+      "type": "dataFlow",
+      "source": "exec-trigger",
+      "sourceHandle": "out",
+      "target": "exec-resolve",
+      "targetHandle": "in",
+      "label": "selects",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-resolve-policy",
+      "type": "dataFlow",
+      "source": "exec-resolve",
+      "sourceHandle": "out",
+      "target": "exec-policy",
+      "targetHandle": "in",
+      "label": "checks",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-policy-context",
+      "type": "dataFlow",
+      "source": "exec-policy",
+      "sourceHandle": "out",
+      "target": "exec-context",
+      "targetHandle": "in",
+      "label": "authorizes",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-context-skill",
+      "type": "dataFlow",
+      "source": "exec-context",
+      "sourceHandle": "out",
+      "target": "exec-skill",
+      "targetHandle": "in",
+      "label": "invokes",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-skill-validate",
+      "type": "dataFlow",
+      "source": "exec-skill",
+      "sourceHandle": "out",
+      "target": "exec-validate",
+      "targetHandle": "in",
+      "label": "returns",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-validate-commit",
+      "type": "dataFlow",
+      "source": "exec-validate",
+      "sourceHandle": "out",
+      "target": "exec-commit",
+      "targetHandle": "in",
+      "label": "commits",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-questions-root",
+      "type": "reference",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-root",
+      "targetHandle": "out",
+      "label": "questions",
+      "style": { "curved": true, "width": 1 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-sync-async",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-sync-async",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-skill-location",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-skill-location",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-instance-scope",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-instance-scope",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-script-sandbox",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-script-sandbox",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-view-only",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-view-only-exec",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-questions-manifest-order",
+      "type": "dataFlow",
+      "source": "exec-open-questions",
+      "sourceHandle": "out",
+      "target": "exec-manifest-order",
+      "targetHandle": "in",
+      "label": "answered",
+      "style": { "curved": true, "width": 2 }
+    }
+    ,
+    {
+      "id": "edge-exec-context-input-routing",
+      "type": "dataFlow",
+      "source": "exec-context",
+      "sourceHandle": "out",
+      "target": "exec-input-routing",
+      "targetHandle": "in",
+      "label": "routes inputs",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-input-schema",
+      "type": "dataFlow",
+      "source": "exec-input-routing",
+      "sourceHandle": "out",
+      "target": "exec-nodeinput-schema",
+      "targetHandle": "in",
+      "label": "defines",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-input-query",
+      "type": "dataFlow",
+      "source": "exec-input-routing",
+      "sourceHandle": "out",
+      "target": "exec-query-input",
+      "targetHandle": "in",
+      "label": "includes",
+      "style": { "curved": true, "width": 2 }
+    },
+    {
+      "id": "edge-exec-dictionary-precedence",
+      "type": "dataFlow",
+      "source": "exec-resolve",
+      "sourceHandle": "out",
+      "target": "exec-dictionary-precedence",
+      "targetHandle": "in",
+      "label": "uses",
+      "style": { "curved": true, "width": 2 }
+    }
+  ],
+  "timestamp": "2026-01-26T09:24:00.000Z",
+  "nodeCount": 18,
+  "edgeCount": 17
+}
