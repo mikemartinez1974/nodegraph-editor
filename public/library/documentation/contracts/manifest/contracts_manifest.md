@@ -139,6 +139,11 @@ Defines **what is allowed to change** and by whom.
   - `none`: load full file (no boundary)
   - `root`: load only the manifest-rooted subgraph (stop at other Manifests)
   - `cluster`: load only the cluster containing the Manifest node (if any)
+- **Reachability rule (root boundary):**
+  - Only **structural edges** extend authority: `contains` and legacy `child`
+  - **Cluster membership** is structural for nodes in the same file/scope
+  - All other edge types are **non-structural** and do not confer authority
+- **Cluster constraint:** clusters must only reference local nodes; external IDs are ignored and should warn
 
 ---
 

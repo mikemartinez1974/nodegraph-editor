@@ -209,6 +209,9 @@ export default function PropertiesPanel({
   const isNodeSelected = Boolean(selectedNode);
   const isEdgeSelected = Boolean(selectedEdge) && !isNodeSelected;
   const isGroupSelected = Boolean(selectedGroup) && !isNodeSelected && !isEdgeSelected;
+  const isManifestNode = isNodeSelected && selectedNode?.type === "manifest";
+  const isLegendNode = isNodeSelected && selectedNode?.type === "legend";
+  const isDictionaryNode = isNodeSelected && selectedNode?.type === "dictionary";
   const activeSelectionId = activeSelection?.id;
   const selectionLabel = selectedNode?.label || selectedEdge?.label || selectedGroup?.label || "Properties";
   const selectionType = isNodeSelected ? "Node" : isEdgeSelected ? "Edge" : isGroupSelected ? "Cluster" : "Item";
@@ -227,6 +230,54 @@ export default function PropertiesPanel({
       return "{}";
     }
   }, [dataEntries]);
+  const manifestNode = useMemo(() => nodes.find((node) => node?.type === "manifest") || null, [nodes]);
+  const manifestDependencies = useMemo(() => {
+    const values = manifestNode?.data?.dependencies?.nodeTypes;
+    if (!Array.isArray(values)) return [];
+    return values.map((value) => String(value || "").trim()).filter(Boolean);
+  }, [manifestNode]);
+  const legendEntries = useMemo(() => {
+    if (!isLegendNode) return [];
+    return Array.isArray(selectedNode?.data?.entries) ? selectedNode.data.entries : [];
+  }, [isLegendNode, selectedNode]);
+  const dictionaryKeySet = useMemo(() => {
+    const keys = new Set();
+    (nodes || [])
+      .filter((node) => node?.type === "dictionary")
+      .forEach((node) => {
+        const nodeDefs = Array.isArray(node?.data?.nodeDefs) ? node.data.nodeDefs : [];
+        const skills = Array.isArray(node?.data?.skills) ? node.data.skills : [];
+        const views = Array.isArray(node?.data?.views) ? node.data.views : [];
+        [...nodeDefs, ...skills, ...views].forEach((entry) => {
+          const key = String(entry?.key || "").trim();
+          if (key) keys.add(key);
+        });
+      });
+    return keys;
+  }, [nodes]);
+  const legendDictionaryRefs = useMemo(() => {
+    const refs = new Set();
+    (nodes || [])
+      .filter((node) => node?.type === "legend")
+      .forEach((node) => {
+        const entries = Array.isArray(node?.data?.entries) ? node.data.entries : [];
+        entries.forEach((entry) => {
+          const key = String(entry?.dictionaryKey || entry?.key || "").trim();
+          if (key) refs.add(key);
+        });
+      });
+    return refs;
+  }, [nodes]);
+  const dictionaryEntries = useMemo(() => {
+    if (!isDictionaryNode) return { nodeDefs: [], skills: [], views: [] };
+    return {
+      nodeDefs: Array.isArray(selectedNode?.data?.nodeDefs) ? selectedNode.data.nodeDefs : [],
+      skills: Array.isArray(selectedNode?.data?.skills) ? selectedNode.data.skills : [],
+      views: Array.isArray(selectedNode?.data?.views) ? selectedNode.data.views : []
+    };
+  }, [isDictionaryNode, selectedNode]);
+  const [legendDraftKey, setLegendDraftKey] = useState("");
+  const [manifestListDrafts, setManifestListDrafts] = useState({});
   const selectedType = selectedNode?.type || "";
   const handleEntriesRef = useRef([]);
 
@@ -346,6 +397,10 @@ export default function PropertiesPanel({
 
   useEffect(() => {
     friendlyDraftRef.current = {};
+  }, [activeSelectionId]);
+
+  useEffect(() => {
+    setManifestListDrafts({});
   }, [activeSelectionId]);
 
   useEffect(() => {
@@ -660,6 +715,755 @@ export default function PropertiesPanel({
     [onUpdateGroup, selectedGroup]
   );
 
+  const updateLegendEntries = useCallback(
+    (nextEntries) => {
+      if (!selectedNode) return;
+      const nextData = { ...(selectedNode.data || {}), entries: nextEntries };
+      onUpdateNode(selectedNode.id, { data: nextData });
+    },
+    [onUpdateNode, selectedNode]
+  );
+
+  const updateDictionaryData = useCallback(
+    (patch) => {
+      if (!selectedNode) return;
+      const nextData = { ...(selectedNode.data || {}), ...patch };
+      onUpdateNode(selectedNode.id, { data: nextData });
+    },
+    [onUpdateNode, selectedNode]
+  );
+
+  const updateManifestSection = useCallback(
+    (section, patch) => {
+      if (!selectedNode) return;
+      const current = selectedNode.data || {};
+      const nextSection = { ...(current[section] || {}), ...patch };
+      const nextData = { ...current, [section]: nextSection };
+      onUpdateNode(selectedNode.id, { data: nextData });
+    },
+    [onUpdateNode, selectedNode]
+  );
+
+  const updateManifestDependencies = useCallback(
+    (patch) => {
+      updateManifestSection("dependencies", patch);
+    },
+    [updateManifestSection]
+  );
+
+  const renderStringList = (label, values, onChange, keyName) => {
+    const draft = manifestListDrafts[keyName] || "";
+    const list = Array.isArray(values) ? values : [];
+    const handleAdd = () => {
+      const nextValue = String(draft || "").trim();
+      if (!nextValue) return;
+      const nextList = [...new Set([...list, nextValue])];
+      onChange(nextList);
+      setManifestListDrafts((prev) => ({ ...prev, [keyName]: "" }));
+    };
+    const handleRemove = (item) => {
+      const nextList = list.filter((value) => value !== item);
+      onChange(nextList);
+    };
+    return (
+      <Stack spacing={1}>
+        <Typography variant="caption">{label}</Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="Add item"
+            value={draft}
+            onChange={(event) =>
+              setManifestListDrafts((prev) => ({ ...prev, [keyName]: event.target.value }))
+            }
+          />
+          <Button size="small" variant="outlined" onClick={handleAdd}>
+            Add
+          </Button>
+        </Stack>
+        {list.length ? (
+          <Stack direction="row" flexWrap="wrap" gap={1}>
+            {list.map((item) => (
+              <Chip key={`${keyName}-${item}`} label={item} onDelete={() => handleRemove(item)} />
+            ))}
+          </Stack>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No items yet.
+          </Typography>
+        )}
+      </Stack>
+    );
+  };
+
+  const renderManifestEditor = () => {
+    const manifest = selectedNode?.data || {};
+    const identity = manifest.identity || {};
+    const intent = manifest.intent || {};
+    const dependencies = manifest.dependencies || {};
+    const authority = manifest.authority || {};
+    const mutation = authority.mutation || {};
+    const actors = authority.actors || {};
+    const history = authority.history || {};
+    const documentInfo = manifest.document || {};
+    const settings = manifest.settings || {};
+
+    return (
+      <Stack spacing={2}>
+        <Typography variant="subtitle2">Identity</Typography>
+        <Stack spacing={1}>
+          <TextField
+            label="Graph ID"
+            size="small"
+            fullWidth
+            value={identity.graphId || ""}
+            onChange={(event) => updateManifestSection("identity", { graphId: event.target.value })}
+          />
+          <TextField
+            label="Name"
+            size="small"
+            fullWidth
+            value={identity.name || ""}
+            onChange={(event) => updateManifestSection("identity", { name: event.target.value })}
+          />
+          <TextField
+            label="Version"
+            size="small"
+            fullWidth
+            value={identity.version || ""}
+            onChange={(event) => updateManifestSection("identity", { version: event.target.value })}
+          />
+          <TextField
+            label="Description"
+            size="small"
+            fullWidth
+            multiline
+            minRows={2}
+            value={identity.description || ""}
+            onChange={(event) => updateManifestSection("identity", { description: event.target.value })}
+          />
+          <Stack direction="row" spacing={1}>
+            <TextField
+              label="Created at"
+              size="small"
+              fullWidth
+              value={identity.createdAt || ""}
+              onChange={(event) => updateManifestSection("identity", { createdAt: event.target.value })}
+            />
+            <TextField
+              label="Updated at"
+              size="small"
+              fullWidth
+              value={identity.updatedAt || ""}
+              onChange={(event) => updateManifestSection("identity", { updatedAt: event.target.value })}
+            />
+          </Stack>
+        </Stack>
+
+        <Divider />
+        <Typography variant="subtitle2">Intent</Typography>
+        <Stack spacing={1}>
+          <FormControl size="small" fullWidth>
+            <InputLabel>Kind</InputLabel>
+            <Select
+              value={intent.kind || ""}
+              label="Kind"
+              onChange={(event) => updateManifestSection("intent", { kind: event.target.value })}
+            >
+              {[
+                "documentation",
+                "workflow",
+                "simulation",
+                "circuit",
+                "knowledge-map",
+                "contract",
+                "executable",
+                "other"
+              ].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl size="small" fullWidth>
+            <InputLabel>Scope</InputLabel>
+            <Select
+              value={intent.scope || ""}
+              label="Scope"
+              onChange={(event) => updateManifestSection("intent", { scope: event.target.value })}
+            >
+              {["human", "agent", "tool", "mixed"].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <TextField
+            label="Intent description"
+            size="small"
+            fullWidth
+            multiline
+            minRows={2}
+            value={intent.description || ""}
+            onChange={(event) => updateManifestSection("intent", { description: event.target.value })}
+          />
+        </Stack>
+
+        <Divider />
+        <Typography variant="subtitle2">Dependencies</Typography>
+        <Stack spacing={2}>
+          {renderStringList(
+            "Node types",
+            dependencies.nodeTypes,
+            (next) => updateManifestDependencies({ nodeTypes: next }),
+            "nodeTypes"
+          )}
+          {renderStringList(
+            "Handle contracts",
+            dependencies.handleContracts,
+            (next) => updateManifestDependencies({ handleContracts: next }),
+            "handleContracts"
+          )}
+          {renderStringList(
+            "Skills",
+            dependencies.skills,
+            (next) => updateManifestDependencies({ skills: next }),
+            "skills"
+          )}
+          {renderStringList(
+            "Optional",
+            dependencies.optional,
+            (next) => updateManifestDependencies({ optional: next }),
+            "optionalDeps"
+          )}
+          <Stack direction="row" spacing={1}>
+            <TextField
+              label="Node schema version"
+              size="small"
+              fullWidth
+              value={dependencies.schemaVersions?.nodes || ""}
+              onChange={(event) =>
+                updateManifestDependencies({
+                  schemaVersions: { ...(dependencies.schemaVersions || {}), nodes: event.target.value }
+                })
+              }
+            />
+            <TextField
+              label="Handle schema version"
+              size="small"
+              fullWidth
+              value={dependencies.schemaVersions?.handles || ""}
+              onChange={(event) =>
+                updateManifestDependencies({
+                  schemaVersions: { ...(dependencies.schemaVersions || {}), handles: event.target.value }
+                })
+              }
+            />
+          </Stack>
+        </Stack>
+
+        <Divider />
+        <Typography variant="subtitle2">Authority</Typography>
+        <Stack spacing={1}>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Graph boundary</InputLabel>
+              <Select
+                value={authority.graphBoundary || "none"}
+                label="Graph boundary"
+                onChange={(event) => updateManifestSection("authority", { graphBoundary: event.target.value })}
+              >
+                {["none", "root", "cluster"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel>Style authority</InputLabel>
+              <Select
+                value={authority.styleAuthority || "descriptive"}
+                label="Style authority"
+                onChange={(event) => updateManifestSection("authority", { styleAuthority: event.target.value })}
+              >
+                {["descriptive", "authoritative", "ignored"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+          <Typography variant="caption">Mutation policy</Typography>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Allow create</InputLabel>
+              <Select
+                value={String(mutation.allowCreate ?? true)}
+                label="Allow create"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    mutation: { ...mutation, allowCreate: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel>Allow update</InputLabel>
+              <Select
+                value={String(mutation.allowUpdate ?? true)}
+                label="Allow update"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    mutation: { ...mutation, allowUpdate: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Allow delete</InputLabel>
+              <Select
+                value={String(mutation.allowDelete ?? false)}
+                label="Allow delete"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    mutation: { ...mutation, allowDelete: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel>Append only</InputLabel>
+              <Select
+                value={String(mutation.appendOnly ?? false)}
+                label="Append only"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    mutation: { ...mutation, appendOnly: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+          <Typography variant="caption">Actors</Typography>
+          <Stack direction="row" spacing={1}>
+            {[
+              { key: "humans", label: "Humans" },
+              { key: "agents", label: "Agents" },
+              { key: "tools", label: "Tools" }
+            ].map((actor) => (
+              <FormControl key={actor.key} fullWidth size="small">
+                <InputLabel>{actor.label}</InputLabel>
+                <Select
+                  value={String(actors[actor.key] ?? true)}
+                  label={actor.label}
+                  onChange={(event) =>
+                    updateManifestSection("authority", {
+                      actors: { ...actors, [actor.key]: event.target.value === "true" }
+                    })
+                  }
+                >
+                  {["true", "false"].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ))}
+          </Stack>
+          <Typography variant="caption">History</Typography>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Rewrite allowed</InputLabel>
+              <Select
+                value={String(history.rewriteAllowed ?? false)}
+                label="Rewrite allowed"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    history: { ...history, rewriteAllowed: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel>Squash allowed</InputLabel>
+              <Select
+                value={String(history.squashAllowed ?? false)}
+                label="Squash allowed"
+                onChange={(event) =>
+                  updateManifestSection("authority", {
+                    history: { ...history, squashAllowed: event.target.value === "true" }
+                  })
+                }
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </Stack>
+
+        <Divider />
+        <Typography variant="subtitle2">Document</Typography>
+        <TextField
+          label="Document URL"
+          size="small"
+          fullWidth
+          value={documentInfo.url || ""}
+          onChange={(event) => updateManifestSection("document", { url: event.target.value })}
+        />
+
+        <Divider />
+        <Typography variant="subtitle2">Settings (optional)</Typography>
+        <Stack spacing={1}>
+          <TextField
+            label="Theme"
+            size="small"
+            fullWidth
+            value={settings.theme || ""}
+            onChange={(event) => updateManifestSection("settings", { theme: event.target.value })}
+          />
+          <TextField
+            label="Background image"
+            size="small"
+            fullWidth
+            value={settings.backgroundImage || ""}
+            onChange={(event) => updateManifestSection("settings", { backgroundImage: event.target.value })}
+          />
+          <Stack direction="row" spacing={1}>
+            <TextField
+              label="Default node color"
+              size="small"
+              fullWidth
+              value={settings.defaultNodeColor || ""}
+              onChange={(event) => updateManifestSection("settings", { defaultNodeColor: event.target.value })}
+            />
+            <TextField
+              label="Default edge color"
+              size="small"
+              fullWidth
+              value={settings.defaultEdgeColor || ""}
+              onChange={(event) => updateManifestSection("settings", { defaultEdgeColor: event.target.value })}
+            />
+          </Stack>
+          <Stack direction="row" spacing={1}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Snap to grid</InputLabel>
+              <Select
+                value={String(settings.snapToGrid ?? false)}
+                label="Snap to grid"
+                onChange={(event) => updateManifestSection("settings", { snapToGrid: event.target.value === "true" })}
+              >
+                {["true", "false"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Grid size"
+              size="small"
+              fullWidth
+              value={settings.gridSize ?? ""}
+              onChange={(event) =>
+                updateManifestSection("settings", { gridSize: Number(event.target.value) || 0 })
+              }
+            />
+          </Stack>
+          <FormControl fullWidth size="small">
+            <InputLabel>Edge routing</InputLabel>
+            <Select
+              value={settings.edgeRouting || "auto"}
+              label="Edge routing"
+              onChange={(event) => updateManifestSection("settings", { edgeRouting: event.target.value })}
+            >
+              {["auto", "orthogonal", "curved", "straight"].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+      </Stack>
+    );
+  };
+
+  const renderLegendEditor = () => {
+    const hasManifest = Boolean(manifestNode);
+    const depsAvailable = manifestDependencies.length > 0;
+    const manifestBlocks = hasManifest && !depsAvailable;
+    const draftMode = !hasManifest;
+    const canAddFromManifest = depsAvailable && manifestDependencies.includes(legendDraftKey);
+    const canAddDraft = draftMode && legendDraftKey.trim().length > 0;
+
+    const handleAddLegendEntry = () => {
+      const key = legendDraftKey.trim();
+      if (!key) return;
+      if (hasManifest && !depsAvailable) return;
+      if (hasManifest && !manifestDependencies.includes(key)) return;
+      if (legendEntries.some((entry) => entry?.key === key)) return;
+      updateLegendEntries([
+        ...legendEntries,
+        { key, intent: "", implementation: "", dictionaryKey: key }
+      ]);
+      setLegendDraftKey("");
+    };
+
+    const handleLegendEntryChange = (index, patch) => {
+      const next = legendEntries.map((entry, idx) => (idx === index ? { ...entry, ...patch } : entry));
+      updateLegendEntries(next);
+    };
+
+    const handleRemoveLegendEntry = (index) => {
+      const next = legendEntries.filter((_, idx) => idx !== index);
+      updateLegendEntries(next);
+    };
+
+    return (
+      <Stack spacing={1}>
+        <Stack spacing={0.5}>
+          <Typography variant="body2" color="text.secondary">
+            {draftMode
+              ? "Draft mode: no manifest found. Legend entries allowed with warnings."
+              : "Legend entries require manifest dependencies."}
+          </Typography>
+          {manifestBlocks && (
+            <Typography variant="body2" color="warning.main">
+              Manifest has no node type dependencies. Add one before creating legend entries.
+            </Typography>
+          )}
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          {depsAvailable ? (
+            <FormControl size="small" fullWidth>
+              <InputLabel>Manifest dependency</InputLabel>
+              <Select
+                value={legendDraftKey}
+                label="Manifest dependency"
+                onChange={(event) => setLegendDraftKey(event.target.value)}
+              >
+                {manifestDependencies.map((dep) => (
+                  <MenuItem key={dep} value={dep}>
+                    {dep}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <TextField
+              label="Legend key"
+              size="small"
+              fullWidth
+              value={legendDraftKey}
+              onChange={(event) => setLegendDraftKey(event.target.value)}
+              disabled={manifestBlocks}
+            />
+          )}
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleAddLegendEntry}
+            disabled={manifestBlocks || (!canAddFromManifest && !canAddDraft)}
+          >
+            Add
+          </Button>
+        </Stack>
+
+        {legendEntries.length ? (
+          legendEntries.map((entry, index) => {
+            const entryKey = String(entry?.key || "").trim();
+            const dictionaryKey = String(entry?.dictionaryKey || "").trim();
+            const missingManifest = depsAvailable && entryKey && !manifestDependencies.includes(entryKey);
+            const missingDictionary = dictionaryKey && !dictionaryKeySet.has(dictionaryKey);
+            return (
+              <Paper key={`${entryKey || "legend"}-${index}`} variant="outlined" sx={{ p: 1 }}>
+                <Stack spacing={1}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="subtitle2">{entryKey || "(unnamed)"}</Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      {missingManifest && <Chip size="small" color="warning" label="Missing manifest dep" />}
+                      {missingDictionary && <Chip size="small" color="warning" label="Missing dictionary entry" />}
+                      <IconButton size="small" onClick={() => handleRemoveLegendEntry(index)}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
+                  <TextField
+                    label="Intent"
+                    size="small"
+                    fullWidth
+                    value={entry?.intent || ""}
+                    onChange={(event) => handleLegendEntryChange(index, { intent: event.target.value })}
+                  />
+                  <TextField
+                    label="Implementation"
+                    size="small"
+                    fullWidth
+                    value={entry?.implementation || ""}
+                    onChange={(event) => handleLegendEntryChange(index, { implementation: event.target.value })}
+                  />
+                  <TextField
+                    label="Dictionary key"
+                    size="small"
+                    fullWidth
+                    value={dictionaryKey}
+                    onChange={(event) => handleLegendEntryChange(index, { dictionaryKey: event.target.value })}
+                  />
+                </Stack>
+              </Paper>
+            );
+          })
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No legend entries defined.
+          </Typography>
+        )}
+      </Stack>
+    );
+  };
+
+  const renderDictionaryEditor = () => {
+    const renderEntryList = (title, sectionKey, entries, defaults = {}) => (
+      <Stack spacing={1}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography variant="subtitle2">{title}</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => updateDictionaryData({
+              [sectionKey]: [...entries, { key: "", ref: "", version: "", ...defaults }]
+            })}
+          >
+            Add
+          </Button>
+        </Stack>
+        {entries.length ? (
+          entries.map((entry, index) => {
+            const entryKey = String(entry?.key || "").trim();
+            const unreferenced = entryKey && !legendDictionaryRefs.has(entryKey);
+            const handleEntryChange = (patch) => {
+              const nextEntries = entries.map((item, idx) => (idx === index ? { ...item, ...patch } : item));
+              updateDictionaryData({ [sectionKey]: nextEntries });
+            };
+            const handleEntryRemove = () => {
+              const nextEntries = entries.filter((_, idx) => idx !== index);
+              updateDictionaryData({ [sectionKey]: nextEntries });
+            };
+            return (
+              <Paper key={`${sectionKey}-${index}`} variant="outlined" sx={{ p: 1 }}>
+                <Stack spacing={1}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="subtitle2">{entryKey || "(unnamed)"}</Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      {unreferenced && <Chip size="small" color="warning" label="Unreferenced" />}
+                      <IconButton size="small" onClick={handleEntryRemove}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
+                  <TextField
+                    label="Key"
+                    size="small"
+                    fullWidth
+                    value={entry?.key || ""}
+                    onChange={(event) => handleEntryChange({ key: event.target.value })}
+                  />
+                  <TextField
+                    label="Reference"
+                    size="small"
+                    fullWidth
+                    value={entry?.ref || entry?.path || entry?.file || ""}
+                    onChange={(event) => handleEntryChange({ ref: event.target.value })}
+                  />
+                  <TextField
+                    label="Version"
+                    size="small"
+                    fullWidth
+                    value={entry?.version || ""}
+                    onChange={(event) => handleEntryChange({ version: event.target.value })}
+                  />
+                  {sectionKey === "views" && (
+                    <Stack direction="row" spacing={1}>
+                      <TextField
+                        label="Intent"
+                        size="small"
+                        fullWidth
+                        value={entry?.intent || "node"}
+                        onChange={(event) => handleEntryChange({ intent: event.target.value })}
+                      />
+                      <TextField
+                        label="Payload"
+                        size="small"
+                        fullWidth
+                        value={entry?.payload || entry?.view || "twilite.web"}
+                        onChange={(event) => handleEntryChange({ payload: event.target.value })}
+                      />
+                    </Stack>
+                  )}
+                </Stack>
+              </Paper>
+            );
+          })
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No entries yet.
+          </Typography>
+        )}
+      </Stack>
+    );
+
+    return (
+      <Stack spacing={2}>
+        {renderEntryList("Node definitions", "nodeDefs", dictionaryEntries.nodeDefs)}
+        {renderEntryList("Skills", "skills", dictionaryEntries.skills)}
+        {renderEntryList("Views", "views", dictionaryEntries.views, { intent: "node", payload: "twilite.web" })}
+      </Stack>
+    );
+  };
+
   const renderPayloadSection = () => (
     <Section
       title="Data"
@@ -668,23 +1472,28 @@ export default function PropertiesPanel({
       onToggle={handleAccordionChange("node", "data")}
       disabled={!isNodeSelected}
     >
-      <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-        <Button size="small" variant={payloadView === "friendly" ? "contained" : "outlined"} onClick={() => setPayloadView("friendly")}>
-          Friendly view
-        </Button>
-        <Button size="small" variant={payloadView === "json" ? "contained" : "outlined"} onClick={() => setPayloadView("json")}>
-          JSON
-        </Button>
-        <Tooltip title="Copy payload JSON">
-          <IconButton size="small" onClick={() => copyToClipboard(payloadJson)}>
-            <ContentCopyIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-      {payloadView === "friendly" ? (
-        dataEntries.length ? (
-          <Stack spacing={1}>
-            {dataEntries.map((entry, index) => {
+      {isManifestNode && renderManifestEditor()}
+      {isLegendNode && renderLegendEditor()}
+      {isDictionaryNode && renderDictionaryEditor()}
+      {!isManifestNode && !isLegendNode && !isDictionaryNode && (
+        <>
+          <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+            <Button size="small" variant={payloadView === "friendly" ? "contained" : "outlined"} onClick={() => setPayloadView("friendly")}>
+              Friendly view
+            </Button>
+            <Button size="small" variant={payloadView === "json" ? "contained" : "outlined"} onClick={() => setPayloadView("json")}>
+              JSON
+            </Button>
+            <Tooltip title="Copy payload JSON">
+              <IconButton size="small" onClick={() => copyToClipboard(payloadJson)}>
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          {payloadView === "friendly" ? (
+            dataEntries.length ? (
+              <Stack spacing={1}>
+                {dataEntries.map((entry, index) => {
                 const isMarkdownField =
                   entry.type === "string" &&
                   ((entry.key && entry.key.toLowerCase().includes("markdown")) ||
@@ -743,14 +1552,14 @@ export default function PropertiesPanel({
                   </Paper>
                 );
               })}
-          </Stack>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            No payload data to show.
-          </Typography>
-        )
-      ) : (
-        <Box key={`json-view-${activeSelectionId || "none"}-${jsonViewRevision}`}>
+              </Stack>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No payload data to show.
+              </Typography>
+            )
+          ) : (
+            <Box key={`json-view-${activeSelectionId || "none"}-${jsonViewRevision}`}>
               <Paper
                 variant="outlined"
                 sx={{ p: 2, fontFamily: "Monospace", whiteSpace: "pre-wrap", mb: 1, maxWidth: "100%", overflowX: "auto" }}
@@ -836,9 +1645,11 @@ export default function PropertiesPanel({
                   );
                 })}
                 {"}"}
-              </Box>
-          </Paper>
-        </Box>
+                  </Box>
+              </Paper>
+            </Box>
+          )}
+        </>
       )}
     </Section>
   );

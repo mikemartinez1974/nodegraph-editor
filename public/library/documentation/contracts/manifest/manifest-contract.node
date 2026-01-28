@@ -145,11 +145,11 @@
         "y": 820
       },
       "width": 560,
-      "height": 420,
+      "height": 520,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Authority & Mutation Policy (REQUIRED)\n\nDefines what may change and by whom.\n\n- mutation rules\n- allowed actors\n- styleAuthority\n- history rules\n\nIf appendOnly = true, deletes are forbidden.\nHistory rules MUST be enforced."
+        "markdown": "## Authority & Mutation Policy (REQUIRED)\n\nDefines what may change and by whom.\n\n- mutation rules\n- allowed actors\n- styleAuthority\n- history rules\n\nIf appendOnly = true, deletes are forbidden.\nHistory rules MUST be enforced.\n\n### Graph Boundary (Authority Scope)\n- `none`: load full file (no boundary)\n- `root`: load manifest-rooted subgraph (stop at other Manifests)\n- `cluster`: load only the cluster containing the Manifest node\n\n**Reachability rule (root boundary):**\n- Only structural edges extend authority: `contains` and legacy `child`\n- Cluster membership is structural for nodes in the same file/scope\n- All other edge types are **non-structural** and do not confer authority\n\n**Cluster constraint:**\n- Clusters must only reference local nodes\n- External node IDs are ignored and should warn"
       }
     },
     {

@@ -36,7 +36,9 @@ const stringifyPreview = (value) => {
 const ViewNode = (props) => {
   const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
-  const datatype = node?.data?.host?.datatype || '';
+  const intent = node?.data?.view?.intent || '';
+  const payloadKey = node?.data?.view?.payload || '';
+  const datatype = payloadKey ? `data.${payloadKey}` : node?.data?.host?.datatype || '';
   const payload = useMemo(
     () => getPayloadByDatatype(node?.data || {}, datatype),
     [node?.data, datatype]
@@ -72,7 +74,7 @@ const ViewNode = (props) => {
             alignSelf: 'flex-start'
           }}
         >
-          {datatype || 'data.twilite.web'}
+          {payloadKey ? `${intent || 'node'} / ${payloadKey}` : datatype || 'data.twilite.web'}
         </div>
         <div
           style={{

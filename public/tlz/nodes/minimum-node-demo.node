@@ -114,24 +114,27 @@
         "views": [
           {
             "key": "demo.min",
-            "view": "twilite.web",
             "ref": "/tlz/nodes/minimum-node-definition.node",
             "source": "local",
-            "version": ">=1.0.0"
+            "version": ">=1.0.0",
+            "intent": "node",
+            "payload": "twilite.web"
           },
           {
             "key": "demo.svg",
-            "view": "twilite.web",
             "ref": "/tlz/nodes/minimum-node-definition-svg.node",
             "source": "local",
-            "version": ">=1.0.0"
+            "version": ">=1.0.0",
+            "intent": "node",
+            "payload": "twilite.web"
           },
           {
             "key": "demo.text",
-            "view": "twilite.web",
             "ref": "/tlz/nodes/text-node-definition.node",
             "source": "local",
-            "version": ">=1.0.0"
+            "version": ">=1.0.0",
+            "intent": "node",
+            "payload": "twilite.web"
           }
         ]
       }

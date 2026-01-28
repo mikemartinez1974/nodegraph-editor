@@ -373,7 +373,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "- Manifest dependency semantics (types/files/skills)\n- Legend \u2194 dictionary examples\n- Open-node / graph-as-site navigation\n- Migration for no-manifest graphs"
+        "markdown": "- Legend \u2194 dictionary examples\n- Open-node / graph-as-site navigation\n- Migration for no-manifest graphs"
       },
       "handles": [
         {
@@ -429,7 +429,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Cluster-scoped manifest resolution in place.\nMissing node type/view/file now warn (fallback).\nDictionary required only if dependencies exist.\n\nVersion mismatch rule still open."
+        "markdown": "Cluster-scoped manifest resolution in place.\nMissing node type/view/file now warn (fallback).\nDictionary required only if dependencies exist.\n\nVersion mismatch rule resolved: **warn only**."
       },
       "handles": [
         {
@@ -457,7 +457,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Hybrid rule chosen:\n- `dictionaryKey` routes to dictionary entry\n- no key = descriptive only\n\nNeed examples."
+        "markdown": "Hybrid rule chosen:\n- `dictionaryKey` routes to dictionary entry\n- no key = descriptive only\n\nNeed examples.\n\nDraft mode: legend entries allowed without manifest (warn only)."
       },
       "handles": [
         {

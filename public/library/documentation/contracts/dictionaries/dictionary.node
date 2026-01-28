@@ -86,7 +86,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data Format\n\nPrimary format: **structured tables**.\n\nRecommended structure:\n```json\n{\n  \"nodeDefs\": [\n    { \"key\": \"markdown\", \"ref\": \"/documentation/contracts/nodes/markdown.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"skills\": [\n    { \"key\": \"auto-layout\", \"ref\": \"/documentation/contracts/skills/layout/skill-autolayout.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"views\": [\n    { \"key\": \"markdown\", \"view\": \"twilite.web\", \"ref\": \"/documentation/contracts/view/view.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ]\n}\n```\n\nOptional `data.markdown` may mirror the entries for humans.\nFuture structured fields may be added under `data.ext.twilite`."
+        "markdown": "## Data Format\n\nPrimary format: **structured tables**.\n\nRecommended structure:\n```json\n{\n  \"nodeDefs\": [\n    { \"key\": \"markdown\", \"ref\": \"/documentation/contracts/nodes/markdown.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"skills\": [\n    { \"key\": \"auto-layout\", \"ref\": \"/documentation/contracts/skills/layout/skill-autolayout.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ],\n  \"views\": [\n    { \"key\": \"markdown\", \"intent\": \"node\", \"payload\": \"twilite.web\", \"ref\": \"/documentation/contracts/view/view.node\", \"version\": \">=1.0.0\", \"source\": \"external\" }\n  ]\n}\n```\n\nOptional `data.markdown` may mirror the entries for humans.\nFuture structured fields may be added under `data.ext.twilite`."
       }
     },
     {
@@ -102,7 +102,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- `nodeDefs` map node types to definition graphs\n- `skills` list dependency references (not execution)\n- `views` map node types to renderable view definitions\n- **Host dictionary is authoritative** (class dictionaries may exist but must be merged explicitly)"
+        "markdown": "## Rules\n\n- Dictionary node does **not** execute code\n- No procedural logic (use Script nodes)\n- Must be readable without plugins\n- Can be ignored if absent, but never invented\n- `nodeDefs` map node types to definition graphs\n- `skills` list dependency references (not execution)\n- `views` map node types to renderable view definitions (intent + payload)\n- **Host dictionary is authoritative** (class dictionaries may exist but must be merged explicitly)"
       }
     },
     {
@@ -134,7 +134,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Runtime Merge (Current Behavior)\n\n- Loader builds a **runtime merged** dictionary\n- Imported definition dictionaries are **defaults only**\n- Host entries override imported entries\n- **No persistence** back to the graph\n\nThis keeps inheritance while preserving host authority."
+        "markdown": "## Runtime Merge (Current Behavior)\n\n- Loader builds a **runtime merged** dictionary\n- Imported definition dictionaries are **defaults only**\n- Host entries override imported entries\n- **No persistence** back to the graph\n- **No inheritance opt-out** (use distinct type names instead)\n- **Version mismatches warn only** (do not block load)\n\nThis keeps inheritance while preserving host authority."
       }
     },
     {
@@ -283,7 +283,8 @@
         "views": [
           {
             "key": "default",
-            "view": "twilite.web",
+            "intent": "node",
+            "payload": "twilite.web",
             "ref": "/documentation/contracts/view/view.node",
             "version": ">=1.0.0",
             "source": "external"
@@ -372,8 +373,7 @@
         "curved": true
       },
       "data": {}
-    }
-    ,
+    },
     {
       "id": "edge-dict-precedence",
       "type": "dataFlow",
@@ -386,8 +386,7 @@
         "curved": true
       },
       "data": {}
-    }
-    ,
+    },
     {
       "id": "edge-dict-runtime-merge",
       "type": "dataFlow",

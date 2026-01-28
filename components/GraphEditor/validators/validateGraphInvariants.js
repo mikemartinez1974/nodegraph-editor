@@ -77,6 +77,18 @@ export function validateGraphInvariants({
     });
   });
 
+  clusterList.forEach((cluster) => {
+    if (!cluster?.id || !Array.isArray(cluster.nodeIds)) return;
+    const invalidMembers = cluster.nodeIds.filter((nodeId) => !nodeMap.has(nodeId));
+    if (invalidMembers.length > 0) {
+      warnings.push({
+        code: 'CLUSTER_UNKNOWN_NODE',
+        message: `Cluster "${cluster.id}" references ${invalidMembers.length} missing node(s).`,
+        nodeId: cluster.id
+      });
+    }
+  });
+
   const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
   if (manifestNodes.length === 0) {
     const entry = {

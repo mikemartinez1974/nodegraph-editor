@@ -63,7 +63,7 @@ const baseNodeTypeRegistry = {
       ],
       skills: [],
       views: [
-        { key: 'default', view: 'twilite.web', ref: '', source: 'local', version: '>=1.0.0' }
+        { key: 'default', intent: 'node', payload: 'twilite.web', ref: '', source: 'local', version: '>=1.0.0' }
       ]
     }
   },
@@ -90,8 +90,9 @@ const baseNodeTypeRegistry = {
     defaultWidth: 360,
     defaultHeight: 240,
     defaultData: {
-      host: {
-        datatype: 'data.twilite.web'
+      view: {
+        intent: 'node',
+        payload: 'twilite.web'
       },
       twilite: {
         web: {
@@ -322,7 +323,7 @@ export const nodeTypeMetadata = [
       ],
       skills: [],
       views: [
-        { key: 'markdown', view: 'twilite.web', ref: '/documentation/contracts/view/view.node', source: 'external', version: '>=1.0.0' }
+        { key: 'markdown', intent: 'node', payload: 'twilite.web', ref: '/documentation/contracts/view/view.node', source: 'external', version: '>=1.0.0' }
       ]
     }
   },

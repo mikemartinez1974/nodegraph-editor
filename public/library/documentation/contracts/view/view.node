@@ -71,7 +71,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# View Node Contract\n\nDefines how a **node definition** exposes renderable output.\n\nA View node declares **what to render** for a given host + datatype."
+        "markdown": "# View Node Contract\n\nDefines how a **node definition** exposes renderable output.\n\nA View node declares **intent + payload format** for rendering."
       }
     },
     {
@@ -103,7 +103,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required\n\n- `type: \"view\"`\n- `data.host.datatype` (string)\n\n`data.host.datatype` declares the primary render target."
+        "markdown": "## Required\n\n- `type: \"view\"`\n- `data.view.intent` (string)\n- `data.view.payload` (string)\n\nIntent declares **why** the view exists; payload declares **how** it is expressed."
       }
     },
     {
@@ -119,7 +119,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Host + Datatype\n\n`data.host.datatype` uses namespaced identifiers.\n\nExamples:\n- `data.twilite.web`\n- `data.twilite.object`\n- `data.twilite.canvas`\n\nThe host namespace declares the runtime that can render it."
+        "markdown": "## Intent + Payload\n\n`data.view.intent` declares purpose.\n`data.view.payload` declares format/runtime.\n\nExamples:\n- `intent: node`, `payload: twilite.web`\n- `intent: panel`, `payload: twilite.web`\n- `intent: preview`, `payload: twilite.svg`\n\nIntent is semantic. Payload is technical."
       }
     },
     {
@@ -135,7 +135,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data Payload\n\n- View payload lives under the host namespace.\n- Example: `data.twilite.web` contains the HTML/CSS/props for the web renderer.\n\nThe payload is **portable**, not UI state."
+        "markdown": "## Data Payload\n\n- View payload lives under the payload namespace.\n- Example: `data.twilite.web` contains HTML/CSS/props.\n\nPayload is **portable**, not UI state."
       }
     },
     {
@@ -151,7 +151,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rules\n\n- A node definition must include **at least one** View node.\n- A definition graph **may contain only View nodes** and still be valid.\n- View nodes are descriptive, not executable.\n- Multiple View nodes can exist for multiple hosts.\n- Renderers choose the best compatible host/datatype."
+        "markdown": "## Rules\n\n- A node definition must include **at least one** View node.\n- A definition graph **may contain only View nodes** and still be valid.\n- View nodes are descriptive, not executable.\n- Multiple View nodes can exist for multiple intent/payload pairs.\n- Renderers choose the best compatible intent + payload."
       }
     },
     {

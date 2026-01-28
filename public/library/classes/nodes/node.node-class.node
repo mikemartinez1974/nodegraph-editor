@@ -1,0 +1,183 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Node Class Definition",
+    "description": "Definition graph for the base content node with editor.web and node.web views.",
+    "created": "2026-01-28T00:00:00.000Z",
+    "modified": "2026-01-28T00:00:00.000Z",
+    "author": "",
+    "tags": ["definition", "node", "content", "views"]
+  },
+  "nodes": [
+    {
+      "id": "node-class-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -460, "y": -40 },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "node-class",
+          "name": "Node Class Definition",
+          "version": "0.1.0",
+          "description": "Definition graph for the base content node.",
+          "createdAt": "2026-01-28T00:00:00.000Z",
+          "updatedAt": "2026-01-28T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "definition",
+          "scope": "node",
+          "description": "Defines the base content node with editor + node views."
+        },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "view", "markdown"],
+          "handleContracts": ["core"],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": { "url": "" }
+      }
+    },
+    {
+      "id": "node-class-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -460, "y": 240 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "node",
+            "intent": "base content node",
+            "implementation": "editor.web + node.web views",
+            "dictionaryKey": "node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node-class-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -460, "y": 520 },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node-class-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": { "x": 0, "y": 0 },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "markdown": "## Editor View\n\nThis view renders the **content editor** for `data.content`."
+          }
+        }
+      }
+    },
+    {
+      "id": "node-class-node-view",
+      "type": "view",
+      "label": "Node View (node.web)",
+      "position": { "x": 420, "y": 0 },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web"
+        },
+        "node": {
+          "web": {
+            "markdown": "# {{label}}\n\n{{data.content}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "node-class-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": { "x": 0, "y": 280 },
+      "width": 800,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Node Class Definition\n\n- `data.content` is a **string**.\n- `editor.web` provides a UI panel for editing content.\n- `node.web` renders **markdown** from `data.content`.\n\nThis definition is resolved via the dictionary."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

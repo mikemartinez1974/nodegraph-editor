@@ -94,7 +94,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Questions\n\n1. Do we persist merged dictionary back into the graph?\n2. Do we allow opt-out of inheritance per node type?\n3. How do we handle version mismatches in imported dictionaries?"
+        "markdown": "## Open Questions\n\n**Resolved**\n1. Persist merged dictionary back into graph? **No** (runtime only).\n2. Opt-out of inheritance per node type? **No** (use distinct type names instead).\n3. Version mismatches in imported dictionaries? **Warn only**."
       },
       "handles": [
         { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }

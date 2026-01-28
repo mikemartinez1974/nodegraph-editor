@@ -1893,6 +1893,7 @@ useEffect(() => {
             ? nodes.filter(node => node && node.type === 'manifest')
             : [];
           const manifestNode = manifestNodes[0] || null;
+          const STRUCTURE_EDGE_TYPES = new Set(['contains', 'child']);
 
           const boundary = manifestNode?.data?.authority?.graphBoundary || 'none';
           if (!manifestNode || boundary === 'none') {
@@ -1919,12 +1920,28 @@ useEffect(() => {
             includedNodeIds = new Set(manifestCluster.nodeIds);
           } else if (boundary === 'root') {
             const adjacency = new Map();
+            const addAdjacency = (from, to) => {
+              if (!from || !to) return;
+              if (!adjacency.has(from)) adjacency.set(from, []);
+              adjacency.get(from).push(to);
+            };
+
             edges.forEach(edge => {
               if (!edge?.source || !edge?.target) return;
-              if (!adjacency.has(edge.source)) adjacency.set(edge.source, []);
-              if (!adjacency.has(edge.target)) adjacency.set(edge.target, []);
-              adjacency.get(edge.source).push(edge.target);
-              adjacency.get(edge.target).push(edge.source);
+              if (!STRUCTURE_EDGE_TYPES.has(edge.type)) return;
+              addAdjacency(edge.source, edge.target);
+              addAdjacency(edge.target, edge.source);
+            });
+
+            clusterList.forEach(cluster => {
+              const members = Array.isArray(cluster?.nodeIds) ? cluster.nodeIds.filter(Boolean) : [];
+              if (members.length < 2) return;
+              const anchor = members[0];
+              for (let i = 1; i < members.length; i += 1) {
+                const memberId = members[i];
+                addAdjacency(anchor, memberId);
+                addAdjacency(memberId, anchor);
+              }
             });
 
             const queue = [manifestNode.id];
@@ -1961,8 +1978,18 @@ useEffect(() => {
           const filteredEdges = edges.filter(edge => includedNodeIds.has(edge.source) && includedNodeIds.has(edge.target));
           const filteredClusters = clusterList
             .map(cluster => {
-              const nodeIds = (cluster.nodeIds || []).filter(nodeId => includedNodeIds.has(nodeId));
-              return nodeIds.length > 0 ? { ...cluster, nodeIds } : null;
+              const originalIds = Array.isArray(cluster.nodeIds) ? cluster.nodeIds : [];
+              const nodeIds = originalIds.filter(nodeId => includedNodeIds.has(nodeId));
+              if (nodeIds.length > 0) {
+                if (nodeIds.length !== originalIds.length) {
+                  boundaryWarnings.push({
+                    code: 'cluster-boundary',
+                    message: `Cluster "${cluster.id}" referenced ${originalIds.length - nodeIds.length} out-of-bounds node(s); ignoring them.`
+                  });
+                }
+                return { ...cluster, nodeIds };
+              }
+              return null;
             })
             .filter(Boolean);
 

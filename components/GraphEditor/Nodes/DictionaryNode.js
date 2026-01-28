@@ -230,7 +230,7 @@ const DictionaryNode = (props) => {
                     {entry?.key || `view-${index + 1}`}
                   </div>
                   <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                    {entry?.view || 'twilite.web'}
+                    {`${entry?.intent || 'node'} / ${entry?.payload || entry?.view || 'twilite.web'}`}
                   </div>
                   <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
                     {entry?.ref || entry?.path || entry?.file || 'No reference'}
