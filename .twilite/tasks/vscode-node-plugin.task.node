@@ -1,0 +1,220 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "vscode-node-plugin-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -980, "y": -280 },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "vscode-node-plugin",
+          "name": "VSCode .node Plugin",
+          "version": "0.1.0",
+          "description": "Task plan for a VSCode editor for .node files.",
+          "createdAt": "2026-01-28T22:15:00.000Z",
+          "updatedAt": "2026-01-28T22:15:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "tooling",
+          "description": "Define the VSCode extension requirements and implementation plan."
+        },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "handleContracts": ["core"],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        }
+      }
+    },
+    {
+      "id": "vscode-node-plugin-root",
+      "type": "markdown",
+      "label": "🧩 VSCode .node Plugin",
+      "position": { "x": -420, "y": -260 },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# VSCode .node Plugin\n\nGoal: **edit .node files with local filesystem access and instant updates**.\n\nThis plugin is the authoring surface for Twilite node files."
+      }
+    },
+    {
+      "id": "vscode-node-plugin-requirements",
+      "type": "markdown",
+      "label": "✅ Requirements",
+      "position": { "x": 160, "y": -260 },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Requirements\n\n- Open `.node` files with custom editor\n- Local file access (read/write)\n- Instant updates (file watcher + save)\n- JSON validation + errors inline\n- Schema hints (nodes/edges/contracts)\n- Works offline"
+      }
+    },
+    {
+      "id": "vscode-node-plugin-features",
+      "type": "markdown",
+      "label": "✨ Core Features",
+      "position": { "x": -420, "y": 40 },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Features\n\n- Graph preview panel (render nodegraph)\n- Split view: JSON + visual\n- Live sync: edits in either view update the other\n- Quick actions: add node/edge/handle\n- Node type picker from dictionary/manifest\n- Validate before save"
+      }
+    },
+    {
+      "id": "vscode-node-plugin-architecture",
+      "type": "markdown",
+      "label": "🏗️ Architecture",
+      "position": { "x": 160, "y": 40 },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Architecture\n\n- VSCode extension (webview)\n- Uses file watcher + document provider\n- Parses/serializes `.node` JSON\n- Reuses Twilite renderer where possible\n- Local-only execution (no network required)"
+      }
+    },
+    {
+      "id": "vscode-node-plugin-security",
+      "type": "markdown",
+      "label": "🔒 Security + Trust",
+      "position": { "x": -420, "y": 360 },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Security\n\n- No remote fetch by default\n- File access limited to workspace\n- Explicit opt-in for external refs\n- Sanitize any embedded HTML/SVG\n\nKeep the editor safe by default."
+      }
+    },
+    {
+      "id": "vscode-node-plugin-open-questions",
+      "type": "markdown",
+      "label": "❓ Answers + Open Items",
+      "position": { "x": 160, "y": 360 },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Answers + Open Items\n\n1) **Auto-generate manifests** on new files. Allow easy overwrite. LLMs may author/refresh manifests when appropriate.\n2) **Schema bundling**: unclear (needs clarification).\n3) **Refs resolution**: **local paths resolve locally** (relative to the current .node). **Remote URLs resolve remotely**. No extra fallback needed.\n4) **Multi-graph files**: treat as **one graph** with clusters; **one manifest per graph**. Different manifest ⇒ different graph."
+      }
+    },
+    {
+      "id": "vscode-node-plugin-missing-features",
+      "type": "markdown",
+      "label": "🧩 Missing Features",
+      "position": { "x": 160, "y": 620 },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Missing Features\n\n**Now (MVP):**\n- **File association + icon** for `.node` (use `public/logo_light.svg` as default icon)\n\n**Later (post-MVP):**\n- Validation pipeline (contract checks on open/save)\n- Schema/source indicator (local vs remote)\n- External change handling (reload/merge prompt)\n- Clipboard import/export for nodegraph-data\n- Performance safeguards (debounce parsing/rendering)\n- CSP + sanitization for HTML/SVG previews\n- Handle/edge helpers (quick-create, ref validation)"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-vscode-manifest-root",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-manifest",
+      "target": "vscode-node-plugin-root",
+      "label": "declares",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-root-reqs",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-root",
+      "target": "vscode-node-plugin-requirements",
+      "label": "defines",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-root-features",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-root",
+      "target": "vscode-node-plugin-features",
+      "label": "scope",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-features-arch",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-features",
+      "target": "vscode-node-plugin-architecture",
+      "label": "drives",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-arch-security",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-architecture",
+      "target": "vscode-node-plugin-security",
+      "label": "constrains",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-security-open",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-security",
+      "target": "vscode-node-plugin-open-questions",
+      "label": "questions",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "edge-vscode-open-missing",
+      "type": "dataFlow",
+      "source": "vscode-node-plugin-open-questions",
+      "target": "vscode-node-plugin-missing-features",
+      "label": "missing",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "timestamp": "2026-01-28T22:15:00.000Z",
+  "nodeCount": 8,
+  "edgeCount": 7
+}

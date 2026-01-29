@@ -4,8 +4,10 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
 import themeMap from '@/components/Browser/themes';
 import GraphEditor from '@/components/GraphEditor/GraphEditor';
+import eventBus from '../../components/NodeGraph/eventBus';
 
 export default function EditorPage() {
+  const isEmbedded = typeof window !== 'undefined' && window.location?.search?.includes('embed=1');
   const getSystemTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
@@ -16,7 +18,25 @@ export default function EditorPage() {
   const [themeName, setThemeName] = useState('default');
   const [themeReady, setThemeReady] = useState(false);
   const [muiTheme, setMuiTheme] = useState(() => themeMap.default);
-  const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isEmbedded) {
+      window.__Twilite_EMBED__ = true;
+    }
+  }, [isEmbedded]);
+
+  useEffect(() => {
+    if (!isEmbedded || typeof window === 'undefined') return;
+    const handleReady = () => {
+      try {
+        window.parent?.postMessage({ type: 'rendererReady' }, '*');
+      } catch (err) {
+        // ignore postMessage failures
+      }
+    };
+    window.addEventListener('Twilite-ready', handleReady);
+    return () => window.removeEventListener('Twilite-ready', handleReady);
+  }, [isEmbedded]);
 
   const isMobile = useMediaQuery('(max-width:768px)');
   const isTablet = useMediaQuery('(min-width:769px) and (max-width:1024px)');
@@ -72,6 +92,8 @@ export default function EditorPage() {
       setMuiTheme(themeMap[themeName] || themeMap.default);
     }
   }, [themeName]);
+
+  // GraphEditor already listens for "loadGraph" messages in the embedded frame.
 
   if (!themeReady) return null;
 
