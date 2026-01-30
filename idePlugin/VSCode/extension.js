@@ -1,6 +1,8 @@
 const vscode = require('vscode');
 
 let activePanelId = null;
+const panelState = new WeakMap();
+const panelStates = new Set();
 
 class TwiliteNodeEditorProvider {
   static viewType = 'twilite.nodeEditor';
@@ -10,7 +12,23 @@ class TwiliteNodeEditorProvider {
   }
 
   resolveCustomTextEditor(document, webviewPanel) {
+    console.log(`[TwilitePreviewHost] resolveCustomTextEditor file=${document.uri?.toString?.()}`);
     const panelId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const priorState = panelState.get(webviewPanel);
+    if (priorState) {
+      priorState.disposables.forEach((disposable) => disposable.dispose());
+      panelState.delete(webviewPanel);
+      panelStates.delete(priorState);
+    }
+    const state = {
+      panelId,
+      webviewPanel,
+      document,
+      documentUri: document.uri?.toString?.(),
+      disposables: []
+    };
+    panelState.set(webviewPanel, state);
+    panelStates.add(state);
     webviewPanel.webview.options = {
       enableScripts: true,
       localResourceRoots: [
@@ -20,53 +38,92 @@ class TwiliteNodeEditorProvider {
     };
 
     webviewPanel.webview.html = this.getHtml(webviewPanel.webview, document.getText());
+    webviewPanel.title = document.uri?.path?.split('/').pop() || '.node editor';
 
     const updateWebview = () => {
-      webviewPanel.webview.postMessage({ type: 'setText', text: document.getText() });
+      const currentDoc = state.document;
+      if (!currentDoc) return;
+      const text = currentDoc.getText();
+      const uri = currentDoc.uri?.toString?.();
+      console.log(`[TwilitePreviewHost] post setText file=${uri} length=${text.length}`);
+      webviewPanel.webview.postMessage({ type: 'setText', text, uri });
     };
 
     const changeSubscription = vscode.workspace.onDidChangeTextDocument((event) => {
-      if (event.document.uri.toString() !== document.uri.toString()) return;
+      const currentDoc = state.document;
+      if (!currentDoc) return;
+      if (event.document.uri.toString() !== currentDoc.uri.toString()) return;
       updateWebview();
     });
 
-    webviewPanel.onDidDispose(() => {
+    const disposeSubscription = webviewPanel.onDidDispose(() => {
       changeSubscription.dispose();
       if (activePanelId === panelId) {
         activePanelId = null;
       }
+      panelState.delete(webviewPanel);
+      panelStates.delete(state);
     });
 
     const setPreviewEnabled = (enabled) => {
       webviewPanel.webview.postMessage({ type: 'previewEnabled', enabled });
     };
 
+    const setActivePanel = (nextId) => {
+      activePanelId = nextId;
+      panelStates.forEach((entry) => {
+        const isActive = entry.panelId === nextId;
+        try {
+          entry.webviewPanel.webview.postMessage({ type: 'previewEnabled', enabled: isActive });
+          if (isActive) {
+            const text = entry.document?.getText?.() || '';
+            const uri = entry.document?.uri?.toString?.() || null;
+            entry.webviewPanel.webview.postMessage({ type: 'setText', text, uri });
+          }
+        } catch {}
+      });
+    };
+
     if (!activePanelId) {
-      activePanelId = panelId;
-      setPreviewEnabled(true);
+      setActivePanel(panelId);
     } else {
       setPreviewEnabled(activePanelId === panelId);
     }
 
-    webviewPanel.onDidChangeViewState((event) => {
+    const viewStateSubscription = webviewPanel.onDidChangeViewState((event) => {
       if (event.webviewPanel.active) {
-        activePanelId = panelId;
-        setPreviewEnabled(true);
+        setActivePanel(panelId);
       } else {
         setPreviewEnabled(false);
       }
     });
 
-    webviewPanel.webview.onDidReceiveMessage((message) => {
-      if (!message || message.type !== 'update') return;
-      const edit = new vscode.WorkspaceEdit();
-      const fullRange = new vscode.Range(
-        document.positionAt(0),
-        document.positionAt(document.getText().length)
-      );
-      edit.replace(document.uri, fullRange, message.text);
-      vscode.workspace.applyEdit(edit);
+    if (webviewPanel.active) {
+      setActivePanel(panelId);
+    }
+
+    // New panels become the active preview immediately (deterministic "last opened wins").
+    setActivePanel(panelId);
+
+    const messageSubscription = webviewPanel.webview.onDidReceiveMessage((message) => {
+      if (!message) return;
+      if (message.type === 'webviewReady') {
+        updateWebview();
+        return;
+      }
+      if (message.type === 'update') {
+        const edit = new vscode.WorkspaceEdit();
+        const fullRange = new vscode.Range(
+          document.positionAt(0),
+          document.positionAt(document.getText().length)
+        );
+        edit.replace(document.uri, fullRange, message.text);
+        vscode.workspace.applyEdit(edit);
+        return;
+      }
     });
+
+    state.disposables = [changeSubscription, disposeSubscription, viewStateSubscription, messageSubscription];
   }
 
   getHtml(webview, text) {
@@ -82,60 +139,148 @@ class TwiliteNodeEditorProvider {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Twilite Node</title>
   <style>
-    body { margin: 0; font-family: system-ui, sans-serif; background: #0b0f1a; color: #e2e8f0; }
-    header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #0f172a; border-bottom: 1px solid #1f2937; }
+    body {
+      margin: 0;
+      font-family: var(--vscode-font-family, system-ui, sans-serif);
+      background: var(--vscode-editor-background, #0b0f1a);
+      color: var(--vscode-editor-foreground, #e2e8f0);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--vscode-sideBar-background, #0f172a);
+      border-bottom: 1px solid var(--vscode-editorGroup-border, #1f2937);
+    }
     header img { width: 18px; height: 18px; }
-    header h1 { font-size: 13px; margin: 0; font-weight: 600; }
-    .container { display: grid; grid-template-columns: minmax(320px, 2.5fr) 12px minmax(280px, 1fr); height: calc(100vh - 44px); }
-    textarea { width: 100%; height: 100%; border: none; outline: none; padding: 12px; box-sizing: border-box; background: #0b0f1a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.5; }
-    .preview { position: relative; overflow: hidden; background: #0b0f1a; }
-    .resizer { background: #1f2937; cursor: col-resize; position: relative; }
-    .resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: 4px; width: 4px; background: #334155; border-radius: 2px; opacity: 0.8; }
-    .preview iframe { width: 100%; height: 100%; border: none; background: #0b0f1a; }
-    .preview-disabled { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.9); color: #94a3b8; font-size: 13px; text-align: center; padding: 16px; }
-    .error { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #f87171; font-size: 13px; padding: 16px; text-align: center; }
+    header h1 { font-size: 13px; margin: 0; font-weight: 600; flex: 1; }
+    .mode-toggle { display: flex; gap: 6px; }
+    .mode-toggle button {
+      border: 1px solid var(--vscode-button-border, #334155);
+      background: var(--vscode-button-secondaryBackground, #111827);
+      color: var(--vscode-button-secondaryForeground, #cbd5f5);
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .mode-toggle button.primary {
+      background: var(--vscode-button-background, #2563eb);
+      border-color: var(--vscode-button-background, #2563eb);
+      color: var(--vscode-button-foreground, #fff);
+    }
+    .container { height: 100vh; }
+    .preview {
+      position: relative;
+      overflow: hidden;
+      background: var(--vscode-editor-background, #0b0f1a);
+      height: 100%;
+    }
+    .preview iframe { width: 100%; height: 100%; border: none; background: var(--vscode-editor-background, #0b0f1a); }
+    .preview-disabled {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: color-mix(in srgb, var(--vscode-editor-background, #0b0f1a) 90%, transparent);
+      color: var(--vscode-descriptionForeground, #94a3b8);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+    .error {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--vscode-errorForeground, #f87171);
+      font-size: 13px;
+      padding: 16px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="${logoUri}" alt="Twilite" />
-    <h1>.node editor</h1>
-  </header>
   <div class="container" id="layout">
     <div class="preview">
-      <iframe id="graphFrame" src="http://localhost:3000/editor?embed=1"></iframe>
+      <iframe id="graphFrame" src="http://localhost:3000/editor?embed=1&draft=1&host=vscode"></iframe>
       <div class="error" id="errorBox" style="display:none;"></div>
       <div class="preview-disabled" id="previewDisabled" style="display:none;">Preview disabled in this editor window.<br/>Activate this tab to render.</div>
     </div>
-    <div class="resizer" id="resizer"></div>
-    <textarea id="editor" spellcheck="false">${escaped}</textarea>
   </div>
-  <script nonce="${nonce}">
-    const vscode = acquireVsCodeApi();
-    const editor = document.getElementById('editor');
+    <script nonce="${nonce}">
+      const vscode = acquireVsCodeApi();
     const graphFrame = document.getElementById('graphFrame');
     const errorBox = document.getElementById('errorBox');
-    const resizer = document.getElementById('resizer');
-    const layout = document.getElementById('layout');
     const previewDisabled = document.getElementById('previewDisabled');
-    let ignore = false;
     let pendingGraph = null;
     let previewEnabled = true;
     let lastRenderedText = '';
+    let needsResend = false;
+    let loadSeq = 0;
+    let pendingAck = null;
+    let ackTimer = null;
+    // Start suspended until we receive the document text from the extension host.
+    let suspendAutoLoad = true;
+    let hasSeenText = false;
+    let hasSentInitialGraph = false;
+    let currentUri = null;
+    let frameReady = false;
 
-    const renderGraph = (raw) => {
+    const applyViewMode = () => {
+      vscode.setState({ viewMode: 'preview' });
+    };
+
+    const clearAckTimer = () => {
+      if (ackTimer) {
+        clearTimeout(ackTimer);
+        ackTimer = null;
+      }
+    };
+
+    const postLoadGraph = (content, options = {}) => {
+      if (!graphFrame.contentWindow) return;
+      const seq = ++loadSeq;
+      pendingAck = seq;
+      graphFrame.contentWindow.postMessage(
+        { type: 'loadGraph', content, force: Boolean(options.force), seq },
+        '*'
+      );
+      clearAckTimer();
+      ackTimer = setTimeout(() => {
+        if (pendingAck !== seq) return;
+        if (!previewEnabled || suspendAutoLoad || !pendingGraph || !graphFrame.contentWindow) return;
+        // Resend the same content with a new seq if the iframe never acknowledged.
+        postLoadGraph(pendingGraph, { force: true });
+      }, 800);
+    };
+
+    const renderGraph = (raw, options = {}) => {
       if (!previewEnabled) {
+        needsResend = true;
         return;
       }
-      if (raw === lastRenderedText) {
+      if (suspendAutoLoad && !options.force) {
+        needsResend = true;
+        return;
+      }
+      if (raw === lastRenderedText && !needsResend) {
         return;
       }
       if (!raw || !raw.trim()) {
         errorBox.style.display = 'none';
         pendingGraph = { nodes: [], edges: [], clusters: [] };
-        if (graphFrame.contentWindow) {
-          graphFrame.contentWindow.postMessage({ type: 'loadGraph', payload: pendingGraph }, '*');
+        if (!frameReady) {
+          lastRenderedText = raw;
+          needsResend = true;
+          return;
         }
+        postLoadGraph(pendingGraph, options);
+        hasSentInitialGraph = true;
+        needsResend = false;
         lastRenderedText = raw;
         return;
       }
@@ -149,67 +294,81 @@ class TwiliteNodeEditorProvider {
       }
       errorBox.style.display = 'none';
       pendingGraph = parsed;
-      if (graphFrame.contentWindow) {
-        graphFrame.contentWindow.postMessage({ type: 'loadGraph', payload: parsed }, '*');
+      if (!frameReady) {
+        lastRenderedText = raw;
+        needsResend = true;
+        return;
       }
+      postLoadGraph(parsed, options);
+      hasSentInitialGraph = true;
+      needsResend = false;
       lastRenderedText = raw;
     };
 
     graphFrame.addEventListener('load', () => {
-      if (previewEnabled && pendingGraph && graphFrame.contentWindow) {
-        graphFrame.contentWindow.postMessage({ type: 'loadGraph', payload: pendingGraph }, '*');
+      frameReady = true;
+      console.log('[TwilitePreview] frame load', {
+        suspendAutoLoad,
+        previewEnabled,
+        hasPending: Boolean(pendingGraph),
+        hasSeenText,
+        hasSentInitialGraph
+      });
+      if (!suspendAutoLoad && previewEnabled && pendingGraph && graphFrame.contentWindow) {
+        postLoadGraph(pendingGraph, { force: true });
+        hasSentInitialGraph = true;
+        needsResend = false;
       }
     });
 
-    const startResize = (event) => {
-      event.preventDefault();
-      const startX = event.clientX;
-      const startWidths = layout.style.gridTemplateColumns || '';
-      const computed = getComputedStyle(layout).gridTemplateColumns.split(' ');
-      const startPreviewWidth = parseFloat(computed[0]) || layout.clientWidth * 0.7;
-      const startEditorWidth = parseFloat(computed[2]) || layout.clientWidth * 0.3;
-
-      const onMove = (moveEvent) => {
-        const delta = moveEvent.clientX - startX;
-        const nextPreview = Math.max(320, startPreviewWidth + delta);
-        const nextEditor = Math.max(280, startEditorWidth - delta);
-        layout.style.gridTemplateColumns = nextPreview + 'px 12px ' + nextEditor + 'px';
-      };
-      const onUp = () => {
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
-      };
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onUp);
-    };
-
-    resizer.addEventListener('mousedown', startResize);
-
-    editor.addEventListener('input', () => {
-      if (ignore) return;
-      vscode.postMessage({ type: 'update', text: editor.value });
-    });
-
-    editor.addEventListener('blur', () => {
-      renderGraph(editor.value);
-    });
+    vscode.postMessage({ type: 'webviewReady' });
 
     window.addEventListener('message', (event) => {
       const message = event.data;
       if (!message || message.type !== 'setText') return;
-      if (editor.value === message.text) return;
-      ignore = true;
-      editor.value = message.text;
-      ignore = false;
-      renderGraph(message.text);
+      const nextUri = message.uri || null;
+      if (nextUri && currentUri && nextUri !== currentUri) {
+        // New file selected: reset render state so we don't reuse old graph.
+        lastRenderedText = '';
+        pendingGraph = null;
+        hasSentInitialGraph = false;
+        needsResend = true;
+      }
+      currentUri = nextUri || currentUri;
+      console.log('[TwilitePreview] setText received', { length: (message.text || '').length, uri: currentUri });
+      hasSeenText = true;
+      suspendAutoLoad = false;
+      hasSentInitialGraph = false;
+      needsResend = true;
+      renderGraph(message.text, { force: true });
+    });
+
+    // rendererReady messages are noisy; loadGraph is driven by setText instead.
+
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+      if (!message || message.type !== 'graphDirty') return;
+      console.log('[TwilitePreview] graphDirty received', { suspendAutoLoad, hasSeenText });
+      suspendAutoLoad = true;
+      hasSentInitialGraph = true;
     });
 
     window.addEventListener('message', (event) => {
       const message = event.data;
-      if (!message || message.type !== 'rendererReady') return;
-      if (previewEnabled && pendingGraph && graphFrame.contentWindow) {
-        graphFrame.contentWindow.postMessage({ type: 'loadGraph', payload: pendingGraph }, '*');
+      if (!message || message.type !== 'graphLoaded') return;
+      if (typeof message.seq === 'number' && pendingAck === message.seq) {
+        pendingAck = null;
+        clearAckTimer();
       }
+    });
+
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+      if (!message || message.type !== 'graphUpdated') return;
+      if (typeof message.text !== 'string') return;
+      if (message.text === lastRenderedText) return;
+      lastRenderedText = message.text;
+      vscode.postMessage({ type: 'update', text: message.text });
     });
 
     window.addEventListener('message', (event) => {
@@ -217,12 +376,15 @@ class TwiliteNodeEditorProvider {
       if (!message || message.type !== 'previewEnabled') return;
       previewEnabled = Boolean(message.enabled);
       previewDisabled.style.display = previewEnabled ? 'none' : 'flex';
-      if (previewEnabled) {
-        renderGraph(editor.value);
+      if (previewEnabled && lastRenderedText) {
+        renderGraph(lastRenderedText, { force: true });
       }
     });
 
-    renderGraph(editor.value);
+    const savedState = vscode.getState();
+    if (!savedState || savedState.viewMode !== 'preview') {
+      applyViewMode();
+    }
   </script>
 </body>
 </html>`;
@@ -237,8 +399,38 @@ function activate(context) {
       { supportsMultipleEditorsPerDocument: false }
     )
   );
+
+  // Active text editor changes are handled by VSCode calling resolveCustomTextEditor
+  // for each .node file; we only sync the document bound to each webview panel.
 }
 
 function deactivate() {}
 
 module.exports = { activate, deactivate };
+    const escapeHtml = (value) => value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const highlightJson = (value) => {
+      const escaped = escapeHtml(value || '');
+      return escaped.replace(/"(?:\\.|[^"\\])*"\s*:|"(?:\\.|[^"\\])*"|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g, (match) => {
+        if (match.endsWith(':')) {
+          return '<span class="json-token-key">' + match.slice(0, -1) + '</span>:';
+        }
+        if (match === 'true' || match === 'false') {
+          return '<span class="json-token-boolean">' + match + '</span>';
+        }
+        if (match === 'null') {
+          return '<span class="json-token-null">' + match + '</span>';
+        }
+        if (match.startsWith('"')) {
+          return '<span class="json-token-string">' + match + '</span>';
+        }
+        return '<span class="json-token-number">' + match + '</span>';
+      });
+    };
+
+    const updateHighlight = () => {
+      jsonHighlight.innerHTML = highlightJson(editor.value);
+    };

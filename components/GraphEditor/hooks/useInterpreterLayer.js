@@ -126,6 +126,25 @@ export default function useInterpreterLayer({
       return;
     }
 
+    const isDraftMode = () => {
+      if (typeof window === 'undefined') return false;
+      if (window.__Twilite_DRAFT__ === true || window.__TWILITE_DRAFT__ === true) return true;
+      try {
+        return new URLSearchParams(window.location.search).get('draft') === '1';
+      } catch (err) {
+        return false;
+      }
+    };
+
+    if (isDraftMode()) {
+      emitTelemetry('validator', intent, { skipped: true, reason: 'draft' });
+      const contractSummary = summarizeContracts({ nodes, edges, documentSettings });
+      emitTelemetry('contractSummary', intent, contractSummary);
+      emitTelemetry('commit', intent);
+      emitTelemetry('done', intent);
+      return;
+    }
+
     emitTelemetry('validator', intent);
     const validation = validateGraphInvariants({
       nodes,

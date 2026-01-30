@@ -1,0 +1,277 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-01-30T19:13:32.255Z",
+    "modified": "2026-01-30T19:13:38.393Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "vscode-plugin-architecture-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": 151,
+        "y": -933
+      },
+      "width": 406,
+      "height": 479,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "vscode-plugin-architecture",
+          "name": "VSCode Plugin Architecture",
+          "version": "0.1.0",
+          "description": "Explains VSCode .node preview flow and the current failure point.",
+          "createdAt": "2026-01-30T00:00:00.000Z",
+          "updatedAt": "2026-01-30T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "tooling",
+          "description": "Clarify VSCode custom editor flow and the wrong-file preview bug."
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": "/tlz/background.html"
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-root",
+      "type": "markdown",
+      "label": "🧩 VSCode Plugin Architecture",
+      "position": {
+        "x": 663,
+        "y": -927
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# VSCode .node Custom Editor\n\nThis graph explains **how the preview pipeline works** and **where the wrong-file preview bug is happening**."
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-lifecycle",
+      "type": "markdown",
+      "label": "1) Editor Lifecycle",
+      "position": {
+        "x": 665,
+        "y": -651
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## VSCode Custom Editor\n\n- VSCode calls `resolveCustomTextEditor(document, panel)` for each .node file.\n- The extension binds **one document per panel**.\n- Panel swaps should re-bind state + listeners."
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-transport",
+      "type": "markdown",
+      "label": "2) Text -> Webview",
+      "position": {
+        "x": 680,
+        "y": -360
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Document Transport\n\n- Extension reads `document.getText()`\n- Sends `{ type: 'setText', text, uri }` to the webview.\n- Webview **parses JSON** and forwards to the iframe."
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-iframe",
+      "type": "markdown",
+      "label": "3) Webview -> Iframe",
+      "position": {
+        "x": 676,
+        "y": -85
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Iframe Renderer\n\n- Webview posts `{ type: 'loadGraph', content }` to the Twilite iframe.\n- GraphEditor listens for `loadGraph` and replaces nodes/edges.\n- LocalStorage graph is just a fallback."
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-failure",
+      "type": "markdown",
+      "label": "Where It Breaks",
+      "position": {
+        "x": 675,
+        "y": 208
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Wrong-File Preview\n\nMost likely causes:\n\n1. **Iframe not ready** when `loadGraph` is posted (message dropped).\n2. **Dirty guard** ignores non-force loads (`__Twilite_DIRTY__`).\n3. The iframe falls back to **localStorage graph** (old debug task)."
+      }
+    },
+    {
+      "id": "vscode-plugin-architecture-fix",
+      "type": "markdown",
+      "label": "Fix / Guardrails",
+      "position": {
+        "x": 670,
+        "y": 522
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Hardening Plan\n\n- **Queue loadGraph** until iframe load, then send with `force`.\n- **Reset render state** when `uri` changes.\n- **Label the active file** in the webview header for sanity."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-arch-root-life",
+      "type": "semantic",
+      "source": "vscode-plugin-architecture-root",
+      "target": "vscode-plugin-architecture-lifecycle",
+      "label": "lifecycle",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-arch-life-transport",
+      "type": "semantic",
+      "source": "vscode-plugin-architecture-lifecycle",
+      "target": "vscode-plugin-architecture-transport",
+      "label": "sends text",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-arch-transport-iframe",
+      "type": "semantic",
+      "source": "vscode-plugin-architecture-transport",
+      "target": "vscode-plugin-architecture-iframe",
+      "label": "loads graph",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-arch-iframe-failure",
+      "type": "semantic",
+      "source": "vscode-plugin-architecture-iframe",
+      "target": "vscode-plugin-architecture-failure",
+      "label": "can fail",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-arch-failure-fix",
+      "type": "semantic",
+      "source": "vscode-plugin-architecture-failure",
+      "target": "vscode-plugin-architecture-fix",
+      "label": "mitigations",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

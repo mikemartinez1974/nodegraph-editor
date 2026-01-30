@@ -557,6 +557,11 @@ export default class GraphCRUD {
     extensions
   } = {}) {
     try {
+      if (typeof window !== 'undefined') {
+        try {
+          console.log('[GraphCrud] createNode draft=', window.__Twilite_DRAFT__, 'draftParam=', new URLSearchParams(window.location.search).get('draft'));
+        } catch {}
+      }
       const currentNodes = this.getNodes();
       let nodeId = id || this._generateId();
       while (currentNodes.some(n => n.id === nodeId)) {

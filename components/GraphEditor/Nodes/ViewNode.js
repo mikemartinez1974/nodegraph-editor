@@ -87,7 +87,9 @@ const ViewNode = (props) => {
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: 8,
             padding: 8,
-            background: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#fafafa'
+            background: theme.palette.mode === 'dark'
+              ? 'rgba(0,0,0,0.2)'
+              : 'rgba(255,255,255,0.08)'
           }}
         >
           {preview}

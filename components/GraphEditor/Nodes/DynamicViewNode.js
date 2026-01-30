@@ -186,7 +186,7 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, ...props }) => {
             fontSize: 14,
             lineHeight: 1.5,
             color: theme.palette.text.primary,
-            background: theme.palette.background.paper,
+            background: 'transparent',
             boxSizing: 'border-box'
           }}
         />

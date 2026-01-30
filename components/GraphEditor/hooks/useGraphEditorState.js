@@ -22,6 +22,16 @@ const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj || {}, key
 const isMissingManifestError = (errors = []) =>
   errors.some((err) => String(err || '').toLowerCase().includes('missing manifest'));
 
+const isDraftMode = () => {
+  if (typeof window === 'undefined') return false;
+  if (window.__Twilite_DRAFT__ === true || window.__TWILITE_DRAFT__ === true) return true;
+  try {
+    return new URLSearchParams(window.location.search).get('draft') === '1';
+  } catch (err) {
+    return false;
+  }
+};
+
 const validateManifestNodes = (nodes = []) => {
   const manifestNodes = Array.isArray(nodes)
     ? nodes.filter((node) => node?.type === 'manifest')
@@ -137,7 +147,12 @@ export function useGraphEditorState() {
   const nodes = graphSnapshot.nodes;
   const edges = graphSnapshot.edges;
   const groups = graphSnapshot.groups;
-  const manifestStatus = useMemo(() => validateManifestNodes(nodes), [nodes]);
+  const manifestStatus = useMemo(() => {
+    if (isDraftMode()) {
+      return { ok: true, errors: [] };
+    }
+    return validateManifestNodes(nodes);
+  }, [nodes]);
   
   // View state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -227,6 +242,13 @@ export function useGraphEditorState() {
     const currentNodes = getGraphSnapshot().nodes;
     const next = typeof value === 'function' ? value(currentNodes) : value;
     const nextNodes = Array.isArray(next) ? next : currentNodes;
+    if (isDraftMode()) {
+      dispatchGraph({
+        type: 'setNodes',
+        payload: nextNodes
+      });
+      return;
+    }
     const validation = validateManifestNodes(nextNodes);
     if (!validation.ok) {
       if (isMissingManifestError(validation.errors)) {
@@ -280,6 +302,14 @@ export function useGraphEditorState() {
   const setEdges = useCallback((value) => {
     const currentEdges = getGraphSnapshot().edges;
     const currentNodes = getGraphSnapshot().nodes;
+    if (isDraftMode()) {
+      const next = typeof value === 'function' ? value(currentEdges) : value;
+      dispatchGraph({
+        type: 'setEdges',
+        payload: Array.isArray(next) ? next : currentEdges
+      });
+      return;
+    }
     const manifestCheck = validateManifestNodes(currentNodes);
     if (!manifestCheck.ok) {
       if (isMissingManifestError(manifestCheck.errors)) {
@@ -303,6 +333,14 @@ export function useGraphEditorState() {
   const setGroups = useCallback((value) => {
     const currentGroups = getGraphSnapshot().groups;
     const currentNodes = getGraphSnapshot().nodes;
+    if (isDraftMode()) {
+      const next = typeof value === 'function' ? value(currentGroups) : value;
+      dispatchGraph({
+        type: 'setGroups',
+        payload: Array.isArray(next) ? next : currentGroups
+      });
+      return;
+    }
     const manifestCheck = validateManifestNodes(currentNodes);
     if (!manifestCheck.ok) {
       if (isMissingManifestError(manifestCheck.errors)) {

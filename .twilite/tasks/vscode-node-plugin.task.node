@@ -1,11 +1,22 @@
 {
-  "type": "nodegraph-data",
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-01-30T19:16:20.630Z",
+    "modified": "2026-01-30T19:16:22.690Z",
+    "author": "",
+    "tags": []
+  },
   "nodes": [
     {
       "id": "vscode-node-plugin-manifest",
       "type": "manifest",
       "label": "Manifest",
-      "position": { "x": -980, "y": -280 },
+      "position": {
+        "x": -980,
+        "y": -280
+      },
       "width": 380,
       "height": 260,
       "visible": true,
@@ -25,8 +36,15 @@
           "description": "Define the VSCode extension requirements and implementation plan."
         },
         "dependencies": {
-          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
-          "handleContracts": ["core"],
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "handleContracts": [
+            "core"
+          ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
@@ -54,6 +72,40 @@
         },
         "document": {
           "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
         }
       }
     },
@@ -61,7 +113,10 @@
       "id": "vscode-node-plugin-root",
       "type": "markdown",
       "label": "🧩 VSCode .node Plugin",
-      "position": { "x": -420, "y": -260 },
+      "position": {
+        "x": -420,
+        "y": -260
+      },
       "width": 520,
       "height": 260,
       "visible": true,
@@ -74,7 +129,10 @@
       "id": "vscode-node-plugin-requirements",
       "type": "markdown",
       "label": "✅ Requirements",
-      "position": { "x": 160, "y": -260 },
+      "position": {
+        "x": 160,
+        "y": -260
+      },
       "width": 420,
       "height": 260,
       "visible": true,
@@ -87,7 +145,10 @@
       "id": "vscode-node-plugin-features",
       "type": "markdown",
       "label": "✨ Core Features",
-      "position": { "x": -420, "y": 40 },
+      "position": {
+        "x": -420,
+        "y": 40
+      },
       "width": 520,
       "height": 280,
       "visible": true,
@@ -100,7 +161,10 @@
       "id": "vscode-node-plugin-architecture",
       "type": "markdown",
       "label": "🏗️ Architecture",
-      "position": { "x": 160, "y": 40 },
+      "position": {
+        "x": 160,
+        "y": 40
+      },
       "width": 420,
       "height": 280,
       "visible": true,
@@ -113,7 +177,10 @@
       "id": "vscode-node-plugin-security",
       "type": "markdown",
       "label": "🔒 Security + Trust",
-      "position": { "x": -420, "y": 360 },
+      "position": {
+        "x": -420,
+        "y": 360
+      },
       "width": 520,
       "height": 240,
       "visible": true,
@@ -126,7 +193,10 @@
       "id": "vscode-node-plugin-open-questions",
       "type": "markdown",
       "label": "❓ Answers + Open Items",
-      "position": { "x": 160, "y": 360 },
+      "position": {
+        "x": 160,
+        "y": 360
+      },
       "width": 420,
       "height": 220,
       "visible": true,
@@ -139,7 +209,10 @@
       "id": "vscode-node-plugin-missing-features",
       "type": "markdown",
       "label": "🧩 Missing Features",
-      "position": { "x": 160, "y": 620 },
+      "position": {
+        "x": 160,
+        "y": 620
+      },
       "width": 520,
       "height": 280,
       "visible": true,
@@ -156,7 +229,10 @@
       "source": "vscode-node-plugin-manifest",
       "target": "vscode-node-plugin-root",
       "label": "declares",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -165,7 +241,10 @@
       "source": "vscode-node-plugin-root",
       "target": "vscode-node-plugin-requirements",
       "label": "defines",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -174,7 +253,10 @@
       "source": "vscode-node-plugin-root",
       "target": "vscode-node-plugin-features",
       "label": "scope",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -183,7 +265,10 @@
       "source": "vscode-node-plugin-features",
       "target": "vscode-node-plugin-architecture",
       "label": "drives",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -192,7 +277,10 @@
       "source": "vscode-node-plugin-architecture",
       "target": "vscode-node-plugin-security",
       "label": "constrains",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -201,7 +289,10 @@
       "source": "vscode-node-plugin-security",
       "target": "vscode-node-plugin-open-questions",
       "label": "questions",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -210,11 +301,12 @@
       "source": "vscode-node-plugin-open-questions",
       "target": "vscode-node-plugin-missing-features",
       "label": "missing",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "timestamp": "2026-01-28T22:15:00.000Z",
-  "nodeCount": 8,
-  "edgeCount": 7
+  "clusters": []
 }

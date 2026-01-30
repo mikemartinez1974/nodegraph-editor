@@ -43,6 +43,9 @@ const GraphEditorContent = () => {
   const historyHook = useGraphEditorHistoryContext();
   const rpc = useGraphEditorRpcContext();
   const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
+  const host = typeof window !== 'undefined'
+    ? (window.__Twilite_HOST__ || new URLSearchParams(window.location.search).get('host') || 'browser')
+    : 'browser';
   const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
   const [viewDefinitions, setViewDefinitions] = useState({});
@@ -567,7 +570,9 @@ const GraphEditorContent = () => {
       emitEdgeIntent('nodeDragEnd');
     };
     eventBus.on('nodeDragEnd', handleNodeDragEndIntent);
-    return () => eventBus.off('nodeDragEnd', handleNodeDragEndIntent);
+    return () => {
+      eventBus.off('nodeDragEnd', handleNodeDragEndIntent);
+    };
   }, [emitEdgeIntent]);
 
   const handleToggleSnapToGrid = useCallback(() => {
@@ -608,6 +613,16 @@ const GraphEditorContent = () => {
   }, [snackbar?.open, snackbar?.message, snackbar?.copyToClipboard]);
 
   useEffect(() => {
+    const isDraftMode = () => {
+      if (typeof window === 'undefined') return false;
+      if (window.__Twilite_DRAFT__ === true || window.__TWILITE_DRAFT__ === true) return true;
+      try {
+        return new URLSearchParams(window.location.search).get('draft') === '1';
+      } catch (err) {
+        return false;
+      }
+    };
+    if (isDraftMode()) return;
     if (!manifestStatus) return;
     if (manifestStatus.ok) {
       lastManifestNoticeRef.current = '';
@@ -689,6 +704,94 @@ const GraphEditorContent = () => {
       }
     };
   }, [handleLoadGraph, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.__Twilite_EMBED__) return;
+    let pending = null;
+    const emitDirty = () => {
+      if (pending) return;
+      pending = setTimeout(() => {
+        pending = null;
+        try {
+          window.__Twilite_DIRTY__ = true;
+        } catch {}
+        try {
+          window.parent?.postMessage({ type: 'graphDirty' }, '*');
+        } catch {}
+      }, 50);
+    };
+    const events = [
+      'nodeAdded',
+      'nodeUpdated',
+      'nodeDeleted',
+      'edgeAdded',
+      'edgeUpdated',
+      'edgeDeleted',
+      'groupUpdated',
+      'groupDeleted',
+      'groupAdded'
+    ];
+    events.forEach((eventName) => eventBus.on(eventName, emitDirty));
+    return () => {
+      events.forEach((eventName) => eventBus.off(eventName, emitDirty));
+      if (pending) {
+        clearTimeout(pending);
+        pending = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.__Twilite_EMBED__ || host !== 'vscode') return;
+    let timer = null;
+    let lastSentHash = null;
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!window.__Twilite_HOST_GRAPH_READY__) return;
+        if (window.__Twilite_SYNCING__) return;
+        const exporter = window.__Twilite_EXPORT_GRAPH__;
+        if (typeof exporter !== 'function') return;
+        try {
+          const payload = exporter();
+          const minimal = {
+            nodes: Array.isArray(payload?.nodes) ? payload.nodes.length : 0,
+            edges: Array.isArray(payload?.edges) ? payload.edges.length : 0,
+            clusters: Array.isArray(payload?.clusters) ? payload.clusters.length : 0,
+            modified: payload?.metadata?.modified || ''
+          };
+          const hash = JSON.stringify(minimal);
+          if (hash === lastSentHash) return;
+          lastSentHash = hash;
+          const text = JSON.stringify(payload, null, 2);
+          window.parent?.postMessage({ type: 'graphUpdated', text }, '*');
+        } catch (err) {
+          // ignore serialize errors
+        }
+      }, 1200);
+    };
+    schedule();
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+  }, [
+    host,
+    nodes,
+    edges,
+    groups,
+    documentSettings,
+    documentTheme,
+    documentBackgroundImage,
+    backgroundUrl,
+    defaultNodeColor,
+    defaultEdgeColor,
+    snapToGrid
+  ]);
 
   const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
   // The gallery/new-tab surface now appears only when explicitly requested.
@@ -899,6 +1002,16 @@ const skipPropertiesCloseRef = useRef(false);
   }, [emitEdgeIntent, handleOpenDocumentProperties]);
 
   useEffect(() => {
+    const handleOpenDocumentPropertiesEvent = () => {
+      handleOpenDocumentPropertiesIntent();
+    };
+    eventBus.on('openDocumentProperties', handleOpenDocumentPropertiesEvent);
+    return () => {
+      eventBus.off('openDocumentProperties', handleOpenDocumentPropertiesEvent);
+    };
+  }, [handleOpenDocumentPropertiesIntent]);
+
+  useEffect(() => {
     const selectionCount =
       (selectedNodeIds.length || 0) +
       (selectedEdgeIds.length || 0) +
@@ -984,6 +1097,7 @@ const skipPropertiesCloseRef = useRef(false);
 
       {!isMobile && (
         <Toolbar
+          host={host}
           onToggleNodeList={handleToggleNodeListIntent}
           showNodeList={showNodeList}
           onToggleGroupList={handleToggleGroupListIntent}

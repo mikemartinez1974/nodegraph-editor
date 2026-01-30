@@ -343,8 +343,18 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     const handleLoadGraphMessage = (event) => {
       const { data } = event || {};
       if (!data || data.type !== 'loadGraph') return;
+      const forceLoad = Boolean(data.force);
+      if (window.__Twilite_DIRTY__ && !forceLoad) {
+        return;
+      }
+      try {
+        window.__Twilite_SYNCING__ = true;
+      } catch {}
       const payload = data.content;
       if (!payload || typeof payload !== 'object') return;
+      if (window.__Twilite_DIRTY__ && forceLoad) {
+        window.__Twilite_DIRTY__ = false;
+      }
       const nextNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
       const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
       const nextGroups = Array.isArray(payload.clusters)
@@ -366,6 +376,21 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       } catch (err) {
         console.warn('Failed to emit loadSaveFile from loadGraph message:', err);
       }
+      try {
+        window.__Twilite_HOST_GRAPH_READY__ = true;
+      } catch {}
+      try {
+        if (typeof window !== 'undefined' && window.__Twilite_EMBED__) {
+          window.parent?.postMessage({ type: 'graphLoaded', seq: data.seq ?? null }, '*');
+        }
+      } catch (err) {
+        // ignore postMessage failures
+      }
+      try {
+        window.setTimeout(() => {
+          try { window.__Twilite_SYNCING__ = false; } catch {}
+        }, 120);
+      } catch {}
     };
 
     window.addEventListener('message', handleLoadGraphMessage);

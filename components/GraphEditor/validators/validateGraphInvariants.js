@@ -56,6 +56,16 @@ export function validateGraphInvariants({
   mode = 'mutation',
   resolvedDictionary = null
 }) {
+  const isDraftMode = () => {
+    if (typeof window === 'undefined') return false;
+    if (window.__Twilite_DRAFT__ === true || window.__TWILITE_DRAFT__ === true) return true;
+    try {
+      return new URLSearchParams(window.location.search).get('draft') === '1';
+    } catch (err) {
+      return false;
+    }
+  };
+  const draft = isDraftMode();
   const nodeMap = new Map();
   nodes.forEach((node) => {
     if (node?.id) {
@@ -95,7 +105,7 @@ export function validateGraphInvariants({
       code: 'MANIFEST_COUNT_INVALID',
       message: 'Manifest missing: graph mutations are blocked.'
     };
-    if (mode === 'load') {
+    if (mode === 'load' || draft) {
       warnings.push(entry);
     } else {
       errors.push(entry);

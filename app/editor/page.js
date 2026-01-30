@@ -6,6 +6,15 @@ import themeMap from '@/components/Browser/themes';
 import GraphEditor from '@/components/GraphEditor/GraphEditor';
 import eventBus from '../../components/NodeGraph/eventBus';
 
+if (typeof window !== 'undefined') {
+  try {
+    const isDraft = new URLSearchParams(window.location.search).get('draft') === '1';
+    if (isDraft) window.__Twilite_DRAFT__ = true;
+    const host = new URLSearchParams(window.location.search).get('host');
+    if (host) window.__Twilite_HOST__ = host;
+  } catch {}
+}
+
 export default function EditorPage() {
   const isEmbedded = typeof window !== 'undefined' && window.location?.search?.includes('embed=1');
   const getSystemTheme = () => {
@@ -20,6 +29,14 @@ export default function EditorPage() {
   const [muiTheme, setMuiTheme] = useState(() => themeMap.default);
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    const isDraft = window.location?.search?.includes('draft=1');
+    if (isDraft) {
+      window.__Twilite_DRAFT__ = true;
+    }
+    const hostParam = new URLSearchParams(window.location.search).get('host');
+    if (hostParam) {
+      window.__Twilite_HOST__ = hostParam;
+    }
     if (isEmbedded) {
       window.__Twilite_EMBED__ = true;
     }
@@ -36,6 +53,18 @@ export default function EditorPage() {
     };
     window.addEventListener('Twilite-ready', handleReady);
     return () => window.removeEventListener('Twilite-ready', handleReady);
+  }, [isEmbedded]);
+
+  useEffect(() => {
+    if (!isEmbedded || typeof window === 'undefined') return;
+    const handler = (event) => {
+      if (!event?.data || event.data.type !== 'openEditorSettings') return;
+      eventBus.emit('openDocumentProperties');
+    };
+    window.addEventListener('message', handler);
+    return () => {
+      window.removeEventListener('message', handler);
+    };
   }, [isEmbedded]);
 
   const isMobile = useMediaQuery('(max-width:768px)');

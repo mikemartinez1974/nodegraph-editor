@@ -218,7 +218,7 @@ const DictionaryNode = (props) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {views.map((entry, index) => (
                 <div
-                  key={`${entry?.key || `view-${index}`}::${entry?.view || 'view'}`}
+                  key={`${entry?.key || `view-${index}`}::${entry?.view || 'view'}::${index}`}
                   style={{
                     padding: '6px 8px',
                     borderRadius: 6,

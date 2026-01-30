@@ -76,6 +76,7 @@ import ViewActions from './Toolbar/ViewActions';
 import PanelActions from './Toolbar/PanelActions';
 
 const Toolbar = ({ 
+  host = 'browser',
   nodes = [], 
   edges = [], 
   groups = [],
@@ -146,6 +147,7 @@ const Toolbar = ({
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
+  const [vscodeDirty, setVscodeDirty] = useState(false);
   
   // Browser navigation state
   const [browserHistory, setBrowserHistory] = useState([]);
@@ -159,6 +161,34 @@ const Toolbar = ({
       return [];
     }
   });
+
+  useEffect(() => {
+    if (host !== 'vscode') return;
+    const markDirty = () => setVscodeDirty(true);
+    const markSaved = () => setVscodeDirty(false);
+    eventBus.on('graphSaved', markSaved);
+    eventBus.on('nodeAdded', markDirty);
+    eventBus.on('nodeUpdated', markDirty);
+    eventBus.on('nodeDeleted', markDirty);
+    eventBus.on('edgeAdded', markDirty);
+    eventBus.on('edgeUpdated', markDirty);
+    eventBus.on('edgeDeleted', markDirty);
+    eventBus.on('groupAdded', markDirty);
+    eventBus.on('groupUpdated', markDirty);
+    eventBus.on('groupDeleted', markDirty);
+    return () => {
+      eventBus.off('graphSaved', markSaved);
+      eventBus.off('nodeAdded', markDirty);
+      eventBus.off('nodeUpdated', markDirty);
+      eventBus.off('nodeDeleted', markDirty);
+      eventBus.off('edgeAdded', markDirty);
+      eventBus.off('edgeUpdated', markDirty);
+      eventBus.off('edgeDeleted', markDirty);
+      eventBus.off('groupAdded', markDirty);
+      eventBus.off('groupUpdated', markDirty);
+      eventBus.off('groupDeleted', markDirty);
+    };
+  }, [host]);
   const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
   const currentUrl = browserHistory[historyIndex] || '';
   const [gridMenuAnchor, setGridMenuAnchor] = useState(null);
@@ -803,18 +833,43 @@ const Toolbar = ({
           flexWrap: 'wrap',
           justifyContent: 'center'
         }}>
-          {/* File Actions Section */}
-        <ButtonGroup variant="contained" size="small">
-          <FileActions 
-            onSave={handleSaveToFile}
-            onLoad={handleLoadFile}
-            onNewFile={handleNewFile}
-            isMobile={false}
-            isFreeUser={isFreeUser}
-          />
-        </ButtonGroup>
+        {host === 'vscode' && (
+          <>
+            <Box
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.18)' : 'rgba(59, 130, 246, 0.12)',
+                color: theme.palette.mode === 'dark' ? '#93c5fd' : '#1d4ed8'
+              }}
+            >
+              Dev Mode
+            </Box>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+              {vscodeDirty ? 'Unsaved changes (VSCode autosave)' : ''}
+            </Typography>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          </>
+        )}
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        {host !== 'vscode' && (
+          <>
+            {/* File Actions Section */}
+            <ButtonGroup variant="contained" size="small">
+              <FileActions 
+                onSave={handleSaveToFile}
+                onLoad={handleLoadFile}
+                onNewFile={handleNewFile}
+                isMobile={false}
+                isFreeUser={isFreeUser}
+              />
+            </ButtonGroup>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          </>
+        )}
 
         {/* History Actions Section */}
         <ButtonGroup variant="contained" size="small">
