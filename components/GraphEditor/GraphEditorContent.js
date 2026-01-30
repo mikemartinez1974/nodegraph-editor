@@ -50,6 +50,7 @@ const GraphEditorContent = () => {
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
   const [viewDefinitions, setViewDefinitions] = useState({});
   const viewDefinitionsRef = useRef({});
+  const isDraggingRef = useRef(false);
 
   const {
     nodes,
@@ -747,22 +748,27 @@ const GraphEditorContent = () => {
     if (!window.__Twilite_EMBED__ || host !== 'vscode') return;
     let timer = null;
     let lastSentHash = null;
+    const startDrag = () => { isDraggingRef.current = true; };
+    const endDrag = () => { isDraggingRef.current = false; };
+    eventBus.on('nodeDragStart', startDrag);
+    eventBus.on('nodeDragEnd', endDrag);
+    eventBus.on('groupDragStart', startDrag);
+    eventBus.on('groupDragEnd', endDrag);
     const schedule = () => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         if (!window.__Twilite_HOST_GRAPH_READY__) return;
         if (window.__Twilite_SYNCING__) return;
+        if (isDraggingRef.current) return;
         const exporter = window.__Twilite_EXPORT_GRAPH__;
         if (typeof exporter !== 'function') return;
         try {
           const payload = exporter();
-          const minimal = {
-            nodes: Array.isArray(payload?.nodes) ? payload.nodes.length : 0,
-            edges: Array.isArray(payload?.edges) ? payload.edges.length : 0,
-            clusters: Array.isArray(payload?.clusters) ? payload.clusters.length : 0,
-            modified: payload?.metadata?.modified || ''
-          };
-          const hash = JSON.stringify(minimal);
+          const hash = JSON.stringify({
+            nodes: payload?.nodes || [],
+            edges: payload?.edges || [],
+            clusters: payload?.clusters || []
+          });
           if (hash === lastSentHash) return;
           lastSentHash = hash;
           const text = JSON.stringify(payload, null, 2);
@@ -778,6 +784,10 @@ const GraphEditorContent = () => {
         clearTimeout(timer);
         timer = null;
       }
+      eventBus.off('nodeDragStart', startDrag);
+      eventBus.off('nodeDragEnd', endDrag);
+      eventBus.off('groupDragStart', startDrag);
+      eventBus.off('groupDragEnd', endDrag);
     };
   }, [
     host,
@@ -1346,6 +1356,7 @@ const skipPropertiesCloseRef = useRef(false);
       <DocumentPropertiesDialog
         open={showDocumentPropertiesDialog}
         onClose={() => setShowDocumentPropertiesDialog(false)}
+        host={host}
         backgroundUrl={backgroundUrl}
         setBackgroundUrl={setBackgroundUrl}
         documentSettings={documentSettings}

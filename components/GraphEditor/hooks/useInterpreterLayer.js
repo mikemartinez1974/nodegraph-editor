@@ -62,7 +62,7 @@ export default function useInterpreterLayer({
   const runReroute = useCallback(async () => {
     if (typeof rerouteEdges !== 'function') return;
     await rerouteEdges();
-    setSnackbar({ open: true, message: 'Edges rerouted', severity: 'success' });
+    // Intentionally silent: edge reroute is noisy for users.
   }, [rerouteEdges, setSnackbar]);
 
   const autoLayoutSkill = useMemo(() => ({
@@ -233,7 +233,7 @@ export default function useInterpreterLayer({
         if (typeof setEdgeRoutes === 'function') setEdgeRoutes({});
         Promise.resolve(rerouteEdges?.())
           .then(() => {
-            setSnackbar({ open: true, message: 'Placed new nodes and rerouted edges', severity: 'success' });
+            // Intentionally silent: edge reroute is noisy for users.
           })
           .catch(() => {
             setSnackbar({ open: true, message: 'Placed new nodes (reroute failed)', severity: 'warning' });

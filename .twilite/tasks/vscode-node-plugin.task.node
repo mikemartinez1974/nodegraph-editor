@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-30T19:16:20.630Z",
-    "modified": "2026-01-30T19:16:22.690Z",
+    "created": "2026-01-30T21:57:13.100Z",
+    "modified": "2026-01-30T21:57:30.127Z",
     "author": "",
     "tags": []
   },
@@ -14,8 +14,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -980,
-        "y": -280
+        "x": -400.1571599551298,
+        "y": -633.3417306523415
       },
       "width": 380,
       "height": 260,
@@ -131,7 +131,7 @@
       "label": "✅ Requirements",
       "position": {
         "x": 160,
-        "y": -260
+        "y": -261
       },
       "width": 420,
       "height": 260,
@@ -170,7 +170,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Architecture\n\n- VSCode extension (webview)\n- Uses file watcher + document provider\n- Parses/serializes `.node` JSON\n- Reuses Twilite renderer where possible\n- Local-only execution (no network required)"
+        "markdown": "## Architectur e\n\n- VSCode extension (webview)\n- Uses file watcher + document provider\n- Parses/serializes `.node` JSON\n- Reuses Twilite renderer where possible\n- Local-only execution (no network required)"
       }
     },
     {
@@ -178,8 +178,8 @@
       "type": "markdown",
       "label": "🔒 Security + Trust",
       "position": {
-        "x": -420,
-        "y": 360
+        "x": -444.83123268113434,
+        "y": 400.6024212217768
       },
       "width": 520,
       "height": 240,

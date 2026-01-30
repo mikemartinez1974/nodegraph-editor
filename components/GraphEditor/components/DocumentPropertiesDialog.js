@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -40,6 +40,9 @@ import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
 import eventBus from '../../NodeGraph/eventBus';
 import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
+import ThemeButtonGroup from '../../Browser/ThemeButtonGroup';
+import themeMap from '../../Browser/themes';
+import { themeConfigFromMuiTheme } from '../utils/themeUtils';
 import {
   DEFAULT_LAYOUT_SETTINGS,
   DEFAULT_ELK_ROUTING_SETTINGS
@@ -99,6 +102,7 @@ const wrapLayoutWithElk = (layout = {}) => ({
 export default function DocumentPropertiesDialog({
   open,
   onClose,
+  host = 'browser',
   backgroundUrl = '',
   documentSettings,
   onDocumentSettingsChange,
@@ -120,6 +124,7 @@ export default function DocumentPropertiesDialog({
   const [activeTab, setActiveTab] = useState('overview');
   const [meta, setMeta] = useState(mapProjectMeta(projectMeta, defaultShareLink));
   const [docSettings, setDocSettings] = useState(documentSettings || {});
+  const [browserThemeName, setBrowserThemeName] = useState('default');
   const [tagInput, setTagInput] = useState('');
   const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
   const [githubPat, setGithubPat] = useState('');
@@ -128,6 +133,33 @@ export default function DocumentPropertiesDialog({
   const [storyMilestoneLabel, setStoryMilestoneLabel] = useState('');
   const [liveStorySnapshots, setLiveStorySnapshots] = useState([]);
   const [liveRecentSnapshots, setLiveRecentSnapshots] = useState([]);
+  const wasOpenRef = useRef(false);
+
+  const handleBrowserThemeChange = useCallback((nextThemeName) => {
+    if (!nextThemeName) return;
+    setBrowserThemeName(nextThemeName);
+    eventBus.emit('applyBrowserTheme', { themeName: nextThemeName });
+    if (host === 'vscode') {
+      const muiTheme = themeMap[nextThemeName] || themeMap.default;
+      const themeConfig = themeConfigFromMuiTheme(muiTheme);
+      if (themeConfig) {
+        eventBus.emit('updateDocumentTheme', themeConfig);
+      }
+    }
+  }, [host]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem('themeName');
+      if (stored) {
+        setBrowserThemeName(stored);
+      }
+    } catch (err) {
+      // ignore storage errors
+    }
+  }, [open]);
   const { nodes = [], edges = [] } = useGraphEditorStateContext();
 
   const contractSummary = useMemo(() => {
@@ -172,13 +204,22 @@ export default function DocumentPropertiesDialog({
   }), [graphStats]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      wasOpenRef.current = false;
+      return;
+    }
+
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = true;
+
     setSettings(loadSettings());
     setMeta(mapProjectMeta(projectMeta, defaultShareLink));
     setDocSettings(documentSettings || {});
-    setActiveTab('overview');
-    setTagInput('');
-    setNewCollaborator({ name: '', email: '', role: 'Editor' });
+    if (!wasOpen) {
+      setActiveTab('overview');
+      setTagInput('');
+      setNewCollaborator({ name: '', email: '', role: 'Editor' });
+    }
     try {
       if (typeof window !== 'undefined') {
         setGithubPat(localStorage.getItem('githubPat') || '');
@@ -778,6 +819,24 @@ export default function DocumentPropertiesDialog({
 
         {activeTab === 'appearance' && (
           <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Browser Theme
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Controls the UI theme of the Twilite browser shell.
+              </Typography>
+              <ThemeButtonGroup
+                themeName={browserThemeName}
+                setThemeName={handleBrowserThemeChange}
+              />
+              {browserThemeName === 'custom' && (
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  Current browser theme is custom.
+                </Typography>
+              )}
+            </Paper>
+
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" gutterBottom>
                 Theme

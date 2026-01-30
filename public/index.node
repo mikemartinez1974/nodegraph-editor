@@ -1,32 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Index of All Graphs",
-    "created": "2025-12-30T18:29:23.784Z",
-    "modified": "2025-12-30T18:29:23.784Z"
-  },
-  "settings": {
-    "theme": {
-      "mode": "dark",
-      "primary": {
-        "main": "#1976d2"
-      },
-      "background": {
-        "default": "#121212",
-        "paper": "#1e1e1e"
-      },
-      "text": {
-        "primary": "#ffffff",
-        "secondary": "rgba(255, 255, 255, 0.7)"
-      }
-    }
-  },
-  "viewport": {
-    "pan": {
-      "x": 400,
-      "y": 300
-    },
-    "zoom": 0.8
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-01-30T20:48:56.029Z",
+    "modified": "2026-01-30T20:50:23.905Z",
+    "author": "",
+    "tags": []
   },
   "nodes": [
     {
@@ -39,6 +19,8 @@
       },
       "width": 600,
       "height": 100,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "markdown": "# Index of All Graphs\nExplore the nodegraphs in this directory."
       }
@@ -53,6 +35,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/index.node"
       }
@@ -67,6 +51,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/breadboard/index.node"
       }
@@ -81,6 +67,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///next/index.node"
       }
@@ -95,6 +83,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/index.node"
       }
@@ -109,6 +99,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Sections/index.node"
       }
@@ -123,6 +115,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/index.node"
       }
@@ -137,6 +131,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/node_intro/index.node"
       }
@@ -151,11 +147,13 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/project1/index.node"
       }
     }
   ],
   "edges": [],
-  "groups": []
+  "clusters": []
 }

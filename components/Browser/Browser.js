@@ -3,8 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ThemeDrawer from './ThemeDrawer';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import themeMap from './themes';
@@ -28,7 +26,6 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import TemplateGallery from './TemplateGallery';
 
 export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme, isMobile, isSmallScreen, isPortrait, isLandscape }) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -486,9 +483,6 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
           {/* Spacer to push drawer button to far right */}
           <Box sx={{ flexGrow: (isMobile && isPortrait) ? 0 : 1 }} />
 
-          <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
-            <MenuIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -516,15 +510,6 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>
         <MenuItem onClick={handleClearHome}>Clear Home page</MenuItem>
       </Menu>
-
-      <ThemeDrawer 
-        open={drawerOpen} 
-        onClose={() => setDrawerOpen(false)} 
-        themeName={themeName} 
-        setThemeName={setThemeName} 
-        theme={theme}
-        applyBrowserTheme={applyBrowserTheme}
-      />
 
       <TemplateGallery open={galleryOpen} onClose={handleCloseGallery} onSelect={handleTemplateSelect} />
     </div>

@@ -1,54 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-10-31T09:11:49.538Z",
-    "modified": "2025-10-31T09:11:49.538Z",
+    "created": "2026-01-30T21:24:40.786Z",
+    "modified": "2026-01-30T21:25:03.391Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "primary": "#1976d2",
-      "primaryContrast": "#fff",
-      "secondary": "#dc004e",
-      "secondaryContrast": "#fff",
-      "background": "#e8eaf6",
-      "paper": "#ffffff",
-      "textPrimary": "rgba(0, 0, 0, 0.87)",
-      "textSecondary": "rgba(0, 0, 0, 0.6)",
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 669,
-      "y": 419.5
-    },
-    "zoom": 1
-  },
-  "document": null,
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
   "nodes": [
     {
       "id": "central",
@@ -160,7 +119,8 @@
       "source": "central",
       "target": "nodes-content",
       "label": "Contains",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-central-edges",
@@ -168,7 +128,8 @@
       "source": "central",
       "target": "edges-links",
       "label": "Connects Via",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-central-network",
@@ -176,7 +137,8 @@
       "source": "central",
       "target": "network-emergence",
       "label": "Forms",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-network-self",
@@ -184,7 +146,8 @@
       "source": "network-emergence",
       "target": "self-reflect",
       "label": "Reflects",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-self-examples",
@@ -192,7 +155,8 @@
       "source": "self-reflect",
       "target": "examples-meta",
       "label": "Like",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-examples-central",
@@ -200,10 +164,11 @@
       "source": "examples-meta",
       "target": "central",
       "label": "Exemplifies",
-      "style": {}
+      "style": {},
+      "data": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group-structure",
       "label": "Core Structure 🏗️",
@@ -213,10 +178,10 @@
         "network-emergence"
       ],
       "bounds": {
-        "x": -597.4200130681497,
-        "y": -260,
-        "width": 1459.3662636988618,
-        "height": 498.3449193140425
+        "x": -447.42001306814973,
+        "y": -170,
+        "width": 1439.3662636988618,
+        "height": 488.3449193140425
       },
       "visible": true,
       "style": {}
@@ -229,10 +194,10 @@
         "examples-meta"
       ],
       "bounds": {
-        "x": -374.6660300567444,
-        "y": -281.2609941193326,
-        "width": 393.6756226509599,
-        "height": 757.4931878675785
+        "x": -264.6660300567444,
+        "y": -211.26099411933262,
+        "width": 408.6756226509599,
+        "height": 762.4931878675785
       },
       "visible": true,
       "style": {}

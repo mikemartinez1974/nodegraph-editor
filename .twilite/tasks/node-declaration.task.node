@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-30T19:47:19.290Z",
-    "modified": "2026-01-30T19:47:53.432Z",
+    "created": "2026-01-30T21:00:22.025Z",
+    "modified": "2026-01-30T21:00:52.639Z",
     "author": "",
     "tags": []
   },
@@ -94,8 +94,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -2009,
-        "y": 276.9
+        "x": -2019,
+        "y": 564.9
       },
       "width": 420,
       "height": 320,

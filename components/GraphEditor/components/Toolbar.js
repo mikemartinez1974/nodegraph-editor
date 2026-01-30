@@ -848,9 +848,6 @@ const Toolbar = ({
             >
               Dev Mode
             </Box>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-              {vscodeDirty ? 'Unsaved changes (VSCode autosave)' : ''}
-            </Typography>
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           </>
         )}

@@ -132,6 +132,26 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
   }, [themeReady, isEmbedded]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleApplyBrowserTheme = (payload = {}) => {
+      if (typeof payload === 'string') {
+        applyBrowserTheme(payload);
+        return;
+      }
+      const { themeName: nextName, themeConfig } = payload;
+      if (themeConfig) {
+        applyBrowserTheme(themeConfig);
+      } else if (nextName) {
+        applyBrowserTheme(nextName);
+      }
+    };
+
+    eventBus.on('applyBrowserTheme', handleApplyBrowserTheme);
+    return () => eventBus.off('applyBrowserTheme', handleApplyBrowserTheme);
+  }, []);
+
+  useEffect(() => {
     if (themeName && themeName !== 'custom') {
       setMuiTheme(themeMap[themeName] || themeMap.default);
     }
