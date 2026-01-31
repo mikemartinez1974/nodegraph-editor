@@ -18,6 +18,7 @@ import EdgeTypes from './edgeTypes';
 import EntitiesPanel from './components/EntitiesPanel';
 import DynamicViewNode from './Nodes/DynamicViewNode';
 import eventBus from '../NodeGraph/eventBus';
+import { loadSettings } from './settingsManager';
 import { createThemeFromConfig } from './utils/themeUtils';
 import {
   useGraphEditorStateContext,
@@ -174,6 +175,24 @@ const GraphEditorContent = () => {
     handleHandshakeComplete
   } = rpc || {};
 
+  const [editorThemeConfig, setEditorThemeConfig] = useState(null);
+
+  const mergeThemeConfigs = useCallback((baseConfig, overrideConfig) => {
+    if (!baseConfig && !overrideConfig) return null;
+    if (!baseConfig) return overrideConfig;
+    if (!overrideConfig) return baseConfig;
+    return {
+      ...baseConfig,
+      ...overrideConfig,
+      primary: { ...(baseConfig.primary || {}), ...(overrideConfig.primary || {}) },
+      secondary: { ...(baseConfig.secondary || {}), ...(overrideConfig.secondary || {}) },
+      background: { ...(baseConfig.background || {}), ...(overrideConfig.background || {}) },
+      text: { ...(baseConfig.text || {}), ...(overrideConfig.text || {}) },
+      divider: overrideConfig.divider ?? baseConfig.divider,
+      mode: overrideConfig.mode ?? baseConfig.mode
+    };
+  }, []);
+
   const memoizedNodes = useMemo(() => nodes, [nodes]);
   const memoizedEdges = useMemo(() => edges, [edges]);
   const memoizedGroups = useMemo(() => groups, [groups]);
@@ -205,12 +224,16 @@ const GraphEditorContent = () => {
     modesHook.applyAutoLayout();
   }, [emitEdgeIntent, modesHook.applyAutoLayout, modesHook.autoLayoutType]);
 
+  const effectiveThemeConfig = useMemo(() => {
+    return mergeThemeConfigs(editorThemeConfig, documentTheme || null);
+  }, [mergeThemeConfigs, editorThemeConfig, documentTheme]);
+
   const documentMuiTheme = useMemo(() => {
-    if (documentTheme) {
-      return createThemeFromConfig(documentTheme);
+    if (effectiveThemeConfig) {
+      return createThemeFromConfig(effectiveThemeConfig);
     }
     return null;
-  }, [documentTheme]);
+  }, [effectiveThemeConfig]);
 
   const contractSummary = useMemo(
     () => summarizeContracts({ nodes, edges, documentSettings }),
@@ -662,11 +685,19 @@ const GraphEditorContent = () => {
 
       if (typeof handleLoadGraph === 'function') {
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+        const settings = loadSettings();
+        if (settings?.theme) {
+          setEditorThemeConfig(settings.theme);
+        }
         return;
       }
 
       if (typeof loadGraph === 'function') {
         loadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
+        const settings = loadSettings();
+        if (settings?.theme) {
+          setEditorThemeConfig(settings.theme);
+        }
         if (nodesRef) nodesRef.current = nodesToLoad;
         if (edgesRef) edgesRef.current = edgesToLoad;
         return;
@@ -705,6 +736,16 @@ const GraphEditorContent = () => {
       }
     };
   }, [handleLoadGraph, setNodes, setEdges, setGroups, nodesRef, edgesRef]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (themeConfig) => {
+      if (!themeConfig) return;
+      setEditorThemeConfig(themeConfig);
+    };
+    eventBus.on('updateEditorTheme', handler);
+    return () => eventBus.off('updateEditorTheme', handler);
+  }, [host]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

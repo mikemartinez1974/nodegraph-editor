@@ -143,7 +143,12 @@ export default function DocumentPropertiesDialog({
       const muiTheme = themeMap[nextThemeName] || themeMap.default;
       const themeConfig = themeConfigFromMuiTheme(muiTheme);
       if (themeConfig) {
-        eventBus.emit('updateDocumentTheme', themeConfig);
+        setSettings((prev) => {
+          const next = { ...prev, theme: themeConfig };
+          saveSettings(next);
+          return next;
+        });
+        eventBus.emit('updateEditorTheme', themeConfig);
       }
     }
   }, [host]);
@@ -410,7 +415,7 @@ export default function DocumentPropertiesDialog({
       fullScreen={isMobile}
       PaperProps={isMobile ? { sx: { m: 0 } } : undefined}
     >
-      <DialogTitle>Project Dashboard</DialogTitle>
+      <DialogTitle>Editor Settings</DialogTitle>
       <DialogContent sx={isMobile ? { p: 0, flex: '1 1 auto', overflowY: 'auto' } : {}}>
         <Box sx={{ px: isMobile ? 2 : 3, pt: isMobile ? 2 : 3, pb: 2 }}>
           <Typography variant="h6">{meta.title || 'Untitled Project'}</Typography>
@@ -867,8 +872,16 @@ export default function DocumentPropertiesDialog({
                   divider: currentTheme.palette.divider || '#e0e0e0',
                 } : null)}
                 onThemeChange={(newTheme) => {
-                  handleSettingsChange('theme', newTheme);
-                  eventBus.emit('updateDocumentTheme', newTheme);
+                  setSettings((prev) => {
+                    const next = { ...prev, theme: newTheme };
+                    saveSettings(next);
+                    return next;
+                  });
+                  if (host === 'vscode') {
+                    eventBus.emit('updateEditorTheme', newTheme);
+                  } else {
+                    eventBus.emit('updateDocumentTheme', newTheme);
+                  }
                 }}
               />
             </Paper>

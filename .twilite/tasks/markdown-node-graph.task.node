@@ -1,16 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Node (content) via Node Graph",
-    "description": "Task plan for implementing a content-only node-definition graph with editor + graph views.",
-    "created": "2026-01-28T00:00:00.000Z",
-    "modified": "2026-01-28T00:00:00.000Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-01-31T03:38:14.023Z",
+    "modified": "2026-01-31T03:38:24.759Z",
     "author": "",
-    "tags": [
-      "task",
-      "node-definition",
-      "node"
-    ]
+    "tags": []
   },
   "nodes": [
     {
@@ -78,6 +74,40 @@
         },
         "document": {
           "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
         }
       }
     },
@@ -95,29 +125,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Implement **node** as a **node-definition graph**.\n\nThe node has a single data field: `content`.\n\n- `content` is a **string**\n- `content` renders as **markdown**\n\nIt exposes **two views**:\n- **editor.web** (UI panel with text editor)\n- **node.web** (rendered markdown)\n\nThis replaces the old “markdown node” concept."
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-node-definition-graph",
@@ -133,29 +141,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Create a **node-definition graph** for `node` that contains:\n\n- **View node** (intent: editor, payload: twilite.web)\n- **View node** (intent: node, payload: twilite.web)\n- Optional **script/skill** nodes (if needed)\n- Minimal handles + default root handle\n\nThis graph is the class definition."
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-view-node",
@@ -171,29 +157,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Define **two View** nodes:\n\n1) **Editor view**\n- `data.view.intent = editor`\n- `data.view.payload = editor.web`\n- UI for editing `data.content`\n\n2) **Graph view**\n- `data.view.intent = node`\n- `data.view.payload = node.web`\n- Render `data.content` as markdown\n\nPayloads map to `data.editor.web` and `data.node.web` in the view node."
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-legend-entry",
@@ -209,29 +173,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Add **legend entry** for `node`:\n\n- `key = node`\n- `dictionaryKey = node`\n- intent + implementation notes\n\nThis represents the base content node."
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-dictionary-entry",
@@ -247,29 +189,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Add dictionary entry for `node`:\n\n- `key = node`\n- `ref = /public/documentation/contracts/nodes/node.node` (or chosen path)\n- `views` entries:\n  - `intent = editor`, `payload = editor.web`\n  - `intent = node`, `payload = node.web`"
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-runtime-checks",
@@ -285,29 +205,7 @@
       "showLabel": true,
       "data": {
         "markdown": "Validate & render:\n\n- Missing view → warn + fallback\n- Missing dictionary entry → warn\n- Manifest dependency missing → warn (draft mode ok)\n\nEnsure editor resolves **node** via dictionary → views."
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     },
     {
       "id": "markdown-acceptance",
@@ -323,19 +221,7 @@
       "showLabel": true,
       "data": {
         "markdown": "A node instance **renders via its View** and behaves like native:\n\n- draggable + resizable\n- handles honored (root default)\n- node type resolved via legend/dictionary\n- `data.content` editable in editor view\n- graph view renders `data.content`"
-      },
-      "handles": [
-        {
-          "id": "in",
-          "label": "in",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      ]
+      }
     }
   ],
   "edges": [

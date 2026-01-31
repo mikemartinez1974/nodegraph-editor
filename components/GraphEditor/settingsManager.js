@@ -69,8 +69,18 @@ const defaultSettings = {
 
 export const loadSettings = () => {
   try {
-    // Return defaults (quiet)
-    return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+    if (typeof window === 'undefined') {
+      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+    }
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (!stored) {
+      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+    }
+    const parsed = JSON.parse(stored);
+    if (!parsed || typeof parsed !== 'object') {
+      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+    }
+    return { ...defaultSettings, ...parsed, nodes: [], edges: [], groups: [] };
   } catch (error) {
     console.error('Failed to load settings:', error);
     return { ...defaultSettings, nodes: [], edges: [], groups: [] };

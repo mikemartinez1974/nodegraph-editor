@@ -968,8 +968,8 @@ const Toolbar = ({
 
           <IconButton
           onClick={onOpenDocumentProperties}
-            title="Preferences"
-            aria-label="Open Preferences"
+            title="Editor Settings"
+            aria-label="Open Editor Settings"
             size="small"
             disabled={isFreeUser}
           >
