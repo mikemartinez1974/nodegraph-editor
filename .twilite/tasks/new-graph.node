@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-30T19:32:13.440Z",
-    "modified": "2026-01-30T19:32:17.117Z",
+    "created": "2026-01-31T20:14:38.908Z",
+    "modified": "2026-01-31T20:14:46.404Z",
     "author": "",
     "tags": []
   },
@@ -69,7 +69,7 @@
           }
         },
         "document": {
-          "url": "/tlz/background.html"
+          "url": ""
         },
         "settings": {
           "theme": null,

@@ -132,7 +132,8 @@ const getCycleInfo = (nodeIds = [], edges = []) => {
 const DEFAULT_GRAPH_MODES_OPTIONS = {
   layoutSettings: null,
   edgeRouting: 'auto',
-  setSnackbar: () => {}
+  setSnackbar: () => {},
+  skipRerouteRef: null
 };
 
 export default function useGraphModes(options = {}) {
@@ -144,7 +145,8 @@ export default function useGraphModes(options = {}) {
     setEdgeRoutes,
     layoutSettings,
     edgeRouting,
-    setSnackbar
+    setSnackbar,
+    skipRerouteRef
   } = { ...DEFAULT_GRAPH_MODES_OPTIONS, ...options };
   const [mode, setMode] = useState('manual'); // 'manual' | 'nav' | 'auto'
   const [autoLayoutType, setAutoLayoutType] = useState('hierarchical'); // 'hierarchical' | 'serpentine' | 'radial' | 'grid'
@@ -745,6 +747,11 @@ const rerouteEdges = useCallback(async () => {
   const rerouteTimerRef = useRef(null);
   useEffect(() => {
     if (typeof window === 'undefined') return () => {};
+    if (skipRerouteRef?.current) {
+      console.log('[EdgeReroute] skipped (cached routes applied)');
+      skipRerouteRef.current = false;
+      return () => {};
+    }
     if (rerouteTimerRef.current) {
       clearTimeout(rerouteTimerRef.current);
     }

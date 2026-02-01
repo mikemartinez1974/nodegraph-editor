@@ -36,6 +36,17 @@ const PANEL_WIDTHS = {
   layout: 380
 };
 
+const postHostMessage = (payload) => {
+  if (typeof window === 'undefined') return;
+  if (typeof window.__Twilite_POST_MESSAGE__ === 'function') {
+    window.__Twilite_POST_MESSAGE__(payload);
+    return;
+  }
+  try {
+    window.parent?.postMessage(payload, '*');
+  } catch {}
+};
+
 const GraphEditorContent = () => {
   const theme = useTheme();
   const state = useGraphEditorStateContext();
@@ -703,15 +714,15 @@ const GraphEditorContent = () => {
         return;
       }
 
-      if (nodesToLoad.length && typeof setNodes === 'function') {
+      if (typeof setNodes === 'function') {
         setNodes(nodesToLoad);
         if (nodesRef) nodesRef.current = nodesToLoad;
       }
-      if (edgesToLoad.length && typeof setEdges === 'function') {
+      if (typeof setEdges === 'function') {
         setEdges(edgesToLoad);
         if (edgesRef) edgesRef.current = edgesToLoad;
       }
-      if (groupsToLoad.length && typeof setGroups === 'function') {
+      if (typeof setGroups === 'function') {
         setGroups(groupsToLoad);
       }
     };
@@ -758,9 +769,7 @@ const GraphEditorContent = () => {
         try {
           window.__Twilite_DIRTY__ = true;
         } catch {}
-        try {
-          window.parent?.postMessage({ type: 'graphDirty' }, '*');
-        } catch {}
+        postHostMessage({ type: 'graphDirty' });
       }, 50);
     };
     const events = [
@@ -813,7 +822,7 @@ const GraphEditorContent = () => {
           if (hash === lastSentHash) return;
           lastSentHash = hash;
           const text = JSON.stringify(payload, null, 2);
-          window.parent?.postMessage({ type: 'graphUpdated', text }, '*');
+          postHostMessage({ type: 'graphUpdated', text });
         } catch (err) {
           // ignore serialize errors
         }

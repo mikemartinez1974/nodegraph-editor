@@ -48,6 +48,17 @@ const decodeBase64 = (value) => {
   return decodeURIComponent(escape(window.atob(value)));
 };
 
+const postHostMessage = (payload) => {
+  if (typeof window === 'undefined') return;
+  if (typeof window.__Twilite_POST_MESSAGE__ === 'function') {
+    window.__Twilite_POST_MESSAGE__(payload);
+    return;
+  }
+  try {
+    window.parent?.postMessage(payload, '*');
+  } catch {}
+};
+
 const parseRepoString = (value = '') => {
   const trimmed = value.trim();
   if (!trimmed) return null;
@@ -237,10 +248,14 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   
   const backgroundRpcRef = useRef(() => Promise.reject(new Error('Background RPC not ready')));
   const backgroundRpcReadyRef = useRef(false);
+  const lastLoadedHashRef = useRef(new Map());
 
   const state = useGraphEditorState();
   const { emitEdgeIntent } = useIntentEmitter();
   const [edgeRoutes, setEdgeRoutes] = useState({});
+  const currentDocUriRef = useRef(null);
+  const skipRerouteRef = useRef(false);
+  const edgeRoutesSaveTimerRef = useRef(null);
 
 // Destructure editor state immediately so variables like `pan` are available for subsequent effects
   const {
@@ -355,6 +370,21 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       if (window.__Twilite_DIRTY__ && forceLoad) {
         window.__Twilite_DIRTY__ = false;
       }
+      const incomingUri = typeof data.uri === 'string' ? data.uri : null;
+      const incomingHash = Number.isFinite(Number(data.hash)) ? Number(data.hash) : 0;
+      const incomingEdgeRoutes = data.edgeRoutes && typeof data.edgeRoutes === 'object' ? data.edgeRoutes : null;
+      const incomingEdgeRouteIds = Array.isArray(data.edgeRouteIds) ? data.edgeRouteIds : null;
+      if (incomingUri) {
+        const cachedHash = lastLoadedHashRef.current.get(incomingUri);
+        if (!forceLoad && cachedHash === incomingHash && incomingHash !== 0) {
+          console.log('[GraphEditor] loadGraph skipped (same hash)', { uri: incomingUri });
+          return;
+        }
+        if (incomingHash) {
+          lastLoadedHashRef.current.set(incomingUri, incomingHash);
+        }
+        currentDocUriRef.current = incomingUri;
+      }
       const nextNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
       const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
       const nextGroups = Array.isArray(payload.clusters)
@@ -362,6 +392,49 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
         : Array.isArray(payload.groups)
         ? payload.groups
         : [];
+      let cachedRoutesApplied = false;
+      if (incomingUri && typeof window !== 'undefined' && window.__Twilite_EMBED__) {
+        try {
+          const cacheKey = `twilite.edgeRoutes.${encodeURIComponent(incomingUri)}`;
+          const cachedRaw = window.localStorage.getItem(cacheKey);
+          if (cachedRaw) {
+            const cached = JSON.parse(cachedRaw);
+            const cachedEdges = Array.isArray(cached?.edgeIds) ? cached.edgeIds : [];
+            const incomingEdgeIds = nextEdges.map((edge) => edge?.id).filter(Boolean);
+            const sameEdges =
+              cachedEdges.length === incomingEdgeIds.length &&
+              cachedEdges.every((id, idx) => id === incomingEdgeIds[idx]);
+            if (sameEdges && cached?.routes && typeof cached.routes === 'object') {
+              console.log('[EdgeReroute] cache hit for routes', { edgeCount: incomingEdgeIds.length });
+              setEdgeRoutes(cached.routes);
+              skipRerouteRef.current = true;
+              cachedRoutesApplied = true;
+            } else {
+              console.log('[EdgeReroute] cache miss (edge ids changed)', {
+                cachedCount: cachedEdges.length,
+                incomingCount: incomingEdgeIds.length
+              });
+            }
+          } else {
+            console.log('[EdgeReroute] cache miss (no stored routes)');
+          }
+        } catch (err) {
+          // ignore cache errors
+        }
+      }
+      if (!cachedRoutesApplied && incomingEdgeRoutes) {
+        const incomingEdgeIds = Array.isArray(nextEdges) ? nextEdges.map((edge) => edge?.id).filter(Boolean) : [];
+        const sameEdges =
+          Array.isArray(incomingEdgeRouteIds) &&
+          incomingEdgeRouteIds.length === incomingEdgeIds.length &&
+          incomingEdgeRouteIds.every((id, idx) => id === incomingEdgeIds[idx]);
+        if (sameEdges) {
+          console.log('[EdgeReroute] host cache applied', { edgeCount: incomingEdgeIds.length });
+          setEdgeRoutes(incomingEdgeRoutes);
+          skipRerouteRef.current = true;
+          cachedRoutesApplied = true;
+        }
+      }
       setNodes(nextNodes);
       setEdges(nextEdges);
       setGroups(nextGroups);
@@ -381,7 +454,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       } catch {}
       try {
         if (typeof window !== 'undefined' && window.__Twilite_EMBED__) {
-          window.parent?.postMessage({ type: 'graphLoaded', seq: data.seq ?? null }, '*');
+          postHostMessage({ type: 'graphLoaded', seq: data.seq ?? null });
         }
       } catch (err) {
         // ignore postMessage failures
@@ -850,7 +923,8 @@ useEffect(() => {
     setEdgeRoutes,
     layoutSettings: documentSettings?.layout,
     edgeRouting: documentSettings?.edgeRouting || 'auto',
-    setSnackbar
+    setSnackbar,
+    skipRerouteRef
   });
 
   const defaultLayoutSyncRef = useRef(null);
@@ -869,6 +943,31 @@ useEffect(() => {
     setSnackbar,
     lastPointerRef
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.__Twilite_EMBED__) return () => {};
+    const uri = currentDocUriRef.current;
+    if (!uri) return () => {};
+    if (!edgeRoutes || Object.keys(edgeRoutes).length === 0) return () => {};
+    if (edgeRoutesSaveTimerRef.current) {
+      clearTimeout(edgeRoutesSaveTimerRef.current);
+    }
+    edgeRoutesSaveTimerRef.current = window.setTimeout(() => {
+      try {
+        const edgeIds = Array.isArray(edges) ? edges.map((edge) => edge?.id).filter(Boolean) : [];
+        const cacheKey = `twilite.edgeRoutes.${encodeURIComponent(uri)}`;
+        window.localStorage.setItem(cacheKey, JSON.stringify({ edgeIds, routes: edgeRoutes }));
+        postHostMessage({ type: 'edgeRoutes', uri, edgeIds, routes: edgeRoutes });
+      } catch (err) {
+        // ignore cache errors
+      }
+    }, 200);
+    return () => {
+      if (edgeRoutesSaveTimerRef.current) {
+        clearTimeout(edgeRoutesSaveTimerRef.current);
+      }
+    };
+  }, [edgeRoutes, edges]);
 
   useEffect(() => {
     const defaultLayout = documentSettings?.layout?.defaultLayout;

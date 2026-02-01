@@ -570,12 +570,17 @@ export function createGraphEditorHandlers({
     const prevEdges = edgesRef.current || [];
     const prevGroups = groups || [];
     const newNodes = [], newEdges = [], newGroups = [];
-    // Update refs first, then state to ensure consistency
+    // Use loadGraph to bypass manifest validation for explicit clears.
+    if (typeof loadGraph === 'function') {
+      loadGraph(newNodes, newEdges, newGroups);
+    } else {
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setGroups(newGroups);
+    }
+    // Update refs after state to ensure consistency
     nodesRef.current = newNodes;
     edgesRef.current = newEdges;
-    setNodes(newNodes);
-    setEdges(newEdges);
-    setGroups(newGroups);
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
@@ -592,8 +597,15 @@ export function createGraphEditorHandlers({
   
   // ===== LOAD/SAVE HANDLERS =====
   const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = []) => {
+    const nextNodes = Array.isArray(loadedNodes) ? loadedNodes : [];
+    const nextEdges = Array.isArray(loadedEdges) ? loadedEdges : [];
+    const nextGroups = Array.isArray(loadedGroups) ? loadedGroups : [];
+    if (nextNodes.length === 0 && nextEdges.length === 0 && nextGroups.length === 0) {
+      handleClearGraph();
+      return;
+    }
     const edgeMap = new Map();
-    (loadedEdges || []).forEach(edge => {
+    nextEdges.forEach(edge => {
       const normalized = normalizeEdgeSchema(edge);
       if (!normalized || !normalized.id) return;
       const previous = edgeMap.get(normalized.id);
@@ -612,27 +624,27 @@ export function createGraphEditorHandlers({
     const normalizedEdges = Array.from(edgeMap.values());
 
     if (typeof loadGraph === 'function') {
-      loadGraph(loadedNodes, normalizedEdges, loadedGroups);
-      nodesRef.current = loadedNodes;
+      loadGraph(nextNodes, normalizedEdges, nextGroups);
+      nodesRef.current = nextNodes;
       edgesRef.current = normalizedEdges;
     } else {
       setNodes(prev => {
-        nodesRef.current = loadedNodes;
-        return loadedNodes;
+        nodesRef.current = nextNodes;
+        return nextNodes;
       });
       setEdges(prev => {
         edgesRef.current = normalizedEdges;
         return normalizedEdges;
       });
-      setGroups(loadedGroups);
+      setGroups(nextGroups);
     }
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
-    saveToHistory(loadedNodes, normalizedEdges);
+    saveToHistory(nextNodes, normalizedEdges);
 
-    if (loadedNodes.length > 0) {
-      const firstNode = loadedNodes[0];
+    if (nextNodes.length > 0) {
+      const firstNode = nextNodes[0];
       state.setPan({
         x: window.innerWidth / 2 - firstNode.position.x * zoom,
         y: window.innerHeight / 2 - firstNode.position.y * zoom
