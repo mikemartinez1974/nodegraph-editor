@@ -1,0 +1,179 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-02T05:23:33.895Z",
+    "modified": "2026-02-02T05:23:45.217Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "bfab02d2-885a-4c93-a3c6-791a1f6855e7",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -353.72005477358175,
+        "y": -523.375091192858
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
+      }
+    },
+    {
+      "id": "d7066f3d-7601-4def-ad01-7ff8d1fe332e",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -363.8084027923917,
+        "y": 81.89621281048397
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "entries": [
+          {
+            "key": "concept",
+            "intent": "what it means",
+            "implementation": "how it appears",
+            "dictionaryKey": "concept"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "12c2e7b7-6c26-4571-ba2f-adef854a0a8a",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -752.4178724686369,
+        "y": -24.056712636199922
+      },
+      "width": 346,
+      "height": 488,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "nodeDefs": [
+          {
+            "key": "default",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "default",
+            "intent": "node",
+            "payload": "twilite.web",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

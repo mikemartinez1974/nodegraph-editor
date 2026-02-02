@@ -188,6 +188,15 @@ const GraphEditorContent = () => {
 
   const [editorThemeConfig, setEditorThemeConfig] = useState(null);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (host !== 'vscode') return;
+    const settings = loadSettings();
+    if (settings?.theme) {
+      setEditorThemeConfig(settings.theme);
+    }
+  }, [host]);
+
   const mergeThemeConfigs = useCallback((baseConfig, overrideConfig) => {
     if (!baseConfig && !overrideConfig) return null;
     if (!baseConfig) return overrideConfig;
@@ -1130,7 +1139,7 @@ const skipPropertiesCloseRef = useRef(false);
     setShowGroupList(false);
   }, [emitEdgeIntent]);
 
-  return (
+  const content = (
     <div
       id="graph-editor-background"
       role="application"
@@ -1158,6 +1167,7 @@ const skipPropertiesCloseRef = useRef(false);
       {!isMobile && (
         <Toolbar
           host={host}
+          uiTheme={documentMuiTheme}
           onToggleNodeList={handleToggleNodeListIntent}
           showNodeList={showNodeList}
           onToggleGroupList={handleToggleGroupListIntent}
@@ -1392,10 +1402,6 @@ const skipPropertiesCloseRef = useRef(false);
           recentSnapshots={recentSnapshots}
           isFreeUser={isFreeUser}
         />
-      ) : documentMuiTheme ? (
-        <MuiThemeProvider theme={documentMuiTheme}>
-          {createGraphRenderer()}
-        </MuiThemeProvider>
       ) : (
         createGraphRenderer()
       )}
@@ -1496,6 +1502,12 @@ const skipPropertiesCloseRef = useRef(false);
       </Backdrop>
     </div>
   );
+
+  return documentMuiTheme ? (
+    <MuiThemeProvider theme={documentMuiTheme}>
+      {content}
+    </MuiThemeProvider>
+  ) : content;
 };
 
 export default GraphEditorContent;

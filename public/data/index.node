@@ -1,32 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Index of data",
-    "created": "2025-12-30T18:29:23.716Z",
-    "modified": "2025-12-30T18:29:23.739Z"
-  },
-  "settings": {
-    "theme": {
-      "mode": "dark",
-      "primary": {
-        "main": "#1976d2"
-      },
-      "background": {
-        "default": "#121212",
-        "paper": "#1e1e1e"
-      },
-      "text": {
-        "primary": "#ffffff",
-        "secondary": "rgba(255, 255, 255, 0.7)"
-      }
-    }
-  },
-  "viewport": {
-    "pan": {
-      "x": 400,
-      "y": 300
-    },
-    "zoom": 0.8
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-02T04:05:41.965Z",
+    "modified": "2026-02-02T04:05:43.745Z",
+    "author": "",
+    "tags": []
   },
   "nodes": [
     {
@@ -39,6 +19,8 @@
       },
       "width": 600,
       "height": 100,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "markdown": "# Index of data\nExplore the nodegraphs in this directory."
       }
@@ -53,6 +35,8 @@
       },
       "width": 180,
       "height": 60,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///index.node"
       }
@@ -67,6 +51,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/AutomationStarter.node"
       }
@@ -81,6 +67,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/CustomerJourneyMap.node"
       }
@@ -95,6 +83,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/https___cpwith.me_data_IntroGraph.json.node"
       }
@@ -109,6 +99,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/IntroGraph.node"
       }
@@ -123,6 +115,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/RealtimeOpsDashboard.node"
       }
@@ -137,11 +131,13 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///data/IntroManual.node"
       }
     }
   ],
   "edges": [],
-  "groups": []
+  "clusters": []
 }

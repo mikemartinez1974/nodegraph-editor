@@ -2,8 +2,6 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 
-const EXTENSION_BUILD_TAG = 'bundle-fix-2';
-
 const panelState = new WeakMap();
 const panelStates = new Set();
 const documentCache = new Map();
@@ -17,7 +15,7 @@ class TwiliteNodeEditorProvider {
   }
 
   resolveCustomTextEditor(document, webviewPanel) {
-    console.log(`[TwilitePreviewHost] resolveCustomTextEditor file=${document.uri?.toString?.()}`);
+    
     const panelId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const priorState = panelState.get(webviewPanel);
     const docUri = document.uri?.toString?.();
@@ -59,6 +57,7 @@ class TwiliteNodeEditorProvider {
       documentUri: document.uri?.toString?.(),
       lastSentText: null,
       lastSentUri: null,
+      suppressNextDocumentUpdate: false,
       postSequence: 0,
       webviewReadyHandled: false,
       htmlInitialized,
@@ -118,7 +117,7 @@ class TwiliteNodeEditorProvider {
         : {};
       if (switchedFile) {
         state.postSequence += 1;
-        console.log(`[TwilitePreviewHost] post clear file=${uri} seq=${state.postSequence}`);
+        
         webviewPanel.webview.postMessage({
           type: 'setText',
           text: '',
@@ -131,12 +130,10 @@ class TwiliteNodeEditorProvider {
       if (shouldForceClear && previousText && previousText.trim()) {
         state.webviewReadyHandled = false;
         state.htmlInitialized = false;
-        console.log(`[TwilitePreviewHost] reload webview for empty file=${uri}`);
         webviewPanel.webview.html = this.getHtml(webviewPanel.webview, text, panelId);
         return;
       }
       state.postSequence += 1;
-      console.log(`[TwilitePreviewHost] post setText file=${uri} length=${text.length}`);
       webviewPanel.webview.postMessage({
         type: 'setText',
         text,
@@ -152,6 +149,10 @@ class TwiliteNodeEditorProvider {
       const currentDoc = state.document;
       if (!currentDoc) return;
       if (event.document.uri.toString() !== currentDoc.uri.toString()) return;
+      if (state.suppressNextDocumentUpdate) {
+        state.suppressNextDocumentUpdate = false;
+        return;
+      }
       const uri = event.document.uri.toString();
       const text = event.document.getText();
       documentCache.set(uri, text);
@@ -172,7 +173,6 @@ class TwiliteNodeEditorProvider {
         if (!raw || !raw.trim()) {
           state.webviewReadyHandled = false;
           state.htmlInitialized = false;
-          console.log(`[TwilitePreviewHost] reload webview on activate (empty file) ${currentDoc.uri?.toString?.()}`);
           webviewPanel.webview.html = this.getHtml(webviewPanel.webview, raw, panelId);
           return;
         }
@@ -195,15 +195,21 @@ class TwiliteNodeEditorProvider {
         edgeRouteCache.set(uri, { edgeIds: Array.isArray(edgeIds) ? edgeIds : [], routes });
         return;
       }
-      if (message.type === 'update') {
+      if (message.type === 'update' || message.type === 'graphUpdated') {
+        const incomingText = typeof message.text === 'string' ? message.text : '';
+        const currentText = document.getText();
+        if (incomingText === currentText) {
+          return;
+        }
+        state.suppressNextDocumentUpdate = true;
         const edit = new vscode.WorkspaceEdit();
         const fullRange = new vscode.Range(
           document.positionAt(0),
           document.positionAt(document.getText().length)
         );
-        edit.replace(document.uri, fullRange, message.text);
+        edit.replace(document.uri, fullRange, incomingText);
         vscode.workspace.applyEdit(edit);
-        documentCache.set(document.uri.toString(), message.text);
+        documentCache.set(document.uri.toString(), incomingText);
         return;
       }
     });
@@ -254,10 +260,10 @@ class TwiliteNodeEditorProvider {
         const updated = content.replace(/let t="[^"]*\/_next\/",/g, replacement);
         if (updated !== content) {
           fs.writeFileSync(runtimeFile, updated, 'utf8');
-          console.log('[TwilitePreviewHost] Patched Turbopack base', desiredBase);
+          
         }
       } catch (err) {
-        console.warn('[TwilitePreviewHost] Failed to patch Turbopack runtime', err);
+        
       }
     };
     patchTurbopackRuntime();
@@ -281,10 +287,10 @@ class TwiliteNodeEditorProvider {
           );
           if (updated !== content) {
             fs.writeFileSync(chunkFile, updated, 'utf8');
-            console.log('[TwilitePreviewHost] Patched chunk currentScript', chunkRef);
+            
           }
         } catch (err) {
-          console.warn('[TwilitePreviewHost] Failed to patch chunk currentScript', chunkFile, err);
+          
         }
       });
     };
@@ -324,112 +330,7 @@ class TwiliteNodeEditorProvider {
         window.__Twilite_HOST__ = 'vscode';
         window.__Twilite_POST_MESSAGE__ = (payload) => vscode.postMessage(payload);
         window.next = window.next || {};
-        console.log('[TwilitePreview] webview bootstrap loaded (bundle-fix-2)');
-        try {
-          const badge = document.createElement('div');
-          badge.textContent = 'Twilite Preview: bundle-fix-2';
-          badge.style.cssText = 'position:fixed;top:6px;right:8px;z-index:2147483647;padding:2px 6px;font:11px/1.2 system-ui,sans-serif;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;pointer-events:none;';
-          document.documentElement.appendChild(badge);
-        } catch {}
-        try {
-          const cspTag = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-          console.log('[TwilitePreview] CSP', cspTag ? cspTag.content : 'missing');
-        } catch {}
-        try {
-          const inlineScripts = Array.from(document.querySelectorAll('script:not([src])'));
-          const withoutNonce = inlineScripts.filter((script) => !script.nonce);
-          console.log('[TwilitePreview] inline scripts', {
-            total: inlineScripts.length,
-            withoutNonce: withoutNonce.length,
-            sampleNonce: inlineScripts[0]?.nonce || null
-          });
-        } catch {}
-        try {
-          const nextQueue = window.__next_f || (window.__next_f = []);
-          if (!nextQueue.__twiliteHooked) {
-            nextQueue.__twiliteHooked = true;
-            const originalPush = nextQueue.push.bind(nextQueue);
-            nextQueue.push = (...args) => {
-              console.log('[TwilitePreview] __next_f push', args[0]);
-              return originalPush(...args);
-            };
-          }
-        } catch {}
-        const attachScriptListeners = (script) => {
-          if (!script || script.__twiliteAttached) return;
-          script.__twiliteAttached = true;
-          script.addEventListener('load', () => {
-            console.log('[TwilitePreview] script loaded', script.src);
-          });
-          script.addEventListener('error', () => {
-            console.error('[TwilitePreview] script error', script.src);
-          });
-        };
-        try {
-          const scripts = Array.from(document.querySelectorAll('script[src]'));
-          console.log('[TwilitePreview] script tags (initial)', scripts.map((script) => ({
-            src: script.src,
-            type: script.type || 'text/javascript',
-            async: script.async,
-            noModule: script.noModule
-          })));
-          scripts.forEach(attachScriptListeners);
-          const observer = new MutationObserver((mutations) => {
-            for (const mutation of mutations) {
-              for (const node of mutation.addedNodes || []) {
-                if (node?.tagName === 'SCRIPT' && node.src) {
-                  attachScriptListeners(node);
-                  console.log('[TwilitePreview] script added', {
-                    src: node.src,
-                    type: node.type || 'text/javascript',
-                    async: node.async,
-                    noModule: node.noModule
-                  });
-                }
-              }
-            }
-          });
-          observer.observe(document.documentElement || document, { childList: true, subtree: true });
-        } catch {}
-        window.addEventListener('load', () => {
-          console.log('[TwilitePreview] window load', JSON.stringify({
-            readyState: document.readyState,
-            hasNext: typeof window.__next_f !== 'undefined',
-            hasTurbopack: typeof window.TURBOPACK !== 'undefined',
-            scriptCount: document.querySelectorAll('script[src]').length
-          }));
-          try {
-            const nextQueue = window.__next_f || [];
-            console.log('[TwilitePreview] __next_f length', nextQueue.length);
-          } catch {}
-        });
-        window.setTimeout(() => {
-          console.log('[TwilitePreview] post-load check', JSON.stringify({
-            hasNext: typeof window.__next_f !== 'undefined',
-            hasApplyGraph: typeof window.__Twilite_APPLY_GRAPH__ === 'function',
-            scriptCount: document.querySelectorAll('script[src]').length
-          }));
-          try {
-            const scripts = Array.from(document.querySelectorAll('script[src]'));
-            console.log('[TwilitePreview] script tags (post-load)', scripts.map((script) => script.src));
-            const resources = performance.getEntriesByType('resource');
-            const scriptEntries = resources.filter((entry) => entry.initiatorType === 'script');
-            console.log('[TwilitePreview] script resources', scriptEntries.map((entry) => entry.name));
-          } catch {}
-          try {
-            console.log('[TwilitePreview] runtime globals', {
-              hasTurbopackRequire: typeof window.__turbopack_require__ === 'function',
-              hasNextRequire: typeof window.__next_require__ === 'function'
-            });
-          } catch {}
-        }, 1000);
-        window.setTimeout(() => {
-          try {
-            const resources = performance.getEntriesByType('resource');
-            const scriptEntries = resources.filter((entry) => entry.initiatorType === 'script');
-            console.log('[TwilitePreview] script resources (2s)', scriptEntries.map((entry) => entry.name));
-          } catch {}
-        }, 2000);
+        
         let pendingPayload = null;
         let retryCount = 0;
         const retryApply = () => {
@@ -438,14 +339,14 @@ class TwiliteNodeEditorProvider {
             const payload = pendingPayload;
             pendingPayload = null;
             window.__Twilite_APPLY_GRAPH__(payload);
-            console.log('[TwilitePreview] applied pending graph');
+            
             return;
           }
           retryCount += 1;
           if (retryCount < 40) {
             window.setTimeout(retryApply, 250);
           } else {
-            console.warn('[TwilitePreview] applyGraph never became ready');
+            
           }
         };
         window.setTimeout(retryApply, 250);
@@ -453,10 +354,7 @@ class TwiliteNodeEditorProvider {
         let lastSeq = 0;
         const applyGraph = (payload) => {
           if (!payload || typeof payload !== 'object') return;
-          console.log('[TwilitePreview] applyGraph', {
-            nodeCount: Array.isArray(payload.nodes) ? payload.nodes.length : 0,
-            edgeCount: Array.isArray(payload.edges) ? payload.edges.length : 0
-          });
+          
           if (window.__Twilite_APPLY_GRAPH__) {
             window.__Twilite_APPLY_GRAPH__(payload);
           } else {
@@ -527,15 +425,14 @@ class TwiliteNodeEditorProvider {
           if (uri && uri !== lastUri) {
             lastUri = uri;
           }
-          console.log('[TwilitePreview] setText received', { uri, length: raw.length, seq });
+          
           try {
             const parsed = raw && raw.trim() ? JSON.parse(raw) : { nodes: [], edges: [], clusters: [] };
+            try { window.__Twilite_HOST_GRAPH_READY__ = true; } catch {}
             if (message.edgeRoutes) parsed.edgeRoutes = message.edgeRoutes;
             if (message.edgeRouteIds) parsed.edgeRouteIds = message.edgeRouteIds;
             const emptyGraph = isEmptyGraph(parsed);
-            if (emptyGraph) {
-              console.log('[TwilitePreview] empty graph detected, forcing clear');
-            }
+            
             if (forceClear && emptyGraph) {
               applyGraph({ nodes: [], edges: [], clusters: [] });
               scheduleEmptyClear();
@@ -548,45 +445,9 @@ class TwiliteNodeEditorProvider {
             if (emptyGraph) {
               scheduleEmptyClear();
             }
-          } catch (err) {
-            console.error('[TwilitePreview] Invalid JSON', err);
-          }
+          } catch (err) {}
         });
-        window.addEventListener('error', (event) => {
-          const target = event?.target;
-          if (target && target.tagName === 'SCRIPT') {
-            console.error('[TwilitePreview] script load failed', target.src);
-          } else if (event?.message) {
-            console.error('[TwilitePreview] error', event.message);
-          }
-        }, true);
-        window.addEventListener('unhandledrejection', (event) => {
-          const reason = event?.reason;
-          if (reason?.message) {
-            console.error('[TwilitePreview] unhandledrejection', reason.message);
-          } else {
-            console.error('[TwilitePreview] unhandledrejection', String(reason));
-          }
-        });
-        window.addEventListener('error', (event) => {
-          const reason = event?.reason;
-          if (reason?.message) {
-            console.error('[TwilitePreview] window error', reason.message);
-          } else if (event?.message) {
-            console.error('[TwilitePreview] window error', event.message);
-          }
-        });
-        window.setTimeout(() => {
-          try {
-            console.log('[TwilitePreview] globals', {
-              hasReact: typeof window.React !== 'undefined',
-              hasReactDOM: typeof window.ReactDOM !== 'undefined',
-              hasNextRequire: typeof window.__next_require__ !== 'undefined',
-              hasApplyGraph: typeof window.__Twilite_APPLY_GRAPH__ === 'function',
-              hasGraphEditor: typeof window.GraphEditor !== 'undefined'
-            });
-          } catch {}
-        }, 1500);
+        
         vscode.postMessage({ type: 'webviewReady' });
       </script>`;
 
@@ -630,7 +491,7 @@ class TwiliteNodeEditorProvider {
 }
 
 function activate(context) {
-  console.log(`[TwilitePreviewHost] activate ${EXTENSION_BUILD_TAG} from ${__filename}`);
+  
   context.subscriptions.push(
     vscode.window.registerCustomEditorProvider(
       TwiliteNodeEditorProvider.viewType,

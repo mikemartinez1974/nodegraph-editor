@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   Paper,
   IconButton,
@@ -133,7 +133,8 @@ const Toolbar = ({
   edgeRouting = 'auto',
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null,  // GitHub sync target settings
-  onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties')
+  onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties'),
+  uiTheme = null
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -783,7 +784,7 @@ const Toolbar = ({
 
   const isBookmarked = currentUrl && bookmarks.some(b => b.url === currentUrl);
 
-  return (
+  const toolbarContent = (
     <>
       {/* Hover trigger area just below address bar */}
       <Box
@@ -1057,6 +1058,17 @@ const Toolbar = ({
     </Paper>
     </>
   );
+
+  if (uiTheme) {
+    const resolvedTheme = uiTheme.palette ? uiTheme : createTheme({ palette: uiTheme });
+    return (
+      <ThemeProvider theme={resolvedTheme}>
+        {toolbarContent}
+      </ThemeProvider>
+    );
+  }
+
+  return toolbarContent;
 };
 
 export default Toolbar;
