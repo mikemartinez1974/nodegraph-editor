@@ -1811,14 +1811,15 @@ useEffect(() => {
   // Listen for 'fetchUrl' event from address bar
   useEffect(() => {
     const handleFetchUrl = async ({ url, source = 'unknown' }) => {
-      if (typeof window !== 'undefined') {
-        // eslint-disable-next-line no-console
-        console.log('[GraphEditor] fetchUrl event received', { url, source });
-      }
       try {
         if (!url) return;
         let fullUrl = url;
         let originalTlzPath = null;
+        let directTlzPath = null;
+
+        if (typeof fullUrl === 'string' && fullUrl.startsWith('/tlz/')) {
+          directTlzPath = fullUrl;
+        }
 
         const ensureAbsoluteFromRelative = (input) => {
           if (!input) return input;
@@ -1910,10 +1911,7 @@ useEffect(() => {
 
         const tryFetch = async (u) => {
           triedUrls.push(u);
-          // console.log('[GraphEditor] Attempting fetch:', u);
           const resp = await fetch(u, fetchOptions);
-          // console.log('[GraphEditor] Fetch response status:', resp.status);
-          // console.log('[GraphEditor] Fetch response headers:', Array.from(resp.headers.entries()));
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           return resp;
         };
@@ -1933,13 +1931,87 @@ useEffect(() => {
           if (!localCandidates.includes(relPath)) localCandidates.push(relPath);
         }
 
+        const hostReadFile = async (path) => {
+          if (typeof window === 'undefined') return null;
+          if (window.__Twilite_HOST__ !== 'vscode') return null;
+          if (typeof window.__Twilite_POST_MESSAGE__ !== 'function') return null;
+
+          const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          const normalized = path.replace(/^\/+/, '');
+
+          return new Promise((resolve) => {
+            let finished = false;
+            const timeoutId = window.setTimeout(() => {
+              if (finished) return;
+              finished = true;
+              window.removeEventListener('Twilite-readFile', handler);
+              resolve({ text: '', error: 'timeout' });
+            }, 3000);
+
+            const handler = (event) => {
+              const detail = event?.detail;
+              if (!detail || detail.requestId !== requestId) return;
+              if (finished) return;
+              finished = true;
+              window.clearTimeout(timeoutId);
+              window.removeEventListener('Twilite-readFile', handler);
+              resolve(detail);
+            };
+
+            window.addEventListener('Twilite-readFile', handler);
+            window.__Twilite_POST_MESSAGE__({
+              type: 'readFile',
+              requestId,
+              path: normalized
+            });
+          });
+        };
+
+        const makeTextResponse = (body, contentType = 'text/plain') => ({
+          ok: true,
+          status: 200,
+          headers: {
+            get: (name) => (name && name.toLowerCase() === 'content-type' ? contentType : null)
+          },
+          text: async () => body
+        });
+
+        if (!response && (originalTlzPath || directTlzPath)) {
+          const relPathRaw = directTlzPath || originalTlzPath;
+          const relPath = relPathRaw.startsWith('/') ? relPathRaw : `/${relPathRaw}`;
+          const tlzCandidates = [];
+          const addCandidate = (candidate) => {
+            if (candidate && !tlzCandidates.includes(candidate)) tlzCandidates.push(candidate);
+          };
+          addCandidate(relPath);
+          if (relPath.endsWith('.json')) {
+            addCandidate(relPath.replace(/\.json$/, '.node'));
+          }
+          if (!relPath.endsWith('.node')) {
+            addCandidate(relPath + '.node');
+          }
+          if (relPath.endsWith('/')) {
+            addCandidate(relPath + 'index.node');
+          } else {
+            const lastSegment = relPath.split('/').pop() || '';
+            if (!lastSegment.includes('.')) {
+              addCandidate(relPath + '/index.node');
+            }
+          }
+
+          for (const candidate of tlzCandidates) {
+            const hostResult = await hostReadFile(candidate);
+            if (hostResult && !hostResult.error) {
+              response = makeTextResponse(hostResult.text || '', 'text/plain');
+              fullUrl = candidate;
+              break;
+            }
+          }
+        }
+
         for (const candidate of localCandidates) {
           if (candidate === fullUrl || triedUrls.includes(candidate)) continue;
           try {
-            if (typeof window !== 'undefined') {
-              // eslint-disable-next-line no-console
-              console.log('[GraphEditor] trying local candidate', candidate);
-            }
             response = await tryFetch(candidate);
             fullUrl = candidate;
             try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }

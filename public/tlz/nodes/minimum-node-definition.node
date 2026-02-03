@@ -1,25 +1,30 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Minimum Node Definition",
-    "description": "View-only definition used to prove minimum node definition contract.",
-    "created": "2026-01-24T00:00:00.000Z",
-    "modified": "2026-01-24T00:00:00.000Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-03T03:35:07.987Z",
+    "modified": "2026-02-03T03:35:09.702Z",
     "author": "",
-    "tags": ["definition", "minimum", "view-only"]
+    "tags": []
   },
   "nodes": [
     {
       "id": "min-view-0001",
       "type": "view",
       "label": "View",
-      "position": { "x": 0, "y": 0 },
+      "position": {
+        "x": 0,
+        "y": 0
+      },
       "width": 360,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "host": { "datatype": "data.twilite.web" },
+        "host": {
+          "datatype": "data.twilite.web"
+        },
         "twilite": {
           "web": {
             "html": "<div style=\"padding:12px;font-family:system-ui;\"><h3 style=\"margin:0 0 6px;\">Minimum Node</h3><div>This node renders from a <strong>View-only</strong> definition.</div></div>"

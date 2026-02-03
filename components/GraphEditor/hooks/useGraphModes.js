@@ -851,7 +851,6 @@ const rerouteEdges = useCallback(async () => {
             const elkNoWorker = await getElkNoWorker();
             layout = await withTimeout(elkNoWorker.layout(elkGraph), 4000, 'ELK layout (no worker)');
           } catch (fallbackErr) {
-            console.error('[AutoLayout] ELK failed (worker + no-worker):', err, fallbackErr);
             throw fallbackErr;
           }
         } else {
@@ -903,7 +902,6 @@ const rerouteEdges = useCallback(async () => {
         await runElkLayout(algorithm);
         return true;
       } catch (err) {
-        console.error('[AutoLayout] ELK layout failed (%s):', algorithm, err);
       }
     }
 

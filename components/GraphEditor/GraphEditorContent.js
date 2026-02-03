@@ -279,6 +279,50 @@ const GraphEditorContent = () => {
   const [resolvedDictionary, setResolvedDictionary] = useState(null);
   const definitionDictionaryCacheRef = useRef({});
 
+  const resolveTlzPath = useCallback((ref) => {
+    if (!ref || typeof ref !== 'string') return null;
+    if (ref.startsWith('/tlz/')) return ref;
+    try {
+      const parsed = new URL(ref);
+      if (parsed.pathname && parsed.pathname.startsWith('/tlz/')) {
+        return parsed.pathname;
+      }
+    } catch {}
+    return null;
+  }, []);
+
+  const readFileViaHost = useCallback((refPath) => {
+    if (typeof window === 'undefined') return Promise.resolve(null);
+    if (window.__Twilite_HOST__ !== 'vscode') return Promise.resolve(null);
+    if (typeof window.__Twilite_POST_MESSAGE__ !== 'function') return Promise.resolve(null);
+    const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const normalized = String(refPath || '').replace(/^\/+/, '');
+    return new Promise((resolve) => {
+      let finished = false;
+      const timeoutId = window.setTimeout(() => {
+        if (finished) return;
+        finished = true;
+        window.removeEventListener('Twilite-readFile', handler);
+        resolve({ text: '', error: 'timeout' });
+      }, 3000);
+      const handler = (event) => {
+        const detail = event?.detail;
+        if (!detail || detail.requestId !== requestId) return;
+        if (finished) return;
+        finished = true;
+        window.clearTimeout(timeoutId);
+        window.removeEventListener('Twilite-readFile', handler);
+        resolve(detail);
+      };
+      window.addEventListener('Twilite-readFile', handler);
+      window.__Twilite_POST_MESSAGE__({
+        type: 'readFile',
+        requestId,
+        path: normalized
+      });
+    });
+  }, []);
+
   const getDictionaryEntryKey = useCallback((entry) => {
     if (!entry) return null;
     return entry.key || entry.nodeType || entry.type || entry.view || null;
@@ -349,9 +393,19 @@ const GraphEditorContent = () => {
         if (!ref) continue;
         if (!definitionDictionaryCacheRef.current[ref]) {
           try {
-            const response = await fetch(ref);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
+            let text = null;
+            const tlzPath = resolveTlzPath(ref);
+            if (tlzPath) {
+              const hostResult = await readFileViaHost(tlzPath);
+              if (hostResult && !hostResult.error) {
+                text = hostResult.text || '';
+              }
+            }
+            if (text === null) {
+              const response = await fetch(ref);
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              text = await response.text();
+            }
             const parsed = JSON.parse(text);
             const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
             const dictNode = parsedNodes.find((candidate) => candidate?.type === 'dictionary') || null;
@@ -429,8 +483,16 @@ const GraphEditorContent = () => {
     const current = viewDefinitionsRef.current[ref];
     if (current && (current.status === 'loading' || current.status === 'ready')) return;
     setViewDefinitions((prev) => ({ ...prev, [ref]: { status: 'loading' } }));
-    fetch(ref)
-      .then((response) => {
+    Promise.resolve()
+      .then(async () => {
+        const tlzPath = resolveTlzPath(ref);
+        if (tlzPath) {
+          const hostResult = await readFileViaHost(tlzPath);
+          if (hostResult && !hostResult.error) {
+            return hostResult.text || '';
+          }
+        }
+        const response = await fetch(ref);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
@@ -454,7 +516,7 @@ const GraphEditorContent = () => {
           [ref]: { status: 'error', error: err?.message || 'Failed to load view' }
         }));
       });
-  }, []);
+  }, [readFileViaHost, resolveTlzPath]);
 
   useEffect(() => {
     if (!Array.isArray(nodes)) return;

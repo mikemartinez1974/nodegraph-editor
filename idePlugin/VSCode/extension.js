@@ -271,6 +271,49 @@ class TwiliteNodeEditorProvider {
         edgeRouteCache.set(uri, { edgeIds: Array.isArray(edgeIds) ? edgeIds : [], routes });
         return;
       }
+      if (message.type === 'readFile') {
+        const requestId = message.requestId;
+        const relPath = typeof message.path === 'string' ? message.path : '';
+        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!workspaceRoot || !relPath) {
+          webviewPanel.webview.postMessage({
+            type: 'readFileResult',
+            requestId,
+            text: '',
+            error: 'Missing workspace or path'
+          });
+          return;
+        }
+        const publicRoot = path.resolve(workspaceRoot, 'public');
+        const normalized = path.normalize(relPath).replace(/^([/\\])+/, '');
+        const resolved = path.resolve(publicRoot, normalized);
+        if (!resolved.startsWith(publicRoot)) {
+          webviewPanel.webview.postMessage({
+            type: 'readFileResult',
+            requestId,
+            text: '',
+            error: 'Path outside public root'
+          });
+          return;
+        }
+        try {
+          const text = fs.readFileSync(resolved, 'utf8');
+          webviewPanel.webview.postMessage({
+            type: 'readFileResult',
+            requestId,
+            text,
+            error: null
+          });
+        } catch (err) {
+          webviewPanel.webview.postMessage({
+            type: 'readFileResult',
+            requestId,
+            text: '',
+            error: String(err?.message || err)
+          });
+        }
+        return;
+      }
       if (message.type === 'update' || message.type === 'graphUpdated') {
         const incomingText = typeof message.text === 'string' ? message.text : '';
         const currentText = document.getText();
@@ -509,6 +552,12 @@ class TwiliteNodeEditorProvider {
           if (message && message.type === 'elkLayoutResult') {
             try {
               window.dispatchEvent(new CustomEvent('Twilite-elkLayout', { detail: message }));
+            } catch {}
+            return;
+          }
+          if (message && message.type === 'readFileResult') {
+            try {
+              window.dispatchEvent(new CustomEvent('Twilite-readFile', { detail: message }));
             } catch {}
             return;
           }

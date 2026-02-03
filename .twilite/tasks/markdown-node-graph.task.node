@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-02T22:25:43.884Z",
-    "modified": "2026-02-02T22:26:46.360Z",
+    "created": "2026-02-03T00:40:39.933Z",
+    "modified": "2026-02-03T00:44:42.080Z",
     "author": "",
     "tags": []
   },
@@ -14,8 +14,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": 12,
-        "y": 12
+        "x": -295.82725979959736,
+        "y": 14.959877498073052
       },
       "width": 360,
       "height": 240,
@@ -85,7 +85,7 @@
           "edgeRouting": "auto",
           "layout": {
             "mode": "autoOnMissingPositions",
-            "defaultLayout": "rectpacking",
+            "defaultLayout": "layered",
             "direction": "DOWN",
             "edgeLaneGapPx": 10,
             "serpentine": {
@@ -116,8 +116,8 @@
       "type": "markdown",
       "label": "🧩 Node (content) via Graph",
       "position": {
-        "x": 428.66666666666663,
-        "y": 12
+        "x": 816.4106189142362,
+        "y": -150.79326239401783
       },
       "width": 520,
       "height": 240,
@@ -164,8 +164,8 @@
       "type": "markdown",
       "label": "3) Legend Entry",
       "position": {
-        "x": 392,
-        "y": 272
+        "x": 275.08514580594766,
+        "y": 324.42960730781687
       },
       "width": 420,
       "height": 220,
@@ -180,8 +180,8 @@
       "type": "markdown",
       "label": "4) Dictionary Entry",
       "position": {
-        "x": 392,
-        "y": 512
+        "x": 276.9037259317838,
+        "y": 574.7068188815941
       },
       "width": 420,
       "height": 220,
