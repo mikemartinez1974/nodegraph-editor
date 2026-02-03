@@ -1,12 +1,29 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import eventBus from '../../NodeGraph/eventBus';
 import { DEFAULT_ELK_ROUTING_SETTINGS, ELK_EDGE_ROUTING_OPTIONS } from '../layoutSettings';
 
 let elkInstance = null;
+let elkNoWorkerInstance = null;
 const getElk = async () => {
   if (elkInstance) return elkInstance;
   const { default: ELK } = await import('elkjs/lib/elk.bundled.js');
-  elkInstance = new ELK();
+  if (typeof window !== 'undefined' && window.__Twilite_ELK_WORKER_URL__) {
+    try {
+      elkInstance = new ELK({ workerUrl: window.__Twilite_ELK_WORKER_URL__ });
+      return elkInstance;
+    } catch {
+      // fall through to default worker resolution
+    }
+  }
+  const workerUrl = new URL('elkjs/lib/elk-worker.min.js', import.meta.url);
+  elkInstance = new ELK({ workerUrl: workerUrl.toString() });
   return elkInstance;
+};
+const getElkNoWorker = async () => {
+  if (elkNoWorkerInstance) return elkNoWorkerInstance;
+  const { default: ELK } = await import('elkjs/lib/elk.bundled.js');
+  elkNoWorkerInstance = new ELK();
+  return elkNoWorkerInstance;
 };
 
 const getNodeSize = (node) => ({
@@ -614,6 +631,9 @@ const buildStraightEdgeRoutes = useCallback((edgeList = [], nodeList = []) => {
   // Apply new positions immediately
   const animateToPositions = useCallback((newPositions) => {
     velocitiesRef.current.clear();
+    if (typeof window !== 'undefined') {
+      window.__Twilite_FORCE_LAYOUT_POSITIONS__ = newPositions;
+    }
     const positionMap = new Map(newPositions.map((pos) => [pos.id, { x: pos.x, y: pos.y }]));
     setNodes((prevNodes) => prevNodes.map((node) => {
       const target = positionMap.get(node.id);
@@ -623,9 +643,16 @@ const buildStraightEdgeRoutes = useCallback((edgeList = [], nodeList = []) => {
         position: {
           x: target.x,
           y: target.y
-        }
+        },
+        x: target.x,
+        y: target.y
       };
     }));
+    try {
+      eventBus.emit('layoutApplied', { count: newPositions.length });
+    } catch (err) {
+      // ignore emit errors
+    }
   }, [setNodes]);
 
 const rerouteEdges = useCallback(async () => {
@@ -783,6 +810,16 @@ const rerouteEdges = useCallback(async () => {
     };
 
     const nodeIdsSet = new Set(nodes.map((node) => node.id));
+    const withTimeout = (promise, ms, label) => {
+      let timer = null;
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} timeout after ${ms}ms`)), ms);
+      });
+      return Promise.race([promise, timeout]).finally(() => {
+        if (timer) clearTimeout(timer);
+      });
+    };
+
     const runElkLayout = async (algorithm) => {
       const elk = await getElk();
       const elkGraph = {
@@ -805,7 +842,22 @@ const rerouteEdges = useCallback(async () => {
           }))
       };
 
-      const layout = await elk.layout(elkGraph);
+      let layout;
+      try {
+        layout = await withTimeout(elk.layout(elkGraph), 3000, 'ELK layout');
+      } catch (err) {
+        if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
+          try {
+            const elkNoWorker = await getElkNoWorker();
+            layout = await withTimeout(elkNoWorker.layout(elkGraph), 4000, 'ELK layout (no worker)');
+          } catch (fallbackErr) {
+            console.error('[AutoLayout] ELK failed (worker + no-worker):', err, fallbackErr);
+            throw fallbackErr;
+          }
+        } else {
+          throw err;
+        }
+      }
       const newPositions = (layout.children || []).map((child) => ({
         id: child.id,
         x: child.x || 0,
@@ -851,7 +903,7 @@ const rerouteEdges = useCallback(async () => {
         await runElkLayout(algorithm);
         return true;
       } catch (err) {
-        console.warn('[AutoLayout] ELK layout failed (%s):', algorithm, err);
+        console.error('[AutoLayout] ELK layout failed (%s):', algorithm, err);
       }
     }
 
@@ -868,6 +920,72 @@ const rerouteEdges = useCallback(async () => {
   // Auto layout algorithms
   const applyAutoLayout = useCallback((layoutType) => {
     if (nodes.length === 0) return;
+    const resolvedLayoutType = layoutType || autoLayoutType;
+    if (typeof window !== 'undefined') {
+      window.__Twilite_ALLOW_LAYOUT__ = true;
+    }
+    if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode' && typeof window.__Twilite_POST_MESSAGE__ === 'function') {
+      const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      try {
+        window.__Twilite_POST_MESSAGE__({
+          type: 'elkLayout',
+          requestId,
+          payload: {
+            layoutType: resolvedLayoutType,
+            direction: layoutDirection,
+            nodes: nodes.map((node) => ({
+              id: node.id,
+              width: node.width,
+              height: node.height
+            })),
+            edges: edges.map((edge) => ({
+              id: edge.id,
+              source: edge.source,
+              target: edge.target
+            }))
+          }
+        });
+      } catch {}
+      return;
+    }
+
+    const fallbackPositions = () => {
+      const sizeMap = Object.fromEntries(nodes.map((node) => [node.id, getNodeSize(node)]));
+      const count = nodes.length;
+      const columns = Math.max(1, Math.ceil(Math.sqrt(count)));
+      const gap = Math.max(80, Number(layoutSettings?.edgeLaneGapPx) || 80);
+      const positions = nodes.map((node, index) => {
+        const col = index % columns;
+        const row = Math.floor(index / columns);
+        const size = sizeMap[node.id] || { width: 200, height: 120 };
+        return {
+          id: node.id,
+          x: col * (size.width + gap),
+          y: row * (size.height + gap)
+        };
+      });
+      // center the fallback layout on the current graph center
+      const currentPositions = nodes.map((node) => ({
+        id: node.id,
+        x: node.position?.x || 0,
+        y: node.position?.y || 0
+      }));
+      const currentBounds = getBoundsFromPositions(currentPositions, sizeMap);
+      const nextBounds = getBoundsFromPositions(positions, sizeMap);
+      if (currentBounds && nextBounds) {
+        const currentCenterX = (currentBounds.minX + currentBounds.maxX) / 2;
+        const currentCenterY = (currentBounds.minY + currentBounds.maxY) / 2;
+        const nextCenterX = (nextBounds.minX + nextBounds.maxX) / 2;
+        const nextCenterY = (nextBounds.minY + nextBounds.maxY) / 2;
+        const dx = currentCenterX - nextCenterX;
+        const dy = currentCenterY - nextCenterY;
+        positions.forEach((pos) => {
+          pos.x += dx;
+          pos.y += dy;
+        });
+      }
+      return positions;
+    };
 
     const algorithmMap = {
       layered: ['layered', 'org.eclipse.elk.layered'],
@@ -875,13 +993,20 @@ const rerouteEdges = useCallback(async () => {
       radial: ['radial', 'org.eclipse.elk.radial']
     };
 
-    const algorithms = algorithmMap[layoutType] || ['layered'];
-    applyElkLayoutWithAlgorithms({ algorithms }).then((used) => {
+    const algorithms = algorithmMap[resolvedLayoutType] || ['layered'];
+    applyElkLayoutWithAlgorithms({ algorithms, fallbackPositions }).then((used) => {
       if (!used) {
-        setSnackbar({ open: true, message: 'Auto-layout failed', severity: 'error', copyToClipboard: true });
+        if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
+          const fallback = fallbackPositions();
+          animateToPositions(fallback);
+          if (typeof setEdgeRoutes === 'function') {
+            setEdgeRoutes({});
+          }
+        }
+        setSnackbar({ open: true, message: 'Auto-layout failed (see console)', severity: 'error', copyToClipboard: true });
       }
     });
-  }, [nodes, applyElkLayoutWithAlgorithms, setSnackbar]);
+  }, [nodes, applyElkLayoutWithAlgorithms, setSnackbar, layoutSettings, autoLayoutType]);
 
   // Handle mode changes
   const handleModeChange = useCallback((newMode) => {
@@ -914,6 +1039,7 @@ const rerouteEdges = useCallback(async () => {
     handleModeChange,
     setAutoLayoutType, // <-- ensure this is exported
     applyAutoLayout: () => applyAutoLayout(autoLayoutType),
+    applyLayoutPositions: animateToPositions,
     rerouteEdges
   };
 }

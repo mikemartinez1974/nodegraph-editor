@@ -53,7 +53,8 @@ export default function EdgeLayoutPanel({
   onClose,
   documentSettings = {},
   setDocumentSettings = () => {},
-  contractSummary = { version: "1.0", handleSummary: {} }
+  contractSummary = { version: "1.0", handleSummary: {} },
+  onApplyLayout = null
 }) {
   const { emitEdgeIntent } = useIntentEmitter();
   const layout = documentSettings.layout || {};
@@ -118,7 +119,11 @@ export default function EdgeLayoutPanel({
     scheduleIntent("layoutSettingChange", { key, value });
     patchLayout({ [key]: value });
     if (key === "defaultLayout") {
+      emitEdgeIntent("applyLayout", { layoutType: value });
       scheduleIntent("applyLayout", { layoutType: value });
+      if (typeof onApplyLayout === "function") {
+        onApplyLayout(value);
+      }
     }
   };
 
@@ -142,7 +147,11 @@ export default function EdgeLayoutPanel({
   };
 
   const handleManualApply = () => {
+    emitEdgeIntent("applyLayout", { layoutType: layout.defaultLayout || DEFAULT_LAYOUT_SETTINGS.defaultLayout });
     emitEdgeIntent("toolbarReroute");
+    if (typeof onApplyLayout === "function") {
+      onApplyLayout(layout.defaultLayout || DEFAULT_LAYOUT_SETTINGS.defaultLayout);
+    }
     setPendingChanges(false);
   };
 

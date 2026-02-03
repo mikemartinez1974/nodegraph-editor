@@ -945,6 +945,20 @@ useEffect(() => {
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (event) => {
+      const detail = event?.detail || {};
+      const positions = Array.isArray(detail.positions) ? detail.positions : [];
+      if (!positions.length) return;
+      if (typeof modesHook.applyLayoutPositions === 'function') {
+        modesHook.applyLayoutPositions(positions);
+      }
+    };
+    window.addEventListener('Twilite-elkLayout', handler);
+    return () => window.removeEventListener('Twilite-elkLayout', handler);
+  }, [modesHook]);
+
+  useEffect(() => {
     if (typeof window === 'undefined' || !window.__Twilite_EMBED__) return () => {};
     const uri = currentDocUriRef.current;
     if (!uri) return () => {};
@@ -976,6 +990,9 @@ useEffect(() => {
     if (defaultLayoutSyncRef.current === defaultLayout) return;
     try {
       modesHook.setAutoLayoutType(defaultLayout);
+      if (typeof modesHook.applyAutoLayout === 'function') {
+        modesHook.applyAutoLayout(defaultLayout);
+      }
       defaultLayoutSyncRef.current = defaultLayout;
     } catch {
       // ignore
@@ -1238,7 +1255,6 @@ useEffect(() => {
             setSelectedGroupIds([]);
           }
         }
-        setShowPropertiesPanel(true);
         setMemoAutoExpandToken((token) => token + 1);
       }
     }
@@ -2379,9 +2395,7 @@ useEffect(() => {
   }, [backgroundUrl, backgroundInteractive, setSnackbar]);
 
   useEffect(() => {
-    if (!isMobile && (selectedNodeIds.length === 1 || selectedEdgeIds.length === 1 || selectedGroupIds.length === 1)) {
-      setShowPropertiesPanel(true);
-    }
+    // Intentionally do not auto-open the properties panel on selection for desktop.
   }, [isMobile, selectedNodeIds, selectedEdgeIds, selectedGroupIds, setShowPropertiesPanel]);
 
   useEffect(() => {

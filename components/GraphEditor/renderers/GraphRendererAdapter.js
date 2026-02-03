@@ -51,53 +51,54 @@ export default function GraphRendererAdapter({
     setSelectedGroupIds,
     hoveredNodeId
   } = state;
-
   return (
-    <NodeGraph
-      key={graphKey}
-      nodes={nodes}
-      setNodes={setNodes}
-      edges={edges}
-      setEdges={setEdges}
-      groups={groups}
-      setGroups={setGroups}
-      pan={pan}
-      zoom={zoom}
-      setPan={setPan}
-      setZoom={setZoom}
-      selectedNodeId={selectedNodeIds[0] || null}
-      selectedEdgeId={selectedEdgeIds[0] || null}
-      selectedNodeIds={selectedNodeIds}
-      selectedEdgeIds={selectedEdgeIds}
-      selectedGroupIds={selectedGroupIds}
-      setSelectedNodeIds={setSelectedNodeIds}
-      setSelectedEdgeIds={setSelectedEdgeIds}
-      setSelectedGroupIds={setSelectedGroupIds}
-      hoveredNodeId={hoveredNodeId}
-      hoveredEdgeId={hoveredEdgeId}
-      nodeTypes={nodeTypes}
-      resolveNodeComponent={resolveNodeComponent}
-      edgeTypes={edgeTypes}
-      edgeRoutes={edgeRoutes}
-      mode={mode}
-      backgroundUrl={backgroundUrl}
-      backgroundInteractive={backgroundInteractive}
-      backgroundImage={backgroundImage}
-      setSnackbar={setSnackbar}
-      showMinimap={showMinimap}
-      minimapOffset={minimapOffset}
-      snapToGrid={snapToGrid}
-      showGrid={showGrid}
-      gridSize={gridSize}
-      defaultEdgeRouting={defaultEdgeRouting}
-      edgeLaneGapPx={edgeLaneGapPx}
-      lockedNodes={lockedNodes}
-      lockedEdges={lockedEdges}
-      onEdgeClick={onEdgeClick}
-      onEdgeHover={onEdgeHover}
-      onNodeContextMenu={onNodeContextMenu}
-      onBackgroundClick={onBackgroundClick}
-      showAllEdgeLabels={showAllEdgeLabels}
-    />
+    <>
+      <NodeGraph
+        key={graphKey}
+        nodes={nodes}
+        setNodes={setNodes}
+        edges={edges}
+        setEdges={setEdges}
+        groups={groups}
+        setGroups={setGroups}
+        pan={pan}
+        zoom={zoom}
+        setPan={setPan}
+        setZoom={setZoom}
+        selectedNodeId={selectedNodeIds[0] || null}
+        selectedEdgeId={selectedEdgeIds[0] || null}
+        selectedNodeIds={selectedNodeIds}
+        selectedEdgeIds={selectedEdgeIds}
+        selectedGroupIds={selectedGroupIds}
+        setSelectedNodeIds={setSelectedNodeIds}
+        setSelectedEdgeIds={setSelectedEdgeIds}
+        setSelectedGroupIds={setSelectedGroupIds}
+        hoveredNodeId={hoveredNodeId}
+        hoveredEdgeId={hoveredEdgeId}
+        nodeTypes={nodeTypes}
+        resolveNodeComponent={resolveNodeComponent}
+        edgeTypes={edgeTypes}
+        edgeRoutes={edgeRoutes}
+        mode={mode}
+        backgroundUrl={backgroundUrl}
+        backgroundInteractive={backgroundInteractive}
+        backgroundImage={backgroundImage}
+        setSnackbar={setSnackbar}
+        showMinimap={showMinimap}
+        minimapOffset={minimapOffset}
+        snapToGrid={snapToGrid}
+        showGrid={showGrid}
+        gridSize={gridSize}
+        defaultEdgeRouting={defaultEdgeRouting}
+        edgeLaneGapPx={edgeLaneGapPx}
+        lockedNodes={lockedNodes}
+        lockedEdges={lockedEdges}
+        onEdgeClick={onEdgeClick}
+        onEdgeHover={onEdgeHover}
+        onNodeContextMenu={onNodeContextMenu}
+        onBackgroundClick={onBackgroundClick}
+        showAllEdgeLabels={showAllEdgeLabels}
+      />
+    </>
   );
 }

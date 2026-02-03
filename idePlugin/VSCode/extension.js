@@ -1,11 +1,19 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const ELK = require('elkjs/lib/elk.bundled.js');
 
 const panelState = new WeakMap();
 const panelStates = new Set();
 const documentCache = new Map();
 const edgeRouteCache = new Map();
+let elkInstance = null;
+
+const getElk = () => {
+  if (elkInstance) return elkInstance;
+  elkInstance = new ELK();
+  return elkInstance;
+};
 
 class TwiliteNodeEditorProvider {
   static viewType = 'twilite.nodeEditor';
@@ -189,6 +197,74 @@ class TwiliteNodeEditorProvider {
         }
         return;
       }
+      if (message.type === 'elkLayout') {
+        const requestId = message.requestId;
+        const payload = message.payload || {};
+        const nodes = Array.isArray(payload.nodes) ? payload.nodes : [];
+        const edges = Array.isArray(payload.edges) ? payload.edges : [];
+        const layoutType = payload.layoutType || 'layered';
+        const direction = payload.direction || 'DOWN';
+        if (!nodes.length) {
+          webviewPanel.webview.postMessage({
+            type: 'elkLayoutResult',
+            requestId,
+            positions: [],
+            error: null
+          });
+          return;
+        }
+        try {
+          const elk = getElk();
+          const nodeIdSet = new Set(nodes.map((node) => node.id));
+          const elkGraph = {
+            id: 'root',
+            layoutOptions: {
+              'elk.algorithm': layoutType,
+              'elk.direction': direction
+            },
+            children: nodes.map((node) => ({
+              id: node.id,
+              width: Number(node.width) || 200,
+              height: Number(node.height) || 120
+            })),
+            edges: edges
+              .filter((edge) => edge && edge.source && edge.target && nodeIdSet.has(edge.source) && nodeIdSet.has(edge.target))
+              .map((edge, index) => ({
+                id: edge.id || `edge_${index}`,
+                sources: [edge.source],
+                targets: [edge.target]
+              }))
+          };
+          elk.layout(elkGraph).then((layout) => {
+            const positions = (layout.children || []).map((child) => ({
+              id: child.id,
+              x: child.x || 0,
+              y: child.y || 0
+            }));
+            webviewPanel.webview.postMessage({
+              type: 'elkLayoutResult',
+              requestId,
+              positions,
+              error: null
+            });
+          }).catch((err) => {
+            webviewPanel.webview.postMessage({
+              type: 'elkLayoutResult',
+              requestId,
+              positions: [],
+              error: String(err?.message || err)
+            });
+          });
+        } catch (err) {
+          webviewPanel.webview.postMessage({
+            type: 'elkLayoutResult',
+            requestId,
+            positions: [],
+            error: String(err?.message || err)
+          });
+        }
+        return;
+      }
       if (message.type === 'edgeRoutes') {
         const { uri, edgeIds, routes } = message || {};
         if (!uri || !routes || typeof routes !== 'object') return;
@@ -235,16 +311,34 @@ class TwiliteNodeEditorProvider {
 
     const rawHtml = fs.readFileSync(editorHtmlPath, 'utf8');
     const normalizeWebviewUri = (uri) => uri.replace('file%2B', 'file+');
-    const toWebviewUri = (assetPath) =>
-      normalizeWebviewUri(
+    const cacheBuster = `v=${panelId}`;
+    const toWebviewUri = (assetPath) => {
+      const raw = normalizeWebviewUri(
         webview.asWebviewUri(vscode.Uri.file(path.join(outDir, assetPath.replace(/^\/+/, '')))).toString()
       );
+      const joiner = raw.includes('?') ? '&' : '?';
+      return `${raw}${joiner}${cacheBuster}`;
+    };
     const nextRootUri = normalizeWebviewUri(
       webview.asWebviewUri(vscode.Uri.file(path.join(outDir, '_next'))).toString()
     );
     const editorRootUri = normalizeWebviewUri(
       webview.asWebviewUri(vscode.Uri.file(path.join(outDir, 'editor'))).toString()
     );
+    let elkWorkerUrl = '';
+    try {
+      const mediaDir = path.join(outDir, '_next', 'static', 'media');
+      if (fs.existsSync(mediaDir)) {
+        const workerFile = fs.readdirSync(mediaDir).find((file) =>
+          /^elk-worker\.min\..+\.js$/i.test(file)
+        );
+        if (workerFile) {
+          elkWorkerUrl = toWebviewUri(`/_next/static/media/${workerFile}`);
+        }
+      }
+    } catch (err) {
+      // ignore worker discovery errors
+    }
 
     const patchTurbopackRuntime = () => {
       const match = rawHtml.match(/\/_next\/static\/chunks\/turbopack-[^"']+\.js/);
@@ -320,7 +414,7 @@ class TwiliteNodeEditorProvider {
       `style-src 'unsafe-inline' ${webview.cspSource} ${vscodeCdn} https:`,
       `script-src '${nonceToken}' 'unsafe-eval' ${webview.cspSource} ${vscodeCdn} https: http: data: blob:`,
       `script-src-elem '${nonceToken}' ${webview.cspSource} ${vscodeCdn} https: http: data: blob:`,
-      `worker-src ${webview.cspSource} blob:`,
+      `worker-src ${webview.cspSource} ${vscodeCdn} https: blob:`,
       `connect-src ${webview.cspSource} ${vscodeCdn} https: http: ws: wss:`
     ].join('; ');
     const bootstrap = `
@@ -329,6 +423,7 @@ class TwiliteNodeEditorProvider {
         window.__Twilite_EMBED__ = true;
         window.__Twilite_HOST__ = 'vscode';
         window.__Twilite_POST_MESSAGE__ = (payload) => vscode.postMessage(payload);
+        window.__Twilite_ELK_WORKER_URL__ = ${JSON.stringify(elkWorkerUrl || '')};
         window.next = window.next || {};
         
         let pendingPayload = null;
@@ -411,6 +506,12 @@ class TwiliteNodeEditorProvider {
         };
         window.addEventListener('message', (event) => {
           const message = event.data;
+          if (message && message.type === 'elkLayoutResult') {
+            try {
+              window.dispatchEvent(new CustomEvent('Twilite-elkLayout', { detail: message }));
+            } catch {}
+            return;
+          }
           if (!message || message.type !== 'setText') return;
           const raw = message.text || '';
           const uri = message.uri || '';

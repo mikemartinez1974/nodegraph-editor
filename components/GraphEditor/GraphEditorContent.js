@@ -790,7 +790,8 @@ const GraphEditorContent = () => {
       'edgeDeleted',
       'groupUpdated',
       'groupDeleted',
-      'groupAdded'
+      'groupAdded',
+      'layoutApplied'
     ];
     events.forEach((eventName) => eventBus.on(eventName, emitDirty));
     return () => {
@@ -1430,6 +1431,7 @@ const skipPropertiesCloseRef = useRef(false);
         documentSettings={documentSettings}
         setDocumentSettings={setDocumentSettings}
         contractSummary={contractSummary}
+        onApplyLayout={modesHook.applyAutoLayout}
       />
 
       <Snackbar

@@ -75,7 +75,7 @@ export default function useInterpreterLayer({
     handle: async (intent, token) => {
       if (token.aborted) return;
       if (typeof applyAutoLayout === 'function') {
-        applyAutoLayout();
+        applyAutoLayout(intent?.payload?.layoutType);
         emitTelemetry('skill', intent, { skill: 'autoLayout' });
       }
     }

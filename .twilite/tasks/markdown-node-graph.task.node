@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-31T19:49:25.670Z",
-    "modified": "2026-01-31T19:49:28.711Z",
+    "created": "2026-02-02T22:25:43.884Z",
+    "modified": "2026-02-02T22:26:46.360Z",
     "author": "",
     "tags": []
   },
@@ -14,8 +14,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -640,
-        "y": -320
+        "x": 12,
+        "y": 12
       },
       "width": 360,
       "height": 240,
@@ -85,7 +85,7 @@
           "edgeRouting": "auto",
           "layout": {
             "mode": "autoOnMissingPositions",
-            "defaultLayout": "layered",
+            "defaultLayout": "rectpacking",
             "direction": "DOWN",
             "edgeLaneGapPx": 10,
             "serpentine": {
@@ -116,8 +116,8 @@
       "type": "markdown",
       "label": "🧩 Node (content) via Graph",
       "position": {
-        "x": -120,
-        "y": -320
+        "x": 428.66666666666663,
+        "y": 12
       },
       "width": 520,
       "height": 240,
@@ -132,8 +132,8 @@
       "type": "markdown",
       "label": "1) Create Node Definition Graph",
       "position": {
-        "x": 520,
-        "y": -260
+        "x": 832,
+        "y": 272
       },
       "width": 460,
       "height": 220,
@@ -148,8 +148,8 @@
       "type": "markdown",
       "label": "2) View Nodes (Editor + Graph)",
       "position": {
-        "x": 520,
-        "y": 40
+        "x": 832,
+        "y": 512
       },
       "width": 460,
       "height": 240,
@@ -164,8 +164,8 @@
       "type": "markdown",
       "label": "3) Legend Entry",
       "position": {
-        "x": -120,
-        "y": 40
+        "x": 392,
+        "y": 272
       },
       "width": 420,
       "height": 220,
@@ -180,8 +180,8 @@
       "type": "markdown",
       "label": "4) Dictionary Entry",
       "position": {
-        "x": -120,
-        "y": 320
+        "x": 392,
+        "y": 512
       },
       "width": 420,
       "height": 220,
@@ -196,8 +196,8 @@
       "type": "markdown",
       "label": "5) Runtime + Validation",
       "position": {
-        "x": 520,
-        "y": 320
+        "x": 832,
+        "y": 772
       },
       "width": 460,
       "height": 240,
@@ -212,8 +212,8 @@
       "type": "markdown",
       "label": "✅ Acceptance Criteria",
       "position": {
-        "x": 200,
-        "y": 620
+        "x": 802,
+        "y": 1032
       },
       "width": 520,
       "height": 220,

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-30T19:45:58.958Z",
-    "modified": "2026-01-30T19:47:07.622Z",
+    "created": "2026-02-02T21:34:59.262Z",
+    "modified": "2026-02-02T21:35:09.869Z",
     "author": "",
     "tags": []
   },
@@ -14,8 +14,8 @@
       "type": "markdown",
       "label": "⚙️ Node Execution Pipeline",
       "position": {
-        "x": 80,
-        "y": 60
+        "x": -246.25,
+        "y": -120.5
       },
       "width": 420,
       "height": 240,
@@ -30,8 +30,8 @@
       "type": "markdown",
       "label": "1) Trigger Sources",
       "position": {
-        "x": 560,
-        "y": 40
+        "x": 193.75,
+        "y": -120.5
       },
       "width": 360,
       "height": 220,
@@ -46,8 +46,8 @@
       "type": "markdown",
       "label": "2) Resolve Node Type",
       "position": {
-        "x": 980,
-        "y": 40
+        "x": 673.75,
+        "y": -120.5
       },
       "width": 380,
       "height": 240,
@@ -62,8 +62,8 @@
       "type": "markdown",
       "label": "3) Manifest + Policy Gate",
       "position": {
-        "x": 1400,
-        "y": 40
+        "x": 1133.75,
+        "y": -120.5
       },
       "width": 380,
       "height": 240,
@@ -78,8 +78,8 @@
       "type": "markdown",
       "label": "4) Execution Context",
       "position": {
-        "x": 560,
-        "y": 320
+        "x": 1513.75,
+        "y": -120.5
       },
       "width": 360,
       "height": 240,
@@ -94,8 +94,8 @@
       "type": "markdown",
       "label": "5) Skill Invocation",
       "position": {
-        "x": 980,
-        "y": 320
+        "x": -246.25,
+        "y": 199.5
       },
       "width": 380,
       "height": 240,
@@ -110,8 +110,8 @@
       "type": "markdown",
       "label": "6) Validation + Diff",
       "position": {
-        "x": 1400,
-        "y": 320
+        "x": 213.75,
+        "y": 199.5
       },
       "width": 380,
       "height": 240,
@@ -126,8 +126,8 @@
       "type": "markdown",
       "label": "7) Commit + Telemetry",
       "position": {
-        "x": 1820,
-        "y": 200
+        "x": 673.75,
+        "y": 199.5
       },
       "width": 380,
       "height": 240,
@@ -142,8 +142,8 @@
       "type": "markdown",
       "label": "Input Routing (Core)",
       "position": {
-        "x": 560,
-        "y": 880
+        "x": 1253.75,
+        "y": 219.5
       },
       "width": 420,
       "height": 260,
@@ -158,8 +158,8 @@
       "type": "markdown",
       "label": "nodeInput Event Schema",
       "position": {
-        "x": 1040,
-        "y": 880
+        "x": 1753.75,
+        "y": 219.5
       },
       "width": 420,
       "height": 260,
@@ -174,8 +174,8 @@
       "type": "markdown",
       "label": "✅ Dictionary Precedence (Hybrid)",
       "position": {
-        "x": 1500,
-        "y": 1140
+        "x": -246.25,
+        "y": 559.5
       },
       "width": 420,
       "height": 260,
@@ -190,8 +190,8 @@
       "type": "markdown",
       "label": "URL Query Input",
       "position": {
-        "x": 1500,
-        "y": 880
+        "x": 253.75,
+        "y": 519.5
       },
       "width": 420,
       "height": 240,
@@ -206,8 +206,8 @@
       "type": "markdown",
       "label": "Open Questions",
       "position": {
-        "x": 80,
-        "y": 360
+        "x": 753.75,
+        "y": 519.5
       },
       "width": 420,
       "height": 240,
@@ -222,8 +222,8 @@
       "type": "markdown",
       "label": "✅ Sync vs Async: Hybrid",
       "position": {
-        "x": 560,
-        "y": 600
+        "x": 1253.75,
+        "y": 479.5
       },
       "width": 420,
       "height": 220,
@@ -238,8 +238,8 @@
       "type": "markdown",
       "label": "✅ References Resolve to Class Graphs",
       "position": {
-        "x": 1020,
-        "y": 600
+        "x": 1753.75,
+        "y": 479.5
       },
       "width": 420,
       "height": 220,
@@ -254,8 +254,8 @@
       "type": "markdown",
       "label": "✅ Instances Are Local Only",
       "position": {
-        "x": 1460,
-        "y": 600
+        "x": -246.25,
+        "y": 839.5
       },
       "width": 420,
       "height": 240,
@@ -270,8 +270,8 @@
       "type": "markdown",
       "label": "✅ Script Nodes: Local Only",
       "position": {
-        "x": 1880,
-        "y": 600
+        "x": 253.75,
+        "y": 839.5
       },
       "width": 420,
       "height": 240,
@@ -286,8 +286,8 @@
       "type": "markdown",
       "label": "✅ View-Only Nodes Can Execute",
       "position": {
-        "x": 1880,
-        "y": 880
+        "x": 753.75,
+        "y": 839.5
       },
       "width": 420,
       "height": 240,
@@ -302,8 +302,8 @@
       "type": "markdown",
       "label": "✅ Manifests: First Wins",
       "position": {
-        "x": 1460,
-        "y": 880
+        "x": 1253.75,
+        "y": 779.5
       },
       "width": 420,
       "height": 220,
@@ -311,6 +311,105 @@
       "showLabel": true,
       "data": {
         "markdown": "## Decision: Multiple Manifests Allowed\n\n- Files may contain multiple manifests\n- **Only the first manifest in file order is authoritative**\n- Others are inert unless explicitly opened\n- Tools should warn if extra manifests exist"
+      }
+    },
+    {
+      "id": "90d6e645-83e5-4d13-b734-4f64a1e1750e",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": 1753.75,
+        "y": 1079.5
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "identity": {
+          "graphId": "",
+          "name": "",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        },
+        "intent": {
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "handleContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "handles": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": false,
+            "appendOnly": true
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "html": "",
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
       }
     }
   ],
@@ -320,8 +419,6 @@
       "type": "dataFlow",
       "source": "exec-root",
       "target": "exec-trigger",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "begins",
       "style": {
         "curved": true,
@@ -334,8 +431,6 @@
       "type": "dataFlow",
       "source": "exec-trigger",
       "target": "exec-resolve",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "selects",
       "style": {
         "curved": true,
@@ -348,8 +443,6 @@
       "type": "dataFlow",
       "source": "exec-resolve",
       "target": "exec-policy",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "checks",
       "style": {
         "curved": true,
@@ -362,8 +455,6 @@
       "type": "dataFlow",
       "source": "exec-policy",
       "target": "exec-context",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "authorizes",
       "style": {
         "curved": true,
@@ -376,8 +467,6 @@
       "type": "dataFlow",
       "source": "exec-context",
       "target": "exec-skill",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "invokes",
       "style": {
         "curved": true,
@@ -390,8 +479,6 @@
       "type": "dataFlow",
       "source": "exec-skill",
       "target": "exec-validate",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "returns",
       "style": {
         "curved": true,
@@ -404,8 +491,6 @@
       "type": "dataFlow",
       "source": "exec-validate",
       "target": "exec-commit",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "commits",
       "style": {
         "curved": true,
@@ -418,8 +503,6 @@
       "type": "reference",
       "source": "exec-open-questions",
       "target": "exec-root",
-      "sourceHandle": "out",
-      "targetHandle": "out",
       "label": "questions",
       "style": {
         "curved": true,
@@ -432,8 +515,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-sync-async",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -446,8 +527,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-skill-location",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -460,8 +539,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-instance-scope",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -474,8 +551,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-script-sandbox",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -488,8 +563,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-view-only-exec",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -502,8 +575,6 @@
       "type": "dataFlow",
       "source": "exec-open-questions",
       "target": "exec-manifest-order",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "answered",
       "style": {
         "curved": true,
@@ -516,8 +587,6 @@
       "type": "dataFlow",
       "source": "exec-context",
       "target": "exec-input-routing",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "routes inputs",
       "style": {
         "curved": true,
@@ -530,8 +599,6 @@
       "type": "dataFlow",
       "source": "exec-input-routing",
       "target": "exec-nodeinput-schema",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "defines",
       "style": {
         "curved": true,
@@ -544,8 +611,6 @@
       "type": "dataFlow",
       "source": "exec-input-routing",
       "target": "exec-query-input",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "includes",
       "style": {
         "curved": true,
@@ -558,8 +623,6 @@
       "type": "dataFlow",
       "source": "exec-resolve",
       "target": "exec-dictionary-precedence",
-      "sourceHandle": "out",
-      "targetHandle": "in",
       "label": "uses",
       "style": {
         "curved": true,

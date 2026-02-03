@@ -107,6 +107,24 @@ const validateManifestNodes = (nodes = []) => {
   return { ok: true, errors: [] };
 };
 
+const isLayoutOnlyChange = (currentNodes = [], nextNodes = []) => {
+  if (!Array.isArray(currentNodes) || !Array.isArray(nextNodes)) return false;
+  if (currentNodes.length !== nextNodes.length) return false;
+  const currentMap = new Map(currentNodes.map((node) => [node?.id, node]));
+  if (currentMap.size !== nextNodes.length) return false;
+  for (const next of nextNodes) {
+    if (!next || !next.id) return false;
+    const current = currentMap.get(next.id);
+    if (!current) return false;
+    const { position: _posNext, width: _wNext, height: _hNext, ...restNext } = next;
+    const { position: _posCur, width: _wCur, height: _hCur, ...restCur } = current;
+    if (JSON.stringify(restNext) !== JSON.stringify(restCur)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
 
 const loadStoredGraph = () => {
@@ -242,6 +260,28 @@ export function useGraphEditorState() {
     const currentNodes = getGraphSnapshot().nodes;
     const next = typeof value === 'function' ? value(currentNodes) : value;
     const nextNodes = Array.isArray(next) ? next : currentNodes;
+    if (typeof window !== 'undefined' && window.__Twilite_FORCE_LAYOUT_POSITIONS__) {
+      const forced = window.__Twilite_FORCE_LAYOUT_POSITIONS__;
+      window.__Twilite_FORCE_LAYOUT_POSITIONS__ = null;
+      if (Array.isArray(forced) && forced.length > 0) {
+        const forcedMap = new Map(forced.map((pos) => [pos.id, pos]));
+        const merged = nextNodes.map((node) => {
+          const target = forcedMap.get(node.id);
+          if (!target) return node;
+          return {
+            ...node,
+            position: { x: target.x, y: target.y },
+            x: target.x,
+            y: target.y
+          };
+        });
+        dispatchGraph({
+          type: 'setNodes',
+          payload: merged
+        });
+        return;
+      }
+    }
     if (isDraftMode()) {
       dispatchGraph({
         type: 'setNodes',
@@ -251,6 +291,14 @@ export function useGraphEditorState() {
     }
     const validation = validateManifestNodes(nextNodes);
     if (!validation.ok) {
+      if (typeof window !== 'undefined' && window.__Twilite_ALLOW_LAYOUT__ === true) {
+        window.__Twilite_ALLOW_LAYOUT__ = false;
+        dispatchGraph({
+          type: 'setNodes',
+          payload: nextNodes
+        });
+        return;
+      }
       if (isMissingManifestError(validation.errors)) {
         dispatchGraph({
           type: 'setNodes',
@@ -269,6 +317,13 @@ export function useGraphEditorState() {
         removedIds.every((id) => currentManifestIds.includes(id)) &&
         !addedNodes;
       if (removedOnlyManifests) {
+        dispatchGraph({
+          type: 'setNodes',
+          payload: nextNodes
+        });
+        return;
+      }
+      if (isLayoutOnlyChange(currentNodes, nextNodes)) {
         dispatchGraph({
           type: 'setNodes',
           payload: nextNodes
