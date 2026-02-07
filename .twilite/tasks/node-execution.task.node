@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-02T21:34:59.262Z",
-    "modified": "2026-02-02T21:35:09.869Z",
+    "created": "2026-02-06T20:06:30.834Z",
+    "modified": "2026-02-06T20:06:33.546Z",
     "author": "",
     "tags": []
   },
@@ -12,7 +12,7 @@
     {
       "id": "exec-root",
       "type": "markdown",
-      "label": "⚙️ Node Execution Pipeline",
+      "label": "🧠 Execution Spine + Node Pipeline",
       "position": {
         "x": -246.25,
         "y": -120.5
@@ -22,7 +22,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\n\nDefine how nodes **execute** (not just render).\n\nThis graph outlines the trigger → resolution → policy → execution → commit loop."
+        "markdown": "## Purpose\n\nUnify the **Execution Spine** (runtime orchestration) with the **Node Execution Pipeline** (step-by-step flow).\n\nThis graph defines how **intent becomes mutation** — from triggers to commit, governed by authority, schemas, and lifecycle events."
       }
     },
     {
@@ -30,8 +30,8 @@
       "type": "markdown",
       "label": "1) Trigger Sources",
       "position": {
-        "x": 193.75,
-        "y": -120.5
+        "x": 271.75,
+        "y": -104.5
       },
       "width": 360,
       "height": 220,
@@ -78,8 +78,8 @@
       "type": "markdown",
       "label": "4) Execution Context",
       "position": {
-        "x": 1513.75,
-        "y": -120.5
+        "x": 1590.75,
+        "y": -121.5
       },
       "width": 360,
       "height": 240,
@@ -110,8 +110,8 @@
       "type": "markdown",
       "label": "6) Validation + Diff",
       "position": {
-        "x": 213.75,
-        "y": 199.5
+        "x": 256.75,
+        "y": 203.5
       },
       "width": 380,
       "height": 240,
@@ -126,8 +126,8 @@
       "type": "markdown",
       "label": "7) Commit + Telemetry",
       "position": {
-        "x": 673.75,
-        "y": 199.5
+        "x": 753.75,
+        "y": 194.5
       },
       "width": 380,
       "height": 240,
@@ -174,8 +174,8 @@
       "type": "markdown",
       "label": "✅ Dictionary Precedence (Hybrid)",
       "position": {
-        "x": -246.25,
-        "y": 559.5
+        "x": -249.25,
+        "y": 514.5
       },
       "width": 420,
       "height": 260,
@@ -222,8 +222,8 @@
       "type": "markdown",
       "label": "✅ Sync vs Async: Hybrid",
       "position": {
-        "x": 1253.75,
-        "y": 479.5
+        "x": 1256.75,
+        "y": 512.5
       },
       "width": 420,
       "height": 220,
@@ -238,8 +238,8 @@
       "type": "markdown",
       "label": "✅ References Resolve to Class Graphs",
       "position": {
-        "x": 1753.75,
-        "y": 479.5
+        "x": 1790.2136685204862,
+        "y": 591.6959031399572
       },
       "width": 420,
       "height": 220,
@@ -302,8 +302,8 @@
       "type": "markdown",
       "label": "✅ Manifests: First Wins",
       "position": {
-        "x": 1253.75,
-        "y": 779.5
+        "x": 1218.75,
+        "y": 839.5
       },
       "width": 420,
       "height": 220,
@@ -410,6 +410,182 @@
         "document": {
           "url": ""
         }
+      }
+    },
+    {
+      "id": "exec-philosophy",
+      "type": "markdown",
+      "label": "Core Philosophy",
+      "position": {
+        "x": -246.25,
+        "y": -420.5
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Philosophy\n\n### Graph is Truth\nSpine owns **no durable state**. All outcomes become graph deltas.\n\n### Skills Propose, Spine Decides\nListeners suggest; spine commits.\n\n### Intent First\nNothing mutates directly. Everything starts as intent."
+      }
+    },
+    {
+      "id": "exec-taxonomy",
+      "type": "markdown",
+      "label": "Event Taxonomy",
+      "position": {
+        "x": 259.75,
+        "y": -416.5
+      },
+      "width": 368,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Event Taxonomy\n\n**Intent**: intent.node.edit, intent.node.run, intent.edge.create, intent.skill.invoke, intent.view.commit\n\n**Lifecycle**: node.created, node.updated, edge.rerouted, execution.started, execution.finished\n\n**Mutation**: createNodes, createEdges, update, delete, translate, reparent, duplicate\n\n**Telemetry**: telemetry.execution, telemetry.commit, telemetry.validation"
+      }
+    },
+    {
+      "id": "exec-view-interaction",
+      "type": "markdown",
+      "label": "View Interaction",
+      "position": {
+        "x": 673.75,
+        "y": -420.5
+      },
+      "width": 384,
+      "height": 276,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## View Interaction\n\nViews emit intent:\n- intent.view.edit\n- intent.view.commit\n- intent.view.reset\n\nSpine decides whether to apply mutation deltas."
+      }
+    },
+    {
+      "id": "exec-arch-position",
+      "type": "markdown",
+      "label": "Architectural Position",
+      "position": {
+        "x": 1133.75,
+        "y": -420.5
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Architectural Position\n\nExecution Spine adds **no new graph primitives**.\n\nExisting primitives remain:\n- Node\n- Class\n- View\n- Dictionary\n- Manifest\n\nSpine is runtime orchestration, not ontology."
+      }
+    },
+    {
+      "id": "exec-impl-intake",
+      "type": "markdown",
+      "label": "Implementation: Intent Intake",
+      "position": {
+        "x": -241.25,
+        "y": 1142.5
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 1) Intent Intake\n\nSingle entry: `emitIntent({ type, payload, origin })`\n\nAll UI/agents call this.\nNo direct mutations."
+      }
+    },
+    {
+      "id": "exec-impl-authority",
+      "type": "markdown",
+      "label": "Implementation: Authority + Validation",
+      "position": {
+        "x": 255.75,
+        "y": 1144.5
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 2) Authority + Validation\n\n- Manifest authority gate\n- Dictionary + schema validation\n- Rejects with `intent.rejected` + reason"
+      }
+    },
+    {
+      "id": "exec-impl-dispatch",
+      "type": "markdown",
+      "label": "Implementation: Listener Dispatch",
+      "position": {
+        "x": 752.75,
+        "y": 1146.5
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 3) Listener Dispatch\n\nDispatch by semantic event (intent.*, node.*).\nListeners return `ProposedDelta[]`."
+      }
+    },
+    {
+      "id": "exec-impl-normalize",
+      "type": "markdown",
+      "label": "Implementation: Normalize Deltas",
+      "position": {
+        "x": 1214.75,
+        "y": 1146.5
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 4) Normalize Deltas\n\nCollect proposals → normalize into CRUD deltas.\nRe-validate before commit."
+      }
+    },
+    {
+      "id": "exec-impl-commit",
+      "type": "markdown",
+      "label": "Implementation: Commit",
+      "position": {
+        "x": 1234.7263128259615,
+        "y": 1590.5987522884348
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 5) Commit\n\nApply deltas via GraphCRUD.\nEmit lifecycle + telemetry."
+      }
+    },
+    {
+      "id": "exec-impl-intent",
+      "type": "markdown",
+      "label": "Implementation: Intent Intake",
+      "position": {
+        "x": -326.25,
+        "y": 1537.5
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 1) Intent Intake\n\nUI, scripts, RPC → normalized intent.\nAssign runId + source metadata."
+      }
+    },
+    {
+      "id": "exec-impl-listeners",
+      "type": "markdown",
+      "label": "Implementation: Listener Dispatch",
+      "position": {
+        "x": 673.75,
+        "y": 1739.5
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## 3) Listener Dispatch\n\nDispatch by semantic event (intent.*, node.*).\nListeners return `ProposedDelta[]`."
       }
     }
   ],
@@ -624,6 +800,174 @@
       "source": "exec-resolve",
       "target": "exec-dictionary-precedence",
       "label": "uses",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-root-philosophy",
+      "type": "dataFlow",
+      "source": "exec-root",
+      "target": "exec-philosophy",
+      "label": "principles",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-philosophy-taxonomy",
+      "type": "dataFlow",
+      "source": "exec-philosophy",
+      "target": "exec-taxonomy",
+      "label": "classifies",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-taxonomy-trigger",
+      "type": "dataFlow",
+      "source": "exec-taxonomy",
+      "target": "exec-trigger",
+      "label": "starts",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-taxonomy-view",
+      "type": "reference",
+      "source": "exec-taxonomy",
+      "target": "exec-view-interaction",
+      "label": "includes",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-view-arch",
+      "type": "reference",
+      "source": "exec-view-interaction",
+      "target": "exec-arch-position",
+      "label": "scoped by",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-intake-authority",
+      "type": "dataFlow",
+      "source": "exec-impl-intake",
+      "target": "exec-impl-authority",
+      "label": "gates",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-authority-dispatch",
+      "type": "dataFlow",
+      "source": "exec-impl-authority",
+      "target": "exec-impl-dispatch",
+      "label": "dispatches",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-dispatch-normalize",
+      "type": "dataFlow",
+      "source": "exec-impl-dispatch",
+      "target": "exec-impl-normalize",
+      "label": "collects",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-normalize-commit",
+      "type": "dataFlow",
+      "source": "exec-impl-normalize",
+      "target": "exec-impl-commit",
+      "label": "commits",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-impl-flow-link",
+      "type": "reference",
+      "source": "exec-flow",
+      "target": "exec-impl-intake",
+      "label": "implementation",
+      "style": {
+        "curved": true,
+        "width": 1
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-impl-intent-authority",
+      "type": "dataFlow",
+      "source": "exec-impl-intent",
+      "target": "exec-impl-authority",
+      "label": "gate",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-impl-authority-listeners",
+      "type": "dataFlow",
+      "source": "exec-impl-authority",
+      "target": "exec-impl-listeners",
+      "label": "dispatch",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-impl-listeners-normalize",
+      "type": "dataFlow",
+      "source": "exec-impl-listeners",
+      "target": "exec-impl-normalize",
+      "label": "collect",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-exec-impl-normalize-commit",
+      "type": "dataFlow",
+      "source": "exec-impl-normalize",
+      "target": "exec-impl-commit",
+      "label": "commit",
       "style": {
         "curved": true,
         "width": 2

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-31T19:56:56.300Z",
-    "modified": "2026-01-31T19:56:58.456Z",
+    "created": "2026-02-05T21:31:57.292Z",
+    "modified": "2026-02-05T21:31:59.390Z",
     "author": "",
     "tags": []
   },
@@ -17,8 +17,8 @@
         "x": -460,
         "y": -40
       },
-      "width": 360,
-      "height": 260,
+      "width": 397.4010330696074,
+      "height": 243.89728401853142,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -115,8 +115,8 @@
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -460,
-        "y": 240
+        "x": -487.93395256750136,
+        "y": 264.20743081001615
       },
       "width": 360,
       "height": 220,
@@ -180,8 +180,8 @@
       "type": "view",
       "label": "Editor View (editor.web)",
       "position": {
-        "x": 0,
-        "y": 0
+        "x": 11.726521757485223,
+        "y": 20.254901217474462
       },
       "width": 380,
       "height": 220,
@@ -194,7 +194,17 @@
         },
         "editor": {
           "web": {
-            "markdown": "## Editor View\n\nThis view renders the **content editor** for `data.content`."
+            "fields": [
+              {
+                "key": "content",
+                "label": "Markdown",
+                "type": "markdown",
+                "path": "data.content",
+                "placeholder": "Enter markdown\u2026",
+                "multiline": true,
+                "rows": 10
+              }
+            ]
           }
         }
       }
@@ -204,8 +214,8 @@
       "type": "view",
       "label": "Node View (node.web)",
       "position": {
-        "x": 420,
-        "y": 0
+        "x": 420.00518798828125,
+        "y": 22.674476623535156
       },
       "width": 380,
       "height": 220,
@@ -228,11 +238,11 @@
       "type": "markdown",
       "label": "Definition Notes",
       "position": {
-        "x": 0,
-        "y": 280
+        "x": 20,
+        "y": 295
       },
-      "width": 800,
-      "height": 220,
+      "width": 482.92114497051057,
+      "height": 305.74133579892896,
       "visible": true,
       "showLabel": true,
       "data": {

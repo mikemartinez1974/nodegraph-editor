@@ -534,9 +534,16 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         return { nodes: 0, edges: 0, groups: 0 };
       }
       // Check if this is a CRUD command (has action property)
-      if (parsed.action && graphCRUD) {
-        const result = await executeCRUDCommand(parsed, graphCRUD, onShowMessage);
-        return result;
+      if (parsed.action) {
+        const intentAPI =
+          (handlers && handlers.graphAPI && handlers.graphAPI.current)
+            ? handlers.graphAPI.current
+            : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
+        const apiToUse = intentAPI || graphCRUD;
+        if (apiToUse) {
+          const result = await executeCRUDCommand(parsed, apiToUse, onShowMessage);
+          return result;
+        }
       }
       // Prefer an external handler if provided (handlers prop, global window handler, or graphEditorHandlers)
       const externalHandler = (handlers && typeof handlers.handlePasteGraphData === 'function' && handlers.handlePasteGraphData)

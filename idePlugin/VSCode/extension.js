@@ -296,6 +296,14 @@ class TwiliteNodeEditorProvider {
           });
           return;
         }
+        const sendReadFileError = (error) => {
+          webviewPanel.webview.postMessage({
+            type: 'readFileResult',
+            requestId,
+            text: '',
+            error: String(error?.message || error)
+          });
+        };
         try {
           const text = fs.readFileSync(resolved, 'utf8');
           webviewPanel.webview.postMessage({
@@ -305,12 +313,29 @@ class TwiliteNodeEditorProvider {
             error: null
           });
         } catch (err) {
-          webviewPanel.webview.postMessage({
-            type: 'readFileResult',
-            requestId,
-            text: '',
-            error: String(err?.message || err)
-          });
+          const normalizedAlt = normalized.replace(
+            'library/classes/nodes/node-node-class.node',
+            'library/classes/nodes/node.node-class.node'
+          );
+          if (normalizedAlt !== normalized) {
+            const altResolved = path.resolve(publicRoot, normalizedAlt);
+            if (altResolved.startsWith(publicRoot)) {
+              try {
+                const altText = fs.readFileSync(altResolved, 'utf8');
+                webviewPanel.webview.postMessage({
+                  type: 'readFileResult',
+                  requestId,
+                  text: altText,
+                  error: null
+                });
+                return;
+              } catch (altErr) {
+                sendReadFileError(altErr);
+                return;
+              }
+            }
+          }
+          sendReadFileError(err);
         }
         return;
       }

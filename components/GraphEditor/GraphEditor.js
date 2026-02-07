@@ -1794,6 +1794,32 @@ useEffect(() => {
       });
       return { ready: backgroundRpcReady, methods: backgroundRpcMethods, url: backgroundUrl };
     };
+
+    // Expose execution spine test helper
+    window.testExecutionIntent = (payload = {}) => {
+      const now = Date.now();
+      const proposals = payload.proposals || [
+        {
+          action: 'createNode',
+          node: {
+            label: 'Execution Spine Test',
+            type: 'default',
+            position: { x: 240 + (now % 120), y: 240 + (now % 120) },
+            data: { memo: 'Created via executionIntent' }
+          }
+        }
+      ];
+      try {
+        eventBus.emit('executionIntent', {
+          trigger: payload.trigger || 'applyScriptProposals',
+          proposals,
+          source: payload.source || 'test'
+        });
+        console.log('✅ executionIntent dispatched', { proposals });
+      } catch (err) {
+        console.error('❌ executionIntent failed', err);
+      }
+    };
     
     // Log available helpers
     console.log('🔧 Global helpers available:');
@@ -1801,10 +1827,12 @@ useEffect(() => {
     console.log('  - window.graphAPI - Graph API');
     console.log('  - window.testBackgroundRpc(method, args) - Test RPC');
     console.log('  - window.backgroundRpcStatus() - Check RPC status');
+    console.log('  - window.testExecutionIntent(payload) - Test execution spine');
     
     return () => {
       delete window.testBackgroundRpc;
       delete window.backgroundRpcStatus;
+      delete window.testExecutionIntent;
     };
   }, [backgroundRpc, backgroundRpcReady, backgroundRpcMethods, backgroundUrl]);
   
@@ -2658,6 +2686,34 @@ useEffect(() => {
       return false;
     };
 
+    const emitUiIntent = (proposals) => {
+      const list = Array.isArray(proposals) ? proposals : [proposals];
+      try {
+        eventBus.emit('executionIntent', {
+          trigger: 'ui',
+          proposals: list,
+          source: 'ui'
+        });
+        return true;
+      } catch (err) {
+        console.error('Failed to emit execution intent', err);
+        return false;
+      }
+    };
+
+    const nextGeneratedId = () => {
+      const raw = graphAPI?.current?._raw || window.graphAPIRaw;
+      if (raw && typeof raw._generateId === 'function') {
+        let candidate = raw._generateId();
+        const existing = new Set((raw.getNodes?.() || []).map((n) => n.id));
+        while (existing.has(candidate)) {
+          candidate = raw._generateId();
+        }
+        return candidate;
+      }
+      return `node_${Date.now()}`;
+    };
+
     const handleHandleDrop = ({
       graph,
       sourceNode,
@@ -2762,7 +2818,9 @@ useEffect(() => {
           return;
         }
 
-        const nodeResult = api.createNode({
+        const createdNodeId = nextGeneratedId();
+        const newNodePayload = {
+          id: createdNodeId,
           label: 'New Node',
           type: parentNode.type || 'default',
           position: { x: graph.x, y: graph.y },
@@ -2770,18 +2828,8 @@ useEffect(() => {
           height: parentNode.height || 120,
           inputs: clonedInputs.map(h => ({ ...h })),
           outputs: clonedOutputs.map(h => ({ ...h }))
-        });
+        };
 
-        if (!nodeResult?.success || !nodeResult.data?.id) {
-          setSnackbar({
-            open: true,
-            message: nodeResult?.error || 'Failed to create node',
-            severity: 'error'
-          });
-          return;
-        }
-
-        const createdNodeId = nodeResult.data.id;
         const newNodeHandle = direction === 'source'
           ? pickHandle({ inputs: clonedInputs }, 'inputs', startHandleType)
           : pickHandle({ outputs: clonedOutputs }, 'outputs', startHandleType);
@@ -2804,7 +2852,58 @@ useEffect(() => {
               style: edgeStyle
             };
 
-        createEdgeViaCrud(api, edgePayload, 'Node and edge created');
+        const queued = emitUiIntent([
+          { action: 'createNode', node: newNodePayload },
+          { action: 'createEdge', edge: edgePayload }
+        ]);
+
+        if (queued) {
+          setSnackbar({ open: true, message: 'Node and edge created', severity: 'success' });
+          return;
+        }
+
+        const nodeResult = api.createNode({
+          label: 'New Node',
+          type: parentNode.type || 'default',
+          position: { x: graph.x, y: graph.y },
+          width: parentNode.width || 200,
+          height: parentNode.height || 120,
+          inputs: clonedInputs.map(h => ({ ...h })),
+          outputs: clonedOutputs.map(h => ({ ...h }))
+        });
+
+        if (!nodeResult?.success || !nodeResult.data?.id) {
+          setSnackbar({
+            open: true,
+            message: nodeResult?.error || 'Failed to create node',
+            severity: 'error'
+          });
+          return;
+        }
+        const fallbackNodeId = nodeResult.data.id;
+        const fallbackHandle = direction === 'source'
+          ? pickHandle({ inputs: clonedInputs }, 'inputs', startHandleType)
+          : pickHandle({ outputs: clonedOutputs }, 'outputs', startHandleType);
+
+        const fallbackEdgePayload = direction === 'source'
+          ? {
+              source: sourceNode,
+              target: fallbackNodeId,
+              sourceHandle: startHandleKey,
+              targetHandle: fallbackHandle.key,
+              type: resolvedEdgeType,
+              style: edgeStyle
+            }
+          : {
+              source: fallbackNodeId,
+              target: sourceNode,
+              sourceHandle: fallbackHandle.key,
+              targetHandle: startHandleKey,
+              type: resolvedEdgeType,
+              style: edgeStyle
+            };
+
+        createEdgeViaCrud(api, fallbackEdgePayload, 'Node and edge created');
       } catch (error) {
         console.error('Error in handleDrop:', error);
         setSnackbar({

@@ -21,7 +21,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
   
   // Initialize GraphCRUD API
   useEffect(() => {
-    graphAPI.current = new GraphCRUD(
+    const rawGraph = new GraphCRUD(
       () => nodesRef.current,
       setNodes,
       () => edgesRef.current,
@@ -35,7 +35,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       groupManager
     );
     
-    attachSkills({ graphAPI: graphAPI.current, context: { eventBus } });
+    attachSkills({ graphAPI: rawGraph, context: { eventBus } });
     
     const emitEvent = (name, payload) => {
       try {
@@ -45,19 +45,226 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       }
     };
 
+    const emitExecutionIntent = (proposals, meta = {}) => {
+      const list = Array.isArray(proposals) ? proposals : [proposals];
+      try {
+        eventBus.emit('executionIntent', {
+          trigger: meta.trigger || 'graphAPI',
+          proposals: list,
+          source: meta.source || 'graphAPI',
+          meta
+        });
+      } catch (err) {
+        // ignore intent emit errors
+      }
+    };
+
+    const nextId = () => {
+      const api = rawGraph;
+      if (api && typeof api._generateId === 'function') {
+        let candidate = api._generateId();
+        const existing = new Set((api.getNodes?.() || []).map((n) => n.id));
+        while (existing.has(candidate)) {
+          candidate = api._generateId();
+        }
+        return candidate;
+      }
+      return `node_${Date.now()}`;
+    };
+
+    const nextEdgeId = () => {
+      const api = rawGraph;
+      if (api && typeof api._generateId === 'function') {
+        let candidate = api._generateId();
+        const existing = new Set((api.getEdges?.() || []).map((e) => e.id));
+        while (existing.has(candidate)) {
+          candidate = api._generateId();
+        }
+        return candidate;
+      }
+      return `edge_${Date.now()}`;
+    };
+
+    const nextGroupId = () => {
+      const api = rawGraph;
+      if (api && typeof api._generateId === 'function') {
+        let candidate = api._generateId();
+        const existing = new Set((api.getGroups?.() || []).map((g) => g.id));
+        while (existing.has(candidate)) {
+          candidate = api._generateId();
+        }
+        return candidate;
+      }
+      return `group_${Date.now()}`;
+    };
+
+    const intentAPI = {
+      _raw: rawGraph,
+      readNode: (...args) => rawGraph.readNode?.(...args),
+      readEdge: (...args) => rawGraph.readEdge?.(...args),
+      getNodes: () => nodesRef.current,
+      getEdges: () => edgesRef.current,
+      applyDeltas: (...args) => rawGraph.applyDeltas?.(...args),
+      createNode: (nodeData = {}) => {
+        const prepared = {
+          ...nodeData,
+          id:
+            typeof nodeData.id === 'string' && nodeData.id.trim()
+              ? nodeData.id.trim()
+              : nextId(),
+          color: nodeData.color || defaultNodeColor
+        };
+        emitExecutionIntent({ action: 'createNode', node: prepared });
+        return { success: true, queued: true, data: prepared };
+      },
+      createNodes: (nodes = []) => {
+        const list = Array.isArray(nodes) ? nodes : [];
+        const prepared = list.map((node) => ({
+          ...node,
+          id:
+            typeof node.id === 'string' && node.id.trim()
+              ? node.id.trim()
+              : nextId(),
+          color: node.color || defaultNodeColor
+        }));
+        emitExecutionIntent({ action: 'createNodes', nodes: prepared });
+        return { success: true, queued: true, data: { created: prepared } };
+      },
+      updateNode: (id, updates = {}) => {
+        if (!id) return { success: false, error: 'updateNode requires id' };
+        emitExecutionIntent({ action: 'updateNode', id, patch: updates });
+        return { success: true, queued: true, data: { id, ...updates } };
+      },
+      updateNodes: (ids = [], updates = {}) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'updateNodes', ids: list, patch: updates });
+        return { success: true, queued: true, data: { updated: list } };
+      },
+      deleteNode: (id) => {
+        if (!id) return { success: false, error: 'deleteNode requires id' };
+        emitExecutionIntent({ action: 'deleteNode', id });
+        return { success: true, queued: true, data: { id } };
+      },
+      deleteNodes: (ids = []) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'deleteNodes', ids: list });
+        return { success: true, queued: true, data: { ids: list } };
+      },
+      createEdge: (edgeData = {}) => {
+        const prepared = {
+          ...edgeData,
+          id:
+            typeof edgeData.id === 'string' && edgeData.id.trim()
+              ? edgeData.id.trim()
+              : nextEdgeId(),
+          color: edgeData.color || defaultEdgeColor
+        };
+        emitExecutionIntent({ action: 'createEdge', edge: prepared });
+        return { success: true, queued: true, data: prepared };
+      },
+      createEdges: (edges = []) => {
+        const list = Array.isArray(edges) ? edges : [];
+        const prepared = list.map((edge) => ({
+          ...edge,
+          id:
+            typeof edge.id === 'string' && edge.id.trim()
+              ? edge.id.trim()
+              : nextEdgeId(),
+          color: edge.color || defaultEdgeColor
+        }));
+        emitExecutionIntent({ action: 'createEdges', edges: prepared });
+        return { success: true, queued: true, data: { created: prepared } };
+      },
+      updateEdge: (id, updates = {}) => {
+        if (!id) return { success: false, error: 'updateEdge requires id' };
+        emitExecutionIntent({ action: 'updateEdge', id, patch: updates });
+        return { success: true, queued: true, data: { id, ...updates } };
+      },
+      updateEdges: (ids = [], updates = {}) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'updateEdges', ids: list, patch: updates });
+        return { success: true, queued: true, data: { updated: list } };
+      },
+      deleteEdge: (id) => {
+        if (!id) return { success: false, error: 'deleteEdge requires id' };
+        emitExecutionIntent({ action: 'deleteEdge', id });
+        return { success: true, queued: true, data: { id } };
+      },
+      deleteEdges: (ids = []) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'deleteEdges', ids: list });
+        return { success: true, queued: true, data: { ids: list } };
+      },
+      translateNodes: (ids = [], delta = {}) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'translateNodes', ids: list, delta });
+        return { success: true, queued: true, data: { ids: list } };
+      },
+      createGroups: (groups = []) => {
+        const list = Array.isArray(groups) ? groups : [];
+        const prepared = list.map((group) => ({
+          ...group,
+          id:
+            typeof group.id === 'string' && group.id.trim()
+              ? group.id.trim()
+              : nextGroupId()
+        }));
+        emitExecutionIntent({ action: 'createGroups', groups: prepared });
+        return { success: true, queued: true, data: { created: prepared } };
+      },
+      updateGroup: (id, updates = {}) => {
+        if (!id) return { success: false, error: 'updateGroup requires id' };
+        emitExecutionIntent({ action: 'updateGroup', id, patch: updates });
+        return { success: true, queued: true, data: { id, ...updates } };
+      },
+      updateGroups: (ids = [], updates = {}) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'updateGroups', ids: list, patch: updates });
+        return { success: true, queued: true, data: { updated: list } };
+      },
+      deleteGroup: (id) => {
+        if (!id) return { success: false, error: 'deleteGroup requires id' };
+        emitExecutionIntent({ action: 'deleteGroup', id });
+        return { success: true, queued: true, data: { id } };
+      },
+      addNodesToGroup: (id, nodeIds = []) => {
+        if (!id) return { success: false, error: 'addNodesToGroup requires id' };
+        const list = Array.isArray(nodeIds) ? nodeIds : [];
+        emitExecutionIntent({ action: 'addNodesToGroup', id, nodeIds: list });
+        return { success: true, queued: true, data: { id, nodeIds: list } };
+      },
+      removeNodesFromGroup: (id, nodeIds = []) => {
+        if (!id) return { success: false, error: 'removeNodesFromGroup requires id' };
+        const list = Array.isArray(nodeIds) ? nodeIds : [];
+        emitExecutionIntent({ action: 'removeNodesFromGroup', id, nodeIds: list });
+        return { success: true, queued: true, data: { id, nodeIds: list } };
+      },
+      setGroupNodes: (id, nodeIds = []) => {
+        if (!id) return { success: false, error: 'setGroupNodes requires id' };
+        const list = Array.isArray(nodeIds) ? nodeIds : [];
+        emitExecutionIntent({ action: 'setGroupNodes', id, nodeIds: list });
+        return { success: true, queued: true, data: { id, nodeIds: list } };
+      },
+      translateGroups: (ids = [], delta = {}) => {
+        const list = Array.isArray(ids) ? ids : [];
+        emitExecutionIntent({ action: 'translateGroups', ids: list, delta });
+        return { success: true, queued: true, data: { ids: list } };
+      }
+    };
+
     const wrapCrud = (method, handler) => {
-      const original = graphAPI.current?.[method];
+      const original = rawGraph?.[method];
       if (typeof original !== 'function') return;
-      graphAPI.current[method] = (...args) => {
-        const result = original.apply(graphAPI.current, args);
+      rawGraph[method] = (...args) => {
+        const result = original.apply(rawGraph, args);
         handler(result, args);
         return result;
       };
     };
 
-    const originalCreateNode = graphAPI.current.createNode;
-    graphAPI.current.createNode = (nodeData = {}) => {
-      const result = originalCreateNode.call(graphAPI.current, {
+    const originalCreateNode = rawGraph.createNode;
+    rawGraph.createNode = (nodeData = {}) => {
+      const result = originalCreateNode.call(rawGraph, {
         ...nodeData,
         color: nodeData.color || defaultNodeColor
       });
@@ -67,9 +274,9 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       return result;
     };
     
-    const originalCreateEdge = graphAPI.current.createEdge;
-    graphAPI.current.createEdge = (edgeData = {}) => {
-      const result = originalCreateEdge.call(graphAPI.current, {
+    const originalCreateEdge = rawGraph.createEdge;
+    rawGraph.createEdge = (edgeData = {}) => {
+      const result = originalCreateEdge.call(rawGraph, {
         ...edgeData,
         color: edgeData.color || defaultEdgeColor
       });
@@ -135,8 +342,64 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       if (id) emitEvent('edgeDeleted', { id });
     });
 
+    wrapCrud('createGroups', (result) => {
+      if (!result?.success) return;
+      const created = Array.isArray(result?.data?.created) ? result.data.created : [];
+      created.forEach((group) => {
+        if (group?.id) emitEvent('groupAdded', { group });
+      });
+    });
+
+    wrapCrud('updateGroup', (result, args) => {
+      if (!result?.success) return;
+      const [id, updates] = args;
+      if (id) emitEvent('groupUpdated', { id, patch: updates || {} });
+    });
+
+    wrapCrud('updateGroups', (result, args) => {
+      if (!result?.success) return;
+      const [ids, updates] = args;
+      const targets = Array.isArray(ids) ? ids : [];
+      targets.forEach((id) => emitEvent('groupUpdated', { id, patch: updates || {} }));
+    });
+
+    wrapCrud('deleteGroup', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('groupDeleted', { id });
+    });
+
+    wrapCrud('addNodesToGroup', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('groupUpdated', { id, patch: { nodeIds: result?.data?.nodeIds } });
+    });
+
+    wrapCrud('removeNodesFromGroup', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('groupUpdated', { id, patch: { nodeIds: result?.data?.nodeIds } });
+    });
+
+    wrapCrud('setGroupNodes', (result, args) => {
+      if (!result?.success) return;
+      const [id] = args;
+      if (id) emitEvent('groupUpdated', { id, patch: { nodeIds: result?.data?.nodeIds } });
+    });
+
+    wrapCrud('translateGroups', (result, args) => {
+      if (!result?.success) return;
+      const [ids] = args;
+      const targets = Array.isArray(ids) ? ids : [];
+      targets.forEach((id) => emitEvent('groupUpdated', { id }));
+    });
+
+    graphAPI.current = intentAPI;
+
     if (typeof window !== 'undefined') {
-      window.graphAPI = graphAPI.current;
+      window.graphAPI = intentAPI;
+      window.graphAPI._raw = rawGraph;
+      window.graphAPIRaw = rawGraph;
       window.graphAPI.getNodes = () => nodesRef.current;
       window.graphAPI.getEdges = () => edgesRef.current;
       window.setDefaultNodeColor = setDefaultNodeColor;

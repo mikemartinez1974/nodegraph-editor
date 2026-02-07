@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { Snackbar, Alert, Backdrop, CircularProgress, Menu, MenuItem } from '@mui/material';
+import { Snackbar, Alert, Backdrop, CircularProgress, Menu, MenuItem, Drawer, Box, IconButton, Typography } from '@mui/material';
 import GraphRendererAdapter from './renderers/GraphRendererAdapter';
 import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
@@ -60,6 +60,10 @@ const GraphEditorContent = () => {
     : 'browser';
   const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
+  const [nodeEditorPanel, setNodeEditorPanel] = useState({ open: false, nodeId: null });
+  const [nodeEditorDirty, setNodeEditorDirty] = useState({ nodeId: null, dirty: false });
+  const [nodeEditorCommitPending, setNodeEditorCommitPending] = useState(false);
+  const [nodeEditorCommitError, setNodeEditorCommitError] = useState(null);
   const [viewDefinitions, setViewDefinitions] = useState({});
   const viewDefinitionsRef = useRef({});
   const isDraggingRef = useRef(false);
@@ -279,12 +283,15 @@ const GraphEditorContent = () => {
   const [resolvedDictionary, setResolvedDictionary] = useState(null);
   const definitionDictionaryCacheRef = useRef({});
 
-  const resolveTlzPath = useCallback((ref) => {
+  const resolvePublicPath = useCallback((ref) => {
     if (!ref || typeof ref !== 'string') return null;
-    if (ref.startsWith('/tlz/')) return ref;
+    if (ref.startsWith('/')) return ref;
     try {
       const parsed = new URL(ref);
-      if (parsed.pathname && parsed.pathname.startsWith('/tlz/')) {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const isSameOrigin = origin && parsed.origin === origin;
+      const isWebviewScheme = parsed.protocol === 'vscode-webview:' || parsed.protocol === 'vscode-resource:';
+      if ((isSameOrigin || isWebviewScheme) && parsed.pathname) {
         return parsed.pathname;
       }
     } catch {}
@@ -323,9 +330,50 @@ const GraphEditorContent = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.__Twilite_HOST__ !== 'vscode') return;
+    if (window.__Twilite_fetchPatched__) return;
+    if (typeof window.fetch !== 'function') return;
+
+    const originalFetch = window.fetch.bind(window);
+    window.__Twilite_fetchPatched__ = true;
+    window.__Twilite_fetchOriginal__ = originalFetch;
+
+    window.fetch = async (input, init) => {
+      const urlStr = typeof input === 'string' ? input : input?.url;
+    const publicPath = resolvePublicPath(urlStr);
+      if (!publicPath) {
+        return originalFetch(input, init);
+      }
+      const hostResult = await readFileViaHost(publicPath);
+      if (hostResult && !hostResult.error) {
+        return new Response(hostResult.text || '', {
+          status: 200,
+          headers: { 'Content-Type': 'text/plain' }
+        });
+      }
+      return new Response('', { status: 404 });
+    };
+
+    return () => {
+      if (window.__Twilite_fetchOriginal__) {
+        window.fetch = window.__Twilite_fetchOriginal__;
+        window.__Twilite_fetchPatched__ = false;
+      }
+    };
+  }, [readFileViaHost, resolvePublicPath]);
+
   const getDictionaryEntryKey = useCallback((entry) => {
     if (!entry) return null;
-    return entry.key || entry.nodeType || entry.type || entry.view || null;
+    const baseKey = entry.key || entry.nodeType || entry.type || entry.view || null;
+    if (!baseKey) return null;
+    const intent = entry.intent || '';
+    const payload = entry.payload || entry.view || '';
+    if (intent || payload) {
+      return `${baseKey}::${intent}::${payload}`;
+    }
+    return baseKey;
   }, []);
 
   const mergeDictionaryEntries = useCallback((hostEntries = [], importedEntries = []) => {
@@ -394,9 +442,9 @@ const GraphEditorContent = () => {
         if (!definitionDictionaryCacheRef.current[ref]) {
           try {
             let text = null;
-            const tlzPath = resolveTlzPath(ref);
-            if (tlzPath) {
-              const hostResult = await readFileViaHost(tlzPath);
+            const publicPath = resolvePublicPath(ref);
+            if (publicPath) {
+              const hostResult = await readFileViaHost(publicPath);
               if (hostResult && !hostResult.error) {
                 text = hostResult.text || '';
               }
@@ -409,9 +457,12 @@ const GraphEditorContent = () => {
             const parsed = JSON.parse(text);
             const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
             const dictNode = parsedNodes.find((candidate) => candidate?.type === 'dictionary') || null;
+            const requiresDictionary = parsedNodes
+              .filter((candidate) => candidate?.type === 'manifest')
+              .some((manifest) => manifest?.data?.requiresDictionary === true);
             definitionDictionaryCacheRef.current[ref] = dictNode?.data || null;
-            if (!dictNode) {
-              warnings.push(`No dictionary found in ${ref}`);
+            if (!dictNode && requiresDictionary) {
+              warnings.push(`Definition graph declares dictionary requirement but has none in ${ref}`);
             }
           } catch (err) {
             definitionDictionaryCacheRef.current[ref] = null;
@@ -472,11 +523,97 @@ const GraphEditorContent = () => {
     const dictionary = resolveDictionaryForNode(node);
     const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
     const lookupKey = node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
-    return views.find((entry) => {
+    const matches = views.filter((entry) => {
       if (!entry) return false;
       return entry.key === lookupKey || entry.nodeType === lookupKey || entry.type === lookupKey;
-    }) || null;
+    });
+    if (matches.length === 0) return null;
+    const nodeView = matches.find((entry) => {
+      const payload = entry.payload || entry.view || '';
+      return entry.intent === 'node' || payload === 'node.web';
+    });
+    return nodeView || matches[0] || null;
   }, [resolveDictionaryForNode]);
+
+  const resolveEditorViewEntry = useCallback((node) => {
+    if (!node) return null;
+    const dictionary = resolveDictionaryForNode(node);
+    const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
+    const lookupKey = node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
+    const matched = views.find((entry) => {
+      if (!entry) return false;
+      const keyMatches = entry.key === lookupKey || entry.nodeType === lookupKey || entry.type === lookupKey;
+      if (!keyMatches) return false;
+      const payload = entry.payload || entry.view || '';
+      return entry.intent === 'editor' || payload === 'editor.web';
+    }) || null;
+    if (matched) return matched;
+
+    const nodeEntry = resolveViewEntry(node);
+    if (!nodeEntry?.ref) return null;
+    const def = viewDefinitionsRef.current[nodeEntry.ref] || null;
+    const viewNodes = Array.isArray(def?.viewNodes) ? def.viewNodes : [];
+    const editorViewNode = viewNodes.find((candidate) => {
+      const viewData = candidate?.data?.view || {};
+      const payload = viewData.payload || '';
+      return viewData.intent === 'editor' || payload === 'editor.web';
+    }) || null;
+    if (!editorViewNode) return null;
+    const viewData = editorViewNode?.data?.view || {};
+    return {
+      key: lookupKey,
+      intent: viewData.intent || 'editor',
+      payload: viewData.payload || 'editor.web',
+      ref: nodeEntry.ref,
+      source: 'definition'
+    };
+  }, [resolveDictionaryForNode, resolveViewEntry]);
+
+  const manifestNode = useMemo(
+    () => (Array.isArray(nodes) ? nodes.find((candidate) => candidate?.type === 'manifest') || null : null),
+    [nodes]
+  );
+
+  const policyAllowsEdit = useMemo(() => {
+    const mutation = manifestNode?.data?.authority?.mutation || {};
+    const allowUpdate = mutation.allowUpdate ?? true;
+    const appendOnly = mutation.appendOnly ?? false;
+    return Boolean(allowUpdate) && !appendOnly;
+  }, [manifestNode]);
+
+  const validateEditorFields = useCallback((viewNodes = [], ref = '') => {
+    const warnings = [];
+    const allowedTypes = new Set(['text', 'markdown', 'number', 'boolean']);
+    viewNodes.forEach((viewNode) => {
+      const viewData = viewNode?.data?.view || {};
+      const payload = viewData.payload || '';
+      const isEditor = viewData.intent === 'editor' || payload === 'editor.web';
+      if (!isEditor) return;
+      const editorWeb = viewNode?.data?.editor?.web || {};
+      if (!('fields' in editorWeb)) return;
+      if (!Array.isArray(editorWeb.fields)) {
+        warnings.push(`Editor view fields must be an array (${ref || 'view'})`);
+        return;
+      }
+      editorWeb.fields.forEach((field, index) => {
+        if (!field || typeof field !== 'object') {
+          warnings.push(`Editor field #${index + 1} must be an object (${ref || 'view'})`);
+          return;
+        }
+        const key = field.key || field.path;
+        if (typeof key !== 'string' || !key.trim()) {
+          warnings.push(`Editor field #${index + 1} missing key/path (${ref || 'view'})`);
+        }
+        if (field.type && (!allowedTypes.has(field.type))) {
+          warnings.push(`Editor field "${key || index + 1}" has invalid type "${field.type}" (${ref || 'view'})`);
+        }
+        if (field.rows !== undefined && !(typeof field.rows === 'number' && Number.isFinite(field.rows))) {
+          warnings.push(`Editor field "${key || index + 1}" rows must be a number (${ref || 'view'})`);
+        }
+      });
+    });
+    return warnings;
+  }, []);
 
   const requestViewDefinition = useCallback((ref) => {
     if (!ref) return;
@@ -485,9 +622,9 @@ const GraphEditorContent = () => {
     setViewDefinitions((prev) => ({ ...prev, [ref]: { status: 'loading' } }));
     Promise.resolve()
       .then(async () => {
-        const tlzPath = resolveTlzPath(ref);
-        if (tlzPath) {
-          const hostResult = await readFileViaHost(tlzPath);
+        const publicPath = resolvePublicPath(ref);
+        if (publicPath) {
+          const hostResult = await readFileViaHost(publicPath);
           if (hostResult && !hostResult.error) {
             return hostResult.text || '';
           }
@@ -501,14 +638,27 @@ const GraphEditorContent = () => {
       .then((text) => {
         const parsed = JSON.parse(text);
         const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
-        const viewNode = parsedNodes.find((candidate) => candidate?.type === 'view') || null;
-        if (!viewNode) {
+        const viewNodes = parsedNodes.filter((candidate) => candidate?.type === 'view');
+        if (!viewNodes.length) {
           throw new Error('No view node found');
         }
+        const editorWarnings = validateEditorFields(viewNodes, ref);
         setViewDefinitions((prev) => ({
           ...prev,
-          [ref]: { status: 'ready', viewNode }
+          [ref]: { status: 'ready', viewNodes }
         }));
+        if (editorWarnings.length > 0) {
+          try {
+            setSnackbar((prev) => ({
+              ...prev,
+              open: true,
+              message: `Editor schema: ${editorWarnings[0]}${editorWarnings.length > 1 ? ` (+${editorWarnings.length - 1} more)` : ''}`,
+              severity: 'warning'
+            }));
+          } catch (err) {
+            // ignore snackbar failures
+          }
+        }
       })
       .catch((err) => {
         setViewDefinitions((prev) => ({
@@ -516,7 +666,7 @@ const GraphEditorContent = () => {
           [ref]: { status: 'error', error: err?.message || 'Failed to load view' }
         }));
       });
-  }, [readFileViaHost, resolveTlzPath]);
+  }, [readFileViaHost, resolvePublicPath, validateEditorFields]);
 
   useEffect(() => {
     if (!Array.isArray(nodes)) return;
@@ -530,20 +680,165 @@ const GraphEditorContent = () => {
     refs.forEach((ref) => requestViewDefinition(ref));
   }, [nodes, nodeTypes, resolveViewEntry, requestViewDefinition]);
 
+  useEffect(() => {
+    const handleTogglePanel = ({ nodeId, source } = {}) => {
+      if (!nodeId) return;
+      setNodeEditorPanel((prev) => {
+        const shouldClose = prev.open && prev.nodeId === nodeId;
+        const next = shouldClose ? { open: false, nodeId: null } : { open: true, nodeId };
+        try {
+          if (next.open) {
+            eventBus.emit('nodeEditorPanelOpen', { nodeId, source: source || 'edit-button', at: Date.now() });
+          } else {
+            eventBus.emit('nodeEditorPanelClose', { nodeId, source: source || 'edit-button', at: Date.now() });
+          }
+        } catch (err) {
+          // ignore telemetry errors
+        }
+        return next;
+      });
+    };
+    eventBus.on('toggleNodeEditorPanel', handleTogglePanel);
+    return () => eventBus.off('toggleNodeEditorPanel', handleTogglePanel);
+  }, []);
+
+  useEffect(() => {
+    const handleDirtyChange = ({ nodeId, dirty } = {}) => {
+      if (!nodeId) return;
+      setNodeEditorDirty((prev) => {
+        if (prev.nodeId === nodeId && prev.dirty === Boolean(dirty)) return prev;
+        return { nodeId, dirty: Boolean(dirty) };
+      });
+    };
+    const handleCommitResult = ({ nodeId, success, error } = {}) => {
+      if (!nodeId) return;
+      if (success) {
+        setNodeEditorCommitError(null);
+        if (nodeEditorCommitPending && nodeEditorPanel.open && nodeEditorPanel.nodeId === nodeId) {
+          setNodeEditorPanel({ open: false, nodeId: null });
+          setNodeEditorCommitPending(false);
+        }
+      } else if (error) {
+        setNodeEditorCommitError(String(error));
+        setNodeEditorCommitPending(false);
+      }
+    };
+    eventBus.on('nodeEditorDirtyChange', handleDirtyChange);
+    eventBus.on('nodeEditorCommitResult', handleCommitResult);
+    return () => {
+      eventBus.off('nodeEditorDirtyChange', handleDirtyChange);
+      eventBus.off('nodeEditorCommitResult', handleCommitResult);
+    };
+  }, [nodeEditorCommitPending, nodeEditorPanel.open, nodeEditorPanel.nodeId]);
+
   const resolveNodeComponent = useCallback((node) => {
     if (!node || nodeTypes?.[node.type]) return null;
     if (typeof node?.type === 'string' && node.type.includes(':')) return null;
     const entry = resolveViewEntry(node);
     if (!entry || !entry.ref) return null;
     const viewDefinition = viewDefinitionsRef.current[entry.ref] || null;
+    const viewNodes = Array.isArray(viewDefinition?.viewNodes) ? viewDefinition.viewNodes : [];
+    const entryIntent = entry.intent || '';
+    const entryPayload = entry.payload || entry.view || '';
+    const selectedViewNode = viewNodes.find((candidate) => {
+      const viewData = candidate?.data?.view || {};
+      if (entryIntent && viewData.intent && entryIntent !== viewData.intent) return false;
+      if (entryPayload && viewData.payload && entryPayload !== viewData.payload) return false;
+      return true;
+    }) || viewNodes[0] || null;
+    const resolvedDefinition = selectedViewNode
+      ? { status: viewDefinition?.status || 'ready', viewNode: selectedViewNode }
+      : viewDefinition;
+    const editorEntry = resolveEditorViewEntry(node);
+    const viewWantsEditButton = selectedViewNode?.data?.view?.showEditButton
+      ?? selectedViewNode?.data?.node?.web?.showEditButton;
+    const nodeEditableFlag = node?.data?.editable;
+    const nodeAllowsEdit = nodeEditableFlag !== false;
+    const allowEditButton = viewWantsEditButton !== false
+      && (Boolean(editorEntry) || viewWantsEditButton === true)
+      && nodeAllowsEdit
+      && policyAllowsEdit;
     return {
       component: DynamicViewNode,
       props: {
         viewEntry: entry,
-        viewDefinition
+        viewDefinition: resolvedDefinition,
+        showEditButton: allowEditButton,
+        editLocked: !policyAllowsEdit || !nodeAllowsEdit
       }
     };
-  }, [nodeTypes, resolveViewEntry]);
+  }, [nodeTypes, resolveViewEntry, resolveEditorViewEntry, policyAllowsEdit]);
+
+  const editorPanelNode = useMemo(() => {
+    if (!nodeEditorPanel.open || !nodeEditorPanel.nodeId) return null;
+    return nodes?.find((candidate) => candidate.id === nodeEditorPanel.nodeId) || null;
+  }, [nodes, nodeEditorPanel]);
+
+  useEffect(() => {
+    if (!nodeEditorPanel.open || !nodeEditorPanel.nodeId) return;
+    setNodeEditorDirty({ nodeId: nodeEditorPanel.nodeId, dirty: false });
+    setNodeEditorCommitPending(false);
+    setNodeEditorCommitError(null);
+  }, [nodeEditorPanel.open, nodeEditorPanel.nodeId]);
+
+  const editorPanelEntry = useMemo(
+    () => (editorPanelNode ? resolveEditorViewEntry(editorPanelNode) : null),
+    [editorPanelNode, resolveEditorViewEntry]
+  );
+
+  useEffect(() => {
+    if (!nodeEditorPanel.open) return;
+    if (editorPanelEntry?.ref) {
+      requestViewDefinition(editorPanelEntry.ref);
+    }
+  }, [nodeEditorPanel.open, editorPanelEntry?.ref, requestViewDefinition]);
+
+  const editorPanelDefinition = (() => {
+    if (!editorPanelEntry?.ref) return null;
+    const def = viewDefinitionsRef.current[editorPanelEntry.ref] || null;
+    const viewNodes = Array.isArray(def?.viewNodes) ? def.viewNodes : [];
+    const entryIntent = editorPanelEntry.intent || '';
+    const entryPayload = editorPanelEntry.payload || editorPanelEntry.view || '';
+    const selectedViewNode = viewNodes.find((candidate) => {
+      const viewData = candidate?.data?.view || {};
+      if (entryIntent && viewData.intent && entryIntent !== viewData.intent) return false;
+      if (entryPayload && viewData.payload && entryPayload !== viewData.payload) return false;
+      return true;
+    }) || viewNodes[0] || null;
+    return selectedViewNode
+      ? { status: def?.status || 'ready', viewNode: selectedViewNode }
+      : def;
+  })();
+
+  const editorPanelDirty = Boolean(editorPanelNode?.id && nodeEditorDirty.nodeId === editorPanelNode.id && nodeEditorDirty.dirty);
+
+  const handleCloseEditorPanel = useCallback((force = false) => {
+    if (editorPanelDirty && !force) {
+      const confirmed = window.confirm('You have unsaved changes. Close without saving?');
+      if (!confirmed) return;
+      try {
+        eventBus.emit('nodeEditorReset', { nodeId: editorPanelNode?.id });
+      } catch (err) {
+        // ignore reset errors
+      }
+    }
+    setNodeEditorPanel({ open: false, nodeId: null });
+    setNodeEditorCommitPending(false);
+    setNodeEditorCommitError(null);
+  }, [editorPanelDirty, editorPanelNode?.id]);
+
+  const handleCommitAndClose = useCallback(() => {
+    if (!editorPanelNode?.id) return;
+    setNodeEditorCommitPending(true);
+    setNodeEditorCommitError(null);
+    eventBus.emit('nodeEditorCommit', { nodeId: editorPanelNode.id });
+  }, [editorPanelNode?.id]);
+
+  const handleResetEditor = useCallback(() => {
+    if (!editorPanelNode?.id) return;
+    eventBus.emit('nodeEditorReset', { nodeId: editorPanelNode.id });
+    setNodeEditorCommitError(null);
+  }, [editorPanelNode?.id]);
 
   const handleToggleMinimap = useCallback(() => {
     emitEdgeIntent('toggleMinimap', { enabled: !showMinimap });
@@ -1495,6 +1790,97 @@ const skipPropertiesCloseRef = useRef(false);
         contractSummary={contractSummary}
         onApplyLayout={modesHook.applyAutoLayout}
       />
+
+      <Drawer
+        anchor="bottom"
+        open={nodeEditorPanel.open}
+        onClose={() => handleCloseEditorPanel()}
+        PaperProps={{
+          sx: {
+            height: '40vh',
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12
+          }
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1">
+                {editorPanelNode?.label || editorPanelNode?.type || 'Editor'}
+              </Typography>
+              {editorPanelDirty && (
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: theme.palette.warning.main }} />
+              )}
+            </Box>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+              {editorPanelDirty ? 'Unsaved changes' : 'No pending changes'}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {nodeEditorCommitError && (
+              <Typography variant="caption" sx={{ color: theme.palette.error.main, maxWidth: 220 }} title={nodeEditorCommitError}>
+                {nodeEditorCommitError}
+              </Typography>
+            )}
+            <button
+              type="button"
+              onClick={handleResetEditor}
+              disabled={!editorPanelDirty}
+              style={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 6,
+                padding: '4px 10px',
+                fontSize: 12,
+                color: theme.palette.text.primary,
+                background: theme.palette.background.paper,
+                cursor: editorPanelDirty ? 'pointer' : 'not-allowed',
+                opacity: editorPanelDirty ? 1 : 0.5
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleCommitAndClose}
+              disabled={!editorPanelDirty || nodeEditorCommitPending}
+              style={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 6,
+                padding: '4px 10px',
+                fontSize: 12,
+                color: theme.palette.text.primary,
+                background: theme.palette.background.paper,
+                cursor: !editorPanelDirty || nodeEditorCommitPending ? 'not-allowed' : 'pointer',
+                opacity: !editorPanelDirty || nodeEditorCommitPending ? 0.5 : 1
+              }}
+            >
+              Done
+            </button>
+            <IconButton
+              size="small"
+              onClick={() => handleCloseEditorPanel()}
+              aria-label="Close editor"
+            >
+              ×
+            </IconButton>
+          </Box>
+        </Box>
+        <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+          {editorPanelNode && editorPanelEntry ? (
+            <DynamicViewNode
+              node={editorPanelNode}
+              viewEntry={editorPanelEntry}
+              viewDefinition={editorPanelDefinition}
+              renderInPanel={true}
+            />
+          ) : (
+            <Box sx={{ p: 2, color: theme.palette.text.secondary }}>
+              No editor view defined for this node.
+            </Box>
+          )}
+        </Box>
+      </Drawer>
 
       <Snackbar
         open={snackbar.open}

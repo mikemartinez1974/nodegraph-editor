@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-03T16:57:43.195Z",
-    "modified": "2026-02-03T16:57:45.094Z",
+    "created": "2026-02-06T02:15:55.454Z",
+    "modified": "2026-02-06T02:16:59.561Z",
     "author": "",
     "tags": []
   },
@@ -15,7 +15,7 @@
       "label": "Manifest",
       "position": {
         "x": -420,
-        "y": -120
+        "y": -188
       },
       "width": 420,
       "height": 280,
@@ -38,7 +38,8 @@
           "nodeTypes": [
             "demo.min",
             "demo.svg",
-            "demo.text"
+            "demo.text",
+            "node"
           ],
           "handleContracts": [
             "core"
@@ -115,8 +116,8 @@
         "x": 21,
         "y": -138
       },
-      "width": 340,
-      "height": 220,
+      "width": 388.5432523794347,
+      "height": 219.6435963559827,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -138,6 +139,12 @@
             "ref": "/tlz/nodes/text-node-definition.node",
             "source": "local",
             "version": ">=1.0.0"
+          },
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
           }
         ],
         "skills": [],
@@ -165,6 +172,14 @@
             "version": ">=1.0.0",
             "intent": "node",
             "payload": "twilite.web"
+          },
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0",
+            "intent": "node",
+            "payload": "node.web"
           }
         ]
       }
@@ -174,8 +189,8 @@
       "type": "demo.min",
       "label": "Minimum Node Instance",
       "position": {
-        "x": 120,
-        "y": 219
+        "x": -377.77162173661964,
+        "y": 221.24221451232708
       },
       "width": 320,
       "height": 180,
@@ -190,8 +205,8 @@
       "type": "demo.svg",
       "label": "SVG Node Instance",
       "position": {
-        "x": 520,
-        "y": 220
+        "x": 526,
+        "y": 107
       },
       "width": 320,
       "height": 180,
@@ -206,8 +221,8 @@
       "type": "demo.text",
       "label": "Text Node",
       "position": {
-        "x": 120,
-        "y": 460
+        "x": 527,
+        "y": 309
       },
       "width": 320,
       "height": 180,
@@ -218,12 +233,28 @@
       }
     },
     {
+      "id": "node-class-demo-0001",
+      "type": "node",
+      "label": "Node Class Instance",
+      "position": {
+        "x": 523.406510223413,
+        "y": 827.2223911697068
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "content": "# This is the first edit test.\n## this is some more text.\n### And even more.\n#### more still.\n"
+      }
+    },
+    {
       "id": "legend-0001",
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": 520,
-        "y": -120
+        "x": 421,
+        "y": -139
       },
       "width": 360,
       "height": 220,
@@ -250,8 +281,70 @@
           }
         ]
       }
+    },
+    {
+      "id": "62cf9e19-392a-401d-a1f6-4e93facafbe4",
+      "type": "node",
+      "label": "New Node",
+      "position": {
+        "x": 521.5884618131902,
+        "y": 633.3328016109838
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# Testing!"
+      }
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "c0619e6b-5f3f-4cac-b22d-803ce71f8087",
+      "type": "relates",
+      "source": "62cf9e19-392a-401d-a1f6-4e93facafbe4",
+      "target": "node-class-demo-0001",
+      "sourceHandle": "root",
+      "targetHandle": "root",
+      "handleMeta": {
+        "source": {
+          "key": "root",
+          "label": "Root",
+          "type": "value",
+          "direction": "output",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {
+        "strength": "weak",
+        "direction": "reverse",
+        "flow": "control"
+      }
+    }
+  ],
   "clusters": []
 }

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-02T21:56:57.143Z",
-    "modified": "2026-02-02T21:56:59.640Z",
+    "created": "2026-02-07T18:13:20.487Z",
+    "modified": "2026-02-07T20:02:17.799Z",
     "author": "",
     "tags": []
   },
@@ -165,6 +165,25 @@
       "showLabel": true,
       "data": {
         "memo": ""
+      }
+    },
+    {
+      "id": "c05c8db5-531b-4761-a0d2-4ebc6561e3d2",
+      "type": "default",
+      "label": "New Node",
+      "position": {
+        "x": -205.5,
+        "y": 524
+      },
+      "width": 200,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
       }
     }
   ],

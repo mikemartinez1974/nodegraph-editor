@@ -1583,6 +1583,134 @@ export default class GraphCRUD {
   }
 
   /**
+   * Apply a batch of deltas in sequence.
+   * Supports node/edge/group ops; can batch history into a single entry.
+   * @param {Array} deltas
+   * @param {Object} options
+   * @param {boolean} options.batchHistory
+   */
+  applyDeltas(deltas = [], options = {}) {
+    const shouldBatchHistory = options.batchHistory !== false;
+    const originalSave = this.saveToHistory;
+    try {
+      if (!Array.isArray(deltas)) {
+        return { success: false, error: 'deltas must be an array' };
+      }
+
+      if (shouldBatchHistory) {
+        this.saveToHistory = () => {};
+      }
+
+      const results = [];
+      for (const delta of deltas) {
+        if (!delta || !delta.op) {
+          results.push({ success: false, error: 'delta missing op', delta });
+          continue;
+        }
+        let result = { success: false, error: `Unknown op ${delta.op}` };
+        try {
+          switch (delta.op) {
+            case 'createNode':
+              result = this.createNode(delta.data || {});
+              break;
+            case 'createNodes':
+              result = this.createNodes(delta.data || delta.nodes || []);
+              break;
+            case 'updateNode':
+              result = this.updateNode(delta.id, delta.patch || {});
+              break;
+            case 'updateNodes':
+              result = this.updateNodes(delta.ids || [], delta.patch || {});
+              break;
+            case 'deleteNode':
+              result = this.deleteNode(delta.id);
+              break;
+            case 'deleteNodes': {
+              const ids = Array.isArray(delta.ids) ? delta.ids : [];
+              const deleted = [];
+              const failed = [];
+              ids.forEach((id) => {
+                const res = this.deleteNode(id);
+                if (res?.success) deleted.push(id);
+                else failed.push({ id, error: res?.error });
+              });
+              result = { success: failed.length === 0, data: { deleted, failed } };
+              break;
+            }
+            case 'createEdge':
+              result = this.createEdge(delta.data || {});
+              break;
+            case 'createEdges':
+              result = this.createEdges(delta.data || delta.edges || []);
+              break;
+            case 'updateEdge':
+              result = this.updateEdge(delta.id, delta.patch || {});
+              break;
+            case 'updateEdges':
+              result = this.updateEdges(delta.ids || [], delta.patch || {});
+              break;
+            case 'deleteEdge':
+              result = this.deleteEdge(delta.id);
+              break;
+            case 'translateNodes':
+              result = this.translateNodes(delta.ids || [], delta.delta || delta);
+              break;
+            case 'translateGroups':
+              result = this.translateGroups(delta.ids || [], delta.delta || delta);
+              break;
+            case 'createGroups':
+              result = this.createGroups(delta.data || delta.groups || []);
+              break;
+            case 'updateGroup':
+              result = this.updateGroup(delta.id, delta.patch || {});
+              break;
+            case 'updateGroups':
+              result = this.updateGroups(delta.ids || [], delta.patch || {});
+              break;
+            case 'deleteGroup':
+              result = this.deleteGroup(delta.id);
+              break;
+            case 'addNodesToGroup':
+              result = this.addNodesToGroup(delta.id, delta.nodeIds || []);
+              break;
+            case 'removeNodesFromGroup':
+              result = this.removeNodesFromGroup(delta.id, delta.nodeIds || []);
+              break;
+            case 'setGroupNodes':
+              result = this.setGroupNodes(delta.id, delta.nodeIds || []);
+              break;
+            case 'batch':
+              if (Array.isArray(delta.deltas)) {
+                result = this.applyDeltas(delta.deltas, { batchHistory: false });
+              }
+              break;
+            default:
+              break;
+          }
+        } catch (err) {
+          result = { success: false, error: err.message };
+        }
+        results.push({ op: delta.op, ...result });
+      }
+
+      if (shouldBatchHistory) {
+        if (originalSave) {
+          originalSave(this.getNodes(), this.getEdges());
+        }
+        this.saveToHistory = originalSave;
+      }
+
+      const failed = results.filter(r => !r.success);
+      return {
+        success: failed.length === 0,
+        data: { results, failed: failed.length ? failed : undefined }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Duplicate nodes (optionally include edges between them)
    * @param {string[]} ids - Array of node IDs
    * @param {Object} options - { offset: {x,y}, includeEdges: boolean }

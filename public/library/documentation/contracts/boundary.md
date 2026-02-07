@@ -31,3 +31,28 @@ If a graph is exported, reloaded, and still works, the data is correct.
 - Meaning changes must be obvious
 
 If it affects interpretation, it belongs in data.
+
+## View Boundary (Multi-Dev Contract)
+Views are the lowest-level graph-defined unit.
+
+Everything above views is graph-defined. Everything below views is code-defined.
+
+### Graph-Defined (above the line)
+- Dictionaries (nodeDefs, skills, views)
+- Node classes and schemas
+- View declarations (intent + payload)
+- Task graphs and workflows
+- Node instances and data
+
+### Code-Defined (below the line)
+- Rendering runtime and components
+- Event plumbing and UI wiring
+- Security/sanitization
+- Performance and caching
+
+### Reasoning
+- Views act as stable API surfaces across teams.
+- Graphs are declarative, reviewable, and portable.
+- Runtime stays centralized for correctness and policy.
+
+If you’re unsure: if it changes what the view **is**, it’s graph-defined. If it changes how the view **renders**, it’s code-defined.

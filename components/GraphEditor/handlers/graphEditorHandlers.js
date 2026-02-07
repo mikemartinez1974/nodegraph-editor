@@ -36,6 +36,29 @@ export function createGraphEditorHandlers({
   } = state;
   
   const { saveToHistory } = historyHook;
+
+  const resolveGraphAPI = () => {
+    if (graphAPI && graphAPI.current) return graphAPI.current;
+    if (typeof window !== 'undefined' && window.graphAPI) return window.graphAPI;
+    return null;
+  };
+
+  const emitExecutionIntent = (proposals, source = 'handlers') => {
+    if (!Array.isArray(proposals) || proposals.length === 0) return false;
+    try {
+      // Emit both legacy and payload-wrapped forms to satisfy older listeners.
+      eventBus.emit('executionIntent', {
+        proposals,
+        proposal: proposals.length === 1 ? proposals[0] : undefined,
+        source,
+        payload: { proposals, source }
+      });
+      return true;
+    } catch (err) {
+      console.warn('Failed to emit executionIntent:', err);
+      return false;
+    }
+  };
   
   const normalizeEdgeSchema = (edge, defaultDirection = 'output') => {
     if (!edge || typeof edge !== 'object') return edge;
@@ -488,76 +511,27 @@ export function createGraphEditorHandlers({
     //   edgesFromRef: edgesRef.current.map(e => ({ id: e.id, type: e.type, source: e.source, target: e.target }))
     // });
     
+    const proposals = [];
     if (selectedNodeIds && selectedNodeIds.length > 0) {
-      // Use refs as source of truth for consistent deletion
-      const deletedNodeIds = [...selectedNodeIds];
-      const affectedEdges = edgesRef.current.filter(e =>
-        deletedNodeIds.includes(e.source) || deletedNodeIds.includes(e.target)
-      );
-      
-      // console.log('DELETING NODE:', deletedNodeId, 'WILL REMOVE EDGES:', affectedEdges.map(e => ({ id: e.id, type: e.type, label: e.label })));
-      
-      const newNodes = nodesRef.current.filter(n => !selectedNodeIds.includes(n.id));
-      const newEdges = edgesRef.current.filter(e => 
-        !selectedNodeIds.includes(e.source) && !selectedNodeIds.includes(e.target)
-      );
-      
-      // console.log('AFTER DELETE - Nodes:', newNodes.length, 'Edges:', newEdges.length);
-      
-      nodesRef.current = newNodes;
-      edgesRef.current = newEdges;
-      setNodes(newNodes);
-      setEdges(newEdges);
-      setSelectedNodeIds([]);
-      saveToHistory(newNodes, newEdges);
-      
-      // Force canvas redraw
-      try {
-        eventBus.emit('forceRedraw');
-      } catch (e) {
-        console.warn('Failed to emit forceRedraw:', e);
-      }
-      try {
-        deletedNodeIds.forEach((id) => eventBus.emit('nodeDeleted', { id }));
-        affectedEdges.forEach((edge) => eventBus.emit('edgeDeleted', { id: edge.id }));
-      } catch (e) {
-        // ignore event bus errors
+      proposals.push({ action: 'deleteNodes', ids: [...selectedNodeIds] });
+      if (selectedEdgeIds && selectedEdgeIds.length > 0) {
+        proposals.push({ action: 'deleteEdges', ids: [...selectedEdgeIds] });
       }
     } else if (selectedEdgeIds && selectedEdgeIds.length > 0) {
-      // Use ref as source of truth, update both ref and state atomically
-      // console.log('DELETING EDGES:', selectedEdgeIds, 'FROM:', edgesRef.current.map(e => e.id));
-      const newEdges = edgesRef.current.filter(e => !selectedEdgeIds.includes(e.id));
-      // console.log('AFTER FILTER - New edges:', newEdges.map(e => e.id));
-      edgesRef.current = newEdges;
-      setEdges(newEdges);
-      setSelectedEdgeIds([]);
-      saveToHistory(nodesRef.current, newEdges);
-      
-      // Force canvas redraw to show edge removal immediately
-      try {
-        eventBus.emit('forceRedraw');
-      } catch (e) {
-        console.warn('Failed to emit forceRedraw:', e);
-      }
-      try {
-        selectedEdgeIds.forEach((id) => eventBus.emit('edgeDeleted', { id }));
-      } catch (e) {
-        // ignore event bus errors
-      }
+      proposals.push({ action: 'deleteEdges', ids: [...selectedEdgeIds] });
     } else if (selectedGroupIds && selectedGroupIds.length > 0) {
-      const deletedGroupIds = [...selectedGroupIds];
-      selectedGroupIds.forEach(groupId => {
-        groupManager.current.removeGroup(groupId);
+      selectedGroupIds.forEach((groupId) => {
+        proposals.push({ action: 'deleteGroup', id: groupId });
       });
-      setGroups(groupManager.current.getAllGroups());
-      setSelectedGroupIds([]);
-      saveToHistory(nodesRef.current, edgesRef.current);
-      try {
-        deletedGroupIds.forEach((id) => eventBus.emit('groupDeleted', { id }));
-      } catch (e) {
-        // ignore event bus errors
-      }
     }
+
+    if (proposals.length) {
+      emitExecutionIntent(proposals, 'deleteSelected');
+    }
+
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
     
     // Reset debounce guard after a short delay
     setTimeout(() => {
@@ -569,30 +543,29 @@ export function createGraphEditorHandlers({
     const prevNodes = nodesRef.current || [];
     const prevEdges = edgesRef.current || [];
     const prevGroups = groups || [];
-    const newNodes = [], newEdges = [], newGroups = [];
-    // Use loadGraph to bypass manifest validation for explicit clears.
-    if (typeof loadGraph === 'function') {
-      loadGraph(newNodes, newEdges, newGroups);
-    } else {
-      setNodes(newNodes);
-      setEdges(newEdges);
-      setGroups(newGroups);
+    const proposals = [];
+
+    if (prevEdges.length) {
+      proposals.push({ action: 'deleteEdges', ids: prevEdges.map((e) => e.id) });
     }
-    // Update refs after state to ensure consistency
-    nodesRef.current = newNodes;
-    edgesRef.current = newEdges;
+    if (prevNodes.length) {
+      proposals.push({ action: 'deleteNodes', ids: prevNodes.map((n) => n.id) });
+    }
+    if (prevGroups.length) {
+      prevGroups.forEach((group) => {
+        if (group?.id) proposals.push({ action: 'deleteGroup', id: group.id });
+      });
+    }
+
+    if (proposals.length) {
+      emitExecutionIntent(proposals, 'clearGraph');
+    } else if (typeof loadGraph === 'function') {
+      loadGraph([], [], []);
+    }
+
     setSelectedNodeIds([]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
-    groupManager.current?.clear?.();
-    saveToHistory(newNodes, newEdges, newGroups);
-    try {
-      prevNodes.forEach((node) => node?.id && eventBus.emit('nodeDeleted', { id: node.id }));
-      prevEdges.forEach((edge) => edge?.id && eventBus.emit('edgeDeleted', { id: edge.id }));
-      prevGroups.forEach((group) => group?.id && eventBus.emit('groupDeleted', { id: group.id }));
-    } catch (e) {
-      // ignore event bus errors
-    }
   };
   
   // ===== LOAD/SAVE HANDLERS =====
@@ -694,8 +667,15 @@ export function createGraphEditorHandlers({
   };
 
   const handleGroupToggleVisibility = (groupId) => {
+    const group = groups.find(g => g.id === groupId);
+    const nextVisible = group ? group.visible !== true : true;
+    const api = resolveGraphAPI();
+    if (api && typeof api.updateGroup === 'function') {
+      api.updateGroup(groupId, { visible: nextVisible });
+      return;
+    }
     const updatedGroups = groups.map(g =>
-      g.id === groupId ? { ...g, visible: g.visible !== true } : g
+      g.id === groupId ? { ...g, visible: nextVisible } : g
     );
     setGroups(updatedGroups);
     saveToHistory(nodes, edges);
@@ -710,6 +690,12 @@ export function createGraphEditorHandlers({
   };
 
   const handleGroupDelete = (groupId) => {
+    const api = resolveGraphAPI();
+    if (api && typeof api.deleteGroup === 'function') {
+      api.deleteGroup(groupId);
+      setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
+      return;
+    }
     const result = groupManager.current.removeGroup(groupId);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
@@ -724,6 +710,11 @@ export function createGraphEditorHandlers({
   };
 
   const handleUpdateGroup = (groupId, updates) => {
+    const api = resolveGraphAPI();
+    if (api && typeof api.updateGroup === 'function') {
+      api.updateGroup(groupId, updates);
+      return;
+    }
     const updatedGroups = groups.map(g =>
       g.id === groupId ? { ...g, ...updates } : g
     );
@@ -740,6 +731,11 @@ export function createGraphEditorHandlers({
   };
 
   const handleAddNodesToGroup = (groupId, nodeIds) => {
+    const api = resolveGraphAPI();
+    if (api && typeof api.addNodesToGroup === 'function') {
+      api.addNodesToGroup(groupId, nodeIds);
+      return;
+    }
     const result = groupManager.current.addNodesToGroup(groupId, nodeIds);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
@@ -756,6 +752,11 @@ export function createGraphEditorHandlers({
   };
 
   const handleRemoveNodesFromGroup = (groupId, nodeIds) => {
+    const api = resolveGraphAPI();
+    if (api && typeof api.removeNodesFromGroup === 'function') {
+      api.removeNodesFromGroup(groupId, nodeIds);
+      return;
+    }
     const result = groupManager.current.removeNodesFromGroup(groupId, nodeIds);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
@@ -778,20 +779,31 @@ export function createGraphEditorHandlers({
       label: `Cluster ${groups.length + 1}`
     });
     if (result.success) {
-      setGroups([...groups, result.data]);
+      const api = resolveGraphAPI();
+      if (api && typeof api.createGroups === 'function') {
+        api.createGroups([result.data]);
+      } else {
+        setGroups([...groups, result.data]);
+        saveToHistory(nodes, edges);
+        try {
+          eventBus.emit('groupAdded', { group: result.data });
+        } catch (err) {
+          // ignore event bus errors
+        }
+      }
       setSelectedNodeIds([]);
       setSelectedGroupIds([result.data.id]);
-      saveToHistory(nodes, edges);
-      try {
-        eventBus.emit('groupAdded', { group: result.data });
-      } catch (err) {
-        // ignore event bus errors
-      }
     }
   };
 
   const handleUngroupSelectedWrapper = () => {
     if (selectedGroupIds.length === 0) return;
+    const api = resolveGraphAPI();
+    if (api && typeof api.deleteGroup === 'function') {
+      selectedGroupIds.forEach((groupId) => api.deleteGroup(groupId));
+      setSelectedGroupIds([]);
+      return;
+    }
     let updated = false;
     selectedGroupIds.forEach(groupId => {
       if (groupManager.current.removeGroup(groupId).success) {
@@ -892,28 +904,27 @@ export function createGraphEditorHandlers({
       if (action === 'replace') {
         const nodeIdSet = new Set(pastedNodes.map(n => n.id));
         const groupsSanitized = sanitizeGroups(pastedGroups, nodeIdSet);
-        
-        setNodes(prev => {
-          nodesRef.current = pastedNodes;
-          return pastedNodes;
-        });
-        setEdges(prev => {
-          edgesRef.current = pastedEdges;
-          return pastedEdges;
-        });
-        setGroups([]);
-        groupManager.current?.clear?.();
-        setGroups(groupsSanitized);
-        
-        groupsSanitized.forEach(g => {
-          groupManager.current.groups.set(g.id, g);
-          g.nodeIds?.forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
-        });
-        
+        const proposals = [];
+        if (edgesRef.current?.length) {
+          proposals.push({ action: 'deleteEdges', ids: edgesRef.current.map(e => e.id) });
+        }
+        if (nodesRef.current?.length) {
+          proposals.push({ action: 'deleteNodes', ids: nodesRef.current.map(n => n.id) });
+        }
+        if (groups?.length) {
+          groups.forEach((g) => g?.id && proposals.push({ action: 'deleteGroup', id: g.id }));
+        }
+        if (pastedNodes.length) proposals.push({ action: 'createNodes', nodes: pastedNodes });
+        if (pastedEdges.length) proposals.push({ action: 'createEdges', edges: pastedEdges });
+        if (groupsSanitized.length) proposals.push({ action: 'createGroups', groups: groupsSanitized });
+
+        if (proposals.length) {
+          emitExecutionIntent(proposals, 'pasteGraphData');
+        }
+
         setSelectedNodeIds([]);
         setSelectedEdgeIds([]);
         setSelectedGroupIds([]);
-        saveToHistory(pastedNodes, pastedEdges, groupsSanitized);
 
         if (shouldAutoLayout && pastedNodes.length > 0) {
           try {
@@ -939,26 +950,14 @@ export function createGraphEditorHandlers({
           combinedNodeIds
         );
 
-        const newNodes = [...nodesRef.current, ...nodesToAdd];
-        const newEdges = [...edgesRef.current, ...edgesToAdd];
-        const newGroups = [...groups, ...groupsToAdd];
+        const proposals = [];
+        if (nodesToAdd.length) proposals.push({ action: 'createNodes', nodes: nodesToAdd });
+        if (edgesToAdd.length) proposals.push({ action: 'createEdges', edges: edgesToAdd });
+        if (groupsToAdd.length) proposals.push({ action: 'createGroups', groups: groupsToAdd });
 
-        setNodes(prev => {
-          nodesRef.current = newNodes;
-          return newNodes;
-        });
-        setEdges(prev => {
-          edgesRef.current = newEdges;
-          return newEdges;
-        });
-        setGroups(newGroups);
-
-        groupsToAdd.forEach(g => {
-          groupManager.current.groups.set(g.id, g);
-          g.nodeIds?.forEach(nodeId => groupManager.current.nodeToGroup.set(nodeId, g.id));
-        });
-
-        saveToHistory(newNodes, newEdges, newGroups);
+        if (proposals.length) {
+          emitExecutionIntent(proposals, 'pasteGraphData');
+        }
 
         if (shouldAutoLayout && nodesToAdd.length > 0) {
           try {

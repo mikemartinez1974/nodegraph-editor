@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
 import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
@@ -80,6 +80,13 @@ const LegendNode = (props) => {
     };
   }, [isResizing, node.id, zoom]);
 
+  const surfaceFill = theme.palette.mode === 'dark'
+    ? alpha(theme.palette.background.paper, 0.72)
+    : alpha(theme.palette.background.paper, 0.9);
+  const cardFill = theme.palette.mode === 'dark'
+    ? alpha(theme.palette.background.paper, 0.85)
+    : alpha(theme.palette.background.paper, 0.98);
+
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
       <div
@@ -100,8 +107,8 @@ const LegendNode = (props) => {
           boxSizing: 'border-box',
           zIndex: 1,
           pointerEvents: 'auto',
-          backgroundColor: 'transparent',
-          color: '#000',
+          backgroundColor: surfaceFill,
+          color: theme.palette.text.primary,
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -134,7 +141,7 @@ const LegendNode = (props) => {
                     padding: '6px 8px',
                     borderRadius: 6,
                     border: `1px solid ${theme.palette.divider}`,
-                    background: theme.palette.background.paper
+                    background: cardFill
                   }}
                 >
                   <div style={{ fontWeight: 600 }}>

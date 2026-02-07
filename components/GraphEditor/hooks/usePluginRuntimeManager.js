@@ -152,7 +152,12 @@ export default function usePluginRuntimeManager({
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
-    const getGraphApi = () => graphApiRef?.current || null;
+    const getGraphApi = () => {
+      if (typeof window !== 'undefined' && window.graphAPI) {
+        return window.graphAPI;
+      }
+      return graphApiRef?.current || null;
+    };
     const getSelectionState = () =>
       (selectionRef?.current || { nodeIds: [], edgeIds: [], groupIds: [] });
 

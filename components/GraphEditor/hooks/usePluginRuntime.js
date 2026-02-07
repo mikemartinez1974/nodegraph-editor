@@ -91,6 +91,20 @@ export default function usePluginRuntime({
     [nodes, nodesRef]
   );
 
+  const emitExecutionIntent = useCallback((proposals, meta = {}) => {
+    const list = Array.isArray(proposals) ? proposals : [proposals];
+    try {
+      eventBus.emit('executionIntent', {
+        trigger: meta.trigger || 'scriptRuntime',
+        proposals: list,
+        source: meta.source || 'scriptRuntime',
+        meta
+      });
+    } catch (err) {
+      console.warn('[GraphEditor] Failed to emit executionIntent', err);
+    }
+  }, []);
+
   const clearScriptEventSubscriptions = useCallback(() => {
     const map = scriptEventSubscriptionsRef.current;
     map.forEach((entry, key) => {
@@ -194,12 +208,7 @@ export default function usePluginRuntime({
             data: nodeData.data && typeof nodeData.data === 'object' ? safeClone(nodeData.data) : {},
             color: nodeData.color || defaultNodeColor || '#1976d2'
           };
-          setNodes((prev) => {
-            const next = [...prev, newNode];
-            nodesRef.current = next;
-            return next;
-          });
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+          emitExecutionIntent({ action: 'createNode', node: newNode });
           return safeClone(newNode);
         }
         case 'createEdge': {
@@ -223,12 +232,7 @@ export default function usePluginRuntime({
             data: edgeData.data && typeof edgeData.data === 'object' ? safeClone(edgeData.data) : {},
             color: edgeData.color || defaultEdgeColor || '#666666'
           };
-          setEdges((prev) => {
-            const next = [...prev, newEdge];
-            edgesRef.current = next;
-            return next;
-          });
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+          emitExecutionIntent({ action: 'createEdge', edge: newEdge });
           return safeClone(newEdge);
         }
         case 'deleteNode': {
@@ -239,12 +243,7 @@ export default function usePluginRuntime({
           if (!id) {
             throw new Error('deleteNode requires an id');
           }
-          setNodes((prev) => {
-            const next = prev.filter((node) => node.id !== id);
-            nodesRef.current = next;
-            return next;
-          });
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+          emitExecutionIntent({ action: 'deleteNode', id });
           return { id };
         }
         case 'updateNode': {
@@ -258,11 +257,8 @@ export default function usePluginRuntime({
           if (!updates || typeof updates !== 'object') {
             throw new Error('updateNode requires an updates object');
           }
-          const result = graphCRUD.updateNode(id, updates);
-          if (!result?.success) {
-            throw new Error(result?.error || 'Failed to update node');
-          }
-          return safeClone(result.data || {});
+          emitExecutionIntent({ action: 'updateNode', id, patch: safeClone(updates) });
+          return { id, ...safeClone(updates) };
         }
         case 'deleteEdge': {
           if (isDry && !allowMutations) {
@@ -272,12 +268,7 @@ export default function usePluginRuntime({
           if (!id) {
             throw new Error('deleteEdge requires an id');
           }
-          setEdges((prev) => {
-            const next = prev.filter((edge) => edge.id !== id);
-            edgesRef.current = next;
-            return next;
-          });
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+          emitExecutionIntent({ action: 'deleteEdge', id });
           return { id };
         }
         case 'applyScriptPatch': {
@@ -286,19 +277,7 @@ export default function usePluginRuntime({
           if (!nodeId || !patch) {
             throw new Error('applyScriptPatch requires nodeId and patch');
           }
-          setNodes((prev) => {
-            const next = prev.map((node) => {
-              if (node.id !== nodeId) return node;
-              return {
-                ...node,
-                ...patch,
-                data: patch.data ? { ...node.data, ...patch.data } : node.data
-              };
-            });
-            nodesRef.current = next;
-            return next;
-          });
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
+          emitExecutionIntent({ action: 'updateNode', id: nodeId, patch: safeClone(patch) });
           return { nodeId };
         }
         case 'bridge:subscribeEvent': {
@@ -404,120 +383,25 @@ export default function usePluginRuntime({
   }, [setSnackbar]);
 
   useEffect(() => {
-    const handleApplyProposals = ({ proposals = [] } = {}) => {
+    const handleApplyProposals = ({ proposals = [], sourceId } = {}) => {
       if (!proposals.length) return;
       try {
-        proposals.forEach((p) => {
-          try {
-            const action = p.action || p.proposal?.action || p.type;
-            if (!action) return;
-            switch (action) {
-              case 'createNode': {
-                const node = p.node || p.payload || p.proposal?.node;
-                if (!node) break;
-                setNodes((prev) => {
-                  const next = [...prev, node];
-                  nodesRef.current = next;
-                  return next;
-                });
-                try {
-                  eventBus.emit('nodeAdded', { node });
-                } catch (err) {
-                  console.warn('[GraphEditor] nodeAdded emit failed', err);
-                }
-                break;
-              }
-              case 'updateNode': {
-                const id = p.id || p.nodeId || p.proposal?.id;
-                const patch = p.patch || p.changes || p.proposal?.patch;
-                if (!id || !patch) break;
-                setNodes((prev) => {
-                  const next = prev.map((n) =>
-                    n.id === id
-                      ? {
-                          ...n,
-                          ...patch,
-                          data: patch?.data ? { ...n.data, ...patch.data } : n.data
-                        }
-                      : n
-                  );
-                  nodesRef.current = next;
-                  return next;
-                });
-                try {
-                  eventBus.emit('nodeUpdated', { id, patch, source: 'script-apply' });
-                } catch (err) {
-                  console.warn('[GraphEditor] nodeUpdated emit failed', err);
-                }
-                break;
-              }
-              case 'deleteNode': {
-                const id = p.id || p.nodeId || p.proposal?.id;
-                if (!id) break;
-                setNodes((prev) => {
-                  const next = prev.filter((n) => n.id !== id);
-                  nodesRef.current = next;
-                  return next;
-                });
-                try {
-                  eventBus.emit('nodeDeleted', { id, source: 'script-apply' });
-                } catch (err) {
-                  console.warn('[GraphEditor] nodeDeleted emit failed', err);
-                }
-                break;
-              }
-              case 'createEdge': {
-                const edge = p.edge || p.payload || p.proposal?.edge;
-                if (!edge) break;
-                setEdges((prev) => {
-                  const next = [...prev, edge];
-                  edgesRef.current = next;
-                  return next;
-                });
-                try {
-                  eventBus.emit('edgeAdded', { edge });
-                } catch (err) {
-                  console.warn('[GraphEditor] edgeAdded emit failed', err);
-                }
-                break;
-              }
-              case 'deleteEdge': {
-                const id = p.id || p.edgeId || p.proposal?.id;
-                if (!id) break;
-                setEdges((prev) => {
-                  const next = prev.filter((e) => e.id !== id);
-                  edgesRef.current = next;
-                  return next;
-                });
-                try {
-                  eventBus.emit('edgeDeleted', { id, source: 'script-apply' });
-                } catch (err) {
-                  console.warn('[GraphEditor] edgeDeleted emit failed', err);
-                }
-                break;
-              }
-              default:
-                console.warn('Unknown proposal action:', action);
-            }
-          } catch (err) {
-            console.warn('Failed to apply proposal item', err);
-          }
+        eventBus.emit('executionIntent', {
+          trigger: 'applyScriptProposals',
+          proposals,
+          sourceId,
+          source: 'script'
         });
-        try {
-          historyHook.saveToHistory(nodesRef.current, edgesRef.current);
-        } catch (err) {
-          console.warn('Failed to save history after applying proposals', err);
-        }
-        setSnackbar({ open: true, message: 'Script changes applied', severity: 'success' });
+        setSnackbar({ open: true, message: 'Script changes queued', severity: 'info' });
       } catch (err) {
-        console.error('Failed to apply script proposals', err);
-        setSnackbar({ open: true, message: 'Failed to apply script proposals', severity: 'error' });
+        console.error('Failed to queue script proposals', err);
+        setSnackbar({ open: true, message: 'Failed to queue script proposals', severity: 'error' });
       }
     };
 
     eventBus.on('applyScriptProposals', handleApplyProposals);
     return () => eventBus.off('applyScriptProposals', handleApplyProposals);
-  }, [historyHook, setSnackbar]);
+  }, [setSnackbar]);
 
   const pluginRuntime = usePluginRuntimeManager({
     graphApiRef: graphAPI,

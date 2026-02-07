@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-03T00:40:39.933Z",
-    "modified": "2026-02-03T00:44:42.080Z",
+    "created": "2026-02-06T20:06:22.964Z",
+    "modified": "2026-02-06T20:06:28.391Z",
     "author": "",
     "tags": []
   },
@@ -222,6 +222,135 @@
       "data": {
         "markdown": "A node instance **renders via its View** and behaves like native:\n\n- draggable + resizable\n- handles honored (root default)\n- node type resolved via legend/dictionary\n- `data.content` editable in editor view\n- graph view renders `data.content`"
       }
+    },
+    {
+      "id": "markdown-node-task-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 300,
+        "y": -120
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0",
+            "intent": "node",
+            "payload": "node.web"
+          },
+          {
+            "key": "node",
+            "ref": "/library/classes/nodes/node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0",
+            "intent": "editor",
+            "payload": "editor.web"
+          }
+        ]
+      }
+    },
+    {
+      "id": "markdown-node-task-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": 300,
+        "y": 120
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "node",
+            "intent": "generic markdown node",
+            "implementation": "node.node-class.node",
+            "dictionaryKey": "node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "markdown-node-subgraph",
+      "type": "node",
+      "label": "Node Class Instance",
+      "position": {
+        "x": 1320,
+        "y": 280
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "content": "This node instance is rendered by the class graph at `/library/classes/nodes/node.node-class.node`."
+      }
+    },
+    {
+      "id": "markdown-node-policy-guard",
+      "type": "markdown",
+      "label": "6) Edit Policy Guard",
+      "position": {
+        "x": 1320,
+        "y": 600
+      },
+      "width": 460,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Guard editing with **manifest authority**:\n\n- If `authority.mutation.allowUpdate = false` → no edit button\n- If `authority.mutation.appendOnly = true` → no edits\n\nUI should reflect read-only policy."
+      }
+    },
+    {
+      "id": "markdown-node-edit-override",
+      "type": "markdown",
+      "label": "7) Per-node Override",
+      "position": {
+        "x": 1320,
+        "y": 840
+      },
+      "width": 460,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Allow instance-level override:\n\n- `data.editable = false` disables edit button\n- Defaults to editable\n\nUseful for locked or read-only nodes."
+      }
+    },
+    {
+      "id": "markdown-node-telemetry",
+      "type": "markdown",
+      "label": "8) Telemetry + Provenance",
+      "position": {
+        "x": 1320,
+        "y": 1080
+      },
+      "width": 460,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Emit events for audit/provenance:\n\n- `nodeEditorPanelOpen` (nodeId, timestamp)\n- `nodeEditorPanelClose`\n- `nodeEditorSave` (nodeId, length, timestamp)"
+      }
     }
   ],
   "edges": [
@@ -291,6 +420,78 @@
       "source": "markdown-runtime-checks",
       "target": "markdown-acceptance",
       "label": "prove",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-definition-to-subgraph",
+      "type": "dataFlow",
+      "source": "markdown-node-definition-graph",
+      "target": "markdown-node-subgraph",
+      "label": "example instance",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dictionary-to-subgraph",
+      "type": "dataFlow",
+      "source": "markdown-node-task-dictionary",
+      "target": "markdown-node-subgraph",
+      "label": "resolves",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-legend-to-subgraph",
+      "type": "dataFlow",
+      "source": "markdown-node-task-legend",
+      "target": "markdown-node-subgraph",
+      "label": "declares",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-runtime-to-policy",
+      "type": "dataFlow",
+      "source": "markdown-runtime-checks",
+      "target": "markdown-node-policy-guard",
+      "label": "gate",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-policy-to-override",
+      "type": "dataFlow",
+      "source": "markdown-node-policy-guard",
+      "target": "markdown-node-edit-override",
+      "label": "override",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-override-to-telemetry",
+      "type": "dataFlow",
+      "source": "markdown-node-edit-override",
+      "target": "markdown-node-telemetry",
+      "label": "audit",
       "style": {
         "width": 2,
         "curved": true
