@@ -5,18 +5,18 @@ Prevent invalid or meaningless connections between nodes.
 
 ## Reads
 - edges[].source / target
-- edges[].handles
-- nodes[].handles
-- handle semantic types
+- edges[].ports
+- nodes[].ports
+- port semantic types
 - strictness flags
 
 ## Writes
-- validationResults.handles
+- validationResults.ports
 - errorNodes (markdown)
 
 ## Never Touches
 - graph topology
-- handles
+- ports
 - edges
 
 ## Determinism
@@ -26,8 +26,8 @@ Yes.
 Edges only (existing or proposed).
 
 ## Failure Modes
-- If handle missing, reject edge
+- If port missing, reject edge
 - If type mismatch and strict, reject edge
 
 ## Notes for AI
-Handles are contracts. Do not invent them.
+Ports are contracts. Do not invent them.

@@ -59,7 +59,7 @@
     {
       "id": "skill-avoidcollisions-root",
       "type": "markdown",
-      "label": "🧭 Skill: AvoidCollisions (Normative)",
+      "label": "\ud83e\udded Skill: AvoidCollisions (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Intent\n\nResolve overlaps with minimal disruption.\n\nPreserve the user’s mental map.\n\nMovement must be explainable."
+        "markdown": "## Intent\n\nResolve overlaps with minimal disruption.\n\nPreserve the user\u2019s mental map.\n\nMovement must be explainable."
       }
     },
     {
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- node bounds\n- group bounds\n- spacing rules\n\nReads define spatial constraints only."
+        "markdown": "## Reads\n\n- node bounds\n- cluster bounds\n- spacing rules\n\nReads define spatial constraints only."
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Never Touches\n\n- edge routes\n- group membership\n- locked nodes\n\nCollision resolution may not violate locks."
+        "markdown": "## Never Touches\n\n- edge routes\n- cluster membership\n- locked nodes\n\nCollision resolution may not violate locks."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If resolution impossible → stop early\n- Never teleport nodes\n\nPartial resolution is acceptable.\nTeleportation is not."
+        "markdown": "## Failure Modes\n\n- If resolution impossible \u2192 stop early\n- Never teleport nodes\n\nPartial resolution is acceptable.\nTeleportation is not."
       }
     },
     {

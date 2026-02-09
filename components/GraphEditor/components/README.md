@@ -20,7 +20,7 @@ This folder contains reusable UI components and panels for the node graph editor
   - Lists all groups in the graph. Supports selection, visibility toggling, focusing, and deletion.
 
 - **GroupPropertiesPanel.js**
-  - Panel for editing group properties: label, style, visibility, and node membership. Allows adding/removing nodes and ungrouping.
+  - Panel for editing cluster properties: label, style, visibility, and node membership. Allows adding/removing nodes and unclustering.
 
 - **MarkdownRenderer.js**
   - Renders markdown content in nodes or panels. Uses ReactMarkdown and supports custom link handling.
@@ -38,7 +38,7 @@ This folder contains reusable UI components and panels for the node graph editor
   - Dialog for global editor preferences: default colors, background image, and more. Persists settings to localStorage.
 
 - **PropertiesPanel.js**
-  - Main panel for editing node, edge, and group properties. Consolidates all property editing into a single UI.
+  - Main panel for editing node, edge, and cluster properties. Consolidates all property editing into a single UI.
 
 - **ResizeableDrawer.js**
   - Drawer component with resize support. Used for side panels and lists.

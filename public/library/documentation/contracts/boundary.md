@@ -12,8 +12,8 @@ If removing the editor changes interpretation, it is data.
 If a graph is exported, reloaded, and still works, the data is correct.
 
 ## Graph Data Includes
-- Nodes, edges, groups
-- Handles and semantics
+- Nodes, edges, clusters
+- Ports and semantics
 - Schema versions
 - Manifest and intent
 - Execution-relevant metadata

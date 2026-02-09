@@ -59,7 +59,7 @@
     {
       "id": "skill-createnodes-root",
       "type": "markdown",
-      "label": "🪜 Skill: createNodes (Normative)",
+      "label": "\ud83e\ude9c Skill: createNodes (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden Actions\n\n- Modify existing nodes\n- Modify edges or groups\n- Delete nodes\n- Reuse IDs\n- Guess schema fields\n- Auto-generate handles\n- Mutate other semantic data\n- Apply layout to existing nodes\n- Create edges"
+        "markdown": "## Forbidden Actions\n\n- Modify existing nodes\n- Modify edges or clusters\n- Delete nodes\n- Reuse IDs\n- Guess schema fields\n- Auto-generate ports\n- Mutate other semantic data\n- Apply layout to existing nodes\n- Create edges"
       }
     },
     {

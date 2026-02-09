@@ -1,14 +1,14 @@
-# Handle Contract Template
+# Port Contract Template
 
 > **Authority:** This document is normative.
-> Any edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to a handle contract defined using this template.
-> Tools and agents may not guess, infer, or invent handle behavior.
+> Any edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to a port contract defined using this template.
+> Tools and agents may not guess, infer, or invent port behavior.
 
 ---
 
 ## 0. Metadata
 
-* **Handle ID:** `<handle-id>`
+* **Port ID:** `<handle-id>`
 * **Node type:** `<node-type>`
 * **Contract version:** `MAJOR.MINOR.PATCH`
 * **Status:** `experimental | stable | deprecated`
@@ -16,35 +16,35 @@
 
 ---
 
-## 0.1 Default Root Handle (REQUIRED)
+## 0.1 Default Root Port (REQUIRED)
 
-Every node exposes a default handle named **`root`**, even when no handles are explicitly declared.
+Every node exposes a default port named **`root`**, even when no ports are explicitly declared.
 
 Implications:
 
-* Edges without handles attach to `root`.
+* Edges without ports attach to `root`.
 * `root` provides a portable attachment point for minimal graphs.
-* If a node declares handles, `root` still exists unless explicitly forbidden by that node’s contract.
+* If a node declares ports, `root` still exists unless explicitly forbidden by that node’s contract.
 
-Handle contracts apply to declared handles. A dedicated `root` contract is optional but recommended for node types that need strict semantics.
+Port contracts apply to declared ports. A dedicated `root` contract is optional but recommended for node types that need strict semantics.
 
 ---
 
 ## 1. Semantic Meaning (REQUIRED)
 
-Describe **what this handle represents** in the domain.
+Describe **what this port represents** in the domain.
 
 This meaning is portable and invariant across editors, renderers, and agents.
 
-* What kind of relationship does this handle express?
+* What kind of relationship does this port express?
 * What does it mean when an edge exists here?
-* What would be false if this handle were misused?
+* What would be false if this port were misused?
 
 ---
 
 ## 2. Direction (REQUIRED)
 
-Defines **how meaning flows** through this handle.
+Defines **how meaning flows** through this port.
 
 Allowed values:
 
@@ -58,7 +58,7 @@ Direction is semantic, not visual.
 
 ## 3. Semantic Type (REQUIRED)
 
-Defines **what kind of meaning** flows through this handle.
+Defines **what kind of meaning** flows through this port.
 
 Examples:
 
@@ -76,7 +76,7 @@ Semantic types are not programming types; they are conceptual contracts.
 
 ## 4. Multiplicity (REQUIRED)
 
-Defines how many edges may attach to this handle.
+Defines how many edges may attach to this port.
 
 Allowed values:
 
@@ -89,7 +89,7 @@ Multiplicity prevents structural ambiguity.
 
 ## 5. Compatibility Rules (REQUIRED)
 
-Define what this handle may connect to.
+Define what this port may connect to.
 
 ### Allowed connections
 
@@ -134,7 +134,7 @@ Examples:
 
 * No self-loops
 * No cycles
-* One per group
+* One per cluster
 * Must connect before execution
 * Must not cross graph boundary
 
@@ -144,12 +144,12 @@ These rules protect meaning and history.
 
 ## 8. Allowed Mutations
 
-List legal changes to edges attached to this handle.
+List legal changes to edges attached to this port.
 
 * add edge: allowed
 * remove edge: allowed
 * rewire edge: forbidden
-* change handle ID: forbidden
+* change port ID: forbidden
 
 Mutations not listed here are forbidden.
 
@@ -167,7 +167,7 @@ Validators MUST enforce:
 
 Validation failure MUST block persistence and execution.
 
-If no handle is specified, validators must treat the attachment as `root` (no error).
+If no port is specified, validators must treat the attachment as `root` (no error).
 
 ---
 
@@ -199,7 +199,7 @@ If no handle is specified, validators must treat the attachment as `root` (no er
 
 ## 11. Migration Notes
 
-Document how this handle evolved over time.
+Document how this port evolved over time.
 
 ### From v0.x → v1.0
 
@@ -214,7 +214,7 @@ Migrations must be explicit and reversible.
 
 Agents MUST:
 
-* Read handle contracts before connecting nodes
+* Read port contracts before connecting nodes
 * Refuse incompatible connections
 * Prefer add/remove over rewire
 * Emit errors instead of guessing
@@ -230,4 +230,4 @@ Ignored by validators but critical for stewardship.
 
 ---
 
-**End of handle contract.**
+**End of port contract.**

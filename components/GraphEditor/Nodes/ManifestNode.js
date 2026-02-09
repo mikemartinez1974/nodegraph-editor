@@ -57,7 +57,7 @@ const ManifestNode = (props) => {
         title: 'Dependencies',
         rows: [
           ['Node Types', formatList(dependencies.nodeTypes)],
-          ['Handle Contracts', formatList(dependencies.handleContracts)],
+          ['Port Contracts', formatList(dependencies.handleContracts)],
           ['Skills', formatList(dependencies.skills)],
           [
             'Schema Versions',

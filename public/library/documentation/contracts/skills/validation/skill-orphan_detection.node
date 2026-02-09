@@ -59,7 +59,7 @@
     {
       "id": "skill-orphan-root",
       "type": "markdown",
-      "label": "🕯️ Skill: OrphanDetection (Normative)",
+      "label": "\ud83d\udd6f\ufe0f Skill: OrphanDetection (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n### This skill:\n- Detects disconnected nodes or groups\n- Detects isolated subgraphs\n- Respects scratchpad flags\n- Emits warnings only\n\n### This skill does NOT:\n- Mutate graph structure\n- Delete anything\n- Infer intent\n- Auto-repair"
+        "markdown": "## Scope\n\n### This skill:\n- Detects disconnected nodes or clusters\n- Detects isolated subgraphs\n- Respects scratchpad flags\n- Emits warnings only\n\n### This skill does NOT:\n- Mutate graph structure\n- Delete anything\n- Infer intent\n- Auto-repair"
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n- Nodes readable\n- Edges readable\n- Group membership known\n- Scratchpad flags resolved"
+        "markdown": "## Preconditions\n\n- Nodes readable\n- Edges readable\n- Cluster membership known\n- Scratchpad flags resolved"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- nodes\n- edges\n- groups\n- scratchpad flags"
+        "markdown": "## Reads\n\n- nodes\n- edges\n- clusters\n- scratchpad flags"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Never Touches\n\n- graph structure\n- edges\n- groups\n- data\n- meaning"
+        "markdown": "## Never Touches\n\n- graph structure\n- edges\n- clusters\n- data\n- meaning"
       }
     },
     {

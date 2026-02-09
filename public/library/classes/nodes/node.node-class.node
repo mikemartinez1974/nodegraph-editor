@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-05T21:31:57.292Z",
-    "modified": "2026-02-05T21:31:59.390Z",
+    "created": "2026-02-09T18:03:46.655Z",
+    "modified": "2026-02-09T18:03:49.879Z",
     "author": "",
     "tags": []
   },
@@ -200,7 +200,7 @@
                 "label": "Markdown",
                 "type": "markdown",
                 "path": "data.content",
-                "placeholder": "Enter markdown\u2026",
+                "placeholder": "Enter markdown…",
                 "multiline": true,
                 "rows": 10
               }

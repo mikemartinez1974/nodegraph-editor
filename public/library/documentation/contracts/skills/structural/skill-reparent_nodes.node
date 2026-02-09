@@ -59,7 +59,7 @@
     {
       "id": "skill-reparent-root",
       "type": "markdown",
-      "label": "🧬 Skill: reparentNodes (Normative)",
+      "label": "\ud83e\uddec Skill: reparentNodes (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n### This skill:\n- Removes nodes from a parent\n- Adds nodes to a new parent\n- Preserves identity, data, edges, type\n- Preserves spatial position\n- Updates group bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change data or type\n- Trigger layout or routing\n- Infer intent"
+        "markdown": "## Scope\n\n### This skill:\n- Removes nodes from a parent\n- Adds nodes to a new parent\n- Preserves identity, data, edges, type\n- Preserves spatial position\n- Updates cluster bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change data or type\n- Trigger layout or routing\n- Infer intent"
       }
     },
     {

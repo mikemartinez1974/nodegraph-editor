@@ -61,7 +61,7 @@
     {
       "id": "required-node-roles-root",
       "type": "markdown",
-      "label": "📌 Required Node Roles",
+      "label": "\ud83d\udccc Required Node Roles",
       "position": {
         "x": -320,
         "y": -220
@@ -103,7 +103,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Definitions\n\n**Type:** `definitions`\n\nLists node schemas, edge schemas, handle contracts, validation rules."
+        "markdown": "## Definitions\n\n**Type:** `definitions`\n\nLists node schemas, edge schemas, port contracts, validation rules."
       }
     },
     {

@@ -1974,6 +1974,7 @@ export default class GraphCRUD {
       eventBus.emit('nodeInput', {
         targetNodeId: nodeId,
         handleId: 'root',
+        inputName: 'root',
         value: meta || {},
         source: 'user',
         meta: { requestedBy: 'executeNode' }
@@ -1995,6 +1996,7 @@ export default class GraphCRUD {
           eventBus.emit('nodeInput', {
             targetNodeId: nodeId,
             handleId: 'root',
+            inputName: 'root',
             value: meta || {},
             source: 'user',
             meta: { requestedBy: 'executeNodes' }
@@ -2014,6 +2016,7 @@ export default class GraphCRUD {
       eventBus.emit('nodeInput', {
         targetNodeId: nodeId,
         handleId: handleId || 'root',
+        inputName: handleId || 'root',
         value,
         source: meta?.source || 'api',
         meta

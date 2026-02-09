@@ -20,6 +20,12 @@
 # production
 /build
 
+# twilite
+/.twilite
+
+# skills
+/.skills
+
 # misc
 .DS_Store
 *.pem

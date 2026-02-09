@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields (OPTIONAL)\n\n- label\n- position\n- size\n- handles\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
+        "markdown": "## Optional Fields (OPTIONAL)\n\n- label\n- position\n- size\n- ports\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
       }
     },
     {
@@ -155,7 +155,7 @@
     {
       "id": "node-schema-handles",
       "type": "markdown",
-      "label": "5. Handles",
+      "label": "5. Ports",
       "position": {
         "x": -80,
         "y": 800
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handles (IF APPLICABLE)\n\nEvery declared handle MUST be specified:\n\n- id\n- direction\n- semanticType\n- multiplicity\n- wildcard\n\nUndeclared handles are forbidden.\n\nEvery node also exposes a default **root** handle for portability."
+        "markdown": "## Ports (IF APPLICABLE)\n\nEvery declared port MUST be specified:\n\n- id\n- direction\n- semanticType\n- multiplicity\n- wildcard\n\nUndeclared ports are forbidden.\n\nEvery node also exposes a default **root** port for portability."
       }
     },
     {
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden Mutations\n\n- change node type\n- delete required fields\n- add undocumented fields\n- modify handle IDs\n- recreate node instead of update"
+        "markdown": "## Forbidden Mutations\n\n- change node type\n- delete required fields\n- add undocumented fields\n- modify port IDs\n- recreate node instead of update"
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- required fields present\n- data shape valid\n- handles valid (default `root` if omitted)\n- schema version compatible\n- no forbidden mutations\n- node resolves at least one View\n\nFailure blocks execution."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- required fields present\n- data shape valid\n- ports valid (default `root` if omitted)\n- schema version compatible\n- no forbidden mutations\n- node resolves at least one View\n\nFailure blocks execution."
       }
     },
     {

@@ -2,7 +2,7 @@
 
 This document defines the **minimal, portable contract** for edges in Twilite graphs.
 
-Edges express relationships. Handles are optional so graphs remain portable.
+Edges express relationships. Ports are optional so graphs remain portable.
 
 ---
 
@@ -45,11 +45,11 @@ Every edge must include:
 
 ---
 
-## Handle Rules (Lightweight)
+## Port Rules (Lightweight)
 
-- Handles are **optional** for portability.
-- If handles are provided, they must match declared handles on the node.
-- If handles are omitted, the edge is still valid and must attach to the default `root` handle.
+- Ports are **optional** for portability.
+- If ports are provided, they must match declared ports on the node.
+- If ports are omitted, the edge is still valid and must attach to the default `root` port.
 
 ---
 
@@ -99,7 +99,7 @@ Edges must never:
 
 - Reference missing nodes
 - Reuse an existing edge `id`
-- Implicitly create handles
+- Implicitly create ports
 
 ---
 
@@ -109,6 +109,6 @@ An edge is valid if:
 
 1. `id`, `source`, `target`, and `type` exist
 2. `source` and `target` exist as node IDs
-3. If handles are provided, they exist on their nodes
+3. If ports are provided, they exist on their nodes
 
 This is intentionally minimal to preserve portability.

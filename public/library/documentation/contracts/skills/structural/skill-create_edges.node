@@ -59,7 +59,7 @@
     {
       "id": "skill-createedges-root",
       "type": "markdown",
-      "label": "🧱 Skill: createEdges (Normative)",
+      "label": "\ud83e\uddf1 Skill: createEdges (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n- Create new edges only\n- Never mutate existing nodes, edges, or groups\n- Never infer semantics\n- Never rewire relationships\n\nCreation is strictly additive."
+        "markdown": "## Scope\n\n- Create new edges only\n- Never mutate existing nodes, edges, or clusters\n- Never infer semantics\n- Never rewire relationships\n\nCreation is strictly additive."
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n1. Source and target nodes exist\n2. Handle contracts respected (if used)\n3. Edge ID is unique\n4. No implicit rewiring\n5. Graph is mutable under Manifest\n\nAny violation → hard failure"
+        "markdown": "## Preconditions\n\n1. Source and target nodes exist\n2. Port contracts respected (if used)\n3. Edge ID is unique\n4. No implicit rewiring\n5. Graph is mutable under Manifest\n\nAny violation \u2192 hard failure"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden Actions\n\n- Delete or modify edges\n- Guess or invent handles\n- Auto-connect nearby nodes\n- Infer intent from position\n- Create nodes implicitly\n- Change layout, routes, or grouping\n- Create edges with missing endpoints"
+        "markdown": "## Forbidden Actions\n\n- Delete or modify edges\n- Guess or invent ports\n- Auto-connect nearby nodes\n- Infer intent from position\n- Create nodes implicitly\n- Change layout, routes, or grouping\n- Create edges with missing endpoints"
       }
     },
     {

@@ -59,7 +59,7 @@
     {
       "id": "skill-handlecheck-root",
       "type": "markdown",
-      "label": "🔒 Skill: HandleCompatibilityChecks (Normative)",
+      "label": "\ud83d\udd12 Skill: HandleCompatibilityChecks (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Skill: HandleCompatibilityChecks\n\n**Category:** Validation Skill\n\n**Intent:** Prevent invalid or meaningless connections between nodes.\n\nHandles are contracts. This skill enforces them.\n\nThis graph is the contract."
+        "markdown": "# Skill: HandleCompatibilityChecks\n\n**Category:** Validation Skill\n\n**Intent:** Prevent invalid or meaningless connections between nodes.\n\nPorts are contracts. This skill enforces them.\n\nThis graph is the contract."
       }
     },
     {
@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Purpose\n\nEnsure all edges respect declared handle semantics.\n\nPrevents meaningless, invalid, or unsafe connections before they become history."
+        "markdown": "## Purpose\n\nEnsure all edges respect declared port semantics.\n\nPrevents meaningless, invalid, or unsafe connections before they become history."
       }
     },
     {
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n### This skill:\n- Validates proposed or existing edges\n- Checks handle existence\n- Checks direction and semantic compatibility\n- Emits validation results\n\n### This skill does NOT:\n- Mutate graph topology\n- Modify handles\n- Modify edges\n- Guess intent"
+        "markdown": "## Scope\n\n### This skill:\n- Validates proposed or existing edges\n- Checks port existence\n- Checks direction and semantic compatibility\n- Emits validation results\n\n### This skill does NOT:\n- Mutate graph topology\n- Modify ports\n- Modify edges\n- Guess intent"
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n- Edge endpoints exist\n- Node handle declarations available\n- Handle semantic types declared\n- Strictness flags resolved"
+        "markdown": "## Preconditions\n\n- Edge endpoints exist\n- Node port declarations available\n- Port semantic types declared\n- Strictness flags resolved"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].handles\n- nodes[].handles\n- handle semantic types\n- strictness flags"
+        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].ports\n- nodes[].ports\n- port semantic types\n- strictness flags"
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Writes\n\n- validationResults.handles\n- errorNodes (markdown)"
+        "markdown": "## Writes\n\n- validationResults.ports\n- errorNodes (markdown)"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Never Touches\n\n- graph topology\n- nodes\n- edges\n- handles\n- meaning"
+        "markdown": "## Never Touches\n\n- graph topology\n- nodes\n- edges\n- ports\n- meaning"
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing handle → reject edge\n- Direction mismatch → reject edge\n- Semantic type mismatch (strict) → reject edge\n\nFailures must be explicit."
+        "markdown": "## Failure Modes\n\n- Missing port \u2192 reject edge\n- Direction mismatch \u2192 reject edge\n- Semantic type mismatch (strict) \u2192 reject edge\n\nFailures must be explicit."
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Design Invariant\n\n**Handles are contracts, not suggestions.**\n\nIf compatibility is unclear, the answer is no."
+        "markdown": "## Design Invariant\n\n**Ports are contracts, not suggestions.**\n\nIf compatibility is unclear, the answer is no."
       }
     }
   ],

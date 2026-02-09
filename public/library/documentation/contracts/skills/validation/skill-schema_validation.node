@@ -59,7 +59,7 @@
     {
       "id": "skill-schema-root",
       "type": "markdown",
-      "label": "🧱 Skill: SchemaValidation (Normative)",
+      "label": "\ud83e\uddf1 Skill: SchemaValidation (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n### This skill:\n- Validates node types and data shape\n- Validates handles and directions\n- Validates required fields\n- Validates width/height constraints\n- Emits blocking errors\n\n### This skill does NOT:\n- Mutate structure\n- Fix schema violations\n- Guess defaults"
+        "markdown": "## Scope\n\n### This skill:\n- Validates node types and data shape\n- Validates ports and directions\n- Validates required fields\n- Validates width/height constraints\n- Emits blocking errors\n\n### This skill does NOT:\n- Mutate structure\n- Fix schema violations\n- Guess defaults"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- nodes[].type\n- nodes[].data\n- nodes[].handles\n- nodes[].width / height\n- edges[].source / target / handles\n- schema registry\n- schema versions"
+        "markdown": "## Reads\n\n- nodes[].type\n- nodes[].data\n- nodes[].ports\n- nodes[].width / height\n- edges[].source / target / ports\n- schema registry\n- schema versions"
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing schema → error\n- Schema version mismatch → warn + block mutation\n- Invalid data shape → error\n- Handle mismatch → error\n\nFailure blocks progress."
+        "markdown": "## Failure Modes\n\n- Missing schema \u2192 error\n- Schema version mismatch \u2192 warn + block mutation\n- Invalid data shape \u2192 error\n- Port mismatch \u2192 error\n\nFailure blocks progress."
       }
     },
     {

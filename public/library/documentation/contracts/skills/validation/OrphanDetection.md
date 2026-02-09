@@ -6,7 +6,7 @@ Identify disconnected or abandoned structures that may indicate incomplete thoug
 ## Reads
 - nodes
 - edges
-- groups
+- clusters
 - scratchpad flags
 
 ## Writes
@@ -16,7 +16,7 @@ Identify disconnected or abandoned structures that may indicate incomplete thoug
 ## Never Touches
 - graph structure
 - edges
-- groups
+- clusters
 
 ## Determinism
 Yes.

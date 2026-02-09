@@ -34,7 +34,7 @@ Duplication is not copying text — it is controlled identity minting.
 - Caller must have mutation authority
 - Graph must be in a mutable state
 - If `includeEdges` is true, only **internal edges** are eligible
-- Target group must exist if provided
+- Target cluster must exist if provided
 
 ---
 
@@ -45,13 +45,13 @@ Duplication is not copying text — it is controlled identity minting.
 - New nodes preserve:
   - type
   - data
-  - handles
+  - ports
   - size
 - Positions are offset to avoid overlap
 - If edges are duplicated:
   - only edges between duplicated nodes are included
   - external edges are excluded
-- Group membership is explicit and intentional
+- Cluster membership is explicit and intentional
 
 ---
 
@@ -60,7 +60,7 @@ Duplication is not copying text — it is controlled identity minting.
 - Reusing original IDs
 - Duplicating external edges by default
 - Mutating original nodes
-- Inferring group membership implicitly
+- Inferring cluster membership implicitly
 - Auto-layout or spatial normalization
 - Copying transient UI state
 
@@ -72,7 +72,7 @@ Duplication is not copying text — it is controlled identity minting.
 |----------|------|
 | Missing node | `NODE_NOT_FOUND` |
 | ID collision | `ID_COLLISION` |
-| Invalid group | `INVALID_GROUP` |
+| Invalid cluster | `INVALID_GROUP` |
 | Protected node | `NODE_LOCKED` |
 | Edge leak | `INVALID_EDGE_SCOPE` |
 

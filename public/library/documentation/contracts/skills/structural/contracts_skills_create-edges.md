@@ -19,13 +19,13 @@ This contract defines how edges may be added **without corrupting identity, hist
 
 This skill:
 - Creates new edges only
-- Never mutates existing nodes, edges, or groups
+- Never mutates existing nodes, edges, or clusters
 - Never infers semantics
 - Never rewires existing relationships
 
 This skill does **not**:
 - Auto-create nodes
-- Auto-create handles
+- Auto-create ports
 - Delete or replace edges
 - Change meaning implicitly
 
@@ -39,12 +39,12 @@ Before execution, the following must be true:
    - Both node IDs must already be present in the graph
    - Missing nodes must cause failure
 
-2. **Handle contracts are respected (if used)**
+2. **Port contracts are respected (if used)**
    - If `sourceHandle` or `targetHandle` is provided:
-     - The handle ID must exist on the node type
+     - The port ID must exist on the node type
      - Direction must be valid
      - Compatibility rules must pass
-   - If handles are omitted:
+   - If ports are omitted:
      - The edge must be semantically neutral (documentation, grouping, reference)
 
 3. **Edge identity is unique**
@@ -107,7 +107,7 @@ After successful execution:
 This skill must never:
 
 - Delete or modify existing edges
-- Guess or invent handles
+- Guess or invent ports
 - Auto-connect “nearby” nodes
 - Infer intent from position
 - Create nodes implicitly

@@ -59,7 +59,7 @@
     {
       "id": "skill-autolayoutelk-root",
       "type": "markdown",
-      "label": "🕸️ Skill: AutoLayoutELK (Normative)",
+      "label": "\ud83d\udd78\ufe0f Skill: AutoLayoutELK (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- nodes[].position\n- nodes[].width / height\n- edges[].source / target / handles\n- groups[].bounds\n- document.layoutOptions\n\nReads define geometry only."
+        "markdown": "## Reads\n\n- nodes[].position\n- nodes[].width / height\n- edges[].source / target / ports\n- clusters[].bounds\n- document.layoutOptions\n\nReads define geometry only."
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Never Touches\n\n- node IDs\n- edge IDs\n- edges[].source / target\n- group membership\n- semantic labels\n\nMeaning is immutable under layout."
+        "markdown": "## Never Touches\n\n- node IDs\n- edge IDs\n- edges[].source / target\n- cluster membership\n- semantic labels\n\nMeaning is immutable under layout."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If ELK fails → preserve previous layout\n- If constraints conflict → relax spacing only\n\nSemantic integrity must always win."
+        "markdown": "## Failure Modes\n\n- If ELK fails \u2192 preserve previous layout\n- If constraints conflict \u2192 relax spacing only\n\nSemantic integrity must always win."
       }
     },
     {

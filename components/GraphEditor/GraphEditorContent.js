@@ -859,6 +859,7 @@ const GraphEditorContent = () => {
         eventBus.emit('nodeInput', {
           targetNodeId: edge.target,
           handleId: targetHandle,
+          inputName: targetHandle,
           value,
           source: 'edge',
           meta: {

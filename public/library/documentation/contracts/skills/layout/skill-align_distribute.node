@@ -59,7 +59,7 @@
     {
       "id": "skill-aligndistribute-root",
       "type": "markdown",
-      "label": "📐 Skill: AlignDistribute (Normative)",
+      "label": "\ud83d\udcd0 Skill: AlignDistribute (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Never Touches\n\n- unselected nodes\n- edges\n- groups\n\nLayout authority is strictly local."
+        "markdown": "## Never Touches\n\n- unselected nodes\n- edges\n- clusters\n\nLayout authority is strictly local."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If fewer than 2 nodes selected → no-op\n\nNo partial application is allowed."
+        "markdown": "## Failure Modes\n\n- If fewer than 2 nodes selected \u2192 no-op\n\nNo partial application is allowed."
       }
     },
     {

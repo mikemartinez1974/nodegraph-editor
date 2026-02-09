@@ -4,6 +4,7 @@ import { useEffect, useRef, useMemo, useCallback } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import { emitIntent } from '../core/graphCore';
 import { createExecutionSpine } from '../core/executionSpine';
+import { createGraphExecutionRuntime } from '../core/graphExecutionRuntime';
 import { placeNodesIncrementally } from '../utils/growthPlacement';
 import { validateGraphInvariants } from '../validators/validateGraphInvariants';
 import { summarizeContracts } from '../contracts/contractManager';
@@ -216,9 +217,44 @@ export default function useInterpreterLayer({
     }
   }), []);
 
+  const executionRuntime = useMemo(() => {
+    return createGraphExecutionRuntime({
+      getNodes: () => nodes,
+      getEdges: () => edges
+    });
+  }, [nodes, edges]);
+
+  const graphExecutionSkill = useMemo(() => ({
+    id: 'graphExecution',
+    matches: (intent) => {
+      if (intent?.payload?.executeGraph || intent?.payload?.executeNodes) return true;
+      const proposals = intent?.payload?.proposals || intent?.proposals || [];
+      return Array.isArray(proposals) && proposals.some((p) => p?.action === 'executeGraph' || p?.action === 'executeNodes');
+    },
+    handle: async (intent) => {
+      const payload = intent?.payload || intent || {};
+      if (payload.executeGraph) {
+        return executionRuntime.executeGraph(payload.executeGraph);
+      }
+      if (payload.executeNodes) {
+        return executionRuntime.executeNodes(payload.executeNodes);
+      }
+      const proposals = payload.proposals || [];
+      proposals.forEach((proposal) => {
+        if (!proposal || typeof proposal !== 'object') return;
+        if (proposal.action === 'executeGraph') {
+          executionRuntime.executeGraph(proposal.payload || proposal.data || proposal);
+        } else if (proposal.action === 'executeNodes') {
+          executionRuntime.executeNodes(proposal.payload || proposal.data || proposal);
+        }
+      });
+      return { success: true };
+    }
+  }), [executionRuntime]);
+
   const skills = useMemo(
-    () => [autoLayoutSkill, rerouteSkill, proposalsSkill],
-    [autoLayoutSkill, rerouteSkill, proposalsSkill]
+    () => [autoLayoutSkill, rerouteSkill, graphExecutionSkill, proposalsSkill],
+    [autoLayoutSkill, rerouteSkill, graphExecutionSkill, proposalsSkill]
   );
 
   const isDraftMode = useCallback(() => {

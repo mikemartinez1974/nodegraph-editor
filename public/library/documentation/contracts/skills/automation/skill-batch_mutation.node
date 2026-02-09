@@ -59,7 +59,7 @@
     {
       "id": "skill-batchmutation-root",
       "type": "markdown",
-      "label": "🛠️ Skill: BatchMutation (Normative)",
+      "label": "\ud83d\udee0\ufe0f Skill: BatchMutation (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Writes\n\n- nodes\n- edges\n- groups\n- batchMetadata\n\nWrites are scoped to the batch only."
+        "markdown": "## Writes\n\n- nodes\n- edges\n- clusters\n- batchMetadata\n\nWrites are scoped to the batch only."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If any step fails → rollback all\n- If validation fails → abort\n\nNo partial success is allowed."
+        "markdown": "## Failure Modes\n\n- If any step fails \u2192 rollback all\n- If validation fails \u2192 abort\n\nNo partial success is allowed."
       }
     },
     {

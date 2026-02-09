@@ -6,9 +6,9 @@ Ensure graph structures conform to declared and versioned schemas before any mut
 ## Reads
 - nodes[].type
 - nodes[].data
-- nodes[].handles
+- nodes[].ports
 - nodes[].width / height
-- edges[].source / target / handles
+- edges[].source / target / ports
 - schema registry
 - schema versions
 

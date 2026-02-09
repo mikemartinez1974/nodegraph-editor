@@ -59,7 +59,7 @@
     {
       "id": "skill-rerouteedges-root",
       "type": "markdown",
-      "label": "🧵 Skill: RerouteEdges (Normative)",
+      "label": "\ud83e\uddf5 Skill: RerouteEdges (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].handles\n- node bounds\n- group bounds\n- routingOptions\n\nReads define geometry and constraints only."
+        "markdown": "## Reads\n\n- edges[].source / target\n- edges[].ports\n- node bounds\n- cluster bounds\n- routingOptions\n\nReads define geometry and constraints only."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If routing fails → preserve previous routes\n- If ports missing → abort\n\nNever degrade meaning for aesthetics."
+        "markdown": "## Failure Modes\n\n- If routing fails \u2192 preserve previous routes\n- If ports missing \u2192 abort\n\nNever degrade meaning for aesthetics."
       }
     },
     {
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- respect declared ports\n- never guess handles\n- preserve endpoints\n- rebuild routes deterministically\n- emit errors instead of guessing"
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- respect declared ports\n- never guess ports\n- preserve endpoints\n- rebuild routes deterministically\n- emit errors instead of guessing"
       }
     },
     {

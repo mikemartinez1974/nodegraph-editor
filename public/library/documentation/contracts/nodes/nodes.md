@@ -99,23 +99,23 @@ Rules:
 
 ---
 
-## 5. Handles (IF APPLICABLE)
+## 5. Ports (IF APPLICABLE)
 
-If this node exposes handles, each must be declared here.
+If this node exposes ports, each must be declared here.
 
-Every node also exposes a default handle named **root** for portability.
+Every node also exposes a default port named **root** for portability.
 
-### Handle definition
+### Port definition
 
 | Field        | Description              |           |               |
 | ------------ | ------------------------ | --------- | ------------- |
-| id           | Stable handle identifier |           |               |
+| id           | Stable port identifier |           |               |
 | direction    | input                    | output    | bidirectional |
 | semanticType | Meaning of data flow     |           |               |
 | multiplicity | one                      | many      |               |
 | wildcard     | allowed                  | forbidden |               |
 
-### Handle list
+### Port list
 
 ```md
 - id: <handle-id>
@@ -147,7 +147,7 @@ Explicitly illegal operations:
 * Changing node type
 * Deleting required fields
 * Adding undocumented fields
-* Modifying handle IDs
+* Modifying port IDs
 * Recreating node instead of updating
 
 ---
@@ -158,7 +158,7 @@ Rules that MUST pass before mutation or persistence.
 
 * Required fields present
 * Data shape valid
-* Handles valid
+* Ports valid
 * Version compatible
 * No forbidden mutations
 

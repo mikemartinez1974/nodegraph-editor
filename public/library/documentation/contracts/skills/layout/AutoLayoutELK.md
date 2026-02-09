@@ -6,8 +6,8 @@ Recompute spatial arrangement for global readability without altering meaning.
 ## Reads
 - nodes[].position
 - nodes[].width / height
-- edges[].source / target / handles
-- groups[].bounds
+- edges[].source / target / ports
+- clusters[].bounds
 - document.layoutOptions
 
 ## Writes
@@ -18,7 +18,7 @@ Recompute spatial arrangement for global readability without altering meaning.
 - node IDs
 - edge IDs
 - edges[].source / target
-- group membership
+- cluster membership
 - semantic labels
 
 ## Determinism

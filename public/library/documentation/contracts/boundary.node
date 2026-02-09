@@ -59,7 +59,7 @@
     {
       "id": "boundary-root",
       "type": "markdown",
-      "label": "🧭 Data vs UI Boundary Contract",
+      "label": "\ud83e\udded Data vs UI Boundary Contract",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Graph Data Includes\n\n- nodes, edges, groups\n- handles and semantics\n- schema versions\n- manifest and intent\n- execution-relevant metadata\n\nGraph data is **meaning-bearing** and must survive export."
+        "markdown": "## Graph Data Includes\n\n- nodes, edges, clusters\n- ports and semantics\n- schema versions\n- manifest and intent\n- execution-relevant metadata\n\nGraph data is **meaning-bearing** and must survive export."
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## View Boundary (Multi-Dev Contract)\n\nViews are the lowest-level graph-defined unit.\n\nEverything above views is graph-defined. Everything below views is code-defined.\n\n### Graph-Defined (above the line)\n- Dictionaries (nodeDefs, skills, views)\n- Node classes and schemas\n- View declarations (intent + payload)\n- Task graphs and workflows\n- Node instances and data\n\n### Code-Defined (below the line)\n- Rendering runtime and components\n- Event plumbing and UI wiring\n- Security/sanitization\n- Performance and caching\n\n### Reasoning\n- Views act as stable API surfaces across teams.\n- Graphs are declarative, reviewable, and portable.\n- Runtime stays centralized for correctness and policy.\n\nIf you’re unsure: if it changes what the view **is**, it’s graph-defined. If it changes how the view **renders**, it’s code-defined."
+        "markdown": "## View Boundary (Multi-Dev Contract)\n\nViews are the lowest-level graph-defined unit.\n\nEverything above views is graph-defined. Everything below views is code-defined.\n\n### Graph-Defined (above the line)\n- Dictionaries (nodeDefs, skills, views)\n- Node classes and schemas\n- View declarations (intent + payload)\n- Task graphs and workflows\n- Node instances and data\n\n### Code-Defined (below the line)\n- Rendering runtime and components\n- Event plumbing and UI wiring\n- Security/sanitization\n- Performance and caching\n\n### Reasoning\n- Views act as stable API surfaces across teams.\n- Graphs are declarative, reviewable, and portable.\n- Runtime stays centralized for correctness and policy.\n\nIf you\u2019re unsure: if it changes what the view **is**, it\u2019s graph-defined. If it changes how the view **renders**, it\u2019s code-defined."
       }
     },
     {

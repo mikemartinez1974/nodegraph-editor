@@ -59,7 +59,7 @@
     {
       "id": "skill-group-root",
       "type": "markdown",
-      "label": "📦 Skill: Group / Ungroup (Normative)",
+      "label": "\ud83d\udce6 Skill: Cluster / Ungroup (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Skill: groupNodes / ungroupNodes\n\n**Category:** Structural Skill\n\n**Intent:** Create or dissolve structural containment without changing graph meaning.\n\nGroups define containment and scope, never semantics.\n\nThis graph is the contract."
+        "markdown": "# Skill: groupNodes / ungroupNodes\n\n**Category:** Structural Skill\n\n**Intent:** Create or dissolve structural containment without changing graph meaning.\n\nClusters define containment and scope, never semantics.\n\nThis graph is the contract."
       }
     },
     {
@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Purpose\n\nManage structural grouping.\n\nGroups help humans and tools perceive organization without altering meaning.\n\nGrouping must never change interpretation, data, or relationships."
+        "markdown": "## Purpose\n\nManage structural grouping.\n\nClusters help humans and tools perceive organization without altering meaning.\n\nGrouping must never change interpretation, data, or relationships."
       }
     },
     {
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Scope\n\n### This skill:\n- Creates groups\n- Adds/removes nodes from groups\n- Preserves identity, edges, data\n- Preserves spatial positions\n- Updates group bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change layout or routing\n- Infer semantics\n- Reparent implicitly"
+        "markdown": "## Scope\n\n### This skill:\n- Creates clusters\n- Adds/removes nodes from clusters\n- Preserves identity, edges, data\n- Preserves spatial positions\n- Updates cluster bounds\n\n### This skill does NOT:\n- Create/delete nodes or edges\n- Change layout or routing\n- Infer semantics\n- Reparent implicitly"
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n### Grouping\n- Nodes exist\n- Nodes not implicitly removed from prior groups\n- Group container explicit (new or existing)\n- Graph mutable per Manifest\n\n### Ungrouping\n- Group exists\n- Group contains nodes\n- Ungrouping is explicit (partial allowed)"
+        "markdown": "## Preconditions\n\n### Grouping\n- Nodes exist\n- Nodes not implicitly removed from prior clusters\n- Cluster container explicit (new or existing)\n- Graph mutable per Manifest\n\n### Ungrouping\n- Cluster exists\n- Cluster contains nodes\n- Ungrouping is explicit (partial allowed)"
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Postconditions\n\n### Grouping\n- Nodes are members of target group\n- Positions unchanged\n- Bounds updated\n- No data or edges modified\n\n### Ungrouping\n- Nodes removed from group\n- Group persists unless explicitly deleted\n- Positions unchanged"
+        "markdown": "## Postconditions\n\n### Grouping\n- Nodes are members of target cluster\n- Positions unchanged\n- Bounds updated\n- No data or edges modified\n\n### Ungrouping\n- Nodes removed from cluster\n- Cluster persists unless explicitly deleted\n- Positions unchanged"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden Actions\n\n- Move nodes implicitly\n- Delete nodes or edges\n- Reparent implicitly\n- Merge/split groups automatically\n- Infer grouping from proximity\n- Trigger layout or reroute\n- Alter node data or type"
+        "markdown": "## Forbidden Actions\n\n- Move nodes implicitly\n- Delete nodes or edges\n- Reparent implicitly\n- Merge/split clusters automatically\n- Infer grouping from proximity\n- Trigger layout or reroute\n- Alter node data or type"
       }
     },
     {
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dry Run Behavior\n\n- Execute validations\n- Simulate group creation\n- No mutation\n- Report success/failure"
+        "markdown": "## Dry Run Behavior\n\n- Execute validations\n- Simulate cluster creation\n- No mutation\n- Report success/failure"
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Design Invariant\n\n**Groups are scaffolding, not structure.**\n\nThey help minds, not meaning.\n\nThis skill must remain conservative and boring."
+        "markdown": "## Design Invariant\n\n**Clusters are scaffolding, not structure.**\n\nThey help minds, not meaning.\n\nThis skill must remain conservative and boring."
       }
     }
   ],

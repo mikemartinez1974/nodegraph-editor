@@ -5,7 +5,7 @@ Resolve overlaps while preserving spatial trust.
 
 ## Reads
 - node bounds
-- group bounds
+- cluster bounds
 - spacing rules
 
 ## Writes
@@ -13,7 +13,7 @@ Resolve overlaps while preserving spatial trust.
 
 ## Never Touches
 - edge routes
-- group membership
+- cluster membership
 - locked nodes
 
 ## Determinism

@@ -1,4 +1,4 @@
-# Skill Contract: Group / Ungroup
+# Skill Contract: Cluster / Ungroup
 
 **Skill name:** `groupNodes` / `ungroupNodes`  
 **Category:** Structural Skills  
@@ -10,7 +10,7 @@
 
 This skill manages **structural grouping**.
 
-Groups define **containment, scope, and organization**, not semantics.  
+Clusters define **containment, scope, and organization**, not semantics.  
 They must never change interpretation, relationships, or data meaning.
 
 Grouping is how humans and tools perceive structure without altering truth.
@@ -20,11 +20,11 @@ Grouping is how humans and tools perceive structure without altering truth.
 ## Scope
 
 This skill:
-- Creates new group containers
-- Adds or removes nodes from groups
+- Creates new cluster containers
+- Adds or removes nodes from clusters
 - Preserves node identity, edges, and data
 - Preserves relative spatial positions
-- Updates group bounds explicitly
+- Updates cluster bounds explicitly
 
 This skill does **not**:
 - Create or delete nodes
@@ -44,19 +44,19 @@ Before execution:
    - Node IDs must be valid and present
 
 2. **Nodes are not already grouped (unless re-grouping is explicit)**
-   - Implicit removal from prior groups is forbidden
+   - Implicit removal from prior clusters is forbidden
 
-3. **Group container is explicit**
+3. **Cluster container is explicit**
    - Either:
-     - A new group is created, or
-     - An existing group ID is provided
+     - A new cluster is created, or
+     - An existing cluster ID is provided
 
 4. **Graph is mutable**
    - If a Manifest exists and forbids mutation, fail
 
 ### For ungrouping
-1. **Group exists**
-2. **Group contains nodes**
+1. **Cluster exists**
+2. **Cluster contains nodes**
 3. **Ungrouping is explicit**
    - Partial ungrouping must list node IDs
 
@@ -81,15 +81,15 @@ Before execution:
 After successful execution:
 
 ### Grouping
-- All listed nodes are members of the target group
+- All listed nodes are members of the target cluster
 - No nodes are moved spatially
-- Group bounds reflect contained nodes
+- Cluster bounds reflect contained nodes
 - No edges or data are modified
 
 ### Ungrouping
-- Listed nodes are removed from the group
-- Group remains if nodes remain
-- Group is deleted only if explicitly requested
+- Listed nodes are removed from the cluster
+- Cluster remains if nodes remain
+- Cluster is deleted only if explicitly requested
 - Spatial positions are unchanged
 
 ---
@@ -102,7 +102,7 @@ This skill must never:
 - Delete nodes
 - Delete edges
 - Reparent nodes implicitly
-- Merge or split groups automatically
+- Merge or split clusters automatically
 - Infer grouping from proximity
 - Trigger layout or rerouting
 - Alter node data or type
@@ -115,7 +115,7 @@ On failure:
 
 - No partial mutations may occur
 - Return structured, machine-readable errors
-- Identify offending node or group IDs
+- Identify offending node or cluster IDs
 - Prefer rejection over silent correction
 
 Optional:
@@ -129,7 +129,7 @@ When `dryRun: true`:
 - All validations execute
 - No grouping changes occur
 - Result indicates success or failure
-- Group creation is simulated only
+- Cluster creation is simulated only
 
 ---
 
@@ -138,7 +138,7 @@ When `dryRun: true`:
 This skill is **not idempotent**.
 
 Agents must:
-- Track group membership explicitly
+- Track cluster membership explicitly
 - Avoid retrying blindly
 - Treat failure as a planning signal
 
@@ -146,7 +146,7 @@ Agents must:
 
 ## Notes
 
-Groups are scaffolding, not structure.  
+Clusters are scaffolding, not structure.  
 They help minds, not meaning.
 
 This skill must remain conservative, explicit, and boring.

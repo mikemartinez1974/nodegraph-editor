@@ -131,7 +131,7 @@ export default function GroupListPanel({
         >
           <ListItemText
             primary={group.label || group.id}
-            secondary={`${group.nodeIds?.length || 0} members • ${group.collapsed ? 'Collapsed' : 'Expanded'}`}
+            secondary={`${group.nodeIds?.length || 0} nodes • ${group.collapsed ? 'Collapsed' : 'Expanded'}`}
           />
         </ListItemButton>
       </ListItem>

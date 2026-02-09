@@ -14,7 +14,7 @@ Normalize alignment and spacing on explicit user selection.
 ## Never Touches
 - unselected nodes
 - edges
-- groups
+- clusters
 
 ## Determinism
 Yes.

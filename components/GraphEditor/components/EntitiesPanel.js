@@ -103,7 +103,7 @@ export default function EntitiesPanel({
             >
               <ListItemText
                 primary={group.label || group.id}
-                secondary={`${group.nodeIds?.length || 0} members`}
+                secondary={`${group.nodeIds?.length || 0} nodes`}
               />
             </ListItemButton>
             {group.collapsed ? <Chip label="collapsed" size="small" /> : null}

@@ -11,7 +11,7 @@ Generate large graph structures from compact, parameterized intent.
 ## Writes
 - nodes
 - edges
-- groups
+- clusters
 - generationMetadata
 
 ## Never Touches

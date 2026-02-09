@@ -59,7 +59,7 @@
     {
       "id": "skill-procgen-root",
       "type": "markdown",
-      "label": "🌿 Skill: ProceduralGeneration (Normative)",
+      "label": "\ud83c\udf3f Skill: ProceduralGeneration (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Writes\n\n- nodes\n- edges\n- groups\n- generationMetadata\n\nGenerated elements must be attributable."
+        "markdown": "## Writes\n\n- nodes\n- edges\n- clusters\n- generationMetadata\n\nGenerated elements must be attributable."
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If template invalid → abort\n- If ID collision → regenerate deterministically\n\nPartial generation is forbidden."
+        "markdown": "## Failure Modes\n\n- If template invalid \u2192 abort\n- If ID collision \u2192 regenerate deterministically\n\nPartial generation is forbidden."
       }
     },
     {

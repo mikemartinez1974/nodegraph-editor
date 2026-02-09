@@ -10,7 +10,7 @@ Apply many mutations as a single logical, reversible operation.
 ## Writes
 - nodes
 - edges
-- groups
+- clusters
 - batchMetadata
 
 ## Never Touches

@@ -5,7 +5,7 @@ Define global and local invariants that guarantee graph safety and interpretabil
 
 ## Validation Order
 1. Schema validation
-2. Handle compatibility
+2. Port compatibility
 3. Manifest validation
 4. Dependency validation
 5. Structural integrity
@@ -14,7 +14,7 @@ Define global and local invariants that guarantee graph safety and interpretabil
 
 ## Error Conditions (hard stop)
 - schema violation
-- invalid handle reference
+- invalid port reference
 - missing dependency
 - forbidden mutation
 - identity loss
@@ -23,10 +23,10 @@ Define global and local invariants that guarantee graph safety and interpretabil
 ## Warning Conditions
 - orphaned nodes
 - deprecated schema usage
-- unused handles
+- unused ports
 - redundant structures
 - missing position or size (presentation gaps)
-- missing optional handles (inferred)
+- missing optional ports (inferred)
 
 ## Auto-fixable Conditions
 - spacing normalization

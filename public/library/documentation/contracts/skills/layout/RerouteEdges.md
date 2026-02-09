@@ -5,9 +5,9 @@ Improve readability by recomputing edge paths without altering relationships.
 
 ## Reads
 - edges[].source / target
-- edges[].handles
+- edges[].ports
 - node bounds
-- group bounds
+- cluster bounds
 - routingOptions
 
 ## Writes

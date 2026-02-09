@@ -922,7 +922,7 @@ export default function PropertiesPanel({
             "nodeTypes"
           )}
           {renderStringList(
-            "Handle contracts",
+            "Port contracts",
             dependencies.handleContracts,
             (next) => updateManifestDependencies({ handleContracts: next }),
             "handleContracts"
@@ -952,7 +952,7 @@ export default function PropertiesPanel({
               }
             />
             <TextField
-              label="Handle schema version"
+              label="Port schema version"
               size="small"
               fullWidth
               value={dependencies.schemaVersions?.handles || ""}
@@ -1670,7 +1670,7 @@ export default function PropertiesPanel({
                 <ListItemButton onClick={() => onSelectEdge?.(edge.id)}>
                   <ListItemText
                     primary={`${edge.label || edge.type || edge.id}`}
-                    secondary={`handles ${edge.sourceHandle || "out"} → ${edge.targetHandle || "in"}`}
+                    secondary={`ports ${edge.sourceHandle || "out"} → ${edge.targetHandle || "in"}`}
                   />
                 </ListItemButton>
                 <ListItemSecondaryAction>
@@ -1759,7 +1759,7 @@ export default function PropertiesPanel({
 
   const renderHandlesSection = () => (
     <Section
-      title="Handles"
+      title="Ports"
       value="handles"
       expanded={expandedSections.node === "handles"}
       onToggle={handleAccordionChange("node", "handles")}
@@ -1767,7 +1767,7 @@ export default function PropertiesPanel({
     >
       <Stack spacing={1}>
         <Button size="small" variant="outlined" onClick={handleAddHandle}>
-          Add handle
+          Add port
         </Button>
         {handleEntries.length ? (
           handleEntries.map((handle, index) => (
@@ -1854,7 +1854,7 @@ export default function PropertiesPanel({
           ))
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No handles declared. Handles are optional unless declared.
+            No ports declared. Ports are optional unless declared.
           </Typography>
         )}
       </Stack>
@@ -1892,7 +1892,7 @@ export default function PropertiesPanel({
           onChange={(event) => updatePortTarget({ nodeId: event.target.value })}
         />
         <TextField
-          label="Target handleId"
+          label="Target portId"
           size="small"
           fullWidth
           value={portTarget.handleId || ""}
@@ -2196,12 +2196,12 @@ export default function PropertiesPanel({
                 {edgeSourceNode?.label || edgeSourceNode?.id || selectedEdge?.source} →{" "}
                 {edgeTargetNode?.label || edgeTargetNode?.id || selectedEdge?.target}
               </Typography>
-          <Typography variant="caption">Handles</Typography>
+          <Typography variant="caption">Ports</Typography>
           <Stack direction="row" spacing={1}>
             <FormControl fullWidth size="small">
-              <InputLabel>Source handle</InputLabel>
+              <InputLabel>Source port</InputLabel>
               <Select
-                label="Source handle"
+                label="Source port"
                 value={selectedEdge?.sourceHandle || "root"}
                 onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { sourceHandle: event.target.value })}
               >
@@ -2213,9 +2213,9 @@ export default function PropertiesPanel({
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
-              <InputLabel>Target handle</InputLabel>
+              <InputLabel>Target port</InputLabel>
               <Select
-                label="Target handle"
+                label="Target port"
                 value={selectedEdge?.targetHandle || "root"}
                 onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { targetHandle: event.target.value })}
               >
@@ -2345,8 +2345,8 @@ export default function PropertiesPanel({
         disabled={!isGroupSelected}
       >
         <Stack spacing={1}>
-          <Typography variant="caption">Members</Typography>
-          <Typography variant="body2">{selectedGroup?.nodeIds?.length || 0} members</Typography>
+          <Typography variant="caption">Nodes</Typography>
+          <Typography variant="body2">{selectedGroup?.nodeIds?.length || 0} nodes</Typography>
           <Typography variant="caption">Collapsed</Typography>
           <Typography variant="body2">{selectedGroup?.collapsed ? "Yes" : "No"}</Typography>
           <Typography variant="caption">Locked</Typography>
@@ -2362,7 +2362,7 @@ export default function PropertiesPanel({
         </Stack>
       </Section>
       <Section
-        title="Members"
+        title="Nodes"
         value="members"
         expanded={expandedSections.group === "members"}
         onToggle={handleAccordionChange("group", "members")}
@@ -2392,7 +2392,7 @@ export default function PropertiesPanel({
           </List>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No nodes in this group.
+            No nodes in this cluster.
           </Typography>
         )}
       </Section>
@@ -2483,7 +2483,7 @@ export default function PropertiesPanel({
           {activeView === "group" && renderGroupView()}
           {!activeView && (
             <Typography variant="body2" color="text.secondary">
-              Select a node, edge, or group to see its properties.
+              Select a node, edge, or cluster to see its properties.
             </Typography>
           )}
         </Box>

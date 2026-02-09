@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Edge Contract\n\n**Authority:** Normative\n\nEvery edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to this contract.\n\nEdges express relationships.\nHandles are optional for portability.\n\nThis graph is the contract."
+        "markdown": "# Edge Contract\n\n**Authority:** Normative\n\nEvery edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to this contract.\n\nEdges express relationships.\nPorts are optional for portability.\n\nThis graph is the contract."
       }
     },
     {
@@ -117,13 +117,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- `label` is human-readable only\n- `data` holds semantic attributes (strength/flow/direction/intent)\n- `style` and `state` are metadata\n- handles are optional"
+        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- `label` is human-readable only\n- `data` holds semantic attributes (strength/flow/direction/intent)\n- `style` and `state` are metadata\n- ports are optional"
       }
     },
     {
       "id": "edge-handle-policy",
       "type": "markdown",
-      "label": "3. Handle Policy",
+      "label": "3. Port Policy",
       "position": {
         "x": 640,
         "y": 360
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handle Policy (REQUIRED)\n\n- Handles are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to the default **root** handle\n\nTools and agents MUST NOT invent handles"
+        "markdown": "## Port Policy (REQUIRED)\n\n- Ports are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to the default **root** port\n\nTools and agents MUST NOT invent ports"
       }
     },
     {
@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden States (HARD ERROR)\n\nEdges must never:\n- reference missing nodes\n- reuse an existing edge id\n- implicitly create handles\n- violate handle contracts\n- contradict manifest authority"
+        "markdown": "## Forbidden States (HARD ERROR)\n\nEdges must never:\n- reference missing nodes\n- reuse an existing edge id\n- implicitly create ports\n- violate port contracts\n- contradict manifest authority"
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. handle rules are respected (default `root` if omitted)\n4. handle contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. port rules are respected (default `root` if omitted)\n4. port contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read edge + handle contracts\n- refuse incompatible edges\n- prefer add/remove over rewire\n- emit errors, never guess\n- preserve edge identity"
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read edge + port contracts\n- refuse incompatible edges\n- prefer add/remove over rewire\n- emit errors, never guess\n- preserve edge identity"
       }
     },
     {
@@ -229,7 +229,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Portability Guarantee\n\nEdges remain valid when:\n- handles are omitted\n- styles are ignored\n- editors differ\n- renderers change\n\nMeaning must survive transport."
+        "markdown": "## Portability Guarantee\n\nEdges remain valid when:\n- ports are omitted\n- styles are ignored\n- editors differ\n- renderers change\n\nMeaning must survive transport."
       }
     }
   ],

@@ -1,0 +1,73 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-08T19:02:10.459Z",
+    "modified": "2026-02-08T19:02:12.605Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "header",
+      "type": "markdown",
+      "label": "Breadboard Task Graph",
+      "position": {
+        "x": -40,
+        "y": -200
+      },
+      "width": 560,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Breadboard Task Graph\n\nSeed scope: data model + node types for the new breadboard."
+      }
+    },
+    {
+      "id": "data-model",
+      "type": "markdown",
+      "label": "Data Model",
+      "position": {
+        "x": -300,
+        "y": 0
+      },
+      "width": 420,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Data Model (v1)\n\n**Graph-level** (`graph.extensions.breadboard`)\n- `grid`: rows, columns, rowSpacing, columnSpacing\n- `rails[]`: { id, label, voltage, polarity, segments[] }\n- `presets[]`: { id, label, grid, rails }\n- `activePresetId`\n\n**Node-level** (`node.extensions.breadboard`)\n- `footprint`: name or schema identifier\n- `orientation`: horizontal | vertical\n- `pins[]`: { id, row, column, polarity, rail?, metadata? }\n- `allowStacking`\n\n**Node data** (`node.data.breadboard`)\n- Runtime state: `anchor`, `pinState`, `ledLit`, `pendingPlacement`, `positionMode`\n- Components may store `pins[]` + `footprint` for snap/placement\n\n**Pins**\n- Rows: A-J, rails: V+, GND (and custom rail ids)\n- Columns: numeric index\n- Polarity: neutral | positive | negative | anode | cathode\n\nReference: `components/NodeGraph/schema.js`"
+      }
+    },
+    {
+      "id": "node-types",
+      "type": "markdown",
+      "label": "Node Types",
+      "position": {
+        "x": 220,
+        "y": 0
+      },
+      "width": 420,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Breadboard Node Types\n\n**Socket Toolkit** (`io.breadboard.sockets`)\n- `io.breadboard.sockets:socket` (socket column)\n- `io.breadboard.sockets:railSocket` (power rails)\n- `io.breadboard.sockets:skin` (baseplate art)\n- `io.breadboard.sockets:bus` (rail net, hidden)\n\n**Component Pack** (`io.breadboard.components`)\n- `io.breadboard.components:resistor`\n- `io.breadboard.components:led`\n- `io.breadboard.components:jumper`\n- `io.breadboard.components:railTapPositive`\n- `io.breadboard.components:railTapNegative`\n\nReferences: `public/plugins/breadboard-sockets/manifest.json`, `public/plugins/breadboard-components/manifest.json`"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-data-model-to-node-types",
+      "type": "child",
+      "source": "data-model",
+      "target": "node-types",
+      "label": "drives",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

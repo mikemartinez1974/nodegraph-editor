@@ -59,7 +59,7 @@
     {
       "id": "validation-root",
       "type": "markdown",
-      "label": "🛡️ Validation Rules Contract",
+      "label": "\ud83d\udee1\ufe0f Validation Rules Contract",
       "position": {
         "x": 0,
         "y": 0
@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Order\n\n1. Schema validation\n2. Handle compatibility\n3. Manifest validation\n4. Dependency validation\n5. Structural integrity\n6. Safety & mutation rules\n7. Intent validation\n\nOrder is mandatory.\nLater stages assume earlier truth."
+        "markdown": "## Validation Order\n\n1. Schema validation\n2. Port compatibility\n3. Manifest validation\n4. Dependency validation\n5. Structural integrity\n6. Safety & mutation rules\n7. Intent validation\n\nOrder is mandatory.\nLater stages assume earlier truth."
       }
     },
     {
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Error Conditions (Hard Stop)\n\n- schema violation\n- invalid handle reference\n- missing dependency\n- forbidden mutation\n- identity loss\n- intent/content mismatch\n\nAny error aborts execution and persistence."
+        "markdown": "## Error Conditions (Hard Stop)\n\n- schema violation\n- invalid port reference\n- missing dependency\n- forbidden mutation\n- identity loss\n- intent/content mismatch\n\nAny error aborts execution and persistence."
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Warning Conditions\n\n- orphaned nodes\n- deprecated schema usage\n- unused handles\n- redundant structures\n- missing position or size\n- missing optional handles\n\nWarnings never block. They inform."
+        "markdown": "## Warning Conditions\n\n- orphaned nodes\n- deprecated schema usage\n- unused ports\n- redundant structures\n- missing position or size\n- missing optional ports\n\nWarnings never block. They inform."
       }
     },
     {

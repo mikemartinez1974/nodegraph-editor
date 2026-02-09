@@ -59,7 +59,7 @@
     {
       "id": "skill-duplicate-root",
       "type": "markdown",
-      "label": "🪞 Skill: duplicate (Normative)",
+      "label": "\ud83e\ude9e Skill: duplicate (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeEdges,\n  offset,\n  groupId?\n}\n```\n\nOffsets must be explicit.\n\nGroup membership is intentional."
+        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeEdges,\n  offset,\n  groupId?\n}\n```\n\nOffsets must be explicit.\n\nCluster membership is intentional."
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n- Nodes exist\n- Nodes readable (not locked)\n- Caller has mutation authority\n- Graph is mutable\n- Only internal edges eligible\n- Target group exists if provided"
+        "markdown": "## Preconditions\n\n- Nodes exist\n- Nodes readable (not locked)\n- Caller has mutation authority\n- Graph is mutable\n- Only internal edges eligible\n- Target cluster exists if provided"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Postconditions\n\n- New nodes created with new UUIDs\n- Originals unchanged\n- Type, data, handles, size preserved\n- Positions offset\n- External edges excluded\n- Group membership explicit"
+        "markdown": "## Postconditions\n\n- New nodes created with new UUIDs\n- Originals unchanged\n- Type, data, ports, size preserved\n- Positions offset\n- External edges excluded\n- Cluster membership explicit"
       }
     },
     {
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Forbidden Actions\n\n- Reusing IDs\n- Duplicating external edges by default\n- Mutating originals\n- Inferring group membership\n- Auto-layout\n- Copying transient UI state"
+        "markdown": "## Forbidden Actions\n\n- Reusing IDs\n- Duplicating external edges by default\n- Mutating originals\n- Inferring cluster membership\n- Auto-layout\n- Copying transient UI state"
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Notes for Implementers\n\n- Prefer deterministic offsets\n- Emit mapping oldId → newId\n- Duplicate is minting, not cloning\n- Must be safe for agent invocation"
+        "markdown": "## Notes for Implementers\n\n- Prefer deterministic offsets\n- Emit mapping oldId \u2192 newId\n- Duplicate is minting, not cloning\n- Must be safe for agent invocation"
       }
     },
     {

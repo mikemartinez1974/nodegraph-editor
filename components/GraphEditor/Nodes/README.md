@@ -85,7 +85,7 @@ This folder contains the built-in node components used by the graph editor. Each
 - Positioning: All nodes expect `node.position {x,y}` in graph coordinates and render from the top-left using the same pan/zoom transforms.
 - Sizing: `width`/`height` are stored on node (user-resizable for DefaultNode). Default fallback sizes exist when `width`/`height` are missing.
 - Interaction: Nodes must call `eventBus` events for selection and pointer interactions (`nodeMouseDown`, `nodeClick`, `nodeMouseEnter`, `nodeMouseLeave`) to keep editor state in sync.
-- `nodeRefs`: Many nodes register their DOM ref in `nodeRefs` (a Map-like ref) so the editor can measure nodes for edge and handle placement.
+- `nodeRefs`: Many nodes register their DOM ref in `nodeRefs` (a Map-like ref) so the editor can measure nodes for edge and port placement.
 - Sanitization: Any node type that renders HTML or SVG should sanitize input to prevent XSS. Default implementations use rehype/remark sanitizers; extend cautiously.
 
 ## Extending nodes

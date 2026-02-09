@@ -512,6 +512,7 @@ useEffect(() => {
       eventBus.emit('nodeInput', {
         targetNodeId: edge.target,
         inputName: edge.targetHandle,
+        handleId: edge.targetHandle,
         value,
         edgeId: edge.id,
         sourceNodeId: nodeId,
@@ -1798,6 +1799,20 @@ useEffect(() => {
     // Expose execution spine test helper
     window.testExecutionIntent = (payload = {}) => {
       const now = Date.now();
+      if (payload.executeGraph || payload.executeNodes) {
+        try {
+          eventBus.emit('executionIntent', {
+            payload,
+            proposals: payload.proposals,
+            proposal: payload.proposals?.[0],
+            source: payload.source || 'test'
+          });
+          console.log('✅ executionIntent dispatched', payload);
+        } catch (err) {
+          console.error('❌ executionIntent failed', err);
+        }
+        return;
+      }
       const proposals = payload.proposals || [
         {
           action: 'createNode',
@@ -2306,6 +2321,7 @@ useEffect(() => {
                 eventBus.emit('nodeInput', {
                   targetNodeId,
                   handleId,
+                  inputName: handleId,
                   value,
                   source: 'url',
                   meta: { query: parsedUrl.search }
@@ -2322,6 +2338,7 @@ useEffect(() => {
                   eventBus.emit('nodeInput', {
                     targetNodeId: node.id,
                     handleId: 'root',
+                    inputName: 'root',
                     value: node.data?.autoRunPayload || {},
                     source: 'autoRun',
                     meta: { reason: 'autoRunOnLoad' }

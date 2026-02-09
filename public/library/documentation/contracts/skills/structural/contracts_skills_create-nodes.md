@@ -122,11 +122,11 @@ This skill MUST NOT:
 
 - Modify existing nodes
 - Modify existing edges
-- Modify existing groups
+- Modify existing clusters
 - Delete any node
 - Recreate nodes with existing IDs
 - Infer or guess schema fields
-- Auto-generate handles
+- Auto-generate ports
 - Mutate semantic data of other nodes
 - Apply layout to existing nodes
 - Create edges (use create-edges skill)

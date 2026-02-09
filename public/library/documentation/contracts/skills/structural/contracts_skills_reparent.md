@@ -26,14 +26,14 @@ This skill:
 - Adds nodes to another parent container
 - Preserves node identity, data, edges, and type
 - Preserves spatial position (unless explicitly adjusted elsewhere)
-- Updates group bounds explicitly
+- Updates cluster bounds explicitly
 
 This skill does **not**:
 - Create or delete nodes
 - Create or delete edges
 - Change node data or type
 - Trigger layout or routing
-- Merge or split groups automatically
+- Merge or split clusters automatically
 - Infer intent
 
 ---
@@ -46,7 +46,7 @@ Before execution:
    - Node IDs must be valid and present
 
 2. **Target parent exists**
-   - Parent group or container ID must exist
+   - Parent cluster or container ID must exist
    - Root-level reparenting must be explicit (`parentId: null`)
 
 3. **Source parent is known**
@@ -89,8 +89,8 @@ After successful execution:
    - Node positions remain unchanged
    - Only container membership changes
 
-3. **Group bounds are correct**
-   - Both source and target groups update bounds
+3. **Cluster bounds are correct**
+   - Both source and target clusters update bounds
 
 4. **Meaning is unchanged**
    - No edges, data, or types are altered
