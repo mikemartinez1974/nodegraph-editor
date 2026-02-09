@@ -280,7 +280,7 @@ const buildStraightEdgeRoutes = useCallback((edgeList = [], nodeList = []) => {
     if (!node) return null;
     const base = nodePositionMap.get(nodeId);
     if (!base) return null;
-    const handles = Array.isArray(node?.handles) ? node.handles : [];
+    const handles = Array.isArray(node?.ports) ? node.ports : [];
     const handle = handles.find((h) => h?.id === handleId);
     const relative = handle ? getHandleRelativePosition(node, handle) : { x: getNodeSize(node).width / 2, y: getNodeSize(node).height / 2 };
     return { x: base.x + (relative.x || 0), y: base.y + (relative.y || 0) };
@@ -288,8 +288,8 @@ const buildStraightEdgeRoutes = useCallback((edgeList = [], nodeList = []) => {
 
   edgeList.forEach((edge) => {
     if (!edge || !edge.id) return;
-    const sourcePoint = resolvePoint(edge.source, edge.sourceHandle);
-    const targetPoint = resolvePoint(edge.target, edge.targetHandle);
+    const sourcePoint = resolvePoint(edge.source, edge.sourcePort);
+    const targetPoint = resolvePoint(edge.target, edge.targetPort);
     if (sourcePoint && targetPoint) {
       routeMap[edge.id] = { points: [sourcePoint, targetPoint] };
     }
@@ -673,7 +673,7 @@ const rerouteEdges = useCallback(async () => {
       const getPortsForNode = (node) => {
         if (!node) return [];
         if (portsByNodeId.has(node.id)) return portsByNodeId.get(node.id);
-        const handles = Array.isArray(node?.handles) ? node.handles : [];
+        const handles = Array.isArray(node?.ports) ? node.ports : [];
         const ports = handles
           .filter((handle) => handle && typeof handle.id === 'string' && handle.id)
           .map((handle) => {
@@ -746,8 +746,8 @@ const rerouteEdges = useCallback(async () => {
           .filter((edge) => edge && edge.source && edge.target && validNodeIds.has(edge.source) && validNodeIds.has(edge.target))
           .map((edge, index) => {
             const id = edge.id || `edge_${index}`;
-            const sourcePort = resolvePort(edge.source, edge.sourceHandle);
-            const targetPort = resolvePort(edge.target, edge.targetHandle);
+            const sourcePort = resolvePort(edge.source, edge.sourcePort);
+            const targetPort = resolvePort(edge.target, edge.targetPort);
             return {
               id,
               sources: [sourcePort || edge.source],

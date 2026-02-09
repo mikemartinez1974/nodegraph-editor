@@ -67,7 +67,7 @@ Before execution:
 ```ts
 {
   mode: "group" | "ungroup",
-  groupId?: string,
+  clusterId?: string,
   nodes: string[],
   createGroup?: boolean,
   groupData?: object

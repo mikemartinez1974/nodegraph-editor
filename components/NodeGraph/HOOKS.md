@@ -41,7 +41,7 @@ const isHovered = useNodeHover(nodeId)
 
 **Description:**
 
-Subscribe to hover state for nodes or edges. Useful for showing handles, highlights, or tooltips.
+Subscribe to hover state for nodes or edges. Useful for showing ports, highlights, or tooltips.
 
 ## useHandleProgress / useHandleAnimation
 
@@ -53,7 +53,7 @@ const progress = useHandleProgress(nodeId, handleId)
 
 **Description:**
 
-Provides an animated progress value `[0..1]` for handle extension/retraction to animate handles.
+Provides an animated progress value `[0..1]` for handle extension/retraction to animate ports.
 
 ## useNodeGraphEvents
 

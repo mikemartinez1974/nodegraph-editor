@@ -56,7 +56,7 @@
     {
       "id": "interpreter-root",
       "type": "markdown",
-      "label": "🧠 Interpreter Layer Plan",
+      "label": "\ud83e\udde0 Interpreter Layer Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -72,7 +72,7 @@
     {
       "id": "interpreter-intents",
       "type": "markdown",
-      "label": "🎯 Intent Handling",
+      "label": "\ud83c\udfaf Intent Handling",
       "position": {
         "x": -360,
         "y": -20
@@ -82,13 +82,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Intent Handling\n+\n+- Standardize intents: toolbar actions, node/handle drags, RPCs, script proposals, agent requests.\n+- Emit intent metadata to trace which skill invoked the dispatcher.\n+- Gate interpreter execution via `onIntent` hooks before mutations run."
+        "markdown": "## Intent Handling\n+\n+- Standardize intents: toolbar actions, node/port drags, RPCs, script proposals, agent requests.\n+- Emit intent metadata to trace which skill invoked the dispatcher.\n+- Gate interpreter execution via `onIntent` hooks before mutations run."
       }
     },
     {
       "id": "interpreter-skills",
       "type": "markdown",
-      "label": "🛠️ Skill Catalog",
+      "label": "\ud83d\udee0\ufe0f Skill Catalog",
       "position": {
         "x": 360,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "interpreter-validation",
       "type": "markdown",
-      "label": "⚖️ Validation Hooks",
+      "label": "\u2696\ufe0f Validation Hooks",
       "position": {
         "x": 0,
         "y": 220
@@ -120,7 +120,7 @@
     {
       "id": "interpreter-backpressure",
       "type": "markdown",
-      "label": "🧘 Flow Control",
+      "label": "\ud83e\uddd8 Flow Control",
       "position": {
         "x": 0,
         "y": 480
@@ -184,5 +184,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

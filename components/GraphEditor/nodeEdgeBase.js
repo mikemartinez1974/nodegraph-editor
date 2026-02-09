@@ -2,7 +2,7 @@
 
 // Base Node class
 export class Node {
-  constructor({ id, label = '', position = { x: 0, y: 0 }, type = 'default', width = 60, height = 60, resizable = false, handlePosition = 'center', showLabel = false }) {
+  constructor({ id, label = '', position = { x: 0, y: 0 }, type = 'default', width = 60, height = 60, resizable = false, portPosition = 'center', showLabel = false }) {
     // Basic Properties
     this.id = id;
     this.label = label;
@@ -19,7 +19,7 @@ export class Node {
 
     // Internal properties
     this.resizable = resizable;
-    this.handlePosition = handlePosition;
+    this.portPosition = portPosition;
     this.showLabel = showLabel;
     this.position = position;
 

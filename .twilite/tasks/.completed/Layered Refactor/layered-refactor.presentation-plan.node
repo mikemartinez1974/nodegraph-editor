@@ -56,7 +56,7 @@
     {
       "id": "presentation-root",
       "type": "markdown",
-      "label": "🎨 Presentation Layer Plan",
+      "label": "\ud83c\udfa8 Presentation Layer Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -72,7 +72,7 @@
     {
       "id": "presentation-subscribe",
       "type": "markdown",
-      "label": "🔁 Subscribe to Core",
+      "label": "\ud83d\udd01 Subscribe to Core",
       "position": {
         "x": -280,
         "y": -20
@@ -88,7 +88,7 @@
     {
       "id": "presentation-pan",
       "type": "markdown",
-      "label": "🔎 Presentation Controls",
+      "label": "\ud83d\udd0e Presentation Controls",
       "position": {
         "x": 280,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "presentation-accessibility",
       "type": "markdown",
-      "label": "🧩 Accessibility & Themes",
+      "label": "\ud83e\udde9 Accessibility & Themes",
       "position": {
         "x": -140,
         "y": 220
@@ -120,7 +120,7 @@
     {
       "id": "presentation-plugins",
       "type": "markdown",
-      "label": "🔌 Plugin Integration",
+      "label": "\ud83d\udd0c Plugin Integration",
       "position": {
         "x": 140,
         "y": 220
@@ -184,5 +184,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

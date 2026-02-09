@@ -45,13 +45,13 @@
             "markdown",
             "port"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -105,7 +105,7 @@
       "data": {
         "markdown": "# Port Node Formalization\n\nGoal: define the **port** node as an external edge endpoint.\n\nPorts are nodes that stand in for external endpoints, keeping all edges local and valid."
       },
-      "handles": [
+      "ports": [
         {
           "id": "out",
           "label": "out",
@@ -121,7 +121,7 @@
     {
       "id": "0f3ad6b7-9c43-4a48-8d68-7f6a6d4b3d3b",
       "type": "port",
-      "label": "Port → Edge Formalization",
+      "label": "Port \u2192 Edge Formalization",
       "position": {
         "x": 520,
         "y": -360
@@ -152,9 +152,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Semantics\n\n- A **port** is a node that represents an external endpoint.\n- Edges stay local: `node \u2192 port`.\n- The port declares where the connection leads (graph/node/handle).\n- Missing target is a warning, not an error."
+        "markdown": "## Semantics\n\n- A **port** is a node that represents an external endpoint.\n- Edges stay local: `node \u2192 port`.\n- The port declares where the connection leads (graph/node/port).\n- Missing target is a warning, not an error."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -190,9 +190,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Schema (Minimum)\n\n```json\n{\n  \"type\": \"port\",\n  \"data\": {\n    \"direction\": \"in|out|bidirectional\",\n    \"target\": {\n      \"graphId\": \"uuid?\",\n      \"url\": \"string?\",\n      \"nodeId\": \"uuid?\",\n      \"handleId\": \"string?\"\n    },\n    \"label\": \"string?\",\n    \"intent\": \"string?\",\n    \"security\": \"prompt|allow|deny\"\n  }\n}\n```\n\n- `target` may include graphId, url, or both (both preferred).\n- Missing target is a warning.\n- Handles optional \u2192 default `root`."
+        "markdown": "## Schema (Minimum)\n\n```json\n{\n  \"type\": \"port\",\n  \"data\": {\n    \"direction\": \"in|out|bidirectional\",\n    \"target\": {\n      \"graphId\": \"uuid?\",\n      \"url\": \"string?\",\n      \"nodeId\": \"uuid?\",\n      \"handleId\": \"string?\"\n    },\n    \"label\": \"string?\",\n    \"intent\": \"string?\",\n    \"security\": \"prompt|allow|deny\"\n  }\n}\n```\n\n- `target` may include graphId, url, or both (both preferred).\n- Missing target is a warning.\n- Ports optional \u2192 default `root`."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -230,7 +230,7 @@
       "data": {
         "markdown": "## Runtime Behavior\n\n- Render as connector/portal glyph.\n- Show target summary (graphId/url).\n- Click \u2192 prompt then navigate.\n- Never auto-execute external scripts.\n- Warnings for unresolved targets."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -268,7 +268,7 @@
       "data": {
         "markdown": "## Implementation Path\n\n1) Add `port` node type in registry\n2) Create PortNode renderer\n3) Properties panel editor for target\n4) Validation warnings for missing target\n5) Navigation action (prompted)"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -306,7 +306,7 @@
       "data": {
         "markdown": "## Open Questions\n\n- Native node vs definition+view?\n- Default direction? (proposed: out)\n- Always prompt vs allowlist?"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -333,8 +333,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "0bc8b783-9d80-4058-9387-8d486880cd4c",
@@ -348,8 +348,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "42814f63-d502-487d-a6b1-bca49a6fb0d0",
@@ -363,8 +363,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "9650216b-fe8e-45b4-b125-2979718cf748",
@@ -378,8 +378,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "2bedaad4-69cf-414a-bfd2-dddfa6bb3f14",
@@ -393,8 +393,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "35d68b59-a449-448b-9fb8-8a9a8c8e17ed",
@@ -408,8 +408,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "0e0a8c5e-6b97-4f0b-8c24-7a1c3e6d2a11",

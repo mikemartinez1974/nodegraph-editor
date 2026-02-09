@@ -26,7 +26,7 @@ Define global and local invariants that guarantee graph safety and interpretabil
 - unused ports
 - redundant structures
 - missing position or size (presentation gaps)
-- missing optional ports (inferred)
+- missing required ports
 
 ## Auto-fixable Conditions
 - spacing normalization

@@ -18,7 +18,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -28,46 +31,58 @@
       "id": "graph-purpose",
       "type": "markdown",
       "label": "Purpose",
-      "position": { "x": 80, "y": 60 },
+      "position": {
+        "x": 80,
+        "y": 60
+      },
       "width": 520,
       "height": 180,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## NodeGraph\nThe NodeGraph is the **data model** for nodes, edges, and groups.\n\nIt is the canonical source for the editor and plugins." 
+        "markdown": "## NodeGraph\nThe NodeGraph is the **data model** for nodes, edges, and clusters.\n\nIt is the canonical source for the editor and plugins."
       }
     },
     {
       "id": "graph-nodes",
       "type": "markdown",
       "label": "Nodes",
-      "position": { "x": 80, "y": 280 },
+      "position": {
+        "x": 80,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Nodes\n- Core node types (markdown, list, etc.)\n- Plugin nodes (namespaced)\n- Handles define connection points"
+        "markdown": "## Nodes\n- Core node types (markdown, list, etc.)\n- Plugin nodes (namespaced)\n- Ports define connection points"
       }
     },
     {
       "id": "graph-edges",
       "type": "markdown",
       "label": "Edges",
-      "position": { "x": 80, "y": 540 },
+      "position": {
+        "x": 80,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edges\n- Connect source → target\n- Optional handle keys\n- Edge types control routing\n- Labels + style metadata"
+        "markdown": "## Edges\n- Connect source \u2192 target\n- Optional port keys\n- Edge types control routing\n- Labels + style metadata"
       }
     },
     {
       "id": "graph-runtime",
       "type": "markdown",
       "label": "Runtime",
-      "position": { "x": 640, "y": 280 },
+      "position": {
+        "x": 640,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -80,7 +95,10 @@
       "id": "graph-serialization",
       "type": "markdown",
       "label": "Serialization",
-      "position": { "x": 640, "y": 540 },
+      "position": {
+        "x": 640,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -93,7 +111,10 @@
       "id": "graph-open",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 80, "y": 820 },
+      "position": {
+        "x": 80,
+        "y": 820
+      },
       "width": 520,
       "height": 200,
       "visible": true,
@@ -109,10 +130,13 @@
       "type": "child",
       "source": "graph-purpose",
       "target": "graph-nodes",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "structure",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -120,10 +144,13 @@
       "type": "child",
       "source": "graph-nodes",
       "target": "graph-edges",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "connect",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -131,10 +158,13 @@
       "type": "child",
       "source": "graph-nodes",
       "target": "graph-runtime",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "extend",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -142,10 +172,13 @@
       "type": "child",
       "source": "graph-runtime",
       "target": "graph-serialization",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "persist",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -153,12 +186,15 @@
       "type": "child",
       "source": "graph-serialization",
       "target": "graph-open",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "questions",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

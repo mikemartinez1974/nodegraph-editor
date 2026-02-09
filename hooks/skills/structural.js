@@ -20,8 +20,8 @@ const cloneEntity = (value) => {
 };
 
 const collectHandles = (node, direction) => {
-  const unified = Array.isArray(node?.handles)
-    ? node.handles
+  const unified = Array.isArray(node?.ports)
+    ? node.ports
         .filter((handle) => {
           if (!handle) return false;
           const dir = (handle.direction || '').toLowerCase();
@@ -129,32 +129,32 @@ const sanitizeEdgeForCreation = (edge, resolution, index) => {
     throw new Error(`edges[${index}] references missing target node "${targetId}"`);
   }
 
-  let sourceHandle = edge.sourceHandle || edge.fromHandle || edge.handle;
-  let targetHandle = edge.targetHandle || edge.toHandle;
-  const resolvedSourceHandle = resolveHandle(sourceNode, 'output', sourceHandle);
-  const resolvedTargetHandle = resolveHandle(targetNode, 'input', targetHandle);
+  let sourcePort = edge.sourcePort || edge.fromHandle || edge.handle;
+  let targetPort = edge.targetPort || edge.toHandle;
+  const resolvedSourceHandle = resolveHandle(sourceNode, 'output', sourcePort);
+  const resolvedTargetHandle = resolveHandle(targetNode, 'input', targetPort);
 
-  if (!sourceHandle && collectHandles(sourceNode, 'output').length > 1 && !resolvedSourceHandle) {
+  if (!sourcePort && collectHandles(sourceNode, 'output').length > 1 && !resolvedSourceHandle) {
     if (!resolution.allowHandleInference) {
-      throw new Error(`edges[${index}] must specify sourceHandle because source node exposes multiple outputs`);
+      throw new Error(`edges[${index}] must specify sourcePort because source node exposes multiple outputs`);
     }
   }
-  if (!targetHandle && collectHandles(targetNode, 'input').length > 1 && !resolvedTargetHandle) {
+  if (!targetPort && collectHandles(targetNode, 'input').length > 1 && !resolvedTargetHandle) {
     if (!resolution.allowHandleInference) {
-      throw new Error(`edges[${index}] must specify targetHandle because target node exposes multiple inputs`);
+      throw new Error(`edges[${index}] must specify targetPort because target node exposes multiple inputs`);
     }
   }
 
-  sourceHandle = sourceHandle || resolvedSourceHandle || null;
-  targetHandle = targetHandle || resolvedTargetHandle || null;
+  sourcePort = sourcePort || resolvedSourceHandle || null;
+  targetPort = targetPort || resolvedTargetHandle || null;
 
   const sanitized = {
     id: edge.id,
     label: edge.label,
     source: sourceId,
     target: targetId,
-    sourceHandle: sourceHandle || undefined,
-    targetHandle: targetHandle || undefined,
+    sourcePort: sourcePort || undefined,
+    targetPort: targetPort || undefined,
     type: edge.type || resolution.defaultEdgeType || 'straight',
     data: edge.data ? cloneEntity(edge.data) : undefined,
     style: edge.style ? cloneEntity(edge.style) : undefined,
@@ -275,7 +275,7 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
     params.allowHandleInference === true ||
     ['import', 'automation', 'transformation', 'auto', 'inferred'].includes(String(params.mode || '').toLowerCase());
 
-  const seen = new Set(edges.map((edge) => `${edge.source}|${edge.sourceHandle || ''}|${edge.target}|${edge.targetHandle || ''}`));
+  const seen = new Set(edges.map((edge) => `${edge.source}|${edge.sourcePort || ''}|${edge.target}|${edge.targetPort || ''}`));
   const duplicates = [];
   const duplicateIds = [];
 
@@ -290,14 +290,14 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
     if (normalized.id && edgeIdSet.has(normalized.id)) {
       duplicateIds.push({ index, id: normalized.id });
     }
-    const key = `${normalized.source}|${normalized.sourceHandle || ''}|${normalized.target}|${normalized.targetHandle || ''}`;
+    const key = `${normalized.source}|${normalized.sourcePort || ''}|${normalized.target}|${normalized.targetPort || ''}`;
     if (seen.has(key)) {
       duplicates.push({
         index,
         source: normalized.source,
         target: normalized.target,
-        sourceHandle: normalized.sourceHandle,
-        targetHandle: normalized.targetHandle
+        sourcePort: normalized.sourcePort,
+        targetPort: normalized.targetPort
       });
     } else {
       seen.add(key);
@@ -330,14 +330,14 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
     const sourceNode = nodeMap.get(edge.source);
     const targetNode = nodeMap.get(edge.target);
     if (!sourceNode || !targetNode) return;
-    if (!edge.sourceHandle && collectHandles(sourceNode, 'output').length > 1) {
+    if (!edge.sourcePort && collectHandles(sourceNode, 'output').length > 1) {
       if (allowHandleInference) {
-        warnings.push(`edges[${index}] omitted sourceHandle on multi-handle node "${edge.source}"`);
+        warnings.push(`edges[${index}] omitted sourcePort on multi-handle node "${edge.source}"`);
       }
     }
-    if (!edge.targetHandle && collectHandles(targetNode, 'input').length > 1) {
+    if (!edge.targetPort && collectHandles(targetNode, 'input').length > 1) {
       if (allowHandleInference) {
-        warnings.push(`edges[${index}] omitted targetHandle on multi-handle node "${edge.target}"`);
+        warnings.push(`edges[${index}] omitted targetPort on multi-handle node "${edge.target}"`);
       }
     }
   });
@@ -354,12 +354,12 @@ const runCreateEdges = async ({ graphAPI }, params = {}) => {
 
   const edgesToCreate = duplicates.length > 0
     ? sanitizedEdges.filter((edge) => {
-        const key = `${edge.source}|${edge.sourceHandle || ''}|${edge.target}|${edge.targetHandle || ''}`;
+        const key = `${edge.source}|${edge.sourcePort || ''}|${edge.target}|${edge.targetPort || ''}`;
         return !duplicates.some((dup) => (
           dup.source === edge.source &&
           dup.target === edge.target &&
-          dup.sourceHandle === (edge.sourceHandle || null) &&
-          dup.targetHandle === (edge.targetHandle || null)
+          dup.sourcePort === (edge.sourcePort || null) &&
+          dup.targetPort === (edge.targetPort || null)
         ));
       })
     : sanitizedEdges;
@@ -444,7 +444,7 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
     const targetNodes = nodeIds.map((id) => nodeMap.get(id));
     const bounds = computeBounds(targetNodes, padding);
     const payload = {
-      id: params.groupId,
+      id: params.clusterId,
       label: params.label || '',
       nodeIds,
       bounds,
@@ -473,17 +473,17 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
   }
 
   if (action === 'dissolve' || action === 'delete') {
-    const groupId = params.groupId;
-    if (!groupId) {
-      return { success: false, error: 'groupId is required for dissolve' };
+    const clusterId = params.clusterId;
+    if (!clusterId) {
+      return { success: false, error: 'clusterId is required for dissolve' };
     }
-    if (!groupMap.has(groupId)) {
-      return { success: false, error: `Group ${groupId} not found` };
+    if (!groupMap.has(clusterId)) {
+      return { success: false, error: `Group ${clusterId} not found` };
     }
     if (params.dryRun) {
-      return { success: true, data: { action: 'dissolve', groupId } };
+      return { success: true, data: { action: 'dissolve', clusterId } };
     }
-    const result = graphAPI.deleteGroup(groupId);
+    const result = graphAPI.deleteGroup(clusterId);
     if (!result?.success) {
       return { success: false, error: result?.error || 'deleteGroup failed', data: result?.data };
     }
@@ -494,14 +494,14 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
   }
 
   if (action === 'add') {
-    const groupId = params.groupId;
+    const clusterId = params.clusterId;
     const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
-    if (!groupMap.has(groupId)) {
-      return { success: false, error: `Group ${groupId} not found` };
+    if (!groupMap.has(clusterId)) {
+      return { success: false, error: `Group ${clusterId} not found` };
     }
     if (params.allowRegroup !== true) {
       const alreadyGrouped = groups
-        .filter((group) => group.id !== groupId && Array.isArray(group.nodeIds))
+        .filter((group) => group.id !== clusterId && Array.isArray(group.nodeIds))
         .flatMap((group) => group.nodeIds)
         .filter((id) => nodeIds.includes(id));
       const uniqueGrouped = Array.from(new Set(alreadyGrouped));
@@ -518,18 +518,18 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
       return { success: false, error: 'One or more nodeIds do not exist', data: { missing } };
     }
     if (params.dryRun) {
-      return { success: true, data: { action: 'add', groupId, nodeIds } };
+      return { success: true, data: { action: 'add', clusterId, nodeIds } };
     }
-    const addResult = graphAPI.addNodesToGroup(groupId, nodeIds);
+    const addResult = graphAPI.addNodesToGroup(clusterId, nodeIds);
     if (!addResult?.success) {
       return { success: false, error: addResult?.error || 'addNodesToGroup failed', data: addResult?.data };
     }
     if (params.recalculateBounds !== false) {
-      const refreshedGroup = graphAPI.readGroup(groupId)?.data;
+      const refreshedGroup = graphAPI.readGroup(clusterId)?.data;
       if (refreshedGroup) {
         const refreshedNodes = (refreshedGroup.nodeIds || []).map((id) => nodeMap.get(id)).filter(Boolean);
         const bounds = computeBounds(refreshedNodes, padding);
-        graphAPI.updateGroup(groupId, { bounds });
+        graphAPI.updateGroup(clusterId, { bounds });
       }
     }
     return {
@@ -539,15 +539,15 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
   }
 
   if (action === 'remove') {
-    const groupId = params.groupId;
+    const clusterId = params.clusterId;
     const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
-    if (!groupMap.has(groupId)) {
-      return { success: false, error: `Group ${groupId} not found` };
+    if (!groupMap.has(clusterId)) {
+      return { success: false, error: `Group ${clusterId} not found` };
     }
     if (params.dryRun) {
-      return { success: true, data: { action: 'remove', groupId, nodeIds } };
+      return { success: true, data: { action: 'remove', clusterId, nodeIds } };
     }
-    const removeResult = graphAPI.removeNodesFromGroup(groupId, nodeIds);
+    const removeResult = graphAPI.removeNodesFromGroup(clusterId, nodeIds);
     if (!removeResult?.success) {
       return { success: false, error: removeResult?.error || 'removeNodesFromGroup failed', data: removeResult?.data };
     }
@@ -558,26 +558,26 @@ const runGrouping = async ({ graphAPI }, params = {}) => {
   }
 
   if (action === 'set') {
-    const groupId = params.groupId;
+    const clusterId = params.clusterId;
     const nodeIds = ensureArray(params.nodeIds, 'nodeIds');
-    if (!groupMap.has(groupId)) {
-      return { success: false, error: `Group ${groupId} not found` };
+    if (!groupMap.has(clusterId)) {
+      return { success: false, error: `Group ${clusterId} not found` };
     }
     const missing = nodeIds.filter((id) => !nodeMap.has(id));
     if (missing.length > 0) {
       return { success: false, error: 'One or more nodeIds do not exist', data: { missing } };
     }
     if (params.dryRun) {
-      return { success: true, data: { action: 'set', groupId, nodeIds } };
+      return { success: true, data: { action: 'set', clusterId, nodeIds } };
     }
-    const result = graphAPI.setGroupNodes(groupId, nodeIds);
+    const result = graphAPI.setGroupNodes(clusterId, nodeIds);
     if (!result?.success) {
       return { success: false, error: result?.error || 'setGroupNodes failed', data: result?.data };
     }
     if (params.recalculateBounds !== false) {
       const refreshedNodes = nodeIds.map((id) => nodeMap.get(id)).filter(Boolean);
       const bounds = computeBounds(refreshedNodes, padding);
-      graphAPI.updateGroup(groupId, { bounds });
+      graphAPI.updateGroup(clusterId, { bounds });
     }
     return { success: true, data: { action: 'set', group: result.data, manifestWarning: mutationCheck.warning } };
   }
@@ -623,15 +623,15 @@ const runReparent = async ({ graphAPI }, params = {}) => {
   }
 
   const operations = [];
-  resolvedSources.forEach((groupId) => {
-    const group = groupMap.get(groupId);
+  resolvedSources.forEach((clusterId) => {
+    const group = groupMap.get(clusterId);
     if (!group) return;
     const candidates = (group.nodeIds || []).filter((id) => nodeIds.includes(id));
     if (candidates.length === 0) return;
-    operations.push({ type: 'remove', groupId, nodeIds: candidates });
+    operations.push({ type: 'remove', clusterId, nodeIds: candidates });
   });
   if (targetGroupId) {
-    operations.push({ type: 'add', groupId: targetGroupId, nodeIds });
+    operations.push({ type: 'add', clusterId: targetGroupId, nodeIds });
   }
 
   if (operations.length === 0) {
@@ -645,24 +645,24 @@ const runReparent = async ({ graphAPI }, params = {}) => {
   const results = [];
   for (const op of operations) {
     if (op.type === 'remove') {
-      const outcome = graphAPI.removeNodesFromGroup(op.groupId, op.nodeIds);
+      const outcome = graphAPI.removeNodesFromGroup(op.clusterId, op.nodeIds);
       if (!outcome?.success) {
-        return { success: false, error: outcome?.error || `Failed to remove nodes from ${op.groupId}`, data: outcome?.data };
+        return { success: false, error: outcome?.error || `Failed to remove nodes from ${op.clusterId}`, data: outcome?.data };
       }
       results.push(outcome);
     } else if (op.type === 'add') {
-      const outcome = graphAPI.addNodesToGroup(op.groupId, op.nodeIds);
+      const outcome = graphAPI.addNodesToGroup(op.clusterId, op.nodeIds);
       if (!outcome?.success) {
-        return { success: false, error: outcome?.error || `Failed to add nodes to ${op.groupId}`, data: outcome?.data };
+        return { success: false, error: outcome?.error || `Failed to add nodes to ${op.clusterId}`, data: outcome?.data };
       }
       results.push(outcome);
       if (params.recalculateBounds !== false) {
-        const refreshedGroup = graphAPI.readGroup(op.groupId)?.data;
+        const refreshedGroup = graphAPI.readGroup(op.clusterId)?.data;
         const nodesForBounds = (refreshedGroup?.nodeIds || []).map((id) =>
           nodes.find((node) => node.id === id)
         ).filter(Boolean);
         const bounds = computeBounds(nodesForBounds, params.padding ?? DEFAULT_GROUP_PADDING);
-        graphAPI.updateGroup(op.groupId, { bounds });
+        graphAPI.updateGroup(op.clusterId, { bounds });
       }
     }
   }
@@ -750,7 +750,7 @@ const runExtractSubgraph = async ({ graphAPI }, params = {}) => {
   const payload = {
     nodes: selectedNodes,
     edges: selectedEdges,
-    groups: intersectedGroups
+    clusters: intersectedGroups
   };
 
   if (params.createGroup) {
@@ -761,7 +761,7 @@ const runExtractSubgraph = async ({ graphAPI }, params = {}) => {
     const nodesForBounds = nodeIds.map((id) => nodeMap.get(id));
     const bounds = computeBounds(nodesForBounds, params.padding ?? DEFAULT_GROUP_PADDING);
     const groupPayload = {
-      id: params.groupId,
+      id: params.clusterId,
       label: params.groupLabel || params.label || 'Extracted Subgraph',
       nodeIds,
       bounds,
@@ -838,7 +838,7 @@ export const structuralSkills = [
     supportsDryRun: true,
     run: runGrouping,
     contracts: {
-      inputs: ['action', 'groupId?', 'nodeIds?'],
+      inputs: ['action', 'clusterId?', 'nodeIds?'],
       warnings: ['Grouping mutations never move nodes; bounds only']
     }
   },

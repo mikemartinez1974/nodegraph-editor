@@ -59,7 +59,7 @@
     {
       "id": "manifest-contract-root",
       "type": "markdown",
-      "label": "📜 Manifest Contract (Normative)",
+      "label": "\ud83d\udcdc Manifest Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Intent & Scope (REQUIRED)\n\nDeclares how the graph is interpreted.\n\n- kind: documentation | workflow | simulation | circuit | knowledge-map | contract | executable | other\n- scope: human | agent | tool | mixed\n\nEditors MUST NOT guess intent.\nAgents MUST respect it.\nUnknown kinds are opaque."
+        "markdown": "## Intent & Scope (REQUIRED)\n\nDeclares how the graph is interpreted.\n\n- kind: graph | fragment | documentation | workflow | simulation | circuit | knowledge-map | contract | executable | other\n- scope: human | agent | tool | mixed\n\nEditors MUST NOT guess intent.\nAgents MUST respect it.\nUnknown kinds are opaque."
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- handleContracts\n- skills\n- schemaVersions\n- optional\n\n**Skill dependencies are mandatory.**\n- If a node definition declares a skill, it **must** appear here.\n- Missing skills invalidate execution.\n\n**Version mismatches are warnings only (for now).**\n- Version conflicts MUST surface as warnings.\n- They MUST NOT block loading until a stricter policy is adopted.\n\nOptional dependencies must never be assumed."
+        "markdown": "## Dependencies (REQUIRED)\n\nDeclares what must exist for validity.\n\n- nodeTypes\n- portContracts\n- skills\n- schemaVersions\n- optional\n\n**Skill dependencies are mandatory.**\n- If a node definition declares a skill, it **must** appear here.\n- Missing skills invalidate execution.\n\n**Version mismatches are warnings only (for now).**\n- Version conflicts MUST surface as warnings.\n- They MUST NOT block loading until a stricter policy is adopted.\n\nOptional dependencies must never be assumed."
       }
     },
     {
@@ -358,5 +358,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

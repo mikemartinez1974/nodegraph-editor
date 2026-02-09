@@ -53,7 +53,7 @@
     {
       "id": "title",
       "type": "markdown",
-      "label": "An Introduction to Node Graphs 🌐",
+      "label": "An Introduction to Node Graphs \ud83c\udf10",
       "position": {
         "x": 0,
         "y": 0
@@ -64,13 +64,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# An Introduction to Node Graphs\n\nNode graphs are visual diagrams that represent complex information as interconnected nodes and edges. They're powerful for brainstorming, planning, and modeling systems.\n\n**Why use them?** Easy to understand relationships at a glance!\n\nExplore below 👇"
+        "memo": "# An Introduction to Node Graphs\n\nNode graphs are visual diagrams that represent complex information as interconnected nodes and edges. They're powerful for brainstorming, planning, and modeling systems.\n\n**Why use them?** Easy to understand relationships at a glance!\n\nExplore below \ud83d\udc47"
       }
     },
     {
       "id": "what-is",
       "type": "markdown",
-      "label": "What is a Node Graph? ❓",
+      "label": "What is a Node Graph? \u2753",
       "position": {
         "x": 500,
         "y": -100
@@ -87,7 +87,7 @@
     {
       "id": "history",
       "type": "markdown",
-      "label": "A Brief History 📜",
+      "label": "A Brief History \ud83d\udcdc",
       "position": {
         "x": 500,
         "y": 200
@@ -104,7 +104,7 @@
     {
       "id": "components",
       "type": "markdown",
-      "label": "Key Components 🧩",
+      "label": "Key Components \ud83e\udde9",
       "position": {
         "x": -570,
         "y": -160
@@ -115,13 +115,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Components\n\n1. **Nodes**: Boxes with labels (e.g., tasks, data).\n   - Types: Text, Markdown, API calls.\n2. **Edges**: Lines connecting nodes.\n   - Types: Straight, curved, directed.\n3. **Groups**: Containers to organize clusters.\n\nColors and sizes enhance visuals!"
+        "memo": "# Components\n\n1. **Nodes**: Boxes with labels (e.g., tasks, data).\n   - Types: Text, Markdown, API calls.\n2. **Edges**: Lines connecting nodes.\n   - Types: Straight, curved, directed.\n3. **Clusters**: Containers to organize clusters.\n\nColors and sizes enhance visuals!"
       }
     },
     {
       "id": "uses",
       "type": "markdown",
-      "label": "Common Uses 🎯",
+      "label": "Common Uses \ud83c\udfaf",
       "position": {
         "x": -549,
         "y": 187
@@ -138,7 +138,7 @@
     {
       "id": "building",
       "type": "markdown",
-      "label": "How to Build One 🛠️",
+      "label": "How to Build One \ud83d\udee0\ufe0f",
       "position": {
         "x": 0,
         "y": 300
@@ -149,13 +149,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Building Steps\n\n1. **Start Central**: Add a main idea node.\n2. **Branch Out**: Connect related nodes.\n3. **Refine**: Adjust positions, labels, colors.\n4. **Group & Style**: Organize and beautify.\n5. **Iterate**: Add/remove as needed.\n\nTools like Copy/Paste w/ Me make it drag-and-drop easy!"
+        "memo": "# Building Steps\n\n1. **Start Central**: Add a main idea node.\n2. **Branch Out**: Connect related nodes.\n3. **Refine**: Adjust positions, labels, colors.\n4. **Cluster & Style**: Organize and beautify.\n5. **Iterate**: Add/remove as needed.\n\nTools like Copy/Paste w/ Me make it drag-and-drop easy!"
       }
     },
     {
       "id": "examples",
       "type": "markdown",
-      "label": "Real-World Examples 💡",
+      "label": "Real-World Examples \ud83d\udca1",
       "position": {
         "x": 500,
         "y": 400
@@ -166,7 +166,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Examples\n\n- **Project Management**: Gantt-like dependencies.\n- **Knowledge Base**: Wiki-style links.\n- **API Flows**: Sequence of calls.\n- **Halloween Planning**: Costumes → Party → Treats (spooky fun!).\n\nTry adapting one to your needs!"
+        "memo": "# Examples\n\n- **Project Management**: Gantt-like dependencies.\n- **Knowledge Base**: Wiki-style links.\n- **API Flows**: Sequence of calls.\n- **Halloween Planning**: Costumes \u2192 Party \u2192 Treats (spooky fun!).\n\nTry adapting one to your needs!"
       }
     }
   ],
@@ -220,10 +220,10 @@
       "style": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group-basics",
-      "label": "Basics 📚",
+      "label": "Basics \ud83d\udcda",
       "nodeIds": [
         "what-is",
         "history",
@@ -240,7 +240,7 @@
     },
     {
       "id": "group-applications",
-      "label": "Applications 🚀",
+      "label": "Applications \ud83d\ude80",
       "nodeIds": [
         "uses",
         "building",

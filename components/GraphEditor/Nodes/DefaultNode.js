@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const NON_PASSIVE_LISTENER = { passive: false };
 
@@ -21,8 +21,8 @@ const DefaultNode = (props) => {
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
 
-  // --- Ensure handles always exist ---
-  const node = useNodeHandleSchema(origNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  // --- Ensure ports always exist ---
+  const node = useNodePortSchema(origNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
 
   // Resize handlers
   const getPointerPosition = (event) => {

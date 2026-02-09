@@ -51,7 +51,7 @@
     {
       "id": "folder-plan-root",
       "type": "markdown",
-      "label": "🗂️ Layered Folder Plan",
+      "label": "\ud83d\uddc2\ufe0f Layered Folder Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -67,7 +67,7 @@
     {
       "id": "folder-layer-core",
       "type": "markdown",
-      "label": "🧱 Core Layer Folder",
+      "label": "\ud83e\uddf1 Core Layer Folder",
       "position": {
         "x": -380,
         "y": -20
@@ -83,7 +83,7 @@
     {
       "id": "folder-layer-presentation",
       "type": "markdown",
-      "label": "🎨 Presentation Layer Folder",
+      "label": "\ud83c\udfa8 Presentation Layer Folder",
       "position": {
         "x": 0,
         "y": -20
@@ -99,7 +99,7 @@
     {
       "id": "folder-layer-interpreter",
       "type": "markdown",
-      "label": "🧠 Interpreter Layer Folder",
+      "label": "\ud83e\udde0 Interpreter Layer Folder",
       "position": {
         "x": 380,
         "y": -20
@@ -115,7 +115,7 @@
     {
       "id": "folder-layer-elk",
       "type": "markdown",
-      "label": "🔧 ELK/Renderer Layer",
+      "label": "\ud83d\udd27 ELK/Renderer Layer",
       "position": {
         "x": 0,
         "y": 220
@@ -167,5 +167,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

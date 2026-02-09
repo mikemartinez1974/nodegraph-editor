@@ -59,7 +59,7 @@ A lightweight pub/sub used across the editor for decoupled communication between
 
 - `handleDragStart` / `handleDragMove` / `handleDragEnd`
 
-  - for connecting edges via handles
+  - for connecting edges via ports
   - payloads include `{ nodeId, handleId, x, y }` coordinates in screen or graph space (documented by the emitter)
 
 ## Best practices
@@ -252,7 +252,7 @@ Examples
   { "id": "nodeId", "event": "<MouseEvent|PointerEvent>" }
   ```
 
-- **notes:** Useful for hover UI (handles, tooltips).
+- **notes:** Useful for hover UI (ports, tooltips).
 
 ---
 
@@ -366,7 +366,7 @@ Examples
 
 ---
 
-## Handles & connection drag
+## Ports & connection drag
 
 ### handleDragStart
 
@@ -400,7 +400,7 @@ Examples
 
 ---
 
-## Groups
+## Clusters
 
 ### groupAdded / groupUpdated / groupRemoved
 

@@ -848,24 +848,24 @@ const GraphEditorContent = () => {
   useEffect(() => {
     const handleNodeOutput = ({ nodeId, outputName, value } = {}) => {
       if (!nodeId) return;
-      const sourceHandle = outputName || 'root';
+      const sourcePort = outputName || 'root';
       const currentEdges = edgesRef?.current || [];
       currentEdges.forEach((edge) => {
         if (!edge) return;
         if (edge.source !== nodeId) return;
-        const edgeSourceHandle = edge.sourceHandle || 'root';
-        if (edgeSourceHandle !== sourceHandle) return;
-        const targetHandle = edge.targetHandle || 'root';
+        const edgeSourceHandle = edge.sourcePort || 'root';
+        if (edgeSourceHandle !== sourcePort) return;
+        const targetPort = edge.targetPort || 'root';
         eventBus.emit('nodeInput', {
           targetNodeId: edge.target,
-          handleId: targetHandle,
-          inputName: targetHandle,
+          handleId: targetPort,
+          inputName: targetPort,
           value,
           source: 'edge',
           meta: {
             edgeId: edge.id,
             sourceNodeId: nodeId,
-            sourceHandle: edgeSourceHandle
+            sourcePort: edgeSourceHandle
           }
         });
       });
@@ -1055,11 +1055,7 @@ const GraphEditorContent = () => {
       if (!data || typeof data !== 'object') return;
       const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
       const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
-      const groupsToLoad = Array.isArray(data.clusters)
-        ? data.clusters
-        : Array.isArray(data.groups)
-        ? data.groups
-        : [];
+      const groupsToLoad = Array.isArray(data.clusters) ? data.clusters : [];
 
       if (typeof handleLoadGraph === 'function') {
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
@@ -1273,7 +1269,7 @@ const GraphEditorContent = () => {
     emitEdgeIntent('loadGraph', {
       nodes: Array.isArray(nodesToLoad) ? nodesToLoad.length : 0,
       edges: Array.isArray(edgesToLoad) ? edgesToLoad.length : 0,
-      groups: Array.isArray(groupsToLoad) ? groupsToLoad.length : 0
+      clusters: Array.isArray(groupsToLoad) ? groupsToLoad.length : 0
     });
     if (typeof handleLoadGraph === 'function') {
       handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
@@ -1368,10 +1364,10 @@ const skipPropertiesCloseRef = useRef(false);
   );
 
   const focusGroupFromEntities = useCallback(
-    (groupId) => {
-      emitEdgeIntent('groupListSelect', { groupId, multiSelect: false });
-      handlers?.handleGroupListSelect?.(groupId, false);
-      handlers?.handleGroupFocus?.(groupId);
+    (clusterId) => {
+      emitEdgeIntent('groupListSelect', { clusterId, multiSelect: false });
+      handlers?.handleGroupListSelect?.(clusterId, false);
+      handlers?.handleGroupFocus?.(clusterId);
     },
     [emitEdgeIntent, handlers]
   );
@@ -1468,29 +1464,29 @@ const skipPropertiesCloseRef = useRef(false);
     setShowNodeList(false);
   }, [emitEdgeIntent]);
 
-  const handleGroupListSelectIntent = useCallback((groupId, multiSelect) => {
-    emitEdgeIntent('groupListSelect', { groupId, multiSelect });
-    handlers?.handleGroupListSelect?.(groupId, multiSelect);
+  const handleGroupListSelectIntent = useCallback((clusterId, multiSelect) => {
+    emitEdgeIntent('groupListSelect', { clusterId, multiSelect });
+    handlers?.handleGroupListSelect?.(clusterId, multiSelect);
   }, [emitEdgeIntent, handlers]);
 
-  const handleGroupListFocusIntent = useCallback((groupId) => {
-    emitEdgeIntent('groupListFocus', { groupId });
-    handlers?.handleGroupFocus?.(groupId);
+  const handleGroupListFocusIntent = useCallback((clusterId) => {
+    emitEdgeIntent('groupListFocus', { clusterId });
+    handlers?.handleGroupFocus?.(clusterId);
   }, [emitEdgeIntent, handlers]);
 
-  const handleGroupListDoubleClickIntent = useCallback((groupId) => {
-    emitEdgeIntent('groupListDoubleClick', { groupId });
-    handlers?.handleGroupDoubleClickFromList?.(groupId);
+  const handleGroupListDoubleClickIntent = useCallback((clusterId) => {
+    emitEdgeIntent('groupListDoubleClick', { clusterId });
+    handlers?.handleGroupDoubleClickFromList?.(clusterId);
   }, [emitEdgeIntent, handlers]);
 
-  const handleGroupToggleVisibilityIntent = useCallback((groupId) => {
-    emitEdgeIntent('groupToggleVisibility', { groupId });
-    handlers?.handleGroupToggleVisibility?.(groupId);
+  const handleGroupToggleVisibilityIntent = useCallback((clusterId) => {
+    emitEdgeIntent('groupToggleVisibility', { clusterId });
+    handlers?.handleGroupToggleVisibility?.(clusterId);
   }, [emitEdgeIntent, handlers]);
 
-  const handleGroupDeleteIntent = useCallback((groupId) => {
-    emitEdgeIntent('groupDelete', { groupId });
-    handlers?.handleGroupDelete?.(groupId);
+  const handleGroupDeleteIntent = useCallback((clusterId) => {
+    emitEdgeIntent('groupDelete', { clusterId });
+    handlers?.handleGroupDelete?.(clusterId);
   }, [emitEdgeIntent, handlers]);
 
   const handleGroupListCloseIntent = useCallback(() => {
@@ -1664,7 +1660,7 @@ const skipPropertiesCloseRef = useRef(false);
               try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
               return next;
             });
-            if (updates?.sourceHandle !== undefined || updates?.targetHandle !== undefined) {
+            if (updates?.sourcePort !== undefined || updates?.targetPort !== undefined) {
               if (typeof setEdgeRoutes === 'function') {
                 setEdgeRoutes((prev) => {
                   if (!prev || !prev[id]) return prev;
@@ -1681,7 +1677,7 @@ const skipPropertiesCloseRef = useRef(false);
             }
           }}
           onUpdateGroup={(id, updates) => {
-            emitEdgeIntent('updateGroup', { groupId: id, changeCount: Object.keys(updates || {}).length });
+            emitEdgeIntent('updateGroup', { clusterId: id, changeCount: Object.keys(updates || {}).length });
             setGroups(prev => {
               const next = prev.map(g => g.id === id ? { ...g, ...updates } : g);
               const updatedGroup = next.find(g => g.id === id);

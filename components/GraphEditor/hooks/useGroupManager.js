@@ -25,7 +25,7 @@ export default function useGroupManager({
       label: `Group ${groups.length + 1}`
     });
     if (result.success) {
-      const newGroups = [...groups, result.data];
+      const newGroups = [...clusters, result.data];
       setGroups(newGroups);
       setSelectedNodeIds([]);
       setSelectedGroupIds([result.data.id]);
@@ -43,11 +43,11 @@ export default function useGroupManager({
       return;
     }
     let updated = false;
-    selectedGroupIds.forEach(groupId => {
-      const result = groupManager.current.removeGroup(groupId);
+    selectedGroupIds.forEach(clusterId => {
+      const result = groupManager.current.removeGroup(clusterId);
       if (result.success) {
         updated = true;
-        console.log('Removed group:', groupId);
+        console.log('Removed group:', clusterId);
       }
     });
     if (updated) {
@@ -58,8 +58,8 @@ export default function useGroupManager({
   }, [selectedGroupIds, setGroups, groupManager, setSelectedGroupIds, saveToHistory, nodes, edges]);
 
   // Toggle group collapse/expand
-  const handleToggleGroupCollapse = useCallback((groupId) => {
-    const result = groupManager.current.toggleGroupCollapse(groupId);
+  const handleToggleGroupCollapse = useCallback((clusterId) => {
+    const result = groupManager.current.toggleGroupCollapse(clusterId);
     if (result.success) {
       const group = result.data;
       
@@ -95,7 +95,7 @@ export default function useGroupManager({
       
       // Update groups state without changing visibility
       const updatedGroups = groups.map(g => 
-        g.id === groupId ? { ...g, collapsed: group.collapsed } : g
+        g.id === clusterId ? { ...g, collapsed: group.collapsed } : g
       );
       
       setNodes(updatedNodes);

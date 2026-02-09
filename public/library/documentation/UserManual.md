@@ -9,7 +9,7 @@ Twilite is a persistent, executable workspace. Every graph is a living system th
 
 1. **Persistent State** – Clusters preserve unfinished work, live data, and history. Closing the tab does not reset your canvas.  
 2. **Executable Nodes** – Nodes are applications: they fetch data, run scripts, drive breadboards, render 3D scenes, and fire triggers.  
-3. **Systemic Layout** – Groups act like OS containers. Handles, sockets, and edges are contracts between subsystems.  
+3. **Systemic Layout** – Clusters act like OS containers. Ports, sockets, and edges are contracts between subsystems.  
 4. **Versioned Reality** – Save and commit clusters through Git/GitHub to maintain a chain of state transitions instead of brittle snapshots.  
 5. **Automation First** – ScriptNodes, Background RPC, and procedural loaders construct or mutate graphs at scale.
 
@@ -22,11 +22,11 @@ Remember: Twilite’s value is _not having to start over_. Work with that contin
 ### Step 1 – Sync Your AI
 1. Open **📋 Onboard LLM** in the toolbar.  
 2. Paste the generated prompt into your AI assistant.  
-3. The AI can now emit valid Twilite JSON commands that respect handles, groups, and automation.
+3. The AI can now emit valid Twilite JSON commands that respect ports, clusters, and automation.
 
 ### Step 2 – Load / Resume
 - Use the Browser address bar to open a `.node` or `tlz://` cluster.  
-- Twilite restores the last-saved state (layout, groups, selections).  
+- Twilite restores the last-saved state (layout, clusters, selections).  
 - Version-enabled workspaces can pull/push directly from Git using the Browser drawer commands.
 
 ### Step 3 – Iterate
@@ -42,7 +42,7 @@ Remember: Twilite’s value is _not having to start over_. Work with that contin
 | --- | --- |
 | **Browser App Bar** | Navigation history, Template Gallery, Git actions, bookmarks, theme controls. |
 | **Graph Toolbar** | Context-sensitive controls for nodes, edges, automation, history, view, scripting. |
-| **Properties Panel** | Edit node/edge/group metadata, markdown, handles, automation toggles. |
+| **Properties Panel** | Edit node/edge/group metadata, markdown, ports, automation toggles. |
 | **Panels & Drawers** | Node palette, plugin manager, scripting console, plugin runtime diagnostics. |
 
 Key toolbar actions:
@@ -74,41 +74,41 @@ Key toolbar actions:
 | **Visual & Docs** | **MarkdownNode** | Renders `data.markdown` (falls back to `data.memo`). Supports live previews, documentation cards, and rich formatting. |
 |  | **DivNode / SvgNode** | Custom HTML/SVG surfaces for bespoke controls or dashboards. |
 | **Logic & Flow** | **ValueTrigger Node** | Converts value changes into rising/falling edge triggers. Configure thresholds, debounce, and outputs for chaining automation. |
-|  | **Toggle Node** | Supports latching (persistent) and momentary (spring) behavior. Expose handles for ON/OFF events. |
-|  | **Gate Node** | Multi-handle logic (AND/OR/XOR). Handles `inputA`, `inputB`, `output`. Works with ValueTrigger for edge detection. |
+|  | **Toggle Node** | Supports latching (persistent) and momentary (spring) behavior. Expose ports for ON/OFF events. |
+|  | **Gate Node** | Multi-port logic (AND/OR/XOR). Ports `inputA`, `inputB`, `output`. Works with ValueTrigger for edge detection. |
 |  | **Delay Node** | Queues or throttles trigger propagation. Parameters for delay ms, repeat, cancel. |
 | **Automation** | **ScriptNode** | Executes stored scripts to generate or mutate graphs, hit APIs, or drive breadboards. Script output can place nodes, edit data, and emit telemetry. |
 |  | **Background RPC Node** | Bridges to iframe/worker runtimes. Use `testBackgroundRpc()` from the console to verify exposed methods. |
 | **Data & APIs** | **APINode** | Full REST support: choose method (GET/POST/PUT/DELETE), headers, body, auth tokens, and preview responses. Pipe results into downstream nodes. |
 | **Stateful Components** | **Counter Node** | Tracks increments/decrements with optional triggers on thresholds. |
 |  | **Timer Node** | Stopwatch or countdown with bindings to toggles, scripts, or UI elements. |
-| **Spatial / 3D** | **3D Node / Spatial Canvas** | Renders Three.js scenes inside Twilite. Connect handles for camera control, data feeds, and signal events. |
-| **Hardware / Breadboard** | **Breadboard Sockets, Rails, Components** | Domain-specific nodes with precise handle schemas (`socket`, `positive`, `negative`, `pinA`, `pinB`). Combine with autowire runtimes for rapid prototyping. |
+| **Spatial / 3D** | **3D Node / Spatial Canvas** | Renders Three.js scenes inside Twilite. Connect ports for camera control, data feeds, and signal events. |
+| **Hardware / Breadboard** | **Breadboard Sockets, Rails, Components** | Domain-specific nodes with precise port schemas (`socket`, `positive`, `negative`, `pinA`, `pinB`). Combine with autowire runtimes for rapid prototyping. |
 
-> Tip: Use the Node Palette search to browse plugin-provided nodes. Each entry shows handle definitions, default data, and categories.
+> Tip: Use the Node Palette search to browse plugin-provided nodes. Each entry shows port definitions, default data, and categories.
 
 ---
 
-## 6. Edge Types & Handle Contracts
+## 6. Edge Types & Port Contracts
 
-- **Child / Parent** – Vertical hierarchy. Handles typically `out` → `in`, but can be custom (e.g., `anode` → `socket`).  
+- **Child / Parent** – Vertical hierarchy. Ports typically `out` → `in`, but can be custom (e.g., `anode` → `socket`).  
 - **Peer** – Lateral relationships; horizontal routing.  
 - **Data Flow / Dependency / Reference / Bidirectional / Weak / Strong** – Styled links for flow, prerequisites, citations, or emphasis.  
-- **Breadboard Handles** – Use semantic labels like `positive`, `negative`, `pinA`, `shield`. Twilite enforces handle existence during paste/create operations.  
-- **Spatial Handles** – Nodes may expose `signal`, `transform`, `camera`, or `pointer` inputs/outputs.
+- **Breadboard Ports** – Use semantic labels like `positive`, `negative`, `pinA`, `shield`. Twilite enforces port existence during paste/create operations.  
+- **Spatial Ports** – Nodes may expose `signal`, `transform`, `camera`, or `pointer` inputs/outputs.
 
-Always inspect `node.handles`, `node.inputs`, and `node.outputs` in the Properties Panel before wiring unfamiliar nodes.
+Always inspect `node.ports`, `node.inputs`, and `node.outputs` in the Properties Panel before wiring unfamiliar nodes.
 
 ---
 
-## 7. Groups as the OS Layer
+## 7. Clusters as the OS Layer
 
-Groups do more than declutter—they are structural boundaries:
+Clusters do more than declutter—they are structural boundaries:
 
 - **Subsystem Containers** – Encapsulate breadboards, logic circuits, or app modules.  
 - **State Isolation** – Hide or lock a group to freeze a subsystem while iterating elsewhere.  
 - **Mini Applications** – Combine nodes, scripts, and markdown inside a group to build self-contained tools.  
-- **Layout Anchors** – Groups maintain bounds even as inner nodes move, making them perfect for dashboards or labs.  
+- **Layout Anchors** – Clusters maintain bounds even as inner nodes move, making them perfect for dashboards or labs.  
 
 Use the Group panel to rename, style, collapse, or ungroup as your system evolves.
 
@@ -139,7 +139,7 @@ Spatial nodes are live today:
 
 - Render Three.js scenes, animated canvases, or VR previews directly inside nodes.  
 - Feed in telemetry from ScriptNodes or ValueTriggers to animate or react to user input.  
-- Use groups to partition spatial scenes (“Lab A”, “Simulation Stage”).  
+- Use clusters to partition spatial scenes (“Lab A”, “Simulation Stage”).  
 - Combine with Toggle/ValueTrigger nodes to run stateful simulations.
 
 ---
@@ -147,9 +147,9 @@ Spatial nodes are live today:
 ## 10. Example Workflows
 
 1. **Breadboard Lab** – Use the Template Gallery to load a breadboard scene. ScriptNodes drop resistors, LEDs, and autowire them. Markdown nodes capture lab notes. ValueTriggers light the LED when rails are powered.  
-2. **Product OS** – Organize roadmap clusters in groups (Quarterly, Teams). API nodes fetch metrics, Markdown nodes host planning docs, ScriptNodes sync status from REST endpoints. Git commits track decisions over time.  
-3. **Spatial Storyboard** – Combine 3D nodes with Toggle/Timer nodes to storyboard interactions. Markdown nodes narrate scenes, while groups isolate each act.  
-4. **Automation Hub** – Build a control room group containing ScriptNodes and ValueTriggers that mutate other groups on schedule (e.g., nightly cleanup, import pipelines).
+2. **Product OS** – Organize roadmap clusters in clusters (Quarterly, Teams). API nodes fetch metrics, Markdown nodes host planning docs, ScriptNodes sync status from REST endpoints. Git commits track decisions over time.  
+3. **Spatial Storyboard** – Combine 3D nodes with Toggle/Timer nodes to storyboard interactions. Markdown nodes narrate scenes, while clusters isolate each act.  
+4. **Automation Hub** – Build a control room group containing ScriptNodes and ValueTriggers that mutate other clusters on schedule (e.g., nightly cleanup, import pipelines).
 
 ---
 
@@ -157,13 +157,13 @@ Spatial nodes are live today:
 
 | Symptom | Fix |
 | --- | --- |
-| Paste fails with handle errors | Ensure every edge declares valid handle keys. Inspect node schemas in Properties Panel. |
+| Paste fails with port errors | Ensure every edge declares valid port ids. Inspect node schemas in Properties Panel. |
 | Graph looks empty | Use **Auto-Layout**, zoom out, or check if you loaded a new branch without nodes. |
 | Markdown doesn’t update | Confirm you’re editing `data.markdown` (Properties Panel does this automatically). |
 | ScriptNode error | Open the Script panel log; errors surface there. Fix inputs or update the script, then rerun. |
 | Git conflicts | Pull latest, resolve JSON conflicts in the built-in diff viewer, then recommit. |
 
-Validation warnings include skipped nodes/edges with reasons (missing IDs, invalid handles, etc.). Feed those warnings back into your AI prompt so it can correct the JSON next time.
+Validation warnings include skipped nodes/edges with reasons (missing IDs, invalid ports, etc.). Feed those warnings back into your AI prompt so it can correct the JSON next time.
 
 ---
 
@@ -181,7 +181,7 @@ Validation warnings include skipped nodes/edges with reasons (missing IDs, inval
 
 - **Cluster** – A `.node` file loaded in Twilite; comparable to a project or workspace.  
 - **Cognitive Runtime** – Twilite’s role as an execution layer for unfinished systems.  
-- **Handle** – A named socket on a node that defines connection semantics (type, position, label).  
+- **Port** – A named socket on a node that defines connection semantics (type, position, label).  
 - **Group** – A structural container acting like an OS window or package.  
 - **ScriptNode** – Embedded automation engine for procedural graph mutations.  
 - **ValueTrigger** – Node that fires on rising/falling edges, enabling instrumentation and control.  

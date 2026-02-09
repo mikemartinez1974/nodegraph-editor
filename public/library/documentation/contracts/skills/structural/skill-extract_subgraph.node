@@ -59,7 +59,7 @@
     {
       "id": "skill-extract-root",
       "type": "markdown",
-      "label": "🪶 Skill: extract-subgraph (Normative)",
+      "label": "\ud83e\udeb6 Skill: extract-subgraph (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Identity Rules\n\n- fork=false → IDs preserved\n- fork=true → new IDs minted\n- newManifest=true → new graph identity\n- newManifest=false → caller supplies identity"
+        "markdown": "## Identity Rules\n\n- fork=false \u2192 IDs preserved\n- fork=true \u2192 new IDs minted\n- newManifest=true \u2192 new graph identity\n- newManifest=false \u2192 caller supplies identity"
       }
     },
     {
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Idempotency\n\n- fork=false → idempotent\n- fork=true → not idempotent\n\nIdentity behavior must be explicit."
+        "markdown": "## Idempotency\n\n- fork=false \u2192 idempotent\n- fork=true \u2192 not idempotent\n\nIdentity behavior must be explicit."
       }
     },
     {
@@ -350,5 +350,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

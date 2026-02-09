@@ -299,7 +299,7 @@ export default function NodeGraph({
   // ============================================
   
   useEffect(() => {
-    const handleDrop = ({ handle, targetNode, targetNodeObject, position, targetHandle, validation }) => {
+    const handleDrop = ({ handle, targetNode, targetNodeObject, position, targetPort, validation }) => {
       if (!handle) return;
       if (validation && validation.ok === false) {
         if (setSnackbar && validation.message) {
@@ -308,37 +308,37 @@ export default function NodeGraph({
         return;
       }
       // Ignore open-space drops; GraphEditor handles node creation + edge wiring.
-      if (!targetHandle) {
+      if (!targetPort) {
         return;
       }
 
       // Only allow output→input connections with matching types
       const sourceOk = handle.type === 'output' || handle.type === 'bidirectional';
-      const targetOk = targetHandle && (targetHandle.type === 'input' || targetHandle.type === 'bidirectional');
+      const targetOk = targetPort && (targetPort.type === 'input' || targetPort.type === 'bidirectional');
       if (sourceOk && targetOk) {
         // Validate type match
         if (
           !isWildcardHandleType(handle.handleType) &&
-          !isWildcardHandleType(targetHandle.handleType) &&
-          handle.handleType !== targetHandle.handleType
+          !isWildcardHandleType(targetPort.handleType) &&
+          handle.handleType !== targetPort.handleType
         ) {
           if (setSnackbar) {
-            setSnackbar({ open: true, message: `Handle types do not match: ${handle.handleType} → ${targetHandle.handleType}`, severity: 'warning' });
+            setSnackbar({ open: true, message: `Handle types do not match: ${handle.handleType} → ${targetPort.handleType}`, severity: 'warning' });
           }
           return;
         }
         // Prevent self-connection
-        if (handle.nodeId === targetHandle.nodeId) return;
+        if (handle.nodeId === targetPort.nodeId) return;
         // Create edge with handle keys
         const newEdge = {
           id: `edge_${Date.now()}`,
           source: handle.nodeId,
-          target: targetHandle.nodeId,
-          sourceHandle: handle.key,
-          targetHandle: targetHandle.key,
-          handleMeta: {
+          target: targetPort.nodeId,
+          sourcePort: handle.key,
+          targetPort: targetPort.key,
+          portMeta: {
             source: { label: handle.label, type: handle.handleType },
-            target: { label: targetHandle.label, type: targetHandle.handleType }
+            target: { label: targetPort.label, type: targetPort.handleType }
           },
           type: validation?.edgeType || 'default',
           label: '',
@@ -346,7 +346,7 @@ export default function NodeGraph({
         };
         setEdges(prev => [...prev, newEdge]);
         if (setSnackbar) {
-          setSnackbar({ open: true, message: `Created edge from ${handle.label} to ${targetHandle.label}`, severity: 'success' });
+          setSnackbar({ open: true, message: `Created edge from ${handle.label} to ${targetPort.label}`, severity: 'success' });
         }
         return;
       }

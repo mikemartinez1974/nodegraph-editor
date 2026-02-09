@@ -21,7 +21,7 @@ Duplication is not copying text — it is controlled identity minting.
   "nodeIds": ["uuid"],
   "includeEdges": false,
   "offset": { "x": 40, "y": 40 },
-  "groupId": "optional-uuid"
+  "clusterId": "optional-uuid"
 }
 ```
 

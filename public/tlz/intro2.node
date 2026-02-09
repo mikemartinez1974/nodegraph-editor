@@ -63,7 +63,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Welcome to NodeGraph Editor\n\nStart here — follow the guides:\n\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n- [Features](tlz://cpwith.me/tlz/Features.node)\n\nThis node is a markdown example that links to other TLZ documents."
+        "memo": "# Welcome to NodeGraph Editor\n\nStart here \u2014 follow the guides:\n\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n- [Features](tlz://cpwith.me/tlz/Features.node)\n\nThis node is a markdown example that links to other TLZ documents."
       }
     },
     {
@@ -115,5 +115,5 @@
       "style": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

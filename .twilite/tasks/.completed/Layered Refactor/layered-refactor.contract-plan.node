@@ -56,7 +56,7 @@
     {
       "id": "contract-root",
       "type": "markdown",
-      "label": "📜 Contracts Layer Plan",
+      "label": "\ud83d\udcdc Contracts Layer Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -66,13 +66,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Contracts Layer Plan\n+\n+Define the semantics (handles, edge types, constraints, skill contracts) as serializable artifacts and make them feed the validation middleware in the new core layer."
+        "markdown": "# Contracts Layer Plan\n+\n+Define the semantics (ports, edge types, constraints, skill contracts) as serializable artifacts and make them feed the validation middleware in the new core layer."
       }
     },
     {
-      "id": "contract-handles",
+      "id": "contract-ports",
       "type": "markdown",
-      "label": "🧱 Handle & Node Schemas",
+      "label": "\ud83e\uddf1 Port & Node Schemas",
       "position": {
         "x": -320,
         "y": -20
@@ -82,13 +82,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handle/NODE Schemas\n+\n+- Enumerate handle types, IDs, directions, and constraints per node type.\n+- Store schema definitions inside graph metadata so agents/skills can ask for them.\n+- Provide helpers to emit violations when contracts are broken."
+        "markdown": "## Port/NODE Schemas\n+\n+- Enumerate port types, IDs, directions, and constraints per node type.\n+- Store schema definitions inside graph metadata so agents/skills can ask for them.\n+- Provide helpers to emit violations when contracts are broken."
       }
     },
     {
       "id": "contract-skills",
       "type": "markdown",
-      "label": "🧠 Skill Contracts",
+      "label": "\ud83e\udde0 Skill Contracts",
       "position": {
         "x": 320,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "contract-constraints",
       "type": "markdown",
-      "label": "⚖️ Constraints + Guards",
+      "label": "\u2696\ufe0f Constraints + Guards",
       "position": {
         "x": 0,
         "y": 200
@@ -120,7 +120,7 @@
     {
       "id": "contract-tools",
       "type": "markdown",
-      "label": "🧰 Contract Tools",
+      "label": "\ud83e\uddf0 Contract Tools",
       "position": {
         "x": -220,
         "y": 420
@@ -148,10 +148,10 @@
   ],
   "edges": [
     {
-      "id": "edge-contract-root-handles",
+      "id": "edge-contract-root-ports",
       "type": "dataFlow",
       "source": "contract-root",
-      "target": "contract-handles",
+      "target": "contract-ports",
       "label": "catalogs",
       "style": {
         "curved": true,
@@ -172,9 +172,9 @@
       "data": {}
     },
     {
-      "id": "edge-handles-constraints",
+      "id": "edge-ports-constraints",
       "type": "dataFlow",
-      "source": "contract-handles",
+      "source": "contract-ports",
       "target": "contract-constraints",
       "label": "enables",
       "style": {
@@ -208,5 +208,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

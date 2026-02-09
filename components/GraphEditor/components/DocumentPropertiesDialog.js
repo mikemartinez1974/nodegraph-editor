@@ -559,10 +559,10 @@ export default function DocumentPropertiesDialog({
                   Version {contractSummary.version}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Handles defined: {contractSummary.handleSummary.total || 0}
+                  Ports defined: {contractSummary.handleSummary.total || 0}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Nodes with handles: {contractSummary.handleSummary.withHandles || 0}
+                  Nodes with ports: {contractSummary.handleSummary.withHandles || 0}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Edges: {contractSummary.edgeCount}

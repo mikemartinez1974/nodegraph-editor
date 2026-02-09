@@ -134,9 +134,9 @@
       }
     },
     {
-      "id": "handles-optional-vs-create-edges",
+      "id": "ports-optional-vs-create-edges",
       "type": "markdown",
-      "label": "\ud83c\udf9a\ufe0f Handles Optional",
+      "label": "\ud83c\udf9a\ufe0f Ports Optional",
       "position": {
         "x": -255.66089251375445,
         "y": -347.0032149656553
@@ -146,7 +146,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handles Optional vs CreateEdges\n\n**Issue:**\n- Contract says handles are optional for portability\n- Code errors when a node has multiple handles and none is specified\n\n**Decision needed:**\n- Downgrade to warning?\n- Keep strict for authored graphs?\n\n**ANSWER:**\n- Handles are optional in serialized graph artifacts\n- Handles are required during authoring when multiple handles exist\n\n**Rule:**\n- During interactive authoring:\n  - If a node has multiple handles and none is specified \u2192 \u274c error (ambiguous intent)\n- During import / automation / transformation:\n  - Missing handles \u2192 \u26a0\ufe0f warning (inference allowed)\n- When only one handle exists:\n  - Handle may be omitted safely\n\n**Rationale:**\n- Prevents intent guessing during human authoring\n- Preserves portability for headless tools and agents\n- Allows legacy and external graphs to load without failure\n- Keeps semantic meaning explicit where humans expect precision\n\n**Optional extension (future):**\n- Introduce edge intent modes:\n  - `explicit` (default, human-authored)\n  - `inferred` (agents/imports)\n  - `wildcard` (declared, rare, loud)\n\n**Validation notes:**\n- Validators must treat ambiguous authoring as errors\n- Validators must treat inferred edges as warnings\n- Editors should surface handle choice affordances when required\n\nHonesty for humans. Politeness for artifacts. Silence is never allowed."
+        "markdown": "## Ports Optional vs CreateEdges\n\n**Issue:**\n- Contract says ports are optional for portability\n- Code errors when a node has multiple ports and none is specified\n\n**Decision needed:**\n- Downgrade to warning?\n- Keep strict for authored graphs?\n\n**ANSWER:**\n- Ports are optional in serialized graph artifacts\n- Ports are required during authoring when multiple ports exist\n\n**Rule:**\n- During interactive authoring:\n  - If a node has multiple ports and none is specified \u2192 \u274c error (ambiguous intent)\n- During import / automation / transformation:\n  - Missing ports \u2192 \u26a0\ufe0f warning (inference allowed)\n- When only one port exists:\n  - Port may be omitted safely\n\n**Rationale:**\n- Prevents intent guessing during human authoring\n- Preserves portability for headless tools and agents\n- Allows legacy and external graphs to load without failure\n- Keeps semantic meaning explicit where humans expect precision\n\n**Optional extension (future):**\n- Introduce edge intent modes:\n  - `explicit` (default, human-authored)\n  - `inferred` (agents/imports)\n  - `wildcard` (declared, rare, loud)\n\n**Validation notes:**\n- Validators must treat ambiguous authoring as errors\n- Validators must treat inferred edges as warnings\n- Editors should surface port choice affordances when required\n\nHonesty for humans. Politeness for artifacts. Silence is never allowed."
       }
     },
     {
@@ -178,7 +178,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Policy (Intent > Presentation)\n\n**Goal:**\n- A graph is valid if its *intent* and *content* align.\n\n**Hard errors (must fail):**\n- Missing/invalid Manifest intent\n- Broken references (missing nodes/edges)\n- Semantic contradictions (intent vs content)\n- Forbidden mutations (authority)\n\n**Warnings only (presentation):**\n- Missing position/size\n- Styling gaps\n- Optional handle omissions\n\n**Principle:**\n- Judge the *graph*, not the author.\n- Semantic coherence > layout polish."
+        "markdown": "## Validation Policy (Intent > Presentation)\n\n**Goal:**\n- A graph is valid if its *intent* and *content* align.\n\n**Hard errors (must fail):**\n- Missing/invalid Manifest intent\n- Broken references (missing nodes/edges)\n- Semantic contradictions (intent vs content)\n- Forbidden mutations (authority)\n\n**Warnings only (presentation):**\n- Missing position/size\n- Styling gaps\n- Optional port omissions\n\n**Principle:**\n- Judge the *graph*, not the author.\n- Semantic coherence > layout polish."
       }
     },
     {
@@ -194,7 +194,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Definitions Contract Inputs\n\nWe cannot finalize `definitions` until these are settled:\n\n1. Required node roles (manifest/definitions/legend/style/content)\n2. Core node type list (initial types)\n3. Canonical edge type list\n4. Cluster vs group primitive decision\n5. Handle optionality rules\n6. Extension namespace policy\n\n**Note:** Dictionary node will need a dedicated implementation, but may render as markdown for now."
+        "markdown": "## Definitions Contract Inputs\n\nWe cannot finalize `definitions` until these are settled:\n\n1. Required node roles (manifest/definitions/legend/style/content)\n2. Core node type list (initial types)\n3. Canonical edge type list\n4. Cluster vs cluster primitive decision\n5. Port optionality rules\n6. Extension namespace policy\n\n**Note:** Dictionary node will need a dedicated implementation, but may render as markdown for now."
       }
     },
     {
@@ -258,13 +258,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Cluster vs Group\n\n**Decision:** file format uses clusters as a primitive.\n\n**File shape:** `nodes`, `edges`, `clusters`.\n\nRoles are satisfied via node types (manifest, dictionary, legend, markdown).\n\nGroups are a node type that *represents* a cluster."
+        "markdown": "## Cluster vs Cluster\n\n**Decision:** file format uses clusters as a primitive.\n\n**File shape:** `nodes`, `edges`, `clusters`.\n\nRoles are satisfied via node types (manifest, dictionary, legend, markdown).\n\nClusters are a node type that *represents* a cluster."
       }
     },
     {
       "id": "definitions-handle-policy",
       "type": "markdown",
-      "label": "Handle Policy \u2705",
+      "label": "Port Policy \u2705",
       "position": {
         "x": 1239.3029918014083,
         "y": 919.3029918014083
@@ -274,7 +274,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handles Optionality\n\n**Decision (from Handles Optional node):**\n- Optional for portability\n- Required during authoring when ambiguous\n- Inferred allowed for import/automation\n"
+        "markdown": "## Ports Optionality\n\n**Decision (from Ports Optional node):**\n- Optional for portability\n- Required during authoring when ambiguous\n- Inferred allowed for import/automation\n"
       }
     },
     {
@@ -335,10 +335,10 @@
       "data": {}
     },
     {
-      "id": "edge-root-handles",
+      "id": "edge-root-ports",
       "type": "dataFlow",
       "source": "contract-review-root",
-      "target": "handles-optional-vs-create-edges",
+      "target": "ports-optional-vs-create-edges",
       "label": "check",
       "style": {
         "width": 2,
@@ -439,7 +439,7 @@
       "data": {}
     },
     {
-      "id": "edge-definitions-handles",
+      "id": "edge-definitions-ports",
       "type": "dataFlow",
       "source": "definitions-contract-readiness",
       "target": "definitions-handle-policy",
@@ -465,5 +465,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

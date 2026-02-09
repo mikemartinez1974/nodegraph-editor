@@ -40,7 +40,7 @@ Before execution, the following must be true:
    - Missing nodes must cause failure
 
 2. **Port contracts are respected (if used)**
-   - If `sourceHandle` or `targetHandle` is provided:
+   - If `sourcePort` or `targetPort` is provided:
      - The port ID must exist on the node type
      - Direction must be valid
      - Compatibility rules must pass
@@ -69,8 +69,8 @@ Before execution, the following must be true:
     id: string
     source: string
     target: string
-    sourceHandle?: string
-    targetHandle?: string
+    sourcePort?: string
+    targetPort?: string
     type?: string
     label?: string
     data?: object

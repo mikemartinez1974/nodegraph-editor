@@ -43,13 +43,13 @@
             "node",
             "view"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -114,7 +114,7 @@
     {
       "id": "markdown-node-task-root",
       "type": "markdown",
-      "label": "🧩 Node (content) via Graph",
+      "label": "\ud83e\udde9 Node (content) via Graph",
       "position": {
         "x": 816.4106189142362,
         "y": -150.79326239401783
@@ -124,7 +124,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Implement **node** as a **node-definition graph**.\n\nThe node has a single data field: `content`.\n\n- `content` is a **string**\n- `content` renders as **markdown**\n\nIt exposes **two views**:\n- **editor.web** (UI panel with text editor)\n- **node.web** (rendered markdown)\n\nThis replaces the old “markdown node” concept."
+        "markdown": "Implement **node** as a **node-definition graph**.\n\nThe node has a single data field: `content`.\n\n- `content` is a **string**\n- `content` renders as **markdown**\n\nIt exposes **two views**:\n- **editor.web** (UI panel with text editor)\n- **node.web** (rendered markdown)\n\nThis replaces the old \u201cmarkdown node\u201d concept."
       }
     },
     {
@@ -140,7 +140,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Create a **node-definition graph** for `node` that contains:\n\n- **View node** (intent: editor, payload: twilite.web)\n- **View node** (intent: node, payload: twilite.web)\n- Optional **script/skill** nodes (if needed)\n- Minimal handles + default root handle\n\nThis graph is the class definition."
+        "markdown": "Create a **node-definition graph** for `node` that contains:\n\n- **View node** (intent: editor, payload: twilite.web)\n- **View node** (intent: node, payload: twilite.web)\n- Optional **script/skill** nodes (if needed)\n- Minimal ports + default root port\n\nThis graph is the class definition."
       }
     },
     {
@@ -204,13 +204,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Validate & render:\n\n- Missing view → warn + fallback\n- Missing dictionary entry → warn\n- Manifest dependency missing → warn (draft mode ok)\n\nEnsure editor resolves **node** via dictionary → views."
+        "markdown": "Validate & render:\n\n- Missing view \u2192 warn + fallback\n- Missing dictionary entry \u2192 warn\n- Manifest dependency missing \u2192 warn (draft mode ok)\n\nEnsure editor resolves **node** via dictionary \u2192 views."
       }
     },
     {
       "id": "markdown-acceptance",
       "type": "markdown",
-      "label": "✅ Acceptance Criteria",
+      "label": "\u2705 Acceptance Criteria",
       "position": {
         "x": 802,
         "y": 1032
@@ -220,7 +220,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "A node instance **renders via its View** and behaves like native:\n\n- draggable + resizable\n- handles honored (root default)\n- node type resolved via legend/dictionary\n- `data.content` editable in editor view\n- graph view renders `data.content`"
+        "markdown": "A node instance **renders via its View** and behaves like native:\n\n- draggable + resizable\n- ports honored (root default)\n- node type resolved via legend/dictionary\n- `data.content` editable in editor view\n- graph view renders `data.content`"
       }
     },
     {
@@ -317,7 +317,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Guard editing with **manifest authority**:\n\n- If `authority.mutation.allowUpdate = false` → no edit button\n- If `authority.mutation.appendOnly = true` → no edits\n\nUI should reflect read-only policy."
+        "markdown": "Guard editing with **manifest authority**:\n\n- If `authority.mutation.allowUpdate = false` \u2192 no edit button\n- If `authority.mutation.appendOnly = true` \u2192 no edits\n\nUI should reflect read-only policy."
       }
     },
     {

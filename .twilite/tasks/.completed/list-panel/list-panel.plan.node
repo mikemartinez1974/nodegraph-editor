@@ -1,1 +1,155 @@
-{"fileVersion":"1.0","metadata":{"title":"List Panel Plan","description":"Plan to implement the unified entities drawer.","created":"2026-01-13T00:00:00.000Z","modified":"2026-01-13T00:00:00.000Z","author":"","tags":[]},"settings":{"theme":{"mode":"light","primary":{"main":"#1976d2","light":"#42a5f5","dark":"#1565c0","contrastText":"#fff"},"secondary":{"main":"#dc004e","light":"#ff4081","dark":"#9a0036","contrastText":"#fff"},"background":{"default":"#e8f0ff","paper":"#ffffff"},"text":{"primary":"rgba(0, 0, 0, 0.87)","secondary":"rgba(0, 0, 0, 0.6)"},"divider":"rgba(0, 0, 0, 0.12)"},"backgroundImage":null,"defaultNodeColor":"#1976d2","defaultEdgeColor":"#666666","snapToGrid":false,"gridSize":20,"edgeRouting":"orthogonal","autoSave":false},"viewport":{"pan":{"x":0,"y":0},"zoom":1},"document":null,"scripts":[],"nodes":[{"id":"plan-root","type":"markdown","label":"🎯 List Panel Plan","position":{"x":0,"y":-340},"width":520,"height":250,"visible":true,"showLabel":true,"data":{"markdown":"# Implementation Plan\nSteps for building the entities list panel while leveraging the existing node/edge/group lists."}},{"id":"plan-state","type":"markdown","label":"📦 State & Layout","position":{"x":-340,"y":-80},"width":420,"height":220,"visible":true,"showLabel":true,"data":{"markdown":"## State\n- Add `entityView` (nodes/edges/groups) and `showEntitiesPanel` to layout context.\n- Track toggle source so toolbar buttons can keep the drawer open.\n- Keep selection handlers (node/edge/group) synced with the master selection state."}},{"id":"plan-ui","type":"markdown","label":"🧠 UI Flow","position":{"x":340,"y":-80},"width":420,"height":220,"visible":true,"showLabel":true,"data":{"markdown":"## UI\n- Toolbar hosts buttons for each view; clicking sets `entityView` and opens the drawer.\n- `EntitiesPanel` renders exactly one of `NodeListPanel`, `EdgeListPanel`, `GroupListPanel` based on `entityView`.\n- Drawer stays persistent, keeps canvas accessible, and closes on background clicks."}},{"id":"plan-handlers","type":"markdown","label":"🤝 Listeners & Navigation","position":{"x":0,"y":120},"width":520,"height":200,"visible":true,"showLabel":true,"data":{"markdown":"## Handlers\n- List selections should focus the graph via existing handlers (reuse `handleNodeListSelectIntent`, etc.).\n- Canvas background clicks close the drawer when nothing is selected.\n- The panel should allow swapping views without re-mounting the whole drawer."}}],"edges":[{"id":"plan-edge-1","source":"plan-root","target":"plan-state","type":"dataFlow","style":{"width":2,"curved":true},"label":"requires"},{"id":"plan-edge-2","source":"plan-root","target":"plan-ui","type":"dataFlow","style":{"width":2,"curved":true},"label":"informs"},{"id":"plan-edge-3","source":"plan-root","target":"plan-handlers","type":"dataFlow","style":{"width":2,"curved":true},"label":"enables"}],"groups":[]}
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "List Panel Plan",
+    "description": "Plan to implement the unified entities drawer.",
+    "created": "2026-01-13T00:00:00.000Z",
+    "modified": "2026-01-13T00:00:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8f0ff",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "plan-root",
+      "type": "markdown",
+      "label": "\ud83c\udfaf List Panel Plan",
+      "position": {
+        "x": 0,
+        "y": -340
+      },
+      "width": 520,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implementation Plan\nSteps for building the entities list panel while leveraging the existing node/edge/cluster lists."
+      }
+    },
+    {
+      "id": "plan-state",
+      "type": "markdown",
+      "label": "\ud83d\udce6 State & Layout",
+      "position": {
+        "x": -340,
+        "y": -80
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## State\n- Add `entityView` (nodes/edges/clusters) and `showEntitiesPanel` to layout context.\n- Track toggle source so toolbar buttons can keep the drawer open.\n- Keep selection handlers (node/edge/cluster) synced with the master selection state."
+      }
+    },
+    {
+      "id": "plan-ui",
+      "type": "markdown",
+      "label": "\ud83e\udde0 UI Flow",
+      "position": {
+        "x": 340,
+        "y": -80
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## UI\n- Toolbar hosts buttons for each view; clicking sets `entityView` and opens the drawer.\n- `EntitiesPanel` renders exactly one of `NodeListPanel`, `EdgeListPanel`, `GroupListPanel` based on `entityView`.\n- Drawer stays persistent, keeps canvas accessible, and closes on background clicks."
+      }
+    },
+    {
+      "id": "plan-handlers",
+      "type": "markdown",
+      "label": "\ud83e\udd1d Listeners & Navigation",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "width": 520,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Handlers\n- List selections should focus the graph via existing handlers (reuse `handleNodeListSelectIntent`, etc.).\n- Canvas background clicks close the drawer when nothing is selected.\n- The panel should allow swapping views without re-mounting the whole drawer."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "plan-edge-1",
+      "source": "plan-root",
+      "target": "plan-state",
+      "type": "dataFlow",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "requires"
+    },
+    {
+      "id": "plan-edge-2",
+      "source": "plan-root",
+      "target": "plan-ui",
+      "type": "dataFlow",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "informs"
+    },
+    {
+      "id": "plan-edge-3",
+      "source": "plan-root",
+      "target": "plan-handlers",
+      "type": "dataFlow",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "enables"
+    }
+  ],
+  "clusters": []
+}

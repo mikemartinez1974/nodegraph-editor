@@ -28,7 +28,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - ✅ **Pan & Zoom**: Mouse wheel zoom, drag-to-pan, HiDPI canvas support
 - ✅ **Multi-Select**: Marquee selection (Shift+drag) with bulk operations
 - ✅ **Undo/Redo**: Full history management (Ctrl+Z/Y)
-- ✅ **Groups**: Visual node grouping with collapse/expand and drag-to-move-all
+- ✅ **Clusters**: Visual node grouping with collapse/expand and drag-to-move-all
 - ✅ **Node Types**: Default, Resizable, with extensible custom types
 - ✅ **Edge Types**: Straight, curved, child/parent (vertical), peer (horizontal)
 - ✅ **Markdown Support**: Rich formatted text in node memos
@@ -44,7 +44,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 
 - **Properties Panel**: Edit labels, markdown memos, links, emoji picker, edge type, style, width, curvature, group membership, styling, visibility
 - **Node List**: Virtualized list with search and filtering (react-window)
-- **Group List**: Browse and manage all groups
+- **Group List**: Browse and manage all clusters
 - **Draggable Toolbar**: Floating toolbar with all essential actions
 
 ### Keyboard Shortcuts
@@ -67,7 +67,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - **Theme System**: 29 built-in themes with dark/light mode support
 - **Background Art**: Customizable canvas backgrounds (tiled, stretched, centered)
 - **Auto-save Ready**: JSON export/import for persistence
-- **Performance**: Handles 1000+ nodes smoothly with canvas rendering and virtualization
+- **Performance**: Ports 1000+ nodes smoothly with canvas rendering and virtualization
 
 ---
 
@@ -76,7 +76,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ### Layered Rendering
 
 - **EdgeLayer** (Canvas): High-performance bezier curve rendering with hit detection
-- **HandleLayer** (Canvas): Connection points with proximity-based activation
+- **HandleLayer** (Canvas): Port connection points with proximity-based activation
 - **NodeLayer** (React/DOM): Interactive node components with selection and hover
 - **GroupLayer** (SVG): Visual grouping with auto-calculated bounds
 - **PanZoomLayer** (SVG): Unified viewport transform with marquee selection
@@ -84,7 +84,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ### Event System
 
 - **Event Bus**: Decoupled cross-component communication (`eventBus.js`)
-- **Handle System**: Context-aware positioning with real-time drag updates (no React re-renders)
+- **Port System**: Context-aware port positioning with real-time drag updates (no React re-renders)
 - **Physics Simulation**: Force-directed layout in Nav Mode (attraction, repulsion, damping)
 
 ### State Management
@@ -160,7 +160,7 @@ nodegraph-editor/
 │   │   ├── Nodes/
 │   │   │   ├── DefaultNode.js      # Standard node component
 │   │   │   └── ResizableNode.js    # Resizable node variant
-│   │   ├── PropertiesPanel.js      # Unified properties panel for nodes, edges, and groups
+│   │   ├── PropertiesPanel.js      # Unified properties panel for nodes, edges, and clusters
 │   │   ├── NodeListPanel.js        # Virtualized node list
 │   │   ├── GroupListPanel.js       # Group browser
 │   │   ├── useGraphHistory.js      # Undo/redo hook
@@ -171,7 +171,7 @@ nodegraph-editor/
 │       ├── NodeGraph.js            # Main orchestrator
 │       ├── EdgeLayer.js            # Canvas edge rendering
 │       ├── NodeLayer.js            # React node rendering
-│       ├── HandleLayer.js          # Canvas handle rendering
+│       ├── HandleLayer.js          # Canvas port rendering
 │       ├── GroupLayer.js           # SVG group rendering
 │       ├── PanZoomLayer.js         # Viewport + marquee
 │       ├── eventBus.js             # Event system
@@ -208,8 +208,8 @@ window.graphAPI.findNodes({ type: "default", hasMemo: true });
 window.graphAPI.createEdge({
   source: "node1",
   target: "node2",
-  sourceHandle: "out",
-  targetHandle: "in",
+  sourcePort: "out",
+  targetPort: "in",
   type: "curved"
 });
 
@@ -218,7 +218,7 @@ window.graphAPI.getStats();
 // { nodeCount: 10, edgeCount: 15, ... }
 ```
 
-> ℹ️ Edge handles are optional. If you include `sourceHandle`/`targetHandle`, they must match handle keys declared by the nodes (check `outputs`/`inputs` or explicit `handles`).
+> ℹ️ Edge ports are required. Use `sourcePort`/`targetPort` and set them to `root` when you want the default port. Ports must match port ids declared by the nodes (check `outputs`/`inputs` or explicit `ports`).
 
 See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) for full API reference.
 
@@ -241,11 +241,11 @@ Custom themes can be added in `components/Header/themes.js`.
 ## Performance Notes
 
 - **Large Graphs**: Tested with 1000+ nodes, 2000+ edges
-- **Canvas Rendering**: Edges/handles drawn on canvas (not DOM)
+- **Canvas Rendering**: Edges/ports drawn on canvas (not DOM)
 - **RAF Batching**: Drag updates batched via requestAnimationFrame
 - **Virtualization**: Node/group list panels use react-window
 - **HiDPI Support**: Canvas scaled for retina displays
-- **Lazy Rendering**: Handles only rendered when near nodes
+- **Lazy Rendering**: Ports only rendered when near nodes
 
 ---
 
@@ -280,7 +280,7 @@ Use these docs as a launchpad when working with other assistants—the descripti
 | **[LLM Onboarding](public/documentation/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
 | **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)** | Reference for `window.graphAPI` with create/update/delete/find examples. |
 | **[NodeGraph README](components/NodeGraph/README.md)** | Deep dive into the layered renderer (EdgeLayer, HandleLayer, PanZoomLayer). |
-| **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for handles, edges, and trigger/data flow. |
+| **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for ports, edges, and trigger/data flow. |
 | **[Copilot Instructions](.github/copilot-instructions.md)** | Contributor guidelines and expectations for AI/code reviewers. |
 
 ---

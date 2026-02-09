@@ -28,7 +28,7 @@ export function scheduleEdgeVerification(api, componentNode, desiredEdges) {
       // index live edges by handle
       const grouped = new Map();
       for (const edge of liveEdges) {
-        const handle = edge.sourceHandle;
+        const handle = edge.sourcePort;
         if (!grouped.has(handle)) grouped.set(handle, []);
         grouped.get(handle).push(edge);
       }
@@ -44,9 +44,9 @@ export function scheduleEdgeVerification(api, componentNode, desiredEdges) {
         if (!match) {
           await api.createEdge({
             source: nodeId,
-            sourceHandle: spec.fromHandle,
+            sourcePort: spec.fromHandle,
             target: spec.toNodeId,
-            targetHandle: spec.toHandle || null
+            targetPort: spec.toHandle || null
           });
           continue;
         }

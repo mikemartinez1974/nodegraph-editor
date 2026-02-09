@@ -12,7 +12,7 @@
     {
       "id": "dictionary-contract-root",
       "type": "markdown",
-      "label": "📖 Dictionary Node Contract",
+      "label": "\ud83d\udcd6 Dictionary Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -70,7 +70,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional\n\n- `label`\n- `position`, `width`, `height`\n- `style`\n- `handles` (rare)\n- `data.markdown` (human-readable)\n- `data.ext.*` namespaces"
+        "markdown": "## Optional\n\n- `label`\n- `position`, `width`, `height`\n- `style`\n- `ports` (rare)\n- `data.markdown` (human-readable)\n- `data.ext.*` namespaces"
       }
     },
     {
@@ -140,7 +140,7 @@
     {
       "id": "dictionary-skills",
       "type": "markdown",
-      "label": "🧠 Skill Requirements",
+      "label": "\ud83e\udde0 Skill Requirements",
       "position": {
         "x": 200,
         "y": 420
@@ -150,7 +150,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary `nodeDefs` map node type → definition file; definition declares skills.\n- Dictionary `skills` provides the dependency reference list used by the manifest.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
+        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary `nodeDefs` map node type \u2192 definition file; definition declares skills.\n- Dictionary `skills` provides the dependency reference list used by the manifest.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
       }
     },
     {
@@ -183,13 +183,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },

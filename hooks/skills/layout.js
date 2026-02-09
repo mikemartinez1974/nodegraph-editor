@@ -538,7 +538,7 @@ export const layoutSkills = [
     run: runRerouteEdges,
     contracts: {
       inputs: [],
-      forbidden: ['Changing edge endpoints or handles']
+      forbidden: ['Changing edge endpoints or ports']
     }
   },
   {
@@ -578,4 +578,3 @@ export const layoutSkills = [
     }
   }
 ];
-

@@ -18,7 +18,7 @@ export function summarizeHandles(nodes = []) {
   };
 
   nodes.forEach((node) => {
-    const handles = Array.isArray(node?.handles) ? node.handles : [];
+    const handles = Array.isArray(node?.ports) ? node.ports : [];
     if (handles.length > 0) {
       handleSummary.withHandles += 1;
       handles.forEach((handle) => {

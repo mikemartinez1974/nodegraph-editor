@@ -59,7 +59,7 @@
     {
       "id": "schema-migration-root",
       "type": "markdown",
-      "label": "🔁 Schema Versioning & Migration Contract (Normative)",
+      "label": "\ud83d\udd01 Schema Versioning & Migration Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Migration Units (REQUIRED)\n\n- One transform per version step\n- Pure functions only\n- graph@vN → graph@vN+1\n- Must emit migration metadata\n\nSide effects are forbidden."
+        "markdown": "## Migration Units (REQUIRED)\n\n- One transform per version step\n- Pure functions only\n- graph@vN \u2192 graph@vN+1\n- Must emit migration metadata\n\nSide effects are forbidden."
       }
     },
     {
@@ -275,5 +275,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

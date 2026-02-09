@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const INPUTS = [{ key: 'value', label: 'Value', type: 'value' }];
 const OUTPUTS = [{ key: 'trigger', label: 'Trigger', type: 'trigger' }];
@@ -53,7 +53,7 @@ export default function ValueTriggerNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
-  const node = useNodeHandleSchema(origNode, INPUTS, OUTPUTS);
+  const node = useNodePortSchema(origNode, INPUTS, OUTPUTS);
 
   const width = (node?.width || 250) * zoom;
   const height = (node?.height || 300) * zoom;

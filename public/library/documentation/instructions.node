@@ -59,7 +59,7 @@
     {
       "id": "onboarding-root",
       "type": "markdown",
-      "label": "👋 Twilite Onboarding Guide",
+      "label": "\ud83d\udc4b Twilite Onboarding Guide",
       "position": {
         "x": 0,
         "y": 0
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Final Note\n\nYou are now part of the graph’s memory.\n\nCare for it.\n\nEvery good graph is a collaboration across time."
+        "markdown": "## Final Note\n\nYou are now part of the graph\u2019s memory.\n\nCare for it.\n\nEvery good graph is a collaboration across time."
       }
     }
   ],
@@ -200,5 +200,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

@@ -273,7 +273,7 @@
           column: col,
           railId,
           polarity,
-          targetHandle: polarity
+          targetPort: polarity
         });
       });
     });
@@ -475,7 +475,7 @@
               handle: pin.id || pin.name || `pin${idx}`,
               target: {
                 nodeId: railTarget.nodeId,
-                targetHandle: railTarget.targetHandle,
+                targetPort: railTarget.targetPort,
                 row: railRow,
                 column: col,
                 segment: pref
@@ -493,7 +493,7 @@
               handle: pin.id || pin.name || `pin${idx}`,
               target: {
                 nodeId: socketId,
-                targetHandle: "socket",
+                targetPort: "socket",
                 row,
                 column: col,
                 segment: pinSegment
@@ -573,9 +573,9 @@
           ? api.createEdge(s)
           : api.addEdge?.({
               fromNodeId: s.source,
-              fromHandle: s.sourceHandle,
+              fromHandle: s.sourcePort,
               toNodeId: s.target,
-              toHandle: s.targetHandle,
+              toHandle: s.targetPort,
               type: s.type || "default"
             })
       ).catch(() => Promise.resolve());
@@ -769,7 +769,7 @@
         row: a.target.row,
         column: a.target.column,
         nodeId: a.target.nodeId,
-        targetHandle: a.target.targetHandle || "socket",
+        targetPort: a.target.targetPort || "socket",
         segment: a.target.segment,
         socketKey: `${a.target.row}${a.target.column}`
       };
@@ -790,9 +790,9 @@
       .filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y));
 
     // Baseline snap: align component top-left to socket top-left.
-    // Prefer a socket target (targetHandle === "socket"); fallback to the nearest socket node.
+    // Prefer a socket target (targetPort === "socket"); fallback to the nearest socket node.
     const primaryTarget =
-      assignments.find((a) => (a.target?.targetHandle || a.target?.target) === "socket") || assignments[0];
+      assignments.find((a) => (a.target?.targetPort || a.target?.target) === "socket") || assignments[0];
 
     let snapped = false;
     let snapNodeId = primaryTarget?.target?.nodeId;
@@ -911,13 +911,13 @@
     const dedup = new Map();
     assignments.forEach((a) => {
       if (dedup.size >= 4) return;
-      const key = `${a.handle}:${a.target.nodeId}:${a.target.targetHandle}`;
+      const key = `${a.handle}:${a.target.nodeId}:${a.target.targetPort}`;
       if (!dedup.has(key)) {
         dedup.set(key, {
           source: node.id,
-          sourceHandle: a.handle,
+          sourcePort: a.handle,
           target: a.target.nodeId,
-          targetHandle: a.target.targetHandle || "socket",
+          targetPort: a.target.targetPort || "socket",
           type: "default"
         });
       }
@@ -951,16 +951,16 @@
       const keepKeys = new Set(
         intendedEdges.map(
           (e) =>
-            `${e.sourceHandle || e.fromHandle || ""}:${
+            `${e.sourcePort || e.fromHandle || ""}:${
               e.target || e.toNodeId
-            }:${e.targetHandle || e.toHandle || ""}`
+            }:${e.targetPort || e.toHandle || ""}`
         )
       );
       const seen = new Set();
       for (const e of current) {
-        const key = `${e.sourceHandle || e.fromHandle || ""}:${
+        const key = `${e.sourcePort || e.fromHandle || ""}:${
           e.target || e.toNodeId
-        }:${e.targetHandle || e.toHandle || ""}`;
+        }:${e.targetPort || e.toHandle || ""}`;
         if (!keepKeys.has(key) || seen.has(key)) {
           await toPromise(
             api.deleteEdge ? api.deleteEdge(e.id) : api.removeEdge?.(e.id)

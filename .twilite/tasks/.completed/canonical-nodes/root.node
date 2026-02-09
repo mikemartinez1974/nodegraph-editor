@@ -47,7 +47,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -56,8 +59,11 @@
     {
       "id": "canonical-root",
       "type": "markdown",
-      "label": "📍 Canonical Node Roles",
-      "position": { "x": -320, "y": -220 },
+      "label": "\ud83d\udccd Canonical Node Roles",
+      "position": {
+        "x": -320,
+        "y": -220
+      },
       "width": 460,
       "height": 240,
       "visible": true,
@@ -69,34 +75,43 @@
     {
       "id": "role-manifest",
       "type": "markdown",
-      "label": "📜 Manifest Role",
-      "position": { "x": -820, "y": 140 },
+      "label": "\ud83d\udcdc Manifest Role",
+      "position": {
+        "x": -820,
+        "y": 140
+      },
       "width": 360,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Manifest Role\n\n**Purpose:** Declare what the graph is and who may mutate it.\n\n**Must contain:**\n- identity\n- intent\n- dependencies\n- authority\n\n**Rules:**\n- Exactly one manifest per graph\n- Tools must defer to it\n- If missing/invalid → hard error"
+        "markdown": "## Manifest Role\n\n**Purpose:** Declare what the graph is and who may mutate it.\n\n**Must contain:**\n- identity\n- intent\n- dependencies\n- authority\n\n**Rules:**\n- Exactly one manifest per graph\n- Tools must defer to it\n- If missing/invalid \u2192 hard error"
       }
     },
     {
       "id": "role-definitions",
       "type": "markdown",
-      "label": "📚 Definitions Role",
-      "position": { "x": -360, "y": 140 },
+      "label": "\ud83d\udcda Definitions Role",
+      "position": {
+        "x": -360,
+        "y": 140
+      },
       "width": 360,
       "height": 280,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Definitions Role\n\n**Purpose:** Define meaning of node/edge/handle types.\n\n**Must contain:**\n- node schemas\n- handle contracts\n- edge contract\n- validation rules\n\n**Rules:**\n- Definitions do not carry project content\n- Only semantics and constraints live here"
+        "markdown": "## Definitions Role\n\n**Purpose:** Define meaning of node/edge/port types.\n\n**Must contain:**\n- node schemas\n- port contracts\n- edge contract\n- validation rules\n\n**Rules:**\n- Definitions do not carry project content\n- Only semantics and constraints live here"
       }
     },
     {
       "id": "role-content",
       "type": "markdown",
-      "label": "📝 Content Role",
-      "position": { "x": 120, "y": 140 },
+      "label": "\ud83d\udcdd Content Role",
+      "position": {
+        "x": 120,
+        "y": 140
+      },
       "width": 360,
       "height": 260,
       "visible": true,
@@ -108,21 +123,27 @@
     {
       "id": "role-structure",
       "type": "markdown",
-      "label": "🧩 Structure Role",
-      "position": { "x": 600, "y": 140 },
+      "label": "\ud83e\udde9 Structure Role",
+      "position": {
+        "x": 600,
+        "y": 140
+      },
       "width": 360,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Structure Role\n\n**Purpose:** Express relationships and containment.\n\n**Includes:**\n- edges\n- groups\n- hierarchies\n- references\n\n**Rules:**\n- Structure adds meaning via relationships\n- It does not edit node data"
+        "markdown": "## Structure Role\n\n**Purpose:** Express relationships and containment.\n\n**Includes:**\n- edges\n- clusters\n- hierarchies\n- references\n\n**Rules:**\n- Structure adds meaning via relationships\n- It does not edit node data"
       }
     },
     {
       "id": "role-style",
       "type": "markdown",
-      "label": "🎨 Style Role",
-      "position": { "x": 1080, "y": 140 },
+      "label": "\ud83c\udfa8 Style Role",
+      "position": {
+        "x": 1080,
+        "y": 140
+      },
       "width": 360,
       "height": 260,
       "visible": true,
@@ -139,7 +160,11 @@
       "source": "canonical-root",
       "target": "role-manifest",
       "label": "requires",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -148,7 +173,11 @@
       "source": "canonical-root",
       "target": "role-definitions",
       "label": "requires",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -157,7 +186,11 @@
       "source": "canonical-root",
       "target": "role-content",
       "label": "includes",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -166,7 +199,11 @@
       "source": "canonical-root",
       "target": "role-structure",
       "label": "includes",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -175,9 +212,13 @@
       "source": "canonical-root",
       "target": "role-style",
       "label": "includes",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

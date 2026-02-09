@@ -178,7 +178,7 @@ export function buildLayoutFromSchema(schema, socketNodes, railNodes = []) {
     const key = makeSegmentColumnKey(segment, column);
     targetsBySegmentColumn.set(key, {
       node: socketNode,
-      targetHandle: 'socket',
+      targetPort: 'socket',
       segmentType: 'socket',
       rowPositions
     });
@@ -220,7 +220,7 @@ export function buildLayoutFromSchema(schema, socketNodes, railNodes = []) {
 
       targetsBySegmentColumn.set(key, {
         node: railNode,
-        targetHandle: preferredHandle,
+        targetPort: preferredHandle,
         segmentType: 'rail',
         railInfo: rail
       });
@@ -344,7 +344,7 @@ export function buildSocketLayout(socketNodes, railNodes = [], schema = null) {
 
     register(segment, col, {
       node,
-      targetHandle: 'socket',
+      targetPort: 'socket',
       segmentType: 'socket',
       rowPositions
     });
@@ -385,7 +385,7 @@ export function buildSocketLayout(socketNodes, railNodes = [], schema = null) {
 
       register(seg, col, {
         node: rail,
-        targetHandle: pol,
+        targetPort: pol,
         segmentType: 'rail',
         railInfo: info
       });

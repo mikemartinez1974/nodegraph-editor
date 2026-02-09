@@ -59,7 +59,7 @@
     {
       "id": "skill-compile-root",
       "type": "markdown",
-      "label": "🏗️ Skill: CompileGraphArtifact (Normative)",
+      "label": "\ud83c\udfd7\ufe0f Skill: CompileGraphArtifact (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If compilation fails → emit error artifact\n- Never partially emit\n\nExternal systems must receive a complete result or a complete failure."
+        "markdown": "## Failure Modes\n\n- If compilation fails \u2192 emit error artifact\n- Never partially emit\n\nExternal systems must receive a complete result or a complete failure."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

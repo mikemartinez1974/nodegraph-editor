@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Edge Contract\n\n**Authority:** Normative\n\nEvery edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to this contract.\n\nEdges express relationships.\nPorts are optional for portability.\n\nThis graph is the contract."
+        "markdown": "# Edge Contract\n\n**Authority:** Normative\n\nEvery edge created, mutated, rendered, or interpreted by humans, agents, or tools **MUST** conform to this contract.\n\nEdges express relationships.\nPorts are required. Use `root` for defaults.\n\nThis graph is the contract."
       }
     },
     {
@@ -117,11 +117,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourceHandle\": \"handle-id\",\n  \"targetHandle\": \"handle-id\"\n}\n```\n\n- `label` is human-readable only\n- `data` holds semantic attributes (strength/flow/direction/intent)\n- `style` and `state` are metadata\n- ports are optional"
+        "markdown": "## Optional Fields\n\n```json\n{\n  \"label\": \"string\",\n  \"data\": {},\n  \"style\": {},\n  \"state\": {},\n  \"sourcePort\": \"port-id\",\n  \"targetPort\": \"port-id\"\n}\n```\n\n- `label` is human-readable only\n- `data` holds semantic attributes (strength/flow/direction/intent)\n- `style` and `state` are metadata\n- ports are required (use `root` for defaults)"
       }
     },
     {
-      "id": "edge-handle-policy",
+      "id": "edge-port-policy",
       "type": "markdown",
       "label": "3. Port Policy",
       "position": {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Port Policy (REQUIRED)\n\n- Ports are optional for portability\n- If provided, they MUST exist on the node\n- If omitted, edge attaches to the default **root** port\n\nTools and agents MUST NOT invent ports"
+        "markdown": "## Port Policy (REQUIRED)\n\n- Ports are required\n- If provided, they MUST exist on the node\n- Use the default **root** port when no specific port is intended\n\nTools and agents MUST NOT invent ports"
       }
     },
     {
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. port rules are respected (default `root` if omitted)\n4. port contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n\n1. required fields exist\n2. source/target exist\n3. ports are required (use `root` for defaults)\n4. port contracts are satisfied\n5. manifest allows mutation\n\nFailure blocks persistence."
       }
     },
     {
@@ -262,10 +262,10 @@
       "data": {}
     },
     {
-      "id": "e-root-handle",
+      "id": "e-root-port",
       "type": "governs",
       "source": "edge-contract-root",
-      "target": "edge-handle-policy",
+      "target": "edge-port-policy",
       "label": "",
       "style": {},
       "data": {}
@@ -325,5 +325,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

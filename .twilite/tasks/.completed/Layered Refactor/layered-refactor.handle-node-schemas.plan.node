@@ -1,8 +1,8 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Handle & Node Schema Plan",
-    "description": "Document what to capture about handles and node types for the contracts layer",
+    "title": "Port & Node Schema Plan",
+    "description": "Document what to capture about ports and node types for the contracts layer",
     "created": "2026-01-11T02:45:00.000Z",
     "modified": "2026-01-11T02:45:00.000Z",
     "author": "",
@@ -56,7 +56,7 @@
     {
       "id": "schema-root",
       "type": "markdown",
-      "label": "🧱 Handle & Node Schema Plan",
+      "label": "\ud83e\uddf1 Port & Node Schema Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -66,13 +66,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Handle & Node Schema Plan\n+\n+Capture every node type’s handles, directions, data types, default positions, and constraints inside the contracts layer so validators/skills can read them deterministically."
+        "markdown": "# Port & Node Schema Plan\n+\n+Capture every node type\u2019s ports, directions, data types, default positions, and constraints inside the contracts layer so validators/skills can read them deterministically."
       }
     },
     {
       "id": "schema-lookup",
       "type": "markdown",
-      "label": "🔍 Schema Lookup Service",
+      "label": "\ud83d\udd0d Schema Lookup Service",
       "position": {
         "x": -320,
         "y": -20
@@ -82,13 +82,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Schema Lookup\n+\n+- Build a registry keyed by node type + version\n+- Each entry lists handle IDs, direction (`input`/`output`/`bidirectional`), port sides, and expected data types\n+- Provide helpers (`getHandles(node)`, `validateHandle(handleId)`) that upstream skills call before mutating"
+        "markdown": "## Schema Lookup\n+\n+- Build a registry keyed by node type + version\n+- Each entry lists port IDs, direction (`input`/`output`/`bidirectional`), port sides, and expected data types\n+- Provide helpers (`getHandles(node)`, `validateHandle(handleId)`) that upstream skills call before mutating"
       }
     },
     {
       "id": "schema-storage",
       "type": "markdown",
-      "label": "💾 Schema Storage",
+      "label": "\ud83d\udcbe Schema Storage",
       "position": {
         "x": 320,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "schema-guards",
       "type": "markdown",
-      "label": "⚖️ Guard Enforcement",
+      "label": "\u2696\ufe0f Guard Enforcement",
       "position": {
         "x": 0,
         "y": 180
@@ -114,13 +114,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Guard Enforcement\n+\n+- Validators subscribe to the schema service and enforce that edges connect matching handles\n+- Edge creation requires schema confirmation; otherwise emit `onViolation` events and fail fast\n+- Jet metadata (allowed handle pairs, port sides) ensures routing skills stay honest"
+        "markdown": "## Guard Enforcement\n+\n+- Validators subscribe to the schema service and enforce that edges connect matching ports\n+- Edge creation requires schema confirmation; otherwise emit `onViolation` events and fail fast\n+- Jet metadata (allowed port pairs, port sides) ensures routing skills stay honest"
       }
     },
     {
       "id": "schema-tools",
       "type": "markdown",
-      "label": "🧰 Conversion Hooks",
+      "label": "\ud83e\uddf0 Conversion Hooks",
       "position": {
         "x": 0,
         "y": 480
@@ -130,7 +130,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Conversion Hooks\n+\n+- Provide serialization helpers for graph exports, onboarding docs, and agent prompts\n+- Offer diff utilities for comparing contracted handles between versions\n+- Emit contract summaries whenever graph loads to keep humans and models aligned"
+        "markdown": "## Conversion Hooks\n+\n+- Provide serialization helpers for graph exports, onboarding docs, and agent prompts\n+- Offer diff utilities for comparing contracted ports between versions\n+- Emit contract summaries whenever graph loads to keep humans and models aligned"
       }
     }
   ],
@@ -184,5 +184,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

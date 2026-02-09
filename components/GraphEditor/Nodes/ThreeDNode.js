@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 // Unified handle schema for display nodes
 const DEFAULT_INPUTS = [
@@ -17,7 +17,7 @@ const DEFAULT_OUTPUTS = [
 ];
 
 const ThreeDNode = React.memo((props) => {
-  const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);

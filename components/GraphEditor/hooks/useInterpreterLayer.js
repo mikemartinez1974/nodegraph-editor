@@ -168,11 +168,11 @@ export default function useInterpreterLayer({
             return [{ op: 'translateNodes', ids: Array.isArray(ids) ? ids : [ids], delta }];
           }
           case 'createGroups': {
-            const groups = proposal.groups || proposal.data || [];
-            return [{ op: 'createGroups', data: Array.isArray(groups) ? groups : [groups] }];
+            const groups = proposal.clusters || proposal.data || [];
+            return [{ op: 'createGroups', data: Array.isArray(groups) ? clusters: [groups] }];
           }
           case 'updateGroup': {
-            const id = proposal.id || proposal.groupId;
+            const id = proposal.id || proposal.clusterId;
             const patch = proposal.patch || proposal.updates || proposal.data || {};
             if (!id) return [];
             return [{ op: 'updateGroup', id, patch }];
@@ -183,24 +183,24 @@ export default function useInterpreterLayer({
             return [{ op: 'updateGroups', ids: Array.isArray(ids) ? ids : [ids], patch }];
           }
           case 'deleteGroup': {
-            const id = proposal.id || proposal.groupId;
+            const id = proposal.id || proposal.clusterId;
             if (!id) return [];
             return [{ op: 'deleteGroup', id }];
           }
           case 'addNodesToGroup': {
-            const id = proposal.id || proposal.groupId;
+            const id = proposal.id || proposal.clusterId;
             const nodeIds = proposal.nodeIds || proposal.nodes || [];
             if (!id) return [];
             return [{ op: 'addNodesToGroup', id, nodeIds: Array.isArray(nodeIds) ? nodeIds : [nodeIds] }];
           }
           case 'removeNodesFromGroup': {
-            const id = proposal.id || proposal.groupId;
+            const id = proposal.id || proposal.clusterId;
             const nodeIds = proposal.nodeIds || proposal.nodes || [];
             if (!id) return [];
             return [{ op: 'removeNodesFromGroup', id, nodeIds: Array.isArray(nodeIds) ? nodeIds : [nodeIds] }];
           }
           case 'setGroupNodes': {
-            const id = proposal.id || proposal.groupId;
+            const id = proposal.id || proposal.clusterId;
             const nodeIds = proposal.nodeIds || proposal.nodes || [];
             if (!id) return [];
             return [{ op: 'setGroupNodes', id, nodeIds: Array.isArray(nodeIds) ? nodeIds : [nodeIds] }];
@@ -285,7 +285,7 @@ export default function useInterpreterLayer({
           nodes: context.nodes,
           edges: context.edges,
           edgeRoutes: context.edgeRoutes,
-          clusters: context.groups,
+          clusters: context.clusters,
           mode: 'mutation',
           resolvedDictionary: context.resolvedDictionary
         });
@@ -351,7 +351,7 @@ export default function useInterpreterLayer({
               api.translateGroups?.(delta.ids || [], delta.delta || delta);
               break;
             case 'createGroups':
-              api.createGroups?.(delta.data || delta.groups || []);
+              api.createGroups?.(delta.data || delta.clusters || []);
               break;
             case 'updateGroup':
               api.updateGroup?.(delta.id, delta.patch || {});

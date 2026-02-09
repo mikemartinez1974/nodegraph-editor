@@ -73,14 +73,14 @@ function isValidEdge(edge, nodes) {
   const sourceNode = nodes.find(n => n.id === edge.source.nodeId);
   const targetNode = nodes.find(n => n.id === edge.target.nodeId);
   if (!sourceNode || !targetNode) return false;
-  const sourceHandle = sourceNode.outputs.find(h => h.key === edge.source.handleKey);
-  const targetHandle = targetNode.inputs.find(h => h.key === edge.target.handleKey);
-  if (!sourceHandle || !targetHandle) return false;
+  const sourcePort = sourceNode.outputs.find(h => h.key === edge.source.handleKey);
+  const targetPort = targetNode.inputs.find(h => h.key === edge.target.handleKey);
+  if (!sourcePort || !targetPort) return false;
   // Only allow output->input
   if (!sourceNode.outputs.some(h => h.key === edge.source.handleKey)) return false;
   if (!targetNode.inputs.some(h => h.key === edge.target.handleKey)) return false;
   // Optionally: type compatibility
-  if (sourceHandle.type !== targetHandle.type && sourceHandle.type !== 'trigger' && targetHandle.type !== 'trigger') return false;
+  if (sourcePort.type !== targetPort.type && sourcePort.type !== 'trigger' && targetPort.type !== 'trigger') return false;
   return true;
 }
 

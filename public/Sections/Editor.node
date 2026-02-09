@@ -18,7 +18,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -28,33 +31,42 @@
       "id": "editor-purpose",
       "type": "markdown",
       "label": "Purpose",
-      "position": { "x": 80, "y": 60 },
+      "position": {
+        "x": 80,
+        "y": 60
+      },
       "width": 520,
       "height": 180,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Editor\nThe Editor is the **canvas + tools** where graphs are created and refined.\n\nIt owns node placement, selection, and graph editing." 
+        "markdown": "## Editor\nThe Editor is the **canvas + tools** where graphs are created and refined.\n\nIt owns node placement, selection, and graph editing."
       }
     },
     {
       "id": "editor-panels",
       "type": "markdown",
       "label": "Panels",
-      "position": { "x": 80, "y": 280 },
+      "position": {
+        "x": 80,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Panels\n- Node Palette (add nodes)\n- Properties Panel (edit)\n- Node/Group lists\n- Script panel + plugin manager"
+        "markdown": "## Panels\n- Node Palette (add nodes)\n- Properties Panel (edit)\n- Node/Cluster lists\n- Script panel + plugin manager"
       }
     },
     {
       "id": "editor-interaction",
       "type": "markdown",
       "label": "Interaction",
-      "position": { "x": 80, "y": 540 },
+      "position": {
+        "x": 80,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -67,7 +79,10 @@
       "id": "editor-doc",
       "type": "markdown",
       "label": "Document",
-      "position": { "x": 640, "y": 280 },
+      "position": {
+        "x": 640,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -80,7 +95,10 @@
       "id": "editor-save",
       "type": "markdown",
       "label": "Save + Share",
-      "position": { "x": 640, "y": 540 },
+      "position": {
+        "x": 640,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -93,7 +111,10 @@
       "id": "editor-open",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 80, "y": 820 },
+      "position": {
+        "x": 80,
+        "y": 820
+      },
       "width": 520,
       "height": 200,
       "visible": true,
@@ -109,10 +130,13 @@
       "type": "child",
       "source": "editor-purpose",
       "target": "editor-panels",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "tools",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -120,10 +144,13 @@
       "type": "child",
       "source": "editor-panels",
       "target": "editor-interaction",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "use",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -131,10 +158,13 @@
       "type": "child",
       "source": "editor-panels",
       "target": "editor-doc",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "configure",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -142,10 +172,13 @@
       "type": "child",
       "source": "editor-doc",
       "target": "editor-save",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "share",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -153,12 +186,15 @@
       "type": "child",
       "source": "editor-save",
       "target": "editor-open",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "questions",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

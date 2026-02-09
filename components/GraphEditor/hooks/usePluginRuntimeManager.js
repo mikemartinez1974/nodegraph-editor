@@ -71,13 +71,13 @@ const normalizeRuntimeNodeDefinition = (pluginId, definition, manifestNode) => {
       ensureNumber(definition.defaultHeight) ??
       ensureNumber(manifestFallback.defaultHeight),
     defaultData: cloneObject(definition.defaultData),
-    handles: normalizeHandleList(definition.handles),
+    ports: normalizeHandleList(definition.ports),
     inputs:
       normalizeHandleList(definition.inputs) ||
-      normalizeHandleList(definition.handles?.inputs),
+      normalizeHandleList(definition.ports?.inputs),
     outputs:
       normalizeHandleList(definition.outputs) ||
-      normalizeHandleList(definition.handles?.outputs),
+      normalizeHandleList(definition.ports?.outputs),
     state: cloneObject(definition.state),
     extensions: cloneObject(definition.extensions),
     entry: ensureString(definition.entry) || ensureString(manifestFallback.entry),

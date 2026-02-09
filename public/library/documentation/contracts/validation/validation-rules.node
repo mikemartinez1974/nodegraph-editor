@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Warning Conditions\n\n- orphaned nodes\n- deprecated schema usage\n- unused ports\n- redundant structures\n- missing position or size\n- missing optional ports\n\nWarnings never block. They inform."
+        "markdown": "## Warning Conditions\n\n- orphaned nodes\n- deprecated schema usage\n- unused ports\n- redundant structures\n- missing position or size\n- missing required ports\n\nWarnings never block. They inform."
       }
     },
     {
@@ -225,5 +225,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

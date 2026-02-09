@@ -72,7 +72,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# The graph is the product.\n\n**Twilite** is a storage format for thought — from a single idea to a complete executable system.\n\nEvery graph is a durable, portable artifact that humans and AI can both read and write.\n\n**Not a diagram tool. Not a note-taking app. A new format for storing human thought.**\n\n---\n\n**Try it:**\n- [Get Started](tlz://twilite.zone/tutorial/getting-started.document.node)\n\n\n**Contact the Developer:** [admin@twilite.zone](mailto:admin@twilite.zone?subject=Twilite%20Node%20Browser)"
+        "markdown": "# The graph is the product.\n\n**Twilite** is a storage format for thought \u2014 from a single idea to a complete executable system.\n\nEvery graph is a durable, portable artifact that humans and AI can both read and write.\n\n**Not a diagram tool. Not a note-taking app. A new format for storing human thought.**\n\n---\n\n**Try it:**\n- [Get Started](tlz://twilite.zone/tutorial/getting-started.document.node)\n\n\n**Contact the Developer:** [admin@twilite.zone](mailto:admin@twilite.zone?subject=Twilite%20Node%20Browser)"
       }
     },
     {
@@ -89,7 +89,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Full Spectrum\n\nA Twilite graph can store thought at any level of fidelity:\n\n- 💭 **A concept** (one node, some text)\n- 💬 **A conversation** (nodes as messages, edges as replies)\n- 🗺️ **A knowledge base** (concepts + relationships)\n- ⚡ **A workflow** (tasks + dependencies)\n- 🎮 **A simulation** (state + transitions)\n- 🌐 **An application** (UI + logic + data)\n\n**Same format. All renderable. All evolvable.**"
+        "markdown": "## The Full Spectrum\n\nA Twilite graph can store thought at any level of fidelity:\n\n- \ud83d\udcad **A concept** (one node, some text)\n- \ud83d\udcac **A conversation** (nodes as messages, edges as replies)\n- \ud83d\uddfa\ufe0f **A knowledge base** (concepts + relationships)\n- \u26a1 **A workflow** (tasks + dependencies)\n- \ud83c\udfae **A simulation** (state + transitions)\n- \ud83c\udf10 **An application** (UI + logic + data)\n\n**Same format. All renderable. All evolvable.**"
       }
     },
     {
@@ -140,7 +140,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Twilite Answer\n\n**One format for everything.**\n\nYour notes, diagrams, workflows, code, and conversations — all in the same graph.\n\n✓ **Portable** — JSON you can version in Git  \n✓ **Durable** — Stable IDs, incremental updates  \n✓ **Executable** — Graphs can run, not just display  \n✓ **AI-readable** — Agents can navigate and mutate  \n✓ **Web-native** — Renders anywhere  \n✓ **Composable** — Graphs link to graphs  "
+        "markdown": "## The Twilite Answer\n\n**One format for everything.**\n\nYour notes, diagrams, workflows, code, and conversations \u2014 all in the same graph.\n\n\u2713 **Portable** \u2014 JSON you can version in Git  \n\u2713 **Durable** \u2014 Stable IDs, incremental updates  \n\u2713 **Executable** \u2014 Graphs can run, not just display  \n\u2713 **AI-readable** \u2014 Agents can navigate and mutate  \n\u2713 **Web-native** \u2014 Renders anywhere  \n\u2713 **Composable** \u2014 Graphs link to graphs  "
       }
     },
     {
@@ -174,7 +174,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Safe Evolution\n\n**AI doesn't rewrite your graph. It mutates it.**\n\n```\ncreate  → add nodes/edges\nupdate  → modify by ID\ndelete  → remove by ID\nbatch   → atomic operations\n```\n\n**Deltas, not replacements.**\n\nYour graph has continuity. History. Identity.\n\nAI extends your thinking. It doesn't erase it."
+        "markdown": "## Safe Evolution\n\n**AI doesn't rewrite your graph. It mutates it.**\n\n```\ncreate  \u2192 add nodes/edges\nupdate  \u2192 modify by ID\ndelete  \u2192 remove by ID\nbatch   \u2192 atomic operations\n```\n\n**Deltas, not replacements.**\n\nYour graph has continuity. History. Identity.\n\nAI extends your thinking. It doesn't erase it."
       }
     },
     {
@@ -191,7 +191,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Vision\n\n**Twilite isn't just a tool. It's infrastructure.**\n\nThe file system for the next era of computing — where thought, code, and AI collaboration happen in the same unified format.\n\nA graph can start as a napkin sketch and evolve into a running application **without ever leaving the format.**\n\n**That's what we're building.**"
+        "markdown": "## The Vision\n\n**Twilite isn't just a tool. It's infrastructure.**\n\nThe file system for the next era of computing \u2014 where thought, code, and AI collaboration happen in the same unified format.\n\nA graph can start as a napkin sketch and evolve into a running application **without ever leaving the format.**\n\n**That's what we're building.**"
       }
     },
     {
@@ -241,13 +241,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -384,5 +384,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

@@ -161,9 +161,9 @@
       "type": "default",
       "source": "node_1763198875969",
       "target": "33af6ae3-ec8b-4646-b8b6-18f5852597d3",
-      "sourceHandle": "value",
-      "targetHandle": "a",
-      "handleMeta": {
+      "sourcePort": "value",
+      "targetPort": "a",
+      "portMeta": {
         "source": {
           "label": "Value",
           "type": "value"
@@ -182,9 +182,9 @@
       "type": "default",
       "source": "722eb60e-c25a-4f9e-b82b-1d97502a110b",
       "target": "33af6ae3-ec8b-4646-b8b6-18f5852597d3",
-      "sourceHandle": "value",
-      "targetHandle": "b",
-      "handleMeta": {
+      "sourcePort": "value",
+      "targetPort": "b",
+      "portMeta": {
         "source": {
           "label": "Value",
           "type": "value"
@@ -203,9 +203,9 @@
       "type": "default",
       "source": "33af6ae3-ec8b-4646-b8b6-18f5852597d3",
       "target": "05f86af1-c99a-4d80-9683-2d4c13698a8b",
-      "sourceHandle": "value",
-      "targetHandle": "value",
-      "handleMeta": {
+      "sourcePort": "value",
+      "targetPort": "value",
+      "portMeta": {
         "source": {
           "label": "Value",
           "type": "value"
@@ -224,9 +224,9 @@
       "type": "default",
       "source": "05f86af1-c99a-4d80-9683-2d4c13698a8b",
       "target": "165a691f-2c24-4dc5-9151-6136712b948d",
-      "sourceHandle": "trigger",
-      "targetHandle": "reset",
-      "handleMeta": {
+      "sourcePort": "trigger",
+      "targetPort": "reset",
+      "portMeta": {
         "source": {
           "label": "Trigger",
           "type": "trigger"
@@ -241,5 +241,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

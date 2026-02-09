@@ -1,6 +1,6 @@
 ## Twilite LLM Node Types Guide
 
-Use this reference when choosing `type` values or wiring handles. Plugin nodes are namespaced as `pluginId:nodeType` (example: `io.breadboard.sockets:socket`).
+Use this reference when choosing `type` values or wiring ports. Plugin nodes are namespaced as `pluginId:nodeType` (example: `io.breadboard.sockets:socket`).
 
 ---
 
@@ -26,8 +26,8 @@ Use this reference when choosing `type` values or wiring handles. Plugin nodes a
 | `3d` | 3D View | Interactive Three.js scene. |
 
 Notes:
-- Documentation-style nodes (`markdown`, `canvas`, `svg`, `div`) do not expose handles unless explicitly declared.
-- Use explicit `handles` arrays with `direction` + `position` when wiring edges.
+- Documentation-style nodes (`markdown`, `canvas`, `svg`, `div`) do not expose ports unless explicitly declared.
+- Use explicit `ports` arrays with `direction` + `position` when wiring edges.
 
 ---
 
@@ -37,7 +37,7 @@ These load from the built-in plugin manifests:
 
 ### Socket Toolkit (`io.breadboard.sockets`)
 
-| Type | Label | Handles |
+| Type | Label | Ports |
 | --- | --- | --- |
 | `io.breadboard.sockets:socket` | Breadboard Socket | `socket` |
 | `io.breadboard.sockets:railSocket` | Rail Socket | `positive`, `negative` |
@@ -46,7 +46,7 @@ These load from the built-in plugin manifests:
 
 ### Component Pack (`io.breadboard.components`)
 
-| Type | Label | Handles |
+| Type | Label | Ports |
 | --- | --- | --- |
 | `io.breadboard.components:resistor` | Resistor | `pinA`, `pinB` |
 | `io.breadboard.components:led` | LED | `anode`, `cathode` |
@@ -57,7 +57,7 @@ These load from the built-in plugin manifests:
 ## Plugin Nodes (General Rule)
 
 Additional plugin node types can be installed. Always read the plugin manifest or `definition` to confirm:
-- handle ids
+- port ids
 - default data fields
 - size/extension constraints
 
@@ -82,7 +82,7 @@ Edges use the `type` field. These are defined in `components/GraphEditor/edgeTyp
 | `energyFlow` | Energy Flow | Gradient-styled flow. |
 
 Notes:
-- `sourceHandle` and `targetHandle` are optional; when omitted the edge attaches to the node boundary.
+- `sourcePort` and `targetPort` are optional; when omitted the edge attaches to the node boundary.
 - Edge styling comes from the edge type; you can override per-edge with `style`.
 
 ### Example: simple child edge
@@ -95,20 +95,20 @@ Notes:
 }
 ```
 
-### Example: data flow edge with handles
+### Example: data flow edge with ports
 ```json
 {
   "id": "edge-2",
   "type": "dataFlow",
   "source": "api-node",
   "target": "display-node",
-  "sourceHandle": "out",
-  "targetHandle": "in"
+  "sourcePort": "out",
+  "targetPort": "in"
 }
 ```
 
 Tip:
-- Only use `sourceHandle` / `targetHandle` when the nodes actually declare those handle keys (some nodes have none by default). If you’re unsure, omit handles and let the edge attach to the node boundary.
+- Only use `sourcePort` / `targetPort` when the nodes actually declare those port ids (some nodes have none by default). If you’re unsure, omit ports and let the edge attach to the node boundary.
 
 ### Example: custom style override
 ```json

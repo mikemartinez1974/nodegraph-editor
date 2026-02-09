@@ -32,7 +32,7 @@
     {
       "id": "header",
       "type": "markdown",
-      "label": "📂 tlz/node_intro",
+      "label": "\ud83d\udcc2 tlz/node_intro",
       "position": {
         "x": 0,
         "y": -200
@@ -46,7 +46,7 @@
     {
       "id": "back",
       "type": "default",
-      "label": "⬅️ Back to Parent",
+      "label": "\u2b05\ufe0f Back to Parent",
       "position": {
         "x": -300,
         "y": -200
@@ -101,5 +101,5 @@
     }
   ],
   "edges": [],
-  "groups": []
+  "clusters": []
 }

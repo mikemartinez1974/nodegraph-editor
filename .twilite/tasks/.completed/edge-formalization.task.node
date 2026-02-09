@@ -26,7 +26,7 @@
           "graphId": "66ad7ccf-01aa-4709-8013-6c86f81cb4a0",
           "name": "Edge Formalization",
           "version": "0.1.0",
-          "description": "Formalize external edges, edge endpoint nodes, and external handles",
+          "description": "Formalize external edges, edge endpoint nodes, and external ports",
           "createdAt": "2026-01-25T20:38:00Z",
           "updatedAt": "2026-01-25T20:38:00Z"
         },
@@ -40,13 +40,13 @@
             "markdown",
             "port"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -111,9 +111,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Edge Formalization\n\nGoal: define **external edges** (edge endpoints that cross graph boundaries),\n**external handles**, and the validation/rendering rules that keep graphs portable.\n\nThis graph is the working plan for the edge/handle split between web links and Twilite edges."
+        "markdown": "# Edge Formalization\n\nGoal: define **external edges** (edge endpoints that cross graph boundaries),\n**external ports**, and the validation/rendering rules that keep graphs portable.\n\nThis graph is the working plan for the edge/port split between web links and Twilite edges."
       },
-      "handles": [
+      "ports": [
         {
           "id": "out",
           "label": "out",
@@ -141,7 +141,7 @@
       "data": {
         "markdown": "## Links vs Edges\n\n- **Links**: web navigation (URL), belong in node data.\n- **Edges**: graph topology, belong in edges[].\n- Edges never point to URLs; links never affect layout."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -179,7 +179,7 @@
       "data": {
         "markdown": "## External Edge Endpoint\n\nIntroduce a **proxy node** to represent an external endpoint.\n\nLocal edge: `nodeA \u2192 edgeEndpoint`\n\nThe endpoint node stores:\n- target graph (URL or graphId)\n- target nodeId + optional handleId\n- direction (in/out/bidirectional)\n- intent / label / security\n\nThis keeps routing local while preserving cross-graph semantics."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -205,7 +205,7 @@
     {
       "id": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
       "type": "markdown",
-      "label": "External Handle Model",
+      "label": "External Port Model",
       "position": {
         "x": 377.26182820073154,
         "y": 967.9992213120854
@@ -215,9 +215,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## External Handles\n\nExternal handles are declared on the endpoint node:\n- `target.handleId` optional\n- if missing, attach to default **root** handle\n\nContract must define:\n- how to validate handle IDs remotely (optional)\n- warnings vs errors for missing handles\n- fallback render behavior\n"
+        "markdown": "## External Ports\n\nExternal ports are declared on the endpoint node:\n- `target.handleId` optional\n- if missing, attach to default **root** port\n\nContract must define:\n- how to validate port IDs remotely (optional)\n- warnings vs errors for missing ports\n- fallback render behavior\n"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -255,7 +255,7 @@
       "data": {
         "markdown": "## Contracts + Dictionary\n\n- Edge contract defines endpoint node type + schema.\n- Dictionary can map endpoint types to views.\n- Manifest dependencies should list endpoint node types.\n- Missing endpoint definitions \u2192 warning, render unknown."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -281,7 +281,7 @@
     {
       "id": "6a3d5d78-7e3a-4e2e-8c8f-9f4a8b2f3d21",
       "type": "port",
-      "label": "Port → Port Formalization",
+      "label": "Port \u2192 Port Formalization",
       "position": {
         "x": 833.2618282007315,
         "y": 967.9992213120854
@@ -314,7 +314,7 @@
       "data": {
         "markdown": "## Validation\n\n- Edge endpoints must reference valid target graph identity.\n- Missing dictionary entry \u2192 warning only.\n- Missing view \u2192 warning only; render unknown.\n- Version mismatch \u2192 warning only."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -350,9 +350,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Rendering + UX\n\n- Endpoint node renders as portal/connector glyph.\n- Edge styling is local; endpoint shows external badge.\n- Click behavior: open target graph or show details.\n- Default `root` handle makes endpoints connectable without extra UI.\n"
+        "markdown": "## Rendering + UX\n\n- Endpoint node renders as portal/connector glyph.\n- Edge styling is local; endpoint shows external badge.\n- Click behavior: open target graph or show details.\n- Default `root` port makes endpoints connectable without extra UI.\n"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -390,7 +390,7 @@
       "data": {
         "markdown": "## Open Questions\n\n1. Endpoint node type name \u2192 **port**\n2. Target addressing \u2192 **both** URL + graphId (graphId for validation, URL for resolution)\n3. Security policy \u2192 warn on external targets; prompt before navigation; never auto-execute external scripts\n4. Endpoints live in clusters with their sources \u2192 **yes** (ports are nodes)"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -542,7 +542,7 @@
     {
       "id": "9f7d1d4a-7e4f-4e52-9b9b-7f9f3b8b5c01",
       "type": "markdown",
-      "label": "Handle Contract",
+      "label": "Port Contract",
       "position": {
         "x": -202.73817179926846,
         "y": -108.6674453545811
@@ -552,7 +552,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handle Contract (Default Root)\n\n- Every node exposes a **default handle**: `root`.\n- Nodes may declare additional handles, but **root always exists**.\n- If no handles are declared, edges attach to `root` by default.\n\nThis preserves portability while keeping explicit handle schemas optional.",
+        "markdown": "## Port Contract (Default Root)\n\n- Every node exposes a **default port**: `root`.\n- Nodes may declare additional ports, but **root always exists**.\n- If no ports are declared, edges attach to `root` by default.\n\nThis preserves portability while keeping explicit port schemas optional.",
         "memo": "",
         "link": "",
         "html": "",
@@ -572,7 +572,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Minimum Node Invariant\n\nA node is valid if it has a resolvable View.\n\nHandles are optional because every node exposes a default **root** handle.\nAdditional handles may be declared, but `root` always exists.\n\nThis keeps nodes interface\u2011first and portable.",
+        "markdown": "## Minimum Node Invariant\n\nA node is valid if it has a resolvable View.\n\nPorts are optional because every node exposes a default **root** port.\nAdditional ports may be declared, but `root` always exists.\n\nThis keeps nodes interface\u2011first and portable.",
         "memo": "",
         "link": "",
         "html": "",
@@ -592,7 +592,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## View Requirement\n\nHandles require geometry.\nGeometry requires a View.\n\nTherefore:\n- All nodes must resolve to at least one View\n- Definition graphs may be view-only\n- Missing view = validation error\n\nRendering is structural; it enables handles (including default `root`).",
+        "markdown": "## View Requirement\n\nPorts require geometry.\nGeometry requires a View.\n\nTherefore:\n- All nodes must resolve to at least one View\n- Definition graphs may be view-only\n- Missing view = validation error\n\nRendering is structural; it enables ports (including default `root`).",
         "memo": "",
         "link": "",
         "html": "",
@@ -612,7 +612,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edge Creation Rule\n\nEdges attach to handles, not nodes.\nIf a handle is not declared, the edge attaches to the default **root** handle.\n\n### Implications\n- Edge menus require handle discovery when present\n- Agents/tools must refuse edges to non-existent handles\n- External endpoints do **not** need special proxy handles; `root` is sufficient\n\nThis preserves portability while avoiding ambiguous topology.",
+        "markdown": "## Edge Creation Rule\n\nEdges attach to ports, not nodes.\nIf a port is not declared, the edge attaches to the default **root** port.\n\n### Implications\n- Edge menus require port discovery when present\n- Agents/tools must refuse edges to non-existent ports\n- External endpoints do **not** need special proxy ports; `root` is sufficient\n\nThis preserves portability while avoiding ambiguous topology.",
         "memo": "",
         "link": "",
         "html": "",
@@ -622,7 +622,7 @@
     {
       "id": "e9c8b88b-6e54-4c44-9d89-2c6e6d90e505",
       "type": "markdown",
-      "label": "Validator Updates (Handles)",
+      "label": "Validator Updates (Ports)",
       "position": {
         "x": -184.8340798491235,
         "y": -512.3041554996706
@@ -632,7 +632,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validator Updates\n\n### New hard errors\n- Edge target handle missing\n- Node with zero handles\n- Node with no resolvable view\n\n### New warnings\n- Synthesized default handles\n- View version mismatch\n\nNo guessing. No fallback edges. Only declared surfaces.",
+        "markdown": "## Validator Updates\n\n### New hard errors\n- Edge target port missing\n- Node with zero ports\n- Node with no resolvable view\n\n### New warnings\n- Synthesized default ports\n- View version mismatch\n\nNo guessing. No fallback edges. Only declared surfaces.",
         "memo": "",
         "link": "",
         "html": "",
@@ -646,8 +646,8 @@
       "type": "straight",
       "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
       "target": "2a06f2b6-2b8e-40f0-be87-df593e1da568",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "separate concepts",
       "style": {
         "width": 2,
@@ -661,8 +661,8 @@
       "type": "straight",
       "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
       "target": "2320f41c-c15b-484b-9525-1c6131ce404c",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "define",
       "style": {
         "width": 2,
@@ -676,8 +676,8 @@
       "type": "straight",
       "source": "58dfbfd8-fdad-4107-9702-f7d4b213b304",
       "target": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "define",
       "style": {
         "width": 2,
@@ -691,8 +691,8 @@
       "type": "straight",
       "source": "2a06f2b6-2b8e-40f0-be87-df593e1da568",
       "target": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "drives",
       "style": {
         "width": 2,
@@ -706,8 +706,8 @@
       "type": "straight",
       "source": "2320f41c-c15b-484b-9525-1c6131ce404c",
       "target": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "requires",
       "style": {
         "width": 2,
@@ -721,8 +721,8 @@
       "type": "straight",
       "source": "89cce4e3-3d71-446e-8967-7dda2754d2b3",
       "target": "386e69a2-32b1-4675-a0aa-980d396d2731",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "informs",
       "style": {
         "width": 2,
@@ -736,8 +736,8 @@
       "type": "straight",
       "source": "fd3aff57-f0d8-448a-be22-7fb08ec16616",
       "target": "386e69a2-32b1-4675-a0aa-980d396d2731",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "validates",
       "style": {
         "width": 2,
@@ -751,8 +751,8 @@
       "type": "straight",
       "source": "386e69a2-32b1-4675-a0aa-980d396d2731",
       "target": "5dae206d-bee7-4423-b1e7-1881eb968258",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "supports",
       "style": {
         "width": 2,
@@ -766,8 +766,8 @@
       "type": "straight",
       "source": "5dae206d-bee7-4423-b1e7-1881eb968258",
       "target": "abb0cbf0-0e99-4ea7-be3b-4d29018bafee",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "questions",
       "style": {
         "width": 2,

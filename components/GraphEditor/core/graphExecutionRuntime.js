@@ -126,20 +126,20 @@ export const createGraphExecutionRuntime = ({ getNodes, getEdges } = {}) => {
       if (incoming.length > 0) {
         incoming.forEach((edge) => {
           const srcOutputs = outputs.get(edge.source) || {};
-          const sourceHandle = edge.sourceHandle || 'root';
-          const targetHandle = edge.targetHandle || 'root';
+          const sourcePort = edge.sourcePort || 'root';
+          const targetPort = edge.targetPort || 'root';
           const sourceValue =
-            srcOutputs[sourceHandle] !== undefined
-              ? srcOutputs[sourceHandle]
+            srcOutputs[sourcePort] !== undefined
+              ? srcOutputs[sourcePort]
               : srcOutputs.root !== undefined
               ? srcOutputs.root
               : initialValue;
-          if (inputByHandle[targetHandle] === undefined) {
-            inputByHandle[targetHandle] = sourceValue;
-          } else if (Array.isArray(inputByHandle[targetHandle])) {
-            inputByHandle[targetHandle].push(sourceValue);
+          if (inputByHandle[targetPort] === undefined) {
+            inputByHandle[targetPort] = sourceValue;
+          } else if (Array.isArray(inputByHandle[targetPort])) {
+            inputByHandle[targetPort].push(sourceValue);
           } else {
-            inputByHandle[targetHandle] = [inputByHandle[targetHandle], sourceValue];
+            inputByHandle[targetPort] = [inputByHandle[targetPort], sourceValue];
           }
         });
       } else {

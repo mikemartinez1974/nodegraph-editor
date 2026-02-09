@@ -46,7 +46,7 @@
       renderer: {
         entry: '/plugins/Twilite-hello/helloRenderer.js'
       },
-      handles: {
+      ports: {
         inputs: [{ id: 'trigger', label: 'Trigger', dataType: 'trigger' }],
         outputs: [{ id: 'greeting', label: 'Greeting', dataType: 'value' }]
       }
@@ -64,7 +64,7 @@
         caption: 'Renderer Canvas Node',
         palette: ['#6C63FF', '#2CB67D', '#FFB020', '#FF5C8D']
       },
-      handles: {
+      ports: {
         inputs: [{ id: 'signal', label: 'Signal', dataType: 'value' }],
         outputs: [{ id: 'out', label: 'Out', dataType: 'value' }]
       },

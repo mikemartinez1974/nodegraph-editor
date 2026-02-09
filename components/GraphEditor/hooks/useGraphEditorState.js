@@ -38,13 +38,12 @@ const validateManifestNodes = (nodes = []) => {
     : [];
 
   if (manifestNodes.length !== 1) {
+    if (manifestNodes.length === 0) {
+      return { ok: true, errors: [], implicit: true, kind: 'fragment' };
+    }
     return {
       ok: false,
-      errors: [
-        manifestNodes.length === 0
-          ? 'Missing Manifest node'
-          : 'Graph must contain exactly one Manifest node'
-      ]
+      errors: ['Graph must contain exactly one Manifest node']
     };
   }
 
@@ -56,7 +55,7 @@ const validateManifestNodes = (nodes = []) => {
 
   const requiredIdentity = ['graphId', 'name', 'version', 'description', 'createdAt', 'updatedAt'];
   const requiredIntent = ['kind', 'scope'];
-  const requiredDependencies = ['nodeTypes', 'handleContracts', 'skills', 'schemaVersions'];
+  const requiredDependencies = ['nodeTypes', 'portContracts', 'skills', 'schemaVersions'];
   const requiredAuthority = ['mutation', 'actors', 'styleAuthority', 'history'];
 
   const errors = [];
@@ -137,7 +136,7 @@ const loadStoredGraph = () => {
       return {
         nodes: Array.isArray(parsed.nodes) ? parsed.nodes : [],
         edges: Array.isArray(parsed.edges) ? parsed.edges : [],
-        groups: Array.isArray(parsed.groups) ? parsed.groups : []
+        clusters: Array.isArray(parsed.clusters) ? parsed.clusters : []
       };
     }
   } catch (err) {
@@ -164,7 +163,7 @@ export function useGraphEditorState() {
 
   const nodes = graphSnapshot.nodes;
   const edges = graphSnapshot.edges;
-  const groups = graphSnapshot.groups;
+  const groups = graphSnapshot.clusters;
   const manifestStatus = useMemo(() => {
     if (isDraftMode()) {
       return { ok: true, errors: [] };
@@ -386,7 +385,7 @@ export function useGraphEditorState() {
   }, [blockMutationForManifest]);
 
   const setGroups = useCallback((value) => {
-    const currentGroups = getGraphSnapshot().groups;
+    const currentGroups = getGraphSnapshot().clusters;
     const currentNodes = getGraphSnapshot().nodes;
     if (isDraftMode()) {
       const next = typeof value === 'function' ? value(currentGroups) : value;

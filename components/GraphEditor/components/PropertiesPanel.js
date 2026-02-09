@@ -162,7 +162,7 @@ export default function PropertiesPanel({
   const edgeTargetNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.target) : null), [nodes, selectedEdge]);
   const edgeSourceHandles = useMemo(() => {
     if (!edgeSourceNode) return [{ id: "root", label: "root" }];
-    const handles = Array.isArray(edgeSourceNode.handles) ? edgeSourceNode.handles : [];
+    const handles = Array.isArray(edgeSourceNode.ports) ? edgeSourceNode.ports : [];
     const mapped = handles.map((handle) => ({
       id: handle?.id || handle?.key || "",
       label: handle?.label || handle?.id || handle?.key || ""
@@ -174,7 +174,7 @@ export default function PropertiesPanel({
   }, [edgeSourceNode]);
   const edgeTargetHandles = useMemo(() => {
     if (!edgeTargetNode) return [{ id: "root", label: "root" }];
-    const handles = Array.isArray(edgeTargetNode.handles) ? edgeTargetNode.handles : [];
+    const handles = Array.isArray(edgeTargetNode.ports) ? edgeTargetNode.ports : [];
     const mapped = handles.map((handle) => ({
       id: handle?.id || handle?.key || "",
       label: handle?.label || handle?.id || handle?.key || ""
@@ -290,8 +290,8 @@ export default function PropertiesPanel({
       setHandleEntries([]);
       return;
     }
-    const next = Array.isArray(selectedNode.handles)
-      ? selectedNode.handles.map((handle) => ({
+    const next = Array.isArray(selectedNode.ports)
+      ? selectedNode.ports.map((handle) => ({
           id: handle?.id || handle?.key || "",
           label: handle?.label || "",
           direction: handle?.direction || "output",
@@ -923,9 +923,9 @@ export default function PropertiesPanel({
           )}
           {renderStringList(
             "Port contracts",
-            dependencies.handleContracts,
-            (next) => updateManifestDependencies({ handleContracts: next }),
-            "handleContracts"
+            dependencies.portContracts,
+            (next) => updateManifestDependencies({ portContracts: next }),
+            "portContracts"
           )}
           {renderStringList(
             "Skills",
@@ -955,10 +955,10 @@ export default function PropertiesPanel({
               label="Port schema version"
               size="small"
               fullWidth
-              value={dependencies.schemaVersions?.handles || ""}
+              value={dependencies.schemaVersions?.ports || ""}
               onChange={(event) =>
                 updateManifestDependencies({
-                  schemaVersions: { ...(dependencies.schemaVersions || {}), handles: event.target.value }
+                  schemaVersions: { ...(dependencies.schemaVersions || {}), ports: event.target.value }
                 })
               }
             />
@@ -1670,7 +1670,7 @@ export default function PropertiesPanel({
                 <ListItemButton onClick={() => onSelectEdge?.(edge.id)}>
                   <ListItemText
                     primary={`${edge.label || edge.type || edge.id}`}
-                    secondary={`ports ${edge.sourceHandle || "out"} → ${edge.targetHandle || "in"}`}
+                    secondary={`ports ${edge.sourcePort || "out"} → ${edge.targetPort || "in"}`}
                   />
                 </ListItemButton>
                 <ListItemSecondaryAction>
@@ -1714,7 +1714,7 @@ export default function PropertiesPanel({
         position: { side: "left", offset: 0.5 }
       };
       const nextHandles = hasRoot ? sanitized : [...sanitized, rootHandle];
-      onUpdateNode(selectedNode.id, { handles: nextHandles });
+      onUpdateNode(selectedNode.id, { ports: nextHandles });
     },
     [onUpdateNode, selectedNode]
   );
@@ -1760,9 +1760,9 @@ export default function PropertiesPanel({
   const renderHandlesSection = () => (
     <Section
       title="Ports"
-      value="handles"
-      expanded={expandedSections.node === "handles"}
-      onToggle={handleAccordionChange("node", "handles")}
+      value="ports"
+      expanded={expandedSections.node === "ports"}
+      onToggle={handleAccordionChange("node", "ports")}
       disabled={!isNodeSelected}
     >
       <Stack spacing={1}>
@@ -2202,8 +2202,8 @@ export default function PropertiesPanel({
               <InputLabel>Source port</InputLabel>
               <Select
                 label="Source port"
-                value={selectedEdge?.sourceHandle || "root"}
-                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { sourceHandle: event.target.value })}
+                value={selectedEdge?.sourcePort || "root"}
+                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { sourcePort: event.target.value })}
               >
                 {edgeSourceHandles.map((handle) => (
                   <MenuItem key={handle.id} value={handle.id}>
@@ -2216,8 +2216,8 @@ export default function PropertiesPanel({
               <InputLabel>Target port</InputLabel>
               <Select
                 label="Target port"
-                value={selectedEdge?.targetHandle || "root"}
-                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { targetHandle: event.target.value })}
+                value={selectedEdge?.targetPort || "root"}
+                onChange={(event) => selectedEdge && onUpdateEdge(selectedEdge.id, { targetPort: event.target.value })}
               >
                 {edgeTargetHandles.map((handle) => (
                   <MenuItem key={handle.id} value={handle.id}>

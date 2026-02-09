@@ -78,7 +78,7 @@ function generateGraph(title, items, parentDir = null) {
     },
     nodes,
     edges,
-    groups: []
+    clusters: []
   };
 }
 

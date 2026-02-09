@@ -94,7 +94,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Layout Panel\n+\n+- Keep this drawer as the single point for routing defaults, default-layout selection, ELK knobs, rendering toggles, and live/manual reroute control so every setting flows through the intent pipeline.\n+- Surface contract versions/handle counts here and document them in the workflow graph so future work knows where to look."
+        "markdown": "## Layout Panel\n+\n+- Keep this drawer as the single point for routing defaults, default-layout selection, ELK knobs, rendering toggles, and live/manual reroute control so every setting flows through the intent pipeline.\n+- Surface contract versions/port counts here and document them in the workflow graph so future work knows where to look."
       }
     },
     {
@@ -180,5 +180,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

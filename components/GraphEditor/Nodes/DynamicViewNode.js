@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 import eventBus from '../../NodeGraph/eventBus';
 
 const DEFAULT_INPUTS = [
@@ -103,7 +103,7 @@ const applyTemplate = (template, context) => {
 
 const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, showEditButton = false, editLocked = false, ...props }) => {
   const theme = useTheme();
-  const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const viewIntent = viewEntry?.intent || viewDefinition?.viewNode?.data?.view?.intent || '';
   const viewPayloadKey = viewDefinition?.viewNode?.data?.view?.payload || viewEntry?.payload || viewEntry?.view || '';
   const isEditorView = viewPayloadKey === 'editor.web' || viewIntent === 'editor';

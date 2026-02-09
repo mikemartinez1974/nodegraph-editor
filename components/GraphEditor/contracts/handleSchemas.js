@@ -1,7 +1,7 @@
 const SCHEMA_REGISTRY = new Map();
 
 const DEFAULT_SCHEMA = {
-  handles: []
+  ports: []
 };
 
 export function defineNodeSchema(type, schema = {}) {
@@ -9,7 +9,7 @@ export function defineNodeSchema(type, schema = {}) {
   const normalized = {
     type,
     version: schema.version || '1.0',
-    handles: Array.isArray(schema.handles) ? schema.handles : [],
+    ports: Array.isArray(schema.ports) ? schema.ports : [],
     metadata: schema.metadata || {}
   };
   SCHEMA_REGISTRY.set(type, normalized);
@@ -22,7 +22,7 @@ export function getNodeSchema(type) {
 
 export function getHandlesForNode(type) {
   const schema = getNodeSchema(type);
-  return Array.isArray(schema.handles) ? schema.handles : [];
+  return Array.isArray(schema.ports) ? schema.ports : [];
 }
 
 export function findHandle(type, handleId) {
@@ -42,7 +42,7 @@ export function allSchemas() {
 // Example schemas — expand as needed
 defineNodeSchema('markdown', {
   version: '1.0',
-  handles: [
+  ports: [
     { id: 'in', direction: 'input', side: 'left', description: 'Optional inbound link' },
     { id: 'out', direction: 'output', side: 'right', description: 'Optional outbound link' }
   ],
@@ -53,7 +53,7 @@ defineNodeSchema('markdown', {
 
 defineNodeSchema('default', {
   version: '1.0',
-  handles: [
+  ports: [
     { id: 'in', direction: 'input', side: 'left' },
     { id: 'out', direction: 'output', side: 'right' }
   ],

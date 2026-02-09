@@ -62,7 +62,7 @@ const normalizeHandleList = (handles, direction, errors, nodeIndex) => {
   return handles
     .map((handle, handleIndex) => {
       if (!handle || typeof handle !== 'object') {
-        errors.push(`nodes[${nodeIndex}].definition.handles.${direction}[${handleIndex}] must be an object`);
+        errors.push(`nodes[${nodeIndex}].definition.ports.${direction}[${handleIndex}] must be an object`);
         return null;
       }
       const id =
@@ -71,7 +71,7 @@ const normalizeHandleList = (handles, direction, errors, nodeIndex) => {
         ensureString(handle.name) ||
         `${direction}-${handleIndex}`;
       if (!id) {
-        errors.push(`nodes[${nodeIndex}].definition.handles.${direction}[${handleIndex}] is missing an id/key`);
+        errors.push(`nodes[${nodeIndex}].definition.ports.${direction}[${handleIndex}] is missing an id/key`);
         return null;
       }
       return {
@@ -217,8 +217,8 @@ const normalizeNodeDefinition = (definition, nodeIndex) => {
               : undefined
         }
       : undefined;
-  const inputHandles = normalizeHandleList(definition.handles?.inputs, 'input', errors, nodeIndex);
-  const outputHandles = normalizeHandleList(definition.handles?.outputs, 'output', errors, nodeIndex);
+  const inputHandles = normalizeHandleList(definition.ports?.inputs, 'input', errors, nodeIndex);
+  const outputHandles = normalizeHandleList(definition.ports?.outputs, 'output', errors, nodeIndex);
   const properties = Array.isArray(definition.properties)
     ? definition.properties
         .map((field, fieldIndex) => normalizePropertyField(field, fieldIndex, nodeIndex, errors))
@@ -229,7 +229,7 @@ const normalizeNodeDefinition = (definition, nodeIndex) => {
     errors,
     value: {
       size,
-      handles: {
+      ports: {
         inputs: inputHandles,
         outputs: outputHandles
       },

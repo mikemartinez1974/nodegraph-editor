@@ -158,7 +158,7 @@ export function handleNodeMouseLeave({ id, setHoveredNodeId, setIsNodeHovered, h
  * Coordinates events across all layers in proper priority order
  * 
  * Priority Order (highest to lowest):
- * 1. Handles (create new edges, modify existing edges)
+* 1. Ports (create new edges, modify existing edges)
  * 2. Nodes (select, drag, click)
  * 3. Edges (select, click)
  * 4. Groups (select, click)
@@ -188,7 +188,7 @@ export class UnifiedEventHandler {
     this.nodeRefs = nodeRefs;
     this.nodes = nodes;
     this.edges = edges;
-    this.groups = groups;
+    this.clusters = groups;
     this.pan = pan;
     this.zoom = zoom;
     this.setSelectedNodeIds = setSelectedNodeIds;
@@ -245,7 +245,7 @@ export class UnifiedEventHandler {
 
   // Check if point is inside a group
   hitTestGroup(graphX, graphY) {
-    for (const group of this.groups) {
+    for (const group of this.clusters) {
       if (!group.bounds || group.visible === false) continue;
       
       const { x, y, width, height } = group.bounds;

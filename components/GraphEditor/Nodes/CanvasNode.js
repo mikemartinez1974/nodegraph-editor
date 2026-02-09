@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const DEFAULT_INPUTS = [
   { key: 'signal', label: 'Signal', type: 'value' }
@@ -91,7 +91,7 @@ const buildBarValues = (data = []) => {
 
 const CanvasNode = (props) => {
   const { node: originalNode, zoom = 1 } = props;
-  const node = useNodeHandleSchema(originalNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(originalNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const canvasRef = useRef(null);
   const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 

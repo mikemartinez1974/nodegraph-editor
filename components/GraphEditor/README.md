@@ -2,7 +2,7 @@
 
 ## Overview
 
-This folder implements a highly-interactive node/edge graph editor built with React and Material-UI (MUI). The editor supports pan/zoom, layered rendering (nodes, edges, handles), draggable nodes, resizable nodes, and an event bus for cross-component communication.
+This folder implements a highly-interactive node/edge graph editor built with React and Material-UI (MUI). The editor supports pan/zoom, layered rendering (nodes, edges, ports), draggable nodes, resizable nodes, and an event bus for cross-component communication.
 
 ## Purpose
 

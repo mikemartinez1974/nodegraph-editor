@@ -17,7 +17,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -27,7 +30,10 @@
       "id": "next-kickoff",
       "type": "markdown",
       "label": "Session Kickoff",
-      "position": { "x": 80, "y": 80 },
+      "position": {
+        "x": 80,
+        "y": 80
+      },
       "width": 520,
       "height": 240,
       "visible": true,
@@ -40,20 +46,26 @@
       "id": "next-recent",
       "type": "markdown",
       "label": "Recent Work",
-      "position": { "x": 80, "y": 360 },
+      "position": {
+        "x": 80,
+        "y": 360
+      },
       "width": 520,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Recent Work Summary\n\n- Edge routing: orthogonal default option in Document Properties\n- Edge approach: per-handle side (perpendicular entry)\n- Simple avoidance and bundling to reduce overlap\n- Minimap: gradients render (or first stop used)\n- URL loader: ?doc= supports tlz, absolute URLs, or public-root paths\n- CRUD createNodes updates node table before createEdges"
+        "memo": "# Recent Work Summary\n\n- Edge routing: orthogonal default option in Document Properties\n- Edge approach: per-port side (perpendicular entry)\n- Simple avoidance and bundling to reduce overlap\n- Minimap: gradients render (or first stop used)\n- URL loader: ?doc= supports tlz, absolute URLs, or public-root paths\n- CRUD createNodes updates node table before createEdges"
       }
     },
     {
       "id": "next-files",
       "type": "markdown",
       "label": "Key Files",
-      "position": { "x": 80, "y": 670 },
+      "position": {
+        "x": 80,
+        "y": 670
+      },
       "width": 520,
       "height": 260,
       "visible": true,
@@ -66,39 +78,48 @@
       "id": "next-schema",
       "type": "markdown",
       "label": "Schema Rules",
-      "position": { "x": 80, "y": 980 },
+      "position": {
+        "x": 80,
+        "y": 980
+      },
       "width": 520,
       "height": 300,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Schema Rules (Do Not Forget)\n\n- Documentation nodes do not expose handles by default\n- `handles` must be an array of objects\n- Handle direction: `input`, `output`, or `bidirectional`\n- Handle position: `{ side: left|right|top|bottom, offset: 0-1 }`\n- Markdown content goes in `data.markdown` or `data.memo`\n- `sourceHandle`/`targetHandle` must match handle `id`\n- If edges reference new nodes, use `createNodes` then `createEdges`"
+        "memo": "# Schema Rules (Do Not Forget)\n\n- Documentation nodes do not expose ports by default\n- `ports` must be an array of objects\n- Port direction: `input`, `output`, or `bidirectional`\n- Port position: `{ side: left|right|top|bottom, offset: 0-1 }`\n- Markdown content goes in `data.markdown` or `data.memo`\n- `sourcePort`/`targetPort` must match port `id`\n- If edges reference new nodes, use `createNodes` then `createEdges`"
       }
     },
     {
       "id": "next-nextsteps",
       "type": "markdown",
       "label": "Open Questions / Next Steps",
-      "position": { "x": 80, "y": 1320 },
+      "position": {
+        "x": 80,
+        "y": 1320
+      },
       "width": 520,
       "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Open Questions / Next Steps\n\n- Improve edge bundling for dense graphs\n- Add stronger obstacle avoidance (route around nodes)\n- Decide if create should guarantee node visibility for edges\n- Expand onboarding examples with strict handle schema"
+        "memo": "# Open Questions / Next Steps\n\n- Improve edge bundling for dense graphs\n- Add stronger obstacle avoidance (route around nodes)\n- Decide if create should guarantee node visibility for edges\n- Expand onboarding examples with strict port schema"
       }
     },
     {
       "id": "next-verify",
       "type": "markdown",
       "label": "Quick Verification",
-      "position": { "x": 80, "y": 1600 },
+      "position": {
+        "x": 80,
+        "y": 1600
+      },
       "width": 520,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Quick Verification\n\n- Load a graph via `?doc=tlz/IntroGraph.node`\n- Toggle edge routing in Document Properties\n- Confirm edges enter handles per side\n- Check minimap node gradients"
+        "memo": "# Quick Verification\n\n- Load a graph via `?doc=tlz/IntroGraph.node`\n- Toggle edge routing in Document Properties\n- Confirm edges enter ports per side\n- Check minimap node gradients"
       }
     }
   ],
@@ -139,5 +160,5 @@
       "style": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

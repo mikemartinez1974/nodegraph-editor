@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const DEFAULT_INPUTS = [
   { key: 'set', label: 'Set', type: 'value' }
@@ -34,7 +34,7 @@ const stringifyPreview = (value) => {
 };
 
 const ViewNode = (props) => {
-  const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
   const intent = node?.data?.view?.intent || '';
   const payloadKey = node?.data?.view?.payload || '';

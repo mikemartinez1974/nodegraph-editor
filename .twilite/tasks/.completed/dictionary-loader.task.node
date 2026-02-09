@@ -4,8 +4,11 @@
     {
       "id": "dict-loader-root",
       "type": "markdown",
-      "label": "📚 Dictionary Loader Logic",
-      "position": { "x": 60, "y": 60 },
+      "label": "\ud83d\udcda Dictionary Loader Logic",
+      "position": {
+        "x": 60,
+        "y": 60
+      },
       "width": 420,
       "height": 220,
       "visible": true,
@@ -13,15 +16,27 @@
       "data": {
         "markdown": "## Goal\n\nDefine how the loader resolves dictionary inheritance.\n\n**Rule:** Host dictionary is authoritative.\nDefinitions may include dictionaries; host may import/merge."
       },
-      "handles": [
-        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
       ]
     },
     {
       "id": "dict-host",
       "type": "markdown",
       "label": "1) Identify Host Dictionary",
-      "position": { "x": 520, "y": 40 },
+      "position": {
+        "x": 520,
+        "y": 40
+      },
       "width": 380,
       "height": 220,
       "visible": true,
@@ -29,16 +44,37 @@
       "data": {
         "markdown": "## Host Dictionary\n\n- Prefer dictionary in same cluster as manifest (if any)\n- Otherwise root-level dictionary\n- If none, inheritance is skipped"
       },
-      "handles": [
-        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
-        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
       ]
     },
     {
       "id": "dict-resolve-defs",
       "type": "markdown",
       "label": "2) Resolve Definition Graphs",
-      "position": { "x": 940, "y": 40 },
+      "position": {
+        "x": 940,
+        "y": 40
+      },
       "width": 380,
       "height": 240,
       "visible": true,
@@ -46,16 +82,37 @@
       "data": {
         "markdown": "## Resolve Definitions\n\n- For each `nodeDefs` entry in host dictionary\n- Fetch referenced definition graph\n- Extract dictionary nodes within definition"
       },
-      "handles": [
-        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
-        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
       ]
     },
     {
       "id": "dict-merge",
       "type": "markdown",
       "label": "3) Merge Policy",
-      "position": { "x": 1360, "y": 40 },
+      "position": {
+        "x": 1360,
+        "y": 40
+      },
       "width": 380,
       "height": 240,
       "visible": true,
@@ -63,16 +120,37 @@
       "data": {
         "markdown": "## Merge Rules\n\n- Host dictionary is authoritative\n- Imported dictionaries provide *defaults*\n- Conflicts resolve in favor of host\n- Merge applies to `nodeDefs`, `skills`, `views`"
       },
-      "handles": [
-        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
-        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
       ]
     },
     {
       "id": "dict-cache",
       "type": "markdown",
       "label": "4) Cache + Telemetry",
-      "position": { "x": 1760, "y": 40 },
+      "position": {
+        "x": 1760,
+        "y": 40
+      },
       "width": 380,
       "height": 220,
       "visible": true,
@@ -80,15 +158,27 @@
       "data": {
         "markdown": "## Cache + Telemetry\n\n- Cache resolved dictionary per graph load\n- Emit warnings on conflicts\n- Surface missing definitions in manifest warnings"
       },
-      "handles": [
-        { "id": "in", "label": "in", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "in",
+          "label": "in",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
       ]
     },
     {
       "id": "dict-open-questions",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 60, "y": 360 },
+      "position": {
+        "x": 60,
+        "y": 360
+      },
       "width": 420,
       "height": 240,
       "visible": true,
@@ -96,8 +186,17 @@
       "data": {
         "markdown": "## Open Questions\n\n**Resolved**\n1. Persist merged dictionary back into graph? **No** (runtime only).\n2. Opt-out of inheritance per node type? **No** (use distinct type names instead).\n3. Version mismatches in imported dictionaries? **Warn only**."
       },
-      "handles": [
-        { "id": "out", "label": "out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+      "ports": [
+        {
+          "id": "out",
+          "label": "out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
       ]
     }
   ],
@@ -106,51 +205,66 @@
       "id": "edge-dict-root-host",
       "type": "dataFlow",
       "source": "dict-loader-root",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "dict-host",
-      "targetHandle": "in",
+      "targetPort": "in",
       "label": "starts",
-      "style": { "curved": true, "width": 2 }
+      "style": {
+        "curved": true,
+        "width": 2
+      }
     },
     {
       "id": "edge-dict-host-resolve",
       "type": "dataFlow",
       "source": "dict-host",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "dict-resolve-defs",
-      "targetHandle": "in",
+      "targetPort": "in",
       "label": "collects",
-      "style": { "curved": true, "width": 2 }
+      "style": {
+        "curved": true,
+        "width": 2
+      }
     },
     {
       "id": "edge-dict-resolve-merge",
       "type": "dataFlow",
       "source": "dict-resolve-defs",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "dict-merge",
-      "targetHandle": "in",
+      "targetPort": "in",
       "label": "merges",
-      "style": { "curved": true, "width": 2 }
+      "style": {
+        "curved": true,
+        "width": 2
+      }
     },
     {
       "id": "edge-dict-merge-cache",
       "type": "dataFlow",
       "source": "dict-merge",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "dict-cache",
-      "targetHandle": "in",
+      "targetPort": "in",
       "label": "caches",
-      "style": { "curved": true, "width": 2 }
+      "style": {
+        "curved": true,
+        "width": 2
+      }
     },
     {
       "id": "edge-dict-open-questions",
       "type": "reference",
       "source": "dict-open-questions",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "dict-loader-root",
-      "targetHandle": "out",
+      "targetPort": "out",
       "label": "questions",
-      "style": { "curved": true, "width": 1 }
+      "style": {
+        "curved": true,
+        "width": 1
+      }
     }
   ],
   "timestamp": "2026-01-26T09:34:00.000Z",

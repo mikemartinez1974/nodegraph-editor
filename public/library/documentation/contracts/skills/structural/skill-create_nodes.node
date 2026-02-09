@@ -165,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required Inputs\n\n```\n{\n  nodes: [{\n    id,\n    type,\n    position?,\n    width,\n    height,\n    data\n  }]\n}\n```\n\nOptional: label, groupId\n\nAuto-layout allowed if position omitted."
+        "markdown": "## Required Inputs\n\n```\n{\n  nodes: [{\n    id,\n    type,\n    position?,\n    width,\n    height,\n    data\n  }]\n}\n```\n\nOptional: label, clusterId\n\nAuto-layout allowed if position omitted."
       }
     },
     {
@@ -350,5 +350,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

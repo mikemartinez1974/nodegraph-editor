@@ -11,7 +11,7 @@ This guide defines the operational rules for agents and tools that mutate graphs
 - **Continuity over convenience.** Never replace a graph by re-emitting a full `nodegraph-data` object.
 - **Intent before action.** Use the Manifest node (if present) to understand purpose and authority.
 - **Semantics over presentation.** Validation focuses on meaning, not layout polish.
-- **Explicit over implicit.** Prefer explicit handles, types, and IDs; avoid guessing.
+- **Explicit over implicit.** Prefer explicit ports, types, and IDs; avoid guessing.
 - **Small diffs, high trust.** Use targeted updates; preserve IDs whenever possible.
 
 ---
@@ -21,15 +21,15 @@ This guide defines the operational rules for agents and tools that mutate graphs
 ### Graph Mutation
 - **Do not** output a full `nodegraph-data` object unless the user explicitly requests a wipe/reset.
 - Use **state deltas only**: `createNodes`, `createEdges`, `update`, `delete`, `move`, `translate`, `batch`, `transaction`.
-- Always create **nodes first**, then **edges**, then **groups**.
+- Always create **nodes first**, then **edges**, then **clusters**.
 
 ### IDs
-- Use RFC 4122 v4 UUIDs for new nodes/edges/groups.
+- Use RFC 4122 v4 UUIDs for new nodes/edges/clusters.
 - Never reuse an existing ID for a new entity.
 
-### Handles
-- Handles are **optional for portability**.
-- If handles are provided, they must exist on the node and respect direction/compatibility.
+### Ports
+- Ports are **optional for portability**.
+- If ports are provided, they must exist on the node and respect direction/compatibility.
 
 ### Edge Types
 - Edge `type` is **required** for persisted graphs.
@@ -47,7 +47,7 @@ This guide defines the operational rules for agents and tools that mutate graphs
 When you’re asked to create or modify a graph:
 
 1. **Inspect** existing nodes/edges and the Manifest (if present).
-2. **Identify constraints** from contracts (nodes, handles, validation, boundary).
+2. **Identify constraints** from contracts (nodes, ports, validation, boundary).
 3. **Plan a delta** that preserves IDs and history.
 4. **Execute** with minimal changes.
 5. **Validate**: surface errors/warnings; do not auto-fix unless asked.
@@ -78,7 +78,7 @@ If a Manifest node exists, it is the highest authority.
 **Warnings only (presentation):**
 - Missing position/size
 - Styling gaps
-- Optional handle omissions
+- Ports are required (use `root` for defaults)
 
 The question is: **Does the graph make sense for its declared purpose?**
 
@@ -135,7 +135,7 @@ For `batch` / `transaction`, use `commands` (not `operations`):
 - `data`
 
 **Optional:**
-- `label`, `position`, `width`, `height`, `style`, `handles`, `extensions`
+- `label`, `position`, `width`, `height`, `style`, `ports`, `extensions`
 
 If missing `position` or `width`/`height`, the renderer/layout will supply defaults.
 
@@ -155,9 +155,9 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
 - `type`
 
 **Optional:**
-- `label`, `data`, `style`, `sourceHandle`, `targetHandle`
+- `label`, `data`, `style`, `sourcePort`, `targetPort`
 
-Handles are optional, but if present they must be valid.
+Ports are required; use `root` for defaults, and they must be valid.
 
 ---
 
@@ -176,7 +176,7 @@ Skills are **graph operations**, not UI features.
 Categories:
 - Structural (create/delete/group/duplicate)
 - Layout (auto-layout, reroute)
-- Validation (schema, handles, manifest, intent)
+- Validation (schema, ports, manifest, intent)
 - Transformation (refactor, migration)
 - Automation (script/batch/import/export)
 

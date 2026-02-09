@@ -68,7 +68,7 @@
     {
       "id": "node_overview",
       "type": "markdown",
-      "label": "Content Types — Overview",
+      "label": "Content Types \u2014 Overview",
       "position": {
         "x": 558.8614116211597,
         "y": -281.0896440443539
@@ -347,7 +347,7 @@
       "data": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group_content",
       "label": "Content Examples",

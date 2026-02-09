@@ -52,7 +52,7 @@
     {
       "id": "edge-orientation-root",
       "type": "markdown",
-      "label": "🧭 Edge Orientation",
+      "label": "\ud83e\udded Edge Orientation",
       "position": {
         "x": 0,
         "y": -220
@@ -68,7 +68,7 @@
     {
       "id": "edge-orientation-problem",
       "type": "markdown",
-      "label": "😨 The Frightening Part",
+      "label": "\ud83d\ude28 The Frightening Part",
       "position": {
         "x": -320,
         "y": -20
@@ -84,7 +84,7 @@
     {
       "id": "edge-orientation-guidelines",
       "type": "markdown",
-      "label": "🗺️ Orientation Guidelines",
+      "label": "\ud83d\uddfa\ufe0f Orientation Guidelines",
       "position": {
         "x": 320,
         "y": -20
@@ -100,7 +100,7 @@
     {
       "id": "edge-orientation-nongoals",
       "type": "markdown",
-      "label": "🚫 Non-Goals",
+      "label": "\ud83d\udeab Non-Goals",
       "position": {
         "x": 0,
         "y": 220
@@ -110,7 +110,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Non-Goals\n+\n+- We are not replacing the breadboard or bringing back GSAP/animation.\n+- We will not lock down handle/edge semantics beyond optional `id` + `side` or enforce style restrictions.\n+- We keep tooling/lightweight summaries for AI agility instead of heavy logs."
+        "markdown": "## Non-Goals\n+\n+- We are not replacing the breadboard or bringing back GSAP/animation.\n+- We will not lock down port/edge semantics beyond optional `id` + `side` or enforce style restrictions.\n+- We keep tooling/lightweight summaries for AI agility instead of heavy logs."
       }
     }
   ],
@@ -152,5 +152,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

@@ -67,8 +67,8 @@ const getNodeHandleDefs = (node) => {
       position: { side: 'left', offset: 0.5 }
     });
   };
-  if (Array.isArray(node.handles) && node.handles.length > 0) {
-    node.handles.forEach((handle) => {
+  if (Array.isArray(node.ports) && node.ports.length > 0) {
+    node.ports.forEach((handle) => {
       const key = handle.id || handle.key;
       if (!key || seen.has(key)) return;
       seen.add(key);
@@ -614,9 +614,9 @@ const HandleLayer = forwardRef(({
     const graphX = (e.clientX - rect.left - pan.x) / zoom;
     const graphY = (e.clientY - rect.top - pan.y) / zoom;
     // Find target handle (not just node)
-    let targetHandle = snapHandle || null;
+    let targetPort = snapHandle || null;
     let targetNode = null;
-    if (!targetHandle) {
+    if (!targetPort) {
       for (const node of nodes) {
         const handles = getHandlePositions(node);
         for (const h of handles) {
@@ -624,15 +624,15 @@ const HandleLayer = forwardRef(({
           const screenY = h.position.y * zoom + pan.y;
           const dist = Math.sqrt(Math.pow(e.clientX - rect.left - screenX, 2) + Math.pow(e.clientY - rect.top - screenY, 2));
           if (dist <= handleRadius * 2) {
-            targetHandle = h;
+            targetPort = h;
             targetNode = node;
             break;
           }
         }
-        if (targetHandle) break;
+        if (targetPort) break;
       }
     } else {
-      targetNode = nodes.find((node) => node.id === targetHandle.nodeId) || null;
+      targetNode = nodes.find((node) => node.id === targetPort.nodeId) || null;
     }
     const dropEvent = {
       graph: { x: graphX, y: graphY },
@@ -642,35 +642,35 @@ const HandleLayer = forwardRef(({
       edgeType: draggingHandle.edgeType,
       direction: draggingHandle.direction,
       handle: draggingHandle,
-      targetHandle: targetHandle
+      targetPort: targetPort
     };
-    if (targetHandle) {
+    if (targetPort) {
       let validation = { ok: true, message: '' };
       const sourceType = draggingHandle.type;
-      const targetType = targetHandle.type;
+      const targetType = targetPort.type;
       const sourceOk = sourceType === 'output' || sourceType === 'bidirectional';
       const targetOk = targetType === 'input' || targetType === 'bidirectional';
       if (!sourceOk) {
         validation = { ok: false, message: 'Start connections from an output handle.' };
       } else if (!targetOk) {
         validation = { ok: false, message: 'Connections must end on an input handle.' };
-      } else if (draggingHandle.nodeId === targetHandle.nodeId) {
+      } else if (draggingHandle.nodeId === targetPort.nodeId) {
         validation = { ok: false, message: 'Cannot connect a node to itself.' };
       } else if (
         !isWildcardHandleType(draggingHandle.handleType) &&
-        !isWildcardHandleType(targetHandle.handleType) &&
-        draggingHandle.handleType !== targetHandle.handleType
+        !isWildcardHandleType(targetPort.handleType) &&
+        draggingHandle.handleType !== targetPort.handleType
       ) {
         validation = {
           ok: false,
-          message: `Handle types do not match: ${draggingHandle.handleType} → ${targetHandle.handleType}`
+          message: `Handle types do not match: ${draggingHandle.handleType} → ${targetPort.handleType}`
         };
       } else {
         const sourceAllowed = Array.isArray(draggingHandle.allowedEdgeTypes)
           ? draggingHandle.allowedEdgeTypes
           : null;
-        const targetAllowed = Array.isArray(targetHandle.allowedEdgeTypes)
-          ? targetHandle.allowedEdgeTypes
+        const targetAllowed = Array.isArray(targetPort.allowedEdgeTypes)
+          ? targetPort.allowedEdgeTypes
           : null;
         let edgeType = 'default';
         if (sourceAllowed && targetAllowed) {
@@ -837,4 +837,3 @@ const HandleLayer = forwardRef(({
 });
 
 export default HandleLayer;
-

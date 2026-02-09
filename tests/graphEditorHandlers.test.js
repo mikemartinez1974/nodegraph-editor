@@ -25,7 +25,7 @@ const createStateStub = () => {
     setSelectedEdgeIds: () => {},
     selectedGroupIds: [],
     setSelectedGroupIds: () => {},
-    groupManager: { current: { groups: new Map(), nodeToGroup: new Map() } },
+    groupManager: { current: { clusters: new Map(), nodeToGroup: new Map() } },
     setSnackbar: () => {},
     setLoading: () => {},
     showNodeList: false,

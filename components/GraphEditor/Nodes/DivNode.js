@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { TlzLink } from '../components/TlzLink';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 // Unified handle schema for display nodes
 const DEFAULT_INPUTS = [
@@ -20,7 +20,7 @@ const DEFAULT_OUTPUTS = [
 
 const DivNode = (props) => {
   // Ensure node has inputs/outputs for handle system
-  const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);

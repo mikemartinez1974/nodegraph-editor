@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeEdges,\n  offset,\n  groupId?\n}\n```\n\nOffsets must be explicit.\n\nCluster membership is intentional."
+        "markdown": "## Inputs\n\n```\n{\n  nodeIds,\n  includeEdges,\n  offset,\n  clusterId?\n}\n```\n\nOffsets must be explicit.\n\nCluster membership is intentional."
       }
     },
     {
@@ -325,5 +325,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

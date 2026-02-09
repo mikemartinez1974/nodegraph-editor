@@ -59,7 +59,7 @@
     {
       "id": "skill-upgrade-root",
       "type": "markdown",
-      "label": "⬆️ Skill: SchemaUpgrade (Normative)",
+      "label": "\u2b06\ufe0f Skill: SchemaUpgrade (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing intermediate version → abort\n- Transform failure → rollback\n- Validation failure → abort\n\nPartial upgrades are forbidden."
+        "markdown": "## Failure Modes\n\n- Missing intermediate version \u2192 abort\n- Transform failure \u2192 rollback\n- Validation failure \u2192 abort\n\nPartial upgrades are forbidden."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

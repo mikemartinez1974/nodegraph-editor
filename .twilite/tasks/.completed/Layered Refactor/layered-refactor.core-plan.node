@@ -56,7 +56,7 @@
     {
       "id": "core-root",
       "type": "markdown",
-      "label": "🧱 Core Layer API",
+      "label": "\ud83e\uddf1 Core Layer API",
       "position": {
         "x": 0,
         "y": -220
@@ -66,13 +66,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Core Layer API Plan\n+\n+Define a UI-agnostic module that owns nodes/edges/groups state, history, persistence, and validation. The module exposes subscribe/dispatch primitives that browser/editor/interpreters rely on."
+        "markdown": "# Core Layer API Plan\n+\n+Define a UI-agnostic module that owns nodes/edges/clusters state, history, persistence, and validation. The module exposes subscribe/dispatch primitives that browser/editor/interpreters rely on."
       }
     },
     {
       "id": "core-export-state",
       "type": "markdown",
-      "label": "📦 State Accessors",
+      "label": "\ud83d\udce6 State Accessors",
       "position": {
         "x": -320,
         "y": 20
@@ -82,13 +82,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## State Accessors\n+\n+- `getGraph()` returns immutable snapshot {nodes, edges, groups}\n+- `subscribe(callback)` fires whenever the graph changes\n+- `getSelection()` / `getView()` for UI consumers\n+- `resolveById(id)` helper for skills"
+        "markdown": "## State Accessors\n+\n+- `getGraph()` returns immutable snapshot {nodes, edges, clusters}\n+- `subscribe(callback)` fires whenever the graph changes\n+- `getSelection()` / `getView()` for UI consumers\n+- `resolveById(id)` helper for skills"
       }
     },
     {
       "id": "core-export-mutators",
       "type": "markdown",
-      "label": "🛠️ Mutators & History",
+      "label": "\ud83d\udee0\ufe0f Mutators & History",
       "position": {
         "x": 320,
         "y": 20
@@ -98,13 +98,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mutators & History\n+\n+- `dispatch({ action, payload })` handles create/update/delete nodes/edges/groups\n+- `snapshot(label)` records history entries with metadata\n+- `replay(snapshotId)` and `rollback()` APIs for auditors\n+- `emitIntent(intent)` + `onIntent(handler)` keep skills traceable"
+        "markdown": "## Mutators & History\n+\n+- `dispatch({ action, payload })` ports create/update/delete nodes/edges/clusters\n+- `snapshot(label)` records history entries with metadata\n+- `replay(snapshotId)` and `rollback()` APIs for auditors\n+- `emitIntent(intent)` + `onIntent(handler)` keep skills traceable"
       }
     },
     {
       "id": "core-validation",
       "type": "markdown",
-      "label": "✅ Validation Hooks",
+      "label": "\u2705 Validation Hooks",
       "position": {
         "x": 0,
         "y": 220
@@ -114,13 +114,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation & Contracts\n+\n+- Core runs validation middleware before mutating state\n+- Contracts declare allowed handles/edge types and register as validators\n+- Violations surface events (`onViolation`) instead of mutating state itself"
+        "markdown": "## Validation & Contracts\n+\n+- Core runs validation middleware before mutating state\n+- Contracts declare allowed ports/edge types and register as validators\n+- Violations surface events (`onViolation`) instead of mutating state itself"
       }
     },
     {
       "id": "core-persistence",
       "type": "markdown",
-      "label": "💾 Persistence & Storage",
+      "label": "\ud83d\udcbe Persistence & Storage",
       "position": {
         "x": -140,
         "y": 420
@@ -136,7 +136,7 @@
     {
       "id": "core-metadata",
       "type": "markdown",
-      "label": "🧭 Metadata & Hooks",
+      "label": "\ud83e\udded Metadata & Hooks",
       "position": {
         "x": 140,
         "y": 420
@@ -169,10 +169,10 @@
       "source": "core-root",
       "target": "core-export-mutators",
       "label": "writers",
-        "style": {
-            "curved": true,
-            "width": 2
-        },
+      "style": {
+        "curved": true,
+        "width": 2
+      },
       "data": {}
     },
     {
@@ -212,5 +212,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

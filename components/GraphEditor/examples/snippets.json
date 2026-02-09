@@ -6,11 +6,14 @@
         "id": "node_div_html_demo_1",
         "type": "div",
         "label": "Div: HTML Demo",
-        "position": { "x": 300, "y": 200 },
+        "position": {
+          "x": 300,
+          "y": 200
+        },
         "width": 300,
         "height": 140,
         "data": {
-          "html": "<h3 style=\"margin:0 0 8px 0\">Div Node HTML Demo</h3><p style=\"margin:0 0 8px 0\">This node renders raw HTML. Try the link: <a href=\"https://www.google.com\" target=\"_blank\" rel=\"noopener\">Open Google</a>.</p><p style=\"margin:0\">• <b>Bold</b> • <i>Italic</i> • <u>Underline</u></p>"
+          "html": "<h3 style=\"margin:0 0 8px 0\">Div Node HTML Demo</h3><p style=\"margin:0 0 8px 0\">This node renders raw HTML. Try the link: <a href=\"https://www.google.com\" target=\"_blank\" rel=\"noopener\">Open Google</a>.</p><p style=\"margin:0\">\u2022 <b>Bold</b> \u2022 <i>Italic</i> \u2022 <u>Underline</u></p>"
         }
       }
     ]
@@ -22,7 +25,10 @@
         "id": "node_md_doc_1",
         "type": "markdown",
         "label": "Docs: Project Goals",
-        "position": { "x": 650, "y": 200 },
+        "position": {
+          "x": 650,
+          "y": 200
+        },
         "width": 320,
         "height": 240,
         "data": {
@@ -38,7 +44,10 @@
         "id": "node_svg_1",
         "type": "svg",
         "label": "SVG Icon",
-        "position": { "x": 300, "y": 420 },
+        "position": {
+          "x": 300,
+          "y": 420
+        },
         "width": 120,
         "height": 120,
         "data": {
@@ -54,7 +63,10 @@
         "id": "node_gradient_1",
         "type": "default",
         "label": "Featured",
-        "position": { "x": 650, "y": 420 },
+        "position": {
+          "x": 650,
+          "y": 420
+        },
         "width": 200,
         "height": 100,
         "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -63,12 +75,20 @@
   },
   {
     "action": "add",
-    "groups": [
+    "clusters": [
       {
         "id": "group_demo_1",
         "label": "Demo Group",
-        "nodeIds": ["node_div_html_demo_1", "node_md_doc_1"],
-        "bounds": { "x": 240, "y": 140, "width": 760, "height": 320 }
+        "nodeIds": [
+          "node_div_html_demo_1",
+          "node_md_doc_1"
+        ],
+        "bounds": {
+          "x": 240,
+          "y": 140,
+          "width": 760,
+          "height": 320
+        }
       }
     ]
   }

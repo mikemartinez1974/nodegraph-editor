@@ -1,10 +1,10 @@
-// GroupManager.js - Handles all group operations and state management
+// GroupManager.js - Manages all cluster operations and state management
 import { v4 as uuidv4 } from 'uuid';
 
 export class GroupManager {
   constructor() {
-    this.groups = new Map(); // groupId -> group data
-    this.nodeToGroup = new Map(); // nodeId -> groupId
+    this.clusters = new Map(); // clusterId -> group data
+    this.nodeToGroup = new Map(); // nodeId -> clusterId
     this.groupHierarchy = new Map(); // parentGroupId -> Set of childGroupIds
   }
 
@@ -14,14 +14,14 @@ export class GroupManager {
       return { success: false, error: 'At least 2 nodes required to create a cluster' };
     }
 
-    const groupId = options.id || `group-${uuidv4()}`;
+    const clusterId = options.id || `group-${uuidv4()}`;
     
     // Calculate group bounds
     const bounds = this.calculateGroupBounds(nodeIds, options.nodes || []);
     
     const group = {
-      id: groupId,
-      label: options.label || `Cluster ${this.groups.size + 1}`,
+      id: clusterId,
+      label: options.label || `Cluster ${this.clusters.size + 1}`,
       nodeIds: [...nodeIds],
       bounds,
       style: {
@@ -38,17 +38,17 @@ export class GroupManager {
     };
 
     // Register group and node mappings
-    this.groups.set(groupId, group);
+    this.clusters.set(clusterId, group);
     nodeIds.forEach(nodeId => {
-      this.nodeToGroup.set(nodeId, groupId);
+      this.nodeToGroup.set(nodeId, clusterId);
     });
 
     return { success: true, data: group };
   }
 
   // Remove a group (ungroup nodes)
-  removeGroup(groupId) {
-    const group = this.groups.get(groupId);
+  removeGroup(clusterId) {
+    const group = this.clusters.get(clusterId);
     if (!group) {
       return { success: false, error: 'Cluster not found' };
     }
@@ -59,17 +59,17 @@ export class GroupManager {
     });
 
     // Remove from hierarchy
-    this.groupHierarchy.delete(groupId);
+    this.groupHierarchy.delete(clusterId);
     
     // Remove group
-    this.groups.delete(groupId);
+    this.clusters.delete(clusterId);
 
     return { success: true, data: group };
   }
 
   // Add nodes to existing group
-  addNodesToGroup(groupId, nodeIds) {
-    const group = this.groups.get(groupId);
+  addNodesToGroup(clusterId, nodeIds) {
+    const group = this.clusters.get(clusterId);
     if (!group) {
       return { success: false, error: 'Cluster not found' };
     }
@@ -78,7 +78,7 @@ export class GroupManager {
     nodeIds.forEach(nodeId => {
       if (!group.nodeIds.includes(nodeId)) {
         group.nodeIds.push(nodeId);
-        this.nodeToGroup.set(nodeId, groupId);
+        this.nodeToGroup.set(nodeId, clusterId);
       }
     });
 
@@ -86,8 +86,8 @@ export class GroupManager {
   }
 
   // Remove nodes from group
-  removeNodesFromGroup(groupId, nodeIds) {
-    const group = this.groups.get(groupId);
+  removeNodesFromGroup(clusterId, nodeIds) {
+    const group = this.clusters.get(clusterId);
     if (!group) {
       return { success: false, error: 'Cluster not found' };
     }
@@ -100,7 +100,7 @@ export class GroupManager {
 
     // If group becomes empty or has only 1 node, remove it
     if (group.nodeIds.length < 2) {
-      return this.removeGroup(groupId);
+      return this.removeGroup(clusterId);
     }
 
     return { success: true, data: group };
@@ -143,8 +143,8 @@ export class GroupManager {
   }
 
   // Update group bounds when nodes move
-  updateGroupBounds(groupId, allNodes) {
-    const group = this.groups.get(groupId);
+  updateGroupBounds(clusterId, allNodes) {
+    const group = this.clusters.get(clusterId);
     if (!group) return { success: false, error: 'Cluster not found' };
 
     group.bounds = this.calculateGroupBounds(group.nodeIds, allNodes);
@@ -153,18 +153,18 @@ export class GroupManager {
 
   // Get group for a node
   getNodeGroup(nodeId) {
-    const groupId = this.nodeToGroup.get(nodeId);
-    return groupId ? this.groups.get(groupId) : null;
+    const clusterId = this.nodeToGroup.get(nodeId);
+    return clusterId ? this.clusters.get(clusterId) : null;
   }
 
   // Get all groups
   getAllGroups() {
-    return Array.from(this.groups.values());
+    return Array.from(this.clusters.values());
   }
 
   // Collapse/expand group
-  toggleGroupCollapse(groupId) {
-    const group = this.groups.get(groupId);
+  toggleGroupCollapse(clusterId) {
+    const group = this.clusters.get(clusterId);
     if (!group) return { success: false, error: 'Cluster not found' };
 
     group.collapsed = !group.collapsed;
@@ -172,8 +172,8 @@ export class GroupManager {
   }
 
   // Move entire group
-  moveGroup(groupId, deltaX, deltaY, allNodes) {
-    const group = this.groups.get(groupId);
+  moveGroup(clusterId, deltaX, deltaY, allNodes) {
+    const group = this.clusters.get(clusterId);
     if (!group || group.collapsed) {
       return { success: false, error: 'Cluster not found or collapsed' };
     }
@@ -204,17 +204,17 @@ export class GroupManager {
   getGroupsForNodes(nodeIds) {
     const groupIds = new Set();
     nodeIds.forEach(nodeId => {
-      const groupId = this.nodeToGroup.get(nodeId);
-      if (groupId) groupIds.add(groupId);
+      const clusterId = this.nodeToGroup.get(nodeId);
+      if (clusterId) groupIds.add(clusterId);
     });
     
-    return Array.from(groupIds).map(id => this.groups.get(id)).filter(Boolean);
+    return Array.from(groupIds).map(id => this.clusters.get(id)).filter(Boolean);
   }
 
   // Serialize groups for saving
   serialize() {
     return {
-      groups: Array.from(this.groups.entries()),
+      clusters: Array.from(this.clusters.entries()),
       nodeToGroup: Array.from(this.nodeToGroup.entries()),
       groupHierarchy: Array.from(this.groupHierarchy.entries())
     };
@@ -224,14 +224,14 @@ export class GroupManager {
   deserialize(data) {
     if (!data) return;
     
-    this.groups = new Map(data.groups || []);
+    this.clusters = new Map(data.clusters || []);
     this.nodeToGroup = new Map(data.nodeToGroup || []);
     this.groupHierarchy = new Map(data.groupHierarchy || []);
   }
 
   // Clear all groups
   clear() {
-    this.groups.clear();
+    this.clusters.clear();
     this.nodeToGroup.clear();
     this.groupHierarchy.clear();
   }

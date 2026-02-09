@@ -61,7 +61,7 @@
     {
       "id": "render-root",
       "type": "markdown",
-      "label": "🎨 Rendering Contract",
+      "label": "\ud83c\udfa8 Rendering Contract",
       "position": {
         "x": 0,
         "y": 0
@@ -77,7 +77,7 @@
     {
       "id": "render-affordances",
       "type": "markdown",
-      "label": "✅ Visual Affordances",
+      "label": "\u2705 Visual Affordances",
       "position": {
         "x": -520,
         "y": 340
@@ -93,7 +93,7 @@
     {
       "id": "render-interpretation",
       "type": "markdown",
-      "label": "✅ Visual Interpretation",
+      "label": "\u2705 Visual Interpretation",
       "position": {
         "x": 531.3633964506597,
         "y": 356.52857665550505
@@ -109,7 +109,7 @@
     {
       "id": "render-forbidden",
       "type": "markdown",
-      "label": "❌ Forbidden Responsibilities",
+      "label": "\u274c Forbidden Responsibilities",
       "position": {
         "x": -44.73913511088928,
         "y": 577.883742652041
@@ -125,7 +125,7 @@
     {
       "id": "render-principle",
       "type": "markdown",
-      "label": "📐 Core Principle",
+      "label": "\ud83d\udcd0 Core Principle",
       "position": {
         "x": -10.080719447873705,
         "y": 1086.2861690332413
@@ -135,7 +135,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Core Principle\n\n**Rendering is a projection, not a participant.**\n\n- It does not decide\n- It does not infer\n- It does not correct\n- It does not help\n\nIt reveals upstream truth.\n\nIf routing fails, rendering must show failure — not invent success."
+        "markdown": "## Core Principle\n\n**Rendering is a projection, not a participant.**\n\n- It does not decide\n- It does not infer\n- It does not correct\n- It does not help\n\nIt reveals upstream truth.\n\nIf routing fails, rendering must show failure \u2014 not invent success."
       }
     }
   ],
@@ -185,5 +185,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

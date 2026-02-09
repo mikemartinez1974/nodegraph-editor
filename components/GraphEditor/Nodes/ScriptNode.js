@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
-// --- New schema handles ---
+// --- New schema ports ---
 const SCRIPT_INPUTS = [
   { key: 'trigger', label: 'Trigger', type: 'trigger' }
 ];
@@ -57,7 +57,7 @@ export default function ScriptNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const runTokenRef = useRef(0);
-  const node = useNodeHandleSchema(origNode, SCRIPT_INPUTS, SCRIPT_OUTPUTS);
+  const node = useNodePortSchema(origNode, SCRIPT_INPUTS, SCRIPT_OUTPUTS);
   const isEmbedded = typeof window !== 'undefined' && window.__Twilite_EMBED__ === true;
 
   const width = (node?.width || 260) * zoom;
@@ -418,7 +418,7 @@ export default function ScriptNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
-  // Handles are rendered via HandleLayer
+  // Ports are rendered via HandleLayer
   return (
     <div
       ref={nodeRef}

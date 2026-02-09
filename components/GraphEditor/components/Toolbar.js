@@ -406,11 +406,11 @@ const Toolbar = ({
         if (jsonData.fileVersion && jsonData.nodes) {
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
-          groupsToLoad = jsonData.clusters || jsonData.groups || [];
+          groupsToLoad = jsonData.clusters || jsonData.clusters || [];
         } else if (jsonData.nodes && jsonData.edges) {
           nodesToLoad = jsonData.nodes;
           edgesToLoad = jsonData.edges;
-          groupsToLoad = jsonData.clusters || jsonData.groups || [];
+          groupsToLoad = jsonData.clusters || jsonData.clusters || [];
         } else {
           if (onShowMessage) onShowMessage('Invalid graph file format. Missing nodes or edges.', 'error');
           return;
@@ -525,16 +525,16 @@ const Toolbar = ({
         const targetNodeId = typeof edge.target === 'object' && edge.target
           ? (edge.target.nodeId ?? edge.target.id ?? '')
           : edge.target;
-        const sourceHandle = edge.sourceHandle || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
-        const targetHandle = edge.targetHandle || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
+        const sourcePort = edge.sourcePort || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
+        const targetPort = edge.targetPort || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
         return {
           id: edge.id,
           type: edge.type,
           source: sourceNodeId,
           target: targetNodeId,
-          sourceHandle: sourceHandle,
-          targetHandle: targetHandle,
-          handleMeta: edge.handleMeta || undefined,
+          sourcePort: sourcePort,
+          targetPort: targetPort,
+          portMeta: edge.portMeta || undefined,
           label: edge.label || "",
           style: edge.style || {},
           data: edge.data || {}
@@ -738,7 +738,7 @@ const Toolbar = ({
     const graphData = {
       nodes,
       edges,
-      groups: groups || [],
+      clusters: groups || [],
       options: documentSettings || {},
       metadata: {},
       extensions: {}

@@ -1,7 +1,7 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "ELK + Edges + Layout — Master Roadmap",
+    "title": "ELK + Edges + Layout \u2014 Master Roadmap",
     "description": "Consolidated roadmap for ELK integration, edge routing, and layout policies in Twilite.",
     "created": "2025-12-28T00:00:00.000Z",
     "modified": "2025-12-28T00:00:00.000Z",
@@ -79,171 +79,273 @@
       "id": "master-goal",
       "type": "markdown",
       "label": "Goal",
-      "position": { "x": 0, "y": -260 },
+      "position": {
+        "x": 0,
+        "y": -260
+      },
       "width": 720,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# ELK + Edges + Layout — Master Roadmap\n\n**North Star:** Twilite graphs look **professional by default** while keeping **LLM payloads small**.\n\n**Authority model:**\n- Document model is source of truth for nodes/edges/groups\n- ELK is authority for layout + routing when invoked\n- Fallback routing is deterministic when ELK data is absent"
+        "markdown": "# ELK + Edges + Layout \u2014 Master Roadmap\n\n**North Star:** Twilite graphs look **professional by default** while keeping **LLM payloads small**.\n\n**Authority model:**\n- Document model is source of truth for nodes/edges/clusters\n- ELK is authority for layout + routing when invoked\n- Fallback routing is deterministic when ELK data is absent"
       }
     },
     {
       "id": "master-principles",
       "type": "markdown",
       "label": "Principles",
-      "position": { "x": 0, "y": -10 },
+      "position": {
+        "x": 0,
+        "y": -10
+      },
       "width": 720,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Principles\n- **Handles optional:** if omitted, attach by geometry + stable slotting\n- **Positions optional:** if omitted on paste, auto-layout fills them in\n- **Size required on create (for now):** include `width`/`height` until type defaults are reliable\n- **Routes are computed:** store in memory (not required in `.node`)\n- **Determinism:** stable order by `edge.id` so visuals don’t jitter between runs\n\nKey document knobs live in `documentSettings.layout` (direction, serpentine wrap, lane gap, cycle fallback)."
+        "markdown": "## Principles\n- **Ports optional:** if omitted, attach by geometry + stable slotting\n- **Positions optional:** if omitted on paste, auto-layout fills them in\n- **Size required on create (for now):** include `width`/`height` until type defaults are reliable\n- **Routes are computed:** store in memory (not required in `.node`)\n- **Determinism:** stable order by `edge.id` so visuals don\u2019t jitter between runs\n\nKey document knobs live in `documentSettings.layout` (direction, serpentine wrap, lane gap, cycle fallback)."
       }
     },
     {
       "id": "master-status",
       "type": "markdown",
       "label": "Current Status",
-      "position": { "x": 0, "y": 290 },
+      "position": {
+        "x": 0,
+        "y": 290
+      },
       "width": 720,
       "height": 250,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Current Status (What Works Today)\n- ✅ Auto-layout triggers when pasted nodes omit `position`\n- ✅ Serpentine layout for chain graphs (wrap by `maxPerRow`)\n- ✅ Cycles fallback: layered best-effort, grid fallback when heavily cyclic\n- ✅ Reroute button: ELK routing without moving nodes\n- ✅ Multi-label edges: `edge.labels = [start, middle, end]` (legacy `edge.label` still works)\n- ✅ Multi-edge lane spacing is configurable (`edgeLaneGapPx`, default 10)\n\n**Demo graph:** `public/Roadmaps/edgeFeaturesShowcase.node`"
+        "markdown": "## Current Status (What Works Today)\n- \u2705 Auto-layout triggers when pasted nodes omit `position`\n- \u2705 Serpentine layout for chain graphs (wrap by `maxPerRow`)\n- \u2705 Cycles fallback: layered best-effort, grid fallback when heavily cyclic\n- \u2705 Reroute button: ELK routing without moving nodes\n- \u2705 Multi-label edges: `edge.labels = [start, middle, end]` (legacy `edge.label` still works)\n- \u2705 Multi-edge lane spacing is configurable (`edgeLaneGapPx`, default 10)\n\n**Demo graph:** `public/Roadmaps/edgeFeaturesShowcase.node`"
       }
     },
     {
       "id": "master-phase0",
       "type": "markdown",
-      "label": "Phase 0 — ELK Foundation",
-      "position": { "x": 0, "y": 620 },
+      "label": "Phase 0 \u2014 ELK Foundation",
+      "position": {
+        "x": 0,
+        "y": 620
+      },
       "width": 720,
       "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 0 — ELK Foundation\n- Choose ELK (layered + orthogonal routing)\n- Convert graph → ELK input (sizes, optional ports)\n- Apply layout results to node positions\n- Cache routes by `edge.id` (memory only)\n\n(Originally explored in `elkIntegration.node` + `elkEdgeRouting.node`.)"
+        "markdown": "## Phase 0 \u2014 ELK Foundation\n- Choose ELK (layered + orthogonal routing)\n- Convert graph \u2192 ELK input (sizes, optional ports)\n- Apply layout results to node positions\n- Cache routes by `edge.id` (memory only)\n\n(Originally explored in `elkIntegration.node` + `elkEdgeRouting.node`.)"
       }
     },
     {
       "id": "master-phase1",
       "type": "markdown",
-      "label": "Phase 1 — Handles & Endpoints",
-      "position": { "x": 0, "y": 920 },
+      "label": "Phase 1 \u2014 Ports & Endpoints",
+      "position": {
+        "x": 0,
+        "y": 920
+      },
       "width": 720,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 1 — Handles & Endpoints\n- Handles are **functional but optional**\n- Missing handles: attach by geometry; slot per-side by `edge.id`\n- Default routing: orthogonal\n- Document policy: create includes size; updates omit unless changed"
+        "markdown": "## Phase 1 \u2014 Ports & Endpoints\n- Ports are **functional but optional**\n- Missing ports: attach by geometry; slot per-side by `edge.id`\n- Default routing: orthogonal\n- Document policy: create includes size; updates omit unless changed"
       }
     },
     {
       "id": "master-phase2",
       "type": "markdown",
-      "label": "Phase 2 — Layout Policy",
-      "position": { "x": 0, "y": 1240 },
+      "label": "Phase 2 \u2014 Layout Policy",
+      "position": {
+        "x": 0,
+        "y": 1240
+      },
       "width": 720,
       "height": 270,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 2 — Layout Policy\n- Auto-layout **only** when `position` keys are omitted in paste/create payloads\n- Beautify mutates positions (positions persist when saved)\n- Shape helpers:\n  - Chain → serpentine\n  - Tree/DAG → layered\n  - Cycles → layered best-effort; grid fallback when heavily cyclic\n- Store defaults in `documentSettings.layout`"
+        "markdown": "## Phase 2 \u2014 Layout Policy\n- Auto-layout **only** when `position` keys are omitted in paste/create payloads\n- Beautify mutates positions (positions persist when saved)\n- Shape helpers:\n  - Chain \u2192 serpentine\n  - Tree/DAG \u2192 layered\n  - Cycles \u2192 layered best-effort; grid fallback when heavily cyclic\n- Store defaults in `documentSettings.layout`"
       }
     },
     {
       "id": "master-phase3",
       "type": "markdown",
-      "label": "Phase 3 — Routing Polish",
-      "position": { "x": 0, "y": 1570 },
+      "label": "Phase 3 \u2014 Routing Polish",
+      "position": {
+        "x": 0,
+        "y": 1570
+      },
       "width": 720,
       "height": 280,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 3 — Routing Polish\n- Use ELK routed segments when available\n- Multi-edge spacing (fan/slot), controlled by `edgeLaneGapPx`\n- Label system:\n  - Legacy: `edge.label` = middle\n  - New: `edge.labels = [start, middle, end]`\n  - Middle label sits on the **center segment** for orthogonal edges\n\n### Remaining polish\n- Tune crossing reduction options\n- Smarter label avoidance when labels collide"
+        "markdown": "## Phase 3 \u2014 Routing Polish\n- Use ELK routed segments when available\n- Multi-edge spacing (fan/slot), controlled by `edgeLaneGapPx`\n- Label system:\n  - Legacy: `edge.label` = middle\n  - New: `edge.labels = [start, middle, end]`\n  - Middle label sits on the **center segment** for orthogonal edges\n\n### Remaining polish\n- Tune crossing reduction options\n- Smarter label avoidance when labels collide"
       }
     },
     {
       "id": "master-phase4",
       "type": "markdown",
-      "label": "Phase 4 — Growth / Mental Map",
-      "position": { "x": 0, "y": 1910 },
+      "label": "Phase 4 \u2014 Growth / Mental Map",
+      "position": {
+        "x": 0,
+        "y": 1910
+      },
       "width": 720,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 4 — Growth / Mental Map\n**Goal:** add nodes/edges without mangling layout.\n\n- Local reflow only (affected region)\n  - Affected region = bbox of newly-added/changed nodes (+ padding)\n- Overlaps: keep existing nodes fixed; move incoming cluster to nearest free spot\n- Pin/lock (opt-in)\n  - Pinned nodes never move and act as hard obstacles\n  - Groups can be treated as obstacles too\n- Place new nodes near cursor/neighbor\n- Clear trigger rules (paste/add/connect)\n\nThis is the main remaining “make it feel pro” milestone."
+        "markdown": "## Phase 4 \u2014 Growth / Mental Map\n**Goal:** add nodes/edges without mangling layout.\n\n- Local reflow only (affected region)\n  - Affected region = bbox of newly-added/changed nodes (+ padding)\n- Overlaps: keep existing nodes fixed; move incoming cluster to nearest free spot\n- Pin/lock (opt-in)\n  - Pinned nodes never move and act as hard obstacles\n  - Clusters can be treated as obstacles too\n- Place new nodes near cursor/neighbor\n- Clear trigger rules (paste/add/connect)\n\nThis is the main remaining \u201cmake it feel pro\u201d milestone."
       }
     },
     {
       "id": "master-phase5",
       "type": "markdown",
-      "label": "Phase 5 — Extensibility",
-      "position": { "x": 0, "y": 2230 },
+      "label": "Phase 5 \u2014 Extensibility",
+      "position": {
+        "x": 0,
+        "y": 2230
+      },
       "width": 720,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 5 — Extensibility\n- Layout strategy API (`layout(graph, options) -> {positions, routes}`)\n- Per-group overrides (optional)\n  - `group.layout.enabled`, `group.layout.algorithm`, `group.layout.direction`\n  - Optional serpentine knobs: `group.layout.serpentine.maxPerRow`\n- Group constraints for growth\n  - `group.lockMembers` (members fixed)\n  - `group.lockBounds` (group rectangle fixed)\n- Consider a \"sequence\" group flavor (ordered content; serpentine default)\n- Plugin-registered layout strategies\n- Optional: persist advanced layout presets in document settings"
+        "markdown": "## Phase 5 \u2014 Extensibility\n- Layout strategy API (`layout(graph, options) -> {positions, routes}`)\n- Per-cluster overrides (optional)\n  - `cluster.layout.enabled`, `cluster.layout.algorithm`, `cluster.layout.direction`\n  - Optional serpentine knobs: `cluster.layout.serpentine.maxPerRow`\n- Cluster constraints for growth\n  - `cluster.lockMembers` (members fixed)\n  - `cluster.lockBounds` (cluster rectangle fixed)\n- Consider a \"sequence\" cluster flavor (ordered content; serpentine default)\n- Plugin-registered layout strategies\n- Optional: persist advanced layout presets in document settings"
       }
     },
     {
       "id": "master-demo-tests",
       "type": "markdown",
       "label": "Demo & Tests",
-      "position": { "x": 0, "y": 2550 },
+      "position": {
+        "x": 0,
+        "y": 2550
+      },
       "width": 720,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Demo & Test Corpus\n- `edgeFeaturesShowcase.node` (multi-labels + lane spacing)\n- Chain graph (serpentine wrap)\n- Dense DAG (crossing reduction)\n- Mixed sizes (markdown + plugin nodes)\n- 100 nodes / 200 edges performance target\n\nLLM contract testing:\n- Create nodes with **size**\n- Omit positions to trigger auto-layout\n- Omit handles unless semantic wiring is needed"
+        "markdown": "## Demo & Test Corpus\n- `edgeFeaturesShowcase.node` (multi-labels + lane spacing)\n- Chain graph (serpentine wrap)\n- Dense DAG (crossing reduction)\n- Mixed sizes (markdown + plugin nodes)\n- 100 nodes / 200 edges performance target\n\nLLM contract testing:\n- Create nodes with **size**\n- Omit positions to trigger auto-layout\n- Omit ports unless semantic wiring is needed"
       }
     },
     {
       "id": "master-archive",
       "type": "markdown",
       "label": "De-Redundancy Plan",
-      "position": { "x": 820, "y": 290 },
+      "position": {
+        "x": 820,
+        "y": 290
+      },
       "width": 640,
       "height": 520,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Consolidation / Archive Candidates\nOnce this master roadmap is the canonical doc, you can keep only:\n- `edgeLayoutRoadmap.node` (detailed phase-by-phase)\n- `elkEdgesLayoutMaster.node` (this file)\n- `edgeFeaturesShowcase.node` (demo)\n\nCandidates to archive/remove after review:\n- `elkIntegration.node` (superseded by Phase 0–2)\n- `elkEdgeRouting.node` (superseded by Phase 3 + demo)\n- `layoutInfo.node` (merged vocabulary/rules into this roadmap)\n\nTip: move older graphs into a subfolder like `public/Roadmaps/_archive/` instead of deleting."
+        "markdown": "## Consolidation / Archive Candidates\nOnce this master roadmap is the canonical doc, you can keep only:\n- `edgeLayoutRoadmap.node` (detailed phase-by-phase)\n- `elkEdgesLayoutMaster.node` (this file)\n- `edgeFeaturesShowcase.node` (demo)\n\nCandidates to archive/remove after review:\n- `elkIntegration.node` (superseded by Phase 0\u20132)\n- `elkEdgeRouting.node` (superseded by Phase 3 + demo)\n- `layoutInfo.node` (merged vocabulary/rules into this roadmap)\n\nTip: move older graphs into a subfolder like `public/Roadmaps/_archive/` instead of deleting."
       }
     },
     {
       "id": "master-glossary",
       "type": "markdown",
       "label": "Vocabulary",
-      "position": { "x": 820, "y": -10 },
+      "position": {
+        "x": 820,
+        "y": -10
+      },
       "width": 640,
       "height": 270,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Vocabulary (Shapes)\n- **Chain:** single path, checklist-like\n- **Tree:** one parent with branches\n- **DAG:** merges + splits (multiple parents)\n\nDefault mapping:\n- Chain → serpentine\n- Tree → top-down layered\n- DAG → left-right layered"
+        "markdown": "## Vocabulary (Shapes)\n- **Chain:** single path, checklist-like\n- **Tree:** one parent with branches\n- **DAG:** merges + splits (multiple parents)\n\nDefault mapping:\n- Chain \u2192 serpentine\n- Tree \u2192 top-down layered\n- DAG \u2192 left-right layered"
       }
     }
   ],
   "edges": [
-    { "id": "m-e1", "type": "child", "source": "master-goal", "target": "master-principles", "label": "principles" },
-    { "id": "m-e2", "type": "child", "source": "master-principles", "target": "master-status", "label": "status" },
-    { "id": "m-e3", "type": "child", "source": "master-status", "target": "master-phase0", "label": "foundation" },
-    { "id": "m-e4", "type": "child", "source": "master-phase0", "target": "master-phase1", "label": "then" },
-    { "id": "m-e5", "type": "child", "source": "master-phase1", "target": "master-phase2", "label": "layout policy" },
-    { "id": "m-e6", "type": "child", "source": "master-phase2", "target": "master-phase3", "label": "routing polish" },
-    { "id": "m-e7", "type": "child", "source": "master-phase3", "target": "master-phase4", "label": "stability" },
-    { "id": "m-e8", "type": "child", "source": "master-phase4", "target": "master-phase5", "label": "extend" },
-    { "id": "m-e9", "type": "child", "source": "master-phase5", "target": "master-demo-tests", "label": "validate" },
-    { "id": "m-e10", "type": "child", "source": "master-principles", "target": "master-glossary", "label": "vocab" },
-    { "id": "m-e11", "type": "child", "source": "master-status", "target": "master-archive", "label": "consolidate" }
+    {
+      "id": "m-e1",
+      "type": "child",
+      "source": "master-goal",
+      "target": "master-principles",
+      "label": "principles"
+    },
+    {
+      "id": "m-e2",
+      "type": "child",
+      "source": "master-principles",
+      "target": "master-status",
+      "label": "status"
+    },
+    {
+      "id": "m-e3",
+      "type": "child",
+      "source": "master-status",
+      "target": "master-phase0",
+      "label": "foundation"
+    },
+    {
+      "id": "m-e4",
+      "type": "child",
+      "source": "master-phase0",
+      "target": "master-phase1",
+      "label": "then"
+    },
+    {
+      "id": "m-e5",
+      "type": "child",
+      "source": "master-phase1",
+      "target": "master-phase2",
+      "label": "layout policy"
+    },
+    {
+      "id": "m-e6",
+      "type": "child",
+      "source": "master-phase2",
+      "target": "master-phase3",
+      "label": "routing polish"
+    },
+    {
+      "id": "m-e7",
+      "type": "child",
+      "source": "master-phase3",
+      "target": "master-phase4",
+      "label": "stability"
+    },
+    {
+      "id": "m-e8",
+      "type": "child",
+      "source": "master-phase4",
+      "target": "master-phase5",
+      "label": "extend"
+    },
+    {
+      "id": "m-e9",
+      "type": "child",
+      "source": "master-phase5",
+      "target": "master-demo-tests",
+      "label": "validate"
+    },
+    {
+      "id": "m-e10",
+      "type": "child",
+      "source": "master-principles",
+      "target": "master-glossary",
+      "label": "vocab"
+    },
+    {
+      "id": "m-e11",
+      "type": "child",
+      "source": "master-status",
+      "target": "master-archive",
+      "label": "consolidate"
+    }
   ],
-  "groups": []
+  "clusters": []
 }

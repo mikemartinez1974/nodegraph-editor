@@ -15,7 +15,7 @@ import {
 const VIEW_LABELS = {
   nodes: "Nodes",
   edges: "Edges",
-  groups: "Clusters"
+  clusters: "Clusters"
 };
 
 const VALID_ANCHORS = new Set(["left", "right", "top", "bottom"]);
@@ -116,7 +116,7 @@ export default function EntitiesPanel({
   let content = null;
   if (entityView === "nodes") content = renderNodes();
   else if (entityView === "edges") content = renderEdges();
-  else if (entityView === "groups") content = renderGroups();
+  else if (entityView === "clusters") content = renderGroups();
 
   return (
     <Drawer

@@ -59,7 +59,7 @@
     {
       "id": "skill-importexport-root",
       "type": "markdown",
-      "label": "🔁 Skill: ImportExport (Normative)",
+      "label": "\ud83d\udd01 Skill: ImportExport (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If schema invalid → abort\n- If ID collision → require fork\n\nPartial imports are forbidden."
+        "markdown": "## Failure Modes\n\n- If schema invalid \u2192 abort\n- If ID collision \u2192 require fork\n\nPartial imports are forbidden."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

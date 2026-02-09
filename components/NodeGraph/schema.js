@@ -8,13 +8,13 @@
 // Core schema version for compatibility tracking
 export const SCHEMA_VERSION = "1.0.0";
 
-// Handle schema for explicit per-node connector definitions
-export const NodeHandleSchema = {
-  id: "string", // Required: Unique handle identifier
+// Port schema for explicit per-node connector definitions
+export const NodePortSchema = {
+  id: "string", // Required: Unique port identifier
   direction: "'input'|'output'|'bidirectional'", // Optional: Defaults to 'output'
   label: "string", // Optional label shown in UI
   dataType: "string", // Optional semantic type (boolean, number, etc.)
-  allowedEdgeTypes: ["string"], // Optional list of edge types this handle accepts
+  allowedEdgeTypes: ["string"], // Optional list of edge types this port accepts
   position: { // Optional hint for renderer/layout
     side: "'top'|'right'|'bottom'|'left'",
     offset: "number" // 0-1 relative position along the side
@@ -141,7 +141,7 @@ export const NodeSchema = {
   data: NodeDataSchema,
   visible: "boolean",
   style: "object",
-  handles: [NodeHandleSchema], // Optional explicit handle definitions
+  ports: [NodePortSchema], // Optional explicit port definitions
   state: NodeStateSchema, // Optional persisted UI/interaction state
   extensions: {
     breadboard: BreadboardNodeExtensionSchema
@@ -180,8 +180,8 @@ export const EdgeSchema = {
   type: "string",
   source: "string",
   target: "string",
-  sourceHandle: "string",
-  targetHandle: "string",
+  sourcePort: "string",
+  targetPort: "string",
   label: "string",
   showLabel: "boolean",
   style: "object",
@@ -191,7 +191,7 @@ export const EdgeSchema = {
   extensions: "object"
 };
 
-export const GroupSchema = {
+export const ClusterSchema = {
   id: "string",
   label: "string",
   nodeIds: ["string"],
@@ -219,7 +219,7 @@ export const GraphSchema = {
   version: "string",
   nodes: [NodeSchema],
   edges: [EdgeSchema],
-  groups: [GroupSchema],
+  clusters: [ClusterSchema],
   options: GraphOptionsSchema,
   metadata: GraphMetadataSchema,
   extensions: {
@@ -261,14 +261,14 @@ export function validateNode(node) {
     'showLabel',
     'color',
     'style',
-    'handles',
+    'ports',
     'inputs',
     'outputs',
-    'groupId',
+    'clusterId',
     'extensions',
     'state',
     'resizable',
-    'handlePosition'
+    'portPosition'
   ]);
 
   Object.keys(node).forEach((key) => {
@@ -303,24 +303,24 @@ export function validateNode(node) {
     }
   }
 
-  if (node.handles !== undefined) {
-    if (!Array.isArray(node.handles)) {
-      errors.push('Node handles must be an array');
+  if (node.ports !== undefined) {
+    if (!Array.isArray(node.ports)) {
+      errors.push('Node ports must be an array');
     } else {
-      const handleIds = new Set();
-      node.handles.forEach((handle, idx) => {
-        if (!handle || typeof handle.id !== 'string' || handle.id.trim() === '') {
-          errors.push(`Node handle ${idx} must have a string id`);
-        } else if (handleIds.has(handle.id)) {
-          errors.push(`Duplicate handle id '${handle.id}' on node '${node.id}'`);
+      const portIds = new Set();
+      node.ports.forEach((port, idx) => {
+        if (!port || typeof port.id !== 'string' || port.id.trim() === '') {
+          errors.push(`Node port ${idx} must have a string id`);
+        } else if (portIds.has(port.id)) {
+          errors.push(`Duplicate port id '${port.id}' on node '${node.id}'`);
         } else {
-          handleIds.add(handle.id);
+          portIds.add(port.id);
         }
-        if (handle.direction && !['input', 'output', 'bidirectional'].includes(handle.direction)) {
-          errors.push(`Handle '${handle.id}' has invalid direction '${handle.direction}'`);
+        if (port.direction && !['input', 'output', 'bidirectional'].includes(port.direction)) {
+          errors.push(`Port '${port.id}' has invalid direction '${port.direction}'`);
         }
-        if (handle.allowedEdgeTypes && !Array.isArray(handle.allowedEdgeTypes)) {
-          errors.push(`Handle '${handle.id}' allowedEdgeTypes must be an array`);
+        if (port.allowedEdgeTypes && !Array.isArray(port.allowedEdgeTypes)) {
+          errors.push(`Port '${port.id}' allowedEdgeTypes must be an array`);
         }
       });
     }
@@ -343,6 +343,12 @@ export function validateEdge(edge) {
   if (!edge.target || typeof edge.target !== 'string') {
     errors.push('Edge must have a string target node id');
   }
+  if (!edge.sourcePort || typeof edge.sourcePort !== 'string') {
+    errors.push('Edge must have a string sourcePort');
+  }
+  if (!edge.targetPort || typeof edge.targetPort !== 'string') {
+    errors.push('Edge must have a string targetPort');
+  }
 
   if (edge.state && typeof edge.state !== 'object') {
     errors.push('Edge state must be an object');
@@ -359,22 +365,22 @@ export function validateEdge(edge) {
   return errors;
 }
 
-function validateGroup(group) {
+function validateCluster(cluster) {
   const errors = [];
-  if (!group || typeof group !== 'object') {
-    errors.push('Group must be an object');
+  if (!cluster || typeof cluster !== 'object') {
+    errors.push('Cluster must be an object');
     return errors;
   }
-  if (!group.id || typeof group.id !== 'string') {
-    errors.push('Group must have a string id');
+  if (!cluster.id || typeof cluster.id !== 'string') {
+    errors.push('Cluster must have a string id');
   }
-  if (!Array.isArray(group.nodeIds)) {
-    errors.push(`Group '${group.id || 'unknown'}' must have a nodeIds array`);
+  if (!Array.isArray(cluster.nodeIds)) {
+    errors.push(`Cluster '${cluster.id || 'unknown'}' must have a nodeIds array`);
   }
-  if (group.bounds) {
-    const { x, y, width, height } = group.bounds;
+  if (cluster.bounds) {
+    const { x, y, width, height } = cluster.bounds;
     if (![x, y, width, height].every(value => typeof value === 'number')) {
-      errors.push(`Group '${group.id}' bounds must include numeric x, y, width, height`);
+      errors.push(`Cluster '${cluster.id}' bounds must include numeric x, y, width, height`);
     }
   }
   return errors;
@@ -416,22 +422,22 @@ export function validateGraph(graph) {
     }
   });
 
-  if (graph.groups) {
-    const groupIds = new Set();
-    graph.groups.forEach((group, index) => {
-      const groupErrors = validateGroup(group);
-      groupErrors.forEach(err => errors.push(`Group ${index}: ${err}`));
-      if (group && group.id) {
-        if (groupIds.has(group.id)) {
-          errors.push(`Duplicate group id '${group.id}'`);
+  if (graph.clusters) {
+    const clusterIds = new Set();
+    graph.clusters.forEach((cluster, index) => {
+      const clusterErrors = validateCluster(cluster);
+      clusterErrors.forEach(err => errors.push(`Cluster ${index}: ${err}`));
+      if (cluster && cluster.id) {
+        if (clusterIds.has(cluster.id)) {
+          errors.push(`Duplicate cluster id '${cluster.id}'`);
         } else {
-          groupIds.add(group.id);
+          clusterIds.add(cluster.id);
         }
       }
-      if (Array.isArray(group?.nodeIds)) {
-        group.nodeIds.forEach(nodeId => {
+      if (Array.isArray(cluster?.nodeIds)) {
+        cluster.nodeIds.forEach(nodeId => {
           if (!nodeIds.has(nodeId)) {
-            errors.push(`Group '${group.id}': node '${nodeId}' not found in graph`);
+            errors.push(`Cluster '${cluster.id}': node '${nodeId}' not found in graph`);
           }
         });
       }
@@ -454,7 +460,7 @@ export function createGraphExport(
     version: SCHEMA_VERSION,
     nodes: nodes.map(cleanNode),
     edges: edges.map(cleanEdge),
-    groups: Array.isArray(groups) ? groups.map(cleanGroup) : [],
+    clusters: Array.isArray(groups) ? groups.map(cleanGroup) : [],
     options,
     metadata: {
       created: new Date().toISOString(),
@@ -477,7 +483,7 @@ function cleanNode(node) {
   if (node.data && Object.keys(node.data).length > 0) cleaned.data = node.data;
   if (node.visible === false) cleaned.visible = node.visible;
   if (node.style && Object.keys(node.style).length > 0) cleaned.style = node.style;
-  if (Array.isArray(node.handles) && node.handles.length > 0) cleaned.handles = node.handles;
+  if (Array.isArray(node.ports) && node.ports.length > 0) cleaned.ports = node.ports;
   if (node.state) cleaned.state = node.state;
   if (node.extensions && Object.keys(node.extensions).length > 0) cleaned.extensions = node.extensions;
   
@@ -492,8 +498,8 @@ function cleanEdge(edge) {
   };
   
   if (edge.type && edge.type !== 'default') cleaned.type = edge.type;
-  if (edge.sourceHandle) cleaned.sourceHandle = edge.sourceHandle;
-  if (edge.targetHandle) cleaned.targetHandle = edge.targetHandle;
+  cleaned.sourcePort = edge.sourcePort || 'root';
+  cleaned.targetPort = edge.targetPort || 'root';
   if (edge.label) cleaned.label = edge.label;
   if (edge.showLabel) cleaned.showLabel = edge.showLabel;
   if (edge.style && Object.keys(edge.style).length > 0) cleaned.style = edge.style;

@@ -10,7 +10,7 @@ import eventBus from '../../NodeGraph/eventBus';
 import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import { alpha } from '@mui/material';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 // Helper to check if a color is a gradient
 const isGradientColor = (color) => {
@@ -41,7 +41,7 @@ const FixedNode = ({
   hideDefaultContent = false,
   disableChrome = false // Allow callers to completely opt out of gradients/borders
 }) => {
-  const node = useNodeHandleSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 50) * zoom;

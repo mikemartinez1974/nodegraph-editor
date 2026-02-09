@@ -1,8 +1,17 @@
 const DEFAULT_GRAPH = {
   nodes: [],
   edges: [],
-  groups: []
+  clusters: []
 };
+
+const normalizeEdges = (edges = []) =>
+  Array.isArray(edges)
+    ? edges.map((edge) => ({
+        ...edge,
+        sourcePort: edge?.sourcePort || 'root',
+        targetPort: edge?.targetPort || 'root'
+      }))
+    : [];
 
 let graphState = deepCopyGraph(DEFAULT_GRAPH);
 let historyEntries = [];
@@ -12,8 +21,8 @@ const intentListeners = new Set();
 function deepCopyGraph(snapshot) {
   return {
     nodes: Array.isArray(snapshot.nodes) ? snapshot.nodes.map((node) => ({ ...node })) : [],
-    edges: Array.isArray(snapshot.edges) ? snapshot.edges.map((edge) => ({ ...edge })) : [],
-    groups: Array.isArray(snapshot.groups) ? snapshot.groups.map((group) => ({ ...group })) : []
+    edges: normalizeEdges(snapshot.edges),
+    clusters: Array.isArray(snapshot.clusters) ? snapshot.clusters.map((group) => ({ ...group })) : []
   };
 }
 
@@ -33,8 +42,8 @@ function persistSnapshot(snapshot, storageKey) {
 export function initGraphCore(initial = {}) {
   graphState = deepCopyGraph({
     nodes: Array.isArray(initial.nodes) ? initial.nodes : DEFAULT_GRAPH.nodes,
-    edges: Array.isArray(initial.edges) ? initial.edges : DEFAULT_GRAPH.edges,
-    groups: Array.isArray(initial.groups) ? initial.groups : DEFAULT_GRAPH.groups
+    edges: Array.isArray(initial.edges) ? normalizeEdges(initial.edges) : DEFAULT_GRAPH.edges,
+    clusters: Array.isArray(initial.clusters) ? initial.clusters : DEFAULT_GRAPH.clusters
   });
   historyEntries = [];
   notifyGraph();
@@ -57,10 +66,10 @@ function mergeGraphPayload(payload = {}) {
     nextState.nodes = payload.nodes.map((node) => ({ ...node }));
   }
   if (Array.isArray(payload.edges)) {
-    nextState.edges = payload.edges.map((edge) => ({ ...edge }));
+    nextState.edges = normalizeEdges(payload.edges);
   }
-  if (Array.isArray(payload.groups)) {
-    nextState.groups = payload.groups.map((group) => ({ ...group }));
+  if (Array.isArray(payload.clusters)) {
+    nextState.clusters = payload.clusters.map((group) => ({ ...group }));
   }
   return nextState;
 }
@@ -78,7 +87,7 @@ export function dispatchGraph(action = {}) {
       break;
     }
     case 'setEdges': {
-      const payload = Array.isArray(action.payload) ? action.payload.map((edge) => ({ ...edge })) : [];
+      const payload = normalizeEdges(action.payload);
       if (payload.length || graphState.edges.length) {
         graphState.edges = payload;
         updated = true;
@@ -87,8 +96,8 @@ export function dispatchGraph(action = {}) {
     }
     case 'setGroups': {
       const payload = Array.isArray(action.payload) ? action.payload.map((group) => ({ ...group })) : [];
-      if (payload.length || graphState.groups.length) {
-        graphState.groups = payload;
+      if (payload.length || graphState.clusters.length) {
+        graphState.clusters = payload;
         updated = true;
       }
       break;
@@ -104,7 +113,7 @@ export function dispatchGraph(action = {}) {
       graphState = {
         nodes: merged.nodes.length ? merged.nodes : graphState.nodes,
         edges: merged.edges.length ? merged.edges : graphState.edges,
-        groups: merged.groups.length ? merged.groups : graphState.groups
+        clusters: merged.clusters.length ? merged.clusters : graphState.clusters
       };
       updated = true;
       break;

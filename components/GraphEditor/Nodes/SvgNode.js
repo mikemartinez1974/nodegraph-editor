@@ -2,7 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const DEFAULT_INPUTS = [
   { key: 'set', label: 'Set', type: 'value' }
@@ -24,7 +24,7 @@ const SvgNode = ({
   draggingHandle,
   nodeRefs 
 }) => {
-  const node = useNodeHandleSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
   const nodeRef = useRef(null);
 

@@ -27,7 +27,7 @@ window.graphAPI.createNode({
   position: { x: 100, y: 100 },
   width: 200,
   height: 120,
-  handles: [ // Optional explicit handle definitions
+  ports: [ // Optional explicit handle definitions
     { id: "out", direction: "output", dataType: "boolean" },
     { id: "in", direction: "input", dataType: "boolean" }
   ],
@@ -67,7 +67,7 @@ window.graphAPI.updateNode("node-id", {
   label: "Updated Label",
   position: { x: 200, y: 300 },
   state: { locked: true },
-  handles: [
+  ports: [
     { id: "out", direction: "output", dataType: "number" }
   ],
   data: { memo: "Updated memo" },
@@ -98,9 +98,9 @@ window.graphAPI.createEdge({
   source: "source-node-id",
   target: "target-node-id",
   // Optional. If omitted, the edge attaches to the node boundary.
-  // If provided, they must match handle keys declared by the nodes.
-  sourceHandle: "output-handle-key",
-  targetHandle: "input-handle-key",
+  // If provided, they must match port ids declared by the nodes.
+  sourcePort: "output-handle-key",
+  targetPort: "input-handle-key",
   type: "child",              // Edge type id
   label: "Edge Label",
   state: { enabled: true, locked: false },
@@ -124,7 +124,7 @@ window.graphAPI.createEdge({
 // Returns: { success: true, data: <edge object> }
 ```
 
-> **Note:** Handles are optional. If you provide `sourceHandle` / `targetHandle`, they must exist on the source/target nodes (from the node's `outputs`/`inputs` arrays, or explicit `handles`). When both handles are present and typed, Twilite validates type compatibility.
+> **Note:** Ports are required. Always provide `sourcePort` / `targetPort`; use `root` for the default port. Ports must exist on the source/target nodes (from the node's `outputs`/`inputs` arrays, or explicit `ports`). When ports are present and typed, Twilite validates type compatibility.
 
 ### Read Edge(s)
 
@@ -184,8 +184,8 @@ window.graphAPI.createNodes([
 
 ```javascript
 window.graphAPI.createEdges([
-  { source: "node1", target: "node2", sourceHandle: "tick", targetHandle: "trigger" },
-  { source: "node2", target: "node3", sourceHandle: "out", targetHandle: "in" }
+  { source: "node1", target: "node2", sourcePort: "tick", targetPort: "trigger" },
+  { source: "node2", target: "node3", sourcePort: "out", targetPort: "in" }
 ])
 // Returns: { success: true, data: { created: [...], failed: [] } }
 ```
@@ -203,7 +203,7 @@ Graph exports now include:
 
 ## Plugin Node Definition Contract
 
-Plugins can now describe their nodes declaratively inside the manifest so the editor can render property panels, node chrome, and handles without loading arbitrary React components.
+Plugins can now describe their nodes declaratively inside the manifest so the editor can render property panels, node chrome, and ports without loading arbitrary React components.
 
 ### Manifest fields
 
@@ -220,7 +220,7 @@ Inside each `nodes[]` entry, add the optional `definition` block:
   },
   "definition": {
     "size": { "width": 240, "height": 160 },
-    "handles": {
+    "ports": {
       "inputs": [
         { "id": "trigger", "label": "Trigger", "dataType": "trigger" }
       ],
@@ -279,7 +279,7 @@ Inside each `nodes[]` entry, add the optional `definition` block:
 | Field | Description |
 | --- | --- |
 | `size.width` / `size.height` | Suggested default node size. |
-| `handles.inputs[]` / `handles.outputs[]` | Declarative handle descriptors used when a node is created. Each entry supports `id`, `label`, and `dataType` (value, trigger, etc.). |
+| `ports.inputs[]` / `ports.outputs[]` | Declarative handle descriptors used when a node is created. Each entry supports `id`, `label`, and `dataType` (value, trigger, etc.). |
 | `properties[]` | Generates form controls inside the Properties Panel. Supported `type` values: `text`, `textarea`, `number`, `select`, `toggle`, `color`, and `json`. `options[]` is required for select fields. Use `default`, `min`, `max`, `step`, `placeholder`, and `helperText` as needed. |
 | `display.variant` | Controls the placeholder rendering inside the canvas. Options: `card`, `stat`, `list`. |
 | `display.primaryField`, `secondaryField`, `badgeField`, `listField`, `footerField`, `emptyState` | Map fields in `node.data` to card sections/badges/list rows. |
@@ -316,7 +316,7 @@ runtime.registerMethod('plugin:listNodes', () => [
 ]);
 ```
 
-Use `runtime.callHost(method, args)` to invoke the whitelisted Graph API surface (e.g. `graph:getNodes`, `selection:get`, `events:emit`). The SDK automatically handles the handshake protocol, request IDs, and timeouts for both iframe and worker sandboxes.
+Use `runtime.callHost(method, args)` to invoke the whitelisted Graph API surface (e.g. `graph:getNodes`, `selection:get`, `events:emit`). The SDK automatically ports the handshake protocol, request IDs, and timeouts for both iframe and worker sandboxes.
 
 ### Plugin Starter CLI
 
@@ -359,9 +359,9 @@ createRenderer({
 
 The iframe is sandboxed (`allow-scripts` only). Communicate with the host via the helper’s `emitEvent` (fires `renderer:event` back to React) and the automatic height observer. Errors thrown inside `render` are relayed to the host so it can fall back to the placeholder UI.
 
-- `nodes`: each node may contain `handles`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
+- `nodes`: each node may contain `ports`, `state`, and `extensions` (namespaced plugin data) in addition to `data`, `style`, `position`, etc.
 - `edges`: edges contain `state`, `logic`, `routing`, `style`, and `extensions`.
-- `groups`: array of `{ id, label, nodeIds, bounds, style, collapsed, visible, extensions }`.
+- `clusters`: array of `{ id, label, nodeIds, bounds, style, collapsed, visible, extensions }`.
 - `options`: graph-level settings such as `gridSize`, `snapToGrid`, `theme`, and `validationMode`.
 - `metadata`: title/description/author/timestamps.
 - `extensions`: top-level plugin-specific data (namespaced).
@@ -385,7 +385,7 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
 - **`breadboard-socket` node**  
   - Represents one column segment (e.g., A1–E1) or a single hole depending on density needs.  
   - `data` fields: `row`, `column`, `segment` (top/bottom), `railId` (optional), `occupiedBy` (computed at runtime).  
-  - Handles: expose one output (`socket`) so components can connect via edges.  
+  - Ports: expose one output (`socket`) so components can connect via edges.  
   - These nodes are locked/hidden in templates so end-users don’t accidentally move them.
 
 - **`breadboard-rail` node**  
@@ -396,7 +396,7 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
 - **`breadboard-skin` node**  
   - Node type `io.breadboard.sockets:skin` renders the baseplate art (see `public/plugins/breadboard-sockets/skinRenderer.js`).  
   - `data` fields mirror the board layout (`rows`, `columns`, `rowPitch`, `columnPitch`) plus styling knobs (`railInset`, `railThickness`, `gapHeight`) so templates can align the canvas to the socket grid.  
-  - Locked/pinned at the bottom z-index; purely visual with no handles so the substrate stays painted while other nodes sit on top.
+  - Locked/pinned at the bottom z-index; purely visual with no ports so the substrate stays painted while other nodes sit on top.
 
 - **`breadboard-bus` node**  
   - Node type `io.breadboard.bus` captures the four continuous rail nets (top/bottom × V+/GND) and emits only the relevant rail handle via its `outputs[]` array.  
@@ -404,11 +404,11 @@ To keep the breadboard “substrate” inside the normal NodeGraph abstractions,
   - Position this node beneath the skin so it stays in the background without competing for handle space; the template ships them at the very start of the nodes array so nothing renders on top of them.
 
 - **Breadboard component plugin**  
-  - `io.breadboard.components` ships resistor, LED, and jumper nodes; each definition includes `pins`, `footprint`, and `handles` so GraphCRUD and validators can align wiring automatically (`public/plugins/breadboard-components/manifest.json`).  
+  - `io.breadboard.components` ships resistor, LED, and jumper nodes; each definition includes `pins`, `footprint`, and `ports` so GraphCRUD and validators can align wiring automatically (`public/plugins/breadboard-components/manifest.json`).  
   - These plugin nodes reuse the native layout system via simple renderer canvases (`/plugins/breadboard-components/*Renderer.js`) that stay locked-by-default, making them feel like first-party assets without polluting the host registry.  
   - The starter template instantiates `component-resistor-1`, `component-led-1`, and `component-jumper-1` with edges already attached to sockets so you can start wiring a basic circuit immediately.
 
-- **Component nodes** (resistor, jumper, DIP) simply connect their pin handles to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
+- **Component nodes** (resistor, jumper, DIP) simply connect their pin ports to the nearby `breadboard-socket` nodes. Moving the component reuses GraphCRUD’s existing edge updates; no special substrate logic required.
 
 > **Plugin source:** The socket nodes ship via the built-in plugin `io.breadboard.sockets`. In templates/code you will see the node type string `io.breadboard.sockets:socket`. Because it’s just a plugin entry, users can inspect/extend it like any other plugin without editing the host.
 
@@ -509,19 +509,19 @@ const n3 = window.graphAPI.createNode({
   position: { x: 500, y: 100 } 
 });
 
-// Connect them (default nodes expose handles named "out" and "in")
+// Connect them (default nodes expose ports named "out" and "in")
 window.graphAPI.createEdge({ 
   source: n1.data.id, 
   target: n2.data.id, 
-  sourceHandle: "out",
-  targetHandle: "in",
+  sourcePort: "out",
+  targetPort: "in",
   type: "child"
 });
 window.graphAPI.createEdge({ 
   source: n2.data.id, 
   target: n3.data.id, 
-  sourceHandle: "out",
-  targetHandle: "in",
+  sourcePort: "out",
+  targetPort: "in",
   type: "child"
 });
 ```
@@ -568,8 +568,8 @@ children.data.created.forEach(child => {
   window.graphAPI.createEdge({
     source: root.data.id,
     target: child.id,
-    sourceHandle: "out",
-    targetHandle: "in",
+    sourcePort: "out",
+    targetPort: "in",
     type: "child"
   });
 });

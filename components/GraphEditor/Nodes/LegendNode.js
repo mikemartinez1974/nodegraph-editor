@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme, alpha } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const NON_PASSIVE_LISTENER = { passive: false };
 
@@ -15,7 +15,7 @@ const DEFAULT_OUTPUTS = [
 ];
 
 const LegendNode = (props) => {
-  const node = useNodeHandleSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);

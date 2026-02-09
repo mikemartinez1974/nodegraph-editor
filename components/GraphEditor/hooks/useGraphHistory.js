@@ -16,7 +16,7 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
   const saveToHistory = useCallback((newNodes, newEdges, newGroups) => {
     setHistory(prevHistory => {
       const truncated = prevHistory.slice(0, historyIndexRef.current + 1);
-      const next = [...truncated, { nodes: newNodes, edges: newEdges, groups: newGroups }];
+      const next = [...truncated, { nodes: newNodes, edges: newEdges, clusters: newGroups }];
       setHistoryIndex(next.length - 1);
       historyIndexRef.current = next.length - 1;
       return next;
@@ -33,7 +33,7 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
       if (snapshot) {
         setNodes(snapshot.nodes);
         setEdges(snapshot.edges);
-        if (setGroups) setGroups(snapshot.groups || []);
+        if (setGroups) setGroups(snapshot.clusters || []);
       }
     }
   }, [history, setNodes, setEdges, setGroups]);
@@ -48,7 +48,7 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
       if (snapshot) {
         setNodes(snapshot.nodes);
         setEdges(snapshot.edges);
-        if (setGroups) setGroups(snapshot.groups || []);
+        if (setGroups) setGroups(snapshot.clusters || []);
       }
     }
   }, [history, setNodes, setEdges, setGroups]);
@@ -63,7 +63,7 @@ export default function useGraphHistory(nodes, edges, groups, setNodes, setEdges
     if (snapshot) {
       setNodes(snapshot.nodes);
       setEdges(snapshot.edges);
-      if (setGroups) setGroups(snapshot.groups || []);
+      if (setGroups) setGroups(snapshot.clusters || []);
     }
     return true;
   }, [setNodes, setEdges, setGroups]);

@@ -112,7 +112,7 @@ Failure of conditional checks MUST downgrade behavior, not block creation, unles
 - `position` may be omitted to allow auto-layout
 - `data` may be empty if schema allows defaults
 - `label` may be omitted if schema allows
-- `groupId` may be provided to assign membership
+- `clusterId` may be provided to assign membership
 
 ---
 

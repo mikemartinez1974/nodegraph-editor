@@ -226,8 +226,8 @@ export default function usePluginRuntime({
                 : `edge_${Date.now()}`,
             source: edgeData.source,
             target: edgeData.target,
-            sourceHandle: edgeData.sourceHandle || edgeData.handle,
-            targetHandle: edgeData.targetHandle || edgeData.handle,
+            sourcePort: edgeData.sourcePort || edgeData.handle,
+            targetPort: edgeData.targetPort || edgeData.handle,
             type: edgeData.type || 'default',
             data: edgeData.data && typeof edgeData.data === 'object' ? safeClone(edgeData.data) : {},
             color: edgeData.color || defaultEdgeColor || '#666666'

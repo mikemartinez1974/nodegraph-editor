@@ -2,7 +2,7 @@
 
 ## Goal
 
-Allow user-authored scripts to safely read/modify the graph (nodes, edges, groups) without exposing app internals or the DOM. Provide dry-run and mutate modes, timeouts, and audited operations.
+Allow user-authored scripts to safely read/modify the graph (nodes, edges, clusters) without exposing app internals or the DOM. Provide dry-run and mutate modes, timeouts, and audited operations.
 
 ## Recommended approach (iframe runner)
 

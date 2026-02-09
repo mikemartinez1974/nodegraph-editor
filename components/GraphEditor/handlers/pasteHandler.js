@@ -1,6 +1,6 @@
 import eventBus from '../../NodeGraph/eventBus';
 
-const HANDLE_IMPORT_HINT = 'Handles are optional; when provided they must match each node\'s handle schema.';
+const HANDLE_IMPORT_HINT = 'Ports are optional; when provided they must match each node\'s port schema.';
 const maybeAugmentHandleError = (message) => {
   if (message && typeof message === 'string' && /handle/i.test(message)) {
     return `${message} (${HANDLE_IMPORT_HINT})`;
@@ -16,31 +16,31 @@ const maybeAugmentHandleError = (message) => {
  */
 const estimateCrudImpact = (command = {}) => {
   const { action } = command;
-  if (!action) return { nodes: 0, edges: 0, groups: 0 };
+  if (!action) return { nodes: 0, edges: 0, clusters: 0 };
   switch (action) {
     case 'create': {
       const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
       const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
-      const groups = Array.isArray(command.groups) ? command.groups : (command.group ? [command.group] : []);
-      return { nodes: nodes.length, edges: edges.length, groups: groups.length };
+      const groups = Array.isArray(command.clusters) ? command.clusters : (command.group ? [command.group] : []);
+      return { nodes: nodes.length, edges: edges.length, clusters: groups.length };
     }
     case 'createNodes':
-      return { nodes: Array.isArray(command.nodes) ? command.nodes.length : 0, edges: 0, groups: 0 };
+      return { nodes: Array.isArray(command.nodes) ? command.nodes.length : 0, edges: 0, clusters: 0 };
     case 'createEdges':
-      return { nodes: 0, edges: Array.isArray(command.edges) ? command.edges.length : 0, groups: 0 };
+      return { nodes: 0, edges: Array.isArray(command.edges) ? command.edges.length : 0, clusters: 0 };
     case 'createGroups':
-      return { nodes: 0, edges: 0, groups: Array.isArray(command.groups) ? command.groups.length : 0 };
+      return { nodes: 0, edges: 0, clusters: Array.isArray(command.clusters) ? command.clusters.length : 0 };
     case 'update':
     case 'delete':
     case 'translate':
     case 'duplicate': {
       const count = Array.isArray(command.ids) ? command.ids.length : command.id ? 1 : 0;
-      if (command.type === 'edge') return { nodes: 0, edges: count, groups: 0 };
-      if (command.type === 'group') return { nodes: 0, edges: 0, groups: count };
-      return { nodes: count, edges: 0, groups: 0 };
+      if (command.type === 'edge') return { nodes: 0, edges: count, clusters: 0 };
+      if (command.type === 'group') return { nodes: 0, edges: 0, clusters: count };
+      return { nodes: count, edges: 0, clusters: 0 };
     }
     case 'skill':
-      return { nodes: 0, edges: 0, groups: 0 };
+      return { nodes: 0, edges: 0, clusters: 0 };
     case 'batch':
     case 'transaction': {
       const commands = Array.isArray(command.commands) ? command.commands : [];
@@ -50,14 +50,14 @@ const estimateCrudImpact = (command = {}) => {
           return {
             nodes: acc.nodes + (result.nodes || 0),
             edges: acc.edges + (result.edges || 0),
-            groups: acc.groups + (result.groups || 0)
+            clusters: acc.clusters + (result.clusters || 0)
           };
         },
-        { nodes: 0, edges: 0, groups: 0 }
+        { nodes: 0, edges: 0, clusters: 0 }
       );
     }
     default:
-      return { nodes: 0, edges: 0, groups: 0 };
+      return { nodes: 0, edges: 0, clusters: 0 };
   }
 };
 
@@ -151,7 +151,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     if (command.dryRun === true) {
       const estimate = estimateCrudImpact(command);
       if (onShowMessage) {
-        onShowMessage(`Dry run: ${action} would affect ${estimate.nodes} nodes, ${estimate.edges} edges, ${estimate.groups} clusters`, 'info');
+        onShowMessage(`Dry run: ${action} would affect ${estimate.nodes} nodes, ${estimate.edges} edges, ${estimate.clusters} clusters`, 'info');
       }
       return { ...estimate, dryRun: true };
     }
@@ -160,7 +160,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
     if (action === 'create') {
       const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
       const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
-      const groups = Array.isArray(command.groups) ? command.groups : (command.group ? [command.group] : []);
+      const groups = Array.isArray(command.clusters) ? command.clusters : (command.group ? [command.group] : []);
       const shouldAutoLayout = positionsOmitted(nodes);
 
       let createdNodes = 0;
@@ -174,7 +174,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         if (!nodeResult || !nodeResult.success) {
           const err = nodeResult?.error || 'Failed to create nodes';
           if (onShowMessage) onShowMessage(err, 'error');
-          return { nodes: 0, edges: 0, groups: 0 };
+          return { nodes: 0, edges: 0, clusters: 0 };
         }
         createdNodes = Array.isArray(nodeResult.data?.created) ? nodeResult.data.created.length : nodes.length;
         createdNodeIds = Array.isArray(nodeResult.data?.created)
@@ -189,7 +189,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           const err = maybeAugmentHandleError(edgeResult?.error || 'Failed to create edges');
           if (onShowMessage) onShowMessage(err, 'error');
           // Return nodes created so far and zero edges/groups
-          return { nodes: createdNodes, edges: 0, groups: 0 };
+          return { nodes: createdNodes, edges: 0, clusters: 0 };
         }
         createdEdges = Array.isArray(edgeResult.data?.created) ? edgeResult.data.created.length : edges.length;
       }
@@ -201,7 +201,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           const err = groupResult?.error || 'Failed to create clusters';
           if (onShowMessage) onShowMessage(err, 'error');
           // Return counts so far
-          return { nodes: createdNodes, edges: createdEdges, groups: 0 };
+          return { nodes: createdNodes, edges: createdEdges, clusters: 0 };
         }
         createdGroups = Array.isArray(groupResult.data?.created) ? groupResult.data.created.length : groups.length;
       }
@@ -218,7 +218,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           // ignore event bus errors
         }
       }
-      return { nodes: createdNodes, edges: createdEdges, groups: createdGroups };
+      return { nodes: createdNodes, edges: createdEdges, clusters: createdGroups };
     }
 
     // Fallback to switch-based handling for other actions
@@ -353,9 +353,9 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         break;
 
       case 'addNodesToGroup': {
-        const groupId = command.groupId || id;
+        const clusterId = command.clusterId || id;
         if (typeof graphCRUD.addNodesToGroup === 'function') {
-          result = await graphCRUD.addNodesToGroup(groupId, command.nodeIds || []);
+          result = await graphCRUD.addNodesToGroup(clusterId, command.nodeIds || []);
         } else {
           result = { success: false, error: 'Group membership updates are not supported' };
         }
@@ -363,9 +363,9 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       }
 
       case 'removeNodesFromGroup': {
-        const groupId = command.groupId || id;
+        const clusterId = command.clusterId || id;
         if (typeof graphCRUD.removeNodesFromGroup === 'function') {
-          result = await graphCRUD.removeNodesFromGroup(groupId, command.nodeIds || []);
+          result = await graphCRUD.removeNodesFromGroup(clusterId, command.nodeIds || []);
         } else {
           result = { success: false, error: 'Group membership updates are not supported' };
         }
@@ -373,9 +373,9 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       }
 
       case 'setGroupNodes': {
-        const groupId = command.groupId || id;
+        const clusterId = command.clusterId || id;
         if (typeof graphCRUD.setGroupNodes === 'function') {
-          result = await graphCRUD.setGroupNodes(groupId, command.nodeIds || []);
+          result = await graphCRUD.setGroupNodes(clusterId, command.nodeIds || []);
         } else {
           result = { success: false, error: 'Group membership updates are not supported' };
         }
@@ -419,7 +419,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       case 'transaction': {
         const commands = Array.isArray(command.commands) ? command.commands : [];
         const continueOnError = command.continueOnError === true;
-        let totals = { nodes: 0, edges: 0, groups: 0 };
+        let totals = { nodes: 0, edges: 0, clusters: 0 };
         for (let i = 0; i < commands.length; i++) {
           const entry = commands[i];
           if (!entry || typeof entry !== 'object') {
@@ -434,7 +434,7 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
           if (childResult && childResult.nodes !== undefined) {
             totals.nodes += childResult.nodes || 0;
             totals.edges += childResult.edges || 0;
-            totals.groups += childResult.groups || 0;
+            totals.clusters += childResult.clusters || 0;
           }
           if (childResult?.error && !continueOnError) {
             result = { success: false, error: childResult.error };
@@ -476,37 +476,37 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
       // Return counts for create operations
       if (action === 'createNodes') {
         const created = result.data?.created || [];
-        return { nodes: created.length, edges: 0, groups: 0 };
+        return { nodes: created.length, edges: 0, clusters: 0 };
       } else if (action === 'createEdges') {
         const created = result.data?.created || [];
-        return { nodes: 0, edges: created.length, groups: 0 };
+        return { nodes: 0, edges: created.length, clusters: 0 };
       } else if (action === 'createGroups') {
         const created = result.data?.created || [];
-        return { nodes: 0, edges: 0, groups: created.length };
+        return { nodes: 0, edges: 0, clusters: created.length };
       } else if (action === 'translate' || action === 'move') {
         if (command.type === 'group') {
-          return { nodes: 0, edges: 0, groups: result.data?.updated || 0 };
+          return { nodes: 0, edges: 0, clusters: result.data?.updated || 0 };
         }
-        return { nodes: result.data?.updated || 0, edges: 0, groups: 0 };
+        return { nodes: result.data?.updated || 0, edges: 0, clusters: 0 };
       } else if (action === 'duplicate') {
         const createdNodes = result.data?.createdNodes || [];
         const createdEdges = result.data?.createdEdges || [];
-        return { nodes: createdNodes.length, edges: createdEdges.length, groups: 0 };
+        return { nodes: createdNodes.length, edges: createdEdges.length, clusters: 0 };
       }
 
-      return { nodes: 0, edges: 0, groups: 0 };
+      return { nodes: 0, edges: 0, clusters: 0 };
     } else {
       if (onShowMessage) {
         onShowMessage(result?.error || 'CRUD command failed', 'error');
       }
-      return { nodes: 0, edges: 0, groups: 0, error: result?.error || 'CRUD command failed' };
+      return { nodes: 0, edges: 0, clusters: 0, error: result?.error || 'CRUD command failed' };
     }
   } catch (error) {
     console.error('executeCRUDCommand error:', error);
     if (onShowMessage) {
       onShowMessage(`Command execution failed: ${error.message}`, 'error');
     }
-    return { nodes: 0, edges: 0, groups: 0 };
+    return { nodes: 0, edges: 0, clusters: 0 };
   }
 }
 
@@ -516,7 +516,7 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
 
   try {
     const text = await navigator.clipboard.readText();
-    if (!text || !text.trim()) return { nodes: 0, edges: 0, groups: 0 };
+    if (!text || !text.trim()) return { nodes: 0, edges: 0, clusters: 0 };
 
     // Try JSON
     let parsed = null;
@@ -527,11 +527,11 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         const validation = validateThemePasteCommand(parsed);
         if (!validation.valid) {
           if (onShowMessage) onShowMessage(`Theme command invalid: ${validation.errors.join('; ')}`, 'error');
-          return { nodes: 0, edges: 0, groups: 0, error: validation.errors.join('; ') };
+          return { nodes: 0, edges: 0, clusters: 0, error: validation.errors.join('; ') };
         }
         eventBus.emit('themePasteValidated', validation.normalized);
         if (onShowMessage) onShowMessage('Theme command validated', 'success');
-        return { nodes: 0, edges: 0, groups: 0 };
+        return { nodes: 0, edges: 0, clusters: 0 };
       }
       // Check if this is a CRUD command (has action property)
       if (parsed.action) {
@@ -554,17 +554,17 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         try {
           const result = await externalHandler(parsed);
           // If the external handler returned counts, respect them
-          if (result && typeof result === 'object' && ('nodes' in result || 'edges' in result || 'groups' in result)) {
+          if (result && typeof result === 'object' && ('nodes' in result || 'edges' in result || 'clusters' in result)) {
             if (onShowMessage) onShowMessage('Imported successfully', 'success');
-            return { nodes: result.nodes || 0, edges: result.edges || 0, groups: result.groups || 0 };
+            return { nodes: result.nodes || 0, edges: result.edges || 0, clusters: result.clusters || 0 };
           }
 
           // Otherwise assume the handler performed the import; infer counts from parsed where possible
           const nodeCount = Array.isArray(parsed.nodes) ? parsed.nodes.length : (Array.isArray(parsed) ? parsed.length : 0);
           const edgeCount = Array.isArray(parsed.edges) ? parsed.edges.length : 0;
-          const groupCount = Array.isArray(parsed.groups) ? parsed.groups.length : 0;
+          const groupCount = Array.isArray(parsed.clusters) ? parsed.clusters.length : 0;
           if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes and ${edgeCount} edges`, 'success');
-          return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
+          return { nodes: nodeCount, edges: edgeCount, clusters: groupCount };
         } catch (err) {
           console.warn('External paste handler failed, falling back to internal import:', err);
           if (onShowMessage) onShowMessage('External paste handler failed — attempting local import', 'warning');
@@ -638,8 +638,8 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
 
         // If parsed contains groups, map node ids and add groups
         let pastedGroups = [];
-        if (Array.isArray(parsed.groups) && parsed.groups.length) {
-          pastedGroups = parsed.groups.map((g) => {
+        if (Array.isArray(parsed.clusters) && parsed.clusters.length) {
+          pastedGroups = parsed.clusters.map((g) => {
             const nodeIds = Array.isArray(g.nodeIds) ? g.nodeIds.map(id => idMapping[id] || id).filter(id => newNodes.some(n => n.id === id)) : [];
             return {
               ...g,
@@ -664,15 +664,15 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         const edgeCount = pastedEdges.length;
         const groupCount = pastedGroups.length;
         if (onShowMessage) onShowMessage(`Pasted ${nodeCount} nodes, ${edgeCount} edges, ${groupCount} clusters`, 'success');
-        return { nodes: nodeCount, edges: edgeCount, groups: groupCount };
+        return { nodes: nodeCount, edges: edgeCount, clusters: groupCount };
       }
 
       // If parsed JSON contains only groups
-      if (Array.isArray(parsed.groups) && setGroups) {
+      if (Array.isArray(parsed.clusters) && setGroups) {
         // Map nodeIds to existing ids where possible
         const currentNodes = nodesRef?.current || [];
         const nodeIdSet = new Set(currentNodes.map(n => n.id));
-        const validGroups = parsed.groups.map(g => ({
+        const validGroups = parsed.clusters.map(g => ({
           ...g,
           nodeIds: Array.isArray(g.nodeIds) ? g.nodeIds.filter(id => nodeIdSet.has(id)) : []
         })).filter(g => g.nodeIds && g.nodeIds.length > 0);
@@ -680,15 +680,15 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
         if (validGroups.length > 0) {
           setGroups(prev => [...prev, ...validGroups]);
           if (onShowMessage) onShowMessage(`Pasted ${validGroups.length} clusters`, 'success');
-          return { nodes: 0, edges: 0, groups: validGroups.length };
+          return { nodes: 0, edges: 0, clusters: validGroups.length };
         }
 
-        return { nodes: 0, edges: 0, groups: 0 };
+        return { nodes: 0, edges: 0, clusters: 0 };
       }
 
       // Fallback: emit event
       eventBus.emit('pasteGraphData', parsed);
-      return { nodes: 0, edges: 0, groups: 0 };
+      return { nodes: 0, edges: 0, clusters: 0 };
     }
 
     // Plain text -> create a resizable node (same behavior as before)
@@ -723,10 +723,10 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
 
     if (saveToHistory) saveToHistory(nodesRef?.current || [], edgesRef?.current || []);
     if (onShowMessage) onShowMessage('Created resizable node from pasted text', 'success');
-    return { nodes: 1, edges: 0, groups: 0 };
+    return { nodes: 1, edges: 0, clusters: 0 };
   } catch (err) {
     console.error('pasteFromClipboardUnified failed:', err);
     if (onShowMessage) onShowMessage('Failed to paste from clipboard', 'error');
-    return { nodes: 0, edges: 0, groups: 0 };
+    return { nodes: 0, edges: 0, clusters: 0 };
   }
 }

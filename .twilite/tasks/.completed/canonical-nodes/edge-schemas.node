@@ -47,7 +47,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -56,8 +59,11 @@
     {
       "id": "edge-schema-root",
       "type": "markdown",
-      "label": "🧩 Edge Schemas",
-      "position": { "x": -320, "y": -220 },
+      "label": "\ud83e\udde9 Edge Schemas",
+      "position": {
+        "x": -320,
+        "y": -220
+      },
       "width": 520,
       "height": 240,
       "visible": true,
@@ -69,34 +75,43 @@
     {
       "id": "edge-schema-checklist",
       "type": "markdown",
-      "label": "✅ Schema Checklist",
-      "position": { "x": -720, "y": 140 },
+      "label": "\u2705 Schema Checklist",
+      "position": {
+        "x": -720,
+        "y": 140
+      },
       "width": 420,
       "height": 340,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required Fields\n\n1. Meaning (one sentence)\n2. Directionality (directed/undirected)\n3. Endpoints (allowed node types)\n4. Handles (required/optional/forbidden)\n5. Multiplicity (duplicates allowed?)\n6. Validation (errors vs warnings)\n7. Labels (required/optional + meaning)\n8. Compatibility (conflicts/overrides)\n9. Examples (1 valid, 1 invalid)"
+        "markdown": "## Required Fields\n\n1. Meaning (one sentence)\n2. Directionality (directed/undirected)\n3. Endpoints (allowed node types)\n4. Ports (required/optional/forbidden)\n5. Multiplicity (duplicates allowed?)\n6. Validation (errors vs warnings)\n7. Labels (required/optional + meaning)\n8. Compatibility (conflicts/overrides)\n9. Examples (1 valid, 1 invalid)"
       }
     },
     {
       "id": "edge-schema-template",
       "type": "markdown",
-      "label": "📝 Edge Schema Template",
-      "position": { "x": -160, "y": 140 },
+      "label": "\ud83d\udcdd Edge Schema Template",
+      "position": {
+        "x": -160,
+        "y": 140
+      },
       "width": 520,
       "height": 420,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edge Type: <typeName>\n\n**Meaning:**\n- \n\n**Directionality:**\n- directed | undirected\n\n**Endpoints:**\n- allowed node types: \n\n**Handles:**\n- required | optional | forbidden\n- allowed handle IDs: \n\n**Multiplicity:**\n- duplicates allowed? (yes/no)\n\n**Validation:**\n- errors: \n- warnings: \n\n**Labels:**\n- required? \n- meaning: \n\n**Compatibility:**\n- conflicts: \n- overrides: \n\n**Examples:**\n- valid: \n- invalid: "
+        "markdown": "## Edge Type: <typeName>\n\n**Meaning:**\n- \n\n**Directionality:**\n- directed | undirected\n\n**Endpoints:**\n- allowed node types: \n\n**Ports:**\n- required | optional | forbidden\n- allowed port IDs: \n\n**Multiplicity:**\n- duplicates allowed? (yes/no)\n\n**Validation:**\n- errors: \n- warnings: \n\n**Labels:**\n- required? \n- meaning: \n\n**Compatibility:**\n- conflicts: \n- overrides: \n\n**Examples:**\n- valid: \n- invalid: "
       }
     },
     {
       "id": "edge-schema-next",
       "type": "markdown",
       "label": "Next Steps",
-      "position": { "x": 420, "y": 140 },
+      "position": {
+        "x": 420,
+        "y": 140
+      },
       "width": 420,
       "height": 260,
       "visible": true,
@@ -113,7 +128,11 @@
       "source": "edge-schema-root",
       "target": "edge-schema-checklist",
       "label": "uses",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -122,7 +141,11 @@
       "source": "edge-schema-root",
       "target": "edge-schema-template",
       "label": "defines",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -131,9 +154,13 @@
       "source": "edge-schema-root",
       "target": "edge-schema-next",
       "label": "plans",
-      "style": { "width": 2, "dash": [], "curved": true },
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

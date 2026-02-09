@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CancelIcon from '@mui/icons-material/Cancel';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 // --- Unified handle schema ---
 const API_INPUTS = [
@@ -24,7 +24,7 @@ export default function APINode({
   onDoubleClick,
   nodeRefs
 }) {
-  const node = useNodeHandleSchema(origNode, API_INPUTS, API_OUTPUTS);
+  const node = useNodePortSchema(origNode, API_INPUTS, API_OUTPUTS);
   const theme = useTheme();
   const nodeRef = useRef(null);
   const controllerRef = useRef(null);

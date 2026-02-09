@@ -6,13 +6,22 @@
     "created": "2025-10-26T00:00:00Z"
   },
   "settings": {},
-  "viewport": { "pan": { "x": 0, "y": 0 }, "zoom": 1 },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
   "nodes": [
     {
       "id": "ex-1",
       "type": "markdown",
       "label": "Example Recipes (Markdown)",
-      "position": { "x": 260, "y": 140 },
+      "position": {
+        "x": 260,
+        "y": 140
+      },
       "width": 420,
       "height": 200,
       "data": {
@@ -23,24 +32,44 @@
       "id": "ex-2",
       "type": "default",
       "label": "Auto Layout Demo",
-      "position": { "x": 620, "y": 160 },
+      "position": {
+        "x": 620,
+        "y": 160
+      },
       "width": 200,
       "height": 90,
-      "data": { "memo": "Try the Auto Layout feature on this set of nodes." }
+      "data": {
+        "memo": "Try the Auto Layout feature on this set of nodes."
+      }
     },
     {
       "id": "ex-3",
       "type": "default",
       "label": "Copy/Paste",
-      "position": { "x": 420, "y": 400 },
+      "position": {
+        "x": 420,
+        "y": 400
+      },
       "width": 220,
       "height": 100,
-      "data": { "memo": "Examples show copying nodes between graphs." }
+      "data": {
+        "memo": "Examples show copying nodes between graphs."
+      }
     }
   ],
   "edges": [
-    { "id": "ex-edge-1", "source": "ex-1", "target": "ex-2", "label": "Demo" },
-    { "id": "ex-edge-2", "source": "ex-2", "target": "ex-3", "label": "Try" }
+    {
+      "id": "ex-edge-1",
+      "source": "ex-1",
+      "target": "ex-2",
+      "label": "Demo"
+    },
+    {
+      "id": "ex-edge-2",
+      "source": "ex-2",
+      "target": "ex-3",
+      "label": "Try"
+    }
   ],
-  "groups": []
+  "clusters": []
 }

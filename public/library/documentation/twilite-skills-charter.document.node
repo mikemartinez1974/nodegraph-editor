@@ -164,7 +164,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Machine-readable truth for tools and agents.\n\nNode schemas, handle contracts, versioning expectations.",
+        "markdown": "Machine-readable truth for tools and agents.\n\nNode schemas, port contracts, versioning expectations.",
         "memo": "",
         "link": "",
         "html": "",
@@ -404,7 +404,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Defines **what node types mean**.\n\nResponsibilities:\n- Node schemas\n- Handle contracts\n- Semantic constraints\n\nDefinitions explain structure; they do not contain domain content.",
+        "markdown": "Defines **what node types mean**.\n\nResponsibilities:\n- Node schemas\n- Port contracts\n- Semantic constraints\n\nDefinitions explain structure; they do not contain domain content.",
         "memo": "",
         "link": "",
         "html": "",
@@ -444,7 +444,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Defines **relationships and containment**.\n\nIncludes:\n- Edges\n- Groups\n- Hierarchies\n\nStructure gives shape without adding meaning.",
+        "markdown": "Defines **relationships and containment**.\n\nIncludes:\n- Edges\n- Clusters\n- Hierarchies\n\nStructure gives shape without adding meaning.",
         "memo": "",
         "link": "",
         "html": "",
@@ -524,7 +524,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Encodes **meaningful states** that affect interpretation.\n\nExamples:\n- draft\n- stable\n- deprecated\n- experimental\n- error\n\nStates are semantic signals for humans, agents, and validators — not transient UI effects.",
+        "markdown": "Encodes **meaningful states** that affect interpretation.\n\nExamples:\n- draft\n- stable\n- deprecated\n- experimental\n- error\n\nStates are semantic signals for humans, agents, and validators \u2014 not transient UI effects.",
         "memo": "",
         "link": "",
         "html": "",
@@ -544,7 +544,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Hints at **visual containment and scope**.\n\nExamples:\n- background vs foreground groups\n- contextual clusters\n- conceptual boundaries\n\nThese cues help readers perceive structure without enforcing layout or hierarchy.",
+        "markdown": "Hints at **visual containment and scope**.\n\nExamples:\n- background vs foreground clusters\n- contextual clusters\n- conceptual boundaries\n\nThese cues help readers perceive structure without enforcing layout or hierarchy.",
         "memo": "",
         "link": "",
         "html": "",
@@ -644,7 +644,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Operate on **graph topology**.\n\nExamples:\n- create / delete nodes\n- create / delete edges\n- group / ungroup\n- reparent\n- duplicate\n- extract subgraph\n\nThese skills define what the graph *is*.",
+        "markdown": "Operate on **graph topology**.\n\nExamples:\n- create / delete nodes\n- create / delete edges\n- cluster / ungroup\n- reparent\n- duplicate\n- extract subgraph\n\nThese skills define what the graph *is*.",
         "memo": "",
         "link": "",
         "html": "",
@@ -684,7 +684,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Detect **invalid or unsafe graph states**.\n\nExamples:\n- schema validation\n- handle compatibility checks\n- missing dependency detection\n- orphan detection\n- unsafe mutation detection\n\nThese skills protect humans, agents, and history.",
+        "markdown": "Detect **invalid or unsafe graph states**.\n\nExamples:\n- schema validation\n- port compatibility checks\n- missing dependency detection\n- orphan detection\n- unsafe mutation detection\n\nThese skills protect humans, agents, and history.",
         "memo": "",
         "link": "",
         "html": "",
@@ -724,7 +724,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Execute **procedural or repeatable operations**.\n\nExamples:\n- script execution\n- batch mutation\n- procedural generation\n- simulation steps\n- compile graph → artifact\n- import / export\n\nThese skills make graphs executable and alive.",
+        "markdown": "Execute **procedural or repeatable operations**.\n\nExamples:\n- script execution\n- batch mutation\n- procedural generation\n- simulation steps\n- compile graph \u2192 artifact\n- import / export\n\nThese skills make graphs executable and alive.",
         "memo": "",
         "link": "",
         "html": "",
@@ -764,7 +764,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Attach relationships between existing nodes.\n\n**Implementation suggestion:**\n- Validate both node IDs exist before wiring\n- Require handles when semantics matter\n- Fail fast if handle contracts are missing\n- Prefer additive edges over rewiring\n\nEdges change meaning. Treat them carefully.",
+        "markdown": "Attach relationships between existing nodes.\n\n**Implementation suggestion:**\n- Validate both node IDs exist before wiring\n- Require ports when semantics matter\n- Fail fast if port contracts are missing\n- Prefer additive edges over rewiring\n\nEdges change meaning. Treat them carefully.",
         "memo": "",
         "link": "",
         "html": "",
@@ -774,7 +774,7 @@
     {
       "id": "struct-grouping-0003",
       "type": "markdown",
-      "label": "Group / Ungroup",
+      "label": "Cluster / Ungroup",
       "position": {
         "x": -205.19549127641255,
         "y": 2812.972448593743
@@ -784,7 +784,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Create or dissolve containment without altering meaning.\n\n**Implementation suggestion:**\n- Use groups as structural containers only\n- Never move nodes implicitly when grouping\n- Preserve relative positions\n- Update group bounds after mutation\n\nGrouping should clarify, not rearrange.",
+        "markdown": "Create or dissolve containment without altering meaning.\n\n**Implementation suggestion:**\n- Use clusters as structural containers only\n- Never move nodes implicitly when grouping\n- Preserve relative positions\n- Update cluster bounds after mutation\n\nGrouping should clarify, not rearrange.",
         "memo": "",
         "link": "",
         "html": "",
@@ -804,7 +804,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Move nodes between structural containers.\n\n**Implementation suggestion:**\n- Explicitly remove from old group before add\n- Log intent in a markdown node if meaning shifts\n- Never reparent implicitly during layout\n\nReparenting is structural surgery. Be explicit.",
+        "markdown": "Move nodes between structural containers.\n\n**Implementation suggestion:**\n- Explicitly remove from old cluster before add\n- Log intent in a markdown node if meaning shifts\n- Never reparent implicitly during layout\n\nReparenting is structural surgery. Be explicit.",
         "memo": "",
         "link": "",
         "html": "",
@@ -864,7 +864,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Recompute spatial arrangement for clarity using ELK.\n\n**Implementation suggestion:**\n- Rebuild ELK graph from current node sizes + handles\n- Respect locked/pinned nodes as obstacles\n- Persist ELK options in Document Properties\n- Never mutate meaning (edges, groups, IDs)\n\nAuto-layout is deterministic, replayable, and reversible.",
+        "markdown": "Recompute spatial arrangement for clarity using ELK.\n\n**Implementation suggestion:**\n- Rebuild ELK graph from current node sizes + ports\n- Respect locked/pinned nodes as obstacles\n- Persist ELK options in Document Properties\n- Never mutate meaning (edges, clusters, IDs)\n\nAuto-layout is deterministic, replayable, and reversible.",
         "memo": "",
         "link": "",
         "html": "",
@@ -884,7 +884,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Recompute edge paths without changing endpoints.\n\n**Implementation suggestion:**\n- Use ELK port data, never guess\n- Preserve source/target handles exactly\n- Replace `edgeRoutes` only\n- Avoid manual bend injection\n\nRerouting changes readability, not relationships.",
+        "markdown": "Recompute edge paths without changing endpoints.\n\n**Implementation suggestion:**\n- Use ELK port data, never guess\n- Preserve source/target ports exactly\n- Replace `edgeRoutes` only\n- Avoid manual bend injection\n\nRerouting changes readability, not relationships.",
         "memo": "",
         "link": "",
         "html": "",
@@ -904,7 +904,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Resolve overlapping nodes and crossings.\n\n**Implementation suggestion:**\n- Treat node bounds as hard constraints\n- Use spacing rules, not teleportation\n- Prefer small incremental moves\n- Never cross group boundaries implicitly\n\nCollision avoidance preserves spatial trust.",
+        "markdown": "Resolve overlapping nodes and crossings.\n\n**Implementation suggestion:**\n- Treat node bounds as hard constraints\n- Use spacing rules, not teleportation\n- Prefer small incremental moves\n- Never cross cluster boundaries implicitly\n\nCollision avoidance preserves spatial trust.",
         "memo": "",
         "link": "",
         "html": "",
@@ -964,7 +964,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Ensure nodes and edges conform to declared schemas.\n\n**Implementation suggestion:**\n- Validate node.type against Definitions Role\n- Check required fields (handles, data, size)\n- Version schemas explicitly\n- Fail fast before mutation\n\nSchema validation is the first line of defense.",
+        "markdown": "Ensure nodes and edges conform to declared schemas.\n\n**Implementation suggestion:**\n- Validate node.type against Definitions Role\n- Check required fields (ports, data, size)\n- Version schemas explicitly\n- Fail fast before mutation\n\nSchema validation is the first line of defense.",
         "memo": "",
         "link": "",
         "html": "",
@@ -972,9 +972,9 @@
       }
     },
     {
-      "id": "validate-handles-0002",
+      "id": "validate-ports-0002",
       "type": "markdown",
-      "label": "Handle Compatibility Checks",
+      "label": "Port Compatibility Checks",
       "position": {
         "x": 568.9032240188501,
         "y": 2558.472822720654
@@ -984,7 +984,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Prevent invalid or meaningless connections.\n\n**Implementation suggestion:**\n- Verify handle IDs exist before wiring\n- Enforce semantic type matching when strict\n- Allow wildcards only when declared\n- Reject implicit handle creation\n\nHandles are contracts, not suggestions.",
+        "markdown": "Prevent invalid or meaningless connections.\n\n**Implementation suggestion:**\n- Verify port IDs exist before wiring\n- Enforce semantic type matching when strict\n- Allow wildcards only when declared\n- Reject implicit port creation\n\nPorts are contracts, not suggestions.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1024,7 +1024,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Identify disconnected or abandoned structures.\n\n**Implementation suggestion:**\n- Find nodes with no edges and no group\n- Flag unreachable subgraphs\n- Exclude intentional scratchpads\n- Offer repair, not auto-delete\n\nOrphans are questions, not trash.",
+        "markdown": "Identify disconnected or abandoned structures.\n\n**Implementation suggestion:**\n- Find nodes with no edges and no cluster\n- Flag unreachable subgraphs\n- Exclude intentional scratchpads\n- Offer repair, not auto-delete\n\nOrphans are questions, not trash.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1144,7 +1144,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Move structure between abstraction layers.\n\n**Implementation suggestion:**\n- Inline when reducing indirection\n- Extract when increasing reuse or clarity\n- Preserve edges and handle semantics\n- Update references atomically\n\nAbstraction depth is a living choice.",
+        "markdown": "Move structure between abstraction layers.\n\n**Implementation suggestion:**\n- Inline when reducing indirection\n- Extract when increasing reuse or clarity\n- Preserve edges and port semantics\n- Update references atomically\n\nAbstraction depth is a living choice.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1184,7 +1184,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Apply many mutations as a single logical operation.\n\n**Implementation suggestion:**\n- Wrap in `batch` or `transaction`\n- Validate entire plan before execution\n- Roll back on partial failure\n- Preserve ordering (nodes → edges → groups)\n\nBatching makes scale safe.",
+        "markdown": "Apply many mutations as a single logical operation.\n\n**Implementation suggestion:**\n- Wrap in `batch` or `transaction`\n- Validate entire plan before execution\n- Roll back on partial failure\n- Preserve ordering (nodes \u2192 edges \u2192 clusters)\n\nBatching makes scale safe.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1204,7 +1204,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Generate large structures from compact intent.\n\n**Implementation suggestion:**\n- Use parameterized ScriptNodes\n- Always document inputs/outputs\n- Emit deterministic IDs when replayable\n- Group generated nodes explicitly\n\nProcedural generation is compression of intent.",
+        "markdown": "Generate large structures from compact intent.\n\n**Implementation suggestion:**\n- Use parameterized ScriptNodes\n- Always document inputs/outputs\n- Emit deterministic IDs when replayable\n- Cluster generated nodes explicitly\n\nProcedural generation is compression of intent.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1234,7 +1234,7 @@
     {
       "id": "auto-compile-artifact-0005",
       "type": "markdown",
-      "label": "Compile Graph → Artifact",
+      "label": "Compile Graph \u2192 Artifact",
       "position": {
         "x": 1362.7168914905074,
         "y": 3451.4842556630138
@@ -1284,7 +1284,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Defines the structure and meaning of every node type.\n\n**This document must specify:**\n- `type` name\n- required vs optional fields\n- `data` shape\n- handles (if any)\n- semantic meaning\n- examples\n- schema version\n- migration notes\n\n**Suggested location:**\n`contracts/nodes/*.md`\n\nWithout this, agents cannot create nodes safely.",
+        "markdown": "Defines the structure and meaning of every node type.\n\n**This document must specify:**\n- `type` name\n- required vs optional fields\n- `data` shape\n- ports (if any)\n- semantic meaning\n- examples\n- schema version\n- migration notes\n\n**Suggested location:**\n`contracts/nodes/*.md`\n\nWithout this, agents cannot create nodes safely.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1292,9 +1292,9 @@
       }
     },
     {
-      "id": "doc-handle-contracts-0002",
+      "id": "doc-port-contracts-0002",
       "type": "markdown",
-      "label": "Handle Contracts",
+      "label": "Port Contracts",
       "position": {
         "x": 150.83312115009608,
         "y": 4194.259119935672
@@ -1304,7 +1304,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Defines legal and meaningful connections between nodes.\n\n**This document must specify:**\n- handle IDs\n- direction (input/output/bidirectional)\n- semantic types\n- compatibility rules\n- wildcards vs strict matching\n- invalid combinations\n- examples\n\n**Suggested location:**\n`contracts/handles/*.md`\n\nHandles are grammar. This is non-optional.",
+        "markdown": "Defines legal and meaningful connections between nodes.\n\n**This document must specify:**\n- port IDs\n- direction (input/output/bidirectional)\n- semantic types\n- compatibility rules\n- wildcards vs strict matching\n- invalid combinations\n- examples\n\n**Suggested location:**\n`contracts/ports/*.md`\n\nPorts are grammar. This is non-optional.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1394,7 +1394,7 @@
     {
       "id": "req-docs-root-0001",
       "type": "markdown",
-      "label": "📋 Required Documentation",
+      "label": "\ud83d\udccb Required Documentation",
       "position": {
         "x": -4096.316352163827,
         "y": -1947.0154358548662
@@ -1424,7 +1424,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Required:** `contracts/nodes/*.md`\n\nDefines structure and semantics of every node type.\n\n**Must specify:**\n- `type` name\n- Required vs optional fields\n- `data` shape and constraints\n- Handle definitions (if any)\n- Semantic meaning and purpose\n- Valid examples\n- Schema version\n- Migration notes\n\n**Example:** `contracts/nodes/markdown.md`",
+        "markdown": "**Required:** `contracts/nodes/*.md`\n\nDefines structure and semantics of every node type.\n\n**Must specify:**\n- `type` name\n- Required vs optional fields\n- `data` shape and constraints\n- Port definitions (if any)\n- Semantic meaning and purpose\n- Valid examples\n- Schema version\n- Migration notes\n\n**Example:** `contracts/nodes/markdown.md`",
         "memo": "",
         "link": "",
         "html": "",
@@ -1432,9 +1432,9 @@
       }
     },
     {
-      "id": "req-handle-contracts-0001",
+      "id": "req-port-contracts-0001",
       "type": "markdown",
-      "label": "Handle Contracts",
+      "label": "Port Contracts",
       "position": {
         "x": -4765.477235509418,
         "y": -2161.362617022175
@@ -1444,7 +1444,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Required:** `contracts/handles/*.md`\n\nDefines legal connections between nodes.\n\n**Must specify:**\n- Handle IDs and naming conventions\n- Direction (input/output/bidirectional)\n- Semantic types and data flow\n- Compatibility matrices\n- Wildcards vs strict matching\n- Invalid combinations\n- Connection examples\n\n**Example:** `contracts/handles/breadboard.md`",
+        "markdown": "**Required:** `contracts/ports/*.md`\n\nDefines legal connections between nodes.\n\n**Must specify:**\n- Port IDs and naming conventions\n- Direction (input/output/bidirectional)\n- Semantic types and data flow\n- Compatibility matrices\n- Wildcards vs strict matching\n- Invalid combinations\n- Connection examples\n\n**Example:** `contracts/ports/breadboard.md`",
         "memo": "",
         "link": "",
         "html": "",
@@ -1594,7 +1594,7 @@
     {
       "id": "mvg-root-0001",
       "type": "markdown",
-      "label": "✅ Minimum Valid Graph",
+      "label": "\u2705 Minimum Valid Graph",
       "position": {
         "x": -4966.930080046055,
         "y": -416.4379608124502
@@ -1614,7 +1614,7 @@
     {
       "id": "mvg-manifest-required-0001",
       "type": "markdown",
-      "label": "🎯 Manifest Node (REQUIRED)",
+      "label": "\ud83c\udfaf Manifest Node (REQUIRED)",
       "position": {
         "x": -4405.486298650623,
         "y": -429.74423520054023
@@ -1634,7 +1634,7 @@
     {
       "id": "mvg-content-required-0001",
       "type": "markdown",
-      "label": "📝 Content Nodes (REQUIRED)",
+      "label": "\ud83d\udcdd Content Nodes (REQUIRED)",
       "position": {
         "x": -3911.994071393727,
         "y": -386.615744302216
@@ -1654,7 +1654,7 @@
     {
       "id": "mvg-structure-optional-0001",
       "type": "markdown",
-      "label": "🔗 Structure (edges, groups)",
+      "label": "\ud83d\udd17 Structure (edges, clusters)",
       "position": {
         "x": -3510.3385429701143,
         "y": -386.6157443022163
@@ -1664,7 +1664,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Optional but powerful.**\n\nStructure defines relationships:\n- **Edges:** connections between nodes\n- **Groups:** containment and scope\n- **Hierarchies:** parent-child relationships\n\n**Status:** Not required for validity, but required for meaning in most domains.\n\nA graph with 1 manifest + 1 content node + 0 edges is technically valid but semantically limited.",
+        "markdown": "**Optional but powerful.**\n\nStructure defines relationships:\n- **Edges:** connections between nodes\n- **Clusters:** containment and scope\n- **Hierarchies:** parent-child relationships\n\n**Status:** Not required for validity, but required for meaning in most domains.\n\nA graph with 1 manifest + 1 content node + 0 edges is technically valid but semantically limited.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1674,7 +1674,7 @@
     {
       "id": "mvg-style-recommended-0001",
       "type": "markdown",
-      "label": "🎨 Style Node (RECOMMENDED)",
+      "label": "\ud83c\udfa8 Style Node (RECOMMENDED)",
       "position": {
         "x": -4937.107863535821,
         "y": -29.04355992191404
@@ -1694,7 +1694,7 @@
     {
       "id": "mvg-definitions-conditional-0001",
       "type": "markdown",
-      "label": "📖 Definition Nodes (CONDITIONAL)",
+      "label": "\ud83d\udcd6 Definition Nodes (CONDITIONAL)",
       "position": {
         "x": -4930.596703872812,
         "y": 414.5619106678206
@@ -1704,7 +1704,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Required if using custom node types.**\n\nDefinition Nodes explain non-standard types:\n- Node schemas for custom types\n- Handle contracts\n- Semantic constraints\n- Field requirements\n\n**When required:**\n- Graph uses types not in standard library\n- Custom handles or semantics\n- Domain-specific extensions\n\n**When not required:**\n- All nodes use standard types\n- Definitions referenced externally",
+        "markdown": "**Required if using custom node types.**\n\nDefinition Nodes explain non-standard types:\n- Node schemas for custom types\n- Port contracts\n- Semantic constraints\n- Field requirements\n\n**When required:**\n- Graph uses types not in standard library\n- Custom ports or semantics\n- Domain-specific extensions\n\n**When not required:**\n- All nodes use standard types\n- Definitions referenced externally",
         "memo": "",
         "link": "",
         "html": "",
@@ -1754,7 +1754,7 @@
     {
       "id": "mvg-checklist-0001",
       "type": "markdown",
-      "label": "✓ Validity Checklist",
+      "label": "\u2713 Validity Checklist",
       "position": {
         "x": -4448.769068180734,
         "y": 563.3785794764826
@@ -1764,7 +1764,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Before committing a graph, verify:**\n\n☑ **Has exactly 1 Manifest node**\n- Declares identity, intent, dependencies\n\n☑ **Has at least 1 Content node**\n- Carries actual domain meaning\n\n☑ **Style node present** (recommended)\n- Makes graph portable\n\n☑ **Definitions included** (if needed)\n- Custom types are documented\n\n☑ **Structure makes sense**\n- Edges connect meaningfully\n- Groups organize logically\n\n☑ **Passes validation rules**\n- No orphaned required fields\n- Handle contracts respected",
+        "markdown": "**Before committing a graph, verify:**\n\n\u2611 **Has exactly 1 Manifest node**\n- Declares identity, intent, dependencies\n\n\u2611 **Has at least 1 Content node**\n- Carries actual domain meaning\n\n\u2611 **Style node present** (recommended)\n- Makes graph portable\n\n\u2611 **Definitions included** (if needed)\n- Custom types are documented\n\n\u2611 **Structure makes sense**\n- Edges connect meaningfully\n- Clusters organize logically\n\n\u2611 **Passes validation rules**\n- No orphaned required fields\n- Port contracts respected",
         "memo": "",
         "link": "",
         "html": "",
@@ -1784,7 +1784,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "This graph is a strong meta-documentation of Twilite OS principles. It preserves continuity by building layers incrementally—from core protocols to detailed skills and contracts—without assuming a blank slate. Key strengths:\n\n- Manifest emphasis: Reinforces identity and portability as foundational.\n- Skill breakdown: Procedural generation and validation skills align with stewardship mindset.\n- Boundaries clarified: Data vs UI separation protects history and diffs.\n\nSuggestions for evolution:\n- Add a ScriptNode to auto-validate against the Minimum Valid Graph checklist.\n- Link to external Git for versioning these contracts.\n- Expand automation skills with AI-specific hooks for agent collaboration.\n\nThis extends the workspace coherently; no overwrites needed.",
+        "markdown": "This graph is a strong meta-documentation of Twilite OS principles. It preserves continuity by building layers incrementally\u2014from core protocols to detailed skills and contracts\u2014without assuming a blank slate. Key strengths:\n\n- Manifest emphasis: Reinforces identity and portability as foundational.\n- Skill breakdown: Procedural generation and validation skills align with stewardship mindset.\n- Boundaries clarified: Data vs UI separation protects history and diffs.\n\nSuggestions for evolution:\n- Add a ScriptNode to auto-validate against the Minimum Valid Graph checklist.\n- Link to external Git for versioning these contracts.\n- Expand automation skills with AI-specific hooks for agent collaboration.\n\nThis extends the workspace coherently; no overwrites needed.",
         "memo": "",
         "link": "",
         "html": "",
@@ -2304,7 +2304,7 @@
       "id": "edge-validate-2",
       "type": "straight",
       "source": "skill-validation-0003",
-      "target": "validate-handles-0002",
+      "target": "validate-ports-0002",
       "label": "includes",
       "style": {
         "width": 2,
@@ -2512,7 +2512,7 @@
       "id": "edge-contracts-2",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
-      "target": "doc-handle-contracts-0002",
+      "target": "doc-port-contracts-0002",
       "label": "requires",
       "style": {
         "width": 2,
@@ -2587,10 +2587,10 @@
       "data": {}
     },
     {
-      "id": "edge-req-root-to-handles",
+      "id": "edge-req-root-to-ports",
       "type": "straight",
       "source": "req-docs-root-0001",
-      "target": "req-handle-contracts-0001",
+      "target": "req-port-contracts-0001",
       "label": "requires",
       "style": {
         "width": 2,
@@ -2869,7 +2869,7 @@
       "data": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "g-task1-aaaa-bbbb-cccc-111111111111",
       "label": "Task 1: Capabilities & Documentation",
@@ -2911,7 +2911,7 @@
     },
     {
       "id": "group-7dcb1de8-fe92-458d-9329-375f0ae57295",
-      "label": "Group 3",
+      "label": "Cluster 3",
       "nodeIds": [
         "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
         "role-manifest-0001",
@@ -2936,7 +2936,7 @@
     },
     {
       "id": "group-303ad95e-bd6c-4036-88a0-0e96bebba788",
-      "label": "Group 4",
+      "label": "Cluster 4",
       "nodeIds": [
         "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
         "mfest-identity-0001",
@@ -2960,7 +2960,7 @@
     },
     {
       "id": "group-bb8ec51b-9b17-4a4b-8fa7-e762d7ba5381",
-      "label": "Group 5",
+      "label": "Cluster 5",
       "nodeIds": [
         "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
         "style-roles-0001",
@@ -2984,7 +2984,7 @@
     },
     {
       "id": "group-841b0cbb-b8d2-4ac8-a628-75e039063067",
-      "label": "Group 6",
+      "label": "Cluster 6",
       "nodeIds": [
         "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
         "boundary-meaning-0001",
@@ -3008,7 +3008,7 @@
     },
     {
       "id": "group-3cc1e704-ebc6-4dc4-ba3b-c95450007585",
-      "label": "Group 7",
+      "label": "Cluster 7",
       "nodeIds": [
         "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
         "skill-structural-0001",

@@ -10,9 +10,9 @@
   },
   "nodes": [
     {
-      "id": "handle-contract-root",
+      "id": "port-contract-root",
       "type": "markdown",
-      "label": "🔌 Handle Contract (Normative)",
+      "label": "\ud83d\udd0c Port Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -22,11 +22,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Handle Contract Template\n\n**Authority:** Normative\n\nAny edge created, mutated, rendered, or interpreted **MUST** conform to a handle contract defined by this graph.\n\nTools and agents may not guess, infer, or invent handle behavior.\n\nAll nodes expose a default `root` handle (see 0.1).\n\nThis graph is the contract."
+        "markdown": "# Port Contract Template\n\n**Authority:** Normative\n\nAny edge created, mutated, rendered, or interpreted **MUST** conform to a port contract defined by this graph.\n\nTools and agents may not guess, infer, or invent port behavior.\n\nAll nodes expose a default `root` port (see 0.1).\n\nThis graph is the contract."
       }
     },
     {
-      "id": "handle-metadata",
+      "id": "port-metadata",
       "type": "markdown",
       "label": "0. Metadata",
       "position": {
@@ -38,11 +38,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Metadata\n\n- Handle ID\n- Node type\n- Contract version (MAJOR.MINOR.PATCH)\n- Status: experimental | stable | deprecated\n- Defined in: contracts/handles/<node-type>.md"
+        "markdown": "## Metadata\n\n- Port ID\n- Node type\n- Contract version (MAJOR.MINOR.PATCH)\n- Status: experimental | stable | deprecated\n- Defined in: contracts/ports/<node-type>.md"
       }
     },
     {
-      "id": "handle-meaning",
+      "id": "port-meaning",
       "type": "markdown",
       "label": "1. Semantic Meaning",
       "position": {
@@ -54,11 +54,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Semantic Meaning (REQUIRED)\n\nDefines what this handle represents in the domain.\n\nMeaning is portable and invariant.\n\nMisuse must make something false."
+        "markdown": "## Semantic Meaning (REQUIRED)\n\nDefines what this port represents in the domain.\n\nMeaning is portable and invariant.\n\nMisuse must make something false."
       }
     },
     {
-      "id": "handle-direction",
+      "id": "port-direction",
       "type": "markdown",
       "label": "2. Direction",
       "position": {
@@ -74,7 +74,7 @@
       }
     },
     {
-      "id": "handle-semantic-type",
+      "id": "port-semantic-type",
       "type": "markdown",
       "label": "3. Semantic Type",
       "position": {
@@ -90,7 +90,7 @@
       }
     },
     {
-      "id": "handle-multiplicity",
+      "id": "port-multiplicity",
       "type": "markdown",
       "label": "4. Multiplicity",
       "position": {
@@ -106,7 +106,7 @@
       }
     },
     {
-      "id": "handle-compatibility",
+      "id": "port-compatibility",
       "type": "markdown",
       "label": "5. Compatibility Rules",
       "position": {
@@ -122,7 +122,7 @@
       }
     },
     {
-      "id": "handle-wildcards",
+      "id": "port-wildcards",
       "type": "markdown",
       "label": "6. Wildcard Policy",
       "position": {
@@ -138,7 +138,7 @@
       }
     },
     {
-      "id": "handle-structure-constraints",
+      "id": "port-structure-constraints",
       "type": "markdown",
       "label": "7. Structural Constraints",
       "position": {
@@ -150,11 +150,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Structural Constraints\n\nRules that must never be violated:\n- no self-loops\n- no cycles\n- one per group\n- must connect before execution\n- must not cross boundary\n\nThese protect meaning and history."
+        "markdown": "## Structural Constraints\n\nRules that must never be violated:\n- no self-loops\n- no cycles\n- one per cluster\n- must connect before execution\n- must not cross boundary\n\nThese protect meaning and history."
       }
     },
     {
-      "id": "handle-mutations",
+      "id": "port-mutations",
       "type": "markdown",
       "label": "8. Allowed Mutations",
       "position": {
@@ -166,11 +166,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Allowed Mutations\n\n- add edge: allowed\n- remove edge: allowed\n- rewire edge: forbidden\n- change handle ID: forbidden\n\nAnything not listed is forbidden."
+        "markdown": "## Allowed Mutations\n\n- add edge: allowed\n- remove edge: allowed\n- rewire edge: forbidden\n- change port ID: forbidden\n\nAnything not listed is forbidden."
       }
     },
     {
-      "id": "handle-validation",
+      "id": "port-validation",
       "type": "markdown",
       "label": "9. Validation Rules",
       "position": {
@@ -182,11 +182,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- direction correctness\n- semantic type compatibility\n- multiplicity limits\n- structural constraints\n- wildcard policy\n\nIf no handle is specified, treat it as `root` (no error).\n\nFailure blocks persistence and execution."
+        "markdown": "## Validation Rules (REQUIRED)\n\nValidators MUST enforce:\n- direction correctness\n- semantic type compatibility\n- multiplicity limits\n- structural constraints\n- wildcard policy\n\nIf no port is specified, treat it as `root` (no error).\n\nFailure blocks persistence and execution."
       }
     },
     {
-      "id": "handle-examples",
+      "id": "port-examples",
       "type": "markdown",
       "label": "10. Examples",
       "position": {
@@ -198,11 +198,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out → nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out → nodeA.data_out"
+        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out \u2192 nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out \u2192 nodeA.data_out"
       }
     },
     {
-      "id": "handle-migrations",
+      "id": "port-migrations",
       "type": "markdown",
       "label": "11. Migration Notes",
       "position": {
@@ -218,7 +218,7 @@
       }
     },
     {
-      "id": "handle-agent-rules",
+      "id": "port-agent-rules",
       "type": "markdown",
       "label": "12. Agent Rules",
       "position": {
@@ -230,11 +230,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read handle contracts\n- refuse incompatible connections\n- prefer add/remove over rewire\n- emit errors, never guess\n- respect multiplicity & structure"
+        "markdown": "## Agent Rules (REQUIRED)\n\nAgents MUST:\n- read port contracts\n- refuse incompatible connections\n- prefer add/remove over rewire\n- emit errors, never guess\n- respect multiplicity & structure"
       }
     },
     {
-      "id": "handle-human-notes",
+      "id": "port-human-notes",
       "type": "markdown",
       "label": "13. Human Notes",
       "position": {
@@ -250,9 +250,9 @@
       }
     },
     {
-      "id": "handle-default-root",
+      "id": "port-default-root",
       "type": "markdown",
-      "label": "0.1 Default Root Handle",
+      "label": "0.1 Default Root Port",
       "position": {
         "x": -900,
         "y": 160
@@ -262,7 +262,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Default Root Handle (REQUIRED)\n\nEvery node exposes a default handle named **root**.\n\n- Edges without handles attach to `root`\n- `root` preserves portability for minimal graphs\n- `root` exists even when other handles are declared\n\nA dedicated `root` contract is optional unless a node type needs strict semantics."
+        "markdown": "## Default Root Port (REQUIRED)\n\nEvery node exposes a default port named **root**.\n\n- Edges without ports attach to `root`\n- `root` preserves portability for minimal graphs\n- `root` exists even when other ports are declared\n\nA dedicated `root` contract is optional unless a node type needs strict semantics."
       }
     }
   ],
@@ -270,8 +270,8 @@
     {
       "id": "e-root-meta",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-metadata",
+      "source": "port-contract-root",
+      "target": "port-metadata",
       "label": "",
       "style": {},
       "data": {}
@@ -279,8 +279,8 @@
     {
       "id": "e-root-meaning",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-meaning",
+      "source": "port-contract-root",
+      "target": "port-meaning",
       "label": "",
       "style": {},
       "data": {}
@@ -288,8 +288,8 @@
     {
       "id": "e-root-direction",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-direction",
+      "source": "port-contract-root",
+      "target": "port-direction",
       "label": "",
       "style": {},
       "data": {}
@@ -297,8 +297,8 @@
     {
       "id": "e-root-type",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-semantic-type",
+      "source": "port-contract-root",
+      "target": "port-semantic-type",
       "label": "",
       "style": {},
       "data": {}
@@ -306,8 +306,8 @@
     {
       "id": "e-root-multiplicity",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-multiplicity",
+      "source": "port-contract-root",
+      "target": "port-multiplicity",
       "label": "",
       "style": {},
       "data": {}
@@ -315,8 +315,8 @@
     {
       "id": "e-root-compat",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-compatibility",
+      "source": "port-contract-root",
+      "target": "port-compatibility",
       "label": "",
       "style": {},
       "data": {}
@@ -324,8 +324,8 @@
     {
       "id": "e-root-wild",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-wildcards",
+      "source": "port-contract-root",
+      "target": "port-wildcards",
       "label": "",
       "style": {},
       "data": {}
@@ -333,8 +333,8 @@
     {
       "id": "e-root-constraints",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-structure-constraints",
+      "source": "port-contract-root",
+      "target": "port-structure-constraints",
       "label": "",
       "style": {},
       "data": {}
@@ -342,8 +342,8 @@
     {
       "id": "e-root-mutations",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-mutations",
+      "source": "port-contract-root",
+      "target": "port-mutations",
       "label": "",
       "style": {},
       "data": {}
@@ -351,8 +351,8 @@
     {
       "id": "e-root-validate",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-validation",
+      "source": "port-contract-root",
+      "target": "port-validation",
       "label": "",
       "style": {},
       "data": {}
@@ -360,8 +360,8 @@
     {
       "id": "e-root-examples",
       "type": "references",
-      "source": "handle-contract-root",
-      "target": "handle-examples",
+      "source": "port-contract-root",
+      "target": "port-examples",
       "label": "",
       "style": {},
       "data": {}
@@ -369,8 +369,8 @@
     {
       "id": "e-root-migrate",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-migrations",
+      "source": "port-contract-root",
+      "target": "port-migrations",
       "label": "",
       "style": {},
       "data": {}
@@ -378,8 +378,8 @@
     {
       "id": "e-root-agents",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-agent-rules",
+      "source": "port-contract-root",
+      "target": "port-agent-rules",
       "label": "",
       "style": {},
       "data": {}
@@ -387,8 +387,8 @@
     {
       "id": "e-root-human",
       "type": "references",
-      "source": "handle-contract-root",
-      "target": "handle-human-notes",
+      "source": "port-contract-root",
+      "target": "port-human-notes",
       "label": "",
       "style": {},
       "data": {}
@@ -396,8 +396,8 @@
     {
       "id": "e-root-default",
       "type": "governs",
-      "source": "handle-contract-root",
-      "target": "handle-default-root",
+      "source": "port-contract-root",
+      "target": "port-default-root",
       "label": "",
       "style": {},
       "data": {}

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
-// --- New schema handles ---
+// --- New schema ports ---
 const GATE_INPUTS = [
   { key: 'a', label: 'A', type: 'value' },
   { key: 'b', label: 'B', type: 'value' }
@@ -25,7 +25,7 @@ export default function GateNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
-  const node = useNodeHandleSchema(origNode, GATE_INPUTS, GATE_OUTPUTS);
+  const node = useNodePortSchema(origNode, GATE_INPUTS, GATE_OUTPUTS);
 
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 300) * zoom;
@@ -144,7 +144,7 @@ export default function GateNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
-  // Handles are rendered via HandleLayer
+  // Ports are rendered via HandleLayer
   return (
     <div
       ref={nodeRef}

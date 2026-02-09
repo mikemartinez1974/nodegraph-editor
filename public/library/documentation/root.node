@@ -185,9 +185,9 @@
       }
     },
     {
-      "id": "doc-contract-handles",
+      "id": "doc-contract-ports",
       "type": "markdown",
-      "label": "Handle Contracts",
+      "label": "Port Contracts",
       "position": {
         "x": 100,
         "y": 460
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Handle Contracts\n\nLocation: `public/documentation/contracts/handles/`"
+        "markdown": "## Port Contracts\n\nLocation: `public/documentation/contracts/ports/`"
       }
     },
     {
@@ -303,10 +303,10 @@
       "data": {}
     },
     {
-      "id": "edge-contracts-handles",
+      "id": "edge-contracts-ports",
       "type": "dataFlow",
       "source": "doc-contracts",
-      "target": "doc-contract-handles",
+      "target": "doc-contract-ports",
       "label": "includes",
       "style": {
         "width": 2,
@@ -394,5 +394,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

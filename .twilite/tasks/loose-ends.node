@@ -39,13 +39,13 @@
             "manifest",
             "markdown"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Save writes clusters, load reads clusters first.\nLegacy groups still accepted."
+        "markdown": "Save writes clusters, load reads clusters first.\nLegacy clusters still accepted."
       }
     },
     {
@@ -215,7 +215,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Manifest/nodes/edges/handles + dictionary/view/legend updated to match schema direction."
+        "markdown": "Manifest/nodes/edges/ports + dictionary/view/legend updated to match schema direction."
       }
     },
     {
@@ -263,7 +263,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "- Legend ↔ dictionary examples\n- Open-node / graph-as-site navigation\n- Migration for no-manifest graphs"
+        "markdown": "- Legend \u2194 dictionary examples\n- Open-node / graph-as-site navigation\n- Migration for no-manifest graphs"
       }
     },
     {
@@ -301,7 +301,7 @@
     {
       "id": "905b1f82-e42e-40e6-90ee-35585fddcdf7",
       "type": "markdown",
-      "label": "Legend ↔ Dictionary",
+      "label": "Legend \u2194 Dictionary",
       "position": {
         "x": 980,
         "y": 430
@@ -385,8 +385,8 @@
       "type": "dataFlow",
       "source": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
       "target": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "bucket",
       "style": {
         "width": 2
@@ -398,8 +398,8 @@
       "type": "dataFlow",
       "source": "e75c7de5-f0a4-4c03-ace9-31bb7fc6352b",
       "target": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "bucket",
       "style": {
         "width": 2
@@ -411,8 +411,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "911db1eb-89fb-4dbe-bd7d-0c76ccfecd0a",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -424,8 +424,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "4e7f7a68-5ab2-45dd-b72b-9ff251d91370",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -437,8 +437,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "428a6fd7-9d9f-4fe8-9a67-413c7c5e9148",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -450,8 +450,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "6495492a-218d-499e-a4ed-21752b31a285",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -463,8 +463,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "020ef689-2bc6-4ea2-983d-03a265901ab3",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -476,8 +476,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "f4b6daf8-2e80-48b1-8a13-947fd35bff6d",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -489,8 +489,8 @@
       "type": "dataFlow",
       "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
       "target": "d31a0951-c137-4e57-aa7f-ac5d6781e081",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "next",
       "style": {
         "width": 1
@@ -502,8 +502,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "16b80542-efa9-4aa1-ad28-080f69dda265",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -515,8 +515,8 @@
       "type": "dataFlow",
       "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
       "target": "16b80542-efa9-4aa1-ad28-080f69dda265",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "status",
       "style": {
         "width": 1
@@ -528,8 +528,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "86275018-6d47-43de-b270-29fb99e782f0",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -541,8 +541,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "96fafb2b-99b3-4d1a-b80c-2ff60b01013b",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -554,8 +554,8 @@
       "type": "dataFlow",
       "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
       "target": "905b1f82-e42e-40e6-90ee-35585fddcdf7",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -567,8 +567,8 @@
       "type": "dataFlow",
       "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
       "target": "0b8fa558-d2b8-4b2b-be05-f73a36ceeb50",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -580,8 +580,8 @@
       "type": "dataFlow",
       "source": "e56e6284-8c0b-4ca3-b9d3-eda61c499876",
       "target": "e17f3ce2-a5ef-4997-a111-09f03f5e2676",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1
@@ -593,8 +593,8 @@
       "type": "dataFlow",
       "source": "76d2481e-d3f2-466c-a4b3-10d102b8db94",
       "target": "f5a51566-d45f-44c4-a068-cfcea509422c",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "includes",
       "style": {
         "width": 1

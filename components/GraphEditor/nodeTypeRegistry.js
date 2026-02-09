@@ -250,11 +250,11 @@ const baseNodeTypeRegistry = {
       },
       dependencies: {
         nodeTypes: [],
-        handleContracts: ['core'],
+        portContracts: ['core'],
         skills: [],
         schemaVersions: {
           nodes: '>=1.0.0',
-          handles: '>=1.0.0'
+          ports: '>=1.0.0'
         },
         optional: []
       },
@@ -503,11 +503,11 @@ export const nodeTypeMetadata = [
       },
       dependencies: {
         nodeTypes: [],
-        handleContracts: ['core'],
+        portContracts: ['core'],
         skills: [],
         schemaVersions: {
           nodes: '>=1.0.0',
-          handles: '>=1.0.0'
+          ports: '>=1.0.0'
         },
         optional: []
       },
@@ -544,8 +544,8 @@ export const nodeTypeMetadata = [
 ];
 
 const buildHandlesFromDefinition = (definition) => {
-  if (!definition || !definition.handles) return undefined;
-  return convertHandlesObjectToArray(definition.handles);
+  if (!definition || !definition.ports) return undefined;
+  return convertHandlesObjectToArray(definition.ports);
 };
 
 const buildLegacyHandleLists = (handles, direction) => {
@@ -609,10 +609,10 @@ const getPluginNodeEntries = () => {
           const runtimeMeta = runtimeNodes[nodeType];
           const definition = manifestMeta.definition || runtimeMeta?.definition;
           const handlesFromDefinition = buildHandlesFromDefinition(definition);
-          const runtimeHandles = Array.isArray(runtimeMeta?.handles)
-            ? runtimeMeta.handles
-            : convertHandlesObjectToArray(runtimeMeta?.handles);
-          const manifestHandles = convertHandlesObjectToArray(manifestMeta.handles);
+          const runtimeHandles = Array.isArray(runtimeMeta?.ports)
+            ? runtimeMeta.ports
+            : convertHandlesObjectToArray(runtimeMeta?.ports);
+          const manifestHandles = convertHandlesObjectToArray(manifestMeta.ports);
           const handles = runtimeHandles || handlesFromDefinition || manifestHandles;
           const inputsList =
             runtimeMeta?.inputs ||
@@ -704,7 +704,7 @@ const buildNodeTypeMetadataList = () => {
     pluginNodeType: meta.pluginNodeType,
     pluginManifestUrl: meta.pluginManifestUrl,
     defaultData: meta.defaultData,
-    handles: meta.handles,
+    ports: meta.ports,
     inputs: meta.inputs,
     outputs: meta.outputs,
     state: meta.state,

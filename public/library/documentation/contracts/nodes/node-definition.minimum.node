@@ -61,7 +61,7 @@
     {
       "id": "min-def-root",
       "type": "markdown",
-      "label": "✅ Minimum Node Definition",
+      "label": "\u2705 Minimum Node Definition",
       "position": {
         "x": -322.01374191614434,
         "y": -221.00687095807217
@@ -136,13 +136,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -197,5 +197,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

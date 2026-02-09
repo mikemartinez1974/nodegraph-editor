@@ -389,8 +389,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
       const nextGroups = Array.isArray(payload.clusters)
         ? payload.clusters
-        : Array.isArray(payload.groups)
-        ? payload.groups
+        : Array.isArray(payload.clusters)
+        ? payload.clusters
         : [];
       let cachedRoutesApplied = false;
       if (incomingUri && typeof window !== 'undefined' && window.__Twilite_EMBED__) {
@@ -507,16 +507,16 @@ useEffect(() => {
     const currentEdges = edgesRef.current || [];
     currentEdges.forEach(edge => {
       if (!edge || edge.source !== nodeId) return;
-      if (edge.sourceHandle && outputName && edge.sourceHandle !== outputName) return;
+      if (edge.sourcePort && outputName && edge.sourcePort !== outputName) return;
       if (!edge.target) return;
       eventBus.emit('nodeInput', {
         targetNodeId: edge.target,
-        inputName: edge.targetHandle,
-        handleId: edge.targetHandle,
+        inputName: edge.targetPort,
+        handleId: edge.targetPort,
         value,
         edgeId: edge.id,
         sourceNodeId: nodeId,
-        outputName: outputName || edge.sourceHandle || null
+        outputName: outputName || edge.sourcePort || null
       });
     });
   };
@@ -539,8 +539,8 @@ useEffect(() => {
           ...edge,
           source: sourceNodeId || edge.source,
           target: targetNodeId || edge.target,
-          sourceHandle: edge.source.handleKey || edge.sourceHandle,
-          targetHandle: targetNodeObj?.handleKey || edge.targetHandle
+          sourcePort: edge.source.handleKey || edge.sourcePort,
+          targetPort: targetNodeObj?.handleKey || edge.targetPort
         };
       }
       if (edge && typeof edge.target === 'object' && edge.target !== null) {
@@ -549,7 +549,7 @@ useEffect(() => {
         return {
           ...edge,
           target: targetNodeId || edge.target,
-          targetHandle: edge.target.handleKey || edge.targetHandle
+          targetPort: edge.target.handleKey || edge.targetPort
         };
       }
       return edge;
@@ -729,16 +729,16 @@ useEffect(() => {
         const targetNodeId = typeof edge.target === 'object' && edge.target
           ? (edge.target.nodeId ?? edge.target.id ?? '')
           : edge.target;
-        const sourceHandle = edge.sourceHandle || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
-        const targetHandle = edge.targetHandle || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
+        const sourcePort = edge.sourcePort || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
+        const targetPort = edge.targetPort || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
         return {
           id: edge.id,
           type: edge.type,
           source: sourceNodeId,
           target: targetNodeId,
-          sourceHandle: sourceHandle,
-          targetHandle: targetHandle,
-          handleMeta: edge.handleMeta || undefined,
+          sourcePort: sourcePort,
+          targetPort: targetPort,
+          portMeta: edge.portMeta || undefined,
           label: edge.label || '',
           style: edge.style || {},
           data: edge.data || {}
@@ -894,7 +894,7 @@ useEffect(() => {
       id: offset + idx + 1,
       nodeCount: (snapshot?.nodes || []).length,
       edgeCount: (snapshot?.edges || []).length,
-      groupCount: (snapshot?.groups || []).length
+      groupCount: (snapshot?.clusters || []).length
     }));
   }, [historyHook.history]);
 
@@ -1125,7 +1125,7 @@ useEffect(() => {
         const data = {
           nodes: nodesRef.current || nodes,
           edges: edgesRef.current || edges,
-          groups: groups || [],
+          clusters: groups || [],
           settings: {
             defaultNodeColor,
             defaultEdgeColor,
@@ -1198,7 +1198,7 @@ useEffect(() => {
     setShowEntitiesPanel(true);
     setShowNodeList(view === 'nodes');
     setShowEdgeList(view === 'edges');
-    setShowGroupList(view === 'groups');
+    setShowGroupList(view === 'clusters');
   }, [setShowEdgeList, setShowGroupList, setShowNodeList]);
 
   const closeEntitiesPanel = useCallback(() => {
@@ -1217,7 +1217,7 @@ useEffect(() => {
   }, [closeEntitiesPanel, entityView, openEntitiesPanel, showEntitiesPanel]);
 
   const toggleNodeList = useCallback(() => toggleEntityView('nodes'), [toggleEntityView]);
-  const toggleGroupList = useCallback(() => toggleEntityView('groups'), [toggleEntityView]);
+  const toggleGroupList = useCallback(() => toggleEntityView('clusters'), [toggleEntityView]);
   const toggleEdgeList = useCallback(() => toggleEntityView('edges'), [toggleEntityView]);
 
   const toggleNodePalette = useCallback(() => {
@@ -1403,8 +1403,8 @@ useEffect(() => {
         const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
         const groupsToLoad = Array.isArray(data.clusters)
           ? data.clusters
-          : Array.isArray(data.groups)
-          ? data.groups
+          : Array.isArray(data.clusters)
+          ? data.clusters
           : [];
         handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
 
@@ -1713,7 +1713,7 @@ useEffect(() => {
           graphCRUD
         });
         
-        if (result && (result.nodes > 0 || result.edges > 0 || result.groups > 0)) {
+        if (result && (result.nodes > 0 || result.edges > 0 || result.clusters > 0)) {
           console.log('[GraphEditor] Successfully pasted:', result);
         }
       } catch (err) {
@@ -2269,7 +2269,7 @@ useEffect(() => {
           if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
             const nodesToLoad = jsonData.nodes;
             const edgesToLoadFromJson = jsonData.edges || [];
-            const groupsToLoadFromJson = jsonData.clusters || jsonData.groups || [];
+            const groupsToLoadFromJson = jsonData.clusters || jsonData.clusters || [];
             const boundaryResult = applyManifestBoundary(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             const filteredNodes = boundaryResult.nodes;
             const filteredEdges = boundaryResult.edges;
@@ -2448,7 +2448,7 @@ useEffect(() => {
         if (data.nodes && Array.isArray(data.nodes)) {
           const nodesToLoad = data.nodes;
           const edgesToLoad = data.edges || [];
-          const groupsToLoad = data.clusters || data.groups || [];
+          const groupsToLoad = data.clusters || data.clusters || [];
           if (handlers && typeof handlers.handleLoadGraph === 'function') {
             handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad);
             try { eventBus.emit('forceRedraw'); } catch (e) { }
@@ -2476,9 +2476,9 @@ useEffect(() => {
         }
 
         // If only groups present
-        if ((data.clusters || data.groups) && Array.isArray(data.clusters || data.groups) && setGroups) {
+        if ((data.clusters || data.clusters) && Array.isArray(data.clusters || data.clusters) && setGroups) {
           setGroups(prev => {
-            const next = [...prev, ...(data.clusters || data.groups)];
+            const next = [...prev, ...(data.clusters || data.clusters)];
             return next;
           });
           setSnackbar({ open: true, message: 'Pasted clusters', severity: 'success', copyToClipboard: true });
@@ -2555,12 +2555,12 @@ useEffect(() => {
       return;
     }
     if (selectedGroupIds.length === 1) {
-      const groupId = selectedGroupIds[0];
+      const clusterId = selectedGroupIds[0];
       const now = Date.now();
-      if (lastGroupTapRef.current.id === groupId && now - lastGroupTapRef.current.time < 350) {
+      if (lastGroupTapRef.current.id === clusterId && now - lastGroupTapRef.current.time < 350) {
         setShowPropertiesPanel(true);
       }
-      lastGroupTapRef.current = { id: groupId, time: now };
+      lastGroupTapRef.current = { id: clusterId, time: now };
     } else if (selectedGroupIds.length === 0) {
       lastGroupTapRef.current = { id: null, time: 0 };
     }
@@ -2737,14 +2737,14 @@ useEffect(() => {
       targetNode,
       edgeType,
       direction,
-      targetHandle,
+      targetPort,
       validation,
       handle
     }) => {
       try {
         let resolvedValidation = validation;
         let resolvedTargetNodeId = targetNode;
-        let resolvedTargetHandle = targetHandle;
+        let resolvedTargetHandle = targetPort;
         const api = graphAPI?.current;
         if (!api || typeof api.createEdge !== 'function') {
           console.warn('Graph API not ready; ignoring handle drop.');
@@ -2804,16 +2804,16 @@ useEffect(() => {
             ? {
                 source: sourceNode,
                 target: resolvedTargetNodeId,
-                sourceHandle: startHandleKey,
-                targetHandle: counterpartHandleKey,
+                sourcePort: startHandleKey,
+                targetPort: counterpartHandleKey,
                 type: resolvedEdgeType,
                 style: edgeStyle
               }
             : {
                 source: resolvedTargetNodeId,
                 target: sourceNode,
-                sourceHandle: counterpartHandleKey,
-                targetHandle: startHandleKey,
+                sourcePort: counterpartHandleKey,
+                targetPort: startHandleKey,
                 type: resolvedEdgeType,
                 style: edgeStyle
               };
@@ -2855,16 +2855,16 @@ useEffect(() => {
           ? {
               source: sourceNode,
               target: createdNodeId,
-              sourceHandle: startHandleKey,
-              targetHandle: newNodeHandle.key,
+              sourcePort: startHandleKey,
+              targetPort: newNodeHandle.key,
               type: resolvedEdgeType,
               style: edgeStyle
             }
           : {
               source: createdNodeId,
               target: sourceNode,
-              sourceHandle: newNodeHandle.key,
-              targetHandle: startHandleKey,
+              sourcePort: newNodeHandle.key,
+              targetPort: startHandleKey,
               type: resolvedEdgeType,
               style: edgeStyle
             };
@@ -2906,16 +2906,16 @@ useEffect(() => {
           ? {
               source: sourceNode,
               target: fallbackNodeId,
-              sourceHandle: startHandleKey,
-              targetHandle: fallbackHandle.key,
+              sourcePort: startHandleKey,
+              targetPort: fallbackHandle.key,
               type: resolvedEdgeType,
               style: edgeStyle
             }
           : {
               source: fallbackNodeId,
               target: sourceNode,
-              sourceHandle: fallbackHandle.key,
-              targetHandle: startHandleKey,
+              sourcePort: fallbackHandle.key,
+              targetPort: startHandleKey,
               type: resolvedEdgeType,
               style: edgeStyle
             };

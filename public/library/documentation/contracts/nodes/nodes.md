@@ -56,9 +56,9 @@ These fields MAY be present but MUST conform if used.
 * `label`
 * `position`
 * `size`
-* `handles`
+* `ports`
 * `inputs / outputs`
-* `groupId`
+* `clusterId`
 
 ---
 
@@ -118,7 +118,7 @@ Every node also exposes a default port named **root** for portability.
 ### Port list
 
 ```md
-- id: <handle-id>
+- id: <port-id>
   direction: input
   semanticType: <type>
   multiplicity: one

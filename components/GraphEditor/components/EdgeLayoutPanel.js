@@ -167,7 +167,7 @@ export default function EdgeLayoutPanel({
     const entries = Object.entries(bySide);
     return entries.length
       ? entries.map(([side, count]) => `${side}: ${count}`).join(", ")
-      : "No handles";
+      : "No ports";
   }, [contractSummary]);
 
   return (

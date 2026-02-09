@@ -177,18 +177,18 @@ const applyDeletes = (graphAPI, ids, dryRun, summary) => {
 
 const applyGroupAdds = (graphAPI, pairs, dryRun, summary) => {
   if (!pairs.length || typeof graphAPI?.addNodesToGroup !== 'function') return;
-  if (!summary.groups) summary.groups = { added: [] };
-  pairs.forEach(({ groupId, nodeIds }) => {
+  if (!summary.clusters) summary.clusters = { added: [] };
+  pairs.forEach(({ clusterId, nodeIds }) => {
     if (dryRun) {
-      summary.groups.added.push({ groupId, nodeIds });
+      summary.clusters.added.push({ clusterId, nodeIds });
       return;
     }
-    const result = graphAPI.addNodesToGroup(groupId, nodeIds);
+    const result = graphAPI.addNodesToGroup(clusterId, nodeIds);
     if (!result?.success) {
-      const message = result?.error || `Failed to add nodes to group ${groupId}`;
+      const message = result?.error || `Failed to add nodes to group ${clusterId}`;
       throw new Error(message);
     }
-    summary.groups.added.push({ groupId, nodeIds });
+    summary.clusters.added.push({ clusterId, nodeIds });
   });
 };
 
@@ -283,8 +283,8 @@ const runRefactor = ({ graphAPI }, params = {}) => {
           }
           const endpoint = redirect?.endpoint === 'target' ? 'target' : 'source';
           const patch = endpoint === 'source'
-            ? { source: base.id, sourceHandle: redirect?.handle ?? redirect?.handleId }
-            : { target: base.id, targetHandle: redirect?.handle ?? redirect?.handleId };
+            ? { source: base.id, sourcePort: redirect?.handle ?? redirect?.handleId }
+            : { target: base.id, targetPort: redirect?.handle ?? redirect?.handleId };
           accumPatch(edgeUpdates, edgeId, patch);
         });
       }
@@ -295,8 +295,8 @@ const runRefactor = ({ graphAPI }, params = {}) => {
             id: ensureUniqueId(existingEdgeIds, edgeBlueprint?.id),
             source: edgeBlueprint?.source || base.id,
             target: edgeBlueprint?.target,
-            sourceHandle: edgeBlueprint?.sourceHandle,
-            targetHandle: edgeBlueprint?.targetHandle,
+            sourcePort: edgeBlueprint?.sourcePort,
+            targetPort: edgeBlueprint?.targetPort,
             type: edgeBlueprint?.type || 'child',
             label: edgeBlueprint?.label,
             data: edgeBlueprint?.data,
@@ -321,8 +321,8 @@ const runRefactor = ({ graphAPI }, params = {}) => {
         });
       }
 
-      if (part?.groupId) {
-        groupAdds.push({ groupId: part.groupId, nodeIds: [base.id] });
+      if (part?.clusterId) {
+        groupAdds.push({ clusterId: part.clusterId, nodeIds: [base.id] });
       }
     });
 
@@ -381,14 +381,14 @@ const runRefactor = ({ graphAPI }, params = {}) => {
           if (edge.source === sourceId) {
             const patch = { source: targetId };
             if (entry?.handleMap?.source) {
-              patch.sourceHandle = entry.handleMap.source;
+              patch.sourcePort = entry.handleMap.source;
             }
             accumPatch(edgeUpdates, edge.id, patch);
           }
           if (edge.target === sourceId) {
             const patch = { target: targetId };
             if (entry?.handleMap?.target) {
-              patch.targetHandle = entry.handleMap.target;
+              patch.targetPort = entry.handleMap.target;
             }
             accumPatch(edgeUpdates, edge.id, patch);
           }
@@ -753,7 +753,7 @@ const runInlineExtract = ({ graphAPI }, params = {}) => {
         width: newNodeBlueprint.width || sourceNode.width,
         height: newNodeBlueprint.height || sourceNode.height,
         data: mergePatch({}, newNodeBlueprint.data || {}),
-        handles: deepClone(newNodeBlueprint.handles || sourceNode.handles),
+        ports: deepClone(newNodeBlueprint.ports || sourceNode.ports),
         inputs: deepClone(newNodeBlueprint.inputs || sourceNode.inputs),
         outputs: deepClone(newNodeBlueprint.outputs || sourceNode.outputs),
         extensions: mergePatch({}, newNodeBlueprint.extensions || {}),

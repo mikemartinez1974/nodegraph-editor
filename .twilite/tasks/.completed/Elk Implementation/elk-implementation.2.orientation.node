@@ -59,7 +59,7 @@
     {
       "id": "edge-primitives-root",
       "type": "markdown",
-      "label": "📐 Edge Primitives",
+      "label": "\ud83d\udcd0 Edge Primitives",
       "position": {
         "x": -49.55172264782928,
         "y": -150.9230997159388
@@ -75,7 +75,7 @@
     {
       "id": "primitive-geometry",
       "type": "markdown",
-      "label": "🧱 Geometry Primitives",
+      "label": "\ud83e\uddf1 Geometry Primitives",
       "position": {
         "x": -330.5484643091562,
         "y": 188.7993703452358
@@ -85,13 +85,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Geometry (irreducible)\n\nOnly **three true geometric primitives exist**:\n\n- **Line** — two points\n- **Polyline** — ordered bend points\n- **Curve** — interpolated path\n\nEverything else derives from these."
+        "markdown": "## Geometry (irreducible)\n\nOnly **three true geometric primitives exist**:\n\n- **Line** \u2014 two points\n- **Polyline** \u2014 ordered bend points\n- **Curve** \u2014 interpolated path\n\nEverything else derives from these."
       }
     },
     {
       "id": "primitive-constraints",
       "type": "markdown",
-      "label": "📏 Constraints",
+      "label": "\ud83d\udccf Constraints",
       "position": {
         "x": 717.2976070661243,
         "y": 197.99456441428634
@@ -101,13 +101,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Constraints\n\nRules applied *to geometry*:\n\n- **Orthogonal** (90° only)\n- **Port-based attachment**\n- **Side / ordering rules**\n- **Self-loop offsets**\n\nConstraints do not create new geometry."
+        "markdown": "## Constraints\n\nRules applied *to geometry*:\n\n- **Orthogonal** (90\u00b0 only)\n- **Port-based attachment**\n- **Side / ordering rules**\n- **Self-loop offsets**\n\nConstraints do not create new geometry."
       }
     },
     {
       "id": "primitive-routing",
       "type": "markdown",
-      "label": "🧭 Routing Policies",
+      "label": "\ud83e\udded Routing Policies",
       "position": {
         "x": 184.39647908518498,
         "y": 194.00082486074004
@@ -123,7 +123,7 @@
     {
       "id": "primitive-rendering",
       "type": "markdown",
-      "label": "🎨 Rendering",
+      "label": "\ud83c\udfa8 Rendering",
       "position": {
         "x": 186.8042478199079,
         "y": 587.5779435058201
@@ -139,7 +139,7 @@
     {
       "id": "canonical-form",
       "type": "markdown",
-      "label": "🧠 Canonical Insight",
+      "label": "\ud83e\udde0 Canonical Insight",
       "position": {
         "x": -313.82651218509534,
         "y": 556.363421886451
@@ -155,7 +155,7 @@
     {
       "id": "elk-root",
       "type": "markdown",
-      "label": "🦌 Edge Routing Contract (ELK)",
+      "label": "\ud83e\udd8c Edge Routing Contract (ELK)",
       "position": {
         "x": -1440.0050908912194,
         "y": -224.21709893223334
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Decision\n\n- **ELK is the sole authority for edge routing**\n- No manual control points are persisted\n- No fallback or bundling heuristics are allowed\n- Any node or handle movement triggers ELK recomputation\n\nThis decision is final."
+        "markdown": "## Decision\n\n- **ELK is the sole authority for edge routing**\n- No manual control points are persisted\n- No fallback or bundling heuristics are allowed\n- Any node or port movement triggers ELK recomputation\n\nThis decision is final."
       }
     },
     {
@@ -229,7 +229,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Vocabulary Reference\n\nEdge semantics, primitives, constraints, and canonical forms are defined in:\n\n➡ **Edge Primitives / Vocabulary Graph**\n\nThis contract depends on that vocabulary and does not redefine it."
+        "markdown": "## Vocabulary Reference\n\nEdge semantics, primitives, constraints, and canonical forms are defined in:\n\n\u27a1 **Edge Primitives / Vocabulary Graph**\n\nThis contract depends on that vocabulary and does not redefine it."
       }
     }
   ],
@@ -328,5 +328,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

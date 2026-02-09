@@ -228,7 +228,7 @@ export function validateGraphInvariants({
     if (handleId === 'root') {
       return { id: 'root' };
     }
-    const handles = Array.isArray(node.handles) ? node.handles : [];
+    const handles = Array.isArray(node.ports) ? node.ports : [];
     return handles.find((handle) => handle?.id === handleId);
   };
 
@@ -260,10 +260,17 @@ export function validateGraphInvariants({
     const targetNode = edge.target ? nodeMap.get(edge.target) : undefined;
 
     [
-      { handleId: edge.sourceHandle, node: sourceNode, nodeType: "source" },
-      { handleId: edge.targetHandle, node: targetNode, nodeType: "target" }
+      { handleId: edge.sourcePort, node: sourceNode, nodeType: "source" },
+      { handleId: edge.targetPort, node: targetNode, nodeType: "target" }
     ].forEach(({ handleId, node, nodeType }) => {
-      if (!handleId) return;
+      if (!handleId) {
+        errors.push({
+          code: "PORT_REQUIRED",
+          message: `Edge "${edge.id}" is missing required ${nodeType} port.`,
+          edgeId: edge.id
+        });
+        return;
+      }
       if (!node) {
         errors.push({
           code: "NODE_NOT_FOUND",

@@ -39,14 +39,14 @@ export default function useSelection({
   }, [setSelectedEdgeIds, setSelectedNodeIds, setShowNodeProperties]);
 
   // Group selection
-  const handleGroupSelection = useCallback((groupId, isMultiSelect = false) => {
+  const handleGroupSelection = useCallback((clusterId, isMultiSelect = false) => {
     setSelectedGroupIds(prev => {
       if (isMultiSelect) {
-        return prev.includes(groupId)
-          ? prev.filter(id => id !== groupId)
-          : [...prev, groupId];
+        return prev.includes(clusterId)
+          ? prev.filter(id => id !== clusterId)
+          : [...prev, clusterId];
       } else {
-        return [groupId];
+        return [clusterId];
       }
     });
     setSelectedNodeIds([]);

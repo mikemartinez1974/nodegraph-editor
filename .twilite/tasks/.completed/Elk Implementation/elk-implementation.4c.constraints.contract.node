@@ -55,7 +55,7 @@
     {
       "id": "constraints-root",
       "type": "markdown",
-      "label": "📝 Constraints Contract",
+      "label": "\ud83d\udcdd Constraints Contract",
       "position": {
         "x": 0,
         "y": -150
@@ -65,13 +65,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Constraints Contract\n+\n+After ELK routes edges, the system must verify every edge honors declared handles, ports, and spacing before committing the map."
+        "markdown": "# Constraints Contract\n+\n+After ELK routes edges, the system must verify every edge honors declared ports, ports, and spacing before committing the map."
       }
     },
     {
       "id": "constraint-checks",
       "type": "markdown",
-      "label": "✅ Constraint Checks",
+      "label": "\u2705 Constraint Checks",
       "position": {
         "x": -360,
         "y": 60
@@ -81,13 +81,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Constraint Checks\n+\n+- Confirm each edge route attaches to declared handles/ports.\n+- Ensure port sides match `input`/`output` expectations.\n+- Validate lane distances (parallel offsets, fan spacing) against document settings.\n+- Detect self-loop adjustments and horizontal/vertical guarantees when straight mode is active."
+        "markdown": "### Constraint Checks\n+\n+- Confirm each edge route attaches to declared ports/ports.\n+- Ensure port sides match `input`/`output` expectations.\n+- Validate lane distances (parallel offsets, fan spacing) against document settings.\n+- Detect self-loop adjustments and horizontal/vertical guarantees when straight mode is active."
       }
     },
     {
       "id": "constraint-reporting",
       "type": "markdown",
-      "label": "📣 Reporting & Remedies",
+      "label": "\ud83d\udce3 Reporting & Remedies",
       "position": {
         "x": 360,
         "y": 60
@@ -97,13 +97,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Reporting\n+\n+- Annotate violations with `edge.data.constraints` metadata and snackbar warnings.\n+- Flag edges that drift from handles and rerun ELK with stricter ports when feasible.\n+- Emit a trace note node to the plan graph whenever constraints rerun."
+        "markdown": "### Reporting\n+\n+- Annotate violations with `edge.data.constraints` metadata and snackbar warnings.\n+- Flag edges that drift from ports and rerun ELK with stricter ports when feasible.\n+- Emit a trace note node to the plan graph whenever constraints rerun."
       }
     },
     {
       "id": "constraint-invariants",
       "type": "markdown",
-      "label": "🧭 Invariants",
+      "label": "\ud83e\udded Invariants",
       "position": {
         "x": 0,
         "y": 320
@@ -113,7 +113,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Invariants\n+\n+- ELK output is authoritative; constraint code only verifies or reruns, but never rewrites paths directly.\n+- Violations either rerun ELK or stay flagged — they do not silently mutate stored edge geometry."
+        "markdown": "### Invariants\n+\n+- ELK output is authoritative; constraint code only verifies or reruns, but never rewrites paths directly.\n+- Violations either rerun ELK or stay flagged \u2014 they do not silently mutate stored edge geometry."
       }
     }
   ],
@@ -155,5 +155,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

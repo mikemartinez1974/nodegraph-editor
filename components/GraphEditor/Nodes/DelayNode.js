@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
-// --- New schema handles ---
+// --- New schema ports ---
 const DELAY_INPUTS = [
   { key: 'trigger', label: 'Trigger', type: 'trigger' }
 ];
@@ -27,7 +27,7 @@ export default function DelayNode({
   const timersRef = useRef([]);
   const queueRef = useRef([]);
   const [, setTick] = useState(0); // force update for UI
-  const node = useNodeHandleSchema(origNode, DELAY_INPUTS, DELAY_OUTPUTS);
+  const node = useNodePortSchema(origNode, DELAY_INPUTS, DELAY_OUTPUTS);
 
   const width = (node?.width || 400) * zoom;
   const height = (node?.height || 200) * zoom;
@@ -140,7 +140,7 @@ export default function DelayNode({
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
 
-  // Handles are rendered centrally via HandleLayer
+  // Ports are rendered centrally via HandleLayer
   return (
     <div
       ref={nodeRef}

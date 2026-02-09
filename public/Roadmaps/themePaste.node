@@ -18,7 +18,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -28,20 +31,26 @@
       "id": "theme-goal",
       "type": "markdown",
       "label": "Goal",
-      "position": { "x": 80, "y": 60 },
+      "position": {
+        "x": 80,
+        "y": 60
+      },
       "width": 520,
       "height": 180,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\nPaste a theme **directly onto the canvas** as a command.\n\nFlow: ask AI for a color scheme → paste → graph updates theme instantly."
+        "markdown": "## Goal\nPaste a theme **directly onto the canvas** as a command.\n\nFlow: ask AI for a color scheme \u2192 paste \u2192 graph updates theme instantly."
       }
     },
     {
       "id": "theme-ux",
       "type": "markdown",
       "label": "UX Flow",
-      "position": { "x": 80, "y": 280 },
+      "position": {
+        "x": 80,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -54,7 +63,10 @@
       "id": "theme-format",
       "type": "markdown",
       "label": "Command Format",
-      "position": { "x": 80, "y": 540 },
+      "position": {
+        "x": 80,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -67,7 +79,10 @@
       "id": "theme-validate",
       "type": "markdown",
       "label": "Validation + Safety",
-      "position": { "x": 640, "y": 280 },
+      "position": {
+        "x": 640,
+        "y": 280
+      },
       "width": 520,
       "height": 240,
       "visible": true,
@@ -80,7 +95,10 @@
       "id": "theme-mvp",
       "type": "markdown",
       "label": "MVP",
-      "position": { "x": 80, "y": 800 },
+      "position": {
+        "x": 80,
+        "y": 800
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -93,7 +111,10 @@
       "id": "theme-expand",
       "type": "markdown",
       "label": "Expansion",
-      "position": { "x": 80, "y": 1060 },
+      "position": {
+        "x": 80,
+        "y": 1060
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -106,7 +127,10 @@
       "id": "theme-open",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 640, "y": 560 },
+      "position": {
+        "x": 640,
+        "y": 560
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -122,10 +146,13 @@
       "type": "child",
       "source": "theme-goal",
       "target": "theme-ux",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "flow",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -133,10 +160,13 @@
       "type": "child",
       "source": "theme-ux",
       "target": "theme-format",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "define",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -144,10 +174,13 @@
       "type": "child",
       "source": "theme-format",
       "target": "theme-mvp",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "implement",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -155,10 +188,13 @@
       "type": "child",
       "source": "theme-mvp",
       "target": "theme-expand",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "extend",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -166,10 +202,13 @@
       "type": "child",
       "source": "theme-ux",
       "target": "theme-validate",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "guard",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -177,12 +216,15 @@
       "type": "child",
       "source": "theme-validate",
       "target": "theme-open",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "decide",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

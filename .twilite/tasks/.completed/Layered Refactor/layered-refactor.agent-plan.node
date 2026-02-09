@@ -56,7 +56,7 @@
     {
       "id": "agent-root",
       "type": "markdown",
-      "label": "🤖 Agent Interface Plan",
+      "label": "\ud83e\udd16 Agent Interface Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -72,7 +72,7 @@
     {
       "id": "agent-prompt",
       "type": "markdown",
-      "label": "📝 Prompt Assembly",
+      "label": "\ud83d\udcdd Prompt Assembly",
       "position": {
         "x": -320,
         "y": -20
@@ -82,13 +82,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Prompt Assembly\n+\n+- Agents read schema metadata and core snapshots to build deterministic prompts.\n+- Use contract definitions and intent templates so agents know what mutations are legal.\n+- Provide tooling to capture the ‘why’ for each proposed action."
+        "markdown": "## Prompt Assembly\n+\n+- Agents read schema metadata and core snapshots to build deterministic prompts.\n+- Use contract definitions and intent templates so agents know what mutations are legal.\n+- Provide tooling to capture the \u2018why\u2019 for each proposed action."
       }
     },
     {
       "id": "agent-dryrun",
       "type": "markdown",
-      "label": "🧪 Dry-Run & Approval",
+      "label": "\ud83e\uddea Dry-Run & Approval",
       "position": {
         "x": 320,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "agent-intents",
       "type": "markdown",
-      "label": "📡 Intent Channel",
+      "label": "\ud83d\udce1 Intent Channel",
       "position": {
         "x": 0,
         "y": 200
@@ -120,7 +120,7 @@
     {
       "id": "agent-safety",
       "type": "markdown",
-      "label": "🧭 Safety & Governance",
+      "label": "\ud83e\udded Safety & Governance",
       "position": {
         "x": 0,
         "y": 440
@@ -184,5 +184,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

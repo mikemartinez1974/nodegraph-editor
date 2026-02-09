@@ -201,7 +201,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         return { success: true, queued: true, data: { ids: list } };
       },
       createGroups: (groups = []) => {
-        const list = Array.isArray(groups) ? groups : [];
+        const list = Array.isArray(groups) ? clusters: [];
         const prepared = list.map((group) => ({
           ...group,
           id:
@@ -209,7 +209,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
               ? group.id.trim()
               : nextGroupId()
         }));
-        emitExecutionIntent({ action: 'createGroups', groups: prepared });
+        emitExecutionIntent({ action: 'createGroups', clusters: prepared });
         return { success: true, queued: true, data: { created: prepared } };
       },
       updateGroup: (id, updates = {}) => {

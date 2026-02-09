@@ -56,7 +56,7 @@
     {
       "id": "interface-root",
       "type": "markdown",
-      "label": "🖱️ Interface Intent Emitter",
+      "label": "\ud83d\uddb1\ufe0f Interface Intent Emitter",
       "position": {
         "x": 0,
         "y": -200
@@ -72,7 +72,7 @@
     {
       "id": "intent-normalize",
       "type": "markdown",
-      "label": "📐 Normalize Inputs",
+      "label": "\ud83d\udcd0 Normalize Inputs",
       "position": {
         "x": -320,
         "y": 0
@@ -88,7 +88,7 @@
     {
       "id": "intent-guard",
       "type": "markdown",
-      "label": "🛡 Guard Contracts",
+      "label": "\ud83d\udee1 Guard Contracts",
       "position": {
         "x": 0,
         "y": 0
@@ -98,13 +98,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Guard Contracts\n+\n+- Check locks, read-only modes, schema invariants before emitting an intent.\n+- Short-circuit and show snackbar/tooltip if the intent violates a contract (e.g., locked node, missing handle).\n+- Emit failure telemetry so the interpreter knows why the intent was blocked."
+        "markdown": "## Guard Contracts\n+\n+- Check locks, read-only modes, schema invariants before emitting an intent.\n+- Short-circuit and show snackbar/tooltip if the intent violates a contract (e.g., locked node, missing port).\n+- Emit failure telemetry so the interpreter knows why the intent was blocked."
       }
     },
     {
       "id": "intent-flow",
       "type": "markdown",
-      "label": "⏱ Flow Control",
+      "label": "\u23f1 Flow Control",
       "position": {
         "x": 320,
         "y": 0
@@ -120,7 +120,7 @@
     {
       "id": "intent-emit",
       "type": "markdown",
-      "label": "📢 Emit Guarded Intent",
+      "label": "\ud83d\udce2 Emit Guarded Intent",
       "position": {
         "x": 0,
         "y": 220
@@ -136,7 +136,7 @@
     {
       "id": "intent-feedback",
       "type": "markdown",
-      "label": "💬 Visual Feedback",
+      "label": "\ud83d\udcac Visual Feedback",
       "position": {
         "x": 320,
         "y": 220
@@ -146,7 +146,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Visual Feedback\n+\n+- Highlight blocked handles, show snackbars, or render tooltip reasons when guards trip.\n+- Mirror intent telemetry (received, blocked, canceled) so users can see what happened."
+        "markdown": "## Visual Feedback\n+\n+- Highlight blocked ports, show snackbars, or render tooltip reasons when guards trip.\n+- Mirror intent telemetry (received, blocked, canceled) so users can see what happened."
       }
     }
   ],
@@ -212,5 +212,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

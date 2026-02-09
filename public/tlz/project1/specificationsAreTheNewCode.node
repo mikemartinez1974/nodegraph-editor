@@ -59,7 +59,7 @@
     {
       "id": "spec-root",
       "type": "markdown",
-      "label": "🧠 Specifications Are the New Code",
+      "label": "\ud83e\udde0 Specifications Are the New Code",
       "position": {
         "x": -460,
         "y": -40
@@ -69,13 +69,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Code is not the primary artifact — intent is.\n\n## Key assertions\n- Code is **10–20%** of the value\n- Structured communication is **80–90%**\n- Engineering ≠ typing\n- Programming = **alignment work**\n\nThis node is the anchor: everything below is “how intent becomes reality.”"
+        "markdown": "# Code is not the primary artifact \u2014 intent is.\n\n## Key assertions\n- Code is **10\u201320%** of the value\n- Structured communication is **80\u201390%**\n- Engineering \u2260 typing\n- Programming = **alignment work**\n\nThis node is the anchor: everything below is \u201chow intent becomes reality.\u201d"
       }
     },
     {
       "id": "c1-core",
       "type": "markdown",
-      "label": "🟦 Engineering Reality",
+      "label": "\ud83d\udfe6 Engineering Reality",
       "position": {
         "x": -1380,
         "y": 460
@@ -91,7 +91,7 @@
     {
       "id": "c1-insight",
       "type": "markdown",
-      "label": "🔑 Insight",
+      "label": "\ud83d\udd11 Insight",
       "position": {
         "x": -1380,
         "y": 720
@@ -261,7 +261,7 @@
     {
       "id": "c2-core",
       "type": "markdown",
-      "label": "🟦 Bottleneck Revealed",
+      "label": "\ud83d\udfe6 Bottleneck Revealed",
       "position": {
         "x": 700,
         "y": 460
@@ -333,7 +333,7 @@
     {
       "id": "c2-pivot",
       "type": "markdown",
-      "label": "🎯 Pivot Claim",
+      "label": "\ud83c\udfaf Pivot Claim",
       "position": {
         "x": 700,
         "y": 920
@@ -391,7 +391,7 @@
     {
       "id": "c3-core",
       "type": "markdown",
-      "label": "🟨 Vibe Coding (Symptom)",
+      "label": "\ud83d\udfe8 Vibe Coding (Symptom)",
       "position": {
         "x": -2157.036540604714,
         "y": 1141.6220069596652
@@ -401,7 +401,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why vibe coding feels good\nBecause it’s **intent-first** and reduces cognitive overhead."
+        "markdown": "## Why vibe coding feels good\nBecause it\u2019s **intent-first** and reduces cognitive overhead."
       }
     },
     {
@@ -449,7 +449,7 @@
     {
       "id": "c3-problem",
       "type": "markdown",
-      "label": "⚠️ Problem",
+      "label": "\u26a0\ufe0f Problem",
       "position": {
         "x": -2162.9896958424283,
         "y": 1566.1734513045958
@@ -465,7 +465,7 @@
     {
       "id": "c3-analogy",
       "type": "markdown",
-      "label": "🧨 Strong metaphor",
+      "label": "\ud83e\udde8 Strong metaphor",
       "position": {
         "x": -2161.836337213381,
         "y": 1767.314134288868
@@ -475,13 +475,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## “We shred the source and version the binary.”\nThis deserves its own node: it is the core critique."
+        "markdown": "## \u201cWe shred the source and version the binary.\u201d\nThis deserves its own node: it is the core critique."
       }
     },
     {
       "id": "c4-core",
       "type": "markdown",
-      "label": "🟩 Specification as Source of Truth",
+      "label": "\ud83d\udfe9 Specification as Source of Truth",
       "position": {
         "x": 1431.2772247700086,
         "y": 1294.3852343434128
@@ -507,7 +507,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Code is a lossy projection of a spec.\n\nSpec → Code is lossy.\nCode → Spec requires irreversible inference."
+        "markdown": "## Code is a lossy projection of a spec.\n\nSpec \u2192 Code is lossy.\nCode \u2192 Spec requires irreversible inference."
       }
     },
     {
@@ -527,7 +527,7 @@
     {
       "id": "c5-core",
       "type": "markdown",
-      "label": "🟩 Specs Compile to Many Artifacts",
+      "label": "\ud83d\udfe9 Specs Compile to Many Artifacts",
       "position": {
         "x": -1380,
         "y": 1897.8389072082782
@@ -537,7 +537,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Specs compile to many artifacts\n\nA spec is architecture-agnostic source.\nThis is Twilite’s export model."
+        "markdown": "## Specs compile to many artifacts\n\nA spec is architecture-agnostic source.\nThis is Twilite\u2019s export model."
       }
     },
     {
@@ -655,7 +655,7 @@
     {
       "id": "c5-compiler",
       "type": "markdown",
-      "label": "🧩 Compiler Analogy",
+      "label": "\ud83e\udde9 Compiler Analogy",
       "position": {
         "x": -1380,
         "y": 2330
@@ -671,7 +671,7 @@
     {
       "id": "c6-core",
       "type": "markdown",
-      "label": "🟧 Concrete Example",
+      "label": "\ud83d\udfe7 Concrete Example",
       "position": {
         "x": 700,
         "y": 1900
@@ -729,7 +729,7 @@
     {
       "id": "c6-insight",
       "type": "markdown",
-      "label": "🔑 Huge insight",
+      "label": "\ud83d\udd11 Huge insight",
       "position": {
         "x": 700,
         "y": 2270
@@ -745,7 +745,7 @@
     {
       "id": "c7-core",
       "type": "markdown",
-      "label": "🟥 Failure Case",
+      "label": "\ud83d\udfe5 Failure Case",
       "position": {
         "x": -1380,
         "y": 2620
@@ -813,7 +813,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Resolution path\n- Spec already forbade behavior → behavior = bug\n- Rollback + fix\n- Re-validate against spec"
+        "markdown": "## Resolution path\n- Spec already forbade behavior \u2192 behavior = bug\n- Rollback + fix\n- Re-validate against spec"
       }
     },
     {
@@ -829,13 +829,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Spec as trust anchor\nConnects humans ↔ models ↔ accountability."
+        "markdown": "## Spec as trust anchor\nConnects humans \u2194 models \u2194 accountability."
       }
     },
     {
       "id": "c8-core",
       "type": "markdown",
-      "label": "🟫 Specs Are Executable",
+      "label": "\ud83d\udfeb Specs Are Executable",
       "position": {
         "x": 700,
         "y": 2620
@@ -861,7 +861,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Prompting vs Specs\n- Prompting → inference-time tax\n- Specs → baked into weights"
+        "markdown": "## Prompting vs Specs\n- Prompting \u2192 inference-time tax\n- Specs \u2192 baked into weights"
       }
     },
     {
@@ -877,13 +877,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## “The model develops muscle memory for policy.”\nAlignment-as-compilation."
+        "markdown": "## \u201cThe model develops muscle memory for policy.\u201d\nAlignment-as-compilation."
       }
     },
     {
       "id": "c9-core",
       "type": "markdown",
-      "label": "🟪 Tooling for Intent",
+      "label": "\ud83d\udfea Tooling for Intent",
       "position": {
         "x": -1370.773130967623,
         "y": 3462.2560146789942
@@ -969,7 +969,7 @@
     {
       "id": "c9-insight",
       "type": "markdown",
-      "label": "🔑 Insight",
+      "label": "\ud83d\udd11 Insight",
       "position": {
         "x": -1363.8529791933404,
         "y": 3853.0418212913924
@@ -979,13 +979,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Tooling targets intent, not syntax.\nThis is the “IDE-for-thinking” territory."
+        "markdown": "## Tooling targets intent, not syntax.\nThis is the \u201cIDE-for-thinking\u201d territory."
       }
     },
     {
       "id": "c10-core",
       "type": "markdown",
-      "label": "🟨 Lawmakers as Programmers",
+      "label": "\ud83d\udfe8 Lawmakers as Programmers",
       "position": {
         "x": 700,
         "y": 3340
@@ -995,7 +995,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Constitution is a national model spec\nSpecs align systems over time — not just software."
+        "markdown": "## The Constitution is a national model spec\nSpecs align systems over time \u2014 not just software."
       }
     },
     {
@@ -1011,7 +1011,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Analogy map\n- Constitution → spec\n- Amendments → versions\n- Courts → graders\n- Precedent → test cases\n- Enforcement → training loop"
+        "markdown": "## Analogy map\n- Constitution \u2192 spec\n- Amendments \u2192 versions\n- Courts \u2192 graders\n- Precedent \u2192 test cases\n- Enforcement \u2192 training loop"
       }
     },
     {
@@ -1033,7 +1033,7 @@
     {
       "id": "c11-core",
       "type": "markdown",
-      "label": "🟦 Universal Alignment Pattern",
+      "label": "\ud83d\udfe6 Universal Alignment Pattern",
       "position": {
         "x": -1366.1596964514347,
         "y": 4110.747779678073
@@ -1059,13 +1059,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mappings\n- Programmers → silicon alignment\n- PMs → team alignment\n- Lawmakers → human alignment\n- Prompt writers → model alignment"
+        "markdown": "## Mappings\n- Programmers \u2192 silicon alignment\n- PMs \u2192 team alignment\n- Lawmakers \u2192 human alignment\n- Prompt writers \u2192 model alignment"
       }
     },
     {
       "id": "c11-power",
       "type": "markdown",
-      "label": "🎤 Mic drop",
+      "label": "\ud83c\udfa4 Mic drop",
       "position": {
         "x": -1054.7528666087137,
         "y": 4303.561481045342
@@ -1081,7 +1081,7 @@
     {
       "id": "c12-core",
       "type": "markdown",
-      "label": "🟪 The Future IDE",
+      "label": "\ud83d\udfea The Future IDE",
       "position": {
         "x": 700,
         "y": 4060
@@ -1113,7 +1113,7 @@
     {
       "id": "c12-Twilite",
       "type": "markdown",
-      "label": "🧠 Why this matters for Twilite",
+      "label": "\ud83e\udde0 Why this matters for Twilite",
       "position": {
         "x": 157.62990451803043,
         "y": 4053.143226449593
@@ -1129,7 +1129,7 @@
     {
       "id": "final-core",
       "type": "markdown",
-      "label": "🔴 Call to Action",
+      "label": "\ud83d\udd34 Call to Action",
       "position": {
         "x": -460,
         "y": 4870
@@ -1139,7 +1139,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Start with a specification\n\nChecklist:\n- Define expectations\n- Define success\n- Debate clarity\n- Make it executable\n- Test against spec, not vibes\n\n**Closing insight:** You didn’t tell it what you wanted — maybe you didn’t know."
+        "markdown": "# Start with a specification\n\nChecklist:\n- Define expectations\n- Define success\n- Debate clarity\n- Make it executable\n- Test against spec, not vibes\n\n**Closing insight:** You didn\u2019t tell it what you wanted \u2014 maybe you didn\u2019t know."
       }
     }
   ],
@@ -1383,7 +1383,7 @@
       "type": "child",
       "source": "c3-core",
       "target": "c3-problem",
-      "label": "but…",
+      "label": "but\u2026",
       "style": {},
       "data": {}
     },
@@ -1793,10 +1793,10 @@
       "data": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "g-root",
-      "label": "🟣 Root Claim",
+      "label": "\ud83d\udfe3 Root Claim",
       "nodeIds": [
         "spec-root"
       ],
@@ -1811,7 +1811,7 @@
     },
     {
       "id": "g-c1",
-      "label": "🟦 Cluster 1 — Engineering Reality",
+      "label": "\ud83d\udfe6 Cluster 1 \u2014 Engineering Reality",
       "nodeIds": [
         "c1-core",
         "c1-insight",
@@ -1838,7 +1838,7 @@
     },
     {
       "id": "g-c2",
-      "label": "🟦 Cluster 2 — Bottleneck",
+      "label": "\ud83d\udfe6 Cluster 2 \u2014 Bottleneck",
       "nodeIds": [
         "c2-core",
         "c2-in-req",
@@ -1861,7 +1861,7 @@
     },
     {
       "id": "g-c3",
-      "label": "🟨 Cluster 3 — Vibe Coding",
+      "label": "\ud83d\udfe8 Cluster 3 \u2014 Vibe Coding",
       "nodeIds": [
         "c3-core",
         "c3-intent",
@@ -1881,7 +1881,7 @@
     },
     {
       "id": "g-c4",
-      "label": "🟩 Cluster 4 — Specs as Source",
+      "label": "\ud83d\udfe9 Cluster 4 \u2014 Specs as Source",
       "nodeIds": [
         "c4-core",
         "c4-claim",
@@ -1898,7 +1898,7 @@
     },
     {
       "id": "g-c5",
-      "label": "🟩 Cluster 5 — Compiler Input",
+      "label": "\ud83d\udfe9 Cluster 5 \u2014 Compiler Input",
       "nodeIds": [
         "c5-core",
         "c5-ts",
@@ -1922,7 +1922,7 @@
     },
     {
       "id": "g-c6",
-      "label": "🟧 Cluster 6 — Model Spec",
+      "label": "\ud83d\udfe7 Cluster 6 \u2014 Model Spec",
       "nodeIds": [
         "c6-core",
         "c6-clause",
@@ -1941,7 +1941,7 @@
     },
     {
       "id": "g-c7",
-      "label": "🟥 Cluster 7 — Failure Case",
+      "label": "\ud83d\udfe5 Cluster 7 \u2014 Failure Case",
       "nodeIds": [
         "c7-core",
         "c7-mis",
@@ -1961,7 +1961,7 @@
     },
     {
       "id": "g-c8",
-      "label": "🟫 Cluster 8 — Executable Specs",
+      "label": "\ud83d\udfeb Cluster 8 \u2014 Executable Specs",
       "nodeIds": [
         "c8-core",
         "c8-contrast",
@@ -1978,7 +1978,7 @@
     },
     {
       "id": "g-c9",
-      "label": "🟪 Cluster 9 — Toolchain",
+      "label": "\ud83d\udfea Cluster 9 \u2014 Toolchain",
       "nodeIds": [
         "c9-core",
         "c9-lint",
@@ -1999,7 +1999,7 @@
     },
     {
       "id": "g-c10",
-      "label": "🟨 Cluster 10 — Law",
+      "label": "\ud83d\udfe8 Cluster 10 \u2014 Law",
       "nodeIds": [
         "c10-core",
         "c10-map",
@@ -2016,7 +2016,7 @@
     },
     {
       "id": "g-c11",
-      "label": "🟦 Cluster 11 — Universal Pattern",
+      "label": "\ud83d\udfe6 Cluster 11 \u2014 Universal Pattern",
       "nodeIds": [
         "c11-core",
         "c11-map",
@@ -2033,7 +2033,7 @@
     },
     {
       "id": "g-c12",
-      "label": "🟪 Cluster 12 — Future IDE",
+      "label": "\ud83d\udfea Cluster 12 \u2014 Future IDE",
       "nodeIds": [
         "c12-core",
         "c12-caps",
@@ -2050,7 +2050,7 @@
     },
     {
       "id": "g-final",
-      "label": "🔴 Final",
+      "label": "\ud83d\udd34 Final",
       "nodeIds": [
         "final-core"
       ],

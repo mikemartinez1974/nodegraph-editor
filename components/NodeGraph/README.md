@@ -22,13 +22,13 @@ A production-grade, interactive node/edge graph visualization component built wi
 - ✅ **Pan & Zoom**: Mouse wheel zoom, drag-to-pan, with HiDPI canvas support
 - ✅ **Multi-Select**: Marquee selection (Shift+drag) with bulk operations
 - ✅ **Undo/Redo**: Full history management with debounced batching
-- ✅ **Groups**: Visual node grouping with collapse/expand and drag-to-move-all
+- ✅ **Clusters**: Visual node grouping with collapse/expand and drag-to-move-all
 - ✅ **Edge Types**: Straight, curved, child/parent (vertical), peer (horizontal), orthogonal
 - ✅ **Handle Animation**: Smooth extension/retraction with progress-based rendering
 - ✅ **Accessibility**: ARIA labels, keyboard navigation (Tab, Ctrl+Arrows), focus management
 
 ### Performance Optimizations
-- Canvas rendering for edges and handles (not React)
+- Canvas rendering for edges and ports (not React)
 - Transient DOM transforms during drag (React state only on drop)
 - Virtualized node/group lists for large graphs
 - RAF-batched redraws and debounced state updates
@@ -38,7 +38,7 @@ A production-grade, interactive node/edge graph visualization component built wi
 - Theme-aware (inherits MUI theme or accepts `theme` prop)
 - Extensible node types via `nodeTypes` prop
 - Custom edge styles (color, width, dash patterns, labels)
-- Resizable nodes with drag handles
+- Resizable nodes with drag ports
 - Markdown support in node memos
 
 ## Props
@@ -77,7 +77,7 @@ A production-grade, interactive node/edge graph visualization component built wi
   ```
 
 ### Optional
-- **`groups`** (array): Group objects for visual organization
+- **`clusters`** (array): Group objects for visual organization
 - **`edgeTypes`** (object): Edge type configuration with style defaults
 - **`nodeTypes`** (object): Custom node component mapping
 - **`selectedNodeId`** (string): Currently selected node
@@ -108,7 +108,7 @@ const nodeTypes = {
 <NodeGraph
   nodes={nodes}
   edges={edges}
-  groups={groups}
+  clusters={clusters}
   edgeTypes={edgeTypes}
   nodeTypes={nodeTypes}
   selectedNodeId={selectedNodeId}
@@ -190,11 +190,11 @@ NodeGraph inherits MUI theme via `useTheme()`:
 ## Performance Notes
 
 - **Large graphs**: Tested with 1000+ nodes, 2000+ edges
-- **Canvas rendering**: Edges/handles drawn on canvas (not DOM)
+- **Canvas rendering**: Edges/ports drawn on canvas (not DOM)
 - **RAF batching**: Drag updates batched via requestAnimationFrame
 - **Virtualization**: Node/group list panels use react-window
 - **HiDPI support**: Canvas scaled for retina displays
-- **Lazy rendering**: Handles only rendered when near nodes
+- **Lazy rendering**: Ports only rendered when near nodes
 
 ## Files
 
@@ -238,7 +238,7 @@ This folder contains the core rendering and interaction logic for the node/edge 
 - `NodeGraph.js` — Main orchestrator: composes layers and wires hooks and event handlers.
 - `NodeLayer.js` — Renders node components and manages node DOM refs for measurement and hit-testing.
 - `EdgeLayer.js` — Canvas/SVG drawing for edges with performance-oriented utilities.
-- `HandleLayer.js` — Renders handles and manages drag interactions for connections.
+- `HandleLayer.js` — Renders ports and manages drag interactions for connections.
 - `PanZoomLayer.js` — Provides pan/zoom transforms and pointer handling.
 - `eventBus.js` — Pub/sub used for decoupled communication between nodes, UI panels, and other systems.
 - `utils/coords.js`, `edgeUtils.js`, `dragUtils.js` — Geometry and interaction utilities used across the graph.

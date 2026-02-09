@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 220;
@@ -23,7 +23,7 @@ export default function BackgroundRpcNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
-  const node = useNodeHandleSchema(origNode, RPC_INPUTS, RPC_OUTPUTS);
+  const node = useNodePortSchema(origNode, RPC_INPUTS, RPC_OUTPUTS);
 
   const width = (node?.width || CARD_WIDTH) * zoom;
   const height = (node?.height || CARD_HEIGHT) * zoom;

@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "name": "__PLUGIN_NAME__",
   "description": "Custom nodegraph plugin created with the starter.",
-  "permissions": ["graph.read"],
+  "permissions": [
+    "graph.read"
+  ],
   "bundle": {
     "url": "/plugins/__PLUGIN_SLUG__/plugin.js",
     "sandbox": "iframe",
@@ -29,7 +31,7 @@
           "width": 240,
           "height": 160
         },
-        "handles": {
+        "ports": {
           "inputs": [
             {
               "id": "trigger",

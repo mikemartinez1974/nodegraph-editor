@@ -154,8 +154,8 @@ export function findNearestTargetForPin(pinPos, layout, pinPreference = null) {
  * Given a node + layout, return:
  *
  * [
- *   { pinName: 'anode',  targetNode: X, targetHandle: 'socket', row: '29t' },
- *   { pinName: 'cathode', targetNode: Y, targetHandle: 'socket', row: '29b' }
+ *   { pinName: 'anode',  targetNode: X, targetPort: 'socket', row: '29t' },
+ *   { pinName: 'cathode', targetNode: Y, targetPort: 'socket', row: '29b' }
  * ]
  *
  */
@@ -178,7 +178,7 @@ export function computeConnectionsForComponent(node, layout) {
     out.push({
       pinName: pin.name,
       targetNodeId: nearest.entry.node?.id || null,
-      targetHandle: nearest.entry.targetHandle || 'socket',
+      targetPort: nearest.entry.targetPort || 'socket',
       row: nearest.rowId,
       pos: nearest.pos
     });
@@ -205,7 +205,7 @@ export function buildEdgeCommands(componentNode, connectionSpecs) {
     fromNodeId: componentNode.id,
     fromHandle: spec.pinName,
     toNodeId: spec.targetNodeId,
-    toHandle: spec.targetHandle
+    toHandle: spec.targetPort
   }));
 }
 

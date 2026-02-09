@@ -59,7 +59,7 @@
     {
       "id": "skill-norm-root",
       "type": "markdown",
-      "label": "🔁 Skill: NormalizeDenormalize (Normative)",
+      "label": "\ud83d\udd01 Skill: NormalizeDenormalize (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing source-of-truth → abort\n- Missing renormalization path → abort\n- Atomic update failure → rollback\n\nPartial states are forbidden."
+        "markdown": "## Failure Modes\n\n- Missing source-of-truth \u2192 abort\n- Missing renormalization path \u2192 abort\n- Atomic update failure \u2192 rollback\n\nPartial states are forbidden."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

@@ -57,9 +57,9 @@
   "scripts": [],
   "nodes": [
     {
-      "id": "skill-handlecheck-root",
+      "id": "skill-portcheck-root",
       "type": "markdown",
-      "label": "\ud83d\udd12 Skill: HandleCompatibilityChecks (Normative)",
+      "label": "\ud83d\udd12 Skill: PortCompatibilityChecks (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -69,11 +69,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Skill: HandleCompatibilityChecks\n\n**Category:** Validation Skill\n\n**Intent:** Prevent invalid or meaningless connections between nodes.\n\nPorts are contracts. This skill enforces them.\n\nThis graph is the contract."
+        "markdown": "# Skill: PortCompatibilityChecks\n\n**Category:** Validation Skill\n\n**Intent:** Prevent invalid or meaningless connections between nodes.\n\nPorts are contracts. This skill enforces them.\n\nThis graph is the contract."
       }
     },
     {
-      "id": "skill-handlecheck-purpose",
+      "id": "skill-portcheck-purpose",
       "type": "markdown",
       "label": "Purpose",
       "position": {
@@ -89,7 +89,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-scope",
+      "id": "skill-portcheck-scope",
       "type": "markdown",
       "label": "Scope",
       "position": {
@@ -105,7 +105,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-preconditions",
+      "id": "skill-portcheck-preconditions",
       "type": "markdown",
       "label": "Preconditions",
       "position": {
@@ -121,7 +121,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-reads",
+      "id": "skill-portcheck-reads",
       "type": "markdown",
       "label": "Reads",
       "position": {
@@ -137,7 +137,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-writes",
+      "id": "skill-portcheck-writes",
       "type": "markdown",
       "label": "Writes",
       "position": {
@@ -153,7 +153,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-forbidden",
+      "id": "skill-portcheck-forbidden",
       "type": "markdown",
       "label": "Never Touches",
       "position": {
@@ -169,7 +169,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-failure",
+      "id": "skill-portcheck-failure",
       "type": "markdown",
       "label": "Failure Modes",
       "position": {
@@ -185,7 +185,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-determinism",
+      "id": "skill-portcheck-determinism",
       "type": "markdown",
       "label": "Determinism",
       "position": {
@@ -201,7 +201,7 @@
       }
     },
     {
-      "id": "skill-handlecheck-invariant",
+      "id": "skill-portcheck-invariant",
       "type": "markdown",
       "label": "Design Invariant",
       "position": {
@@ -221,8 +221,8 @@
     {
       "id": "e-root-purpose",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-purpose",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-purpose",
       "label": "",
       "style": {},
       "data": {}
@@ -230,8 +230,8 @@
     {
       "id": "e-root-scope",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-scope",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-scope",
       "label": "",
       "style": {},
       "data": {}
@@ -239,8 +239,8 @@
     {
       "id": "e-root-preconditions",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-preconditions",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-preconditions",
       "label": "",
       "style": {},
       "data": {}
@@ -248,8 +248,8 @@
     {
       "id": "e-root-reads",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-reads",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-reads",
       "label": "",
       "style": {},
       "data": {}
@@ -257,8 +257,8 @@
     {
       "id": "e-root-writes",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-writes",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-writes",
       "label": "",
       "style": {},
       "data": {}
@@ -266,8 +266,8 @@
     {
       "id": "e-root-forbidden",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-forbidden",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-forbidden",
       "label": "",
       "style": {},
       "data": {}
@@ -275,8 +275,8 @@
     {
       "id": "e-root-failure",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-failure",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-failure",
       "label": "",
       "style": {},
       "data": {}
@@ -284,8 +284,8 @@
     {
       "id": "e-root-determinism",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-determinism",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-determinism",
       "label": "",
       "style": {},
       "data": {}
@@ -293,12 +293,12 @@
     {
       "id": "e-root-invariant",
       "type": "governs",
-      "source": "skill-handlecheck-root",
-      "target": "skill-handlecheck-invariant",
+      "source": "skill-portcheck-root",
+      "target": "skill-portcheck-invariant",
       "label": "",
       "style": {},
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

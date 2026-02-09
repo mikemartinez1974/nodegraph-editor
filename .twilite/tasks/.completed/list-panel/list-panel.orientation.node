@@ -1,1 +1,155 @@
-{"fileVersion":"1.0","metadata":{"title":"List Panel Orientation","description":"Orientation for the unified entities list panel task.","created":"2026-01-13T00:00:00.000Z","modified":"2026-01-13T00:00:00.000Z","author":"","tags":[]},"settings":{"theme":{"mode":"light","primary":{"main":"#1976d2","light":"#42a5f5","dark":"#1565c0","contrastText":"#fff"},"secondary":{"main":"#dc004e","light":"#ff4081","dark":"#9a0036","contrastText":"#fff"},"background":{"default":"#e8eaf6","paper":"#ffffff"},"text":{"primary":"rgba(0, 0, 0, 0.87)","secondary":"rgba(0, 0, 0, 0.6)"},"divider":"rgba(0, 0, 0, 0.12)"},"backgroundImage":null,"defaultNodeColor":"#1976d2","defaultEdgeColor":"#666666","snapToGrid":false,"gridSize":20,"edgeRouting":"orthogonal","autoSave":false},"viewport":{"pan":{"x":0,"y":0},"zoom":1},"document":null,"scripts":[],"nodes":[{"id":"panel-root","type":"markdown","label":"🧾 List Panel Orientation","position":{"x":20,"y":-440},"width":520,"height":220,"visible":true,"showLabel":true,"data":{"markdown":"# Unified Entities Panel\nThe panel hosts **node, edge, or group lists** depending on the toolbar toggle. It remains docked so the canvas stays visible and leverages existing list implementations."}},{"id":"panel-views","type":"markdown","label":"👉 View Modes","position":{"x":-340,"y":-220},"width":380,"height":180,"visible":true,"showLabel":true,"data":{"markdown":"## View Modes\n- Nodes: show `NodeListPanel` search/filters.\n- Edges: show the existing `EdgeListPanel`.\n- Groups: re-use `GroupListPanel` or similar.\nEach button sets the `entityView` state and opens the drawer."}},{"id":"panel-toolbar","type":"markdown","label":"🌐 Toolbar Controls","position":{"x":340,"y":-180},"width":380,"height":180,"visible":true,"showLabel":true,"data":{"markdown":"## Toolbar Controls\nAdd toggle buttons for nodes/edges/groups. Buttons update layout context (`setEntityView`, `setShowEntitiesPanel`). Keep them grouped with the existing side panels for a consistent experience."}},{"id":"panel-switches","type":"markdown","label":"🔁 Panel Behavior","position":{"x":20,"y":60},"width":420,"height":200,"visible":true,"showLabel":true,"data":{"markdown":"## Panel Behavior\n- Panel opens with the active `entityView`.\n- Switching buttons keeps drawer open and swaps the rendered list.\n- Selection from any list should focus the graph (via existing handlers) and close on canvas click."}}],"edges":[{"id":"e1","source":"panel-root","target":"panel-views","type":"reference","style":{"width":2,"curved":true},"label":"drives requirements"},{"id":"e2","source":"panel-root","target":"panel-toolbar","type":"reference","style":{"width":2,"curved":true},"label":"triggers"},{"id":"e3","source":"panel-root","target":"panel-switches","type":"reference","style":{"width":2,"curved":true},"label":"ensures behavior"}],"groups":[]}
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "List Panel Orientation",
+    "description": "Orientation for the unified entities list panel task.",
+    "created": "2026-01-13T00:00:00.000Z",
+    "modified": "2026-01-13T00:00:00.000Z",
+    "author": "",
+    "tags": []
+  },
+  "settings": {
+    "theme": {
+      "mode": "light",
+      "primary": {
+        "main": "#1976d2",
+        "light": "#42a5f5",
+        "dark": "#1565c0",
+        "contrastText": "#fff"
+      },
+      "secondary": {
+        "main": "#dc004e",
+        "light": "#ff4081",
+        "dark": "#9a0036",
+        "contrastText": "#fff"
+      },
+      "background": {
+        "default": "#e8eaf6",
+        "paper": "#ffffff"
+      },
+      "text": {
+        "primary": "rgba(0, 0, 0, 0.87)",
+        "secondary": "rgba(0, 0, 0, 0.6)"
+      },
+      "divider": "rgba(0, 0, 0, 0.12)"
+    },
+    "backgroundImage": null,
+    "defaultNodeColor": "#1976d2",
+    "defaultEdgeColor": "#666666",
+    "snapToGrid": false,
+    "gridSize": 20,
+    "edgeRouting": "orthogonal",
+    "autoSave": false
+  },
+  "viewport": {
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "zoom": 1
+  },
+  "document": null,
+  "scripts": [],
+  "nodes": [
+    {
+      "id": "panel-root",
+      "type": "markdown",
+      "label": "\ud83e\uddfe List Panel Orientation",
+      "position": {
+        "x": 20,
+        "y": -440
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Unified Entities Panel\nThe panel hosts **node, edge, or cluster lists** depending on the toolbar toggle. It remains docked so the canvas stays visible and leverages existing list implementations."
+      }
+    },
+    {
+      "id": "panel-views",
+      "type": "markdown",
+      "label": "\ud83d\udc49 View Modes",
+      "position": {
+        "x": -340,
+        "y": -220
+      },
+      "width": 380,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## View Modes\n- Nodes: show `NodeListPanel` search/filters.\n- Edges: show the existing `EdgeListPanel`.\n- Clusters: re-use `GroupListPanel` or similar.\nEach button sets the `entityView` state and opens the drawer."
+      }
+    },
+    {
+      "id": "panel-toolbar",
+      "type": "markdown",
+      "label": "\ud83c\udf10 Toolbar Controls",
+      "position": {
+        "x": 340,
+        "y": -180
+      },
+      "width": 380,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Toolbar Controls\nAdd toggle buttons for nodes/edges/clusters. Buttons update layout context (`setEntityView`, `setShowEntitiesPanel`). Keep them grouped with the existing side panels for a consistent experience."
+      }
+    },
+    {
+      "id": "panel-switches",
+      "type": "markdown",
+      "label": "\ud83d\udd01 Panel Behavior",
+      "position": {
+        "x": 20,
+        "y": 60
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Panel Behavior\n- Panel opens with the active `entityView`.\n- Switching buttons keeps drawer open and swaps the rendered list.\n- Selection from any list should focus the graph (via existing handlers) and close on canvas click."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "panel-root",
+      "target": "panel-views",
+      "type": "reference",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "drives requirements"
+    },
+    {
+      "id": "e2",
+      "source": "panel-root",
+      "target": "panel-toolbar",
+      "type": "reference",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "triggers"
+    },
+    {
+      "id": "e3",
+      "source": "panel-root",
+      "target": "panel-switches",
+      "type": "reference",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "label": "ensures behavior"
+    }
+  ],
+  "clusters": []
+}

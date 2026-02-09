@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Optional Fields (OPTIONAL)\n\n- label\n- position\n- size\n- ports\n- inputs / outputs\n- groupId\n\nIf present, they MUST conform."
+        "markdown": "## Optional Fields (OPTIONAL)\n\n- label\n- position\n- size\n- ports\n- inputs / outputs\n- clusterId\n\nIf present, they MUST conform."
       }
     },
     {
@@ -153,7 +153,7 @@
       }
     },
     {
-      "id": "node-schema-handles",
+      "id": "node-schema-ports",
       "type": "markdown",
       "label": "5. Ports",
       "position": {
@@ -344,10 +344,10 @@
       "data": {}
     },
     {
-      "id": "e-root-handles",
+      "id": "e-root-ports",
       "type": "governs",
       "source": "node-schema-contract-root",
-      "target": "node-schema-handles",
+      "target": "node-schema-ports",
       "label": "",
       "style": {},
       "data": {}
@@ -425,5 +425,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

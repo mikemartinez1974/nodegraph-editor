@@ -43,13 +43,13 @@
             "manifest",
             "markdown"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -103,7 +103,7 @@
       "data": {
         "markdown": "# Edge Taxonomy Proposal (v1)\n\nGoal: define a **canonical, minimal semantic set** of edge types,\nwith additional meaning expressed as **attributes** (strength, direction, flow, etc.).\n\nThis keeps the taxonomy precise but not over\u2011specific."
       },
-      "handles": [
+      "ports": [
         {
           "id": "out",
           "label": "out",
@@ -131,7 +131,7 @@
       "data": {
         "markdown": "## Canonical Types\n\n1. relates (generic association)\n2. contains (structural containment)\n3. dependsOn (soft dependency)\n4. requires (hard dependency)\n5. precedes (sequence/order)\n6. derivesFrom (lineage/derivation)\n7. constrains (restriction/guard)\n8. governs (authority/ownership)\n9. equivalentTo (semantic equivalence)\n10. transformsTo (change of form)\n11. conflictsWith (contradiction/competition)\n12. references (graph\u2011internal citation)"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -169,7 +169,7 @@
       "data": {
         "markdown": "## Attributes\n\n- direction: forward | reverse | bidirectional\n- strength: weak | normal | strong\n- flow: none | data | energy | control\n- temporal: none | precedes (or use type)\n- style: color, route, arrows, etc. (presentation only)"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -207,7 +207,7 @@
       "data": {
         "markdown": "## Current \u2192 Canonical\n\n- child \u2192 contains\n- peer \u2192 relates + direction=bidirectional\n- dataFlow \u2192 relates + flow=data\n- dependency \u2192 dependsOn\n- reference \u2192 references\n- bidirectional \u2192 relates + direction=bidirectional\n- weak/strong \u2192 relates + strength=weak/strong\n- temporal \u2192 precedes\n- energyFlow \u2192 relates + flow=energy\n- requires \u2192 requires\n- precedes \u2192 precedes\n- derives \u2192 derivesFrom\n- constrains \u2192 constrains\n- governs \u2192 governs\n- equivalentTo \u2192 equivalentTo"
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -245,7 +245,7 @@
       "data": {
         "markdown": "## Implications\n\n- Types express semantics only.\n- Styling/strength/flow are attributes.\n- Fewer types \u2192 better portability and validation.\n- Rendering can still honor attributes for UX."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -281,9 +281,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Questions\n\n1. Edge vs link: **no difference**. A node link is the edge as seen from inside the node (handle definition / exit).\n2. TransformsTo / ConflictsWith: clarify whether they belong in canonical types now or later.\n3. Flow/Strength are **always attributes**, never types."
+        "markdown": "## Open Questions\n\n1. Edge vs link: **no difference**. A node link is the edge as seen from inside the node (port definition / exit).\n2. TransformsTo / ConflictsWith: clarify whether they belong in canonical types now or later.\n3. Flow/Strength are **always attributes**, never types."
       },
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "in",
@@ -310,8 +310,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "9aa9a778-701c-4fd7-8f8a-dc165b8ce44d",
@@ -325,8 +325,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "e7ca108a-e805-4a82-89f1-289073a99a79",
@@ -340,8 +340,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "ca6eb913-f2b8-4199-80d4-6110e6627207",
@@ -355,8 +355,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "1388922b-2975-498c-91c3-17387b344670",
@@ -370,8 +370,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "937efc0a-f3ab-4f3a-b2c6-adbe7a48f46c",
@@ -385,8 +385,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     },
     {
       "id": "00b5555a-b00c-4854-b23f-928309ee41a5",
@@ -400,8 +400,8 @@
         "curved": true
       },
       "data": {},
-      "sourceHandle": "out",
-      "targetHandle": "in"
+      "sourcePort": "out",
+      "targetPort": "in"
     }
   ],
   "clusters": []

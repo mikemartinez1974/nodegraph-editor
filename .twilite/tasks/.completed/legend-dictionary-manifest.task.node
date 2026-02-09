@@ -1,1 +1,200 @@
-{"type":"nodegraph-data","nodes":[{"id":"ldm-root","type":"markdown","label":"Legend ↔ Dictionary ↔ Manifest Task","position":{"x":-520,"y":-320},"width":560,"height":260,"visible":true,"showLabel":true,"data":{"markdown":"# Legend ↔ Dictionary ↔ Manifest\n\nDefine the **contracted flow** between Manifest requirements, Legend intent labels, and Dictionary resolutions.\n\nGoal: **portable, auditable resources** with clear failure behavior."}},{"id":"ldm-truth-order","type":"markdown","label":"Source of Truth Order","position":{"x":80,"y":-320},"width":420,"height":240,"visible":true,"showLabel":true,"data":{"markdown":"## Source of Truth Order\n\n1. **Manifest** declares required resources (node types, skills, handles, schemas)\n2. **Legend** maps intent → `dictionaryKey`\n3. **Dictionary** resolves `dictionaryKey` → node definition / view / skill refs\n\nManifest is authority. Legend is human-facing. Dictionary is resolver."}},{"id":"ldm-ui-gating","type":"markdown","label":"UI Gating Rules","position":{"x":-520,"y":-10},"width":520,"height":260,"visible":true,"showLabel":true,"data":{"markdown":"## UI Gating Rules\n\n- Legend entry **requires** a matching Manifest dependency to be created.\n- If Manifest lacks the dependency, UI blocks creation with warning.\n- Dictionary entries can be created freely, but warn if unreferenced.\n\n**Draft mode:** Legend entries allowed without Manifest (warn only)."}},{"id":"ldm-validation","type":"markdown","label":"Validation Rules","position":{"x":80,"y":-10},"width":420,"height":280,"visible":true,"showLabel":true,"data":{"markdown":"## Validation Rules\n\n- Manifest dependency missing → **warn** (unless strict)\n- Legend entry missing dictionary entry → **warn** (unresolved)\n- Dictionary entry missing manifest dep → **warn** (non-portable)\n- Missing view for required node type → **warn** (render fallback)\n\nNo silent failures. Warnings only unless Manifest marks strict."}},{"id":"ldm-keys","type":"markdown","label":"Key & Naming Rules","position":{"x":-520,"y":310},"width":520,"height":240,"visible":true,"showLabel":true,"data":{"markdown":"## Key & Naming Rules\n\n- Canonical key field is `dictionaryKey`.\n- Legend entries reference `dictionaryKey` only.\n- Manifest dependencies list the same keys (node type strings).\n- Dictionary entries key must match exactly."}},{"id":"ldm-runtime","type":"markdown","label":"Runtime Behavior","position":{"x":80,"y":310},"width":420,"height":240,"visible":true,"showLabel":true,"data":{"markdown":"## Runtime Behavior\n\n- Legend renders entries when manifest dependency exists.\n- Unresolved entries render with warning badge.\n- Execution requires resolved dictionary entry + declared dependency.\n- View-only entries are renderable but non-executable.\n\n**No Manifest → fragment mode:** editing allowed, execution blocked."}},{"id":"ldm-open","type":"markdown","label":"Open Questions","position":{"x":-220,"y":640},"width":520,"height":220,"visible":true,"showLabel":true,"data":{"markdown":"## Open Questions\n\n**Resolved**\n1. Do we add `strict` flags in manifest for dependency enforcement? **Not yet**\n2. Should dictionary entries ever auto-add manifest dependencies? **No**\n3. Should legend entries be allowed without manifest in draft mode? **Yes (warn only)**"}}],"edges":[{"id":"edge-ldm-root-truth","type":"dataFlow","source":"ldm-root","target":"ldm-truth-order","label":"defines","style":{"width":2,"dash":[],"curved":true},"data":{}},{"id":"edge-ldm-root-ui","type":"dataFlow","source":"ldm-root","target":"ldm-ui-gating","label":"requires","style":{"width":2,"dash":[],"curved":true},"data":{}},{"id":"edge-ldm-truth-validation","type":"dataFlow","source":"ldm-truth-order","target":"ldm-validation","label":"drives","style":{"width":2,"dash":[],"curved":true},"data":{}},{"id":"edge-ldm-ui-keys","type":"dataFlow","source":"ldm-ui-gating","target":"ldm-keys","label":"constrains","style":{"width":2,"dash":[],"curved":true},"data":{}},{"id":"edge-ldm-keys-runtime","type":"dataFlow","source":"ldm-keys","target":"ldm-runtime","label":"enables","style":{"width":2,"dash":[],"curved":true},"data":{}},{"id":"edge-ldm-runtime-open","type":"dataFlow","source":"ldm-runtime","target":"ldm-open","label":"questions","style":{"width":2,"dash":[],"curved":true},"data":{}}],"timestamp":"2026-01-27T00:00:00.000Z","nodeCount":7,"edgeCount":6}
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "ldm-root",
+      "type": "markdown",
+      "label": "Legend \u2194 Dictionary \u2194 Manifest Task",
+      "position": {
+        "x": -520,
+        "y": -320
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Legend \u2194 Dictionary \u2194 Manifest\n\nDefine the **contracted flow** between Manifest requirements, Legend intent labels, and Dictionary resolutions.\n\nGoal: **portable, auditable resources** with clear failure behavior."
+      }
+    },
+    {
+      "id": "ldm-truth-order",
+      "type": "markdown",
+      "label": "Source of Truth Order",
+      "position": {
+        "x": 80,
+        "y": -320
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Source of Truth Order\n\n1. **Manifest** declares required resources (node types, skills, ports, schemas)\n2. **Legend** maps intent \u2192 `dictionaryKey`\n3. **Dictionary** resolves `dictionaryKey` \u2192 node definition / view / skill refs\n\nManifest is authority. Legend is human-facing. Dictionary is resolver."
+      }
+    },
+    {
+      "id": "ldm-ui-gating",
+      "type": "markdown",
+      "label": "UI Gating Rules",
+      "position": {
+        "x": -520,
+        "y": -10
+      },
+      "width": 520,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## UI Gating Rules\n\n- Legend entry **requires** a matching Manifest dependency to be created.\n- If Manifest lacks the dependency, UI blocks creation with warning.\n- Dictionary entries can be created freely, but warn if unreferenced.\n\n**Draft mode:** Legend entries allowed without Manifest (warn only)."
+      }
+    },
+    {
+      "id": "ldm-validation",
+      "type": "markdown",
+      "label": "Validation Rules",
+      "position": {
+        "x": 80,
+        "y": -10
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Validation Rules\n\n- Manifest dependency missing \u2192 **warn** (unless strict)\n- Legend entry missing dictionary entry \u2192 **warn** (unresolved)\n- Dictionary entry missing manifest dep \u2192 **warn** (non-portable)\n- Missing view for required node type \u2192 **warn** (render fallback)\n\nNo silent failures. Warnings only unless Manifest marks strict."
+      }
+    },
+    {
+      "id": "ldm-keys",
+      "type": "markdown",
+      "label": "Key & Naming Rules",
+      "position": {
+        "x": -520,
+        "y": 310
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Key & Naming Rules\n\n- Canonical key field is `dictionaryKey`.\n- Legend entries reference `dictionaryKey` only.\n- Manifest dependencies list the same keys (node type strings).\n- Dictionary entries key must match exactly."
+      }
+    },
+    {
+      "id": "ldm-runtime",
+      "type": "markdown",
+      "label": "Runtime Behavior",
+      "position": {
+        "x": 80,
+        "y": 310
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Runtime Behavior\n\n- Legend renders entries when manifest dependency exists.\n- Unresolved entries render with warning badge.\n- Execution requires resolved dictionary entry + declared dependency.\n- View-only entries are renderable but non-executable.\n\n**No Manifest \u2192 fragment mode:** editing allowed, execution blocked."
+      }
+    },
+    {
+      "id": "ldm-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": -220,
+        "y": 640
+      },
+      "width": 520,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n**Resolved**\n1. Do we add `strict` flags in manifest for dependency enforcement? **Not yet**\n2. Should dictionary entries ever auto-add manifest dependencies? **No**\n3. Should legend entries be allowed without manifest in draft mode? **Yes (warn only)**"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-ldm-root-truth",
+      "type": "dataFlow",
+      "source": "ldm-root",
+      "target": "ldm-truth-order",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ldm-root-ui",
+      "type": "dataFlow",
+      "source": "ldm-root",
+      "target": "ldm-ui-gating",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ldm-truth-validation",
+      "type": "dataFlow",
+      "source": "ldm-truth-order",
+      "target": "ldm-validation",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ldm-ui-keys",
+      "type": "dataFlow",
+      "source": "ldm-ui-gating",
+      "target": "ldm-keys",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ldm-keys-runtime",
+      "type": "dataFlow",
+      "source": "ldm-keys",
+      "target": "ldm-runtime",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-ldm-runtime-open",
+      "type": "dataFlow",
+      "source": "ldm-runtime",
+      "target": "ldm-open",
+      "label": "questions",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "timestamp": "2026-01-27T00:00:00.000Z",
+  "nodeCount": 7,
+  "edgeCount": 6
+}

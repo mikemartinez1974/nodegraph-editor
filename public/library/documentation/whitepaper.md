@@ -48,7 +48,7 @@ A `.node` file is a structured, versioned artifact with:
   "fileVersion": "1.0",
   "nodes": [...],
   "edges": [...],
-  "groups": [...],
+  "clusters": [...],
   "metadata": { ... }
 }
 ```
@@ -69,9 +69,9 @@ Each graph organizes content by **semantic role**, not just node type:
 | -------------- | ----------------------------------------------------------- |
 | 📜 Manifest    | Declares identity, intent, dependencies, and authority      |
 | 📘 Content     | Carries actual meaning—notes, logic, tasks, data            |
-| 🔗 Structure   | Relationships—edges, groups, hierarchies                    |
+| 🔗 Structure   | Relationships—edges, clusters, hierarchies                    |
 | 🎨 Style       | Visual semantics—color roles, emphasis, state, grouping     |
-| 📖 Definitions | Schema, handle contracts, constraints (optional but formal) |
+| 📖 Definitions | Schema, port contracts, constraints (optional but formal) |
 
 ---
 
@@ -123,7 +123,7 @@ To ensure interoperability and portability, every graph must:
 * ✅ Include **one Manifest node**
 * ✅ Include **at least one Content node**
 * ⚠️ Optionally include **Structure**, **Style**, and **Definitions**
-* ✅ Pass validation rules (no orphans, invalid handles, etc.)
+* ✅ Pass validation rules (no orphans, invalid ports, etc.)
 
 These rules are enforced by agents and tools alike.
 
@@ -137,7 +137,7 @@ Twilite ships with formal spec files in `contracts/`:
 | --------------- | --------------------------------- |
 | `manifest.md`   | Manifest fields, validation rules |
 | `nodes/*.md`    | Node type schemas                 |
-| `handles/*.md`  | Handle compatibility              |
+| `ports/*.md`  | Port compatibility              |
 | `skills/*.md`   | Skill behavior contracts          |
 | `migrations.md` | Schema upgrade paths              |
 | `validation.md` | Invariants and rules              |

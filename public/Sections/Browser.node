@@ -18,7 +18,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -28,7 +31,10 @@
       "id": "browser-purpose",
       "type": "markdown",
       "label": "Purpose",
-      "position": { "x": 80, "y": 60 },
+      "position": {
+        "x": 80,
+        "y": 60
+      },
       "width": 520,
       "height": 180,
       "visible": true,
@@ -41,7 +47,10 @@
       "id": "browser-address",
       "type": "markdown",
       "label": "Address Bar",
-      "position": { "x": 80, "y": 280 },
+      "position": {
+        "x": 80,
+        "y": 280
+      },
       "width": 520,
       "height": 200,
       "visible": true,
@@ -54,7 +63,10 @@
       "id": "browser-tabs",
       "type": "markdown",
       "label": "Tabs & Sessions",
-      "position": { "x": 80, "y": 520 },
+      "position": {
+        "x": 80,
+        "y": 520
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -67,7 +79,10 @@
       "id": "browser-launch",
       "type": "markdown",
       "label": "Launch Paths",
-      "position": { "x": 640, "y": 280 },
+      "position": {
+        "x": 640,
+        "y": 280
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -80,7 +95,10 @@
       "id": "browser-storage",
       "type": "markdown",
       "label": "Storage",
-      "position": { "x": 640, "y": 540 },
+      "position": {
+        "x": 640,
+        "y": 540
+      },
       "width": 520,
       "height": 220,
       "visible": true,
@@ -93,7 +111,10 @@
       "id": "browser-open",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 80, "y": 780 },
+      "position": {
+        "x": 80,
+        "y": 780
+      },
       "width": 520,
       "height": 200,
       "visible": true,
@@ -109,10 +130,13 @@
       "type": "child",
       "source": "browser-purpose",
       "target": "browser-address",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "navigate",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -120,10 +144,13 @@
       "type": "child",
       "source": "browser-address",
       "target": "browser-tabs",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "session",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -131,10 +158,13 @@
       "type": "child",
       "source": "browser-address",
       "target": "browser-launch",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "load",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -142,10 +172,13 @@
       "type": "child",
       "source": "browser-tabs",
       "target": "browser-storage",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "persist",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -153,12 +186,15 @@
       "type": "child",
       "source": "browser-storage",
       "target": "browser-open",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "questions",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

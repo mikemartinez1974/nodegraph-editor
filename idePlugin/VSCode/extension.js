@@ -531,8 +531,8 @@ class TwiliteNodeEditorProvider {
           const edges = Array.isArray(payload?.edges) ? payload.edges : [];
           const clusters = Array.isArray(payload?.clusters)
             ? payload.clusters
-            : Array.isArray(payload?.groups)
-              ? payload.groups
+            : Array.isArray(payload?.clusters)
+              ? payload.clusters
               : [];
           return nodes.length === 0 && edges.length === 0 && clusters.length === 0;
         };
@@ -553,8 +553,8 @@ class TwiliteNodeEditorProvider {
               const currentEdges = Array.isArray(current?.edges) ? current.edges : [];
               const currentClusters = Array.isArray(current?.clusters)
                 ? current.clusters
-                : Array.isArray(current?.groups)
-                  ? current.groups
+                : Array.isArray(current?.clusters)
+                  ? current.clusters
                   : [];
               const stillHasGraph =
                 currentNodes.length > 0 || currentEdges.length > 0 || currentClusters.length > 0;

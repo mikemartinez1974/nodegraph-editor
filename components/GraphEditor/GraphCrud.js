@@ -116,11 +116,11 @@ const toHandleDescriptor = (handle, fallbackDirection, index = 0) => {
 };
 
 const extractHandlesFromUnified = (node, targetDirection) => {
-  if (!node || !Array.isArray(node.handles) || node.handles.length === 0) return [];
+  if (!node || !Array.isArray(node.ports) || node.ports.length === 0) return [];
   const allowed = targetDirection === 'outputs'
     ? ['output', 'bidirectional', undefined]
     : ['input', 'bidirectional', undefined];
-  return node.handles
+  return node.ports
     .map((handle, index) => {
       const descriptor = toHandleDescriptor(handle, targetDirection === 'outputs' ? 'output' : 'input', index);
       if (!descriptor) return null;
@@ -223,7 +223,7 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
             .filter(h => h.direction === 'output' || h.direction === 'bidirectional' || !h.direction)
             .map(legacyHandleFromNormalized);
     return {
-      handles: normalizedHandles,
+      ports: normalizedHandles,
       inputs: derivedInputs,
       outputs: derivedOutputs
     };
@@ -260,7 +260,7 @@ const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
   });
 
   return {
-    handles: derivedHandles,
+    ports: derivedHandles,
     inputs: normalizedInputs,
     outputs: normalizedOutputs
   };
@@ -308,60 +308,61 @@ const validateHandlePair = (sourceNode, targetNode, sourceHandleKey, targetHandl
   if (!targetNode || !targetNode.id) {
     return { error: 'Target node not found' };
   }
-  if (!sourceHandleKey && !targetHandleKey) {
-    return { meta: null };
-  }
 
   const sourceHandles = getHandleList(sourceNode, 'outputs');
   const targetHandles = getHandleList(targetNode, 'inputs');
 
-  const sourceHandle = sourceHandleKey
+  const sourcePort = sourceHandleKey === 'root'
+    ? { key: 'root', label: 'root', type: 'value' }
+    : sourceHandleKey
     ? sourceHandles.find(h => h.key === sourceHandleKey)
     : null;
-  if (sourceHandleKey && !sourceHandle) {
-    return { error: `Output handle "${sourceHandleKey}" not found on node ${sourceNode.id}` };
+  if (sourceHandleKey && !sourcePort) {
+    return { error: `Output port "${sourceHandleKey}" not found on node ${sourceNode.id}` };
   }
-  const targetHandle = targetHandleKey
+  const targetPort = targetHandleKey === 'root'
+    ? { key: 'root', label: 'root', type: 'value' }
+    : targetHandleKey
     ? targetHandles.find(h => h.key === targetHandleKey)
     : null;
-  if (targetHandleKey && !targetHandle) {
-    return { error: `Input handle "${targetHandleKey}" not found on node ${targetNode.id}` };
+  if (targetHandleKey && !targetPort) {
+    return { error: `Input port "${targetHandleKey}" not found on node ${targetNode.id}` };
   }
-  if (!sourceHandle || !targetHandle) {
+  if (!sourcePort || !targetPort) {
     return {
       meta: {
-        source: sourceHandle ? toHandleMeta(sourceHandle) : undefined,
-        target: targetHandle ? toHandleMeta(targetHandle) : undefined
+        source: sourcePort ? toHandleMeta(sourcePort) : undefined,
+        target: targetPort ? toHandleMeta(targetPort) : undefined
       }
     };
   }
   if (edgeType) {
-    const sourceAllowed = Array.isArray(sourceHandle.allowedEdgeTypes)
-      ? sourceHandle.allowedEdgeTypes
+    const sourceAllowed = Array.isArray(sourcePort.allowedEdgeTypes)
+      ? sourcePort.allowedEdgeTypes
       : null;
-    const targetAllowed = Array.isArray(targetHandle.allowedEdgeTypes)
-      ? targetHandle.allowedEdgeTypes
+    const targetAllowed = Array.isArray(targetPort.allowedEdgeTypes)
+      ? targetPort.allowedEdgeTypes
       : null;
     if (sourceAllowed && !sourceAllowed.includes(edgeType)) {
-      return { error: `Edge type "${edgeType}" is not allowed by source handle "${sourceHandleKey}"` };
+      return { error: `Edge type "${edgeType}" is not allowed by source port "${sourceHandleKey}"` };
     }
     if (targetAllowed && !targetAllowed.includes(edgeType)) {
-      return { error: `Edge type "${edgeType}" is not allowed by target handle "${targetHandleKey}"` };
+      return { error: `Edge type "${edgeType}" is not allowed by target port "${targetHandleKey}"` };
     }
   }
 
   if (
-    !isWildcardHandleType(sourceHandle.type) &&
-    !isWildcardHandleType(targetHandle.type) &&
-    sourceHandle.type !== targetHandle.type
+    !isWildcardHandleType(sourcePort.type) &&
+    !isWildcardHandleType(targetPort.type) &&
+    sourcePort.type !== targetPort.type
   ) {
-    return { error: `Handle types do not match: ${sourceHandle.type} → ${targetHandle.type}` };
+    return { error: `Port types do not match: ${sourcePort.type} → ${targetPort.type}` };
   }
 
   return {
     meta: {
-      source: toHandleMeta(sourceHandle),
-      target: toHandleMeta(targetHandle)
+      source: toHandleMeta(sourcePort),
+      target: toHandleMeta(targetPort)
     }
   };
 };
@@ -373,11 +374,11 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
 
   const { nodeId: normalizedSource, handleKey: normalizedSourceHandle } = normalizeEndpoint(
     edgeInput.source,
-    edgeInput.sourceHandle
+    edgeInput.sourcePort
   );
   const { nodeId: normalizedTarget, handleKey: normalizedTargetHandle } = normalizeEndpoint(
     edgeInput.target,
-    edgeInput.targetHandle
+    edgeInput.targetPort
   );
 
   if (!normalizedSource || !normalizedTarget) {
@@ -395,11 +396,14 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
   }
 
   const edgeType = edgeInput.type || defaultType || 'relates';
+  const sourcePortKey = normalizedSourceHandle || 'root';
+  const targetPortKey = normalizedTargetHandle || 'root';
+
   const handleValidation = validateHandlePair(
     sourceNode,
     targetNode,
-    normalizedSourceHandle,
-    normalizedTargetHandle,
+    sourcePortKey,
+    targetPortKey,
     edgeType
   );
   if (handleValidation.error) {
@@ -418,8 +422,8 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
     id: edgeId,
     source: normalizedSource,
     target: normalizedTarget,
-    sourceHandle: normalizedSourceHandle,
-    targetHandle: normalizedTargetHandle,
+    sourcePort: sourcePortKey,
+    targetPort: targetPortKey,
     type: edgeType,
     label: edgeInput.label || '',
     color: edgeInput.color,
@@ -435,7 +439,7 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
       curved: style.curved !== undefined ? style.curved : true,
       color: style.color
     },
-    handleMeta: handleValidation.meta,
+    portMeta: handleValidation.meta,
     state: edgeInput.state ? cloneValue(edgeInput.state) : undefined,
     logic: edgeInput.logic ? cloneValue(edgeInput.logic) : undefined,
     routing: edgeInput.routing ? cloneValue(edgeInput.routing) : undefined,
@@ -453,19 +457,19 @@ const applyNodeUpdates = (node, updates = {}) => {
     ? updates.outputs.map(handle => ({ ...handle }))
     : node.outputs;
 
-  let nextHandles = node.handles;
-  if (updates.handles) {
+  let nextHandles = node.ports;
+  if (updates.ports) {
     nextHandles = normalizeHandleDefinitions({
-      handles: updates.handles,
+      ports: updates.ports,
       inputs: nextInputs,
       outputs: nextOutputs
-    }).handles;
+    }).ports;
   } else if (updates.inputs || updates.outputs) {
     nextHandles = normalizeHandleDefinitions({
-      handles: node.handles,
+      ports: node.ports,
       inputs: nextInputs,
       outputs: nextOutputs
-    }).handles;
+    }).ports;
   }
 
   return {
@@ -473,7 +477,7 @@ const applyNodeUpdates = (node, updates = {}) => {
     ...updates,
     inputs: nextInputs,
     outputs: nextOutputs,
-    handles: nextHandles,
+    ports: nextHandles,
     data: updates.data ? { ...node.data, ...updates.data } : node.data,
     position: updates.position ? { ...node.position, ...updates.position } : node.position,
     state: updates.state ? { ...node.state, ...updates.state } : node.state,
@@ -583,13 +587,13 @@ export default class GraphCRUD {
         data: sanitizedData,
         inputs: normalizedHandles.inputs,
         outputs: normalizedHandles.outputs,
-        handles: normalizedHandles.handles,
+        ports: normalizedHandles.ports,
         visible,
         state: sanitizedState,
         style: sanitizedStyle,
         extensions: sanitizedExtensions,
         resizable: true,
-        handlePosition: 'center',
+        portPosition: 'center',
         showLabel: true
       };
       const updatedNodes = deduplicateNodes([...currentNodes, newNode]);
@@ -831,14 +835,14 @@ export default class GraphCRUD {
       const handleValidation = validateHandlePair(
         sourceNode,
         targetNode,
-        mergedEdge.sourceHandle,
-        mergedEdge.targetHandle,
+        mergedEdge.sourcePort,
+        mergedEdge.targetPort,
         mergedEdge.type
       );
       if (handleValidation.error) {
         return { success: false, error: handleValidation.error };
       }
-      mergedEdge.handleMeta = handleValidation.meta;
+      mergedEdge.portMeta = handleValidation.meta;
 
       const updatedEdges = currentEdges.map(edge => (edge.id === id ? mergedEdge : edge));
 
@@ -888,14 +892,14 @@ export default class GraphCRUD {
         const handleValidation = validateHandlePair(
           sourceNode,
           targetNode,
-          mergedEdge.sourceHandle,
-          mergedEdge.targetHandle,
+          mergedEdge.sourcePort,
+          mergedEdge.targetPort,
           mergedEdge.type
         );
         if (handleValidation.error) {
           throw new Error(`Edge ${edge.id}: ${handleValidation.error}`);
         }
-        mergedEdge.handleMeta = handleValidation.meta;
+        mergedEdge.portMeta = handleValidation.meta;
         updatedItems.push(mergedEdge);
         return mergedEdge;
       });
@@ -973,7 +977,7 @@ export default class GraphCRUD {
           }
 
           const normalizedHandles = normalizeHandleDefinitions({
-            handles: opts.handles,
+            ports: opts.ports,
             inputs: opts.inputs,
             outputs: opts.outputs
           });
@@ -999,12 +1003,12 @@ export default class GraphCRUD {
             data: sanitizedData,
             inputs: normalizedHandles.inputs,
             outputs: normalizedHandles.outputs,
-            handles: normalizedHandles.handles,
+            ports: normalizedHandles.ports,
             state: opts.state ? cloneValue(opts.state) : undefined,
             style: opts.style ? cloneValue(opts.style) : undefined,
             extensions: cloneExtensions(opts.extensions),
             resizable: opts.resizable !== undefined ? opts.resizable : true,
-            handlePosition: opts.handlePosition || 'center',
+            portPosition: opts.portPosition || 'center',
             showLabel: opts.showLabel !== undefined ? opts.showLabel : true
           };
 
@@ -1104,7 +1108,7 @@ export default class GraphCRUD {
     if (!this.groupManagerRef) return;
     const manager = this.groupManagerRef.current || this.groupManagerRef;
     if (!manager) return;
-    const groupStore = manager.groups;
+    const groupStore = manager.clusters;
     const nodeToGroup = manager.nodeToGroup;
     if (typeof manager.clear === 'function') {
       manager.clear();
@@ -1365,18 +1369,18 @@ export default class GraphCRUD {
 
   /**
    * Add nodes to an existing group
-   * @param {string} groupId - Cluster ID
+   * @param {string} clusterId - Cluster ID
    * @param {string[]} nodeIds - Node IDs to add
    */
-  addNodesToGroup(groupId, nodeIds) {
+  addNodesToGroup(clusterId, nodeIds) {
     try {
       if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
         return { success: false, error: 'nodeIds must be a non-empty array' };
       }
       const currentGroups = this.getGroups();
-      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      const groupIndex = currentGroups.findIndex(g => g.id === clusterId);
       if (groupIndex === -1) {
-        return { success: false, error: `Cluster ${groupId} not found` };
+        return { success: false, error: `Cluster ${clusterId} not found` };
       }
 
       const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
@@ -1386,10 +1390,10 @@ export default class GraphCRUD {
       }
 
       const updatedGroups = currentGroups.map(group => {
-        if (group.id !== groupId) return group;
+        if (group.id !== clusterId) return group;
         const nextNodeIds = Array.from(new Set([...(group.nodeIds || []), ...additions]));
         if (nextNodeIds.length < 2) {
-          throw new Error(`Cluster ${groupId}: must reference at least two existing nodes`);
+          throw new Error(`Cluster ${clusterId}: must reference at least two existing nodes`);
         }
         return { ...group, nodeIds: nextNodeIds };
       });
@@ -1405,24 +1409,24 @@ export default class GraphCRUD {
 
   /**
    * Remove nodes from an existing group
-   * @param {string} groupId - Cluster ID
+   * @param {string} clusterId - Cluster ID
    * @param {string[]} nodeIds - Node IDs to remove
    */
-  removeNodesFromGroup(groupId, nodeIds) {
+  removeNodesFromGroup(clusterId, nodeIds) {
     try {
       if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
         return { success: false, error: 'nodeIds must be a non-empty array' };
       }
       const currentGroups = this.getGroups();
-      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      const groupIndex = currentGroups.findIndex(g => g.id === clusterId);
       if (groupIndex === -1) {
-        return { success: false, error: `Cluster ${groupId} not found` };
+        return { success: false, error: `Cluster ${clusterId} not found` };
       }
 
       let removedGroup = false;
       const updatedGroups = currentGroups
         .map(group => {
-          if (group.id !== groupId) return group;
+          if (group.id !== clusterId) return group;
           const nextNodeIds = (group.nodeIds || []).filter(id => !nodeIds.includes(id));
           if (nextNodeIds.length < 2) {
             removedGroup = true;
@@ -1437,7 +1441,7 @@ export default class GraphCRUD {
 
       return {
         success: true,
-        data: removedGroup ? { deletedGroupId: groupId } : updatedGroups[groupIndex]
+        data: removedGroup ? { deletedGroupId: clusterId } : updatedGroups[groupIndex]
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -1446,28 +1450,28 @@ export default class GraphCRUD {
 
   /**
    * Replace a group's nodeIds
-   * @param {string} groupId - Cluster ID
+   * @param {string} clusterId - Cluster ID
    * @param {string[]} nodeIds - New node IDs
    */
-  setGroupNodes(groupId, nodeIds) {
+  setGroupNodes(clusterId, nodeIds) {
     try {
       if (!Array.isArray(nodeIds)) {
         return { success: false, error: 'nodeIds must be an array' };
       }
       const currentGroups = this.getGroups();
-      const groupIndex = currentGroups.findIndex(g => g.id === groupId);
+      const groupIndex = currentGroups.findIndex(g => g.id === clusterId);
       if (groupIndex === -1) {
-        return { success: false, error: `Cluster ${groupId} not found` };
+        return { success: false, error: `Cluster ${clusterId} not found` };
       }
 
       const nodeIdSet = new Set((this.getNodes() || []).map(n => n.id));
       const filtered = nodeIds.filter(id => nodeIdSet.has(id));
       if (filtered.length < 2) {
-        return { success: false, error: `Cluster ${groupId}: must reference at least two existing nodes` };
+        return { success: false, error: `Cluster ${clusterId}: must reference at least two existing nodes` };
       }
 
       const updatedGroups = currentGroups.map(group =>
-        group.id === groupId ? { ...group, nodeIds: filtered } : group
+        group.id === clusterId ? { ...group, nodeIds: filtered } : group
       );
 
       this._commitGroups(updatedGroups);
@@ -1659,7 +1663,7 @@ export default class GraphCRUD {
               result = this.translateGroups(delta.ids || [], delta.delta || delta);
               break;
             case 'createGroups':
-              result = this.createGroups(delta.data || delta.groups || []);
+              result = this.createGroups(delta.data || delta.clusters || []);
               break;
             case 'updateGroup':
               result = this.updateGroup(delta.id, delta.patch || {});
@@ -2060,8 +2064,8 @@ crud.createNode({
 crud.createEdge({
   source: "node1",
   target: "node2",
-  sourceHandle: "out",
-  targetHandle: "in",
+  sourcePort: "out",
+  targetPort: "in",
   type: "relates"
 });
 

@@ -52,7 +52,7 @@
     {
       "id": "workflow-root",
       "type": "markdown",
-      "label": "🧠 Layered Refactor Workflow",
+      "label": "\ud83e\udde0 Layered Refactor Workflow",
       "position": {
         "x": 0,
         "y": -220
@@ -62,13 +62,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Layered Refactor Workflow\n+\n+A repeatable method for staying aligned while moving through orientation → planning → implementation."
+        "markdown": "# Layered Refactor Workflow\n+\n+A repeatable method for staying aligned while moving through orientation \u2192 planning \u2192 implementation."
       }
     },
     {
       "id": "workflow-intake",
       "type": "markdown",
-      "label": "🧭 Intake & Orientation",
+      "label": "\ud83e\udded Intake & Orientation",
       "position": {
         "x": -360,
         "y": -20
@@ -84,7 +84,7 @@
     {
       "id": "workflow-plan",
       "type": "markdown",
-      "label": "📝 Plan & Agreement",
+      "label": "\ud83d\udcdd Plan & Agreement",
       "position": {
         "x": 360,
         "y": -20
@@ -100,7 +100,7 @@
     {
       "id": "workflow-implement",
       "type": "markdown",
-      "label": "🛠️ Implement & Iterate",
+      "label": "\ud83d\udee0\ufe0f Implement & Iterate",
       "position": {
         "x": 0,
         "y": 180
@@ -116,7 +116,7 @@
     {
       "id": "workflow-checkin",
       "type": "markdown",
-      "label": "🔁 Check-In & Reflect",
+      "label": "\ud83d\udd01 Check-In & Reflect",
       "position": {
         "x": 0,
         "y": 400
@@ -204,5 +204,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

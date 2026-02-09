@@ -70,7 +70,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Rendering Logic**\n\n- Open graph normally → render full graph\n- Reference graph as node → render its View\n- Missing View on Node Declaration → validation error\n\nRenderers never guess. They only read Views."
+        "markdown": "**Rendering Logic**\n\n- Open graph normally \u2192 render full graph\n- Reference graph as node \u2192 render its View\n- Missing View on Node Declaration \u2192 validation error\n\nRenderers never guess. They only read Views."
       }
     },
     {
@@ -86,7 +86,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Validation Invariant**\n\nIf a graph declares itself a Node Declaration:\n- It must define ≥ 1 View node\n\nIf not a Node Declaration:\n- Views are ignored or forbidden\n\nNo implicit promotion. No guessing."
+        "markdown": "**Validation Invariant**\n\nIf a graph declares itself a Node Declaration:\n- It must define \u2265 1 View node\n\nIf not a Node Declaration:\n- Views are ignored or forbidden\n\nNo implicit promotion. No guessing."
       }
     },
     {
@@ -119,13 +119,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },

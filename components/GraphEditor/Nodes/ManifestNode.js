@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import FixedNode from './FixedNode';
 import eventBus from '../../NodeGraph/eventBus';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const EMPTY_HANDLES = [];
 const NON_PASSIVE_LISTENER = { passive: false };
@@ -17,7 +17,7 @@ const formatList = (value) => {
 };
 
 const ManifestNode = (props) => {
-  const node = useNodeHandleSchema(props.node, EMPTY_HANDLES, EMPTY_HANDLES);
+  const node = useNodePortSchema(props.node, EMPTY_HANDLES, EMPTY_HANDLES);
   const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
@@ -57,7 +57,7 @@ const ManifestNode = (props) => {
         title: 'Dependencies',
         rows: [
           ['Node Types', formatList(dependencies.nodeTypes)],
-          ['Port Contracts', formatList(dependencies.handleContracts)],
+          ['Port Contracts', formatList(dependencies.portContracts)],
           ['Skills', formatList(dependencies.skills)],
           [
             'Schema Versions',

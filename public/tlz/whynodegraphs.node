@@ -18,7 +18,10 @@
     "autoSave": false
   },
   "viewport": {
-    "pan": { "x": 0, "y": 0 },
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
     "zoom": 1
   },
   "document": null,
@@ -28,20 +31,26 @@
       "id": "whyg-overview",
       "type": "markdown",
       "label": "Thesis",
-      "position": { "x": 80, "y": 60 },
+      "position": {
+        "x": 80,
+        "y": 60
+      },
       "width": 540,
       "height": 200,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why Node Graphs\nNode graphs turn **systems thinking** into a visible, editable artifact.\nThey make structure, flow, and dependencies explicit." 
+        "markdown": "## Why Node Graphs\nNode graphs turn **systems thinking** into a visible, editable artifact.\nThey make structure, flow, and dependencies explicit."
       }
     },
     {
       "id": "whyg-clarity",
       "type": "markdown",
       "label": "Clarity",
-      "position": { "x": 80, "y": 300 },
+      "position": {
+        "x": 80,
+        "y": 300
+      },
       "width": 540,
       "height": 220,
       "visible": true,
@@ -54,7 +63,10 @@
       "id": "whyg-collab",
       "type": "markdown",
       "label": "Collaboration",
-      "position": { "x": 80, "y": 560 },
+      "position": {
+        "x": 80,
+        "y": 560
+      },
       "width": 540,
       "height": 220,
       "visible": true,
@@ -67,7 +79,10 @@
       "id": "whyg-ai",
       "type": "markdown",
       "label": "AI + Automation",
-      "position": { "x": 660, "y": 300 },
+      "position": {
+        "x": 660,
+        "y": 300
+      },
       "width": 540,
       "height": 220,
       "visible": true,
@@ -80,7 +95,10 @@
       "id": "whyg-products",
       "type": "markdown",
       "label": "Products",
-      "position": { "x": 660, "y": 560 },
+      "position": {
+        "x": 660,
+        "y": 560
+      },
       "width": 540,
       "height": 220,
       "visible": true,
@@ -93,7 +111,10 @@
       "id": "whyg-future",
       "type": "markdown",
       "label": "Modern Landscape",
-      "position": { "x": 80, "y": 820 },
+      "position": {
+        "x": 80,
+        "y": 820
+      },
       "width": 540,
       "height": 220,
       "visible": true,
@@ -106,7 +127,10 @@
       "id": "whyg-open",
       "type": "markdown",
       "label": "Open Questions",
-      "position": { "x": 660, "y": 820 },
+      "position": {
+        "x": 660,
+        "y": 820
+      },
       "width": 540,
       "height": 200,
       "visible": true,
@@ -122,10 +146,13 @@
       "type": "child",
       "source": "whyg-overview",
       "target": "whyg-clarity",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "value",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -133,10 +160,13 @@
       "type": "child",
       "source": "whyg-clarity",
       "target": "whyg-collab",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "share",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -144,10 +174,13 @@
       "type": "child",
       "source": "whyg-clarity",
       "target": "whyg-ai",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "enable",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -155,10 +188,13 @@
       "type": "child",
       "source": "whyg-ai",
       "target": "whyg-products",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "apply",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -166,10 +202,13 @@
       "type": "child",
       "source": "whyg-collab",
       "target": "whyg-future",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "scale",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -177,12 +216,15 @@
       "type": "child",
       "source": "whyg-future",
       "target": "whyg-open",
-      "sourceHandle": "out",
-      "targetHandle": "in",
+      "sourcePort": "out",
+      "targetPort": "in",
       "label": "next",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

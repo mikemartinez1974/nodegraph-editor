@@ -38,7 +38,7 @@
     {
       "id": "node_tz",
       "type": "default",
-      "label": "The Twilite Zone 🌌",
+      "label": "The Twilite Zone \ud83c\udf0c",
       "position": {
         "x": 400,
         "y": 50
@@ -53,7 +53,7 @@
     {
       "id": "node_create",
       "type": "default",
-      "label": "Create 📝",
+      "label": "Create \ud83d\udcdd",
       "position": {
         "x": 28.92857175846484,
         "y": 208.21428582814275
@@ -98,7 +98,7 @@
     {
       "id": "node_connect",
       "type": "default",
-      "label": "Connect 🔗",
+      "label": "Connect \ud83d\udd17",
       "position": {
         "x": 388.21428574639924,
         "y": 209.28571439665188
@@ -143,7 +143,7 @@
     {
       "id": "node_visualize",
       "type": "default",
-      "label": "Visualize 📊",
+      "label": "Visualize \ud83d\udcca",
       "position": {
         "x": 757.142856850916,
         "y": 212.5000001021794
@@ -173,7 +173,7 @@
     {
       "id": "node_extend",
       "type": "default",
-      "label": "Extend 🚀",
+      "label": "Extend \ud83d\ude80",
       "position": {
         "x": 1037.1428567691726,
         "y": 217.85714294472518
@@ -213,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# The Twilite Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it’s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.json)"
+        "memo": "# The Twilite Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it\u2019s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.json)"
       }
     },
     {
@@ -315,10 +315,10 @@
       "style": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group_create",
-      "label": "Creation Zone 📝",
+      "label": "Creation Zone \ud83d\udcdd",
       "nodeIds": [
         "node_create",
         "node_create_graphs",
@@ -335,7 +335,7 @@
     },
     {
       "id": "group_connect",
-      "label": "Connection Zone 🔗",
+      "label": "Connection Zone \ud83d\udd17",
       "nodeIds": [
         "node_connect",
         "node_connect_graphs",
@@ -352,7 +352,7 @@
     },
     {
       "id": "group_visualize",
-      "label": "Visualization Zone 📊",
+      "label": "Visualization Zone \ud83d\udcca",
       "nodeIds": [
         "node_visualize",
         "node_visualize_data"
@@ -368,7 +368,7 @@
     },
     {
       "id": "group_extend",
-      "label": "Future Zone 🚀",
+      "label": "Future Zone \ud83d\ude80",
       "nodeIds": [
         "node_extend",
         "node_extend_vr"

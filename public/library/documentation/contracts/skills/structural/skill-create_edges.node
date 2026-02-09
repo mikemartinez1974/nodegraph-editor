@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Inputs\n\n```\n{\n  edges: [{\n    id,\n    source,\n    target,\n    sourceHandle?,\n    targetHandle?,\n    type?,\n    label?,\n    data?\n  }]\n}\n```\n\nAll fields are validated. None are inferred."
+        "markdown": "## Inputs\n\n```\n{\n  edges: [{\n    id,\n    source,\n    target,\n    sourcePort?,\n    targetPort?,\n    type?,\n    label?,\n    data?\n  }]\n}\n```\n\nAll fields are validated. None are inferred."
       }
     },
     {
@@ -325,5 +325,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

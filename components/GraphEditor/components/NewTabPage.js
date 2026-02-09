@@ -64,7 +64,7 @@ export default function NewTabPage({
         const jsonData = JSON.parse(e.target.result);
         const nodesToLoad = jsonData.nodes || [];
         const edgesToLoad = jsonData.edges || [];
-        const groupsToLoad = jsonData.clusters || jsonData.groups || [];
+        const groupsToLoad = jsonData.clusters || jsonData.clusters || [];
 
         if (nodesToLoad.length === 0 && edgesToLoad.length === 0) {
           throw new Error('File does not contain any nodes or edges.');

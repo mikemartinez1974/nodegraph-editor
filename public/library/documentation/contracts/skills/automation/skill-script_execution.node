@@ -59,7 +59,7 @@
     {
       "id": "skill-scriptexec-root",
       "type": "markdown",
-      "label": "🧠 Skill: ScriptExecution (Normative)",
+      "label": "\ud83e\udde0 Skill: ScriptExecution (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- On error → rollback entire transaction\n- If script exceeds limits → abort\n\nPartial execution is forbidden."
+        "markdown": "## Failure Modes\n\n- On error \u2192 rollback entire transaction\n- If script exceeds limits \u2192 abort\n\nPartial execution is forbidden."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

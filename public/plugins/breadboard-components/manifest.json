@@ -46,10 +46,18 @@
           "height": 1
         }
       },
-      "handles": {
+      "ports": {
         "outputs": [
-          { "id": "pinA", "label": "Pin A", "dataType": "value" },
-          { "id": "pinB", "label": "Pin B", "dataType": "value" }
+          {
+            "id": "pinA",
+            "label": "Pin A",
+            "dataType": "value"
+          },
+          {
+            "id": "pinB",
+            "label": "Pin B",
+            "dataType": "value"
+          }
         ]
       },
       "renderer": {
@@ -69,7 +77,7 @@
     {
       "type": "led",
       "label": "LED",
-      "description": "Polarized LED node with anode/cathode handles.",
+      "description": "Polarized LED node with anode/cathode ports.",
       "category": "breadboard",
       "icon": "LightMode",
       "entry": "/plugins/breadboard-components/componentPlugin.js#LEDNode",
@@ -94,12 +102,35 @@
             "segmentPreference": "bottom"
           }
         ],
-        "footprint": { "rows": 2, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 2 }
+        "footprint": {
+          "rows": 2,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 2
+        }
       },
-      "handles": {
+      "ports": {
         "outputs": [
-          { "id": "anode", "label": "Anode", "dataType": "value", "position": { "x": 0.5, "y": 0 } },
-          { "id": "cathode", "label": "Cathode", "dataType": "value", "position": { "x": 0.5, "y": 1 } }
+          {
+            "id": "anode",
+            "label": "Anode",
+            "dataType": "value",
+            "position": {
+              "x": 0.5,
+              "y": 0
+            }
+          },
+          {
+            "id": "cathode",
+            "label": "Cathode",
+            "dataType": "value",
+            "position": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
         ]
       },
       "renderer": {
@@ -144,12 +175,27 @@
             "segmentPreference": "same"
           }
         ],
-        "footprint": { "rows": 1, "columns": 4, "rowPitch": 1, "columnPitch": 1, "width": 4, "height": 1 }
+        "footprint": {
+          "rows": 1,
+          "columns": 4,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 4,
+          "height": 1
+        }
       },
-      "handles": {
+      "ports": {
         "outputs": [
-          { "id": "wireA", "label": "Wire A", "dataType": "value" },
-          { "id": "wireB", "label": "Wire B", "dataType": "value" }
+          {
+            "id": "wireA",
+            "label": "Wire A",
+            "dataType": "value"
+          },
+          {
+            "id": "wireB",
+            "label": "Wire B",
+            "dataType": "value"
+          }
         ]
       },
       "renderer": {
@@ -194,12 +240,27 @@
             "segmentPreference": "top"
           }
         ],
-        "footprint": { "rows": 1, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 1 }
+        "footprint": {
+          "rows": 1,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 1
+        }
       },
-      "handles": {
+      "ports": {
         "outputs": [
-          { "id": "rail", "label": "Rail", "dataType": "value" },
-          { "id": "tap", "label": "Tap", "dataType": "value" }
+          {
+            "id": "rail",
+            "label": "Rail",
+            "dataType": "value"
+          },
+          {
+            "id": "tap",
+            "label": "Tap",
+            "dataType": "value"
+          }
         ]
       },
       "renderer": {
@@ -244,12 +305,27 @@
             "segmentPreference": "top"
           }
         ],
-        "footprint": { "rows": 1, "columns": 1, "rowPitch": 1, "columnPitch": 1, "width": 1, "height": 1 }
+        "footprint": {
+          "rows": 1,
+          "columns": 1,
+          "rowPitch": 1,
+          "columnPitch": 1,
+          "width": 1,
+          "height": 1
+        }
       },
-      "handles": {
+      "ports": {
         "outputs": [
-          { "id": "rail", "label": "Rail", "dataType": "value" },
-          { "id": "tap", "label": "Tap", "dataType": "value" }
+          {
+            "id": "rail",
+            "label": "Rail",
+            "dataType": "value"
+          },
+          {
+            "id": "tap",
+            "label": "Tap",
+            "dataType": "value"
+          }
         ]
       },
       "renderer": {

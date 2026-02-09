@@ -65,12 +65,12 @@ export function createGraphEditorHandlers({
     const normalized = { ...edge };
     if (normalized.source && typeof normalized.source === 'object') {
       const sourceObj = normalized.source;
-      normalized.sourceHandle = normalized.sourceHandle || sourceObj.handleKey;
+      normalized.sourcePort = normalized.sourcePort || sourceObj.handleKey;
       normalized.source = sourceObj.nodeId ?? sourceObj.id ?? normalized.source;
     }
     if (normalized.target && typeof normalized.target === 'object') {
       const targetObj = normalized.target;
-      normalized.targetHandle = normalized.targetHandle || targetObj.handleKey;
+      normalized.targetPort = normalized.targetPort || targetObj.handleKey;
       normalized.target = targetObj.nodeId ?? targetObj.id ?? normalized.target;
     }
     normalized.state = normalized.state && typeof normalized.state === 'object' ? { ...normalized.state } : undefined;
@@ -112,8 +112,8 @@ export function createGraphEditorHandlers({
     };
 
     const handles =
-      Array.isArray(node.handles) && node.handles.length > 0
-        ? node.handles
+      Array.isArray(node.ports) && node.ports.length > 0
+        ? node.ports
         : hydrateHandlesFromLegacy();
 
     const normalizedHandles = handles.map((handle, index) => {
@@ -135,7 +135,7 @@ export function createGraphEditorHandlers({
 
     return {
       ...node,
-      handles: normalizedHandles,
+      ports: normalizedHandles,
       state: node.state && typeof node.state === 'object' ? { ...node.state } : undefined,
       extensions: node.extensions && typeof node.extensions === 'object' ? { ...node.extensions } : undefined,
       style: node.style && typeof node.style === 'object' ? { ...node.style } : undefined,
@@ -294,15 +294,15 @@ export function createGraphEditorHandlers({
       : undefined;
 
     const normalizedHandles =
-      Array.isArray(meta?.handles)
-        ? meta.handles
-        : convertHandlesObjectToArray(meta?.handles) || derivedHandlesFromPins;
+      Array.isArray(meta?.ports)
+        ? meta.ports
+        : convertHandlesObjectToArray(meta?.ports) || derivedHandlesFromPins;
 
     const normalizedOutputs =
       Array.isArray(meta?.outputs)
         ? meta.outputs
-        : Array.isArray(meta?.handles?.outputs)
-        ? meta.handles.outputs
+        : Array.isArray(meta?.ports?.outputs)
+        ? meta.ports.outputs
         : derivedHandlesFromPins
         ? derivedHandlesFromPins.map(handle => ({
             key: handle.id,
@@ -314,8 +314,8 @@ export function createGraphEditorHandlers({
     const normalizedInputs =
       Array.isArray(meta?.inputs)
         ? meta.inputs
-        : Array.isArray(meta?.handles?.inputs)
-        ? meta.handles.inputs
+        : Array.isArray(meta?.ports?.inputs)
+        ? meta.ports.inputs
         : undefined;
 
     const payload = {
@@ -384,11 +384,11 @@ export function createGraphEditorHandlers({
       width: resolvedWidth,
       height: resolvedHeight,
       resizable: true,
-      handlePosition: 'center',
+      portPosition: 'center',
       showLabel: true,
       inputs: normalizedInputs,
       outputs: normalizedOutputs,
-      handles: normalizedHandles,
+      ports: normalizedHandles,
       state:
         meta && meta.state && typeof meta.state === 'object'
           ? { ...meta.state }
@@ -520,8 +520,8 @@ export function createGraphEditorHandlers({
     } else if (selectedEdgeIds && selectedEdgeIds.length > 0) {
       proposals.push({ action: 'deleteEdges', ids: [...selectedEdgeIds] });
     } else if (selectedGroupIds && selectedGroupIds.length > 0) {
-      selectedGroupIds.forEach((groupId) => {
-        proposals.push({ action: 'deleteGroup', id: groupId });
+      selectedGroupIds.forEach((clusterId) => {
+        proposals.push({ action: 'deleteGroup', id: clusterId });
       });
     }
 
@@ -587,9 +587,9 @@ export function createGraphEditorHandlers({
         return;
       }
       const takeNew =
-        (!previous.sourceHandle && normalized.sourceHandle) ||
-        (!previous.targetHandle && normalized.targetHandle) ||
-        (!previous.handleMeta && normalized.handleMeta);
+        (!previous.sourcePort && normalized.sourcePort) ||
+        (!previous.targetPort && normalized.targetPort) ||
+        (!previous.portMeta && normalized.portMeta);
       if (takeNew) {
         edgeMap.set(normalized.id, normalized);
       }
@@ -627,18 +627,18 @@ export function createGraphEditorHandlers({
   };
   
   // ===== GROUP HANDLERS =====
-  const handleGroupListSelect = (groupId, isMultiSelect = false) => {
-    selectionHook.handleGroupSelection(groupId, isMultiSelect);
+  const handleGroupListSelect = (clusterId, isMultiSelect = false) => {
+    selectionHook.handleGroupSelection(clusterId, isMultiSelect);
   };
 
-  const handleGroupFocus = (groupId) => {
-    const group = groups.find(g => g.id === groupId);
+  const handleGroupFocus = (clusterId) => {
+    const group = groups.find(g => g.id === clusterId);
     if (group?.bounds) {
       state.setPan({
         x: window.innerWidth / 2 - (group.bounds.x + group.bounds.width / 2) * zoom,
         y: window.innerHeight / 2 - (group.bounds.y + group.bounds.height / 2) * zoom
       });
-      setSelectedGroupIds([groupId]);
+      setSelectedGroupIds([clusterId]);
       setSelectedNodeIds([]);
       setSelectedEdgeIds([]);
     }
@@ -662,88 +662,88 @@ export function createGraphEditorHandlers({
     setSelectedGroupIds([]);
   };
 
-  const handleGroupDoubleClickFromList = (groupId) => {
+  const handleGroupDoubleClickFromList = (clusterId) => {
     state.setShowGroupProperties(true);
   };
 
-  const handleGroupToggleVisibility = (groupId) => {
-    const group = groups.find(g => g.id === groupId);
+  const handleGroupToggleVisibility = (clusterId) => {
+    const group = groups.find(g => g.id === clusterId);
     const nextVisible = group ? group.visible !== true : true;
     const api = resolveGraphAPI();
     if (api && typeof api.updateGroup === 'function') {
-      api.updateGroup(groupId, { visible: nextVisible });
+      api.updateGroup(clusterId, { visible: nextVisible });
       return;
     }
     const updatedGroups = groups.map(g =>
-      g.id === groupId ? { ...g, visible: nextVisible } : g
+      g.id === clusterId ? { ...g, visible: nextVisible } : g
     );
     setGroups(updatedGroups);
     saveToHistory(nodes, edges);
-    const updatedGroup = updatedGroups.find(g => g.id === groupId);
+    const updatedGroup = updatedGroups.find(g => g.id === clusterId);
     if (updatedGroup) {
       try {
-        eventBus.emit('groupUpdated', { id: groupId, patch: { visible: updatedGroup.visible }, group: updatedGroup });
+        eventBus.emit('groupUpdated', { id: clusterId, patch: { visible: updatedGroup.visible }, group: updatedGroup });
       } catch (err) {
         // ignore event bus errors
       }
     }
   };
 
-  const handleGroupDelete = (groupId) => {
+  const handleGroupDelete = (clusterId) => {
     const api = resolveGraphAPI();
     if (api && typeof api.deleteGroup === 'function') {
-      api.deleteGroup(groupId);
-      setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
+      api.deleteGroup(clusterId);
+      setSelectedGroupIds(prev => prev.filter(id => id !== clusterId));
       return;
     }
-    const result = groupManager.current.removeGroup(groupId);
+    const result = groupManager.current.removeGroup(clusterId);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
-      setSelectedGroupIds(prev => prev.filter(id => id !== groupId));
+      setSelectedGroupIds(prev => prev.filter(id => id !== clusterId));
       saveToHistory(nodes, edges);
       try {
-        eventBus.emit('groupDeleted', { id: groupId });
+        eventBus.emit('groupDeleted', { id: clusterId });
       } catch (err) {
         // ignore event bus errors
       }
     }
   };
 
-  const handleUpdateGroup = (groupId, updates) => {
+  const handleUpdateGroup = (clusterId, updates) => {
     const api = resolveGraphAPI();
     if (api && typeof api.updateGroup === 'function') {
-      api.updateGroup(groupId, updates);
+      api.updateGroup(clusterId, updates);
       return;
     }
     const updatedGroups = groups.map(g =>
-      g.id === groupId ? { ...g, ...updates } : g
+      g.id === clusterId ? { ...g, ...updates } : g
     );
     setGroups(updatedGroups);
     saveToHistory(nodes, edges);
-    const updatedGroup = updatedGroups.find(g => g.id === groupId);
+    const updatedGroup = updatedGroups.find(g => g.id === clusterId);
     if (updatedGroup) {
       try {
-        eventBus.emit('groupUpdated', { id: groupId, patch: updates, group: updatedGroup });
+        eventBus.emit('groupUpdated', { id: clusterId, patch: updates, group: updatedGroup });
       } catch (err) {
         // ignore event bus errors
       }
     }
   };
 
-  const handleAddNodesToGroup = (groupId, nodeIds) => {
+  const handleAddNodesToGroup = (clusterId, nodeIds) => {
     const api = resolveGraphAPI();
     if (api && typeof api.addNodesToGroup === 'function') {
-      api.addNodesToGroup(groupId, nodeIds);
+      api.addNodesToGroup(clusterId, nodeIds);
       return;
     }
-    const result = groupManager.current.addNodesToGroup(groupId, nodeIds);
+    const result = groupManager.current.addNodesToGroup(clusterId, nodeIds);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
       saveToHistory(nodes, edges);
       const updatedGroup = result.data;
       if (updatedGroup) {
         try {
-          eventBus.emit('groupUpdated', { id: groupId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
+          eventBus.emit('groupUpdated', { id: clusterId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
         } catch (err) {
           // ignore event bus errors
         }
@@ -751,20 +751,20 @@ export function createGraphEditorHandlers({
     }
   };
 
-  const handleRemoveNodesFromGroup = (groupId, nodeIds) => {
+  const handleRemoveNodesFromGroup = (clusterId, nodeIds) => {
     const api = resolveGraphAPI();
     if (api && typeof api.removeNodesFromGroup === 'function') {
-      api.removeNodesFromGroup(groupId, nodeIds);
+      api.removeNodesFromGroup(clusterId, nodeIds);
       return;
     }
-    const result = groupManager.current.removeNodesFromGroup(groupId, nodeIds);
+    const result = groupManager.current.removeNodesFromGroup(clusterId, nodeIds);
     if (result.success) {
       setGroups(groupManager.current.getAllGroups());
       saveToHistory(nodes, edges);
       const updatedGroup = result.data;
       if (updatedGroup) {
         try {
-          eventBus.emit('groupUpdated', { id: groupId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
+          eventBus.emit('groupUpdated', { id: clusterId, patch: { nodeIds: updatedGroup.nodeIds }, group: updatedGroup });
         } catch (err) {
           // ignore event bus errors
         }
@@ -783,7 +783,7 @@ export function createGraphEditorHandlers({
       if (api && typeof api.createGroups === 'function') {
         api.createGroups([result.data]);
       } else {
-        setGroups([...groups, result.data]);
+        setGroups([...clusters, result.data]);
         saveToHistory(nodes, edges);
         try {
           eventBus.emit('groupAdded', { group: result.data });
@@ -800,16 +800,16 @@ export function createGraphEditorHandlers({
     if (selectedGroupIds.length === 0) return;
     const api = resolveGraphAPI();
     if (api && typeof api.deleteGroup === 'function') {
-      selectedGroupIds.forEach((groupId) => api.deleteGroup(groupId));
+      selectedGroupIds.forEach((clusterId) => api.deleteGroup(clusterId));
       setSelectedGroupIds([]);
       return;
     }
     let updated = false;
-    selectedGroupIds.forEach(groupId => {
-      if (groupManager.current.removeGroup(groupId).success) {
+    selectedGroupIds.forEach(clusterId => {
+      if (groupManager.current.removeGroup(clusterId).success) {
         updated = true;
         try {
-          eventBus.emit('groupDeleted', { id: groupId });
+          eventBus.emit('groupDeleted', { id: clusterId });
         } catch (err) {
           // ignore event bus errors
         }
@@ -838,10 +838,10 @@ export function createGraphEditorHandlers({
         if (pastedData[0]?.position && pastedData[0]?.id) pastedNodes = pastedData;
         else if (pastedData[0]?.source && pastedData[0]?.target) pastedEdges = pastedData;
         else if (pastedData[0]?.nodeIds) pastedGroups = pastedData;
-      } else if (pastedData.nodes || pastedData.edges || pastedData.groups) {
+      } else if (pastedData.nodes || pastedData.edges || pastedData.clusters) {
         pastedNodes = pastedData.nodes || [];
         pastedEdges = pastedData.edges || [];
-        pastedGroups = pastedData.groups || [];
+        pastedGroups = pastedData.clusters || [];
       } else if (pastedData.id && pastedData.position) {
         pastedNodes = [pastedData];
       } else if (pastedData.id && pastedData.source && pastedData.target) {
@@ -916,7 +916,7 @@ export function createGraphEditorHandlers({
         }
         if (pastedNodes.length) proposals.push({ action: 'createNodes', nodes: pastedNodes });
         if (pastedEdges.length) proposals.push({ action: 'createEdges', edges: pastedEdges });
-        if (groupsSanitized.length) proposals.push({ action: 'createGroups', groups: groupsSanitized });
+        if (groupsSanitized.length) proposals.push({ action: 'createGroups', clusters: groupsSanitized });
 
         if (proposals.length) {
           emitExecutionIntent(proposals, 'pasteGraphData');
@@ -953,7 +953,7 @@ export function createGraphEditorHandlers({
         const proposals = [];
         if (nodesToAdd.length) proposals.push({ action: 'createNodes', nodes: nodesToAdd });
         if (edgesToAdd.length) proposals.push({ action: 'createEdges', edges: edgesToAdd });
-        if (groupsToAdd.length) proposals.push({ action: 'createGroups', groups: groupsToAdd });
+        if (groupsToAdd.length) proposals.push({ action: 'createGroups', clusters: groupsToAdd });
 
         if (proposals.length) {
           emitExecutionIntent(proposals, 'pasteGraphData');

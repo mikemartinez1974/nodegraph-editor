@@ -61,7 +61,7 @@
     {
       "id": "plan-root",
       "type": "markdown",
-      "label": "🎯 ELK Edge Routing Plan",
+      "label": "\ud83c\udfaf ELK Edge Routing Plan",
       "position": {
         "x": 275.5,
         "y": -491.5
@@ -71,7 +71,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# ELK Edge Routing Implementation Plan\n+\n+Use the orientation + skills graphs as the specification. Each skill becomes a subgraph in this plan with concrete steps. The plan proceeds from intent capture → ELK routing → constraint validation → rendering → persistence, with toolbar and document settings orchestrating the whole flow.",
+        "markdown": "# ELK Edge Routing Implementation Plan\n+\n+Use the orientation + skills graphs as the specification. Each skill becomes a subgraph in this plan with concrete steps. The plan proceeds from intent capture \u2192 ELK routing \u2192 constraint validation \u2192 rendering \u2192 persistence, with toolbar and document settings orchestrating the whole flow.",
         "memo": "",
         "link": "",
         "html": "",
@@ -81,7 +81,7 @@
     {
       "id": "plan-intent",
       "type": "markdown",
-      "label": "🖱️ Intent Capture Skill",
+      "label": "\ud83d\uddb1\ufe0f Intent Capture Skill",
       "position": {
         "x": 345.5,
         "y": -221.5
@@ -97,7 +97,7 @@
     {
       "id": "plan-routing",
       "type": "markdown",
-      "label": "🦌 Routing Skill Subgraph",
+      "label": "\ud83e\udd8c Routing Skill Subgraph",
       "position": {
         "x": 245.5,
         "y": 228.5
@@ -107,13 +107,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## EdgeRouting Skill\n+\n+- `rerouteEdges` is the single ELK entry point; all other routing helpers route through it.\n+- Construct ELK ports from node handles (normalize sides, offsets, pin IDs) and include every ELK option we expose (algorithm, edgeRouting, spacing, port constraints).\n+- Allow the toolbar/document settings to override `elk.edgeRouting` (ORTHOGONAL, POLYLINE, possibly curved) and `elk.algorithm` (layered, radial, rectpacking).\n+- If ELK fails, log the failure (via `setSnackbar` or note node) rather than falling back to heuristics; update constraint metadata for retries.\n+- Translate `layout.edges[].sections` into `edgeRoutes[edgeId].points` plus lane offsets & fan spacing so the renderer always sees complete polylines.\n+- At the end, always replace the previous `edgeRoutes` map; do not reuse leftover geometry or manual handles."
+        "markdown": "## EdgeRouting Skill\n+\n+- `rerouteEdges` is the single ELK entry point; all other routing helpers route through it.\n+- Construct ELK ports from node ports (normalize sides, offsets, pin IDs) and include every ELK option we expose (algorithm, edgeRouting, spacing, port constraints).\n+- Allow the toolbar/document settings to override `elk.edgeRouting` (ORTHOGONAL, POLYLINE, possibly curved) and `elk.algorithm` (layered, radial, rectpacking).\n+- If ELK fails, log the failure (via `setSnackbar` or note node) rather than falling back to heuristics; update constraint metadata for retries.\n+- Translate `layout.edges[].sections` into `edgeRoutes[edgeId].points` plus lane offsets & fan spacing so the renderer always sees complete polylines.\n+- At the end, always replace the previous `edgeRoutes` map; do not reuse leftover geometry or manual ports."
       }
     },
     {
       "id": "plan-constraints",
       "type": "markdown",
-      "label": "🧠 Constraint Enforcement",
+      "label": "\ud83e\udde0 Constraint Enforcement",
       "position": {
         "x": 275.5,
         "y": 568.5
@@ -123,13 +123,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Constraint Skill\n+\n+- After routing completes, verify each routed edge still matches declared handles, port sides, and fallbacks from `edge-routing.orientation`.\n+- Annotate violations in `edge.data` or emit warnings via snackbar.\n+- If violation is fixable, rerun ELK with tightened constraints (e.g., port forces)."
+        "markdown": "## Constraint Skill\n+\n+- After routing completes, verify each routed edge still matches declared ports, port sides, and fallbacks from `edge-routing.orientation`.\n+- Annotate violations in `edge.data` or emit warnings via snackbar.\n+- If violation is fixable, rerun ELK with tightened constraints (e.g., port forces)."
       }
     },
     {
       "id": "plan-rendering",
       "type": "markdown",
-      "label": "🎨 Rendering Skill",
+      "label": "\ud83c\udfa8 Rendering Skill",
       "position": {
         "x": -174.5,
         "y": 988.5
@@ -145,7 +145,7 @@
     {
       "id": "plan-toolbar",
       "type": "markdown",
-      "label": "🧰 Toolbar + Settings",
+      "label": "\ud83e\uddf0 Toolbar + Settings",
       "position": {
         "x": -194.5,
         "y": -251.5
@@ -161,7 +161,7 @@
     {
       "id": "plan-persistence",
       "type": "markdown",
-      "label": "📦 Persistence Skill",
+      "label": "\ud83d\udce6 Persistence Skill",
       "position": {
         "x": -174.5,
         "y": 1268.5
@@ -369,5 +369,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

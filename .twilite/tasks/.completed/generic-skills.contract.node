@@ -59,7 +59,7 @@
     {
       "id": "skills-root",
       "type": "markdown",
-      "label": "🧠 Runtime Skills",
+      "label": "\ud83e\udde0 Runtime Skills",
       "position": {
         "x": 119.7881715753283,
         "y": 391.18525058096134
@@ -75,7 +75,7 @@
     {
       "id": "skill-routing",
       "type": "markdown",
-      "label": "🦌 EdgeRoutingSkill",
+      "label": "\ud83e\udd8c EdgeRoutingSkill",
       "position": {
         "x": -592.3982564584117,
         "y": 678.8378211329394
@@ -91,7 +91,7 @@
     {
       "id": "skill-rendering",
       "type": "markdown",
-      "label": "🎨 EdgeRenderingSkill",
+      "label": "\ud83c\udfa8 EdgeRenderingSkill",
       "position": {
         "x": 309.5521682665493,
         "y": 740.9224832358084
@@ -107,7 +107,7 @@
     {
       "id": "skill-interaction",
       "type": "markdown",
-      "label": "🖱️ InteractionSkill",
+      "label": "\ud83d\uddb1\ufe0f InteractionSkill",
       "position": {
         "x": -141.30504244154167,
         "y": 747.0115358569503
@@ -123,7 +123,7 @@
     {
       "id": "skill-constraints",
       "type": "markdown",
-      "label": "🧠 ConstraintEnforcementSkill",
+      "label": "\ud83e\udde0 ConstraintEnforcementSkill",
       "position": {
         "x": 189.7457436016889,
         "y": -3.922483235808386
@@ -139,7 +139,7 @@
     {
       "id": "skill-persistence",
       "type": "markdown",
-      "label": "📦 PersistenceSkill",
+      "label": "\ud83d\udce6 PersistenceSkill",
       "position": {
         "x": 749.3982564584117,
         "y": 193.44027252167473
@@ -227,5 +227,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

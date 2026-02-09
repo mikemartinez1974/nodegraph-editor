@@ -17,7 +17,7 @@ This folder contains reusable UI components and panels for the node graph editor
   - Panel for editing edge properties: type, label, style, color, gradient, arrow, animation, and more.
 
 - **GroupListPanel.js**
-  - Lists all groups in the graph. Supports selection, visibility toggling, focusing, and deletion.
+  - Lists all clusters in the graph. Supports selection, visibility toggling, focusing, and deletion.
 
 - **GroupPropertiesPanel.js**
   - Panel for editing cluster properties: label, style, visibility, and node membership. Allows adding/removing nodes and unclustering.

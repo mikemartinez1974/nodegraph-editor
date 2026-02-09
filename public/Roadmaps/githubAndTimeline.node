@@ -81,7 +81,7 @@
     {
       "id": "b0000001-0000-4000-8000-000000000002",
       "type": "markdown",
-      "label": "GitHub Integration — Core Idea",
+      "label": "GitHub Integration \u2014 Core Idea",
       "position": {
         "x": 736.452095006724,
         "y": 11.9169377412818
@@ -101,7 +101,7 @@
     {
       "id": "d0000002-0000-4000-8000-000000000009",
       "type": "markdown",
-      "label": "Decision — Repo Scope",
+      "label": "Decision \u2014 Repo Scope",
       "position": {
         "x": 736.452095006724,
         "y": 396.9169377412818
@@ -121,7 +121,7 @@
     {
       "id": "b0000002-0000-4000-8000-000000000003",
       "type": "markdown",
-      "label": "GitHub Integration — MVP",
+      "label": "GitHub Integration \u2014 MVP",
       "position": {
         "x": 736.452095006724,
         "y": 751.9169377412818
@@ -141,7 +141,7 @@
     {
       "id": "d0000003-0000-4000-8000-000000000010",
       "type": "markdown",
-      "label": "Decision — Sync + Commits",
+      "label": "Decision \u2014 Sync + Commits",
       "position": {
         "x": 736.452095006724,
         "y": 1166.9169377412818
@@ -161,7 +161,7 @@
     {
       "id": "b0000003-0000-4000-8000-000000000004",
       "type": "markdown",
-      "label": "GitHub Integration — Advanced",
+      "label": "GitHub Integration \u2014 Advanced",
       "position": {
         "x": 736.452095006724,
         "y": 1531.9169377412818
@@ -171,7 +171,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Advanced GitHub Flow\n- Commit history browser\n- Restore / open historical version\n- Diff summary (nodes / edges changed)\n- PR-based graph changes\n- Auto-generated markdown summaries\n- Webhook validation (schema, handle rules)\n- Optional: **canonical GitHub storage** per project",
+        "markdown": "## Advanced GitHub Flow\n- Commit history browser\n- Restore / open historical version\n- Diff summary (nodes / edges changed)\n- PR-based graph changes\n- Auto-generated markdown summaries\n- Webhook validation (schema, port rules)\n- Optional: **canonical GitHub storage** per project",
         "memo": "",
         "link": "",
         "html": "",
@@ -181,7 +181,7 @@
     {
       "id": "c0000001-0000-4000-8000-000000000005",
       "type": "markdown",
-      "label": "Timeline — Core Concept",
+      "label": "Timeline \u2014 Core Concept",
       "position": {
         "x": 196.45209500672394,
         "y": 11.9169377412818
@@ -201,7 +201,7 @@
     {
       "id": "c0000002-0000-4000-8000-000000000006",
       "type": "markdown",
-      "label": "Timeline — MVP",
+      "label": "Timeline \u2014 MVP",
       "position": {
         "x": 196.45209500672394,
         "y": 371.9169377412818
@@ -221,7 +221,7 @@
     {
       "id": "d0000004-0000-4000-8000-000000000011",
       "type": "markdown",
-      "label": "Decision — Timeline Scope",
+      "label": "Decision \u2014 Timeline Scope",
       "position": {
         "x": 196.45209500672394,
         "y": 766.9169377412818
@@ -241,7 +241,7 @@
     {
       "id": "c0000003-0000-4000-8000-000000000007",
       "type": "markdown",
-      "label": "Timeline — Advanced",
+      "label": "Timeline \u2014 Advanced",
       "position": {
         "x": 196.45209500672394,
         "y": 1131.9169377412818
@@ -285,9 +285,9 @@
       "type": "child",
       "source": "a0000001-0000-4000-8000-000000000001",
       "target": "b0000001-0000-4000-8000-000000000002",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -322,9 +322,9 @@
       "type": "child",
       "source": "a0000001-0000-4000-8000-000000000001",
       "target": "c0000001-0000-4000-8000-000000000005",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -359,9 +359,9 @@
       "type": "child",
       "source": "b0000001-0000-4000-8000-000000000002",
       "target": "d0000002-0000-4000-8000-000000000009",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -396,9 +396,9 @@
       "type": "child",
       "source": "d0000002-0000-4000-8000-000000000009",
       "target": "b0000002-0000-4000-8000-000000000003",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -433,9 +433,9 @@
       "type": "child",
       "source": "d0000003-0000-4000-8000-000000000010",
       "target": "b0000003-0000-4000-8000-000000000004",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -470,9 +470,9 @@
       "type": "child",
       "source": "c0000001-0000-4000-8000-000000000005",
       "target": "c0000002-0000-4000-8000-000000000006",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -507,9 +507,9 @@
       "type": "child",
       "source": "b0000002-0000-4000-8000-000000000003",
       "target": "d0000003-0000-4000-8000-000000000010",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -544,9 +544,9 @@
       "type": "child",
       "source": "c0000002-0000-4000-8000-000000000006",
       "target": "d0000004-0000-4000-8000-000000000011",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -581,9 +581,9 @@
       "type": "child",
       "source": "d0000004-0000-4000-8000-000000000011",
       "target": "c0000003-0000-4000-8000-000000000007",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "out",
@@ -614,5 +614,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

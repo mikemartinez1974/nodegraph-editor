@@ -12,7 +12,7 @@
     {
       "id": "exec-root",
       "type": "markdown",
-      "label": "🧠 Execution Spine + Node Pipeline",
+      "label": "\ud83e\udde0 Execution Spine + Node Pipeline",
       "position": {
         "x": -246.25,
         "y": -120.5
@@ -22,7 +22,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Purpose\n\nUnify the **Execution Spine** (runtime orchestration) with the **Node Execution Pipeline** (step-by-step flow).\n\nThis graph defines how **intent becomes mutation** — from triggers to commit, governed by authority, schemas, and lifecycle events."
+        "markdown": "## Purpose\n\nUnify the **Execution Spine** (runtime orchestration) with the **Node Execution Pipeline** (step-by-step flow).\n\nThis graph defines how **intent becomes mutation** \u2014 from triggers to commit, governed by authority, schemas, and lifecycle events."
       }
     },
     {
@@ -54,7 +54,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Type Resolution\n\n- Node → type key\n- Dictionary resolves definition\n- Definition exposes views + skills\n- Missing definition → warning + fallback"
+        "markdown": "## Type Resolution\n\n- Node \u2192 type key\n- Dictionary resolves definition\n- Definition exposes views + skills\n- Missing definition \u2192 warning + fallback"
       }
     },
     {
@@ -70,7 +70,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Policy Gate\n\n- Manifest authority\n- Allowed actors\n- Skill dependencies satisfied\n- Version checks (warn only)\n\nIf blocked → refuse execution"
+        "markdown": "## Policy Gate\n\n- Manifest authority\n- Allowed actors\n- Skill dependencies satisfied\n- Version checks (warn only)\n\nIf blocked \u2192 refuse execution"
       }
     },
     {
@@ -86,7 +86,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Context\n\n- Graph snapshot (read-only)\n- Selected node/edge/group\n- User/agent identity\n- Cursor / viewport / selection (optional)\n\nContext is input; it is not mutated."
+        "markdown": "## Context\n\n- Graph snapshot (read-only)\n- Selected node/edge/cluster\n- User/agent identity\n- Cursor / viewport / selection (optional)\n\nContext is input; it is not mutated."
       }
     },
     {
@@ -118,7 +118,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation + Diff\n\n- Validate mutations (schema, handles, manifest)\n- Produce warnings/errors\n- Build diff for audit\n\nIf invalid → refuse commit"
+        "markdown": "## Validation + Diff\n\n- Validate mutations (schema, ports, manifest)\n- Produce warnings/errors\n- Build diff for audit\n\nIf invalid \u2192 refuse commit"
       }
     },
     {
@@ -150,7 +150,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Input Routing\\n\\nExecution triggers should resolve to `nodeInput` events.\\n\\nSources:\\n- Edge output → target input\\n- Manual Run → `nodeInput` on root handle\\n- Query string → `nodeInput` on load\\n- API calls → `nodeInput`\\n\\nHandles default to `root` when missing."
+        "markdown": "## Input Routing\\n\\nExecution triggers should resolve to `nodeInput` events.\\n\\nSources:\\n- Edge output \u2192 target input\\n- Manual Run \u2192 `nodeInput` on root port\\n- Query string \u2192 `nodeInput` on load\\n- API calls \u2192 `nodeInput`\\n\\nHandles default to `root` when missing."
       }
     },
     {
@@ -172,7 +172,7 @@
     {
       "id": "exec-dictionary-precedence",
       "type": "markdown",
-      "label": "✅ Dictionary Precedence (Hybrid)",
+      "label": "\u2705 Dictionary Precedence (Hybrid)",
       "position": {
         "x": -249.25,
         "y": 514.5
@@ -198,7 +198,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Query String Trigger\\n\\nExample:\\n`/graph.node?node=abc&handle=root&value=hello`\\n\\nOn load:\\n- decode `value` (JSON if possible)\\n- emit `nodeInput` once\\n- optional `run=1` or `auto=1`"
+        "markdown": "## Query String Trigger\\n\\nExample:\\n`/graph.node?node=abc&port=root&value=hello`\\n\\nOn load:\\n- decode `value` (JSON if possible)\\n- emit `nodeInput` once\\n- optional `run=1` or `auto=1`"
       }
     },
     {
@@ -214,13 +214,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Questions\n\n1. Sync vs async skills? **Answered: Hybrid**\n2. Where do skills live? **Answered: Node refs → node classes**\n3. Sandboxing policy for script nodes? **Answered: Local only**\n4. Should view-only nodes ever execute? **Answered: Yes (limited)**\n5. Can multiple manifests coexist in one file? **Answered: Yes, first wins**\n6. Can node references ever target instances? **Answered: Local only**"
+        "markdown": "## Open Questions\n\n1. Sync vs async skills? **Answered: Hybrid**\n2. Where do skills live? **Answered: Node refs \u2192 node classes**\n3. Sandboxing policy for script nodes? **Answered: Local only**\n4. Should view-only nodes ever execute? **Answered: Yes (limited)**\n5. Can multiple manifests coexist in one file? **Answered: Yes, first wins**\n6. Can node references ever target instances? **Answered: Local only**"
       }
     },
     {
       "id": "exec-sync-async",
       "type": "markdown",
-      "label": "✅ Sync vs Async: Hybrid",
+      "label": "\u2705 Sync vs Async: Hybrid",
       "position": {
         "x": 1256.75,
         "y": 512.5
@@ -236,7 +236,7 @@
     {
       "id": "exec-skill-location",
       "type": "markdown",
-      "label": "✅ References Resolve to Class Graphs",
+      "label": "\u2705 References Resolve to Class Graphs",
       "position": {
         "x": 1790.2136685204862,
         "y": 591.6959031399572
@@ -252,7 +252,7 @@
     {
       "id": "exec-instance-scope",
       "type": "markdown",
-      "label": "✅ Instances Are Local Only",
+      "label": "\u2705 Instances Are Local Only",
       "position": {
         "x": -246.25,
         "y": 839.5
@@ -268,7 +268,7 @@
     {
       "id": "exec-script-sandbox",
       "type": "markdown",
-      "label": "✅ Script Nodes: Local Only",
+      "label": "\u2705 Script Nodes: Local Only",
       "position": {
         "x": 253.75,
         "y": 839.5
@@ -284,7 +284,7 @@
     {
       "id": "exec-view-only-exec",
       "type": "markdown",
-      "label": "✅ View-Only Nodes Can Execute",
+      "label": "\u2705 View-Only Nodes Can Execute",
       "position": {
         "x": 753.75,
         "y": 839.5
@@ -300,7 +300,7 @@
     {
       "id": "exec-manifest-order",
       "type": "markdown",
-      "label": "✅ Manifests: First Wins",
+      "label": "\u2705 Manifests: First Wins",
       "position": {
         "x": 1218.75,
         "y": 839.5
@@ -343,13 +343,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -537,7 +537,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 4) Normalize Deltas\n\nCollect proposals → normalize into CRUD deltas.\nRe-validate before commit."
+        "markdown": "## 4) Normalize Deltas\n\nCollect proposals \u2192 normalize into CRUD deltas.\nRe-validate before commit."
       }
     },
     {
@@ -569,7 +569,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 1) Intent Intake\n\nUI, scripts, RPC → normalized intent.\nAssign runId + source metadata."
+        "markdown": "## 1) Intent Intake\n\nUI, scripts, RPC \u2192 normalized intent.\nAssign runId + source metadata."
       }
     },
     {

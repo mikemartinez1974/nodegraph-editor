@@ -356,8 +356,8 @@ const EdgeLayer = forwardRef(({
       let targetSide = null;
 
       if (typeof getHandlePositionForEdge === 'function') {
-        const sourceHandleKey = edge.sourceHandle || edge.handleMeta?.source?.key;
-        const targetHandleKey = edge.targetHandle || edge.handleMeta?.target?.key;
+        const sourceHandleKey = edge.sourcePort || edge.portMeta?.source?.key;
+        const targetHandleKey = edge.targetPort || edge.portMeta?.target?.key;
         const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source', sourceHandleKey, targetHandleKey);
         const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target', sourceHandleKey, targetHandleKey);
         if (sourceResult && typeof sourceResult === 'object') {
@@ -465,8 +465,8 @@ const EdgeLayer = forwardRef(({
       let targetSide = null;
       
       if (typeof getHandlePositionForEdge === 'function') {
-        const sourceHandleKey = edge.sourceHandle || edge.handleMeta?.source?.key;
-        const targetHandleKey = edge.targetHandle || edge.handleMeta?.target?.key;
+        const sourceHandleKey = edge.sourcePort || edge.portMeta?.source?.key;
+        const targetHandleKey = edge.targetPort || edge.portMeta?.target?.key;
         const sourceResult = getHandlePositionForEdge(edge.source, edge.target, 'source', sourceHandleKey, targetHandleKey);
         const targetResult = getHandlePositionForEdge(edge.source, edge.target, 'target', sourceHandleKey, targetHandleKey);
         

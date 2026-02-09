@@ -59,7 +59,7 @@
     {
       "id": "skill-inline-root",
       "type": "markdown",
-      "label": "🧩 Skill: InlineExtract (Normative)",
+      "label": "\ud83e\udde9 Skill: InlineExtract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Ambiguous references → abort\n- Atomic update failure → rollback\n\nPartial states are forbidden."
+        "markdown": "## Failure Modes\n\n- Ambiguous references \u2192 abort\n- Atomic update failure \u2192 rollback\n\nPartial states are forbidden."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

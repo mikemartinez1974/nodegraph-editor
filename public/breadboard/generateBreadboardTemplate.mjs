@@ -135,7 +135,7 @@ function buildSocketNode({ id, label, col, rows, segment, x, y }) {
       sockets: rows.map((r) => `${r}${col}`),
       breadboard: { positionMode: "topleft" }
     },
-    handles: [
+    ports: [
       {
         id: "socket",
         label: "Socket",
@@ -452,9 +452,9 @@ function buildBusEdges(busNode) {
       edges.push({
         id: `edge-bus-pos-${col}-${idx}`,
         source: busId,
-        sourceHandle: "positive",
+        sourcePort: "positive",
         target: targetId,
-        targetHandle: "positive",
+        targetPort: "positive",
         type: "default"
       });
     });
@@ -463,9 +463,9 @@ function buildBusEdges(busNode) {
       edges.push({
         id: `edge-bus-neg-${col}-${idx}`,
         source: busId,
-        sourceHandle: "negative",
+        sourcePort: "negative",
         target: targetId,
-        targetHandle: "negative",
+        targetPort: "negative",
         type: "default"
       });
     });

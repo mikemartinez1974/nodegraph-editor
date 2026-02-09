@@ -61,7 +61,7 @@
     {
       "id": "structure-root",
       "type": "markdown",
-      "label": "📐 Structure Role Specification",
+      "label": "\ud83d\udcd0 Structure Role Specification",
       "position": {
         "x": 0,
         "y": 0
@@ -103,7 +103,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Structure IS\n- relationships\n- adjacency semantics\n- scope & boundaries\n\n## Structure is NOT\n- content\n- style\n- layout\n- annotation\n\nIf content disappears and meaning remains → structure."
+        "markdown": "## Structure IS\n- relationships\n- adjacency semantics\n- scope & boundaries\n\n## Structure is NOT\n- content\n- style\n- layout\n- annotation\n\nIf content disappears and meaning remains \u2192 structure."
       }
     },
     {
@@ -119,7 +119,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Canonical Elements\n\n**Edges (primary)**\n- contains\n- requires\n- precedes\n- derives\n- references\n- constrains\n- governs\n- equivalentTo\n\n**Structure Nodes (when edges need identity)**\n- Group\n- Sequence\n- Boundary\n- DependencyGraph\n- EquivalenceSet"
+        "markdown": "## Canonical Elements\n\n**Edges (primary)**\n- contains\n- requires\n- precedes\n- derives\n- references\n- constrains\n- governs\n- equivalentTo\n\n**Structure Nodes (when edges need identity)**\n- Cluster\n- Sequence\n- Boundary\n- DependencyGraph\n- EquivalenceSet"
       }
     },
     {
@@ -135,7 +135,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mutation Rules\n\n**Allowed:**\n- add/remove edge\n- retype edge\n- reorder sequence\n- reparent group\n\n**Forbidden:**\n- implicit content edits\n- layout-as-meaning\n- delete+recreate identity\n- untyped edges"
+        "markdown": "## Mutation Rules\n\n**Allowed:**\n- add/remove edge\n- retype edge\n- reorder sequence\n- reparent cluster\n\n**Forbidden:**\n- implicit content edits\n- layout-as-meaning\n- delete+recreate identity\n- untyped edges"
       }
     },
     {
@@ -151,7 +151,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation\n\n**Hard errors:**\n- untyped edges\n- broken references\n- forbidden cycles\n- manifest contradiction\n\n**Warnings:**\n- redundancy\n- ambiguous order\n- unused structure nodes\n\nMeaning change → validation required."
+        "markdown": "## Validation\n\n**Hard errors:**\n- untyped edges\n- broken references\n- forbidden cycles\n- manifest contradiction\n\n**Warnings:**\n- redundancy\n- ambiguous order\n- unused structure nodes\n\nMeaning change \u2192 validation required."
       }
     },
     {
@@ -302,5 +302,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

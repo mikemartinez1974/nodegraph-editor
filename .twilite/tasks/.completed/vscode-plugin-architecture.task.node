@@ -42,13 +42,13 @@
             "dictionary",
             "markdown"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -112,7 +112,7 @@
     {
       "id": "vscode-plugin-architecture-root",
       "type": "markdown",
-      "label": "🧩 VSCode Plugin Architecture",
+      "label": "\ud83e\udde9 VSCode Plugin Architecture",
       "position": {
         "x": 663,
         "y": -927

@@ -401,46 +401,46 @@ export class ValidationGuard {
         }
       }
 
-      if (sanitized.handles !== undefined) {
-        if (!Array.isArray(sanitized.handles)) {
+      if (sanitized.ports !== undefined) {
+        if (!Array.isArray(sanitized.ports)) {
           result.errors.push({
             type: VALIDATION_ERRORS.INVALID_DATA,
-            message: 'Handles must be an array',
-            field: 'handles'
+            message: 'Ports must be an array',
+            field: 'ports'
           });
         } else {
-          const handleIds = new Set();
-          sanitized.handles = sanitized.handles
-            .map((handle, index) => {
-              if (!handle) return null;
-              if (typeof handle === 'string') {
+          const portIds = new Set();
+          sanitized.ports = sanitized.ports
+            .map((port, index) => {
+              if (!port) return null;
+              if (typeof port === 'string') {
                 return {
-                  id: handle,
-                  label: handle,
+                  id: port,
+                  label: port,
                   direction: 'output',
                   dataType: 'value'
                 };
               }
-              if (typeof handle !== 'object') return null;
-              const id = handle.id || handle.key || `handle-${index}`;
+              if (typeof port !== 'object') return null;
+              const id = port.id || port.key || `port-${index}`;
               if (!id) return null;
-              if (handleIds.has(id)) {
+              if (portIds.has(id)) {
                 result.errors.push({
                   type: VALIDATION_ERRORS.DUPLICATE_ID,
-                  message: `Duplicate handle id '${id}'`,
-                  field: 'handles'
+                  message: `Duplicate port id '${id}'`,
+                  field: 'ports'
                 });
                 return null;
               }
-              handleIds.add(id);
+              portIds.add(id);
               return {
                 id,
-                label: handle.label || id,
-                direction: handle.direction || (handle.type === 'input' ? 'input' : handle.type === 'output' ? 'output' : 'output'),
-                dataType: handle.dataType || handle.type || 'value',
-                allowedEdgeTypes: Array.isArray(handle.allowedEdgeTypes) ? [...handle.allowedEdgeTypes] : undefined,
-                position: handle.position ? { ...handle.position } : undefined,
-                metadata: handle.metadata ? { ...handle.metadata } : undefined
+                label: port.label || id,
+                direction: port.direction || (port.type === 'input' ? 'input' : port.type === 'output' ? 'output' : 'output'),
+                dataType: port.dataType || port.type || 'value',
+                allowedEdgeTypes: Array.isArray(port.allowedEdgeTypes) ? [...port.allowedEdgeTypes] : undefined,
+                position: port.position ? { ...port.position } : undefined,
+                metadata: port.metadata ? { ...port.metadata } : undefined
               };
             })
             .filter(Boolean);
@@ -451,18 +451,18 @@ export class ValidationGuard {
         if (!Array.isArray(list)) return list;
         const seen = new Set();
         const sanitizedList = [];
-        list.forEach((handle, index) => {
-          if (!handle) return;
-          let candidate = handle;
-          if (typeof handle === 'string') {
-            candidate = { key: handle, label: handle, type: 'value' };
+        list.forEach((port, index) => {
+          if (!port) return;
+          let candidate = port;
+          if (typeof port === 'string') {
+            candidate = { key: port, label: port, type: 'value' };
           }
           if (typeof candidate !== 'object') return;
           const key = candidate.key || candidate.id;
           if (!key) {
             result.errors.push({
               type: VALIDATION_ERRORS.INVALID_DATA,
-              message: `${fieldName} handle missing key`,
+              message: `${fieldName} port missing key`,
               field: fieldName
             });
             return;
@@ -470,7 +470,7 @@ export class ValidationGuard {
           if (seen.has(key)) {
             result.errors.push({
               type: VALIDATION_ERRORS.DUPLICATE_ID,
-              message: `Duplicate ${fieldName} handle key '${key}'`,
+              message: `Duplicate ${fieldName} port key '${key}'`,
               field: fieldName
             });
             return;
@@ -498,19 +498,19 @@ export class ValidationGuard {
       sanitized = this.applyBreadboardExtensionValidation(sanitized, result);
 
       const deriveLegacyHandles = (direction) => {
-        const source = Array.isArray(sanitized.handles) ? sanitized.handles : [];
+        const source = Array.isArray(sanitized.ports) ? sanitized.ports : [];
         return source
-          .filter(handle => {
-            const dir = handle.direction || 'output';
+          .filter(port => {
+            const dir = port.direction || 'output';
             if (direction === 'input') {
               return dir === 'input' || dir === 'bidirectional';
             }
             return dir === 'output' || dir === 'bidirectional' || !dir;
           })
-          .map(handle => ({
-            key: handle.id,
-            label: handle.label || handle.id,
-            type: handle.dataType || 'value'
+          .map(port => ({
+            key: port.id,
+            label: port.label || port.id,
+            type: port.dataType || 'value'
           }));
       };
 

@@ -25,7 +25,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
           column: 1,
           segment: 'top'
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'socket', label: 'Socket', dataType: 'value' }
           ]
@@ -54,7 +54,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
             { railId: 'rail-top-positive', polarity: 'positive', label: 'V+', slot: 1 }
           ]
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'positive', label: 'V+', dataType: 'value' },
             { id: 'negative', label: 'GND', dataType: 'value' }
@@ -113,7 +113,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
           channel: 'top',
           polarity: 'positive'
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'positive', label: 'V+', dataType: 'value' },
             { id: 'negative', label: 'GND', dataType: 'value' }
@@ -169,7 +169,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
           ],
           footprint: { rows: 1, columns: 2, rowPitch: 1, columnPitch: 1, width: 2, height: 1 }
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'pinA', label: 'Pin A', dataType: 'value' },
             { id: 'pinB', label: 'Pin B', dataType: 'value' }
@@ -185,7 +185,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
       {
         type: 'led',
         label: 'LED',
-        description: 'Polarized LED node with anode/cathode handles.',
+        description: 'Polarized LED node with anode/cathode ports.',
         category: 'breadboard',
         icon: 'LightMode',
         entry: '/plugins/breadboard-components/componentPlugin.js#LEDNode',
@@ -198,7 +198,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
           ],
           footprint: { rows: 2, columns: 1, rowPitch: 1, columnPitch: 1, width: 1, height: 2 }
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'anode', label: 'Anode', dataType: 'value' },
             { id: 'cathode', label: 'Cathode', dataType: 'value' }
@@ -227,7 +227,7 @@ export const BUILTIN_PLUGIN_MANIFESTS = [
           ],
           footprint: { rows: 1, columns: 2, rowPitch: 1, columnPitch: 1, width: 2, height: 1 }
         },
-        handles: {
+        ports: {
           outputs: [
             { id: 'wireA', label: 'Wire A', dataType: 'value' },
             { id: 'wireB', label: 'Wire B', dataType: 'value' }

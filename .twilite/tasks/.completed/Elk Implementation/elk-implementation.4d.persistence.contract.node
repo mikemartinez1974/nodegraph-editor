@@ -55,7 +55,7 @@
     {
       "id": "persistence-root",
       "type": "markdown",
-      "label": "📦 Persistence Contract",
+      "label": "\ud83d\udce6 Persistence Contract",
       "position": {
         "x": 0,
         "y": -150
@@ -71,7 +71,7 @@
     {
       "id": "persistence-history",
       "type": "markdown",
-      "label": "🕒 History Recording",
+      "label": "\ud83d\udd52 History Recording",
       "position": {
         "x": -320,
         "y": 120
@@ -87,7 +87,7 @@
     {
       "id": "persistence-notes",
       "type": "markdown",
-      "label": "📝 Trace Notes",
+      "label": "\ud83d\udcdd Trace Notes",
       "position": {
         "x": 320,
         "y": 120
@@ -103,7 +103,7 @@
     {
       "id": "persistence-policies",
       "type": "markdown",
-      "label": "🔐 Policies",
+      "label": "\ud83d\udd10 Policies",
       "position": {
         "x": 0,
         "y": 320
@@ -167,5 +167,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

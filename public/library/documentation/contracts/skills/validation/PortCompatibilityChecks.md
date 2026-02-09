@@ -1,4 +1,4 @@
-# Skill: HandleCompatibilityChecks
+# Skill: PortCompatibilityChecks
 
 ## Intent
 Prevent invalid or meaningless connections between nodes.

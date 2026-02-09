@@ -98,11 +98,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe’re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships — especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can’t be easily shared, and aren’t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don’t fail because they’re bad — they fail because they’re all trying to use a medium that doesn’t exist yet, so everyone builds a private substitute.",
+        "memo": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe\u2019re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships \u2014 especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can\u2019t be easily shared, and aren\u2019t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don\u2019t fail because they\u2019re bad \u2014 they fail because they\u2019re all trying to use a medium that doesn\u2019t exist yet, so everyone builds a private substitute.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe’re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships — especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can’t be easily shared, and aren’t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don’t fail because they’re bad — they fail because they’re all trying to use a medium that doesn’t exist yet, so everyone builds a private substitute."
+        "markdown": "### Problem Framing\n\n**Question:**\nWhat problem exists today, and why do existing tools fail to address it cleanly?\n\n**Answer:**\nWe\u2019re in a transition period where node graphs are becoming the obvious medium for expressing complex logic, workflows, and relationships \u2014 especially in AI-driven systems.\n\nThe problem is that the web does not yet have a shared, first-class graph format the way it has HTML for documents or JSON for data.\n\nAs a result, every company is reinventing its own graph system inside closed tools. These tools fail to interoperate, can\u2019t be easily shared, and aren\u2019t designed to be read, modified, or extended by both humans and AI.\n\nExisting solutions don\u2019t fail because they\u2019re bad \u2014 they fail because they\u2019re all trying to use a medium that doesn\u2019t exist yet, so everyone builds a private substitute."
       }
     },
     {
@@ -118,11 +118,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilite *fundamentally different* from other tools?\n\n**Answer:**\nTwilite treats the node graph itself as the shared source of intelligence — not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilite lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn’t limited by predefined features, but by imagination and iteration — because the graph is both the medium and the interface for collaboration.",
+        "memo": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilite *fundamentally different* from other tools?\n\n**Answer:**\nTwilite treats the node graph itself as the shared source of intelligence \u2014 not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilite lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn\u2019t limited by predefined features, but by imagination and iteration \u2014 because the graph is both the medium and the interface for collaboration.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilite *fundamentally different* from other tools?\n\n**Answer:**\nTwilite treats the node graph itself as the shared source of intelligence — not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilite lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn’t limited by predefined features, but by imagination and iteration — because the graph is both the medium and the interface for collaboration."
+        "markdown": "### Core Insight\n\n**Question:**\nWhat is the single idea that makes Twilite *fundamentally different* from other tools?\n\n**Answer:**\nTwilite treats the node graph itself as the shared source of intelligence \u2014 not just a UI or a data structure, but a living artifact that both humans and AI can read, modify, and extend.\n\nInstead of AI operating outside the system and emitting text, Twilite lets AI operate inside the same graph humans use. This creates a feedback loop where structure, intent, and execution evolve together.\n\nThe result is a system where capability isn\u2019t limited by predefined features, but by imagination and iteration \u2014 because the graph is both the medium and the interface for collaboration."
       }
     },
     {
@@ -138,11 +138,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say “oh… I get it”?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application — the breadboard — proving this isn’t just conversational novelty, but a foundation for real software.",
+        "memo": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say \u201coh\u2026 I get it\u201d?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application \u2014 the breadboard \u2014 proving this isn\u2019t just conversational novelty, but a foundation for real software.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say “oh… I get it”?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application — the breadboard — proving this isn’t just conversational novelty, but a foundation for real software."
+        "markdown": "### Live Demo\n\n**Question:**\nWhat is the *one thing* I should show that makes the audience say \u201coh\u2026 I get it\u201d?\n\n**Answer:**\nI show a live back-and-forth where an AI reads a node graph, proposes a concrete change, and that change is pasted back into the graph and immediately takes effect.\n\nIn a few seconds, the audience sees a new kind of web content: not text, not code, but a shared, structured artifact that both humans and AI can understand and evolve together.\n\nThen I show that the same mechanism is powerful enough to produce a working application \u2014 the breadboard \u2014 proving this isn\u2019t just conversational novelty, but a foundation for real software."
       }
     },
     {
@@ -158,11 +158,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### Why This Is Different\n\n**Question:**\nWhy can’t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilite could be reduced to a feature inside an existing graph or workflow tool — but in practice, it can’t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilite treats the graph itself as the product — a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn’t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That’s why everyone builds graph-based tools — but no one has built a universal graph medium.\n\nTwilite isn’t a feature because it replaces the assumption those tools are built on.",
+        "memo": "### Why This Is Different\n\n**Question:**\nWhy can\u2019t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilite could be reduced to a feature inside an existing graph or workflow tool \u2014 but in practice, it can\u2019t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilite treats the graph itself as the product \u2014 a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn\u2019t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That\u2019s why everyone builds graph-based tools \u2014 but no one has built a universal graph medium.\n\nTwilite isn\u2019t a feature because it replaces the assumption those tools are built on.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### Why This Is Different\n\n**Question:**\nWhy can’t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilite could be reduced to a feature inside an existing graph or workflow tool — but in practice, it can’t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilite treats the graph itself as the product — a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn’t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That’s why everyone builds graph-based tools — but no one has built a universal graph medium.\n\nTwilite isn’t a feature because it replaces the assumption those tools are built on."
+        "markdown": "### Why This Is Different\n\n**Question:**\nWhy can\u2019t this be reduced to a feature in an existing graph or workflow tool?\n\n**Answer:**\nIn theory, Twilite could be reduced to a feature inside an existing graph or workflow tool \u2014 but in practice, it can\u2019t, because it changes what the graph is.\n\nExisting tools treat graphs as internal implementations: tightly coupled to their UI, their execution model, and their product boundaries. Twilite treats the graph itself as the product \u2014 a shared, portable, executable artifact that lives on the web.\n\nMaking that shift isn\u2019t additive. It requires rethinking persistence, interoperability, AI collaboration, and authorship from the ground up. That\u2019s why everyone builds graph-based tools \u2014 but no one has built a universal graph medium.\n\nTwilite isn\u2019t a feature because it replaces the assumption those tools are built on."
       }
     },
     {
@@ -178,11 +178,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilite is not speculative — it’s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilite’s graph model. And this pitch itself is being authored inside Twilite, using the same mechanisms we’re describing.\n\nIn other words, this isn’t a concept demo — it’s a system that’s already in use by its creator, doing real work.",
+        "memo": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilite is not speculative \u2014 it\u2019s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilite\u2019s graph model. And this pitch itself is being authored inside Twilite, using the same mechanisms we\u2019re describing.\n\nIn other words, this isn\u2019t a concept demo \u2014 it\u2019s a system that\u2019s already in use by its creator, doing real work.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilite is not speculative — it’s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilite’s graph model. And this pitch itself is being authored inside Twilite, using the same mechanisms we’re describing.\n\nIn other words, this isn’t a concept demo — it’s a system that’s already in use by its creator, doing real work."
+        "markdown": "### Credibility & Proof\n\n**Question:**\nWhat evidence proves this is real, working, and not speculative?\n\n**Answer:**\nTwilite is not speculative \u2014 it\u2019s already working.\n\nThe platform exists today as a functional web-based node graph system. It can save graphs to the web, execute them, and allow both humans and AI to create and modify them.\n\nThe breadboard application is a concrete proof point: a non-trivial, executable system built entirely on Twilite\u2019s graph model. And this pitch itself is being authored inside Twilite, using the same mechanisms we\u2019re describing.\n\nIn other words, this isn\u2019t a concept demo \u2014 it\u2019s a system that\u2019s already in use by its creator, doing real work."
       }
     },
     {
@@ -198,11 +198,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality — not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilite already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilite claim the space early with a coherent, logical abstraction — instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first.",
+        "memo": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality \u2014 not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilite already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilite claim the space early with a coherent, logical abstraction \u2014 instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first.",
         "link": "",
         "html": "",
         "svg": "",
-        "markdown": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality — not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilite already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilite claim the space early with a coherent, logical abstraction — instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first."
+        "markdown": "### What Comes Next\n\n**Question:**\nIf this works, what is the most obvious next step or expansion?\n\n**Answer:**\nThe most obvious next step is Virtual Reality \u2014 not as a separate product, but as a new rendering surface for the same graph.\n\nBecause Twilite already treats the node graph as the source of truth, VR becomes a natural extension: scenes, objects, and interactions can all be expressed as nodes in the same format humans and AI already share.\n\nThat lets Twilite claim the space early with a coherent, logical abstraction \u2014 instead of bolting graphs onto VR later. Anyone who follows will be forced to interoperate with the graph format we establish first."
       }
     },
     {
@@ -218,7 +218,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Twilite Pitch Script\n\n---\n\n**Opening**\n\nToday I’m not here to show you an idea — I’m here to show you a *new medium*.\n\nWhat you’re looking at is Twilite: a web-native node graph that can be read, written, and evolved by both humans and AI.\n\n---\n\n**The Problem**\n\nWe’re in a transition period.\n\nNode graphs are clearly becoming the dominant way to express complex logic, workflows, and relationships — especially in AI systems. Everyone is building them.\n\nBut the web itself has no shared graph format.\n\nSo every tool reinvents its own closed graph, trapped inside a product boundary. These graphs can’t interoperate, can’t be shared cleanly, and weren’t designed to be collaborated on by AI.\n\n---\n\n**The Core Insight**\n\nTwilite treats the node graph itself as the product.\n\nNot just a UI.\nNot just an internal data structure.\n\nThe graph is a living artifact on the web — readable, editable, and executable by both humans and AI.\n\nThat changes the relationship between structure, intent, and execution. AI doesn’t sit outside the system generating text — it operates *inside* the same graph you do.\n\n---\n\n**Live Demonstration**\n\nHere’s the moment where it usually clicks.\n\nI copy a graph. An AI reads it. The AI proposes a concrete structural change. I paste that change back — and the graph updates instantly.\n\nIn seconds, you’re watching a new class of web content emerge: not text, not code, but shared structure evolving in real time.\n\nThen I show the breadboard — a working application built entirely from these same nodes — to prove this isn’t novelty. It’s software.\n\n---\n\n**Why This Is Different**\n\nCould this be a feature in another tool?\n\nIn theory, maybe.\n\nIn practice, no — because Twilite changes what a graph *is*.\n\nExisting tools treat graphs as internal implementation details. Twilite treats the graph as a first-class, portable, executable medium on the web.\n\nThat shift isn’t additive. It requires rethinking persistence, interoperability, authorship, and AI collaboration from the ground up.\n\n---\n\n**Credibility & Proof**\n\nThis isn’t speculative.\n\nTwilite already exists. It runs in the browser. It saves graphs to the web. AI can read and modify them. And the breadboard app is a non-trivial system built entirely on this model.\n\nThis pitch itself was authored inside Twilite.\n\n---\n\n**What Comes Next**\n\nThe most obvious expansion is Virtual Reality — not as a separate product, but as another rendering surface for the same graph.\n\nScenes, objects, and interactions become nodes. The graph remains the source of truth.\n\nAnyone who follows will be forced to interoperate with the format established first.\n\n---\n\n**Close**\n\nTwilite isn’t finished.\n\nIt’s already useful.\nIt’s already working.\n\nWhat comes next depends on who helps build it.",
+        "markdown": "## Twilite Pitch Script\n\n---\n\n**Opening**\n\nToday I\u2019m not here to show you an idea \u2014 I\u2019m here to show you a *new medium*.\n\nWhat you\u2019re looking at is Twilite: a web-native node graph that can be read, written, and evolved by both humans and AI.\n\n---\n\n**The Problem**\n\nWe\u2019re in a transition period.\n\nNode graphs are clearly becoming the dominant way to express complex logic, workflows, and relationships \u2014 especially in AI systems. Everyone is building them.\n\nBut the web itself has no shared graph format.\n\nSo every tool reinvents its own closed graph, trapped inside a product boundary. These graphs can\u2019t interoperate, can\u2019t be shared cleanly, and weren\u2019t designed to be collaborated on by AI.\n\n---\n\n**The Core Insight**\n\nTwilite treats the node graph itself as the product.\n\nNot just a UI.\nNot just an internal data structure.\n\nThe graph is a living artifact on the web \u2014 readable, editable, and executable by both humans and AI.\n\nThat changes the relationship between structure, intent, and execution. AI doesn\u2019t sit outside the system generating text \u2014 it operates *inside* the same graph you do.\n\n---\n\n**Live Demonstration**\n\nHere\u2019s the moment where it usually clicks.\n\nI copy a graph. An AI reads it. The AI proposes a concrete structural change. I paste that change back \u2014 and the graph updates instantly.\n\nIn seconds, you\u2019re watching a new class of web content emerge: not text, not code, but shared structure evolving in real time.\n\nThen I show the breadboard \u2014 a working application built entirely from these same nodes \u2014 to prove this isn\u2019t novelty. It\u2019s software.\n\n---\n\n**Why This Is Different**\n\nCould this be a feature in another tool?\n\nIn theory, maybe.\n\nIn practice, no \u2014 because Twilite changes what a graph *is*.\n\nExisting tools treat graphs as internal implementation details. Twilite treats the graph as a first-class, portable, executable medium on the web.\n\nThat shift isn\u2019t additive. It requires rethinking persistence, interoperability, authorship, and AI collaboration from the ground up.\n\n---\n\n**Credibility & Proof**\n\nThis isn\u2019t speculative.\n\nTwilite already exists. It runs in the browser. It saves graphs to the web. AI can read and modify them. And the breadboard app is a non-trivial system built entirely on this model.\n\nThis pitch itself was authored inside Twilite.\n\n---\n\n**What Comes Next**\n\nThe most obvious expansion is Virtual Reality \u2014 not as a separate product, but as another rendering surface for the same graph.\n\nScenes, objects, and interactions become nodes. The graph remains the source of truth.\n\nAnyone who follows will be forced to interoperate with the format established first.\n\n---\n\n**Close**\n\nTwilite isn\u2019t finished.\n\nIt\u2019s already useful.\nIt\u2019s already working.\n\nWhat comes next depends on who helps build it.",
         "memo": "",
         "link": "",
         "html": "",
@@ -238,7 +238,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**What is Twilite, really — a tool, a platform, or a protocol?**\n\n**Draft Answer:**\n\nTwilite is a browser — but not in the traditional sense.\n\nIt’s a browser for structured thought and executable graphs on the web.\n\nAt the surface, it looks like a tool. Underneath, it behaves like a platform. And over time, it naturally wants to become a protocol — because it defines a shared, interoperable graph format that both humans and AI can read, modify, and execute.\n\nWe didn’t start by declaring a protocol. We started by building something people can actually use. The protocol emerges from that use.",
+        "markdown": "### Investor Question\n\n**What is Twilite, really \u2014 a tool, a platform, or a protocol?**\n\n**Draft Answer:**\n\nTwilite is a browser \u2014 but not in the traditional sense.\n\nIt\u2019s a browser for structured thought and executable graphs on the web.\n\nAt the surface, it looks like a tool. Underneath, it behaves like a platform. And over time, it naturally wants to become a protocol \u2014 because it defines a shared, interoperable graph format that both humans and AI can read, modify, and execute.\n\nWe didn\u2019t start by declaring a protocol. We started by building something people can actually use. The protocol emerges from that use.",
         "memo": "",
         "link": "",
         "html": "",
@@ -258,7 +258,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**Why does this need to exist *now*? What changed recently?**\n\n**Draft Answer:**\n\nThis needs to exist now because AI has crossed a threshold where text is no longer a sufficient interface.\n\nLarge language models can reason, plan, and modify structure — but the web doesn’t have a shared, structured medium for them to work in. Everything is still flattened into prompts, documents, or proprietary tools.\n\nWhat changed recently is that AI became capable enough to use a graph meaningfully — and at the same time, the cost of building and sharing software dropped low enough that an individual could actually create the missing layer.\n\nTwilite exists now because the models are ready, the web is ready, and for the first time, the gap between human intent and machine execution can be bridged by a shared artifact instead of code alone.",
+        "markdown": "### Investor Question\n\n**Why does this need to exist *now*? What changed recently?**\n\n**Draft Answer:**\n\nThis needs to exist now because AI has crossed a threshold where text is no longer a sufficient interface.\n\nLarge language models can reason, plan, and modify structure \u2014 but the web doesn\u2019t have a shared, structured medium for them to work in. Everything is still flattened into prompts, documents, or proprietary tools.\n\nWhat changed recently is that AI became capable enough to use a graph meaningfully \u2014 and at the same time, the cost of building and sharing software dropped low enough that an individual could actually create the missing layer.\n\nTwilite exists now because the models are ready, the web is ready, and for the first time, the gap between human intent and machine execution can be bridged by a shared artifact instead of code alone.",
         "memo": "",
         "link": "",
         "html": "",
@@ -278,7 +278,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**Why won’t an existing player (Notion, Figma, React Flow, OpenAI, etc.) just do this?**\n\n**Draft Answer:**\n\nThey’re all close — and that’s exactly the problem.\n\nEach of these tools treats the graph as an internal implementation detail, tightly coupled to their UI, execution model, or business boundaries. That works well for building a product, but it breaks down when the graph itself needs to be shared, extended, and operated on by both humans and AI across contexts.\n\nTwilite starts from a different assumption: the graph is the product. It’s the portable, executable artifact that lives on the web, independent of any single application.\n\nFor an incumbent to do this properly, they wouldn’t be adding a feature — they’d be undoing core architectural and product decisions that made them successful in the first place. That’s not impossible, but it’s extraordinarily difficult, slow, and internally risky.\n\nThat’s why you see many graph-based tools — but no universal graph medium.",
+        "markdown": "### Investor Question\n\n**Why won\u2019t an existing player (Notion, Figma, React Flow, OpenAI, etc.) just do this?**\n\n**Draft Answer:**\n\nThey\u2019re all close \u2014 and that\u2019s exactly the problem.\n\nEach of these tools treats the graph as an internal implementation detail, tightly coupled to their UI, execution model, or business boundaries. That works well for building a product, but it breaks down when the graph itself needs to be shared, extended, and operated on by both humans and AI across contexts.\n\nTwilite starts from a different assumption: the graph is the product. It\u2019s the portable, executable artifact that lives on the web, independent of any single application.\n\nFor an incumbent to do this properly, they wouldn\u2019t be adding a feature \u2014 they\u2019d be undoing core architectural and product decisions that made them successful in the first place. That\u2019s not impossible, but it\u2019s extraordinarily difficult, slow, and internally risky.\n\nThat\u2019s why you see many graph-based tools \u2014 but no universal graph medium.",
         "memo": "",
         "link": "",
         "html": "",
@@ -298,7 +298,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**How does this make money? Who pays, and for what?**\n\n**Draft Answer:**\nTwilite is designed to monetize at the points where value concentrates — not by taxing experimentation.\n\nThe core graph format remains open and usable, because adoption and interoperability matter more than early revenue. Monetization happens around that core through premium capabilities: hosted services, advanced AI workflows, private or enterprise graphs, and an ecosystem of paid plugins and extensions.\n\nIndividual developers pay for power and convenience. Teams and companies pay for collaboration, governance, and scale. And over time, an app and plugin marketplace emerges naturally, with Twilite taking a platform share.\n\nThe key point is that the system doesn’t depend on a single revenue bet. The architecture supports multiple monetization paths — and we can sequence them based on real usage instead of speculation.",
+        "markdown": "### Investor Question\n\n**How does this make money? Who pays, and for what?**\n\n**Draft Answer:**\nTwilite is designed to monetize at the points where value concentrates \u2014 not by taxing experimentation.\n\nThe core graph format remains open and usable, because adoption and interoperability matter more than early revenue. Monetization happens around that core through premium capabilities: hosted services, advanced AI workflows, private or enterprise graphs, and an ecosystem of paid plugins and extensions.\n\nIndividual developers pay for power and convenience. Teams and companies pay for collaboration, governance, and scale. And over time, an app and plugin marketplace emerges naturally, with Twilite taking a platform share.\n\nThe key point is that the system doesn\u2019t depend on a single revenue bet. The architecture supports multiple monetization paths \u2014 and we can sequence them based on real usage instead of speculation.",
         "memo": "",
         "link": "",
         "html": "",
@@ -318,7 +318,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**What makes this defensible once people realize it’s important?**\n\n**Draft Answer:**\n\nDefensibility comes from accumulation, not exclusion.\n\nEvery time someone creates, saves, or shares a graph in Twilite, they’re adding to a growing body of structured knowledge that’s immediately usable by both humans and AI. Every plugin, node type, or workflow strengthens the ecosystem for everyone else.\n\nThat creates natural inertia: switching away doesn’t just mean changing tools — it means leaving behind living graphs, shared conventions, and accumulated intelligence.\n\nAt the same time, Twilite benefits from power creep in a positive way. Any useful idea from another node-based system can be expressed as a graph or plugin inside Twilite. Instead of competing feature-for-feature, the system absorbs progress across the entire category.\n\nOnce that loop starts — shared graphs, shared tooling, shared AI collaboration — it becomes very difficult for late entrants to replicate without starting from zero.\n",
+        "markdown": "### Investor Question\n\n**What makes this defensible once people realize it\u2019s important?**\n\n**Draft Answer:**\n\nDefensibility comes from accumulation, not exclusion.\n\nEvery time someone creates, saves, or shares a graph in Twilite, they\u2019re adding to a growing body of structured knowledge that\u2019s immediately usable by both humans and AI. Every plugin, node type, or workflow strengthens the ecosystem for everyone else.\n\nThat creates natural inertia: switching away doesn\u2019t just mean changing tools \u2014 it means leaving behind living graphs, shared conventions, and accumulated intelligence.\n\nAt the same time, Twilite benefits from power creep in a positive way. Any useful idea from another node-based system can be expressed as a graph or plugin inside Twilite. Instead of competing feature-for-feature, the system absorbs progress across the entire category.\n\nOnce that loop starts \u2014 shared graphs, shared tooling, shared AI collaboration \u2014 it becomes very difficult for late entrants to replicate without starting from zero.\n",
         "memo": "",
         "link": "",
         "html": "",
@@ -338,7 +338,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Investor Question\n\n**This seems very broad. How do you avoid it becoming unfocused or unshippable?**\n\n**Draft Answer:**\nBreadth comes from extensibility, not from scope creep.\n\nTwilite stays focused by maintaining a small, stable core: a limited set of fundamental node types and a clear execution model. Everything else lives at the edges through plugins.\n\nThat means the platform itself doesn’t need to grow bloated to support new use cases. Users only load the node types and capabilities they need for a given graph, whether that’s logic, visualization, simulation, or rendering.\n\nAs a result, Twilite can support an extremely wide range of applications while remaining shippable, understandable, and maintainable. The system grows outward, not inward — which lets it evolve indefinitely without collapsing under its own weight.",
+        "markdown": "### Investor Question\n\n**This seems very broad. How do you avoid it becoming unfocused or unshippable?**\n\n**Draft Answer:**\nBreadth comes from extensibility, not from scope creep.\n\nTwilite stays focused by maintaining a small, stable core: a limited set of fundamental node types and a clear execution model. Everything else lives at the edges through plugins.\n\nThat means the platform itself doesn\u2019t need to grow bloated to support new use cases. Users only load the node types and capabilities they need for a given graph, whether that\u2019s logic, visualization, simulation, or rendering.\n\nAs a result, Twilite can support an extremely wide range of applications while remaining shippable, understandable, and maintainable. The system grows outward, not inward \u2014 which lets it evolve indefinitely without collapsing under its own weight.",
         "memo": "",
         "link": "",
         "html": "",
@@ -352,9 +352,9 @@
       "type": "step",
       "source": "0f7b9d52-6b7c-4a41-9b9a-7a6e1d9c2f01",
       "target": "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -381,9 +381,9 @@
       "type": "step",
       "source": "a6e3c4f1-1d2a-4e8c-9f3a-6c2b8e4a1d77",
       "target": "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -410,9 +410,9 @@
       "type": "step",
       "source": "c3d0b5a9-2a1f-4f5a-8e6c-7b8f0e9d2c41",
       "target": "9b7e0d41-6a3f-4c9e-8c5b-3e7d1a2f6b8c",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -439,9 +439,9 @@
       "type": "step",
       "source": "9b7e0d41-6a3f-4c9e-8c5b-3e7d1a2f6b8c",
       "target": "7e5a6b9d-2c3a-4f8e-9d41-0b7c1e3a6f52",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -468,9 +468,9 @@
       "type": "step",
       "source": "7e5a6b9d-2c3a-4f8e-9d41-0b7c1e3a6f52",
       "target": "d1f2c9a6-4e8b-4b2f-9a5c-7e0d3b1a8f9c",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -497,9 +497,9 @@
       "type": "step",
       "source": "d1f2c9a6-4e8b-4b2f-9a5c-7e0d3b1a8f9c",
       "target": "4b9a7d0e-1c5f-4b3e-8a6d-2f9c7e1a0b54",
-      "sourceHandle": "out",
-      "targetHandle": "in",
-      "handleMeta": {
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
@@ -522,5 +522,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

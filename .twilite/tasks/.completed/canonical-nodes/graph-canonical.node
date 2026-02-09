@@ -85,7 +85,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Nodes (Primitive)\n\n**What they are:**\n- identity + content container\n- typed semantic unit\n\n**Carry:**\n- data payload\n- optional handles\n- optional style hints\n\n**Rules:**\n- must be addressable by `id`\n- meaning lives in `type` + `data`"
+        "markdown": "## Nodes (Primitive)\n\n**What they are:**\n- identity + content container\n- typed semantic unit\n\n**Carry:**\n- data payload\n- optional ports\n- optional style hints\n\n**Rules:**\n- must be addressable by `id`\n- meaning lives in `type` + `data`"
       }
     },
     {
@@ -101,7 +101,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edges (Primitive)\n\n**What they are:**\n- typed relationships\n- directional by default\n\n**Carry:**\n- type + endpoints\n- optional handles\n- optional label\n\n**Rules:**\n- must reference existing nodes\n- changes in edges change meaning"
+        "markdown": "## Edges (Primitive)\n\n**What they are:**\n- typed relationships\n- directional by default\n\n**Carry:**\n- type + endpoints\n- optional ports\n- optional label\n\n**Rules:**\n- must reference existing nodes\n- changes in edges change meaning"
       }
     },
     {
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Not Primitives\n\nThese are **representations**, not primitives:\n- Groups (node type that renders a cluster)\n- Layout / routing\n- Viewport + editor state\n- Stylesheets\n\nThey may change appearance without changing meaning."
+        "markdown": "## Not Primitives\n\nThese are **representations**, not primitives:\n- Clusters (node type that renders a cluster)\n- Layout / routing\n- Viewport + editor state\n- Stylesheets\n\nThey may change appearance without changing meaning."
       }
     },
     {
@@ -261,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Definitions\n\nDefines node types, handle contracts, edge schemas, and validation."
+        "markdown": "## Definitions\n\nDefines node types, port contracts, edge schemas, and validation."
       }
     },
     {
@@ -571,5 +571,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

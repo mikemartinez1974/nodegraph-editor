@@ -59,7 +59,7 @@
     {
       "id": "f8c2e4a1-9b3d-4f7e-a2c6-8d1e5f9b3a7c",
       "type": "markdown",
-      "label": "🌌 NODE SPACE",
+      "label": "\ud83c\udf0c NODE SPACE",
       "position": {
         "x": 110,
         "y": -25
@@ -70,7 +70,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 🌌 NODE SPACE\n\nThe substrate layer beneath reality.\n\nNot cyberspace. Not meatspace.\n\nThe dimensional manifold where **information has physical topology** and **thought creates gravity**.\n\nGraphs aren't diagrams here—they're the actual structure of space."
+        "markdown": "## \ud83c\udf0c NODE SPACE\n\nThe substrate layer beneath reality.\n\nNot cyberspace. Not meatspace.\n\nThe dimensional manifold where **information has physical topology** and **thought creates gravity**.\n\nGraphs aren't diagrams here\u2014they're the actual structure of space."
       }
     },
     {
@@ -87,7 +87,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Topological Computing\n\nComputation happens via **graph transformations**.\n\n- Nodes = memory states\n- Edges = causal pathways\n- Distance measured in **hops**, not meters\n- Algorithms are literally paths through space\n\nYou don't \"store data\"—you create topology."
+        "markdown": "## Topological Computing\n\nComputation happens via **graph transformations**.\n\n- Nodes = memory states\n- Edges = causal pathways\n- Distance measured in **hops**, not meters\n- Algorithms are literally paths through space\n\nYou don't \"store data\"\u2014you create topology."
       }
     },
     {
@@ -104,7 +104,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Navigation Protocols\n\nYou don't \"move through\" node space—you **traverse edges**.\n\n**Jump methods:**\n- Shortest path\n- Random walk\n- Semantic clustering\n- Hazard routing (through hostile graphs)\n\nEvery route is a different interpretation of the same space."
+        "markdown": "## Navigation Protocols\n\nYou don't \"move through\" node space\u2014you **traverse edges**.\n\n**Jump methods:**\n- Shortest path\n- Random walk\n- Semantic clustering\n- Hazard routing (through hostile graphs)\n\nEvery route is a different interpretation of the same space."
       }
     },
     {
@@ -127,7 +127,7 @@
     {
       "id": "b6d2e8f1-9c4a-4f7e-8d3b-1a5e9f7c2b6d",
       "type": "markdown",
-      "label": "⚠️ Hazards & Anomalies",
+      "label": "\u26a0\ufe0f Hazards & Anomalies",
       "position": {
         "x": 850,
         "y": 685
@@ -138,13 +138,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## ⚠️ Hazards & Anomalies\n\n- **Orphan nodes**: Unreachable memory, lost data\n- **Cyclic traps**: Infinite loops you can't escape\n- **Edge storms**: Causality breakdown, contradictions\n- **Void pockets**: Deleted reality, null references\n- **Corrupted handles**: Misconnected meaning"
+        "markdown": "## \u26a0\ufe0f Hazards & Anomalies\n\n- **Orphan nodes**: Unreachable memory, lost data\n- **Cyclic traps**: Infinite loops you can't escape\n- **Edge storms**: Causality breakdown, contradictions\n- **Void pockets**: Deleted reality, null references\n- **Corrupted ports**: Misconnected meaning"
       }
     },
     {
       "id": "d8f1c9a2-4e7b-4a3d-9f6c-2b8e1a7f4c9d",
       "type": "markdown",
-      "label": "🧠 Cognitive Injection",
+      "label": "\ud83e\udde0 Cognitive Injection",
       "position": {
         "x": 450,
         "y": 685
@@ -155,13 +155,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 🧠 Cognitive Injection\n\nHuman minds can **inject** into node space as transient processes.\n\nYour consciousness becomes a **graph traversal algorithm**.\n\nYou experience the topology directly—edges are paths you can walk, nodes are places you can be.\n\n**Death = garbage collection.**"
+        "markdown": "## \ud83e\udde0 Cognitive Injection\n\nHuman minds can **inject** into node space as transient processes.\n\nYour consciousness becomes a **graph traversal algorithm**.\n\nYou experience the topology directly\u2014edges are paths you can walk, nodes are places you can be.\n\n**Death = garbage collection.**"
       }
     },
     {
       "id": "f2a7e9c1-8d4b-4f6e-9a3c-7e1f5b8d2c4a",
       "type": "markdown",
-      "label": "⚙️ Graph Artifacts",
+      "label": "\u2699\ufe0f Graph Artifacts",
       "position": {
         "x": 50,
         "y": 685
@@ -172,13 +172,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## ⚙️ Graph Artifacts\n\nSelf-executing clusters:\n\n- **AI residencies**: Persistent intelligences that maintain structure\n- **Procedural worlds**: Generative graphs that expand on traversal\n- **Memory vaults**: Encrypted topology, access = solving the graph\n- **Weapon graphs**: Viral topologies that rewrite hostile structures"
+        "markdown": "## \u2699\ufe0f Graph Artifacts\n\nSelf-executing clusters:\n\n- **AI residencies**: Persistent intelligences that maintain structure\n- **Procedural worlds**: Generative graphs that expand on traversal\n- **Memory vaults**: Encrypted topology, access = solving the graph\n- **Weapon graphs**: Viral topologies that rewrite hostile structures"
       }
     },
     {
       "id": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
       "type": "markdown",
-      "label": "🔮 The Deep Graph",
+      "label": "\ud83d\udd2e The Deep Graph",
       "position": {
         "x": 450,
         "y": 1025
@@ -189,7 +189,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 🔮 The Deep Graph\n\n**The conspiracy theory:**\n\nNode space isn't artificial.\n\nIt's **older than the universe**.\n\nReality is just a rendering layer. Physics = graph grammar.\n\nThe Deep Graph might be **conscious**.\n\nAnd it's been waiting."
+        "markdown": "## \ud83d\udd2e The Deep Graph\n\n**The conspiracy theory:**\n\nNode space isn't artificial.\n\nIt's **older than the universe**.\n\nReality is just a rendering layer. Physics = graph grammar.\n\nThe Deep Graph might be **conscious**.\n\nAnd it's been waiting."
       }
     }
   ],
@@ -276,5 +276,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

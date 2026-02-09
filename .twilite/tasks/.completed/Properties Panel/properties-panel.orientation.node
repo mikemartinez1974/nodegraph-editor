@@ -50,7 +50,7 @@
     {
       "id": "properties-root",
       "type": "markdown",
-      "label": "🧩 Properties Panel Orientation",
+      "label": "\ud83e\udde9 Properties Panel Orientation",
       "position": {
         "x": 0,
         "y": -220
@@ -66,7 +66,7 @@
     {
       "id": "properties-payload",
       "type": "markdown",
-      "label": "📦 Surface Payload Data",
+      "label": "\ud83d\udce6 Surface Payload Data",
       "position": {
         "x": -360,
         "y": -20
@@ -82,7 +82,7 @@
     {
       "id": "properties-edges",
       "type": "markdown",
-      "label": "🔗 Show Connected Edges",
+      "label": "\ud83d\udd17 Show Connected Edges",
       "position": {
         "x": 360,
         "y": -20
@@ -92,13 +92,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Connected Edges\n+\n+- List every edge touching the selection (handles, types, routing hints).\n+- Provide quick navigation or formatting actions for the connected nodes/edges."
+        "markdown": "## Connected Edges\n+\n+- List every edge touching the selection (ports, types, routing hints).\n+- Provide quick navigation or formatting actions for the connected nodes/edges."
       }
     },
     {
       "id": "properties-format",
       "type": "markdown",
-      "label": "🪄 Formatting & Templates",
+      "label": "\ud83e\ude84 Formatting & Templates",
       "position": {
         "x": 0,
         "y": 220

@@ -20,11 +20,17 @@
       "defaultWidth": 24,
       "defaultHeight": 63,
       "defaultData": {
-        "rows": ["A", "B", "C", "D", "E"],
+        "rows": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
         "column": 1,
         "segment": "top"
       },
-      "handles": {
+      "ports": {
         "outputs": [
           {
             "id": "socket",
@@ -74,7 +80,7 @@
           }
         ]
       },
-      "handles": {
+      "ports": {
         "outputs": [
           {
             "id": "positive",
@@ -101,8 +107,7 @@
           "paddingLeft": 0
         }
       }
-    }
-    ,
+    },
     {
       "type": "skin",
       "label": "Breadboard Skin",
@@ -148,7 +153,7 @@
         "channel": "top",
         "polarity": "positive"
       },
-      "handles": {
+      "ports": {
         "outputs": [
           {
             "id": "positive",

@@ -59,7 +59,7 @@
     {
       "id": "skill-deps-root",
       "type": "markdown",
-      "label": "🚨 Skill: MissingDependencyDetection (Normative)",
+      "label": "\ud83d\udea8 Skill: MissingDependencyDetection (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing dependency → block execution\n- Missing skill → block execution\n- Unknown node type → block execution\n\nFailure is safety."
+        "markdown": "## Failure Modes\n\n- Missing dependency \u2192 block execution\n- Missing skill \u2192 block execution\n- Unknown node type \u2192 block execution\n\nFailure is safety."
       }
     },
     {
@@ -300,5 +300,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

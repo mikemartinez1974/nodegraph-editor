@@ -59,7 +59,7 @@
     {
       "id": "substrate-root",
       "type": "markdown",
-      "label": "🧱 Substrate Programming",
+      "label": "\ud83e\uddf1 Substrate Programming",
       "position": {
         "x": 470.7102024773559,
         "y": 175.08738807089657
@@ -69,7 +69,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# 🧱 Substrate Programming\n\nDefining **durable structures** that outlive execution.\n\nYou are not telling the system *what to do next*.\nYou are defining **what can exist, what may happen, and what must never break**.",
+        "markdown": "# \ud83e\uddf1 Substrate Programming\n\nDefining **durable structures** that outlive execution.\n\nYou are not telling the system *what to do next*.\nYou are defining **what can exist, what may happen, and what must never break**.",
         "memo": "",
         "link": "",
         "html": "",
@@ -79,7 +79,7 @@
     {
       "id": "cluster-identity",
       "type": "markdown",
-      "label": "🪪 Identity & Persistence",
+      "label": "\ud83e\udeaa Identity & Persistence",
       "position": {
         "x": 905.1968050787183,
         "y": 447.0221058179331
@@ -89,7 +89,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Identity & Persistence\n\nWhat exists **even when nothing is running**.\n\n- **Artifact** — durable object (graph, node, edge)\n- **Identity** — stable IDs, not regenerated labels\n- **State** — observable properties at rest\n- **History** — meaningful past mutations\n- **Continuity** — existence survives time",
+        "markdown": "## Identity & Persistence\n\nWhat exists **even when nothing is running**.\n\n- **Artifact** \u2014 durable object (graph, node, edge)\n- **Identity** \u2014 stable IDs, not regenerated labels\n- **State** \u2014 observable properties at rest\n- **History** \u2014 meaningful past mutations\n- **Continuity** \u2014 existence survives time",
         "memo": "",
         "link": "",
         "html": "",
@@ -99,7 +99,7 @@
     {
       "id": "cluster-behavior",
       "type": "markdown",
-      "label": "🧠 Behavior",
+      "label": "\ud83e\udde0 Behavior",
       "position": {
         "x": 372.17891520002104,
         "y": 595.330830597657
@@ -109,7 +109,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Behavior\n\nWhat *may* happen to the substrate.\n\n- **Skill** — predictable behavior over a graph\n- **Interpreter** — engine that applies a skill\n- **Evaluation** — read without mutation\n- **Mutation** — write deltas only\n- **Delta** — the legal unit of change",
+        "markdown": "## Behavior\n\nWhat *may* happen to the substrate.\n\n- **Skill** \u2014 predictable behavior over a graph\n- **Interpreter** \u2014 engine that applies a skill\n- **Evaluation** \u2014 read without mutation\n- **Mutation** \u2014 write deltas only\n- **Delta** \u2014 the legal unit of change",
         "memo": "",
         "link": "",
         "html": "",
@@ -119,7 +119,7 @@
     {
       "id": "cluster-constraints",
       "type": "markdown",
-      "label": "🛡️ Constraints",
+      "label": "\ud83d\udee1\ufe0f Constraints",
       "position": {
         "x": 46.58476135233548,
         "y": 139.33659309915532
@@ -129,7 +129,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Constraints\n\nWhat must **never** break.\n\n- **Invariant** — always true\n- **Guardrail** — blocks invalid change\n- **Contract** — promises a skill must honor\n- **Scope** — what a skill may touch\n- **Reversibility** — whether change can be undone",
+        "markdown": "## Constraints\n\nWhat must **never** break.\n\n- **Invariant** \u2014 always true\n- **Guardrail** \u2014 blocks invalid change\n- **Contract** \u2014 promises a skill must honor\n- **Scope** \u2014 what a skill may touch\n- **Reversibility** \u2014 whether change can be undone",
         "memo": "",
         "link": "",
         "html": "",
@@ -139,7 +139,7 @@
     {
       "id": "cluster-semantics",
       "type": "markdown",
-      "label": "🗣️ Semantics",
+      "label": "\ud83d\udde3\ufe0f Semantics",
       "position": {
         "x": 377.780102922766,
         "y": -309.9582195091337
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Semantics\n\nHow humans stay oriented.\n\n- **Meaning** — human-legible intent\n- **Affordance** — what the graph invites\n- **Perspective** — a view over the same artifact\n- **Role** — expected behavior of an actor\n- **Narrative** — why this exists",
+        "markdown": "## Semantics\n\nHow humans stay oriented.\n\n- **Meaning** \u2014 human-legible intent\n- **Affordance** \u2014 what the graph invites\n- **Perspective** \u2014 a view over the same artifact\n- **Role** \u2014 expected behavior of an actor\n- **Narrative** \u2014 why this exists",
         "memo": "",
         "link": "",
         "html": "",
@@ -159,7 +159,7 @@
     {
       "id": "cluster-execution",
       "type": "markdown",
-      "label": "⚙️ Execution (Downstream)",
+      "label": "\u2699\ufe0f Execution (Downstream)",
       "position": {
         "x": 924.8939664682157,
         "y": -145.18059358944444
@@ -169,7 +169,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Execution (Downstream)\n\nImportant — but **not primary**.\n\n- **Trigger** — what causes interpretation\n- **Scheduler** — when it happens\n- **Agent** — an actor using skills\n- **Tool** — external capability\n- **Side-effect** — something substrates minimize",
+        "markdown": "## Execution (Downstream)\n\nImportant \u2014 but **not primary**.\n\n- **Trigger** \u2014 what causes interpretation\n- **Scheduler** \u2014 when it happens\n- **Agent** \u2014 an actor using skills\n- **Tool** \u2014 external capability\n- **Side-effect** \u2014 something substrates minimize",
         "memo": "",
         "link": "",
         "html": "",
@@ -179,7 +179,7 @@
     {
       "id": "skill-contract",
       "type": "markdown",
-      "label": "🧾 Skill Contract",
+      "label": "\ud83e\uddfe Skill Contract",
       "position": {
         "x": -217.56053467231573,
         "y": 625.969616527695
@@ -189,7 +189,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 🧾 Skill Contract\n\nA **Skill Contract** defines the *rules under which a skill may operate*.\n\nIt is **not code**.\nIt is a **promise**.\n\n### A Skill Contract specifies:\n\n- **Reads** — what parts of the graph the skill may inspect\n- **Writes** — what the skill is allowed to mutate\n- **Invariants** — what must remain true after execution\n- **Failure modes** — what happens if constraints are violated\n- **Reversibility** — whether changes can be undone\n\n### Why this exists\n\n- Skills become **predictable**\n- Multiple interpreters can safely coexist\n- Humans can reason about agent behavior\n- Graph continuity is preserved\n\n> A skill without a contract is just a suggestion.\n> A contract makes it *trustworthy*.",
+        "markdown": "## \ud83e\uddfe Skill Contract\n\nA **Skill Contract** defines the *rules under which a skill may operate*.\n\nIt is **not code**.\nIt is a **promise**.\n\n### A Skill Contract specifies:\n\n- **Reads** \u2014 what parts of the graph the skill may inspect\n- **Writes** \u2014 what the skill is allowed to mutate\n- **Invariants** \u2014 what must remain true after execution\n- **Failure modes** \u2014 what happens if constraints are violated\n- **Reversibility** \u2014 whether changes can be undone\n\n### Why this exists\n\n- Skills become **predictable**\n- Multiple interpreters can safely coexist\n- Humans can reason about agent behavior\n- Graph continuity is preserved\n\n> A skill without a contract is just a suggestion.\n> A contract makes it *trustworthy*.",
         "memo": "",
         "link": "",
         "html": "",
@@ -199,7 +199,7 @@
     {
       "id": "skill-contract-template",
       "type": "markdown",
-      "label": "🧾 Skill Contract — Template",
+      "label": "\ud83e\uddfe Skill Contract \u2014 Template",
       "position": {
         "x": -765.406471204067,
         "y": 569.3791626581759
@@ -209,7 +209,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## 🧾 Skill Contract — Template\n\nThis node defines the **standard structure** for a Skill Contract.\n\nIt is meant to be **copied and filled**, not edited in place.\n\n---\n\n### 1. Skill Identity\n- **Name:**\n- **Version:**\n- **Description:**\n\n---\n\n### 2. Permissions\n\n**Reads** (what the skill may inspect):\n- \n\n**Writes** (what the skill may mutate):\n- \n\n---\n\n### 3. Constraints\n\n**Invariants** (must remain true):\n- \n\n**Guardrails** (explicit prohibitions):\n- \n\n---\n\n### 4. Failure Semantics\n\n- **On violation:** (reject / partial apply / log only)\n- **Error visibility:** (silent / surfaced / recorded)\n\n---\n\n### 5. Reversibility\n\n- **Undo supported:** yes / no\n- **Rollback scope:** (nodes / edges / metadata / none)\n\n---\n\n### 6. Audit & Provenance\n\n- **Interpreter(s) allowed:**\n- **Last reviewed by:**\n- **Review date:**\n\n---\n\n> A Skill Contract exists so behavior can be trusted **without trusting the executor**.",
+        "markdown": "## \ud83e\uddfe Skill Contract \u2014 Template\n\nThis node defines the **standard structure** for a Skill Contract.\n\nIt is meant to be **copied and filled**, not edited in place.\n\n---\n\n### 1. Skill Identity\n- **Name:**\n- **Version:**\n- **Description:**\n\n---\n\n### 2. Permissions\n\n**Reads** (what the skill may inspect):\n- \n\n**Writes** (what the skill may mutate):\n- \n\n---\n\n### 3. Constraints\n\n**Invariants** (must remain true):\n- \n\n**Guardrails** (explicit prohibitions):\n- \n\n---\n\n### 4. Failure Semantics\n\n- **On violation:** (reject / partial apply / log only)\n- **Error visibility:** (silent / surfaced / recorded)\n\n---\n\n### 5. Reversibility\n\n- **Undo supported:** yes / no\n- **Rollback scope:** (nodes / edges / metadata / none)\n\n---\n\n### 6. Audit & Provenance\n\n- **Interpreter(s) allowed:**\n- **Last reviewed by:**\n- **Review date:**\n\n---\n\n> A Skill Contract exists so behavior can be trusted **without trusting the executor**.",
         "memo": "",
         "link": "",
         "html": "",
@@ -323,5 +323,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

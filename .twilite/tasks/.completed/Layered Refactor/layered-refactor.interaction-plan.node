@@ -56,7 +56,7 @@
     {
       "id": "interaction-root",
       "type": "markdown",
-      "label": "🖱️ Interaction Layer Plan",
+      "label": "\ud83d\uddb1\ufe0f Interaction Layer Plan",
       "position": {
         "x": 0,
         "y": -220
@@ -72,7 +72,7 @@
     {
       "id": "interaction-inputs",
       "type": "markdown",
-      "label": "🖱️ Input Harness",
+      "label": "\ud83d\uddb1\ufe0f Input Harness",
       "position": {
         "x": -320,
         "y": -20
@@ -88,7 +88,7 @@
     {
       "id": "interaction-guards",
       "type": "markdown",
-      "label": "🚦 Guarded Intent Flow",
+      "label": "\ud83d\udea6 Guarded Intent Flow",
       "position": {
         "x": 320,
         "y": -20
@@ -104,7 +104,7 @@
     {
       "id": "interaction-feedback",
       "type": "markdown",
-      "label": "🎯 Visual Feedback",
+      "label": "\ud83c\udfaf Visual Feedback",
       "position": {
         "x": -140,
         "y": 220
@@ -120,7 +120,7 @@
     {
       "id": "interaction-ordering",
       "type": "markdown",
-      "label": "⏱️ Intent Scheduling",
+      "label": "\u23f1\ufe0f Intent Scheduling",
       "position": {
         "x": 140,
         "y": 220
@@ -184,5 +184,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

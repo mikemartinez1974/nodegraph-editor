@@ -53,7 +53,7 @@
     {
       "id": "central-vr-content",
       "type": "markdown",
-      "label": "VR + Content Network: Immersive Webs 🌐🕶️",
+      "label": "VR + Content Network: Immersive Webs \ud83c\udf10\ud83d\udd76\ufe0f",
       "position": {
         "x": 0,
         "y": 0
@@ -64,13 +64,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Merging VR with Content Networks\n\n**Virtual Reality (VR)** meets **Content Networks** (node graphs of interconnected ideas/data): A fusion creating **immersive, spatial knowledge landscapes**.\n\n- **VR**: 3D environments, interaction via headsets.\n- **Content Net**: Nodes/edges as navigable structures.\n- **Combo**: Walk through ideas, manipulate connections in 3D!\n\nExplore the ripples below. 🚀"
+        "memo": "# Merging VR with Content Networks\n\n**Virtual Reality (VR)** meets **Content Networks** (node graphs of interconnected ideas/data): A fusion creating **immersive, spatial knowledge landscapes**.\n\n- **VR**: 3D environments, interaction via headsets.\n- **Content Net**: Nodes/edges as navigable structures.\n- **Combo**: Walk through ideas, manipulate connections in 3D!\n\nExplore the ripples below. \ud83d\ude80"
       }
     },
     {
       "id": "immersion",
       "type": "markdown",
-      "label": "Deep Immersion 🌊",
+      "label": "Deep Immersion \ud83c\udf0a",
       "position": {
         "x": 400,
         "y": -150
@@ -81,13 +81,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Heightened Engagement\n\n- **Spatial Navigation**: Float between nodes in 3D space—scale up for details, zoom out for overviews.\n- **Embodied Interaction**: Gesture to connect edges, 'touch' content to expand.\n- **Sensory Layers**: Add audio (node whispers), haptics (edge vibrations).\n\nResult: Learning feels like exploring a dream world. 🧠✨"
+        "memo": "# Heightened Engagement\n\n- **Spatial Navigation**: Float between nodes in 3D space\u2014scale up for details, zoom out for overviews.\n- **Embodied Interaction**: Gesture to connect edges, 'touch' content to expand.\n- **Sensory Layers**: Add audio (node whispers), haptics (edge vibrations).\n\nResult: Learning feels like exploring a dream world. \ud83e\udde0\u2728"
       }
     },
     {
       "id": "collaboration",
       "type": "markdown",
-      "label": "Shared Realities 👥",
+      "label": "Shared Realities \ud83d\udc65",
       "position": {
         "x": 400,
         "y": 150
@@ -98,13 +98,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Multi-User VR Networks\n\n- **Co-Presence**: Avatars collaborate in shared VR graphs—build edges together.\n- **Real-Time Sync**: Changes propagate instantly; see others' cursors.\n- **Diverse Views**: Personalize angles while merging contributions.\n\nTransforms solo brainstorming into global workshops. 🌍"
+        "memo": "# Multi-User VR Networks\n\n- **Co-Presence**: Avatars collaborate in shared VR graphs\u2014build edges together.\n- **Real-Time Sync**: Changes propagate instantly; see others' cursors.\n- **Diverse Views**: Personalize angles while merging contributions.\n\nTransforms solo brainstorming into global workshops. \ud83c\udf0d"
       }
     },
     {
       "id": "applications",
       "type": "markdown",
-      "label": "Emergent Applications 🚀",
+      "label": "Emergent Applications \ud83d\ude80",
       "position": {
         "x": -400,
         "y": 0
@@ -115,13 +115,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# New Use Cases\n\n- **Education**: Virtual museums of knowledge—walk through history timelines.\n- **Design**: 3D prototyping networks for architecture or games.\n- **Therapy**: Navigable mind maps for mental health visualization.\n- **Business**: Immersive org charts, strategy simulations.\n- **Art**: Procedural worlds generated from content edges.\n\nBoundaries blur—content becomes habitat! 🏗️"
+        "memo": "# New Use Cases\n\n- **Education**: Virtual museums of knowledge\u2014walk through history timelines.\n- **Design**: 3D prototyping networks for architecture or games.\n- **Therapy**: Navigable mind maps for mental health visualization.\n- **Business**: Immersive org charts, strategy simulations.\n- **Art**: Procedural worlds generated from content edges.\n\nBoundaries blur\u2014content becomes habitat! \ud83c\udfd7\ufe0f"
       }
     },
     {
       "id": "challenges",
       "type": "markdown",
-      "label": "Challenges & Horizons ⚠️",
+      "label": "Challenges & Horizons \u26a0\ufe0f",
       "position": {
         "x": 0,
         "y": 300
@@ -132,13 +132,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Hurdles to Overcome\n\n- **Tech Barriers**: Hardware cost, motion sickness in dense networks.\n- **Scalability**: Rendering massive graphs without lag.\n- **Accessibility**: Inclusive design for non-VR users.\n- **Ethics**: Privacy in shared mental spaces?\n\nFuture: Lighter AR hybrids, AI-assisted layouts. The potential is boundless! 🔮"
+        "memo": "# Hurdles to Overcome\n\n- **Tech Barriers**: Hardware cost, motion sickness in dense networks.\n- **Scalability**: Rendering massive graphs without lag.\n- **Accessibility**: Inclusive design for non-VR users.\n- **Ethics**: Privacy in shared mental spaces?\n\nFuture: Lighter AR hybrids, AI-assisted layouts. The potential is boundless! \ud83d\udd2e"
       }
     },
     {
       "id": "examples",
       "type": "markdown",
-      "label": "Real & Hypothetical Examples 💡",
+      "label": "Real & Hypothetical Examples \ud83d\udca1",
       "position": {
         "x": -200,
         "y": -200
@@ -149,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Visions\n\n- **Oculus Knowledge Base**: VR wiki where pages are floating islands.\n- **Node-RED in VR**: Wire workflows by hand in 3D.\n- **Hypothetical**: Halloween Horror Network—spooky content webs you 'haunt' (Oct 31, 2025 vibes!).\n\nBuild your own: Start with this graph in VR tools! 🎃"
+        "memo": "# Visions\n\n- **Oculus Knowledge Base**: VR wiki where pages are floating islands.\n- **Node-RED in VR**: Wire workflows by hand in 3D.\n- **Hypothetical**: Halloween Horror Network\u2014spooky content webs you 'haunt' (Oct 31, 2025 vibes!).\n\nBuild your own: Start with this graph in VR tools! \ud83c\udf83"
       }
     }
   ],
@@ -203,10 +203,10 @@
       "style": {}
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group-benefits",
-      "label": "Benefits & Powers 💪",
+      "label": "Benefits & Powers \ud83d\udcaa",
       "nodeIds": [
         "immersion",
         "collaboration",
@@ -223,7 +223,7 @@
     },
     {
       "id": "group-future",
-      "label": "Challenges & Visions 🔮",
+      "label": "Challenges & Visions \ud83d\udd2e",
       "nodeIds": [
         "challenges",
         "examples"

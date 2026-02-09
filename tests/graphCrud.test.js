@@ -184,8 +184,8 @@ describe('GraphCRUD core CRUD flows', () => {
     const invalid = fixture.crud.createEdge({
       source: 'source',
       target: { nodeId: 'missing', handleKey: 'fire' },
-      sourceHandle: 'tick',
-      targetHandle: 'fire',
+      sourcePort: 'tick',
+      targetPort: 'fire',
     });
     assert.equal(invalid.success, false);
     assert.match(invalid.error, /not found/);
@@ -193,15 +193,15 @@ describe('GraphCRUD core CRUD flows', () => {
     const created = fixture.crud.createEdge({
       source: 'source',
       target: 'target',
-      sourceHandle: 'tick',
-      targetHandle: 'fire',
+      sourcePort: 'tick',
+      targetPort: 'fire',
       label: 'Edge',
     });
     assert.equal(created.success, true);
     assert.equal(fixture.edges.length, 1);
     assert.equal(fixture.edges[0].label, 'Edge');
-    assert.equal(fixture.edges[0].sourceHandle, 'tick');
-    assert.equal(fixture.edges[0].targetHandle, 'fire');
+    assert.equal(fixture.edges[0].sourcePort, 'tick');
+    assert.equal(fixture.edges[0].targetPort, 'fire');
     assert.equal(fixture.history.length, 1);
   });
 
@@ -217,8 +217,8 @@ describe('GraphCRUD core CRUD flows', () => {
     const result = fixture.crud.createEdge({
       source: 'a',
       target: 'b',
-      sourceHandle: 'a-out',
-      targetHandle: 'b-in',
+      sourcePort: 'a-out',
+      targetPort: 'b-in',
       label: 'SyncEdge'
     });
 
@@ -255,8 +255,8 @@ describe('GraphCRUD core CRUD flows', () => {
     });
 
     const result = fixture.crud.createEdges([
-      { source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' },
-      { source: 'b', target: 'c', sourceHandle: 'pass', targetHandle: 'missing' },
+      { source: 'a', target: 'b', sourcePort: 'out', targetPort: 'in' },
+      { source: 'b', target: 'c', sourcePort: 'pass', targetPort: 'missing' },
     ]);
 
     assert.equal(result.success, true);
@@ -293,17 +293,17 @@ describe('GraphCRUD core CRUD flows', () => {
     const missingHandle = fixture.crud.createEdge({
       source: 'source',
       target: 'target',
-      sourceHandle: 'tick',
-      // targetHandle omitted intentionally
+      sourcePort: 'tick',
+      // targetPort omitted intentionally
     });
     assert.equal(missingHandle.success, false);
-    assert.match(missingHandle.error, /targetHandle is required/i);
+    assert.match(missingHandle.error, /targetPort is required/i);
 
     const typeMismatch = fixture.crud.createEdge({
       source: 'source',
       target: 'target',
-      sourceHandle: 'value',
-      targetHandle: 'trigger',
+      sourcePort: 'value',
+      targetPort: 'trigger',
     });
     assert.equal(typeMismatch.success, false);
     assert.match(typeMismatch.error, /Handle types do not match/i);
@@ -396,14 +396,14 @@ describe('GraphCRUD core CRUD flows', () => {
     const created = fixture.crud.createEdge({
       source: 'src',
       target: 'dst',
-      sourceHandle: 'pinA',
-      targetHandle: 'pinB'
+      sourcePort: 'pinA',
+      targetPort: 'pinB'
     });
     assert.equal(created.success, true);
     const stored = fixture.edges[0];
-    assert.ok(stored.handleMeta);
-    assert.deepEqual(stored.handleMeta.source.metadata, { pinId: 'A1', row: 'A', column: 1 });
-    assert.deepEqual(stored.handleMeta.target.metadata, { pinId: 'B1', rail: 'vcc' });
+    assert.ok(stored.portMeta);
+    assert.deepEqual(stored.portMeta.source.metadata, { pinId: 'A1', row: 'A', column: 1 });
+    assert.deepEqual(stored.portMeta.target.metadata, { pinId: 'B1', rail: 'vcc' });
   });
 });
 

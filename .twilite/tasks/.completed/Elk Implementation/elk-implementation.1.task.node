@@ -71,7 +71,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Every edge is ELK’s job\n\nWe ignore pre-existing route data and refuse fallback heuristics. The moment a layout finishes, ELK _alone_ dictates all polyline geometry (and any subsequent adjustments change ELK inputs, not manual overrides).",
+        "markdown": "## Every edge is ELK\u2019s job\n\nWe ignore pre-existing route data and refuse fallback heuristics. The moment a layout finishes, ELK _alone_ dictates all polyline geometry (and any subsequent adjustments change ELK inputs, not manual overrides).",
         "memo": "",
         "link": "",
         "html": "",
@@ -91,7 +91,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Pipeline\n1. Gather nodes + handles (position + size)\n2. Call ELK with `'elk.edgeRouting': 'ORTHOGONAL'` + fixed nodes\n3. Convert each `layout.edges[].sections` into `edgeRoutes[edgeId]`\n4. Skip any earlier bundling heuristics — ELK data is canonical",
+        "markdown": "### Pipeline\n1. Gather nodes + ports (position + size)\n2. Call ELK with `'elk.edgeRouting': 'ORTHOGONAL'` + fixed nodes\n3. Convert each `layout.edges[].sections` into `edgeRoutes[edgeId]`\n4. Skip any earlier bundling heuristics \u2014 ELK data is canonical",
         "memo": "",
         "link": "",
         "html": "",
@@ -111,7 +111,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "### Outcome\n- No bundling\n- No manual control points\n- All routes come from ELK’s bend points / source/target\n- After layout, `edgeRoutes` gets replaced with the freshly computed ELK polylines",
+        "markdown": "### Outcome\n- No bundling\n- No manual control points\n- All routes come from ELK\u2019s bend points / source/target\n- After layout, `edgeRoutes` gets replaced with the freshly computed ELK polylines",
         "memo": "",
         "link": "",
         "html": "",
@@ -177,5 +177,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

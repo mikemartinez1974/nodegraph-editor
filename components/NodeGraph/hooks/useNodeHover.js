@@ -20,8 +20,8 @@ export function useNodeHover(nodes) {
                 foundNode = node;
                 break;
             }
-            if (node.handles) {
-                for (const handle of node.handles) {
+            if (node.ports) {
+                for (const handle of node.ports) {
                     // Assume handle has {x, y, radius}
                     const dx = clientX - handle.x;
                     const dy = clientY - handle.y;

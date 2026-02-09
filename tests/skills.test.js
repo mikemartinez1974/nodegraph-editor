@@ -21,12 +21,12 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
   const state = {
     nodes: clone(nodes),
     edges: clone(edges),
-    groups: clone(groups)
+    clusters: clone(groups)
   };
 
   const findNodeIndex = (id) => state.nodes.findIndex((node) => node.id === id);
   const findEdgeIndex = (id) => state.edges.findIndex((edge) => edge.id === id);
-  const findGroupIndex = (id) => state.groups.findIndex((group) => group.id === id);
+  const findGroupIndex = (id) => state.clusters.findIndex((group) => group.id === id);
 
   const ensureNode = (id) => {
     const index = findNodeIndex(id);
@@ -41,7 +41,7 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
     if (index === -1) {
       throw new Error(`Group ${id} not found`);
     }
-    return { group: state.groups[index], index };
+    return { group: state.clusters[index], index };
   };
 
   let copyCounter = 0;
@@ -49,7 +49,7 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
   const api = {
     getNodes: () => clone(state.nodes),
     getEdges: () => clone(state.edges),
-    getGroups: () => clone(state.groups),
+    getGroups: () => clone(state.clusters),
     createNodes: (nodesToCreate = []) => {
       const created = nodesToCreate.map((node) => {
         const next = clone(node);
@@ -103,7 +103,7 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
       state.edges = state.edges.filter(
         (edge) => edge.source !== id && edge.target !== id
       );
-      state.groups.forEach((group) => {
+      state.clusters.forEach((group) => {
         group.nodeIds = (group.nodeIds || []).filter((nodeId) => nodeId !== id);
       });
       return { success: true, data: { id } };
@@ -129,7 +129,7 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
         if (!next.nodeIds) {
           next.nodeIds = [];
         }
-        state.groups.push(next);
+        state.clusters.push(next);
         return clone(next);
       });
       return { success: true, data: { created } };
@@ -139,44 +139,44 @@ function createGraphApiFixture({ nodes = [], edges = [], groups = [] } = {}) {
       if (index === -1) {
         return { success: false, error: `Group ${id} not found` };
       }
-      state.groups.splice(index, 1);
+      state.clusters.splice(index, 1);
       return { success: true, data: { deletedGroupId: id } };
     },
-    addNodesToGroup: (groupId, nodeIds = []) => {
-      const { group, index } = ensureGroup(groupId);
+    addNodesToGroup: (clusterId, nodeIds = []) => {
+      const { group, index } = ensureGroup(clusterId);
       const nodeSet = new Set(group.nodeIds || []);
       nodeIds.forEach((id) => nodeSet.add(id));
       const updated = { ...group, nodeIds: Array.from(nodeSet) };
-      state.groups[index] = updated;
+      state.clusters[index] = updated;
       return { success: true, data: clone(updated) };
     },
-    removeNodesFromGroup: (groupId, nodeIds = []) => {
-      const { group, index } = ensureGroup(groupId);
+    removeNodesFromGroup: (clusterId, nodeIds = []) => {
+      const { group, index } = ensureGroup(clusterId);
       const updated = {
         ...group,
         nodeIds: (group.nodeIds || []).filter((id) => !nodeIds.includes(id))
       };
-      state.groups[index] = updated;
+      state.clusters[index] = updated;
       return { success: true, data: clone(updated) };
     },
-    setGroupNodes: (groupId, nodeIds = []) => {
-      const { group, index } = ensureGroup(groupId);
+    setGroupNodes: (clusterId, nodeIds = []) => {
+      const { group, index } = ensureGroup(clusterId);
       const updated = { ...group, nodeIds: [...nodeIds] };
-      state.groups[index] = updated;
+      state.clusters[index] = updated;
       return { success: true, data: clone(updated) };
     },
-    updateGroup: (groupId, patch = {}) => {
-      const { group, index } = ensureGroup(groupId);
+    updateGroup: (clusterId, patch = {}) => {
+      const { group, index } = ensureGroup(clusterId);
       const updated = mergeShallow(group, patch);
-      state.groups[index] = updated;
+      state.clusters[index] = updated;
       return { success: true, data: clone(updated) };
     },
-    readGroup: (groupId) => {
-      const index = findGroupIndex(groupId);
+    readGroup: (clusterId) => {
+      const index = findGroupIndex(clusterId);
       if (index === -1) {
-        return { success: false, error: `Group ${groupId} not found` };
+        return { success: false, error: `Group ${clusterId} not found` };
       }
-      return { success: true, data: clone(state.groups[index]) };
+      return { success: true, data: clone(state.clusters[index]) };
     },
     duplicateNodes: (nodeIds = [], options = {}) => {
       const offset = options.offset || { x: 40, y: 40 };
@@ -231,7 +231,7 @@ const expectedSkillIds = [
   'layout.alignDistribute',
   'layout.normalizeSpacing',
   'validation.schema',
-  'validation.handles',
+  'validation.ports',
   'validation.dependencies',
   'validation.orphans',
   'validation.unsafeMutation',
@@ -273,7 +273,7 @@ describe('Structural skills', () => {
         { id: 'node-3', width: 160, height: 80, position: { x: 200, y: 0 } }
       ],
       edges: [],
-      groups: []
+      clusters: []
     }));
   });
 
@@ -296,7 +296,7 @@ describe('Structural skills', () => {
   it('creates groups without moving nodes', async () => {
     const outcome = await graphAPI.executeSkill('struct.grouping', {
       action: 'create',
-      groupId: 'group-1',
+      clusterId: 'group-1',
       label: 'Test Group',
       nodeIds: ['node-1', 'node-2']
     });
@@ -309,12 +309,12 @@ describe('Structural skills', () => {
   it('reparents nodes between groups', async () => {
     await graphAPI.executeSkill('struct.grouping', {
       action: 'create',
-      groupId: 'group-1',
+      clusterId: 'group-1',
       nodeIds: ['node-1', 'node-2']
     });
     await graphAPI.executeSkill('struct.grouping', {
       action: 'create',
-      groupId: 'group-2',
+      clusterId: 'group-2',
       nodeIds: ['node-2', 'node-3']
     });
     const res = await graphAPI.executeSkill('struct.reparent', {
@@ -430,7 +430,7 @@ describe('Validation skills', () => {
           height: 80,
           label: 'Validator',
           position: { x: 0, y: 0 },
-          handles: [{ id: 'out', direction: 'output', dataType: 'value' }]
+          ports: [{ id: 'out', direction: 'output', dataType: 'value' }]
         },
     {
       id: 'isolated-node',
@@ -454,7 +454,7 @@ describe('Validation skills', () => {
           id: 'edge-valid',
           source: 'validator-node',
           target: 'isolated-node',
-          sourceHandle: 'out'
+          sourcePort: 'out'
         }
       ]
     }));
@@ -467,13 +467,13 @@ describe('Validation skills', () => {
   });
 
   it('detects handle mismatches', async () => {
-    const res = await graphAPI.executeSkill('validation.handles', {
+    const res = await graphAPI.executeSkill('validation.ports', {
       edges: [
         {
           id: 'bad-edge',
           source: 'validator-node',
           target: 'isolated-node',
-          sourceHandle: 'missing-handle'
+          sourcePort: 'missing-handle'
         }
       ]
     });

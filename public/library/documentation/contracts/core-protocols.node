@@ -59,7 +59,7 @@
     {
       "id": "protocols-root",
       "type": "markdown",
-      "label": "⚖️ Core Protocols",
+      "label": "\u2696\ufe0f Core Protocols",
       "position": {
         "x": 0,
         "y": 0
@@ -133,7 +133,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Persistence Guarantees\n\n- Graphs must load without tools\n- Graphs must survive version drift\n- Graphs must remain interpretable by agents\n\nIf it can’t survive time, it’s not real."
+        "markdown": "## Persistence Guarantees\n\n- Graphs must load without tools\n- Graphs must survive version drift\n- Graphs must remain interpretable by agents\n\nIf it can\u2019t survive time, it\u2019s not real."
       }
     },
     {
@@ -225,5 +225,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

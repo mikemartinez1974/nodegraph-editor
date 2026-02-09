@@ -3,9 +3,9 @@ import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
-// --- New schema handles ---
+// --- New schema ports ---
 const TOGGLE_INPUTS = [
   { key: 'set', label: 'Set', type: 'trigger' }
 ];
@@ -26,7 +26,7 @@ export default function ToggleNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
-  const node = useNodeHandleSchema(origNode, TOGGLE_INPUTS, TOGGLE_OUTPUTS);
+  const node = useNodePortSchema(origNode, TOGGLE_INPUTS, TOGGLE_OUTPUTS);
   
   const width = (node?.width || 250) * zoom;
   const height = (node?.height || 350) * zoom;
@@ -107,7 +107,7 @@ export default function ToggleNode({
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
-  // Handles are rendered via the shared HandleLayer
+  // Ports are rendered via the shared HandleLayer
   return (
     <div
       ref={nodeRef}

@@ -5,7 +5,7 @@ import PluginNodePlaceholder from './PluginNodePlaceholder';
 import { getNodeTypeMetadata } from '../nodeTypeRegistry';
 import { NODE_RENDERER_SDK_SOURCE } from '../plugins/sdkSource';
 import FixedNode from './FixedNode';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
 const generateToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
@@ -32,7 +32,7 @@ const resolveUrl = (entry) => {
 
 export default function PluginNodeRenderer(props) {
   const { node, type } = props;
-  const nodeWithHandles = useNodeHandleSchema(node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const nodeWithHandles = useNodePortSchema(node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const nodeTypeKey =
     typeof nodeWithHandles?.type === 'string'
       ? nodeWithHandles.type

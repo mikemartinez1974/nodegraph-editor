@@ -18,7 +18,7 @@ const baseManifest = {
       entry: 'https://example.com/plugins/node.js#Widget',
       label: 'Widget',
       definition: {
-        handles: {
+        ports: {
           inputs: [{ id: 'in', label: 'In', dataType: 'value' }],
           outputs: [{ id: 'out', label: 'Out', dataType: 'value' }]
         }

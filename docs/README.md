@@ -35,7 +35,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - ✅ **Pan & Zoom**: Mouse wheel zoom, drag-to-pan, HiDPI canvas support
 - ✅ **Multi-Select**: Marquee selection (Shift+drag) with bulk operations
 - ✅ **Undo/Redo**: Full history management (Ctrl+Z/Y)
-- ✅ **Groups**: Visual node grouping with collapse/expand and drag-to-move-all
+- ✅ **Clusters**: Visual node grouping with collapse/expand and drag-to-move-all
 - ✅ **Node Types**: Default, Resizable, with extensible custom types
 - ✅ **Edge Types**: Straight, curved, child/parent (vertical), peer (horizontal)
 - ✅ **Markdown Support**: Rich formatted text in node memos
@@ -51,7 +51,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 
 - **Properties Panel**: Edit labels, markdown memos, links, emoji picker, edge type, style, width, curvature, group membership, styling, visibility
 - **Node List**: Virtualized list with search and filtering (react-window)
-- **Group List**: Browse and manage all groups
+- **Group List**: Browse and manage all clusters
 - **Draggable Toolbar**: Floating toolbar with all essential actions
 
 ### Keyboard Shortcuts
@@ -74,7 +74,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 - **Theme System**: 29 built-in themes with dark/light mode support
 - **Background Art**: Customizable canvas backgrounds (tiled, stretched, centered)
 - **Auto-save Ready**: JSON export/import for persistence
-- **Performance**: Handles 1000+ nodes smoothly with canvas rendering and virtualization
+- **Performance**: Ports 1000+ nodes smoothly with canvas rendering and virtualization
 
 ---
 
@@ -83,7 +83,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ### Layered Rendering
 
 - **EdgeLayer** (Canvas): High-performance bezier curve rendering with hit detection
-- **HandleLayer** (Canvas): Connection points with proximity-based activation
+- **HandleLayer** (Canvas): Port connection points with proximity-based activation
 - **NodeLayer** (React/DOM): Interactive node components with selection and hover
 - **GroupLayer** (SVG): Visual grouping with auto-calculated bounds
 - **PanZoomLayer** (SVG): Unified viewport transform with marquee selection
@@ -91,7 +91,7 @@ Think of it as "Figma meets ChatGPT" for visual thinking and knowledge organizat
 ### Event System
 
 - **Event Bus**: Decoupled cross-component communication (`eventBus.js`)
-- **Handle System**: Context-aware positioning with real-time drag updates (no React re-renders)
+- **Port System**: Context-aware port positioning with real-time drag updates (no React re-renders)
 - **Physics Simulation**: Force-directed layout in Nav Mode (attraction, repulsion, damping)
 
 ### State Management
@@ -161,7 +161,7 @@ nodegraph-editor/
 │   │   ├── Nodes/
 │   │   │   ├── DefaultNode.js      # Standard node component
 │   │   │   └── ResizableNode.js    # Resizable node variant
-│   │   ├── PropertiesPanel.js      # Unified properties panel for nodes, edges, and groups
+│   │   ├── PropertiesPanel.js      # Unified properties panel for nodes, edges, and clusters
 │   │   ├── NodeListPanel.js        # Virtualized node list
 │   │   ├── GroupListPanel.js       # Group browser
 │   │   ├── useGraphHistory.js      # Undo/redo hook
@@ -172,7 +172,7 @@ nodegraph-editor/
 │       ├── NodeGraph.js            # Main orchestrator
 │       ├── EdgeLayer.js            # Canvas edge rendering
 │       ├── NodeLayer.js            # React node rendering
-│       ├── HandleLayer.js          # Canvas handle rendering
+│       ├── HandleLayer.js          # Canvas port rendering
 │       ├── GroupLayer.js           # SVG group rendering
 │       ├── PanZoomLayer.js         # Viewport + marquee
 │       ├── eventBus.js             # Event system
@@ -209,8 +209,8 @@ window.graphAPI.findNodes({ type: "default", hasMemo: true });
 window.graphAPI.createEdge({
   source: "node1",
   target: "node2",
-  sourceHandle: "out",
-  targetHandle: "in",
+  sourcePort: "out",
+  targetPort: "in",
   type: "curved"
 });
 
@@ -219,7 +219,7 @@ window.graphAPI.getStats();
 // { nodeCount: 10, edgeCount: 15, ... }
 ```
 
-> ℹ️ Edge creation now requires `sourceHandle`/`targetHandle` keys. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` handles) to pick the correct connection points.
+> ℹ️ Edge creation now requires `sourcePort`/`targetPort` keys. Use the node's `outputs`/`inputs` arrays (or the default `out`/`in` ports) to pick the correct connection points.
 
 See [GraphAPIdocumentation.md](components/GraphEditor/GraphAPIdocumentation.md) for full API reference.
 
@@ -242,11 +242,11 @@ Custom themes can be added in `components/Header/themes.js`.
 ## Performance Notes
 
 - **Large Graphs**: Tested with 1000+ nodes, 2000+ edges
-- **Canvas Rendering**: Edges/handles drawn on canvas (not DOM)
+- **Canvas Rendering**: Edges/ports drawn on canvas (not DOM)
 - **RAF Batching**: Drag updates batched via requestAnimationFrame
 - **Virtualization**: Node/group list panels use react-window
 - **HiDPI Support**: Canvas scaled for retina displays
-- **Lazy Rendering**: Handles only rendered when near nodes
+- **Lazy Rendering**: Ports only rendered when near nodes
 
 ---
 
@@ -281,7 +281,7 @@ Use these docs as a launchpad when working with other assistants—the descripti
 | **[LLM Onboarding](public/documentation/OnboardLLM.md)** | Prompt you can paste into ChatGPT/Claude/etc. so they emit valid graph JSON. |
 | **[GraphCRUD API](components/GraphEditor/GraphAPIdocumentation.md)** | Reference for `window.graphAPI` with create/update/delete/find examples. |
 | **[NodeGraph README](components/NodeGraph/README.md)** | Deep dive into the layered renderer (EdgeLayer, HandleLayer, PanZoomLayer). |
-| **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for handles, edges, and trigger/data flow. |
+| **[Node Logic System](.github/NodeLogicSystem.md)** | Schema + execution model for ports, edges, and trigger/data flow. |
 | **[Copilot Instructions](.github/copilot-instructions.md)** | Contributor guidelines and expectations for AI/code reviewers. |
 
 ---
@@ -370,7 +370,7 @@ This folder contains the top-level header and theme controls for the NodeGraph e
 
 ## Overview
 
-This folder implements a highly-interactive node/edge graph editor built with React and Material-UI (MUI). The editor supports pan/zoom, layered rendering (nodes, edges, handles), draggable nodes, resizable nodes, and an event bus for cross-component communication.
+This folder implements a highly-interactive node/edge graph editor built with React and Material-UI (MUI). The editor supports pan/zoom, layered rendering (nodes, edges, ports), draggable nodes, resizable nodes, and an event bus for cross-component communication.
 
 ## Purpose
 
@@ -424,7 +424,7 @@ For user scripts that operate on graphs, prefer a sandboxed runner (iframe or we
 ## Developer notes
 
 - Use the provided hooks for editor state and to avoid duplicating logic.
-- `nodeRefs` is a `Map`-like ref that registers node DOM elements for measurements and handle positioning.
+- `nodeRefs` is a `Map`-like ref that registers node DOM elements for measurements and port positioning.
 - Keep heavy DOM parsing (markdown/html) memoized or performed at save-time to avoid render-time performance hits.
 
 ## Troubleshooting
@@ -458,7 +458,7 @@ This folder contains reusable UI components and panels for the node graph editor
   - Panel for editing edge properties: type, label, style, color, gradient, arrow, animation, and more.
 
 - **GroupListPanel.js**
-  - Lists all groups in the graph. Supports selection, visibility toggling, focusing, and deletion.
+  - Lists all clusters in the graph. Supports selection, visibility toggling, focusing, and deletion.
 
 - **GroupPropertiesPanel.js**
   - Panel for editing group properties: label, style, visibility, and node membership. Allows adding/removing nodes and ungrouping.
@@ -589,7 +589,7 @@ This folder contains the built-in node components used by the graph editor. Each
 - Positioning: All nodes expect `node.position {x,y}` in graph coordinates. Node components apply the same pan/zoom transforms and center the node on that position.
 - Sizing: `width`/`height` are stored on node (user-resizable for DefaultNode). Default fallback sizes exist when `width`/`height` are missing.
 - Interaction: Nodes must call `eventBus` events for selection and pointer interactions (`nodeMouseDown`, `nodeClick`, `nodeMouseEnter`, `nodeMouseLeave`) to keep editor state in sync.
-- `nodeRefs`: Many nodes register their DOM ref in `nodeRefs` (a Map-like ref) so the editor can measure nodes for edge and handle placement.
+- `nodeRefs`: Many nodes register their DOM ref in `nodeRefs` (a Map-like ref) so the editor can measure nodes for edge and port placement.
 - Sanitization: Any node type that renders HTML or SVG should sanitize input to prevent XSS. Default implementations use rehype/remark sanitizers; extend cautiously.
 
 ## Extending nodes
@@ -700,14 +700,14 @@ A production-grade, interactive node/edge graph visualization component built wi
 
 **Layered rendering system** for optimal performance:
 - **EdgeLayer** (Canvas): High-performance edge rendering with bezier curves, hit detection, and label support
-- **HandleLayer** (Canvas): Connection point visualization with proximity-based activation and drag preview
+- **HandleLayer** (Canvas): Port connection point visualization with proximity-based activation and drag preview
 - **NodeLayer** (React/DOM): Interactive node components with selection, hover, and resize support
 - **GroupLayer** (SVG): Visual grouping with auto-calculated bounds, collapse/expand, and drag-to-move
 - **PanZoomLayer** (SVG overlay): Unified viewport transform with mouse/touch support and marquee selection
 
 **Event Bus**: Decoupled cross-layer communication via `eventBus.js` for clean separation of concerns.
 
-**Handle System**: Context-aware handle positioning with real-time updates during drag operations (no React re-renders).
+**Port System**: Context-aware port positioning with real-time updates during drag operations (no React re-renders).
 
 ## Features
 
@@ -716,23 +716,23 @@ A production-grade, interactive node/edge graph visualization component built wi
 - ✅ **Pan & Zoom**: Mouse wheel zoom, drag-to-pan, with HiDPI canvas support
 - ✅ **Multi-Select**: Marquee selection (Shift+drag) with bulk operations
 - ✅ **Undo/Redo**: Full history management with debounced batching
-- ✅ **Groups**: Visual node grouping with collapse/expand and drag-to-move-all
+- ✅ **Clusters**: Visual node grouping with collapse/expand and drag-to-move-all
 - ✅ **Edge Types**: Straight, curved, child/parent (vertical), peer (horizontal), orthogonal
-- ✅ **Handle Animation**: Smooth extension/retraction with progress-based rendering
+- ✅ **Port Animation**: Smooth extension/retraction with progress-based rendering
 - ✅ **Accessibility**: ARIA labels, keyboard navigation (Tab, Ctrl+Arrows), focus management
 
 ### Performance Optimizations
-- Canvas rendering for edges and handles (not React)
+- Canvas rendering for edges and ports (not React)
 - Transient DOM transforms during drag (React state only on drop)
 - Virtualized node/group lists for large graphs
 - RAF-batched redraws and debounced state updates
-- Proximity-based handle sensor activation (pointer-events optimization)
+- Proximity-based port sensor activation (pointer-events optimization)
 
 ### Customization
 - Theme-aware (inherits MUI theme or accepts `theme` prop)
 - Extensible node types via `nodeTypes` prop
 - Custom edge styles (color, width, dash patterns, labels)
-- Resizable nodes with drag handles
+- Resizable nodes with drag ports
 - Markdown support in node memos
 
 ## Props
@@ -771,7 +771,7 @@ A production-grade, interactive node/edge graph visualization component built wi
   ```
 
 ### Optional
-- **`groups`** (array): Group objects for visual organization
+- **`clusters`** (array): Group objects for visual organization
 - **`edgeTypes`** (object): Edge type configuration with style defaults
 - **`nodeTypes`** (object): Custom node component mapping
 - **`selectedNodeId`** (string): Currently selected node
@@ -802,7 +802,7 @@ const nodeTypes = {
 <NodeGraph
   nodes={nodes}
   edges={edges}
-  groups={groups}
+  clusters={clusters}
   edgeTypes={edgeTypes}
   nodeTypes={nodeTypes}
   selectedNodeId={selectedNodeId}
@@ -884,11 +884,11 @@ NodeGraph inherits MUI theme via `useTheme()`:
 ## Performance Notes
 
 - **Large graphs**: Tested with 1000+ nodes, 2000+ edges
-- **Canvas rendering**: Edges/handles drawn on canvas (not DOM)
+- **Canvas rendering**: Edges/ports drawn on canvas (not DOM)
 - **RAF batching**: Drag updates batched via requestAnimationFrame
 - **Virtualization**: Node/group list panels use react-window
 - **HiDPI support**: Canvas scaled for retina displays
-- **Lazy rendering**: Handles only rendered when near nodes
+- **Lazy rendering**: Ports only rendered when near nodes
 
 ## Files
 
@@ -896,7 +896,7 @@ NodeGraph inherits MUI theme via `useTheme()`:
 - `NodeGraph.js` - Main orchestrator, state management, event coordination
 - `EdgeLayer.js` - Canvas-based edge rendering with hit detection
 - `NodeLayer.js` - React-based node rendering with drag/resize
-- `HandleLayer.js` - Canvas-based handle rendering with proximity activation
+- `HandleLayer.js` - Canvas-based port rendering with proximity activation
 - `GroupLayer.js` - SVG-based group visualization with bounds calculation
 - `PanZoomLayer.js` - Viewport transform and marquee selection
 
@@ -919,7 +919,7 @@ NodeGraph inherits MUI theme via `useTheme()`:
 
 # NodeGraph Overview
 
-This folder contains the core rendering and interaction logic for the node/edge graph: pan/zoom, layered rendering (canvas/SVG/DOM), selection, handle/edge dragging, marquee selection, and event dispatching.
+This folder contains the core rendering and interaction logic for the node/edge graph: pan/zoom, layered rendering (canvas/SVG/DOM), selection, port/edge dragging, marquee selection, and event dispatching.
 
 ## Primary responsibilities
 
@@ -932,7 +932,7 @@ This folder contains the core rendering and interaction logic for the node/edge 
 - `NodeGraph.js` — Main orchestrator: composes layers and wires hooks and event handlers.
 - `NodeLayer.js` — Renders node components and manages node DOM refs for measurement and hit-testing.
 - `EdgeLayer.js` — Canvas/SVG drawing for edges with performance-oriented utilities.
-- `HandleLayer.js` — Renders handles and manages drag interactions for connections.
+- `HandleLayer.js` — Renders ports and manages drag interactions for connections.
 - `PanZoomLayer.js` — Provides pan/zoom transforms and pointer handling.
 - `eventBus.js` — Pub/sub used for decoupled communication between nodes, UI panels, and other systems.
 - `utils/coords.js`, `edgeUtils.js`, `dragUtils.js` — Geometry and interaction utilities used across the graph.

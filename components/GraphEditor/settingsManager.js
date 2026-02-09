@@ -31,7 +31,7 @@ const introGraph = {
       label: 'Next Step'
     }
   ],
-  groups: []
+  clusters: []
 };
 
 const defaultSettings = {
@@ -70,20 +70,20 @@ const defaultSettings = {
 export const loadSettings = () => {
   try {
     if (typeof window === 'undefined') {
-      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+      return { ...defaultSettings, nodes: [], edges: [], clusters: [] };
     }
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (!stored) {
-      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+      return { ...defaultSettings, nodes: [], edges: [], clusters: [] };
     }
     const parsed = JSON.parse(stored);
     if (!parsed || typeof parsed !== 'object') {
-      return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+      return { ...defaultSettings, nodes: [], edges: [], clusters: [] };
     }
-    return { ...defaultSettings, ...parsed, nodes: [], edges: [], groups: [] };
+    return { ...defaultSettings, ...parsed, nodes: [], edges: [], clusters: [] };
   } catch (error) {
     console.error('Failed to load settings:', error);
-    return { ...defaultSettings, nodes: [], edges: [], groups: [] };
+    return { ...defaultSettings, nodes: [], edges: [], clusters: [] };
   }
 };
 

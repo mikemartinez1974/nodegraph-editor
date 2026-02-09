@@ -8,11 +8,11 @@
 
 ## 0. Metadata
 
-* **Port ID:** `<handle-id>`
+* **Port ID:** `<port-id>`
 * **Node type:** `<node-type>`
 * **Contract version:** `MAJOR.MINOR.PATCH`
 * **Status:** `experimental | stable | deprecated`
-* **Defined in:** `contracts/handles/<node-type>.md`
+* **Defined in:** `contracts/ports/<node-type>.md`
 
 ---
 
@@ -95,7 +95,7 @@ Define what this port may connect to.
 
 ```yaml
 - nodeType: <other-node-type>
-  handleId: <handle-id>
+  portId: <port-id>
   semanticType: <type>
 ```
 
@@ -104,7 +104,7 @@ Define what this port may connect to.
 ```yaml
 - reason: <why this is invalid>
   nodeType: <type>
-  handleId: <handle-id>
+  portId: <port-id>
 ```
 
 Rules:
@@ -178,9 +178,9 @@ If no port is specified, validators must treat the attachment as `root` (no erro
 ```json
 {
   "source": "nodeA",
-  "sourceHandle": "data_out",
+  "sourcePort": "data_out",
   "target": "nodeB",
-  "targetHandle": "data_in"
+  "targetPort": "data_in"
 }
 ```
 
@@ -189,9 +189,9 @@ If no port is specified, validators must treat the attachment as `root` (no erro
 ```json
 {
   "source": "nodeA",
-  "sourceHandle": "data_out",
+  "sourcePort": "data_out",
   "target": "nodeA",
-  "targetHandle": "data_out"
+  "targetPort": "data_out"
 }
 ```
 

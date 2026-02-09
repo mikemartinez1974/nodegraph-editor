@@ -5,9 +5,9 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import PinIcon from '@mui/icons-material/Pin';
-import useNodeHandleSchema from '../hooks/useNodeHandleSchema';
+import useNodePortSchema from '../hooks/useNodePortSchema';
 
-// --- New schema handles ---
+// --- New schema ports ---
 const COUNTER_INPUTS = [
   { key: 'increment', label: 'Increment', type: 'trigger' },
   { key: 'decrement', label: 'Decrement', type: 'trigger' },
@@ -30,7 +30,7 @@ export default function CounterNode({
 }) {
   const theme = useTheme();
   const nodeRef = useRef(null);
-  const node = useNodeHandleSchema(origNode, COUNTER_INPUTS, COUNTER_OUTPUTS);
+  const node = useNodePortSchema(origNode, COUNTER_INPUTS, COUNTER_OUTPUTS);
   
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 300) * zoom;
@@ -124,7 +124,7 @@ export default function CounterNode({
   const atMax = max !== null && count >= max;
   const atMin = min !== null && count <= min;
 
-  // Handles are rendered centrally via HandleLayer
+  // Ports are rendered centrally via HandleLayer
   return (
     <div
       ref={nodeRef}

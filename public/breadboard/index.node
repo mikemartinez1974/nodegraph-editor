@@ -32,7 +32,7 @@
     {
       "id": "header",
       "type": "markdown",
-      "label": "📂 data/breadboard",
+      "label": "\ud83d\udcc2 data/breadboard",
       "position": {
         "x": 0,
         "y": -200
@@ -46,7 +46,7 @@
     {
       "id": "back",
       "type": "default",
-      "label": "⬅️ Back to Parent",
+      "label": "\u2b05\ufe0f Back to Parent",
       "position": {
         "x": -300,
         "y": -200
@@ -87,5 +87,5 @@
     }
   ],
   "edges": [],
-  "groups": []
+  "clusters": []
 }

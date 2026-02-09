@@ -61,7 +61,7 @@
     {
       "id": "view-contract-root",
       "type": "markdown",
-      "label": "👁️ View Node Contract",
+      "label": "\ud83d\udc41\ufe0f View Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -184,13 +184,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -284,5 +284,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

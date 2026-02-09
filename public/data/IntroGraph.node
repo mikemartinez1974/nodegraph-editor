@@ -38,7 +38,7 @@
     {
       "id": "intro_welcome",
       "type": "markdown",
-      "label": "🎨 Welcome to Twilite Node Browser!",
+      "label": "\ud83c\udfa8 Welcome to Twilite Node Browser!",
       "position": {
         "x": 0,
         "y": 0
@@ -49,7 +49,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Twilite Node Browser on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click and drag to scroll the page, and follow the steps below. 🚀"
+        "markdown": "# Hey!\n\n### Eyes Right Here!\n---\n\nIn order for this to work, we need to get your screen split, with Twilite Node Browser on on side, and your chatbot on the other side.\n\nYou are aiming for something like this:\n\n![Split-screen setup](/data/TutorialScreenshot1.png)\n\nOnce you've got that squared away, click and drag to scroll the page, and follow the steps below. \ud83d\ude80"
       }
     },
     {
@@ -66,7 +66,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Step 1: Onboard Your AI 🤖\n\n## What to Do\n\n1. Look at the toolbar at the top\n2. Click the **📋 Onboard LLM** button\n   - It's the **FIRST button on the far left**\n3. The onboarding text copies to your clipboard\n4. Open your AI chat (ChatGPT, Claude, Grok, etc.)\n5. **Paste** the text and hit Enter\n\n## Why This Matters\n\nThis teaches your AI how to create graphs in the exact format this app understands. You only need to do this once per chat session!\n\n**This is a markdown node** - notice how it displays rich formatted text directly on the canvas!"
+        "markdown": "# Step 1: Onboard Your AI \ud83e\udd16\n\n## What to Do\n\n1. Look at the toolbar at the top\n2. Click the **\ud83d\udccb Onboard LLM** button\n   - It's the **FIRST button on the far left**\n3. The onboarding text copies to your clipboard\n4. Open your AI chat (ChatGPT, Claude, Grok, etc.)\n5. **Paste** the text and hit Enter\n\n## Why This Matters\n\nThis teaches your AI how to create graphs in the exact format this app understands. You only need to do this once per chat session!\n\n**This is a markdown node** - notice how it displays rich formatted text directly on the canvas!"
       }
     },
     {
@@ -83,7 +83,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Step 2: Ask Your AI 💬\n\n## Tell Your AI What You Want\n\nNow that your AI knows how to make graphs, just describe what you want:\n\n### Good Examples:\n\n- *\"Create a graph about planets in our solar system\"*\n- *\"Make a flowchart showing how to brew coffee\"*\n- *\"Build an org chart for a startup\"*\n- *\"Show me the water cycle as a graph\"*\n\n## What Happens\n\nYour AI will respond with JSON code - a bunch of text with curly braces. **Copy all of it!**\n\nDon't worry if it looks complicated - you don't need to understand it."
+        "markdown": "# Step 2: Ask Your AI \ud83d\udcac\n\n## Tell Your AI What You Want\n\nNow that your AI knows how to make graphs, just describe what you want:\n\n### Good Examples:\n\n- *\"Create a graph about planets in our solar system\"*\n- *\"Make a flowchart showing how to brew coffee\"*\n- *\"Build an org chart for a startup\"*\n- *\"Show me the water cycle as a graph\"*\n\n## What Happens\n\nYour AI will respond with JSON code - a bunch of text with curly braces. **Copy all of it!**\n\nDon't worry if it looks complicated - you don't need to understand it."
       }
     },
     {
@@ -100,7 +100,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Step 3: Paste & Create! ✨\n\n## Bring Your Graph to Life\n\n1. **Copy** the JSON your AI created (Ctrl+C or Cmd+C)\n2. Click anywhere on this canvas\n3. Press **Ctrl+V** (or **Cmd+V** on Mac)\n   - *Or click the **📋 Paste** button (2nd from left in toolbar)*\n4. **BOOM!** Your graph appears instantly!\n\n## What's Next?\n\n- **Don't like something?** Tell your AI to change it\n- **Want more?** Ask your AI to add more nodes\n- **Made a mistake?** Press **Ctrl+Z** to undo\n\n### Pro Tip\n\nYou can iterate as many times as you want. Just keep asking your AI to modify, add, or improve!"
+        "markdown": "# Step 3: Paste & Create! \u2728\n\n## Bring Your Graph to Life\n\n1. **Copy** the JSON your AI created (Ctrl+C or Cmd+C)\n2. Click anywhere on this canvas\n3. Press **Ctrl+V** (or **Cmd+V** on Mac)\n   - *Or click the **\ud83d\udccb Paste** button (2nd from left in toolbar)*\n4. **BOOM!** Your graph appears instantly!\n\n## What's Next?\n\n- **Don't like something?** Tell your AI to change it\n- **Want more?** Ask your AI to add more nodes\n- **Made a mistake?** Press **Ctrl+Z** to undo\n\n### Pro Tip\n\nYou can iterate as many times as you want. Just keep asking your AI to modify, add, or improve!"
       }
     },
     {
@@ -117,7 +117,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# 💡 Copy These to Try!\n\n## For Your AI\n\nCopy any of these and paste them into your AI chat:\n\n### Example 1: Simple Start\n```\nCreate a graph about the solar system with the sun \nin the center and 4 planets around it. Use colors!\n```\n\n### Example 2: Workflow\n```\nCreate a flowchart showing the steps to make \nthe perfect cup of coffee, from grinding beans \nto the first sip.\n```\n\n### Example 3: Learning\n```\nCreate a graph explaining photosynthesis with \nmarkdown nodes showing detailed explanations.\n```\n\n**Just copy one, paste it to your AI, then paste the result here!**"
+        "markdown": "# \ud83d\udca1 Copy These to Try!\n\n## For Your AI\n\nCopy any of these and paste them into your AI chat:\n\n### Example 1: Simple Start\n```\nCreate a graph about the solar system with the sun \nin the center and 4 planets around it. Use colors!\n```\n\n### Example 2: Workflow\n```\nCreate a flowchart showing the steps to make \nthe perfect cup of coffee, from grinding beans \nto the first sip.\n```\n\n### Example 3: Learning\n```\nCreate a graph explaining photosynthesis with \nmarkdown nodes showing detailed explanations.\n```\n\n**Just copy one, paste it to your AI, then paste the result here!**"
       }
     },
     {
@@ -134,13 +134,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# 🎯 You're Ready to Create!\n\n## Quick Recap\n\n1. Click **📋 Onboard LLM** (first button, far left)\n2. Paste into your AI chat\n3. Ask your AI to create a graph\n4. Copy the JSON and press **Ctrl+V** here\n\n## Next Steps\n\n- Try one of the examples above ☝️\n- Or ask your AI about YOUR interests\n- Save your work with **💾 Save** (11th button)\n- Delete this intro graph anytime with **👎 Clear Graph** (10th button)\n\n### Have Fun! 🚀✨"
+        "markdown": "# \ud83c\udfaf You're Ready to Create!\n\n## Quick Recap\n\n1. Click **\ud83d\udccb Onboard LLM** (first button, far left)\n2. Paste into your AI chat\n3. Ask your AI to create a graph\n4. Copy the JSON and press **Ctrl+V** here\n\n## Next Steps\n\n- Try one of the examples above \u261d\ufe0f\n- Or ask your AI about YOUR interests\n- Save your work with **\ud83d\udcbe Save** (11th button)\n- Delete this intro graph anytime with **\ud83d\udc4e Clear Graph** (10th button)\n\n### Have Fun! \ud83d\ude80\u2728"
       }
     },
     {
       "id": "intro_manual_link",
       "type": "markdown",
-      "label": "📖 Full Manual",
+      "label": "\ud83d\udcd6 Full Manual",
       "position": {
         "x": 640,
         "y": 40
@@ -184,13 +184,13 @@
         },
         "dependencies": {
           "nodeTypes": [],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -273,5 +273,5 @@
       "data": {}
     }
   ],
-  "groups": []
+  "clusters": []
 }

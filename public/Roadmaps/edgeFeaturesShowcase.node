@@ -77,7 +77,7 @@
     {
       "id": "showcase-title",
       "type": "markdown",
-      "label": "Edge Features — Showcase",
+      "label": "Edge Features \u2014 Showcase",
       "position": {
         "x": -140,
         "y": -260
@@ -87,13 +87,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Edge Features Showcase\n\nThis graph demonstrates:\n- **Multi-label edges**: `edge.labels = [start, middle, end]`\n- **Center-segment label placement** (orthogonal)\n- **Multi-edge lane spacing** using `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n\nTry changing **Document Properties → Appearance → Edge lane spacing (px)** to see lanes widen/narrow."
+        "markdown": "# Edge Features Showcase\n\nThis graph demonstrates:\n- **Multi-label edges**: `edge.labels = [start, middle, end]`\n- **Center-segment label placement** (orthogonal)\n- **Multi-edge lane spacing** using `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n\nTry changing **Document Properties \u2192 Appearance \u2192 Edge lane spacing (px)** to see lanes widen/narrow."
       }
     },
     {
       "id": "source",
       "type": "default",
-      "label": "🟢 Source",
+      "label": "\ud83d\udfe2 Source",
       "position": {
         "x": -120,
         "y": 0
@@ -109,7 +109,7 @@
     {
       "id": "t-a",
       "type": "default",
-      "label": "🧼 Clean",
+      "label": "\ud83e\uddfc Clean",
       "position": {
         "x": 280,
         "y": -90
@@ -125,7 +125,7 @@
     {
       "id": "t-b",
       "type": "default",
-      "label": "🔍 Validate",
+      "label": "\ud83d\udd0d Validate",
       "position": {
         "x": 280,
         "y": 40
@@ -141,7 +141,7 @@
     {
       "id": "t-c",
       "type": "default",
-      "label": "✨ Enrich",
+      "label": "\u2728 Enrich",
       "position": {
         "x": 280,
         "y": 170
@@ -157,7 +157,7 @@
     {
       "id": "merge",
       "type": "default",
-      "label": "🧩 Merge",
+      "label": "\ud83e\udde9 Merge",
       "position": {
         "x": 680,
         "y": 40
@@ -173,7 +173,7 @@
     {
       "id": "output",
       "type": "default",
-      "label": "📦 Output",
+      "label": "\ud83d\udce6 Output",
       "position": {
         "x": 1080,
         "y": 40
@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## What to look for\n\n1) **Multi-label edges**\n- Start label near the source\n- Middle label on the center segment\n- End label near the target\n\n2) **Multi-edge spacing**\n- Two edges from Source → Clean are parallel and should not overlap.\n\n3) **Backwards compatibility**\n- One edge uses legacy `edge.label` and should still render a middle label."
+        "markdown": "## What to look for\n\n1) **Multi-label edges**\n- Start label near the source\n- Middle label on the center segment\n- End label near the target\n\n2) **Multi-edge spacing**\n- Two edges from Source \u2192 Clean are parallel and should not overlap.\n\n3) **Backwards compatibility**\n- One edge uses legacy `edge.label` and should still render a middle label."
       }
     }
   ],
@@ -271,7 +271,7 @@
       "target": "merge",
       "labels": [
         "clean",
-        "→",
+        "\u2192",
         "merge"
       ],
       "style": {
@@ -285,7 +285,7 @@
       "target": "merge",
       "labels": [
         "valid",
-        "→",
+        "\u2192",
         "merge"
       ],
       "style": {
@@ -299,7 +299,7 @@
       "target": "merge",
       "labels": [
         "enrich",
-        "→",
+        "\u2192",
         "merge"
       ],
       "style": {
@@ -317,6 +317,5 @@
       }
     }
   ],
-  "groups": []
+  "clusters": []
 }
-

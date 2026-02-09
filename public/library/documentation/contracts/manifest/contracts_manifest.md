@@ -2,8 +2,9 @@
 
 This document defines the **required structure, meaning, and authority** of a Manifest node.
 
-Every portable Twilite graph **must** contain exactly one Manifest node that conforms to this contract.  
-Graphs without a valid Manifest are **non-portable, unsafe, and non-executable** (draft-only).
+Every portable Twilite graph **must** have a Manifest that conforms to this contract.
+A Manifest may be **explicit** (a Manifest node) or **implicit** (auto-materialized at load time).
+If the Manifest is implicit, the graph is treated as a **fragment** by default.
 
 The Manifest is the highest authority in a graph.  
 No editor, agent, or tool may override it.
@@ -18,9 +19,9 @@ No editor, agent, or tool may override it.
 }
 ```
 
-There MUST be exactly **one authoritative** Manifest node per graph.
-Draft graphs may temporarily have zero Manifests, but they are not portable and must warn.
-Files may contain multiple Manifests; **the first Manifest in file order is authoritative**.
+There MUST be exactly **one authoritative** Manifest per graph.
+A graph with no Manifest node is assumed to have an **implicit Manifest**, and is therefore a **fragment**.
+Files may contain multiple Manifest nodes; **the first Manifest in file order is authoritative**.
 
 ---
 
@@ -56,7 +57,7 @@ Declares **how this graph is meant to be interpreted**.
 ```json
 {
   "intent": {
-    "kind": "documentation | workflow | simulation | circuit | knowledge-map | contract | executable | other",
+    "kind": "graph | fragment | documentation | workflow | simulation | circuit | knowledge-map | contract | executable | other",
     "scope": "human | agent | tool | mixed",
     "description": "Optional clarification of intent"
   }
@@ -65,6 +66,7 @@ Declares **how this graph is meant to be interpreted**.
 
 ### Rules
 - Intent constrains interpretation, not rendering
+- If the Manifest is implicit, `intent.kind` is treated as `fragment`
 - Editors MUST NOT guess intent
 - Agents MUST respect intent when acting
 - Unknown intent values are allowed but must be treated as opaque
@@ -79,11 +81,11 @@ Declares what must exist for this graph to be valid.
 {
   "dependencies": {
     "nodeTypes": ["markdown", "default", "script", "customType"],
-    "handleContracts": ["core", "breadboard"],
+    "portContracts": ["core", "breadboard"],
     "skills": ["auto-layout", "schema-validation", "batch-mutation"],
     "schemaVersions": {
       "nodes": ">=1.0.0",
-      "handles": ">=1.0.0"
+      "ports": ">=1.0.0"
     },
     "optional": []
   }
@@ -242,11 +244,11 @@ Manifest nodes MUST NOT:
     },
     "dependencies": {
       "nodeTypes": ["markdown"],
-      "handleContracts": ["core"],
+      "portContracts": ["core"],
       "skills": [],
       "schemaVersions": {
         "nodes": ">=1.0.0",
-        "handles": ">=1.0.0"
+        "ports": ">=1.0.0"
       }
     },
     "authority": {

@@ -3,7 +3,10 @@
   "version": "0.2.0",
   "name": "Hello from the Twilite Zone",
   "description": "Demo plugin that exposes sample nodes, including a custom canvas renderer.",
-  "permissions": ["graph.read", "selection.read"],
+  "permissions": [
+    "graph.read",
+    "selection.read"
+  ],
   "bundle": {
     "url": "/plugins/Twilite-hello/helloPlugin.js",
     "sandbox": "iframe",
@@ -30,7 +33,7 @@
           "width": 240,
           "height": 160
         },
-        "handles": {
+        "ports": {
           "inputs": [
             {
               "id": "trigger",
@@ -66,9 +69,18 @@
             "type": "select",
             "default": "calm",
             "options": [
-              { "label": "Calm", "value": "calm" },
-              { "label": "Excited", "value": "excited" },
-              { "label": "Spooky", "value": "spooky" }
+              {
+                "label": "Calm",
+                "value": "calm"
+              },
+              {
+                "label": "Excited",
+                "value": "excited"
+              },
+              {
+                "label": "Spooky",
+                "value": "spooky"
+              }
             ]
           },
           {
@@ -104,14 +116,19 @@
       "defaultData": {
         "style": "wave",
         "caption": "Renderer Canvas Node",
-        "palette": ["#6C63FF", "#2CB67D", "#FFB020", "#FF5C8D"]
+        "palette": [
+          "#6C63FF",
+          "#2CB67D",
+          "#FFB020",
+          "#FF5C8D"
+        ]
       },
       "definition": {
         "size": {
           "width": 220,
           "height": 140
         },
-        "handles": {
+        "ports": {
           "inputs": [
             {
               "id": "signal",
@@ -140,8 +157,14 @@
             "type": "select",
             "default": "wave",
             "options": [
-              { "label": "Wave", "value": "wave" },
-              { "label": "Bars", "value": "bars" }
+              {
+                "label": "Wave",
+                "value": "wave"
+              },
+              {
+                "label": "Bars",
+                "value": "bars"
+              }
             ]
           },
           {
@@ -175,7 +198,7 @@
   "metadata": {
     "homepage": "https://example.com/Twilite",
     "license": "MIT",
-    "changelog": "0.1.0 – Initial sample plugin shipped with the host",
+    "changelog": "0.1.0 \u2013 Initial sample plugin shipped with the host",
     "author": {
       "name": "Twilite Lab"
     }

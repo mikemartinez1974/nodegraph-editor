@@ -30,8 +30,8 @@ const buildHandleIndex = (node) => {
     });
   };
 
-  if (Array.isArray(node?.handles)) {
-    node.handles.forEach((handle) => {
+  if (Array.isArray(node?.ports)) {
+    node.ports.forEach((handle) => {
       if (!handle) return;
       add(handle.id || handle.key, handle);
     });
@@ -85,7 +85,7 @@ const collectEdgesByNode = (edges = []) => {
 const runSchemaValidation = ({ graphAPI }, params = {}) => {
   const nodes = params.nodes || defaultNodes(graphAPI);
   const edges = params.edges || defaultEdges(graphAPI);
-  const groups = params.groups || defaultGroups(graphAPI);
+  const groups = params.clusters || defaultGroups(graphAPI);
 
   const nodeResult = validateNodes(nodes);
   const edgeResult = validateEdges(edges, nodeResult.valid);
@@ -137,34 +137,34 @@ const runHandleValidation = ({ graphAPI }, params = {}) => {
       return;
     }
 
-    const sourceHandle = edge.sourceHandle
-      ? findHandleMeta(sourceNode, edge.sourceHandle)
+    const sourcePort = edge.sourcePort
+      ? findHandleMeta(sourceNode, edge.sourcePort)
       : null;
-    const targetHandle = edge.targetHandle
-      ? findHandleMeta(targetNode, edge.targetHandle)
+    const targetPort = edge.targetPort
+      ? findHandleMeta(targetNode, edge.targetPort)
       : null;
 
-    if (edge.sourceHandle && !sourceHandle) {
+    if (edge.sourcePort && !sourcePort) {
       errors.push({
         edgeId: edge.id,
         nodeId: sourceNode.id,
         code: 'MISSING_HANDLE',
-        message: `Source handle "${edge.sourceHandle}" not found on node "${sourceNode.id}".`
+        message: `Source handle "${edge.sourcePort}" not found on node "${sourceNode.id}".`
       });
     }
 
-    if (edge.targetHandle && !targetHandle) {
+    if (edge.targetPort && !targetPort) {
       errors.push({
         edgeId: edge.id,
         nodeId: targetNode.id,
         code: 'MISSING_HANDLE',
-        message: `Target handle "${edge.targetHandle}" not found on node "${targetNode.id}".`
+        message: `Target handle "${edge.targetPort}" not found on node "${targetNode.id}".`
       });
     }
 
-    if (sourceHandle && targetHandle) {
-      const sourceType = sourceHandle.dataType;
-      const targetType = targetHandle.dataType;
+    if (sourcePort && targetPort) {
+      const sourceType = sourcePort.dataType;
+      const targetType = targetPort.dataType;
       if (isStrictType(sourceType) && isStrictType(targetType) && sourceType !== targetType) {
         errors.push({
           edgeId: edge.id,
@@ -174,7 +174,7 @@ const runHandleValidation = ({ graphAPI }, params = {}) => {
       }
     }
 
-    if (!edge.sourceHandle) {
+    if (!edge.sourcePort) {
       const outputs = buildHandleIndex(sourceNode);
       if (outputs.size > 1) {
         warnings.push({
@@ -185,7 +185,7 @@ const runHandleValidation = ({ graphAPI }, params = {}) => {
       }
     }
 
-    if (!edge.targetHandle) {
+    if (!edge.targetPort) {
       const inputs = buildHandleIndex(targetNode);
       if (inputs.size > 1) {
         warnings.push({
@@ -229,7 +229,7 @@ const runDependencyValidation = ({ graphAPI }, params = {}) => {
     params.requiredDefinitions ||
       params.dependencies?.definitions ||
       manifestData?.dependencies?.definitions ||
-      manifestData?.dependencies?.handleContracts ||
+      manifestData?.dependencies?.portContracts ||
       manifestData?.requiredDefinitions
   );
 
@@ -316,8 +316,8 @@ const runManifestValidation = ({ graphAPI }, params = {}) => {
     if (!Array.isArray(dependencies.nodeTypes)) {
       errors.push({ code: 'MANIFEST_DEPENDENCIES_NODE_TYPES', message: 'Manifest dependencies.nodeTypes must be an array.' });
     }
-    if (!Array.isArray(dependencies.handleContracts)) {
-      errors.push({ code: 'MANIFEST_DEPENDENCIES_HANDLES', message: 'Manifest dependencies.handleContracts must be an array.' });
+    if (!Array.isArray(dependencies.portContracts)) {
+      errors.push({ code: 'MANIFEST_DEPENDENCIES_HANDLES', message: 'Manifest dependencies.portContracts must be an array.' });
     }
     if (!Array.isArray(dependencies.skills)) {
       errors.push({ code: 'MANIFEST_DEPENDENCIES_SKILLS', message: 'Manifest dependencies.skills must be an array.' });
@@ -339,7 +339,7 @@ const runManifestValidation = ({ graphAPI }, params = {}) => {
 const runOrphanDetection = ({ graphAPI }, params = {}) => {
   const nodes = params.nodes || defaultNodes(graphAPI);
   const edges = params.edges || defaultEdges(graphAPI);
-  const groups = params.groups || defaultGroups(graphAPI);
+  const groups = params.clusters || defaultGroups(graphAPI);
 
   const allowances = new Set(toArray(params.allowedNodeIds));
   const edgeCounts = collectEdgesByNode(edges);
@@ -535,9 +535,9 @@ export const validationSkills = [
     }
   },
   {
-    id: 'validation.handles',
+    id: 'validation.ports',
     title: 'Handle Compatibility Checks',
-    description: 'Ensure edge handles exist and match declared semantics.',
+    description: 'Ensure edge ports exist and match declared semantics.',
     category: 'validation',
     supportsDryRun: true,
     run: runHandleValidation,

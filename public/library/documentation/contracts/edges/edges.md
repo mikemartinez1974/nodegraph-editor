@@ -2,7 +2,7 @@
 
 This document defines the **minimal, portable contract** for edges in Twilite graphs.
 
-Edges express relationships. Ports are optional so graphs remain portable.
+Edges express relationships. Ports are required; use `root` for default attachments.
 
 ---
 
@@ -25,7 +25,7 @@ Every edge must include:
 
 ---
 
-## Optional Fields
+## Fields
 
 ```json
 {
@@ -33,23 +33,23 @@ Every edge must include:
   "data": { "any": "json" },
   "style": { "any": "json" },
   "state": { "any": "json" },
-  "sourceHandle": "handle-id",
-  "targetHandle": "handle-id"
+  "sourcePort": "port-id",
+  "targetPort": "port-id"
 }
 ```
 
 - `label` is human-readable, not semantic logic.
 - `data` is where semantic attributes live (strength/flow/direction/intent).
 - `style` and `state` are optional metadata.
-- `sourceHandle` / `targetHandle` are optional **and may be omitted**.
+- `sourcePort` / `targetPort` are required and may be set to `root`.
 
 ---
 
-## Port Rules (Lightweight)
+## Port Rules
 
-- Ports are **optional** for portability.
+- Ports are **required**.
 - If ports are provided, they must match declared ports on the node.
-- If ports are omitted, the edge is still valid and must attach to the default `root` port.
+- Use the default `root` port when no specific port is intended.
 
 ---
 

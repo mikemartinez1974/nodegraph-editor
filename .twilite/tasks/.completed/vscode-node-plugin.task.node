@@ -42,13 +42,13 @@
             "dictionary",
             "markdown"
           ],
-          "handleContracts": [
+          "portContracts": [
             "core"
           ],
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },
@@ -112,7 +112,7 @@
     {
       "id": "vscode-node-plugin-root",
       "type": "markdown",
-      "label": "🧩 VSCode .node Plugin",
+      "label": "\ud83e\udde9 VSCode .node Plugin",
       "position": {
         "x": -420,
         "y": -260
@@ -128,7 +128,7 @@
     {
       "id": "vscode-node-plugin-requirements",
       "type": "markdown",
-      "label": "✅ Requirements",
+      "label": "\u2705 Requirements",
       "position": {
         "x": 160,
         "y": -261
@@ -144,7 +144,7 @@
     {
       "id": "vscode-node-plugin-features",
       "type": "markdown",
-      "label": "✨ Core Features",
+      "label": "\u2728 Core Features",
       "position": {
         "x": -420,
         "y": 40
@@ -154,13 +154,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Core Features\n\n- Graph preview panel (render nodegraph)\n- Split view: JSON + visual\n- Live sync: edits in either view update the other\n- Quick actions: add node/edge/handle\n- Node type picker from dictionary/manifest\n- Validate before save"
+        "markdown": "## Core Features\n\n- Graph preview panel (render nodegraph)\n- Split view: JSON + visual\n- Live sync: edits in either view update the other\n- Quick actions: add node/edge/port\n- Node type picker from dictionary/manifest\n- Validate before save"
       }
     },
     {
       "id": "vscode-node-plugin-architecture",
       "type": "markdown",
-      "label": "🏗️ Architecture",
+      "label": "\ud83c\udfd7\ufe0f Architecture",
       "position": {
         "x": 160,
         "y": 40
@@ -176,7 +176,7 @@
     {
       "id": "vscode-node-plugin-security",
       "type": "markdown",
-      "label": "🔒 Security + Trust",
+      "label": "\ud83d\udd12 Security + Trust",
       "position": {
         "x": -444.83123268113434,
         "y": 400.6024212217768
@@ -192,7 +192,7 @@
     {
       "id": "vscode-node-plugin-open-questions",
       "type": "markdown",
-      "label": "❓ Answers + Open Items",
+      "label": "\u2753 Answers + Open Items",
       "position": {
         "x": 160,
         "y": 360
@@ -202,13 +202,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Answers + Open Items\n\n1) **Auto-generate manifests** on new files. Allow easy overwrite. LLMs may author/refresh manifests when appropriate.\n2) **Schema bundling**: unclear (needs clarification).\n3) **Refs resolution**: **local paths resolve locally** (relative to the current .node). **Remote URLs resolve remotely**. No extra fallback needed.\n4) **Multi-graph files**: treat as **one graph** with clusters; **one manifest per graph**. Different manifest ⇒ different graph."
+        "markdown": "## Answers + Open Items\n\n1) **Auto-generate manifests** on new files. Allow easy overwrite. LLMs may author/refresh manifests when appropriate.\n2) **Schema bundling**: unclear (needs clarification).\n3) **Refs resolution**: **local paths resolve locally** (relative to the current .node). **Remote URLs resolve remotely**. No extra fallback needed.\n4) **Multi-graph files**: treat as **one graph** with clusters; **one manifest per graph**. Different manifest \u21d2 different graph."
       }
     },
     {
       "id": "vscode-node-plugin-missing-features",
       "type": "markdown",
-      "label": "🧩 Missing Features",
+      "label": "\ud83e\udde9 Missing Features",
       "position": {
         "x": 160,
         "y": 620
@@ -218,7 +218,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Missing Features\n\n**Now (MVP):**\n- **File association + icon** for `.node` (use `public/logo_light.svg` as default icon)\n\n**Later (post-MVP):**\n- Validation pipeline (contract checks on open/save)\n- Schema/source indicator (local vs remote)\n- External change handling (reload/merge prompt)\n- Clipboard import/export for nodegraph-data\n- Performance safeguards (debounce parsing/rendering)\n- CSP + sanitization for HTML/SVG previews\n- Handle/edge helpers (quick-create, ref validation)"
+        "markdown": "## Missing Features\n\n**Now (MVP):**\n- **File association + icon** for `.node` (use `public/logo_light.svg` as default icon)\n\n**Later (post-MVP):**\n- Validation pipeline (contract checks on open/save)\n- Schema/source indicator (local vs remote)\n- External change handling (reload/merge prompt)\n- Clipboard import/export for nodegraph-data\n- Performance safeguards (debounce parsing/rendering)\n- CSP + sanitization for HTML/SVG previews\n- Port/edge helpers (quick-create, ref validation)"
       }
     }
   ],

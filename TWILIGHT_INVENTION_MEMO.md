@@ -16,7 +16,7 @@ Key pain points in existing systems:
 
 - AI output often overwrites or re-creates state rather than applying safe incremental changes.
 - Graph formats are either not canonical (exports) or not safe to mutate programmatically (no validation/rollback/ID continuity).
-- Edge/handle detail can become verbose and brittle, especially in AI-generated payloads.
+- Edge/port detail can become verbose and brittle, especially in AI-generated payloads.
 - Layout and routing degrade quickly as graphs grow, making the artifact hard to share.
 
 ---
@@ -30,7 +30,7 @@ Core principles:
 1. **State continuity is default.** IDs are stable and history matters.
 2. **Mutations are explicit.** Agents emit `create/update/delete/...` commands (deltas), not whole-graph re-draws.
 3. **Validation + rollback are first-class.** Commands can be checked before applying and reverted if rejected.
-4. **Handles are functional but optional.** Minimal edges (`source`, `target`) remain meaningful via deterministic attachment + routing.
+4. **Ports are functional but optional.** Minimal edges (`source`, `target`) remain meaningful via deterministic attachment + routing.
 5. **Professional output by default.** Autolayout + edge routing are built-in so shareable artifacts stay readable as they grow.
 
 ---
@@ -51,8 +51,8 @@ A web-based system in which a URL-addressable graph artifact acts as a canonical
 
 1. Provide a graph workspace accessible via a web client, where the workspace state is representable as a shareable artifact (e.g., a `.node` document) associated with a stable identifier/address (such as a URL).
 2. Accept, via paste or equivalent input, a structured mutation payload describing one or more state transitions using explicit action verbs (e.g., create/update/delete/move/transaction), rather than a full snapshot.
-3. Validate the payload against graph constraints and schemas (node types, optional handle schemas, IDs, ordering rules).
-4. Interpret omitted optional details deterministically (e.g., missing handles attach by geometry-based boundary selection; missing style/size/position fields hydrate from node-type/document defaults).
+3. Validate the payload against graph constraints and schemas (node types, port schemas, IDs, ordering rules).
+4. Interpret omitted optional details deterministically (e.g., missing ports attach by geometry-based boundary selection; missing style/size/position fields hydrate from node-type/document defaults).
 5. Apply the mutation to the live graph state and update persistent history/timeline.
 6. Present a confirmation UX (toast/dialog/action) that allows acceptance or rollback to the pre-apply state.
 7. Render the updated graph using automatic layout and edge routing so minimal payloads produce professional, shareable visuals.
@@ -61,7 +61,7 @@ A web-based system in which a URL-addressable graph artifact acts as a canonical
 
 - The “transmission” is the **delta protocol** + deterministic interpretation rules, not just shipping a file.
 - Continuity guarantees: stable IDs, small diffs, “no overwrite unless explicitly requested”.
-- Optional-handle semantics that preserve correctness while reducing payload size.
+- Port-required semantics that preserve correctness while reducing payload size.
 - Transactional paste flow with validation + rollback.
 
 **Useful variants (often important for claims)**
@@ -81,13 +81,13 @@ Key aspects:
 - A “never overwrite unless explicitly asked” contract to protect continuity.
 - Small diffs suitable for version control and collaboration.
 
-### B) Deterministic Edge Attachment When Handles Are Omitted
+### B) Deterministic Edge Attachment When Ports Are Omitted
 
-Edges remain valid and render deterministically even when `sourceHandle/targetHandle` are absent:
+Edges remain valid and render deterministically even when `sourcePort/targetPort` are absent:
 
 - Side selection derived from geometry (source→target direction) rather than requiring explicit port keys.
 - Stable slotting along node edges to avoid stacking for multi-edge cases.
-- Explicit handles override fallback behavior for precision wiring when needed.
+- Explicit ports override fallback behavior for precision wiring when needed.
 
 This reduces AI payload size while keeping graphs functional.
 
@@ -128,9 +128,9 @@ A system where the editor fills in missing details from node-type defaults and d
 2. LLM proposes a small command payload that mutates state.
 3. Twilite validates, applies, records history, and updates the UI.
 
-### Workflow 2 — Minimal Edge Creation Without Handles
+### Workflow 2 — Minimal Edge Creation Without Ports
 
-1. LLM creates nodes and connects them with edges that omit handles.
+1. LLM creates nodes and connects them with edges that omit ports.
 2. Twilite attaches edges deterministically to node boundaries (directional).
 3. ELK-based routing (or equivalent) renders orthogonal routes by default.
 
@@ -144,7 +144,7 @@ A system where the editor fills in missing details from node-type defaults and d
 
 ## 5) Concrete Examples (Illustrative)
 
-### Example: Create Two Nodes + Connect (No Handles)
+### Example: Create Two Nodes + Connect (No Ports)
 
 ```json
 {
@@ -163,9 +163,9 @@ Expected behavior:
 
 - Edge attaches on the boundary sides that match A→B direction (right side of A, left side of B).
 - Edge routes orthogonally by default.
-- No explicit handles are required for a readable result.
+- No explicit ports are required for a readable result.
 
-### Example: Precision Wiring With Explicit Handles (Optional Upgrade)
+### Example: Precision Wiring With Explicit Ports (Optional Upgrade)
 
 ```json
 {
@@ -174,9 +174,9 @@ Expected behavior:
     {
       "id": "44444444-4444-4444-8444-444444444444",
       "source": "node-logic",
-      "sourceHandle": "out.true",
+      "sourcePort": "out.true",
       "target": "node-gate",
-      "targetHandle": "in.condition",
+      "targetPort": "in.condition",
       "label": "true"
     }
   ]
@@ -185,8 +185,8 @@ Expected behavior:
 
 Expected behavior:
 
-- Explicit handles override boundary fallback.
-- Validation checks handle existence when handles are specified.
+- Explicit ports override boundary fallback.
+- Validation checks port existence when ports are specified.
 
 ---
 
@@ -194,17 +194,17 @@ Expected behavior:
 
 This memo does not claim novelty in generic ideas such as:
 
-- Node graph editors, draggable nodes, edges/handles as a concept.
+- Node graph editors, draggable nodes, edges/ports as a concept.
 - Auto-layout and orthogonal routing in general.
 - Git-based storage of project artifacts.
 - “AI-assisted editing” as a broad concept.
 
-The potential novelty is in the **specific combination** and system design: persistent graph workspace + delta mutation protocol + validation/rollback UX + optional-handle semantics + hydration/layout to minimize AI payload.
+The potential novelty is in the **specific combination** and system design: persistent graph workspace + delta mutation protocol + validation/rollback UX + port-required semantics + hydration/layout to minimize AI payload.
 
 ---
 
 ## 7) Next Steps (If You Want to Preserve Options)
 
 - Keep this memo updated with screenshots/graphs demonstrating the workflows.
-- Maintain dated notes for major design decisions (handles optionality, deterministic fallback, rollback UX, timeline semantics).
+- Maintain dated notes for major design decisions (ports optionality, deterministic fallback, rollback UX, timeline semantics).
 - If pursuing IP protection later: convert the “Candidate Novel Concepts” into a short set of method/system descriptions with diagrams and variants.

@@ -114,7 +114,7 @@
       "width": 190,
       "height": 110,
       "color": "#ffb74d",
-      "handles": [
+      "ports": [
         {
           "id": "positive",
           "label": "+5V",
@@ -150,7 +150,7 @@
       },
       "width": 180,
       "height": 90,
-      "handles": [
+      "ports": [
         {
           "id": "pinA",
           "label": "Pin A",
@@ -187,7 +187,7 @@
       },
       "width": 160,
       "height": 110,
-      "handles": [
+      "ports": [
         {
           "id": "anode",
           "label": "Anode",
@@ -224,7 +224,7 @@
       },
       "width": 160,
       "height": 90,
-      "handles": [
+      "ports": [
         {
           "id": "in",
           "label": "In",
@@ -262,7 +262,7 @@
       "width": 180,
       "height": 110,
       "color": "#90a4ae",
-      "handles": [
+      "ports": [
         {
           "id": "ground",
           "label": "GND",
@@ -289,7 +289,7 @@
       "width": 220,
       "height": 100,
       "color": "#4dd0e1",
-      "handles": [
+      "ports": [
         {
           "id": "sense",
           "label": "Sense",
@@ -316,7 +316,7 @@
       "width": 260,
       "height": 220,
       "data": {
-        "markdown": "## SVG Breadboard Demo\n- Drag the switch and watch the LED path highlight on the SVG grid.\n- The logic probe monitors the LED\u2019s cathode so you can capture when the slide switch pulls the rail to ground.\n- Every component node stores its own pin handles so the wiring feels like a real breadboard netlist.\n"
+        "markdown": "## SVG Breadboard Demo\n- Drag the switch and watch the LED path highlight on the SVG grid.\n- The logic probe monitors the LED\u2019s cathode so you can capture when the slide switch pulls the rail to ground.\n- Every component node stores its own pin ports so the wiring feels like a real breadboard netlist.\n"
       }
     }
   ],
@@ -325,9 +325,9 @@
       "id": "edge-power-positive-resistor",
       "type": "signal",
       "source": "node-power-supply",
-      "sourceHandle": "positive",
+      "sourcePort": "positive",
       "target": "node-resistor-220",
-      "targetHandle": "pinA",
+      "targetPort": "pinA",
       "style": {
         "color": "#ffee58",
         "width": 3,
@@ -341,9 +341,9 @@
       "id": "edge-resistor-led",
       "type": "signal",
       "source": "node-resistor-220",
-      "sourceHandle": "pinB",
+      "sourcePort": "pinB",
       "target": "node-led-3mm",
-      "targetHandle": "anode",
+      "targetPort": "anode",
       "style": {
         "color": "#ffee58",
         "width": 3,
@@ -357,9 +357,9 @@
       "id": "edge-led-switch",
       "type": "signal",
       "source": "node-led-3mm",
-      "sourceHandle": "cathode",
+      "sourcePort": "cathode",
       "target": "node-switch-slide",
-      "targetHandle": "in",
+      "targetPort": "in",
       "style": {
         "color": "#ffee58",
         "width": 3,
@@ -373,9 +373,9 @@
       "id": "edge-switch-ground",
       "type": "signal",
       "source": "node-switch-slide",
-      "sourceHandle": "out",
+      "sourcePort": "out",
       "target": "node-negative-rail",
-      "targetHandle": "ground",
+      "targetPort": "ground",
       "style": {
         "color": "#ffee58",
         "width": 3,
@@ -389,9 +389,9 @@
       "id": "edge-led-probe",
       "type": "signal",
       "source": "node-led-3mm",
-      "sourceHandle": "cathode",
+      "sourcePort": "cathode",
       "target": "node-logic-probe",
-      "targetHandle": "sense",
+      "targetPort": "sense",
       "style": {
         "color": "#81d4fa",
         "width": 2,
@@ -405,9 +405,9 @@
       "id": "edge-power-negative-ground",
       "type": "signal",
       "source": "node-power-supply",
-      "sourceHandle": "negative",
+      "sourcePort": "negative",
       "target": "node-negative-rail",
-      "targetHandle": "ground",
+      "targetPort": "ground",
       "style": {
         "color": "#ffee58",
         "width": 3,
@@ -418,7 +418,7 @@
       }
     }
   ],
-  "groups": [
+  "clusters": [
     {
       "id": "group-breadboard-cluster",
       "label": "Breadboard Cluster",

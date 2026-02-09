@@ -337,19 +337,19 @@ const applyCommandsSequentially = async (graphAPI, commands, dryRun, summary) =>
         if (typeof graphAPI?.[action] !== 'function') {
           throw new Error(`Graph API does not support ${action}.`);
         }
-        const groupId = command.groupId || command.id;
+        const clusterId = command.clusterId || command.id;
         const nodeIds = ensureArray(command.nodeIds);
-        if (!groupId || !nodeIds.length) break;
+        if (!clusterId || !nodeIds.length) break;
         if (dryRun) {
           if (!summary.groupMutations) summary.groupMutations = [];
-          summary.groupMutations.push({ action, groupId, nodeIds });
+          summary.groupMutations.push({ action, clusterId, nodeIds });
         } else {
-          const result = graphAPI[action](groupId, nodeIds);
+          const result = graphAPI[action](clusterId, nodeIds);
           if (!result?.success) {
             throw new Error(result?.error || `${action} failed`);
           }
           if (!summary.groupMutations) summary.groupMutations = [];
-          summary.groupMutations.push({ action, groupId, nodeIds });
+          summary.groupMutations.push({ action, clusterId, nodeIds });
         }
         break;
       }
@@ -437,7 +437,7 @@ const runProceduralGeneration = ({ graphAPI }, params = {}) => {
   const blueprint = params.blueprint || {};
   const nodesTemplate = Array.isArray(blueprint.nodes) ? blueprint.nodes : [];
   const edgesTemplate = Array.isArray(blueprint.edges) ? blueprint.edges : [];
-  const groupsTemplate = Array.isArray(blueprint.groups) ? blueprint.groups : [];
+  const groupsTemplate = Array.isArray(blueprint.clusters) ? blueprint.clusters : [];
   if (!nodesTemplate.length && !edgesTemplate.length && !groupsTemplate.length) {
     return { success: false, data: { errors: ['Blueprint must include nodes, edges, or groups'] } };
   }
@@ -500,14 +500,14 @@ const runProceduralGeneration = ({ graphAPI }, params = {}) => {
     groupsTemplate.forEach((template, groupIndex) => {
       const rawId = template?.id || `group_${groupIndex}`;
       const substituted = substituteTokens(template, iterationParams);
-      const groupId = ensureUniqueId(existingGroupIds, substituted.id || rawId);
-      existingGroupIds.add(groupId);
+      const clusterId = ensureUniqueId(existingGroupIds, substituted.id || rawId);
+      existingGroupIds.add(clusterId);
       const nodeIds = Array.isArray(substituted.nodeIds)
         ? substituted.nodeIds.map((id) => idMapping.get(id) || id)
         : [];
       createdGroups.push({
         ...deepClone(substituted),
-        id: groupId,
+        id: clusterId,
         nodeIds
       });
     });
@@ -681,7 +681,7 @@ const runImportExport = ({ graphAPI }, params = {}) => {
       manifest: params.manifest || {},
       nodes: filteredNodes,
       edges: filteredEdges,
-      groups: filteredGroups,
+      clusters: filteredGroups,
       exportedAt: new Date().toISOString()
     };
     if (params.as === 'string' || params.format === 'string') {
@@ -708,7 +708,7 @@ const runImportExport = ({ graphAPI }, params = {}) => {
     }
     const nodes = Array.isArray(payload.nodes) ? payload.nodes : [];
     const edges = Array.isArray(payload.edges) ? payload.edges : [];
-    const groups = Array.isArray(payload.groups) ? payload.groups : [];
+    const groups = Array.isArray(payload.clusters) ? payload.clusters : [];
     if (!nodes.length && !edges.length && !groups.length) {
       return { success: false, data: { errors: ['Import payload is empty'] } };
     }
