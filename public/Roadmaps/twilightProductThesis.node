@@ -299,147 +299,189 @@
       "type": "child",
       "source": "tpt-title",
       "target": "tpt-whygraphs",
-      "label": "but why?"
+      "label": "but why?",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-whygraphs-oneliner",
       "type": "peer",
       "source": "tpt-whygraphs",
       "target": "tpt-oneliner",
-      "label": ""
+      "label": "",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-oneliner-possibilities",
       "type": "peer",
       "source": "tpt-oneliner",
       "target": "tpt-possibilities",
-      "label": "imagine"
+      "label": "imagine",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-title-oneliner",
       "type": "child",
       "source": "tpt-title",
       "target": "tpt-oneliner",
-      "label": ""
+      "label": "",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-title-possibilities",
       "type": "child",
       "source": "tpt-title",
       "target": "tpt-possibilities",
-      "label": "what's possible"
+      "label": "what's possible",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-oneliner-problem",
       "type": "child",
       "source": "tpt-oneliner",
       "target": "tpt-problem",
-      "label": "the pain"
+      "label": "the pain",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-oneliner-solution",
       "type": "child",
       "source": "tpt-oneliner",
       "target": "tpt-solution",
-      "label": "the fix"
+      "label": "the fix",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-oneliner-alternatives",
       "type": "child",
       "source": "tpt-oneliner",
       "target": "tpt-alternatives",
-      "label": "vs others"
+      "label": "vs others",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-problem-artifact",
       "type": "child",
       "source": "tpt-problem",
       "target": "tpt-artifact",
-      "label": "so we built"
+      "label": "so we built",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-solution-ai",
       "type": "child",
       "source": "tpt-solution",
       "target": "tpt-ai",
-      "label": "enables"
+      "label": "enables",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-alternatives-workflow",
       "type": "child",
       "source": "tpt-alternatives",
       "target": "tpt-workflow",
-      "label": "our way"
+      "label": "our way",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-artifact-progression",
       "type": "child",
       "source": "tpt-artifact",
       "target": "tpt-progression",
-      "label": "evolves into"
+      "label": "evolves into",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-ai-web",
       "type": "child",
       "source": "tpt-ai",
       "target": "tpt-web",
-      "label": "distributed via"
+      "label": "distributed via",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-workflow-moat",
       "type": "child",
       "source": "tpt-workflow",
       "target": "tpt-moat",
-      "label": "creates"
+      "label": "creates",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-progression-wedges",
       "type": "child",
       "source": "tpt-progression",
       "target": "tpt-wedges",
-      "label": "start with"
+      "label": "start with",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-web-wedges",
       "type": "child",
       "source": "tpt-web",
       "target": "tpt-wedges",
-      "label": "find users"
+      "label": "find users",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-moat-usecases",
       "type": "child",
       "source": "tpt-moat",
       "target": "tpt-usecases",
-      "label": "applies to"
+      "label": "applies to",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-wedges-next",
       "type": "child",
       "source": "tpt-wedges",
       "target": "tpt-next",
-      "label": "ship"
+      "label": "ship",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-usecases-next",
       "type": "child",
       "source": "tpt-usecases",
       "target": "tpt-next",
-      "label": "roadmap"
+      "label": "roadmap",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-peer-artifact-ai",
       "type": "peer",
       "source": "tpt-artifact",
       "target": "tpt-ai",
-      "label": "supports"
+      "label": "supports",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "tpt-e-peer-ai-workflow",
       "type": "peer",
       "source": "tpt-ai",
       "target": "tpt-workflow",
-      "label": "enables"
+      "label": "enables",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

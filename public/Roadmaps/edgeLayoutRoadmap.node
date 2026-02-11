@@ -1,75 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-12-28T05:33:17.145Z",
-    "modified": "2025-12-28T05:33:17.145Z",
+    "created": "2026-02-10T16:25:01.463Z",
+    "modified": "2026-02-10T16:25:05.277Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 106,
-      "y": 287.5
-    },
-    "zoom": 1
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
   "nodes": [
     {
       "id": "edge-layout-goal",
@@ -272,7 +210,9 @@
       "target": "edge-layout-payload",
       "label": "optimize for",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e2",
@@ -281,7 +221,9 @@
       "target": "edge-layout-phase-1",
       "label": "drives",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e2b",
@@ -290,7 +232,9 @@
       "target": "edge-layout-phase-1-blockers",
       "label": "consider",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e3",
@@ -299,7 +243,9 @@
       "target": "edge-layout-phase-2",
       "label": "then",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e3b",
@@ -308,7 +254,9 @@
       "target": "edge-layout-phase-2-considerations",
       "label": "consider",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e4",
@@ -317,7 +265,9 @@
       "target": "edge-layout-phase-3",
       "label": "polish",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e5",
@@ -326,7 +276,9 @@
       "target": "edge-layout-phase-4",
       "label": "stability",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e5b",
@@ -335,7 +287,9 @@
       "target": "edge-layout-phase-3-considerations",
       "label": "consider",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e6",
@@ -344,7 +298,9 @@
       "target": "edge-layout-phase-5",
       "label": "extend",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e6b",
@@ -353,7 +309,9 @@
       "target": "edge-layout-phase-4-considerations",
       "label": "consider",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-e7",
@@ -362,7 +320,9 @@
       "target": "edge-layout-testing",
       "label": "validate",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

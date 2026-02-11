@@ -263,7 +263,9 @@
       "target": "node_text_md",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_image",
@@ -272,7 +274,9 @@
       "target": "node_image_media",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_code",
@@ -281,7 +285,9 @@
       "target": "node_code",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_table",
@@ -290,7 +296,9 @@
       "target": "node_table",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_embed",
@@ -299,7 +307,9 @@
       "target": "node_embed",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_links",
@@ -308,7 +318,9 @@
       "target": "node_links",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_task",
@@ -317,7 +329,9 @@
       "target": "node_task",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_decision",
@@ -326,7 +340,9 @@
       "target": "node_decision",
       "label": "explains",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_text_comments",
@@ -335,7 +351,9 @@
       "target": "node_comments",
       "label": "discusses",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_links_overview",
@@ -344,7 +362,9 @@
       "target": "node_overview",
       "label": "references",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

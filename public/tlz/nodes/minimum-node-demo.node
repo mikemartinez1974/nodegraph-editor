@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-09T21:44:10.299Z",
-    "modified": "2026-02-09T21:44:12.161Z",
+    "created": "2026-02-11T17:20:04.488Z",
+    "modified": "2026-02-11T17:24:10.346Z",
     "author": "",
     "tags": []
   },
@@ -15,7 +15,7 @@
       "label": "Manifest",
       "position": {
         "x": -420,
-        "y": -188
+        "y": -186.16218495476113
       },
       "width": 420,
       "height": 280,
@@ -114,10 +114,10 @@
       "label": "Dictionary",
       "position": {
         "x": 21,
-        "y": -138
+        "y": -139
       },
-      "width": 388.5432523794347,
-      "height": 219.6435963559827,
+      "width": 371.3810674246736,
+      "height": 781.6200793891953,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -192,8 +192,8 @@
         "x": -377.77162173661964,
         "y": 221.24221451232708
       },
-      "width": 320,
-      "height": 180,
+      "width": 357.66567386447923,
+      "height": 336.81248853990064,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -206,9 +206,9 @@
       "label": "SVG Node Instance",
       "position": {
         "x": 526,
-        "y": 107
+        "y": 105.16218495476112
       },
-      "width": 320,
+      "width": 387.99481201171875,
       "height": 180,
       "visible": true,
       "showLabel": true,
@@ -221,11 +221,11 @@
       "type": "demo.text",
       "label": "Text Node",
       "position": {
-        "x": 527,
-        "y": 309
+        "x": 523.328125,
+        "y": 336.8255310058594
       },
-      "width": 320,
-      "height": 180,
+      "width": 396.32806396484375,
+      "height": 180.9765167236328,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -238,10 +238,10 @@
       "label": "Node Class Instance",
       "position": {
         "x": 523.406510223413,
-        "y": 827.2223911697068
+        "y": 834.2145786697068
       },
-      "width": 320,
-      "height": 180,
+      "width": 337.99481201171875,
+      "height": 173.0078125,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -287,11 +287,11 @@
       "type": "node",
       "label": "New Node",
       "position": {
-        "x": 521.5884618131902,
-        "y": 633.3328016109838
+        "x": 548.5884618131902,
+        "y": 557.3328016109838
       },
-      "width": 320,
-      "height": 180,
+      "width": 351.53954893279735,
+      "height": 160,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -309,30 +309,8 @@
       "type": "relates",
       "source": "62cf9e19-392a-401d-a1f6-4e93facafbe4",
       "target": "node-class-demo-0001",
-      "sourceHandle": "root",
-      "targetHandle": "root",
-      "handleMeta": {
-        "source": {
-          "key": "root",
-          "label": "Root",
-          "type": "value",
-          "direction": "output",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "root",
-          "label": "root",
-          "type": "value",
-          "direction": "input",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        }
-      },
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {
         "width": 2,

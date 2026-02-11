@@ -62,13 +62,17 @@
       "id": "ex-edge-1",
       "source": "ex-1",
       "target": "ex-2",
-      "label": "Demo"
+      "label": "Demo",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ex-edge-2",
       "source": "ex-2",
       "target": "ex-3",
-      "label": "Try"
+      "label": "Try",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

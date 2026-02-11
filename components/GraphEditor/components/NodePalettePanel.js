@@ -25,7 +25,7 @@ import usePluginRegistry from '../hooks/usePluginRegistry';
 
 const FAVORITES_KEY = 'nodegraph-editor:palette:favorites';
 
-const BASE_CATEGORY_ORDER = ['favorites', 'breadboard', 'basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
+const BASE_CATEGORY_ORDER = ['favorites', 'breadboard', 'basic', 'utility', 'logic', 'content', 'definitions', 'media', 'integration', 'advanced', 'other'];
 const categoryLabels = {
   favorites: 'Favorites',
   breadboard: 'Breadboard',
@@ -33,6 +33,7 @@ const categoryLabels = {
   utility: 'Utility Nodes',
   logic: 'Logic Nodes',
   content: 'Content Nodes',
+  definitions: 'Dictionary Definitions',
   media: 'Media Nodes',
   integration: 'Integration',
   advanced: 'Advanced Nodes',
@@ -134,12 +135,70 @@ export default function NodePalettePanel({
 
   const { plugins } = usePluginRegistry();
   const nodesByCategory = useMemo(() => getNodeTypesByCategory(), [plugins]);
+  const [dictionaryEntries, setDictionaryEntries] = useState([]);
+  const baseTypeSet = useMemo(() => {
+    const set = new Set();
+    Object.values(nodesByCategory || {}).forEach((nodes) => {
+      nodes.forEach((meta) => {
+        if (meta?.type) set.add(meta.type);
+      });
+    });
+    return set;
+  }, [nodesByCategory]);
+
+  const buildEntriesFromDictionary = useCallback((dictionary) => {
+    const nodeDefs = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
+    return nodeDefs
+      .map((entry) => {
+        const type = entry?.key || entry?.type || entry?.nodeType;
+        if (!type || typeof type !== 'string') return null;
+        if (baseTypeSet.has(type)) return null;
+        return {
+          type,
+          label: entry?.label || entry?.title || type,
+          description: entry?.description || entry?.ref || entry?.source || '',
+          icon: entry?.icon || 'Extension',
+          category: 'definitions',
+          definition: entry
+        };
+      })
+      .filter(Boolean);
+  }, [baseTypeSet]);
+
+  useEffect(() => {
+    const handleDictionaryResolved = ({ dictionary } = {}) => {
+      setDictionaryEntries(buildEntriesFromDictionary(dictionary));
+    };
+    eventBus.on('dictionaryResolved', handleDictionaryResolved);
+    eventBus.emit('dictionaryRequest');
+    if (typeof window !== 'undefined' && window.graphAPI?.getNodes) {
+      try {
+        const nodes = window.graphAPI.getNodes() || [];
+        const dictionaryNode = nodes.find((node) => node?.type === 'dictionary') || null;
+        if (dictionaryNode) {
+          setDictionaryEntries(buildEntriesFromDictionary(dictionaryNode));
+        }
+      } catch (err) {
+        // ignore graphAPI lookup failures
+      }
+    }
+    return () => {
+      eventBus.off('dictionaryResolved', handleDictionaryResolved);
+    };
+  }, [baseTypeSet, buildEntriesFromDictionary]);
+
+  const mergedNodesByCategory = useMemo(() => {
+    if (!dictionaryEntries.length) return nodesByCategory;
+    const merged = { ...nodesByCategory };
+    merged.definitions = [...(merged.definitions || []), ...dictionaryEntries];
+    return merged;
+  }, [nodesByCategory, dictionaryEntries]);
   const orderedCategories = useMemo(() => {
-    const extraCategories = Object.keys(nodesByCategory || {})
+    const extraCategories = Object.keys(mergedNodesByCategory || {})
       .filter((category) => category && category !== 'favorites' && !BASE_CATEGORY_ORDER.includes(category))
       .sort();
     return [...BASE_CATEGORY_ORDER, ...extraCategories];
-  }, [nodesByCategory]);
+  }, [mergedNodesByCategory]);
   const [search, setSearch] = useState('');
   const [favorites, setFavorites] = useState(() => {
     if (typeof window === 'undefined') return new Set();
@@ -155,13 +214,13 @@ export default function NodePalettePanel({
 
   const metaByType = useMemo(() => {
     const map = {};
-    Object.values(nodesByCategory).forEach((nodes) => {
+    Object.values(mergedNodesByCategory).forEach((nodes) => {
       nodes.forEach((meta) => {
         map[meta.type] = meta;
       });
     });
     return map;
-  }, [nodesByCategory]);
+  }, [mergedNodesByCategory]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -207,7 +266,7 @@ export default function NodePalettePanel({
 
     orderedCategories.forEach((category) => {
       if (category === 'favorites') return;
-      const nodes = (nodesByCategory[category] || []).filter((meta) => matchesQuery(meta, query));
+      const nodes = (mergedNodesByCategory[category] || []).filter((meta) => matchesQuery(meta, query));
       if (nodes.length > 0) {
         sections.push({
           key: category,
@@ -218,7 +277,7 @@ export default function NodePalettePanel({
     });
 
     return sections;
-  }, [favorites, metaByType, nodesByCategory, search]);
+  }, [favorites, metaByType, mergedNodesByCategory, search]);
 
   return (
     <Drawer

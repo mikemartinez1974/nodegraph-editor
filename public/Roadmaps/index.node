@@ -1,44 +1,26 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Index of Roadmaps",
-    "created": "2025-12-30T18:29:23.757Z",
-    "modified": "2025-12-30T18:29:23.757Z"
-  },
-  "settings": {
-    "theme": {
-      "mode": "dark",
-      "primary": {
-        "main": "#1976d2"
-      },
-      "background": {
-        "default": "#121212",
-        "paper": "#1e1e1e"
-      },
-      "text": {
-        "primary": "#ffffff",
-        "secondary": "rgba(255, 255, 255, 0.7)"
-      }
-    }
-  },
-  "viewport": {
-    "pan": {
-      "x": 400,
-      "y": 300
-    },
-    "zoom": 0.8
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-10T16:26:33.900Z",
+    "modified": "2026-02-10T16:26:37.576Z",
+    "author": "",
+    "tags": []
   },
   "nodes": [
     {
       "id": "header",
       "type": "markdown",
-      "label": "\ud83d\udcc2 Roadmaps",
+      "label": "📂 Roadmaps",
       "position": {
         "x": 0,
         "y": -200
       },
       "width": 600,
       "height": 100,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "markdown": "# Index of Roadmaps\nExplore the nodegraphs in this directory."
       }
@@ -46,13 +28,15 @@
     {
       "id": "back",
       "type": "default",
-      "label": "\u2b05\ufe0f Back to Parent",
+      "label": "⬅️ Back to Parent",
       "position": {
         "x": -300,
         "y": -200
       },
       "width": 180,
       "height": 60,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///index.node"
       }
@@ -67,6 +51,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/artifactContract_portsAndDocuments.node"
       }
@@ -81,6 +67,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/domainMemoryFactory.node"
       }
@@ -95,6 +83,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/edgeFeaturesShowcase.node"
       }
@@ -109,6 +99,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/edgeLayoutRoadmap.node"
       }
@@ -123,6 +115,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/elkEdgesLayoutMaster.node"
       }
@@ -137,6 +131,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/githubAndTimeline.node"
       }
@@ -151,6 +147,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/graphApiEnhancements.node"
       }
@@ -165,6 +163,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/graphApiOverview.node"
       }
@@ -179,6 +179,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/liveDocuments.node"
       }
@@ -193,6 +195,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/monetization.node"
       }
@@ -207,6 +211,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/themePaste.node"
       }
@@ -221,6 +227,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/TwilitePatentability.node"
       }
@@ -235,6 +243,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/TwiliteProductThesis.node"
       }
@@ -249,6 +259,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///Roadmaps/vscodeAddon.node"
       }

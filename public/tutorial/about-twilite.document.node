@@ -357,7 +357,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-navigation",
@@ -369,7 +371,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-identity",
@@ -381,7 +385,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-node-content",
@@ -393,7 +399,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-structure-composability",
@@ -405,7 +413,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-navigation-executable",
@@ -417,7 +427,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-identity-ai",
@@ -429,7 +441,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-composability-version",
@@ -441,7 +455,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-executable-reasoning",
@@ -453,7 +469,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-ai-memory",
@@ -465,7 +483,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-version-rendering",
@@ -477,7 +497,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-reasoning-format",
@@ -489,7 +511,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-memory-email",
@@ -501,7 +525,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-rendering-community",
@@ -513,7 +539,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-format-nodespace",
@@ -525,7 +553,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-email-nodespace",
@@ -537,7 +567,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-community-nodespace",
@@ -549,7 +581,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-nodespace-unknown",
@@ -561,7 +595,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

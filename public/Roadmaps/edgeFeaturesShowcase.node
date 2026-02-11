@@ -1,78 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Edge Features Showcase",
-    "description": "Demonstrates multi-label edges, orthogonal routing, and multi-edge lane spacing.",
-    "created": "2025-12-28T00:00:00.000Z",
-    "modified": "2025-12-28T00:00:00.000Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-10T16:24:35.168Z",
+    "modified": "2026-02-10T16:24:56.991Z",
     "author": "",
-    "tags": [
-      "roadmap",
-      "edges",
-      "showcase"
-    ]
+    "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "layout": {
-      "mode": "manual",
-      "defaultLayout": "hierarchical",
-      "direction": "DOWN",
-      "edgeLaneGapPx": 10,
-      "serpentine": {
-        "maxPerRow": 6
-      },
-      "cycleFallback": {
-        "enabled": true
-      }
-    },
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 140,
-      "y": 180
-    },
-    "zoom": 1
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "showcase-title",
@@ -111,8 +46,8 @@
       "type": "default",
       "label": "\ud83e\uddfc Clean",
       "position": {
-        "x": 280,
-        "y": -90
+        "x": 169,
+        "y": -63
       },
       "width": 220,
       "height": 90,
@@ -159,8 +94,8 @@
       "type": "default",
       "label": "\ud83e\udde9 Merge",
       "position": {
-        "x": 680,
-        "y": 40
+        "x": 521,
+        "y": 44
       },
       "width": 220,
       "height": 90,
@@ -175,8 +110,8 @@
       "type": "default",
       "label": "\ud83d\udce6 Output",
       "position": {
-        "x": 1080,
-        "y": 40
+        "x": 1270,
+        "y": 56
       },
       "width": 220,
       "height": 90,
@@ -209,102 +144,95 @@
       "type": "child",
       "source": "source",
       "target": "t-a",
-      "labels": [
-        "out",
-        "primary",
-        "in"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-source-a-2",
       "type": "child",
       "source": "source",
       "target": "t-a",
-      "labels": [
-        "out",
-        "secondary",
-        "in"
-      ],
+      "label": "",
       "style": {
         "width": 2,
         "dash": [
           8,
           4
         ]
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-source-b",
       "type": "child",
       "source": "source",
       "target": "t-b",
-      "labels": [
-        "emit",
-        "validate",
-        "recv"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-source-c",
       "type": "child",
       "source": "source",
       "target": "t-c",
-      "labels": [
-        "emit",
-        "enrich",
-        "recv"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-a-merge",
       "type": "child",
       "source": "t-a",
       "target": "merge",
-      "labels": [
-        "clean",
-        "\u2192",
-        "merge"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-b-merge",
       "type": "child",
       "source": "t-b",
       "target": "merge",
-      "labels": [
-        "valid",
-        "\u2192",
-        "merge"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-c-merge",
       "type": "child",
       "source": "t-c",
       "target": "merge",
-      "labels": [
-        "enrich",
-        "\u2192",
-        "merge"
-      ],
+      "label": "",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-merge-output",
@@ -314,7 +242,10 @@
       "label": "legacy middle label",
       "style": {
         "width": 2
-      }
+      },
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

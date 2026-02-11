@@ -7,7 +7,7 @@ import themeMap from './themes';
 import GraphEditor from '@/components/GraphEditor/GraphEditor';
 import eventBus from '@/components/NodeGraph/eventBus';
 
-const FALLBACK_DOC_URL = '/site-layout.node';
+const FALLBACK_DOC_URL = '/root.node';
 
 export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FALLBACK_DOC_URL }) {
   const getSystemTheme = () => {

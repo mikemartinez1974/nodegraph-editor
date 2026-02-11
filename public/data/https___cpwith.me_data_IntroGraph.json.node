@@ -379,7 +379,9 @@
       "target": "node_step1_markdown",
       "label": "start here",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_step1_to_step2",
@@ -388,7 +390,9 @@
       "target": "node_step2_markdown",
       "label": "then",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_step2_to_step3",
@@ -397,7 +401,9 @@
       "target": "node_step3_markdown",
       "label": "finally",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_step2_to_examples",
@@ -406,7 +412,9 @@
       "target": "node_try_examples",
       "label": "copy these",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_examples_to_features",
@@ -415,7 +423,9 @@
       "target": "node_feature_colors",
       "label": "features",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_colors_to_markdown",
@@ -424,7 +434,9 @@
       "target": "node_feature_markdown",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_markdown_to_groups",
@@ -433,7 +445,9 @@
       "target": "node_feature_groups",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_groups_to_iterate",
@@ -442,7 +456,9 @@
       "target": "node_feature_iterate",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_features_to_cta",
@@ -451,7 +467,9 @@
       "target": "node_ready_cta",
       "label": "ready!",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_welcome_to_undo",
@@ -460,7 +478,9 @@
       "target": "node_shortcut_undo",
       "label": "quick tips",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_undo_to_save",
@@ -469,7 +489,9 @@
       "target": "node_shortcut_save",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_save_to_delete",
@@ -478,7 +500,9 @@
       "target": "node_shortcut_delete",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_delete_to_clear",
@@ -487,7 +511,9 @@
       "target": "node_shortcut_clear",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_clear_to_pan",
@@ -496,7 +522,9 @@
       "target": "node_shortcut_pan",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_welcome_to_toolbar",
@@ -505,7 +533,9 @@
       "target": "node_toolbar_reminder",
       "label": "look up",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_welcome_to_manual",
@@ -514,7 +544,9 @@
       "target": "node_copy_manual",
       "label": "need more?",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_welcome_to_svgdemo",
@@ -523,7 +555,9 @@
       "target": "node_svg_demo",
       "label": "SVG node",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

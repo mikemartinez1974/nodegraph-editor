@@ -129,35 +129,45 @@
       "source": "next-kickoff",
       "target": "next-recent",
       "label": "review",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "next-edge-2",
       "source": "next-recent",
       "target": "next-files",
       "label": "inspect",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "next-edge-3",
       "source": "next-files",
       "target": "next-schema",
       "label": "align",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "next-edge-4",
       "source": "next-schema",
       "target": "next-nextsteps",
       "label": "plan",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "next-edge-5",
       "source": "next-nextsteps",
       "target": "next-verify",
       "label": "check",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

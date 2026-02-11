@@ -1,60 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Documentation Root",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-20T18:05:00.000Z",
-    "modified": "2026-01-21T23:17:43.836Z",
+    "created": "2026-02-10T15:54:14.916Z",
+    "modified": "2026-02-10T15:54:17.394Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 0,
-      "y": 0
-    },
-    "zoom": 1
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "doc-root",
@@ -261,7 +214,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-doc-root-contracts",
@@ -274,7 +229,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-nodes",
@@ -287,7 +244,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-edges",
@@ -300,7 +259,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-ports",
@@ -313,7 +274,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-manifest",
@@ -326,7 +289,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-skills",
@@ -339,7 +304,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-doc-root-validation",
@@ -352,7 +319,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-doc-root-boundary",
@@ -365,7 +334,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-doc-root-primitives",
@@ -378,7 +349,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-dictionaries",
@@ -391,7 +364,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

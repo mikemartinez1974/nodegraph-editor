@@ -241,7 +241,9 @@
       "target": "edge-meta",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-required",
@@ -250,7 +252,9 @@
       "target": "edge-required",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-optional",
@@ -259,7 +263,9 @@
       "target": "edge-optional",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-port",
@@ -268,7 +274,9 @@
       "target": "edge-port-policy",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-types",
@@ -277,7 +285,9 @@
       "target": "edge-types",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-forbidden",
@@ -286,7 +296,9 @@
       "target": "edge-forbidden",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-validate",
@@ -295,7 +307,9 @@
       "target": "edge-validation",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-mutations",
@@ -304,7 +318,9 @@
       "target": "edge-mutations",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-agents",
@@ -313,7 +329,9 @@
       "target": "edge-agent-rules",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-portable",
@@ -322,7 +340,9 @@
       "target": "edge-portability",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

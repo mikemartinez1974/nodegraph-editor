@@ -10,6 +10,18 @@ import { convertHandlesObjectToArray } from '../utils/handleUtils.js';
 // Debounce guard for delete operations (must be outside function to persist)
 let deleteInProgress = false;
 
+const deduplicateEdges = (edges = []) => {
+  const seen = new Set();
+  const out = [];
+  edges.forEach((edge) => {
+    if (!edge || !edge.id) return;
+    if (seen.has(edge.id)) return;
+    seen.add(edge.id);
+    out.push(edge);
+  });
+  return out;
+};
+
 export function createGraphEditorHandlers({
   graphAPI,
   state,
@@ -573,6 +585,69 @@ export function createGraphEditorHandlers({
     const nextNodes = Array.isArray(loadedNodes) ? loadedNodes : [];
     const nextEdges = Array.isArray(loadedEdges) ? loadedEdges : [];
     const nextGroups = Array.isArray(loadedGroups) ? loadedGroups : [];
+    const hasManifest = nextNodes.some((node) => node?.type === 'manifest');
+    if (!hasManifest) {
+      const prevNodes = Array.isArray(nodesRef.current) ? nodesRef.current : [];
+      const prevEdges = Array.isArray(edgesRef.current) ? edgesRef.current : [];
+      const prevGroups = Array.isArray(groups) ? groups : [];
+      const existingIds = new Set(prevNodes.map((node) => node.id));
+      const idMap = new Map();
+      const uniqueNodes = nextNodes.map((node) => {
+        if (!node || typeof node !== 'object') return node;
+        const originalId = node.id;
+        if (!originalId || existingIds.has(originalId)) {
+          const newId = generateUUID(existingIds);
+          existingIds.add(newId);
+          idMap.set(originalId, newId);
+          return { ...node, id: newId };
+        }
+        existingIds.add(originalId);
+        idMap.set(originalId, originalId);
+        return node;
+      });
+      const existingEdgeIds = new Set(prevEdges.map((edge) => edge.id));
+      const remappedEdges = nextEdges.map((edge) => {
+        if (!edge || typeof edge !== 'object') return edge;
+        const next = { ...edge };
+        if (next.source) next.source = idMap.get(next.source) || next.source;
+        if (next.target) next.target = idMap.get(next.target) || next.target;
+        if (!next.id || existingEdgeIds.has(next.id)) {
+          next.id = generateUUID(existingEdgeIds);
+        }
+        existingEdgeIds.add(next.id);
+        return normalizeEdgeSchema(next);
+      }).filter(Boolean);
+      const remappedGroups = nextGroups.map((group) => {
+        if (!group || typeof group !== 'object') return group;
+        const nodeIds = Array.isArray(group.nodeIds)
+          ? group.nodeIds.map((id) => idMap.get(id) || id)
+          : [];
+        return { ...group, nodeIds };
+      });
+      const mergedNodes = deduplicateNodes([...prevNodes, ...uniqueNodes]);
+      const mergedEdges = deduplicateEdges([...prevEdges, ...remappedEdges]);
+      const mergedGroups = [...prevGroups, ...remappedGroups];
+      if (typeof loadGraph === 'function') {
+        loadGraph(mergedNodes, mergedEdges, mergedGroups);
+        nodesRef.current = mergedNodes;
+        edgesRef.current = mergedEdges;
+      } else {
+        setNodes(() => {
+          nodesRef.current = mergedNodes;
+          return mergedNodes;
+        });
+        setEdges(() => {
+          edgesRef.current = mergedEdges;
+          return mergedEdges;
+        });
+        setGroups(mergedGroups);
+      }
+      setSelectedNodeIds([]);
+      setSelectedEdgeIds([]);
+      setSelectedGroupIds([]);
+      saveToHistory(mergedNodes, mergedEdges);
+      return;
+    }
     if (nextNodes.length === 0 && nextEdges.length === 0 && nextGroups.length === 0) {
       handleClearGraph();
       return;
@@ -1088,4 +1163,3 @@ export function handlePasteGraph({ nodesRef, setNodes, pastedNodes = [] }) {
     return next;
   });
 }
-

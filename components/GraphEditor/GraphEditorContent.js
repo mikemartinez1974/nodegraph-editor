@@ -21,6 +21,11 @@ import eventBus from '../NodeGraph/eventBus';
 import { loadSettings } from './settingsManager';
 import { createThemeFromConfig } from './utils/themeUtils';
 import {
+  createDefaultManifestNode,
+  createDefaultLegendNode,
+  createDefaultDictionaryNode
+} from './utils/systemNodeDefaults';
+import {
   useGraphEditorStateContext,
   useGraphEditorLayoutContext,
   useGraphEditorServicesContext,
@@ -391,6 +396,19 @@ const GraphEditorContent = () => {
     return Array.from(merged.values());
   }, [getDictionaryEntryKey]);
 
+  const implicitManifestRef = useRef(null);
+  const implicitLegendRef = useRef(null);
+  const implicitDictionaryRef = useRef(null);
+  if (!implicitManifestRef.current) {
+    implicitManifestRef.current = createDefaultManifestNode({ kind: 'fragment' });
+  }
+  if (!implicitLegendRef.current) {
+    implicitLegendRef.current = createDefaultLegendNode();
+  }
+  if (!implicitDictionaryRef.current) {
+    implicitDictionaryRef.current = createDefaultDictionaryNode();
+  }
+
   const resolveDictionaryForNode = useCallback((node) => {
     if (!node || !Array.isArray(nodes)) return null;
     const clusterList = Array.isArray(groups) ? groups : [];
@@ -399,7 +417,13 @@ const GraphEditorContent = () => {
       ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
       : null;
     const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-    return resolvedDictionary || dictionaryInCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
+    return (
+      resolvedDictionary ||
+      dictionaryInCluster ||
+      rootDictionary ||
+      nodes.find((candidate) => candidate.type === 'dictionary') ||
+      implicitDictionaryRef.current
+    );
   }, [nodes, groups, resolvedDictionary]);
 
   useEffect(() => {
@@ -415,7 +439,12 @@ const GraphEditorContent = () => {
         ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === manifestClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
         : null;
       const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-      return dictionaryInManifestCluster || rootDictionary || nodes.find((candidate) => candidate.type === 'dictionary') || null;
+      return (
+        dictionaryInManifestCluster ||
+        rootDictionary ||
+        nodes.find((candidate) => candidate.type === 'dictionary') ||
+        implicitDictionaryRef.current
+      );
     })();
 
     if (!hostDictionary) {
@@ -516,6 +545,20 @@ const GraphEditorContent = () => {
     } catch (err) {
       // ignore event bus errors
     }
+  }, [resolvedDictionary]);
+
+  useEffect(() => {
+    const handleDictionaryRequest = () => {
+      try {
+        eventBus.emit('dictionaryResolved', { dictionary: resolvedDictionary || null });
+      } catch (err) {
+        // ignore event bus errors
+      }
+    };
+    eventBus.on('dictionaryRequest', handleDictionaryRequest);
+    return () => {
+      eventBus.off('dictionaryRequest', handleDictionaryRequest);
+    };
   }, [resolvedDictionary]);
 
   const resolveViewEntry = useCallback((node) => {
@@ -1222,31 +1265,10 @@ const GraphEditorContent = () => {
   const showNewTabPage = false;
 
   const handleCreateBlankGraph = useCallback(() => {
-    const makeId = () => {
-      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-      }
-      return `node_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
-    };
-    const legendNode = {
-      id: makeId(),
-      label: 'Legend',
-      type: 'legend',
-      position: { x: -180, y: -120 },
-      width: 340,
-      height: 220,
-      data: {
-        entries: [
-          {
-            key: 'default',
-            intent: 'placeholder',
-            implementation: 'default renderer',
-            dictionaryKey: 'default'
-          }
-        ]
-      }
-    };
-    const nextNodes = [legendNode];
+    const manifestNode = createDefaultManifestNode({ kind: 'graph' });
+    const legendNode = createDefaultLegendNode();
+    const dictionaryNode = createDefaultDictionaryNode();
+    const nextNodes = [manifestNode, legendNode, dictionaryNode];
     if (typeof loadGraph === 'function') {
       loadGraph(nextNodes, [], []);
     } else {
@@ -1262,7 +1284,7 @@ const GraphEditorContent = () => {
       setGroups(() => []);
     }
     historyHook.saveToHistory(nextNodes, []);
-    setSelectedNodeIds([legendNode.id]);
+    setSelectedNodeIds([manifestNode.id]);
   }, [loadGraph, setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
 
   const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {

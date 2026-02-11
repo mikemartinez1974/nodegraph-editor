@@ -2268,7 +2268,14 @@ useEffect(() => {
           const jsonData = JSON.parse(text);
           if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
             const nodesToLoad = jsonData.nodes;
-            const edgesToLoadFromJson = jsonData.edges || [];
+            const edgesToLoadFromJson = (jsonData.edges || []).map((edge) => {
+              if (!edge || typeof edge !== 'object') return edge;
+              return {
+                ...edge,
+                sourcePort: edge.sourcePort || 'root',
+                targetPort: edge.targetPort || 'root'
+              };
+            });
             const groupsToLoadFromJson = jsonData.clusters || jsonData.clusters || [];
             const boundaryResult = applyManifestBoundary(nodesToLoad, edgesToLoadFromJson, groupsToLoadFromJson);
             const filteredNodes = boundaryResult.nodes;

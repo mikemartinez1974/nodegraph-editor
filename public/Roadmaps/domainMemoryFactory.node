@@ -5,59 +5,74 @@
       "id": "dmf-goal",
       "type": "markdown",
       "label": "Thesis",
-      "position": { "x": -40, "y": -320 },
+      "position": {
+        "x": -40,
+        "y": -320
+      },
       "width": 660,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Domain Memory Factory (Agents)\n**Thesis:** long-running agents fail when they are *amnesiac*. The fix is not a smarter model — it’s **durable domain memory** + a **harness ritual** that forces disciplined progress.\n\nTwilite turns domain memory into a shareable artifact: a persistent `.node` graph that evolves by validated deltas."
+        "markdown": "## Domain Memory Factory (Agents)\n**Thesis:** long-running agents fail when they are *amnesiac*. The fix is not a smarter model \u2014 it\u2019s **durable domain memory** + a **harness ritual** that forces disciplined progress.\n\nTwilite turns domain memory into a shareable artifact: a persistent `.node` graph that evolves by validated deltas."
       }
     },
     {
       "id": "dmf-problem",
       "type": "markdown",
       "label": "Problem",
-      "position": { "x": -40, "y": -70 },
+      "position": {
+        "x": -40,
+        "y": -70
+      },
       "width": 660,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Problem with “General Agents”\n- Context windows reset → agent becomes an amnesiac with tools\n- Long-horizon work degrades into:\n  - manic bursts that fail\n  - wandering partial progress\n  - false success reports\n- Without durable state, each run re-derives “definition of done”"
+        "markdown": "## The Problem with \u201cGeneral Agents\u201d\n- Context windows reset \u2192 agent becomes an amnesiac with tools\n- Long-horizon work degrades into:\n  - manic bursts that fail\n  - wandering partial progress\n  - false success reports\n- Without durable state, each run re-derives \u201cdefinition of done\u201d"
       }
     },
     {
       "id": "dmf-solution",
       "type": "markdown",
       "label": "Solution",
-      "position": { "x": 700, "y": -70 },
+      "position": {
+        "x": 700,
+        "y": -70
+      },
       "width": 660,
       "height": 260,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Solution: Domain Memory as Structured State\nDomain memory is not “a vector DB lookup.”\n\nIt is a **persistent structured representation** of:\n- goals and backlog\n- constraints and requirements\n- status (passing/failing/blocked)\n- what was tried, what broke, what was reverted\n- rituals: how to run, test, deploy, extend\n\nThe agent becomes a policy that transforms one memory state into the next."
+        "markdown": "## Solution: Domain Memory as Structured State\nDomain memory is not \u201ca vector DB lookup.\u201d\n\nIt is a **persistent structured representation** of:\n- goals and backlog\n- constraints and requirements\n- status (passing/failing/blocked)\n- what was tried, what broke, what was reverted\n- rituals: how to run, test, deploy, extend\n\nThe agent becomes a policy that transforms one memory state into the next."
       }
     },
     {
       "id": "dmf-pattern",
       "type": "markdown",
       "label": "Two-Agent Pattern",
-      "position": { "x": -40, "y": 220 },
+      "position": {
+        "x": -40,
+        "y": 220
+      },
       "width": 660,
       "height": 300,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Two-Agent Pattern (Initializer → Worker)\nNot about personalities — about who owns memory.\n\n- **Initializer:** expands the prompt into memory artifacts (feature list, rules, scaffolding)\n- **Worker:** reads memory, picks one item, makes small testable progress, updates memory, commits, exits\n\nEvery run starts the same way: **read memory → verify state → act**."
+        "markdown": "## Two-Agent Pattern (Initializer \u2192 Worker)\nNot about personalities \u2014 about who owns memory.\n\n- **Initializer:** expands the prompt into memory artifacts (feature list, rules, scaffolding)\n- **Worker:** reads memory, picks one item, makes small testable progress, updates memory, commits, exits\n\nEvery run starts the same way: **read memory \u2192 verify state \u2192 act**."
       }
     },
     {
       "id": "dmf-Twilite-fit",
       "type": "markdown",
       "label": "Why Twilite",
-      "position": { "x": 700, "y": 240 },
+      "position": {
+        "x": 700,
+        "y": 240
+      },
       "width": 660,
       "height": 320,
       "visible": true,
@@ -70,20 +85,26 @@
       "id": "dmf-ritual",
       "type": "markdown",
       "label": "Boot Ritual",
-      "position": { "x": -40, "y": 560 },
+      "position": {
+        "x": -40,
+        "y": 560
+      },
       "width": 660,
       "height": 300,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Boot Ritual (Session Discipline)\nA serious run follows a ritual:\n\n1. Read the graph memory (goal, backlog, constraints)\n2. Read history (timeline / Git commits)\n3. Select one atomic target (a failing feature or open question)\n4. Execute small changes + validate\n5. Update memory (status + notes)\n6. Commit / milestone\n\nThis turns “LLM calls” into durable progress."
+        "markdown": "## Boot Ritual (Session Discipline)\nA serious run follows a ritual:\n\n1. Read the graph memory (goal, backlog, constraints)\n2. Read history (timeline / Git commits)\n3. Select one atomic target (a failing feature or open question)\n4. Execute small changes + validate\n5. Update memory (status + notes)\n6. Commit / milestone\n\nThis turns \u201cLLM calls\u201d into durable progress."
       }
     },
     {
       "id": "dmf-next",
       "type": "markdown",
       "label": "What To Build",
-      "position": { "x": 700, "y": 600 },
+      "position": {
+        "x": 700,
+        "y": 600
+      },
       "width": 660,
       "height": 320,
       "visible": true,
@@ -94,15 +115,62 @@
     }
   ],
   "edges": [
-    { "id": "dmf-e1", "type": "child", "source": "dmf-goal", "target": "dmf-problem", "label": "problem" },
-    { "id": "dmf-e2", "type": "child", "source": "dmf-problem", "target": "dmf-solution", "label": "requires" },
-    { "id": "dmf-e3", "type": "child", "source": "dmf-solution", "target": "dmf-pattern", "label": "pattern" },
-    { "id": "dmf-e4", "type": "child", "source": "dmf-pattern", "target": "dmf-Twilite-fit", "label": "implemented by" },
-    { "id": "dmf-e5", "type": "child", "source": "dmf-Twilite-fit", "target": "dmf-ritual", "label": "ritual" },
-    { "id": "dmf-e6", "type": "child", "source": "dmf-ritual", "target": "dmf-next", "label": "build next" }
+    {
+      "id": "dmf-e1",
+      "type": "child",
+      "source": "dmf-goal",
+      "target": "dmf-problem",
+      "label": "problem",
+      "sourcePort": "root",
+      "targetPort": "root"
+    },
+    {
+      "id": "dmf-e2",
+      "type": "child",
+      "source": "dmf-problem",
+      "target": "dmf-solution",
+      "label": "requires",
+      "sourcePort": "root",
+      "targetPort": "root"
+    },
+    {
+      "id": "dmf-e3",
+      "type": "child",
+      "source": "dmf-solution",
+      "target": "dmf-pattern",
+      "label": "pattern",
+      "sourcePort": "root",
+      "targetPort": "root"
+    },
+    {
+      "id": "dmf-e4",
+      "type": "child",
+      "source": "dmf-pattern",
+      "target": "dmf-Twilite-fit",
+      "label": "implemented by",
+      "sourcePort": "root",
+      "targetPort": "root"
+    },
+    {
+      "id": "dmf-e5",
+      "type": "child",
+      "source": "dmf-Twilite-fit",
+      "target": "dmf-ritual",
+      "label": "ritual",
+      "sourcePort": "root",
+      "targetPort": "root"
+    },
+    {
+      "id": "dmf-e6",
+      "type": "child",
+      "source": "dmf-ritual",
+      "target": "dmf-next",
+      "label": "build next",
+      "sourcePort": "root",
+      "targetPort": "root"
+    }
   ],
   "timestamp": "2025-12-28T00:00:00.000Z",
   "nodeCount": 7,
   "edgeCount": 6
 }
-

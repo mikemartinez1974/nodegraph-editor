@@ -1,75 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-18T02:09:07.285Z",
-    "modified": "2026-01-18T02:09:07.285Z",
+    "created": "2026-02-10T15:54:38.981Z",
+    "modified": "2026-02-10T15:54:41.769Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 744,
-      "y": 326
-    },
-    "zoom": 1
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
   "nodes": [
     {
       "id": "a1f2c001-6c7e-4f3b-9b1b-01a8a9e2c111",
@@ -1804,7 +1742,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e222bbbb-2b2b-4b2b-9b2b-222222222222",
@@ -1817,7 +1757,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e333cccc-3c3c-4c3c-9c3c-333333333333",
@@ -1830,7 +1772,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e444dddd-4d4d-4d4d-9d4d-444444444444",
@@ -1843,7 +1787,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e555eeee-5e5e-4e5e-9e5e-555555555555",
@@ -1856,7 +1802,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mfest-id",
@@ -1869,7 +1817,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mfest-intent",
@@ -1882,7 +1832,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mfest-deps",
@@ -1895,7 +1847,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mfest-auth",
@@ -1908,7 +1862,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-role-manifest",
@@ -1921,7 +1877,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-role-definitions",
@@ -1934,7 +1892,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-role-content",
@@ -1947,7 +1907,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-role-structure",
@@ -1960,7 +1922,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-role-style",
@@ -1973,7 +1937,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-style-roles",
@@ -1986,7 +1952,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-style-emphasis",
@@ -1999,7 +1967,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-style-state",
@@ -2012,7 +1982,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-style-grouping",
@@ -2025,7 +1997,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-boundary-meaning",
@@ -2038,7 +2012,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-boundary-portability",
@@ -2051,7 +2027,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-boundary-ui",
@@ -2064,7 +2042,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-boundary-diff",
@@ -2077,7 +2057,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-skill-structural",
@@ -2090,7 +2072,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-skill-layout",
@@ -2103,7 +2087,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-skill-validation",
@@ -2116,7 +2102,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-skill-transform",
@@ -2129,7 +2117,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-skill-automation",
@@ -2142,7 +2132,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-1",
@@ -2155,7 +2147,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-2",
@@ -2168,7 +2162,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-3",
@@ -2181,7 +2177,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-4",
@@ -2194,7 +2192,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-5",
@@ -2207,7 +2207,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-struct-6",
@@ -2220,7 +2222,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-1",
@@ -2233,7 +2237,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-2",
@@ -2246,7 +2252,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-3",
@@ -2259,7 +2267,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-4",
@@ -2272,7 +2282,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-layout-5",
@@ -2285,7 +2297,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-validate-1",
@@ -2298,7 +2312,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-validate-2",
@@ -2311,7 +2327,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-validate-3",
@@ -2324,7 +2342,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-validate-4",
@@ -2337,7 +2357,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-validate-5",
@@ -2350,7 +2372,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-transform-1",
@@ -2363,7 +2387,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-transform-2",
@@ -2376,7 +2402,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-transform-3",
@@ -2389,7 +2417,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-transform-4",
@@ -2402,7 +2432,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-transform-5",
@@ -2415,7 +2447,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-1",
@@ -2428,7 +2462,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-2",
@@ -2441,7 +2477,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-3",
@@ -2454,7 +2492,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-4",
@@ -2467,7 +2507,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-5",
@@ -2480,7 +2522,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-auto-6",
@@ -2493,7 +2537,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-1",
@@ -2506,7 +2552,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-2",
@@ -2519,7 +2567,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-3",
@@ -2532,7 +2582,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-4",
@@ -2545,7 +2597,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-5",
@@ -2558,7 +2612,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contracts-6",
@@ -2571,7 +2627,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-node-schemas",
@@ -2584,7 +2642,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-ports",
@@ -2597,7 +2657,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-manifest",
@@ -2610,7 +2672,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-skills",
@@ -2623,7 +2687,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-versioning",
@@ -2636,7 +2702,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-validation",
@@ -2649,7 +2717,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-protocols",
@@ -2662,7 +2732,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-boundary",
@@ -2675,7 +2747,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-req-root-to-onboarding",
@@ -2688,7 +2762,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-manifest",
@@ -2701,7 +2777,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-content",
@@ -2714,7 +2792,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-structure",
@@ -2727,7 +2807,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-style",
@@ -2740,7 +2822,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-definitions",
@@ -2753,7 +2837,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-example-min",
@@ -2766,7 +2852,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-example-rec",
@@ -2779,7 +2867,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mvg-to-checklist",
@@ -2792,7 +2882,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-manifest-to-example-min",
@@ -2808,7 +2900,9 @@
         ],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-content-to-example-min",
@@ -2824,7 +2918,9 @@
         ],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-style-to-example-rec",
@@ -2840,7 +2936,9 @@
         ],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e9f8a7b6-c5d4-4e3f-2a1b-0c9d8e7f6a5b",
@@ -2853,7 +2951,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "f0a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c",
@@ -2866,7 +2966,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

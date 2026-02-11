@@ -62,13 +62,17 @@
       "id": "feat-edge-1",
       "source": "feat-1",
       "target": "feat-2",
-      "label": "See"
+      "label": "See",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "feat-edge-2",
       "source": "feat-2",
       "target": "feat-3",
-      "label": "Also"
+      "label": "Also",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

@@ -1,62 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-12-30T01:42:53.475Z",
-    "modified": "2025-12-30T01:42:53.475Z",
+    "created": "2026-02-10T16:25:48.998Z",
+    "modified": "2026-02-10T16:25:52.962Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 290.7684735442393,
-      "y": 471.87968153325187
-    },
-    "zoom": 1.085448274712218
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "a0000000-0000-4aaa-8aaa-000000000001",
@@ -282,7 +233,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e2",
@@ -295,7 +248,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e3",
@@ -308,7 +263,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e4",
@@ -321,7 +278,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e5",
@@ -334,7 +293,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e6",
@@ -347,7 +308,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e7",
@@ -360,7 +323,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e8",
@@ -373,7 +338,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e9",
@@ -386,7 +353,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e10",
@@ -399,7 +368,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e11",
@@ -412,7 +383,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e12",
@@ -425,7 +398,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

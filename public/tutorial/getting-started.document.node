@@ -194,7 +194,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-welcome-nodespace",
@@ -206,7 +208,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-intro-practical",
@@ -218,7 +222,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-nodespace-technical",
@@ -230,7 +236,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-practical-blank",
@@ -242,7 +250,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-technical-blank",
@@ -254,7 +264,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-blank-tips",
@@ -266,7 +278,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

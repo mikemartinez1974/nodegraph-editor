@@ -240,7 +240,9 @@
       "source": "node_tz",
       "target": "node_create",
       "label": "",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_create_graphs",
@@ -248,7 +250,9 @@
       "source": "node_create",
       "target": "node_create_graphs",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_create_ideas",
@@ -256,7 +260,9 @@
       "source": "node_create",
       "target": "node_create_ideas",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_tz_connect",
@@ -264,7 +270,9 @@
       "source": "node_tz",
       "target": "node_connect",
       "label": "",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_connect_graphs",
@@ -272,7 +280,9 @@
       "source": "node_connect",
       "target": "node_connect_graphs",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_connect_collaborate",
@@ -280,7 +290,9 @@
       "source": "node_connect",
       "target": "node_connect_collaborate",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_tz_visualize",
@@ -288,7 +300,9 @@
       "source": "node_tz",
       "target": "node_visualize",
       "label": "",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_visualize_data",
@@ -296,7 +310,9 @@
       "source": "node_visualize",
       "target": "node_visualize_data",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_tz_extend",
@@ -304,7 +320,9 @@
       "source": "node_tz",
       "target": "node_extend",
       "label": "",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_extend_vr",
@@ -312,7 +330,9 @@
       "source": "node_extend",
       "target": "node_extend_vr",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

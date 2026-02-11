@@ -102,7 +102,9 @@
       "target": "65936bdf-60da-452c-a189-bb1dcbaa5266",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

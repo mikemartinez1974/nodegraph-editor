@@ -82,19 +82,25 @@
       "id": "edge_awareness_activation",
       "source": "node_awareness",
       "target": "node_activation",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_activation_retention",
       "source": "node_activation",
       "target": "node_retention",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_retention_advocacy",
       "source": "node_retention",
       "target": "node_advocacy",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

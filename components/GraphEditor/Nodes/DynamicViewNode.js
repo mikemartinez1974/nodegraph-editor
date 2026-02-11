@@ -85,6 +85,15 @@ const setByPath = (source, path, value) => {
 
 const isEmptyValue = (value) => value === undefined || value === null || value === '';
 
+const shallowEqual = (a, b) => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  return aKeys.every((key) => a[key] === b[key]);
+};
+
 const applyTemplate = (template, context) => {
   if (typeof template !== 'string') return template;
   return template.replace(/{{\s*([^}]+)\s*}}/g, (_, expr) => {
@@ -101,9 +110,39 @@ const applyTemplate = (template, context) => {
   });
 };
 
+const NON_PASSIVE_LISTENER = { passive: false };
+const HANDLE_SIZE = 10;
+const HANDLE_OFFSET = -4;
+const RESIZE_HANDLES = [
+  { key: 'nw', cursor: 'nwse-resize', x: HANDLE_OFFSET, y: HANDLE_OFFSET },
+  { key: 'n', cursor: 'ns-resize', x: '50%', y: HANDLE_OFFSET, transform: 'translate(-50%, 0)' },
+  { key: 'ne', cursor: 'nesw-resize', x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, y: HANDLE_OFFSET },
+  { key: 'e', cursor: 'ew-resize', x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, y: '50%', transform: 'translate(0, -50%)' },
+  { key: 'se', cursor: 'nwse-resize', x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)` },
+  { key: 's', cursor: 'ns-resize', x: '50%', y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, transform: 'translate(-50%, 0)' },
+  { key: 'sw', cursor: 'nesw-resize', x: HANDLE_OFFSET, y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)` },
+  { key: 'w', cursor: 'ew-resize', x: HANDLE_OFFSET, y: '50%', transform: 'translate(0, -50%)' }
+];
+
 const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, showEditButton = false, editLocked = false, ...props }) => {
   const theme = useTheme();
   const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const [isResizing, setIsResizing] = useState(false);
+  const isResizingRef = useRef(false);
+  const resizeStateRef = useRef({
+    handle: 'se',
+    startX: 0,
+    startY: 0,
+    startWidth: 0,
+    startHeight: 0,
+    startPosX: 0,
+    startPosY: 0
+  });
+  const rafRef = useRef(null);
+  const pendingSizeRef = useRef(null);
+  const pendingPosRef = useRef(null);
+  const MIN_WIDTH = 220;
+  const MIN_HEIGHT = 160;
   const viewIntent = viewEntry?.intent || viewDefinition?.viewNode?.data?.view?.intent || '';
   const viewPayloadKey = viewDefinition?.viewNode?.data?.view?.payload || viewEntry?.payload || viewEntry?.view || '';
   const isEditorView = viewPayloadKey === 'editor.web' || viewIntent === 'editor';
@@ -142,6 +181,16 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   const [dirtyFields, setDirtyFields] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
   const isEditingRef = useRef(false);
+  const editorFieldSnapshot = useMemo(() => {
+    if (!effectiveEditorFields.length) return {};
+    const nextValues = {};
+    effectiveEditorFields.forEach((field) => {
+      const path = field?.path || field?.key || '';
+      const current = path ? getByPath(node, path) : undefined;
+      nextValues[field.key || path] = current ?? '';
+    });
+    return nextValues;
+  }, [effectiveEditorFields, node?.id, node?.data]);
 
   useEffect(() => {
     if (isEditingRef.current) return;
@@ -157,19 +206,19 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
     if (!effectiveEditorFields.length) return;
     if (isEditingRef.current) return;
     setEditorFieldValues((prev) => {
-      const nextValues = { ...prev };
-      effectiveEditorFields.forEach((field) => {
-        const path = field?.path || field?.key || '';
-        const current = path ? getByPath(node, path) : undefined;
-        nextValues[field.key || path] = current ?? '';
-      });
-      return nextValues;
+      const prevKeys = Object.keys(prev);
+      const nextKeys = Object.keys(editorFieldSnapshot);
+      if (prevKeys.length === nextKeys.length) {
+        const same = nextKeys.every((key) => prev[key] === editorFieldSnapshot[key]);
+        if (same) return prev;
+      }
+      return editorFieldSnapshot;
     });
-  }, [effectiveEditorFields, node]);
+  }, [effectiveEditorFields.length, editorFieldSnapshot]);
 
   useEffect(() => {
     if (!effectiveEditorFields.length) {
-      setFieldErrors({});
+      setFieldErrors((prev) => (Object.keys(prev).length ? {} : prev));
       return;
     }
     const nextErrors = {};
@@ -188,8 +237,123 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
         }
       }
     });
-    setFieldErrors(nextErrors);
+    setFieldErrors((prev) => (shallowEqual(prev, nextErrors) ? prev : nextErrors));
   }, [effectiveEditorFields, editorFieldValues]);
+
+  const getPointerPosition = (event) => {
+    if (!event) return null;
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    if (touch) return { x: touch.clientX, y: touch.clientY };
+    if (typeof event.clientX === 'number' && typeof event.clientY === 'number') {
+      return { x: event.clientX, y: event.clientY };
+    }
+    return null;
+  };
+
+  const flushResize = () => {
+    rafRef.current = null;
+    if (!pendingSizeRef.current || !node?.id) return;
+    const { width, height } = pendingSizeRef.current;
+    eventBus.emit('nodeResize', { id: node.id, width, height });
+    if (pendingPosRef.current) {
+      eventBus.emit('nodeMove', { id: node.id, position: pendingPosRef.current });
+    }
+  };
+
+  const handleResizeStart = (event, handle) => {
+    const point = getPointerPosition(event);
+    if (!point || renderInPanel) return;
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.cancelable && event.preventDefault) event.preventDefault();
+    isResizingRef.current = true;
+    setIsResizing(true);
+    resizeStateRef.current = {
+      handle,
+      startX: point.x,
+      startY: point.y,
+      startWidth: node.width || MIN_WIDTH,
+      startHeight: node.height || MIN_HEIGHT,
+      startPosX: node.position?.x ?? node.x ?? 0,
+      startPosY: node.position?.y ?? node.y ?? 0
+    };
+    if (event.currentTarget?.setPointerCapture && event.pointerId !== undefined) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (err) {
+        // ignore pointer capture errors
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleResizeMove = (event) => {
+      if (!isResizingRef.current) return;
+      const point = getPointerPosition(event);
+      if (!point) return;
+      if (event.cancelable && event.preventDefault) event.preventDefault();
+      const zoom = props.zoom || 1;
+      const state = resizeStateRef.current;
+      const dx = (point.x - state.startX) / zoom;
+      const dy = (point.y - state.startY) / zoom;
+      let newWidth = state.startWidth;
+      let newHeight = state.startHeight;
+      let newX = state.startPosX;
+      let newY = state.startPosY;
+
+      if (state.handle.includes('e')) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth + dx);
+      }
+      if (state.handle.includes('s')) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight + dy);
+      }
+      if (state.handle.includes('w')) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth - dx);
+        newX = state.startPosX + (state.startWidth - newWidth);
+      }
+      if (state.handle.includes('n')) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight - dy);
+        newY = state.startPosY + (state.startHeight - newHeight);
+      }
+
+      pendingSizeRef.current = { width: newWidth, height: newHeight };
+      pendingPosRef.current = { x: newX, y: newY };
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(flushResize);
+      }
+    };
+
+    const handleResizeEnd = () => {
+      if (!isResizingRef.current) return;
+      isResizingRef.current = false;
+      setIsResizing(false);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      flushResize();
+      eventBus.emit('nodeResizeEnd', { id: node.id });
+    };
+
+    document.addEventListener('pointermove', handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener('pointerup', handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener('pointercancel', handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener('mousemove', handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener('mouseup', handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener('touchmove', handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener('touchend', handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener('touchcancel', handleResizeEnd, NON_PASSIVE_LISTENER);
+    return () => {
+      document.removeEventListener('pointermove', handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener('pointerup', handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener('pointercancel', handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener('mousemove', handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener('mouseup', handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener('touchmove', handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener('touchend', handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener('touchcancel', handleResizeEnd, NON_PASSIVE_LISTENER);
+    };
+  }, [isResizing, node.id, props.zoom, renderInPanel]);
 
   const emitDirtyState = (nodeId, dirty) => {
     try {
@@ -606,6 +770,43 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
         </button>
       )}
       {content}
+      {!renderInPanel && (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          {RESIZE_HANDLES.map((handle) => (
+            <div
+              key={handle.key}
+              onPointerDown={(event) => handleResizeStart(event, handle.key)}
+              onMouseDown={(event) => handleResizeStart(event, handle.key)}
+              onTouchStart={(event) => handleResizeStart(event.nativeEvent || event, handle.key)}
+              style={{
+                position: 'absolute',
+                width: HANDLE_SIZE,
+                height: HANDLE_SIZE,
+                borderRadius: 3,
+                border: `1px solid ${theme.palette.divider}`,
+                background: theme.palette.background.paper,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+                cursor: handle.cursor,
+                opacity: isResizing ? 1 : 0,
+                transition: 'opacity 0.2s ease',
+                zIndex: 3,
+                pointerEvents: 'auto',
+                touchAction: 'none',
+                userSelect: 'none',
+                left: handle.x,
+                top: handle.y,
+                transform: handle.transform || 'none'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = isResizing ? '1' : '0';
+              }}
+            />
+          ))}
+        </div>
+      )}
     </FixedNode>
   );
 };

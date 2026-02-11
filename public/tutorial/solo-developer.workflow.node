@@ -306,7 +306,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-title-not",
@@ -318,7 +320,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-title-state",
@@ -330,7 +334,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e1",
@@ -342,7 +348,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e2",
@@ -354,7 +362,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e3",
@@ -366,7 +376,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e4",
@@ -378,7 +390,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e5",
@@ -390,7 +404,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "loop-e6",
@@ -402,7 +418,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-state-modes",
@@ -414,7 +432,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-modes-arch",
@@ -426,7 +446,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-modes-impl",
@@ -438,7 +460,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-modes-ext",
@@ -450,7 +474,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-modes-plan",
@@ -462,7 +488,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

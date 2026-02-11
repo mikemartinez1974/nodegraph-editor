@@ -201,7 +201,9 @@
       "target": "a7d9e2f1-4c8b-4a3e-9d7f-2b6c8e1a4f9d",
       "label": "substrate",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-root-nav",
@@ -210,7 +212,9 @@
       "target": "c3f8a1d9-7e2b-4f9c-8a6d-1e4f7b9c2a5d",
       "label": "access",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-root-factions",
@@ -219,7 +223,9 @@
       "target": "e9b4f7c2-1a8d-4e3f-9c6a-7d2e5f8b1c4a",
       "label": "politics",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-topo-hazards",
@@ -228,7 +234,9 @@
       "target": "b6d2e8f1-9c4a-4f7e-8d3b-1a5e9f7c2b6d",
       "label": "failure modes",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-nav-cognition",
@@ -237,7 +245,9 @@
       "target": "d8f1c9a2-4e7b-4a3d-9f6c-2b8e1a7f4c9d",
       "label": "mind-upload",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-factions-artifacts",
@@ -246,7 +256,9 @@
       "target": "f2a7e9c1-8d4b-4f6e-9a3c-7e1f5b8d2c4a",
       "label": "weapons & tools",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-hazards-deep",
@@ -255,7 +267,9 @@
       "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
       "label": "anomalies point to...",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-cognition-deep",
@@ -264,7 +278,9 @@
       "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
       "label": "deep divers discover",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-artifacts-deep",
@@ -273,7 +289,9 @@
       "target": "a9c4e7f2-1d8b-4e3a-9f6c-2b7e5f1c8d4a",
       "label": "ancient artifacts found in",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

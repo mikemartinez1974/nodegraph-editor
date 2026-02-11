@@ -225,7 +225,9 @@
       "target": "intro_step1",
       "label": "start here",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_intro_step1_step2",
@@ -234,7 +236,9 @@
       "target": "intro_step2",
       "label": "next",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_intro_step2_step3",
@@ -243,7 +247,9 @@
       "target": "intro_step3",
       "label": "then",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_intro_step3_examples",
@@ -252,7 +258,9 @@
       "target": "intro_examples",
       "label": "try",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_intro_examples_ready",
@@ -261,7 +269,9 @@
       "target": "intro_ready",
       "label": "finish",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_intro_welcome_manual",
@@ -270,7 +280,9 @@
       "target": "intro_manual_link",
       "label": "full guide",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

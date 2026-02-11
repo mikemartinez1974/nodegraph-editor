@@ -82,25 +82,33 @@
       "id": "edge_ingest_alerting",
       "source": "node_metrics_ingest",
       "target": "node_alerting",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_alerting_incident",
       "source": "node_alerting",
       "target": "node_incident_hub",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_incident_dashboard",
       "source": "node_incident_hub",
       "target": "node_dashboard",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_alerting_dashboard",
       "source": "node_alerting",
       "target": "node_dashboard",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

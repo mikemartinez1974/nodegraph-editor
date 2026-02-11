@@ -177,7 +177,9 @@
       "target": "protocol-identity",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-meaning",
@@ -186,7 +188,9 @@
       "target": "protocol-meaning",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-mutation",
@@ -195,7 +199,9 @@
       "target": "protocol-mutation",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-persistence",
@@ -204,7 +210,9 @@
       "target": "protocol-persistence",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-forbidden",
@@ -213,7 +221,9 @@
       "target": "protocol-forbidden",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-law",
@@ -222,7 +232,9 @@
       "target": "protocol-law",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

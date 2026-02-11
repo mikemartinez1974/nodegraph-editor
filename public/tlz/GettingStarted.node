@@ -62,13 +62,17 @@
       "id": "gs-edge-1",
       "source": "gs-1",
       "target": "gs-2",
-      "label": "Try"
+      "label": "Try",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "gs-edge-2",
       "source": "gs-2",
       "target": "gs-3",
-      "label": "Then"
+      "label": "Then",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

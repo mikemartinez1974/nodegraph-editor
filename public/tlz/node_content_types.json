@@ -235,70 +235,90 @@
       "type": "child",
       "source": "node_overview",
       "target": "node_text_md",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_image",
       "type": "child",
       "source": "node_overview",
       "target": "node_image_media",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_code",
       "type": "child",
       "source": "node_overview",
       "target": "node_code",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_table",
       "type": "child",
       "source": "node_overview",
       "target": "node_table",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_embed",
       "type": "child",
       "source": "node_overview",
       "target": "node_embed",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_links",
       "type": "child",
       "source": "node_overview",
       "target": "node_links",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_task",
       "type": "child",
       "source": "node_overview",
       "target": "node_task",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_overview_decision",
       "type": "child",
       "source": "node_overview",
       "target": "node_decision",
-      "label": "explains"
+      "label": "explains",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_text_comments",
       "type": "ref",
       "source": "node_text_md",
       "target": "node_comments",
-      "label": "discusses"
+      "label": "discusses",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e_links_overview",
       "type": "ref",
       "source": "node_links",
       "target": "node_overview",
-      "label": "references"
+      "label": "references",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": [

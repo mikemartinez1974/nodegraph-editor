@@ -185,56 +185,72 @@
       "type": "child",
       "source": "ac-goal",
       "target": "ac-reality-ports",
-      "label": "ports"
+      "label": "ports",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e2",
       "type": "child",
       "source": "ac-reality-ports",
       "target": "ac-contract-ports",
-      "label": "contract"
+      "label": "contract",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e3",
       "type": "child",
       "source": "ac-contract-ports",
       "target": "ac-reality-docurl",
-      "label": "documents"
+      "label": "documents",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e4",
       "type": "child",
       "source": "ac-reality-docurl",
       "target": "ac-contract-docurl",
-      "label": "contract"
+      "label": "contract",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e5",
       "type": "child",
       "source": "ac-contract-docurl",
       "target": "ac-deltas-vs-replace",
-      "label": "mutation safety"
+      "label": "mutation safety",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e6",
       "type": "child",
       "source": "ac-deltas-vs-replace",
       "target": "ac-format-unification",
-      "label": "standardize"
+      "label": "standardize",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e7",
       "type": "child",
       "source": "ac-format-unification",
       "target": "ac-command-schema",
-      "label": "enforce"
+      "label": "enforce",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ac-e8",
       "type": "child",
       "source": "ac-command-schema",
       "target": "ac-next-steps",
-      "label": "do next"
+      "label": "do next",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

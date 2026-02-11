@@ -1,60 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-20T23:34:05.874Z",
-    "modified": "2026-01-20T23:34:05.874Z",
+    "created": "2026-02-10T15:37:16.398Z",
+    "modified": "2026-02-10T15:37:19.879Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 463.11320271200924,
-      "y": 176.18852498596294
-    },
-    "zoom": 0.326710082261698
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "onboarding-root",
@@ -161,7 +114,9 @@
       "target": "onboarding-mindset",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-howto",
@@ -170,7 +125,9 @@
       "target": "onboarding-howto",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-continuity",
@@ -179,7 +136,9 @@
       "target": "onboarding-continuity",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-firststeps",
@@ -188,7 +147,9 @@
       "target": "onboarding-firststeps",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-oath",
@@ -197,7 +158,9 @@
       "target": "onboarding-oath",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

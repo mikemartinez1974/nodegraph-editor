@@ -177,7 +177,9 @@
       "target": "boundary-tests",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-data",
@@ -186,7 +188,9 @@
       "target": "graph-data",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-ui",
@@ -195,7 +199,9 @@
       "target": "ui-state",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-diff",
@@ -204,7 +210,9 @@
       "target": "diff-hygiene",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-view",
@@ -213,7 +221,9 @@
       "target": "view-boundary",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e-root-law",
@@ -222,7 +232,9 @@
       "target": "boundary-law",
       "label": "",
       "style": {},
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

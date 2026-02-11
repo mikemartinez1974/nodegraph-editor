@@ -1,0 +1,201 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-11T16:34:14.050Z",
+    "modified": "2026-02-11T16:34:17.379Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "f18f3a99-b526-4eb8-8561-f2faafd4b7b1",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -315.71244498582496,
+        "y": -202.25498473131523
+      },
+      "width": 497.24979592204335,
+      "height": 611.6578586097885,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "20ae27f7-4bb7-4400-81d6-3ca87c785d9e",
+          "name": "Twilite Root",
+          "version": "0.1.0",
+          "description": "Canonical root graph for twilite.zone. Defines baseline manifest authority, legend semantics, and dictionary foundations for Twilite node-space.",
+          "createdAt": "2026-02-10T17:36:11.561Z",
+          "updatedAt": "2026-02-10T22:30:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "4bff3ceb-0dd1-459e-8ab6-349d9343c813",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": 692.9917269955204,
+        "y": -172.39798941217398
+      },
+      "width": 325.6526457119519,
+      "height": 241.4241111829631,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "Node",
+            "intent": "Content",
+            "implementation": "default renderer",
+            "dictionaryKey": "node"
+          }
+        ],
+        "markdown": "## Legend\\n- default: placeholder"
+      }
+    },
+    {
+      "id": "5bd95e8e-5bb9-4ec3-ab81-28a329edf9ac",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 213.78389193150105,
+        "y": -169.141107493754
+      },
+      "width": 444.8475686537231,
+      "height": 594.3725164534347,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "external"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "remote"
+          },
+          {
+            "key": "node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "remote"
+          }
+        ]
+      }
+    },
+    {
+      "id": "146d9d49-44e6-42f9-b7a3-f0fbc18bf834",
+      "type": "node",
+      "label": "node",
+      "position": {
+        "x": 1118.287555014175,
+        "y": 130.2450152686847
+      },
+      "width": 200,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# Welcome to the Twilite Zone\n---\n\nThis is pre-alpha software."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

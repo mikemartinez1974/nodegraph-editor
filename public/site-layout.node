@@ -285,7 +285,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-hero-ai",
@@ -297,7 +299,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-spectrum-problem",
@@ -309,7 +313,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-ai-solution",
@@ -321,7 +327,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-solution-format",
@@ -333,7 +341,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-solution-mutation",
@@ -345,7 +355,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-format-vision",
@@ -357,7 +369,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-mutation-vision",
@@ -369,7 +383,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-vision-status",
@@ -381,7 +397,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

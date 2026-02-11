@@ -1,62 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-12-28T20:06:35.324Z",
-    "modified": "2025-12-28T20:06:35.324Z",
+    "created": "2026-02-10T16:25:41.067Z",
+    "modified": "2026-02-10T16:25:45.356Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 240.63463278614967,
-      "y": 32.46089596890238
-    },
-    "zoom": 0.8744416163266786
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "a0000001-0000-4000-8000-000000000001",
@@ -285,333 +236,135 @@
       "type": "child",
       "source": "a0000001-0000-4000-8000-000000000001",
       "target": "b0000001-0000-4000-8000-000000000002",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "axis",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000002-0000-4000-8000-000000000102",
       "type": "child",
       "source": "a0000001-0000-4000-8000-000000000001",
       "target": "c0000001-0000-4000-8000-000000000005",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "axis",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000007-0000-4000-8000-000000000107",
       "type": "child",
       "source": "b0000001-0000-4000-8000-000000000002",
       "target": "d0000002-0000-4000-8000-000000000009",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "decision",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000008-0000-4000-8000-000000000108",
       "type": "child",
       "source": "d0000002-0000-4000-8000-000000000009",
       "target": "b0000002-0000-4000-8000-000000000003",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "mvp",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000004-0000-4000-8000-000000000104",
       "type": "child",
       "source": "d0000003-0000-4000-8000-000000000010",
       "target": "b0000003-0000-4000-8000-000000000004",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "evolves to",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000005-0000-4000-8000-000000000105",
       "type": "child",
       "source": "c0000001-0000-4000-8000-000000000005",
       "target": "c0000002-0000-4000-8000-000000000006",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "mvp",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000009-0000-4000-8000-000000000109",
       "type": "child",
       "source": "b0000002-0000-4000-8000-000000000003",
       "target": "d0000003-0000-4000-8000-000000000010",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "decision",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000006-0000-4000-8000-000000000106",
       "type": "child",
       "source": "c0000002-0000-4000-8000-000000000006",
       "target": "d0000004-0000-4000-8000-000000000011",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "evolves to",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "e0000010-0000-4000-8000-000000000110",
       "type": "child",
       "source": "d0000004-0000-4000-8000-000000000011",
       "target": "c0000003-0000-4000-8000-000000000007",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "out",
-          "label": "out",
-          "type": "any",
-          "direction": "output",
-          "position": {
-            "side": "bottom",
-            "offset": 0.5
-          }
-        },
-        "target": {
-          "key": "in",
-          "label": "in",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "top",
-            "offset": 0.5
-          }
-        }
-      },
       "label": "evolves to",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

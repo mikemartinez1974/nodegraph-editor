@@ -288,7 +288,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-hero-thesis",
@@ -300,7 +302,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-hero-why",
@@ -312,7 +316,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-why-problem",
@@ -324,7 +330,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-why-how",
@@ -336,7 +344,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-how-shape",
@@ -348,7 +358,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-how-contract",
@@ -360,7 +372,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-contract-build",
@@ -372,7 +386,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-build-status",
@@ -384,7 +400,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-status-links",
@@ -396,7 +414,9 @@
         "width": 2,
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

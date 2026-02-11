@@ -65,13 +65,17 @@
       "id": "edge_trigger_action",
       "source": "node_trigger",
       "target": "node_action",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge_action_followup",
       "source": "node_action",
       "target": "node_followup",
-      "type": "default"
+      "type": "default",
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

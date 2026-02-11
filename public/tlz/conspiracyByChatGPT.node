@@ -172,7 +172,9 @@
       "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
       "target": "f15e6e4d-8d5b-4a3b-9b7e-2d65cddc2f17",
       "label": "explores",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "d79d9392-f1cd-40a7-92c3-1d9e7bb1d5e9",
@@ -180,7 +182,9 @@
       "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
       "target": "a81cb8f2-3f9a-4f71-a9cd-09b9a5e5d478",
       "label": "driven by",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "a44736e2-d7b5-4e4d-83c8-3e03e8b85b16",
@@ -188,7 +192,9 @@
       "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
       "target": "cc9ab57e-bc94-4b43-8a54-d046e1de3983",
       "label": "spreads through",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ba95ebf3-1f9a-45a2-8b32-6a9d6c98e227",
@@ -196,7 +202,9 @@
       "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
       "target": "e22c9121-2a6c-41fd-815f-23c5f3c34d91",
       "label": "includes",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "ec40470c-4820-4143-8a62-0c536f22a6b9",
@@ -204,7 +212,9 @@
       "source": "b2e10b31-69b0-4c4a-9c5d-91c2c0a9a36a",
       "target": "d17b4c2d-c27e-47d0-9354-90dfd93c5e2b",
       "label": "affects",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

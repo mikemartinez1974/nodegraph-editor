@@ -307,7 +307,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-required",
@@ -320,7 +322,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-optional",
@@ -333,7 +337,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-format",
@@ -346,7 +352,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-rules",
@@ -359,7 +367,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-skills",
@@ -372,7 +382,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-precedence",
@@ -385,7 +397,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "edge-dict-runtime-merge",
@@ -398,7 +412,9 @@
         "dash": [],
         "curved": true
       },
-      "data": {}
+      "data": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

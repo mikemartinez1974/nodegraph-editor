@@ -105,14 +105,18 @@
       "source": "intro-1",
       "target": "intro-2",
       "label": "Next",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     },
     {
       "id": "intro-edge-2",
       "source": "intro-2",
       "target": "intro-3",
       "label": "Example",
-      "style": {}
+      "style": {},
+      "sourcePort": "root",
+      "targetPort": "root"
     }
   ],
   "clusters": []

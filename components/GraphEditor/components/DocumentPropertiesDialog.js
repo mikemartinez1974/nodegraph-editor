@@ -16,6 +16,9 @@ import {
   Tabs,
   Tab,
   Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Stack,
   Paper,
   List,
@@ -36,6 +39,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
 import eventBus from '../../NodeGraph/eventBus';
 import BackgroundControls from './BackgroundControls';
@@ -50,6 +54,12 @@ import {
 import useIntentEmitter from '../hooks/useIntentEmitter';
 import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
 import { summarizeContracts } from '../contracts/contractManager';
+import {
+  createDefaultManifestNode,
+  createDefaultLegendNode,
+  createDefaultDictionaryNode,
+  findSystemNode
+} from '../utils/systemNodeDefaults';
 
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
@@ -81,6 +91,48 @@ const mapProjectMeta = (meta = {}, fallbackLink = '') => {
 };
 
 const uniqueCollaboratorId = () => `collab-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+function StringListEditor({ label, items = [], onChange, helperText }) {
+  const [input, setInput] = useState('');
+  const handleAdd = () => {
+    const value = input.trim();
+    if (!value) return;
+    if (items.includes(value)) return;
+    onChange([...items, value]);
+    setInput('');
+  };
+  return (
+    <Stack spacing={1}>
+      <Typography variant="subtitle2">{label}</Typography>
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        {items.map((item) => (
+          <Chip
+            key={item}
+            label={item}
+            onDelete={() => onChange(items.filter((entry) => entry !== item))}
+            size="small"
+          />
+        ))}
+      </Stack>
+      <Stack direction="row" spacing={1}>
+        <TextField
+          label={`Add ${label}`}
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          fullWidth
+        />
+        <Button variant="outlined" onClick={handleAdd}>
+          Add
+        </Button>
+      </Stack>
+      {helperText && (
+        <Typography variant="caption" color="text.secondary">
+          {helperText}
+        </Typography>
+      )}
+    </Stack>
+  );
+}
 
 const wrapLayoutWithElk = (layout = {}) => ({
   ...DEFAULT_LAYOUT_SETTINGS,
@@ -165,7 +217,90 @@ export default function DocumentPropertiesDialog({
       // ignore storage errors
     }
   }, [open]);
-  const { nodes = [], edges = [] } = useGraphEditorStateContext();
+  const { nodes = [], edges = [], setNodes } = useGraphEditorStateContext();
+  const implicitManifestRef = useRef(null);
+  const implicitLegendRef = useRef(null);
+  const implicitDictionaryRef = useRef(null);
+  if (!implicitManifestRef.current) {
+    implicitManifestRef.current = createDefaultManifestNode({ kind: 'fragment' });
+  }
+  if (!implicitLegendRef.current) {
+    implicitLegendRef.current = createDefaultLegendNode();
+  }
+  if (!implicitDictionaryRef.current) {
+    implicitDictionaryRef.current = createDefaultDictionaryNode();
+  }
+
+  const manifestInfo = useMemo(() => {
+    const node = findSystemNode(nodes, 'manifest');
+    return { node: node || implicitManifestRef.current, implicit: !node };
+  }, [nodes]);
+
+  const legendInfo = useMemo(() => {
+    const node = findSystemNode(nodes, 'legend');
+    return { node: node || implicitLegendRef.current, implicit: !node };
+  }, [nodes]);
+
+  const dictionaryInfo = useMemo(() => {
+    const node = findSystemNode(nodes, 'dictionary');
+    return { node: node || implicitDictionaryRef.current, implicit: !node };
+  }, [nodes]);
+
+  const [manifestError, setManifestError] = useState('');
+  const [legendError, setLegendError] = useState('');
+  const [dictionaryError, setDictionaryError] = useState('');
+  const [manifestDraft, setManifestDraft] = useState({
+    identity: { graphId: '', name: '', version: '', description: '', createdAt: '', updatedAt: '' },
+    intent: { kind: 'graph', scope: 'mixed', description: '' },
+    dependencies: { nodeTypes: [], portContracts: [], skills: [], optional: [] }
+  });
+  const [legendDraft, setLegendDraft] = useState({ entries: [] });
+  const [dictionaryDraft, setDictionaryDraft] = useState({ nodeDefs: [], skills: [], views: [] });
+  const legendCount = legendDraft.entries.length;
+  const dictionaryCounts = {
+    nodeDefs: dictionaryDraft.nodeDefs.length,
+    skills: dictionaryDraft.skills.length,
+    views: dictionaryDraft.views.length
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const manifestData = manifestInfo.node?.data || {};
+    setManifestDraft({
+      identity: {
+        graphId: manifestData.identity?.graphId || '',
+        name: manifestData.identity?.name || '',
+        version: manifestData.identity?.version || '',
+        description: manifestData.identity?.description || '',
+        createdAt: manifestData.identity?.createdAt || '',
+        updatedAt: manifestData.identity?.updatedAt || ''
+      },
+      intent: {
+        kind: manifestData.intent?.kind || 'graph',
+        scope: manifestData.intent?.scope || 'mixed',
+        description: manifestData.intent?.description || ''
+      },
+      dependencies: {
+        nodeTypes: Array.isArray(manifestData.dependencies?.nodeTypes) ? manifestData.dependencies.nodeTypes : [],
+        portContracts: Array.isArray(manifestData.dependencies?.portContracts) ? manifestData.dependencies.portContracts : [],
+        skills: Array.isArray(manifestData.dependencies?.skills) ? manifestData.dependencies.skills : [],
+        optional: Array.isArray(manifestData.dependencies?.optional) ? manifestData.dependencies.optional : []
+      }
+    });
+    const legendData = legendInfo.node?.data || {};
+    setLegendDraft({
+      entries: Array.isArray(legendData.entries) ? legendData.entries.map((entry) => ({ ...entry })) : []
+    });
+    const dictData = dictionaryInfo.node?.data || {};
+    setDictionaryDraft({
+      nodeDefs: Array.isArray(dictData.nodeDefs) ? dictData.nodeDefs.map((entry) => ({ ...entry })) : [],
+      skills: Array.isArray(dictData.skills) ? dictData.skills.map((entry) => ({ ...entry })) : [],
+      views: Array.isArray(dictData.views) ? dictData.views.map((entry) => ({ ...entry })) : []
+    });
+    setManifestError('');
+    setLegendError('');
+    setDictionaryError('');
+  }, [open, manifestInfo.node?.id, legendInfo.node?.id, dictionaryInfo.node?.id]);
 
   const contractSummary = useMemo(() => {
     return summarizeContracts({ nodes, edges, documentSettings });
@@ -406,6 +541,37 @@ export default function DocumentPropertiesDialog({
   const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
   const sectionSpacing = 3;
 
+  const applySystemNodeData = useCallback((type, data, setError, defaultsRef) => {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      setError('Data must be an object');
+      return;
+    }
+    setError('');
+    if (typeof setNodes !== 'function') return;
+    setNodes((prev = []) => {
+      const existing = findSystemNode(prev, type);
+      if (existing) {
+        return prev.map((node) =>
+          node?.id === existing.id
+            ? { ...node, data }
+            : node
+        );
+      }
+      const template = defaultsRef.current;
+      const materialized = { ...template, data };
+      return [...prev, materialized];
+    });
+  }, [setNodes]);
+
+  const materializeSystemNode = useCallback((type, defaultsRef) => {
+    if (typeof setNodes !== 'function') return;
+    setNodes((prev = []) => {
+      const existing = findSystemNode(prev, type);
+      if (existing) return prev;
+      return [...prev, defaultsRef.current];
+    });
+  }, [setNodes]);
+
   return (
     <Dialog
       open={open}
@@ -431,6 +597,7 @@ export default function DocumentPropertiesDialog({
           sx={{ px: isMobile ? 1 : 3, borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab label="Overview" value="overview" />
+          <Tab label="System Nodes" value="system" />
           <Tab label="Activity" value="activity" />
           <Tab label="Appearance" value="appearance" />
           <Tab label="GitHub" value="github" />
@@ -572,6 +739,737 @@ export default function DocumentPropertiesDialog({
                 </Typography>
               </Box>
             </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'system' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Typography variant="body2" color="text.secondary">
+              System nodes are grouped below. Expand only what you need while editing.
+            </Typography>
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="subtitle1">Manifest</Typography>
+                  <Chip
+                    size="small"
+                    label={manifestInfo.implicit ? 'Implicit' : 'Explicit'}
+                    color={manifestInfo.implicit ? 'warning' : 'success'}
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    If missing, a fragment import uses implicit defaults until materialized.
+                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle2">Identity</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        <TextField
+                          label="Graph ID"
+                          value={manifestDraft.identity.graphId}
+                          onChange={(event) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              identity: { ...prev.identity, graphId: event.target.value }
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Name"
+                          value={manifestDraft.identity.name}
+                          onChange={(event) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              identity: { ...prev.identity, name: event.target.value }
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Version"
+                          value={manifestDraft.identity.version}
+                          onChange={(event) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              identity: { ...prev.identity, version: event.target.value }
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Description"
+                          value={manifestDraft.identity.description}
+                          onChange={(event) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              identity: { ...prev.identity, description: event.target.value }
+                            }))
+                          }
+                          multiline
+                          minRows={2}
+                          fullWidth
+                        />
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle2">Intent</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+                          <TextField
+                            label="Kind"
+                            value={manifestDraft.intent.kind}
+                            onChange={(event) =>
+                              setManifestDraft((prev) => ({
+                                ...prev,
+                                intent: { ...prev.intent, kind: event.target.value }
+                              }))
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            label="Scope"
+                            value={manifestDraft.intent.scope}
+                            onChange={(event) =>
+                              setManifestDraft((prev) => ({
+                                ...prev,
+                                intent: { ...prev.intent, scope: event.target.value }
+                              }))
+                            }
+                            fullWidth
+                          />
+                        </Stack>
+                        <TextField
+                          label="Intent description"
+                          value={manifestDraft.intent.description}
+                          onChange={(event) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              intent: { ...prev.intent, description: event.target.value }
+                            }))
+                          }
+                          multiline
+                          minRows={2}
+                          fullWidth
+                        />
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle2">Dependencies</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        <StringListEditor
+                          label="Node types"
+                          items={manifestDraft.dependencies.nodeTypes}
+                          onChange={(next) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              dependencies: { ...prev.dependencies, nodeTypes: next }
+                            }))
+                          }
+                        />
+                        <StringListEditor
+                          label="Port contracts"
+                          items={manifestDraft.dependencies.portContracts}
+                          onChange={(next) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              dependencies: { ...prev.dependencies, portContracts: next }
+                            }))
+                          }
+                        />
+                        <StringListEditor
+                          label="Skills"
+                          items={manifestDraft.dependencies.skills}
+                          onChange={(next) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              dependencies: { ...prev.dependencies, skills: next }
+                            }))
+                          }
+                        />
+                        <StringListEditor
+                          label="Optional"
+                          items={manifestDraft.dependencies.optional}
+                          onChange={(next) =>
+                            setManifestDraft((prev) => ({
+                              ...prev,
+                              dependencies: { ...prev.dependencies, optional: next }
+                            }))
+                          }
+                        />
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Stack direction="row" spacing={1}>
+                    {manifestInfo.implicit && (
+                      <Button
+                        variant="outlined"
+                        onClick={() => materializeSystemNode('manifest', implicitManifestRef)}
+                      >
+                        Materialize
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        applySystemNodeData(
+                          'manifest',
+                          {
+                            ...(manifestInfo.node?.data || {}),
+                            identity: manifestDraft.identity,
+                            intent: manifestDraft.intent,
+                            dependencies: manifestDraft.dependencies
+                          },
+                          setManifestError,
+                          implicitManifestRef
+                        )
+                      }
+                    >
+                      Apply
+                    </Button>
+                  </Stack>
+                  {manifestError && (
+                    <Typography variant="caption" color="error">
+                      {manifestError}
+                    </Typography>
+                  )}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="subtitle1">Legend</Typography>
+                  <Chip
+                    size="small"
+                    label={legendInfo.implicit ? 'Implicit' : 'Explicit'}
+                    color={legendInfo.implicit ? 'warning' : 'success'}
+                  />
+                  <Chip size="small" label={`${legendCount} entries`} variant="outlined" />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={2}>
+                  {legendDraft.entries.map((entry, index) => (
+                    <Paper key={`legend-${index}`} variant="outlined" sx={{ p: 2 }}>
+                      <Stack spacing={2}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography variant="subtitle2">Entry {index + 1}</Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              setLegendDraft((prev) => ({
+                                ...prev,
+                                entries: prev.entries.filter((_, i) => i !== index)
+                              }))
+                            }
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                        <TextField
+                          label="Key"
+                          value={entry.key || ''}
+                          onChange={(event) =>
+                            setLegendDraft((prev) => ({
+                              ...prev,
+                              entries: prev.entries.map((item, i) =>
+                                i === index ? { ...item, key: event.target.value } : item
+                              )
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Intent"
+                          value={entry.intent || ''}
+                          onChange={(event) =>
+                            setLegendDraft((prev) => ({
+                              ...prev,
+                              entries: prev.entries.map((item, i) =>
+                                i === index ? { ...item, intent: event.target.value } : item
+                              )
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Implementation"
+                          value={entry.implementation || ''}
+                          onChange={(event) =>
+                            setLegendDraft((prev) => ({
+                              ...prev,
+                              entries: prev.entries.map((item, i) =>
+                                i === index ? { ...item, implementation: event.target.value } : item
+                              )
+                            }))
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label="Dictionary key"
+                          value={entry.dictionaryKey || ''}
+                          onChange={(event) =>
+                            setLegendDraft((prev) => ({
+                              ...prev,
+                              entries: prev.entries.map((item, i) =>
+                                i === index ? { ...item, dictionaryKey: event.target.value } : item
+                              )
+                            }))
+                          }
+                          fullWidth
+                        />
+                      </Stack>
+                    </Paper>
+                  ))}
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      setLegendDraft((prev) => ({
+                        ...prev,
+                        entries: [
+                          ...prev.entries,
+                          { key: '', intent: '', implementation: '', dictionaryKey: '' }
+                        ]
+                      }))
+                    }
+                  >
+                    Add Legend Entry
+                  </Button>
+                </Stack>
+                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                  {legendInfo.implicit && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => materializeSystemNode('legend', implicitLegendRef)}
+                    >
+                      Materialize
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      applySystemNodeData(
+                        'legend',
+                        { ...(legendInfo.node?.data || {}), entries: legendDraft.entries },
+                        setLegendError,
+                        implicitLegendRef
+                      )
+                    }
+                  >
+                    Apply
+                  </Button>
+                </Stack>
+                {legendError && (
+                  <Typography variant="caption" color="error">
+                    {legendError}
+                  </Typography>
+                )}
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="subtitle1">Dictionary</Typography>
+                  <Chip
+                    size="small"
+                    label={dictionaryInfo.implicit ? 'Implicit' : 'Explicit'}
+                    color={dictionaryInfo.implicit ? 'warning' : 'success'}
+                  />
+                  <Chip
+                    size="small"
+                    label={`${dictionaryCounts.nodeDefs} defs · ${dictionaryCounts.skills} skills · ${dictionaryCounts.views} views`}
+                    variant="outlined"
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={2}>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="subtitle2">Node Definitions</Typography>
+                        <Chip size="small" label={`${dictionaryCounts.nodeDefs}`} variant="outlined" />
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        {dictionaryDraft.nodeDefs.map((entry, index) => (
+                          <Paper key={`nodeDef-${index}`} variant="outlined" sx={{ p: 2 }}>
+                            <Stack spacing={2}>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="subtitle2">Entry {index + 1}</Typography>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      nodeDefs: prev.nodeDefs.filter((_, i) => i !== index)
+                                    }))
+                                  }
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Stack>
+                              <TextField
+                                label="Key"
+                                value={entry.key || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    nodeDefs: prev.nodeDefs.map((item, i) =>
+                                      i === index ? { ...item, key: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <TextField
+                                label="Ref"
+                                value={entry.ref || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    nodeDefs: prev.nodeDefs.map((item, i) =>
+                                      i === index ? { ...item, ref: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+                                <TextField
+                                  label="Version"
+                                  value={entry.version || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      nodeDefs: prev.nodeDefs.map((item, i) =>
+                                        i === index ? { ...item, version: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                                <TextField
+                                  label="Source"
+                                  value={entry.source || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      nodeDefs: prev.nodeDefs.map((item, i) =>
+                                        i === index ? { ...item, source: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                              </Stack>
+                            </Stack>
+                          </Paper>
+                        ))}
+                        <Button
+                          variant="outlined"
+                          onClick={() =>
+                            setDictionaryDraft((prev) => ({
+                              ...prev,
+                              nodeDefs: [
+                                ...prev.nodeDefs,
+                                { key: '', ref: '', version: '', source: '' }
+                              ]
+                            }))
+                          }
+                        >
+                          Add Node Definition
+                        </Button>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="subtitle2">Skills</Typography>
+                        <Chip size="small" label={`${dictionaryCounts.skills}`} variant="outlined" />
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        {dictionaryDraft.skills.map((entry, index) => (
+                          <Paper key={`skill-${index}`} variant="outlined" sx={{ p: 2 }}>
+                            <Stack spacing={2}>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="subtitle2">Entry {index + 1}</Typography>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      skills: prev.skills.filter((_, i) => i !== index)
+                                    }))
+                                  }
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Stack>
+                              <TextField
+                                label="Key"
+                                value={entry.key || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    skills: prev.skills.map((item, i) =>
+                                      i === index ? { ...item, key: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <TextField
+                                label="Ref"
+                                value={entry.ref || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    skills: prev.skills.map((item, i) =>
+                                      i === index ? { ...item, ref: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+                                <TextField
+                                  label="Version"
+                                  value={entry.version || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      skills: prev.skills.map((item, i) =>
+                                        i === index ? { ...item, version: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                                <TextField
+                                  label="Source"
+                                  value={entry.source || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      skills: prev.skills.map((item, i) =>
+                                        i === index ? { ...item, source: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                              </Stack>
+                            </Stack>
+                          </Paper>
+                        ))}
+                        <Button
+                          variant="outlined"
+                          onClick={() =>
+                            setDictionaryDraft((prev) => ({
+                              ...prev,
+                              skills: [
+                                ...prev.skills,
+                                { key: '', ref: '', version: '', source: '' }
+                              ]
+                            }))
+                          }
+                        >
+                          Add Skill
+                        </Button>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="subtitle2">Views</Typography>
+                        <Chip size="small" label={`${dictionaryCounts.views}`} variant="outlined" />
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2}>
+                        {dictionaryDraft.views.map((entry, index) => (
+                          <Paper key={`view-${index}`} variant="outlined" sx={{ p: 2 }}>
+                            <Stack spacing={2}>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="subtitle2">Entry {index + 1}</Typography>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      views: prev.views.filter((_, i) => i !== index)
+                                    }))
+                                  }
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Stack>
+                              <TextField
+                                label="Key"
+                                value={entry.key || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    views: prev.views.map((item, i) =>
+                                      i === index ? { ...item, key: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+                                <TextField
+                                  label="Intent"
+                                  value={entry.intent || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      views: prev.views.map((item, i) =>
+                                        i === index ? { ...item, intent: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                                <TextField
+                                  label="Payload"
+                                  value={entry.payload || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      views: prev.views.map((item, i) =>
+                                        i === index ? { ...item, payload: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                              </Stack>
+                              <TextField
+                                label="Ref"
+                                value={entry.ref || ''}
+                                onChange={(event) =>
+                                  setDictionaryDraft((prev) => ({
+                                    ...prev,
+                                    views: prev.views.map((item, i) =>
+                                      i === index ? { ...item, ref: event.target.value } : item
+                                    )
+                                  }))
+                                }
+                                fullWidth
+                              />
+                              <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+                                <TextField
+                                  label="Version"
+                                  value={entry.version || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      views: prev.views.map((item, i) =>
+                                        i === index ? { ...item, version: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                                <TextField
+                                  label="Source"
+                                  value={entry.source || ''}
+                                  onChange={(event) =>
+                                    setDictionaryDraft((prev) => ({
+                                      ...prev,
+                                      views: prev.views.map((item, i) =>
+                                        i === index ? { ...item, source: event.target.value } : item
+                                      )
+                                    }))
+                                  }
+                                  fullWidth
+                                />
+                              </Stack>
+                            </Stack>
+                          </Paper>
+                        ))}
+                        <Button
+                          variant="outlined"
+                          onClick={() =>
+                            setDictionaryDraft((prev) => ({
+                              ...prev,
+                              views: [
+                                ...prev.views,
+                                { key: '', intent: '', payload: '', ref: '', version: '', source: '' }
+                              ]
+                            }))
+                          }
+                        >
+                          Add View
+                        </Button>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Stack direction="row" spacing={1}>
+                    {dictionaryInfo.implicit && (
+                      <Button
+                        variant="outlined"
+                        onClick={() => materializeSystemNode('dictionary', implicitDictionaryRef)}
+                      >
+                        Materialize
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        applySystemNodeData(
+                          'dictionary',
+                          {
+                            ...(dictionaryInfo.node?.data || {}),
+                            nodeDefs: dictionaryDraft.nodeDefs,
+                            skills: dictionaryDraft.skills,
+                            views: dictionaryDraft.views
+                          },
+                          setDictionaryError,
+                          implicitDictionaryRef
+                        )
+                      }
+                    >
+                      Apply
+                    </Button>
+                  </Stack>
+                  {dictionaryError && (
+                    <Typography variant="caption" color="error">
+                      {dictionaryError}
+                    </Typography>
+                  )}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
           </Stack>
         )}
 

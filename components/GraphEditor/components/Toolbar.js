@@ -623,7 +623,7 @@ const Toolbar = ({
 
   const handleCopyOnboard = async () => {
     try {
-      const resp = await fetch('/documentation/OnboardLLM.md');
+      const resp = await fetch('/library/documentation/OnboardLLM.md');
       let text;
       if (resp.ok) text = await resp.text(); else text = 'OnboardLLM.md not available.';
       await navigator.clipboard.writeText(text);
