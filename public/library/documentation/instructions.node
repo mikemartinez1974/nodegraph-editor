@@ -3,30 +3,32 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-10T15:37:16.398Z",
-    "modified": "2026-02-10T15:37:19.879Z",
+    "created": "2026-02-12T16:46:37.586Z",
+    "modified": "2026-02-12T16:46:40.600Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
-      "id": "b0dbd9fc-04ab-4e4c-9d72-4e96f5d1d9b3",
-      "label": "Manifest",
+      "id": "ad1bc401-51fc-42a7-83b4-01a30793fc78",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "ad26b57b-d277-4228-a69d-0f94fef677f0",
-          "name": "Instructions",
+          "graphId": "163e3d23-9cfb-45ed-8fc6-527d7b338162",
+          "name": "Untitled Graph",
           "version": "0.1.0",
           "description": "",
-          "createdAt": "2026-02-12T17:26:06.002Z",
-          "updatedAt": "2026-02-12T17:26:06.002Z"
+          "createdAt": "2026-02-11T18:25:56.571Z",
+          "updatedAt": "2026-02-11T18:25:56.571Z"
         },
         "intent": {
           "kind": "graph",
@@ -79,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -87,6 +107,104 @@
           },
           "autoSave": false
         }
+      }
+    },
+    {
+      "id": "fc7d456e-1d0c-497c-af92-6687e944dc2b",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -267.14121892134773,
+        "y": 335.87148107251517
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "default",
+            "intent": "placeholder",
+            "implementation": "default renderer",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\\n- default: placeholder"
+      }
+    },
+    {
+      "id": "26990693-a5cf-4a4b-b646-96777692fe8f",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -260,
+        "y": 100
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "external"
+          }
+        ],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
+      "type": "node",
+      "label": "node",
+      "position": {
+        "x": 164.5940651920355,
+        "y": -162.78729659824154
+      },
+      "width": 471.25,
+      "height": 271.25,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# The Library\n\n ---\n\nHere you can find links to the various classes and contracts that make all of this possible."
+      }
+    },
+    {
+      "id": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "type": "port",
+      "label": "Port",
+      "position": {
+        "x": 708.4325016036811,
+        "y": 35.307266915923464
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "https://twilite.zone/library/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
       }
     },
     {
@@ -192,55 +310,55 @@
       "type": "governs",
       "source": "onboarding-root",
       "target": "onboarding-mindset",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-howto",
       "type": "governs",
       "source": "onboarding-root",
       "target": "onboarding-howto",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-continuity",
       "type": "governs",
       "source": "onboarding-root",
       "target": "onboarding-continuity",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-firststeps",
       "type": "governs",
       "source": "onboarding-root",
       "target": "onboarding-firststeps",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-oath",
       "type": "governs",
       "source": "onboarding-root",
       "target": "onboarding-oath",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

@@ -1,86 +1,44 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-11-01T06:17:14.152Z",
-    "modified": "2025-11-01T06:17:14.152Z",
+    "created": "2026-02-12T17:21:45.515Z",
+    "modified": "2026-02-12T17:21:47.603Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "primary": "#1976d2",
-      "primaryContrast": "#fff",
-      "secondary": "#dc004e",
-      "secondaryContrast": "#fff",
-      "background": "#e8eaf6",
-      "paper": "#ffffff",
-      "textPrimary": "rgba(0, 0, 0, 0.87)",
-      "textSecondary": "rgba(0, 0, 0, 0.6)",
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 445.3669724770642,
-      "y": 326.2798165137615
-    },
-    "zoom": 0.673394495412844
-  },
-  "document": null,
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
   "nodes": [
     {
-      "id": "1c1e0753-265d-4de7-a79c-0656886239d6",
-      "label": "Manifest",
+      "id": "bfab02d2-885a-4c93-a3c6-791a1f6855e7",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
-        "x": -260,
-        "y": -160
+        "x": -353.72005477358175,
+        "y": -523.375091192858
       },
-      "width": 360,
-      "height": 220,
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
       "data": {
+        "memo": "",
+        "link": "",
         "identity": {
-          "graphId": "3fe7dea8-6167-458d-9455-56f917b4c91e",
-          "name": "MergeWithVR",
+          "graphId": "",
+          "name": "",
           "version": "0.1.0",
           "description": "",
-          "createdAt": "2026-02-12T17:26:06.187Z",
-          "updatedAt": "2026-02-12T17:26:06.187Z"
+          "createdAt": "",
+          "updatedAt": ""
         },
         "intent": {
-          "kind": "graph",
-          "scope": "mixed"
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
         },
         "dependencies": {
-          "nodeTypes": [
-            "manifest",
-            "legend",
-            "dictionary",
-            "default",
-            "markdown"
-          ],
+          "nodeTypes": [],
           "portContracts": [
             "core"
           ],
@@ -95,8 +53,8 @@
           "mutation": {
             "allowCreate": true,
             "allowUpdate": true,
-            "allowDelete": true,
-            "appendOnly": false
+            "allowDelete": false,
+            "appendOnly": true
           },
           "actors": {
             "humans": true,
@@ -109,9 +67,8 @@
             "squashAllowed": false
           }
         },
-        "document": {
-          "url": ""
-        },
+        "html": "",
+        "svg": "",
         "settings": {
           "theme": null,
           "backgroundImage": null,
@@ -120,14 +77,401 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
             "branch": "main"
           },
           "autoSave": false
+        },
+        "document": {
+          "url": ""
         }
+      }
+    },
+    {
+      "id": "d7066f3d-7601-4def-ad01-7ff8d1fe332e",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -363.8084027923917,
+        "y": 81.89621281048397
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "entries": [
+          {
+            "key": "concept",
+            "intent": "what it means",
+            "implementation": "how it appears",
+            "dictionaryKey": "concept"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "12c2e7b7-6c26-4571-ba2f-adef854a0a8a",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -752.4178724686369,
+        "y": -24.056712636199922
+      },
+      "width": 346,
+      "height": 488,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "nodeDefs": [
+          {
+            "key": "default",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "default",
+            "intent": "node",
+            "payload": "twilite.web",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "central",
+      "type": "markdown",
+      "label": "Node Graph as Content Network 🌐📦",
+      "position": {
+        "x": 210.1469304547285,
+        "y": 153.9836834668957
+      },
+      "width": 350,
+      "height": 220,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Node Graph = Content Network\n\nImagine a graph where **nodes hold content** (text, data, links) and **edges weave relationships**. It's a living web of ideas:\n\n- **Nodes**: Vessels for knowledge chunks.\n- **Edges**: Threads connecting meaning.\n- **Network**: Emergent understanding.\n\nThis self-describes: Each node below is content about this structure! 🔄"
+      }
+    },
+    {
+      "id": "nodes-content",
+      "type": "markdown",
+      "label": "Nodes: Content Containers 🗃️",
+      "position": {
+        "x": 400,
+        "y": -150
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#4CAF50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Nodes Hold the Stuff\n\nNodes aren't just dots—they're **containers**:\n- **Text/Markdown**: Stories, notes, code.\n- **Data**: APIs, timers, scripts injecting live content.\n- **Visuals**: SVGs, images as embedded media.\n\nExample: This node contains *this* explanation. Infinite nesting? Why not! 📜"
+      }
+    },
+    {
+      "id": "edges-links",
+      "type": "markdown",
+      "label": "Edges: Relationship Weavers 🧵",
+      "position": {
+        "x": 711.946250630712,
+        "y": 138.34491931404247
+      },
+      "width": 260,
+      "height": 160,
+      "color": "#FF9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Edges Connect the Dots\n\nEdges transform isolated content into a **network**:\n- **Types**: Flows (data), hierarchies (parent-child), peers (equals).\n- **Labels**: 'Depends On', 'Inspires', 'Links To'.\n- **Styles**: Colors for categories, animations for dynamics.\n\nWithout edges, nodes are a pile; with them, a tapestry. 🎨"
+      }
+    },
+    {
+      "id": "network-emergence",
+      "type": "markdown",
+      "label": "Network: Emergent Knowledge 🌱",
+      "position": {
+        "x": -427.42001306814973,
+        "y": 72.18801829540962
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#9C27B0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# The Whole > Sum of Parts\n\nA node graph births **emergence**:\n- **Patterns**: Clusters reveal themes.\n- **Flows**: Trace ideas from source to insight.\n- **Scalability**: Add nodes/edges; the network grows smarter.\n\nMeta: This graph *is* its own emergent content network. Zoom out—what do you see? 🔍"
+      }
+    },
+    {
+      "id": "self-reflect",
+      "type": "markdown",
+      "label": "Self-Reference Loop ♾️",
+      "position": {
+        "x": -125.99040740578451,
+        "y": 381.2321937482459
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#F44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# It's About Itself\n\nThis graph **embodies** the concept:\n- Central node: The thesis.\n- Branches: Explains components.\n- Loop back: Reflects on the reflection.\n\nAdd your content: Paste new nodes to evolve the network. What's your twist? 🤔"
+      }
+    },
+    {
+      "id": "examples-meta",
+      "type": "markdown",
+      "label": "Examples in the Wild 🌍",
+      "position": {
+        "x": -244.66603005674438,
+        "y": -191.26099411933262
+      },
+      "width": 220,
+      "height": 140,
+      "color": "#FFC107",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Real Networks\n\n- **Wiki**: Pages (nodes) hyperlinked (edges).\n- **Blockchain**: Blocks chained by hashes.\n- **Social Media**: Posts connected by shares.\n- **Your Brain**: Neurons firing networks of thought.\n\nAll node graphs at heart! 🧠"
+      }
+    },
+    {
+      "id": "header",
+      "type": "markdown",
+      "label": "📂 tlz/node_intro",
+      "position": {
+        "x": 0,
+        "y": -200
+      },
+      "width": 600,
+      "height": 100,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Index of tlz/node_intro\nExplore the nodegraphs in this directory."
+      }
+    },
+    {
+      "id": "back",
+      "type": "default",
+      "label": "⬅️ Back to Parent",
+      "position": {
+        "x": -300,
+        "y": -200
+      },
+      "width": 180,
+      "height": 60,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "link": "tlz:///tlz/index.node"
+      }
+    },
+    {
+      "id": "node-0",
+      "type": "default",
+      "label": "content_network",
+      "position": {
+        "x": -330,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "link": "tlz:///tlz/node_intro/content_network.node"
+      }
+    },
+    {
+      "id": "node-1",
+      "type": "default",
+      "label": "introduction",
+      "position": {
+        "x": -110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "link": "tlz:///tlz/node_intro/introduction.node"
+      }
+    },
+    {
+      "id": "node-2",
+      "type": "default",
+      "label": "mergeWithVR",
+      "position": {
+        "x": 110,
+        "y": 0
+      },
+      "width": 200,
+      "height": 80,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "link": "tlz:///tlz/node_intro/mergeWithVR.node"
+      }
+    },
+    {
+      "id": "title",
+      "type": "markdown",
+      "label": "An Introduction to Node Graphs 🌐",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "width": 400,
+      "height": 200,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# An Introduction to Node Graphs\n\nNode graphs are visual diagrams that represent complex information as interconnected nodes and edges. They're powerful for brainstorming, planning, and modeling systems.\n\n**Why use them?** Easy to understand relationships at a glance!\n\nExplore below 👇"
+      }
+    },
+    {
+      "id": "what-is",
+      "type": "markdown",
+      "label": "What is a Node Graph? ❓",
+      "position": {
+        "x": 500,
+        "y": -100
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#2196F3",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# What is It?\n\nA **node graph** (or graph diagram) consists of:\n- **Nodes**: Represent entities, ideas, or steps.\n- **Edges**: Show connections or flows between nodes.\n\nLike a mind map, but more structured for data or processes.\n\n*Example*: A family tree or software architecture."
+      }
+    },
+    {
+      "id": "history",
+      "type": "markdown",
+      "label": "A Brief History 📜",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#FF9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# History\n\n- **1960s**: Graph theory in computer science (e.g., flowcharts).\n- **1980s**: Rise with UML diagrams.\n- **2000s+**: Tools like Graphviz, Node-RED for workflows.\n- **Today**: Web apps like this one for collaborative editing!\n\nEvolved from math to everyday tools."
+      }
+    },
+    {
+      "id": "components",
+      "type": "markdown",
+      "label": "Key Components 🧩",
+      "position": {
+        "x": -570,
+        "y": -160
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#4CAF50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Components\n\n1. **Nodes**: Boxes with labels (e.g., tasks, data).\n   - Types: Text, Markdown, API calls.\n2. **Edges**: Lines connecting nodes.\n   - Types: Straight, curved, directed.\n3. **Clusters**: Containers to organize clusters.\n\nColors and sizes enhance visuals!"
+      }
+    },
+    {
+      "id": "uses",
+      "type": "markdown",
+      "label": "Common Uses 🎯",
+      "position": {
+        "x": -549,
+        "y": 187
+      },
+      "width": 260,
+      "height": 160,
+      "color": "#9C27B0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Uses\n\n- **Mind Mapping**: Brainstorm ideas.\n- **Workflows**: Plan processes (e.g., DevOps).\n- **Data Viz**: Show networks or dependencies.\n- **Storyboarding**: Narratives or games.\n- **Education**: Teach concepts visually.\n\nVersatile for pros and beginners!"
+      }
+    },
+    {
+      "id": "building",
+      "type": "markdown",
+      "label": "How to Build One 🛠️",
+      "position": {
+        "x": 0,
+        "y": 300
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#F44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Building Steps\n\n1. **Start Central**: Add a main idea node.\n2. **Branch Out**: Connect related nodes.\n3. **Refine**: Adjust positions, labels, colors.\n4. **Cluster & Style**: Organize and beautify.\n5. **Iterate**: Add/remove as needed.\n\nTools like Copy/Paste w/ Me make it drag-and-drop easy!"
+      }
+    },
+    {
+      "id": "examples",
+      "type": "markdown",
+      "label": "Real-World Examples 💡",
+      "position": {
+        "x": 500,
+        "y": 400
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#FFC107",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Examples\n\n- **Project Management**: Gantt-like dependencies.\n- **Knowledge Base**: Wiki-style links.\n- **API Flows**: Sequence of calls.\n- **Halloween Planning**: Costumes → Party → Treats (spooky fun!).\n\nTry adapting one to your needs!"
       }
     },
     {
@@ -216,7 +560,7 @@
       }
     },
     {
-      "id": "examples",
+      "id": "b9d6492b-393f-47ba-9c33-bc4f474f8d70",
       "type": "markdown",
       "label": "Real & Hypothetical Examples 💡",
       "position": {
@@ -235,55 +579,272 @@
   ],
   "edges": [
     {
+      "id": "e-central-nodes",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "nodes-content",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Contains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-central-edges",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "edges-links",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Connects Via",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-central-network",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "network-emergence",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Forms",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-network-self",
+      "type": "bidirectional",
+      "source": "network-emergence",
+      "target": "self-reflect",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Reflects",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-self-examples",
+      "type": "peer",
+      "source": "self-reflect",
+      "target": "examples-meta",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Like",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-examples-central",
+      "type": "reference",
+      "source": "examples-meta",
+      "target": "central",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Exemplifies",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-title-what",
+      "type": "child",
+      "source": "title",
+      "target": "what-is",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Define",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-title-history",
+      "type": "child",
+      "source": "what-is",
+      "target": "history",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Evolved From",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-title-components",
+      "type": "child",
+      "source": "title",
+      "target": "components",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Building Blocks",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-title-uses",
+      "type": "peer",
+      "source": "components",
+      "target": "uses",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Applied In",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-title-building",
+      "type": "child",
+      "source": "title",
+      "target": "building",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Create Your Own",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-building-examples",
+      "type": "child",
+      "source": "building",
+      "target": "examples",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "See In Action",
+      "style": {},
+      "data": {}
+    },
+    {
       "id": "e-central-immersion",
       "type": "dataFlow",
       "source": "central-vr-content",
       "target": "immersion",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Enables",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-central-collab",
       "type": "dataFlow",
       "source": "central-vr-content",
       "target": "collaboration",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Facilitates",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-central-apps",
       "type": "dataFlow",
       "source": "central-vr-content",
       "target": "applications",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Unlocks",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-apps-challenges",
       "type": "dependency",
       "source": "applications",
       "target": "challenges",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "But Faces",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
       "id": "e-challenges-examples",
       "type": "peer",
       "source": "challenges",
-      "target": "examples",
+      "target": "b9d6492b-393f-47ba-9c33-bc4f474f8d70",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Inspires",
-      "style": {}
+      "style": {},
+      "data": {}
     },
     {
-      "id": "e-examples-central",
+      "id": "ef1e2200-ed14-4fbd-bef4-b5bf22ce0608",
       "type": "bidirectional",
-      "source": "examples",
+      "source": "b9d6492b-393f-47ba-9c33-bc4f474f8d70",
       "target": "central-vr-content",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Loops Back",
-      "style": {}
+      "style": {},
+      "data": {}
     }
   ],
   "clusters": [
+    {
+      "id": "group-structure",
+      "label": "Core Structure 🏗️",
+      "nodeIds": [
+        "nodes-content",
+        "edges-links",
+        "network-emergence"
+      ],
+      "bounds": {
+        "x": -447.42001306814973,
+        "y": -170,
+        "width": 1439.3662636988618,
+        "height": 488.3449193140425
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group-meta",
+      "label": "Meta Layer 🔄",
+      "nodeIds": [
+        "self-reflect",
+        "examples-meta"
+      ],
+      "bounds": {
+        "x": -264.6660300567444,
+        "y": -211.26099411933262,
+        "width": 408.6756226509599,
+        "height": 762.4931878675785
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group-basics",
+      "label": "Basics 📚",
+      "nodeIds": [
+        "what-is",
+        "history",
+        "components"
+      ],
+      "bounds": {
+        "x": -590,
+        "y": -180,
+        "width": 1390,
+        "height": 550
+      },
+      "visible": false,
+      "style": {}
+    },
+    {
+      "id": "group-applications",
+      "label": "Applications 🚀",
+      "nodeIds": [
+        "uses",
+        "building",
+        "examples"
+      ],
+      "bounds": {
+        "x": -569,
+        "y": 167,
+        "width": 1339,
+        "height": 403
+      },
+      "visible": false,
+      "style": {}
+    },
     {
       "id": "group-benefits",
       "label": "Benefits & Powers 💪",
@@ -293,10 +854,10 @@
         "applications"
       ],
       "bounds": {
-        "x": -570,
-        "y": -260,
-        "width": 1130,
-        "height": 510
+        "x": -420,
+        "y": -170,
+        "width": 1120,
+        "height": 500
       },
       "visible": true,
       "style": {}
@@ -306,13 +867,13 @@
       "label": "Challenges & Visions 🔮",
       "nodeIds": [
         "challenges",
-        "examples"
+        "b9d6492b-393f-47ba-9c33-bc4f474f8d70"
       ],
       "bounds": {
-        "x": -345,
-        "y": -295,
-        "width": 505,
-        "height": 705
+        "x": -220,
+        "y": -220,
+        "width": 520,
+        "height": 720
       },
       "visible": true,
       "style": {}

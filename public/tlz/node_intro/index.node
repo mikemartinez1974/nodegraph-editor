@@ -1,65 +1,44 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Index of tlz/node_intro",
-    "created": "2025-12-30T18:29:23.780Z",
-    "modified": "2025-12-30T18:29:23.780Z"
-  },
-  "settings": {
-    "theme": {
-      "mode": "dark",
-      "primary": {
-        "main": "#1976d2"
-      },
-      "background": {
-        "default": "#121212",
-        "paper": "#1e1e1e"
-      },
-      "text": {
-        "primary": "#ffffff",
-        "secondary": "rgba(255, 255, 255, 0.7)"
-      }
-    }
-  },
-  "viewport": {
-    "pan": {
-      "x": 400,
-      "y": 300
-    },
-    "zoom": 0.8
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-12T17:09:29.117Z",
+    "modified": "2026-02-12T17:09:31.983Z",
+    "author": "",
+    "tags": []
   },
   "nodes": [
     {
-      "id": "b6e409b2-d63f-4ac1-b638-65229a51a8c2",
-      "label": "Manifest",
+      "id": "bfab02d2-885a-4c93-a3c6-791a1f6855e7",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
-        "x": -260,
-        "y": -160
+        "x": -353.72005477358175,
+        "y": -523.375091192858
       },
-      "width": 360,
-      "height": 220,
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
       "data": {
+        "memo": "",
+        "link": "",
         "identity": {
-          "graphId": "64367f86-8239-4ed6-a2d9-28016953e0fe",
-          "name": "Index",
+          "graphId": "",
+          "name": "",
           "version": "0.1.0",
           "description": "",
-          "createdAt": "2026-02-12T17:26:06.171Z",
-          "updatedAt": "2026-02-12T17:26:06.171Z"
+          "createdAt": "",
+          "updatedAt": ""
         },
         "intent": {
-          "kind": "graph",
-          "scope": "mixed"
+          "kind": "documentation",
+          "scope": "mixed",
+          "description": ""
         },
         "dependencies": {
-          "nodeTypes": [
-            "manifest",
-            "legend",
-            "dictionary",
-            "default",
-            "markdown"
-          ],
+          "nodeTypes": [],
           "portContracts": [
             "core"
           ],
@@ -74,8 +53,8 @@
           "mutation": {
             "allowCreate": true,
             "allowUpdate": true,
-            "allowDelete": true,
-            "appendOnly": false
+            "allowDelete": false,
+            "appendOnly": true
           },
           "actors": {
             "humans": true,
@@ -88,9 +67,8 @@
             "squashAllowed": false
           }
         },
-        "document": {
-          "url": ""
-        },
+        "html": "",
+        "svg": "",
         "settings": {
           "theme": null,
           "backgroundImage": null,
@@ -99,14 +77,202 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
             "branch": "main"
           },
           "autoSave": false
+        },
+        "document": {
+          "url": ""
         }
+      }
+    },
+    {
+      "id": "d7066f3d-7601-4def-ad01-7ff8d1fe332e",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -363.8084027923917,
+        "y": 81.89621281048397
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "entries": [
+          {
+            "key": "concept",
+            "intent": "what it means",
+            "implementation": "how it appears",
+            "dictionaryKey": "concept"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "12c2e7b7-6c26-4571-ba2f-adef854a0a8a",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -752.4178724686369,
+        "y": -24.056712636199922
+      },
+      "width": 346,
+      "height": 488,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "nodeDefs": [
+          {
+            "key": "default",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "default",
+            "intent": "node",
+            "payload": "twilite.web",
+            "ref": "",
+            "source": "local",
+            "version": ">=1.0.0"
+          }
+        ],
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "central",
+      "type": "markdown",
+      "label": "Node Graph as Content Network 🌐📦",
+      "position": {
+        "x": 210.1469304547285,
+        "y": 153.9836834668957
+      },
+      "width": 350,
+      "height": 220,
+      "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Node Graph = Content Network\n\nImagine a graph where **nodes hold content** (text, data, links) and **edges weave relationships**. It's a living web of ideas:\n\n- **Nodes**: Vessels for knowledge chunks.\n- **Edges**: Threads connecting meaning.\n- **Network**: Emergent understanding.\n\nThis self-describes: Each node below is content about this structure! 🔄"
+      }
+    },
+    {
+      "id": "nodes-content",
+      "type": "markdown",
+      "label": "Nodes: Content Containers 🗃️",
+      "position": {
+        "x": 400,
+        "y": -150
+      },
+      "width": 280,
+      "height": 180,
+      "color": "#4CAF50",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Nodes Hold the Stuff\n\nNodes aren't just dots—they're **containers**:\n- **Text/Markdown**: Stories, notes, code.\n- **Data**: APIs, timers, scripts injecting live content.\n- **Visuals**: SVGs, images as embedded media.\n\nExample: This node contains *this* explanation. Infinite nesting? Why not! 📜"
+      }
+    },
+    {
+      "id": "edges-links",
+      "type": "markdown",
+      "label": "Edges: Relationship Weavers 🧵",
+      "position": {
+        "x": 711.946250630712,
+        "y": 138.34491931404247
+      },
+      "width": 260,
+      "height": 160,
+      "color": "#FF9800",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Edges Connect the Dots\n\nEdges transform isolated content into a **network**:\n- **Types**: Flows (data), hierarchies (parent-child), peers (equals).\n- **Labels**: 'Depends On', 'Inspires', 'Links To'.\n- **Styles**: Colors for categories, animations for dynamics.\n\nWithout edges, nodes are a pile; with them, a tapestry. 🎨"
+      }
+    },
+    {
+      "id": "network-emergence",
+      "type": "markdown",
+      "label": "Network: Emergent Knowledge 🌱",
+      "position": {
+        "x": -427.42001306814973,
+        "y": 72.18801829540962
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#9C27B0",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# The Whole > Sum of Parts\n\nA node graph births **emergence**:\n- **Patterns**: Clusters reveal themes.\n- **Flows**: Trace ideas from source to insight.\n- **Scalability**: Add nodes/edges; the network grows smarter.\n\nMeta: This graph *is* its own emergent content network. Zoom out—what do you see? 🔍"
+      }
+    },
+    {
+      "id": "self-reflect",
+      "type": "markdown",
+      "label": "Self-Reference Loop ♾️",
+      "position": {
+        "x": -125.99040740578451,
+        "y": 381.2321937482459
+      },
+      "width": 250,
+      "height": 150,
+      "color": "#F44336",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# It's About Itself\n\nThis graph **embodies** the concept:\n- Central node: The thesis.\n- Branches: Explains components.\n- Loop back: Reflects on the reflection.\n\nAdd your content: Paste new nodes to evolve the network. What's your twist? 🤔"
+      }
+    },
+    {
+      "id": "examples-meta",
+      "type": "markdown",
+      "label": "Examples in the Wild 🌍",
+      "position": {
+        "x": -244.66603005674438,
+        "y": -191.26099411933262
+      },
+      "width": 220,
+      "height": 140,
+      "color": "#FFC107",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "# Real Networks\n\n- **Wiki**: Pages (nodes) hyperlinked (edges).\n- **Blockchain**: Blocks chained by hashes.\n- **Social Media**: Posts connected by shares.\n- **Your Brain**: Neurons firing networks of thought.\n\nAll node graphs at heart! 🧠"
       }
     },
     {
@@ -119,6 +285,8 @@
       },
       "width": 600,
       "height": 100,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "markdown": "# Index of tlz/node_intro\nExplore the nodegraphs in this directory."
       }
@@ -133,6 +301,8 @@
       },
       "width": 180,
       "height": 60,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/index.node"
       }
@@ -147,6 +317,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/node_intro/content_network.node"
       }
@@ -161,6 +333,8 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/node_intro/introduction.node"
       }
@@ -175,11 +349,114 @@
       },
       "width": 200,
       "height": 80,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "link": "tlz:///tlz/node_intro/mergeWithVR.node"
       }
     }
   ],
-  "edges": [],
-  "clusters": []
+  "edges": [
+    {
+      "id": "e-central-nodes",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "nodes-content",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Contains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-central-edges",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "edges-links",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Connects Via",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-central-network",
+      "type": "dataFlow",
+      "source": "central",
+      "target": "network-emergence",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Forms",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-network-self",
+      "type": "bidirectional",
+      "source": "network-emergence",
+      "target": "self-reflect",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Reflects",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-self-examples",
+      "type": "peer",
+      "source": "self-reflect",
+      "target": "examples-meta",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Like",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "e-examples-central",
+      "type": "reference",
+      "source": "examples-meta",
+      "target": "central",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "Exemplifies",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "clusters": [
+    {
+      "id": "group-structure",
+      "label": "Core Structure 🏗️",
+      "nodeIds": [
+        "nodes-content",
+        "edges-links",
+        "network-emergence"
+      ],
+      "bounds": {
+        "x": -447.42001306814973,
+        "y": -170,
+        "width": 1439.3662636988618,
+        "height": 488.3449193140425
+      },
+      "visible": true,
+      "style": {}
+    },
+    {
+      "id": "group-meta",
+      "label": "Meta Layer 🔄",
+      "nodeIds": [
+        "self-reflect",
+        "examples-meta"
+      ],
+      "bounds": {
+        "x": -264.6660300567444,
+        "y": -211.26099411933262,
+        "width": 408.6756226509599,
+        "height": 762.4931878675785
+      },
+      "visible": true,
+      "style": {}
+    }
+  ]
 }
