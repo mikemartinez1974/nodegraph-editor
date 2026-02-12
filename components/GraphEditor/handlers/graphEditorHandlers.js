@@ -581,12 +581,13 @@ export function createGraphEditorHandlers({
   };
   
   // ===== LOAD/SAVE HANDLERS =====
-  const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = []) => {
+  const handleLoadGraph = (loadedNodes, loadedEdges, loadedGroups = [], options = {}) => {
     const nextNodes = Array.isArray(loadedNodes) ? loadedNodes : [];
     const nextEdges = Array.isArray(loadedEdges) ? loadedEdges : [];
     const nextGroups = Array.isArray(loadedGroups) ? loadedGroups : [];
+    const shouldReplace = options?.replace === true || options?.mode === 'replace';
     const hasManifest = nextNodes.some((node) => node?.type === 'manifest');
-    if (!hasManifest) {
+    if (!hasManifest && !shouldReplace) {
       const prevNodes = Array.isArray(nodesRef.current) ? nodesRef.current : [];
       const prevEdges = Array.isArray(edgesRef.current) ? edgesRef.current : [];
       const prevGroups = Array.isArray(groups) ? groups : [];

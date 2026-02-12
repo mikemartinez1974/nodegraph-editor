@@ -13,6 +13,86 @@
   },
   "nodes": [
     {
+      "id": "091c047d-30ab-435a-a11e-cb4ec47a066f",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "41de170a-3387-4801-8dd6-5fede431253b",
+          "name": "CustomerJourneyMap",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.556Z",
+          "updatedAt": "2026-02-12T17:26:05.556Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "node_awareness",
       "type": "markdown",
       "label": "Awareness",

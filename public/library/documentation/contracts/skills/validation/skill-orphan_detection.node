@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "cff98e8e-21c0-4535-b88d-50faec3a65f3",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "2321ffb3-5124-45eb-b403-1b0d4f35f1c3",
+          "name": "Skill Orphan Detection",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.949Z",
+          "updatedAt": "2026-02-12T17:26:05.949Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-orphan-root",
       "type": "markdown",
-      "label": "\ud83d\udd6f\ufe0f Skill: OrphanDetection (Normative)",
+      "label": "🕯️ Skill: OrphanDetection (Normative)",
       "position": {
         "x": 0,
         "y": 0

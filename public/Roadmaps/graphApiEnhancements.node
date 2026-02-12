@@ -10,9 +10,89 @@
   },
   "nodes": [
     {
+      "id": "3d660628-09e7-4b7f-9fed-d49c891cc30e",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "c01b3493-052b-4b79-a723-1cb399212fec",
+          "name": "GraphApiEnhancements",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.418Z",
+          "updatedAt": "2026-02-12T17:26:05.418Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "a0000000-0000-4aaa-8aaa-000000000001",
       "type": "markdown",
-      "label": "\ud83e\udded API Evolution Goals",
+      "label": "🧭 API Evolution Goals",
       "position": {
         "x": 125,
         "y": -125
@@ -22,7 +102,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# API Evolution Goals\n\n**Reduce agent error. Preserve continuity. Enable safe autonomy.**\n\nThis graph captures *incremental improvements* to the existing Graph API\u2014not a rewrite. Each node represents a pressure point where Twilite can become more resilient to human + AI collaboration.",
+        "markdown": "# API Evolution Goals\n\n**Reduce agent error. Preserve continuity. Enable safe autonomy.**\n\nThis graph captures *incremental improvements* to the existing Graph API—not a rewrite. Each node represents a pressure point where Twilite can become more resilient to human + AI collaboration.",
         "memo": "",
         "link": "",
         "html": "",
@@ -32,7 +112,7 @@
     {
       "id": "b0000000-0000-4bbb-8bbb-000000000002",
       "type": "default",
-      "label": "\ud83e\udde9 Patch / Delta Model",
+      "label": "🧩 Patch / Delta Model",
       "position": {
         "x": 860,
         "y": 245
@@ -51,7 +131,7 @@
     {
       "id": "b0000000-0000-4bbb-8bbb-000000000003",
       "type": "default",
-      "label": "\ud83d\udee1 Intent Validation Layer",
+      "label": "🛡 Intent Validation Layer",
       "position": {
         "x": 480,
         "y": 245
@@ -70,7 +150,7 @@
     {
       "id": "b0000000-0000-4bbb-8bbb-000000000004",
       "type": "default",
-      "label": "\ud83d\udd0d Action Preview / Diff",
+      "label": "🔍 Action Preview / Diff",
       "position": {
         "x": 100,
         "y": 245
@@ -89,7 +169,7 @@
     {
       "id": "c0000000-0000-4ccc-8ccc-000000000005",
       "type": "default",
-      "label": "\ud83e\udde0 Graph Introspection API",
+      "label": "🧠 Graph Introspection API",
       "position": {
         "x": 860,
         "y": 545
@@ -108,7 +188,7 @@
     {
       "id": "c0000000-0000-4ccc-8ccc-000000000006",
       "type": "default",
-      "label": "\ud83d\udccc \"Why\" Metadata",
+      "label": "📌 \"Why\" Metadata",
       "position": {
         "x": 480,
         "y": 545
@@ -127,7 +207,7 @@
     {
       "id": "c0000000-0000-4ccc-8ccc-000000000007",
       "type": "default",
-      "label": "\ud83c\udfad Agent Roles",
+      "label": "🎭 Agent Roles",
       "position": {
         "x": 100,
         "y": 545
@@ -146,7 +226,7 @@
     {
       "id": "d0000000-0000-4ddd-8ddd-000000000008",
       "type": "default",
-      "label": "\ud83e\uddec Cluster Semantics",
+      "label": "🧬 Cluster Semantics",
       "position": {
         "x": 860,
         "y": 845
@@ -165,7 +245,7 @@
     {
       "id": "d0000000-0000-4ddd-8ddd-000000000009",
       "type": "default",
-      "label": "\ud83d\udd0c Port Schemas",
+      "label": "🔌 Port Schemas",
       "position": {
         "x": 480,
         "y": 845
@@ -184,7 +264,7 @@
     {
       "id": "d0000000-0000-4ddd-8ddd-000000000010",
       "type": "default",
-      "label": "\u2699 ScriptNode Contracts",
+      "label": "⚙ ScriptNode Contracts",
       "position": {
         "x": 100,
         "y": 845
@@ -203,7 +283,7 @@
     {
       "id": "e0000000-0000-4eee-8eee-000000000011",
       "type": "markdown",
-      "label": "\ud83c\udf31 Living System Principle",
+      "label": "🌱 Living System Principle",
       "position": {
         "x": 400,
         "y": 1145

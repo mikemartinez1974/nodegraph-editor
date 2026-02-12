@@ -1,7 +1,7 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Artifact Contract \u2014 Ports + Document URLs",
+    "title": "Artifact Contract — Ports + Document URLs",
     "description": "Clarifies the reality of port behavior, how AIs should edit graphs (deltas vs replace), and how to represent local/remote document URLs.",
     "created": "2025-12-29T00:00:00.000Z",
     "modified": "2025-12-29T00:00:00.000Z",
@@ -35,6 +35,86 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "0786dd2c-aed3-41a6-a6e9-3b91d381ee71",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "0d579027-2d87-4cd7-b744-c9547afec499",
+          "name": "ArtifactContract PortsAndDocuments",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.361Z",
+          "updatedAt": "2026-02-12T17:26:05.361Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "ac-goal",
       "type": "markdown",
       "label": "Goal",
@@ -47,7 +127,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Artifact Contract \u2014 Ports + Document URLs\n\n**Goal:** make Twilite artifacts reliably editable by humans and AIs.\n\nThis graph defines:\n- the **reality** of port behavior (what the editor actually enforces)\n- how agents should mutate graphs (**deltas**, not overwrites)\n- how to represent **document URLs** when graphs can be local *or* remote"
+        "markdown": "# Artifact Contract — Ports + Document URLs\n\n**Goal:** make Twilite artifacts reliably editable by humans and AIs.\n\nThis graph defines:\n- the **reality** of port behavior (what the editor actually enforces)\n- how agents should mutate graphs (**deltas**, not overwrites)\n- how to represent **document URLs** when graphs can be local *or* remote"
       }
     },
     {
@@ -79,7 +159,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Contract: Ports (What agents should do)\n- Omit ports for conceptual links.\n- Use ports when wiring **execution/dataflow** nodes (Timer \u2192 Script \u2192 API, breadboards, etc.).\n- When ports are used:\n  - **declare them first** on the nodes (via `inputs`/`outputs` or `ports`)\n  - reference port keys exactly in edges\n\nOpen choice: for some edge types (e.g. `dataFlow`), do we want to *recommend* ports or *require* them? (Recommendation is lower friction.)"
+        "markdown": "## Contract: Ports (What agents should do)\n- Omit ports for conceptual links.\n- Use ports when wiring **execution/dataflow** nodes (Timer → Script → API, breadboards, etc.).\n- When ports are used:\n  - **declare them first** on the nodes (via `inputs`/`outputs` or `ports`)\n  - reference port keys exactly in edges\n\nOpen choice: for some edge types (e.g. `dataFlow`), do we want to *recommend* ports or *require* them? (Recommendation is lower friction.)"
       }
     },
     {
@@ -95,7 +175,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Reality: Document URL (Problem)\nA graph can be loaded from:\n- a **remote** URL (`https://\u2026/graph.node`)\n- a **GitHub** path (`github://owner/repo/path.node`)\n- a **local label** (`local://something.node`) which is *not* a fetchable URL\n- a Twilite link (`tlz://\u2026`) which is convertible\n\nSeparately, the graph can embed a **background document** (`document.url`) used by the BackgroundFrame/RPC.\n\nWe need a contract that distinguishes:\n- where the graph was loaded from (address/source)\n- what document the graph embeds (background document)"
+        "markdown": "## Reality: Document URL (Problem)\nA graph can be loaded from:\n- a **remote** URL (`https://…/graph.node`)\n- a **GitHub** path (`github://owner/repo/path.node`)\n- a **local label** (`local://something.node`) which is *not* a fetchable URL\n- a Twilite link (`tlz://…`) which is convertible\n\nSeparately, the graph can embed a **background document** (`document.url`) used by the BackgroundFrame/RPC.\n\nWe need a contract that distinguishes:\n- where the graph was loaded from (address/source)\n- what document the graph embeds (background document)"
       }
     },
     {
@@ -111,7 +191,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Contract: Document URL (Proposed)\nUse **two concepts**:\n\n1) **Graph address** (where the `.node` came from)\n- UI-only: drives the address bar + history.\n- Examples: `https://\u2026`, `github://\u2026`, `local://\u2026`, `tlz://\u2026`.\n\n2) **Embedded document** (what the graph references)\n- Stored in the artifact as `document: { url }`.\n- URL may be remote, local-path-like, or empty.\n\nSuggestion: keep `document.url` as the canonical storage, and optionally mirror to `settings.document.url` for backward compatibility if needed."
+        "markdown": "## Contract: Document URL (Proposed)\nUse **two concepts**:\n\n1) **Graph address** (where the `.node` came from)\n- UI-only: drives the address bar + history.\n- Examples: `https://…`, `github://…`, `local://…`, `tlz://…`.\n\n2) **Embedded document** (what the graph references)\n- Stored in the artifact as `document: { url }`.\n- URL may be remote, local-path-like, or empty.\n\nSuggestion: keep `document.url` as the canonical storage, and optionally mirror to `settings.document.url` for backward compatibility if needed."
       }
     },
     {
@@ -127,7 +207,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Mutation Contract: Deltas vs Replace\nTwilite\u2019s superpower is continuity.\n\n- Default: AIs should emit **delta commands** (`action: create/update/delete/batch`), not full snapshots.\n- Replace is dangerous: importing a full `{nodes,edges,clusters}` payload can wipe state.\n\nProposal:\n- Introduce an explicit, hard-to-accidentally-trigger replace mode (e.g., `action: \"replace\"` + `confirmReplace: true`).\n- For agents: treat replace as *forbidden* unless user explicitly asked to reset."
+        "markdown": "## Mutation Contract: Deltas vs Replace\nTwilite’s superpower is continuity.\n\n- Default: AIs should emit **delta commands** (`action: create/update/delete/batch`), not full snapshots.\n- Replace is dangerous: importing a full `{nodes,edges,clusters}` payload can wipe state.\n\nProposal:\n- Introduce an explicit, hard-to-accidentally-trigger replace mode (e.g., `action: \"replace\"` + `confirmReplace: true`).\n- For agents: treat replace as *forbidden* unless user explicitly asked to reset."
       }
     },
     {

@@ -3,14 +3,14 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-12T17:36:24.611Z",
-    "modified": "2026-02-12T17:36:26.373Z",
+    "created": "2026-02-12T17:37:16.715Z",
+    "modified": "2026-02-12T17:37:18.571Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
-      "id": "adaff37b-dbb0-4742-9ccc-b3f5c487e57d",
+      "id": "ad1bc401-51fc-42a7-83b4-01a30793fc78",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -23,12 +23,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "c37a2045-9ef1-4ebd-9a30-4d573a04262c",
-          "name": "IntroGraph",
+          "graphId": "163e3d23-9cfb-45ed-8fc6-527d7b338162",
+          "name": "Untitled Graph",
           "version": "0.1.0",
           "description": "",
-          "createdAt": "2026-02-12T17:26:06.077Z",
-          "updatedAt": "2026-02-12T17:26:06.077Z"
+          "createdAt": "2026-02-11T18:25:56.571Z",
+          "updatedAt": "2026-02-11T18:25:56.571Z"
         },
         "intent": {
           "kind": "graph",
@@ -110,75 +110,104 @@
       }
     },
     {
-      "id": "intro-1",
-      "type": "markdown",
-      "label": "Welcome (Markdown)",
+      "id": "fc7d456e-1d0c-497c-af92-6687e944dc2b",
+      "type": "legend",
+      "label": "Legend",
       "position": {
-        "x": -37,
-        "y": 90
+        "x": -267.14121892134773,
+        "y": 335.87148107251517
       },
-      "width": 546,
-      "height": 264,
+      "width": 340,
+      "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Welcome to NodeGraph Editor\n\nStart here — follow the guides:\n\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n- [Features](tlz://cpwith.me/tlz/Features.node)\n\nThis node is a markdown example that links to other TLZ documents."
+        "entries": [
+          {
+            "key": "default",
+            "intent": "placeholder",
+            "implementation": "default renderer",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\\n- default: placeholder"
       }
     },
     {
-      "id": "intro-2",
-      "type": "default",
-      "label": "Try Dragging",
+      "id": "26990693-a5cf-4a4b-b646-96777692fe8f",
+      "type": "dictionary",
+      "label": "Dictionary",
       "position": {
-        "x": 520,
-        "y": 150
+        "x": -260,
+        "y": 100
       },
-      "width": 180,
-      "height": 80,
+      "width": 320,
+      "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "Drag nodes around to explore the canvas."
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "external"
+          }
+        ],
+        "skills": [],
+        "views": []
       }
     },
     {
-      "id": "intro-3",
-      "type": "default",
-      "label": "Need Examples",
+      "id": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
+      "type": "node",
+      "label": "node",
       "position": {
-        "x": 360,
-        "y": 360
+        "x": 164.5940651920355,
+        "y": -162.78729659824154
+      },
+      "width": 471.25,
+      "height": 271.25,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# The Library\n\n ---\n\nHere you can find links to the various classes and contracts that make all of this possible."
+      }
+    },
+    {
+      "id": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "type": "port",
+      "label": "Port",
+      "position": {
+        "x": 708.4325016036811,
+        "y": 35.307266915923464
       },
       "width": 220,
-      "height": 100,
+      "height": 140,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "See concrete examples:\n\n- [Examples](tlz://cpwith.me/tlz/Examples.node)\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)"
+        "memo": "",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "https://twilite.zone/library/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
       }
     }
   ],
-  "edges": [
-    {
-      "id": "intro-edge-1",
-      "source": "intro-1",
-      "target": "intro-2",
-      "sourcePort": "root",
-      "targetPort": "root",
-      "label": "Next",
-      "style": {},
-      "data": {}
-    },
-    {
-      "id": "intro-edge-2",
-      "source": "intro-2",
-      "target": "intro-3",
-      "sourcePort": "root",
-      "targetPort": "root",
-      "label": "Example",
-      "style": {},
-      "data": {}
-    }
-  ],
+  "edges": [],
   "clusters": []
 }

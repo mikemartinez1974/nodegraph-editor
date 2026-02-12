@@ -134,7 +134,8 @@ const Toolbar = ({
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null,  // GitHub sync target settings
   onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties'),
-  uiTheme = null
+  uiTheme = null,
+  documentAccess = null
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -849,6 +850,33 @@ const Toolbar = ({
             >
               Dev Mode
             </Box>
+            <Box
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: documentAccess?.writable
+                  ? (theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.12)')
+                  : (theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.18)' : 'rgba(245, 158, 11, 0.12)'),
+                color: documentAccess?.writable
+                  ? (theme.palette.mode === 'dark' ? '#6ee7b7' : '#047857')
+                  : (theme.palette.mode === 'dark' ? '#fcd34d' : '#92400e')
+              }}
+              title={documentAccess?.target || 'Active VS Code document'}
+            >
+              {documentAccess?.writable ? 'Writable target' : 'Read-only view'}
+            </Box>
+            {!documentAccess?.writable && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => eventBus.emit('documentAccessPromoteWritable')}
+              >
+                Bind Save Target
+              </Button>
+            )}
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           </>
         )}

@@ -30,9 +30,89 @@
   },
   "nodes": [
     {
+      "id": "b6e409b2-d63f-4ac1-b638-65229a51a8c2",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "64367f86-8239-4ed6-a2d9-28016953e0fe",
+          "name": "Index",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.171Z",
+          "updatedAt": "2026-02-12T17:26:06.171Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "header",
       "type": "markdown",
-      "label": "\ud83d\udcc2 tlz/node_intro",
+      "label": "📂 tlz/node_intro",
       "position": {
         "x": 0,
         "y": -200
@@ -46,7 +126,7 @@
     {
       "id": "back",
       "type": "default",
-      "label": "\u2b05\ufe0f Back to Parent",
+      "label": "⬅️ Back to Parent",
       "position": {
         "x": -300,
         "y": -200

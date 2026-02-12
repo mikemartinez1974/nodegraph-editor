@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "3050af57-b6ba-4ef0-b79d-acf22caec4e7",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "546e42a4-fbbe-4c25-a7fc-a6ff02ae0db0",
+          "name": "Skill Create Edges",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.831Z",
+          "updatedAt": "2026-02-12T17:26:05.831Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-createedges-root",
       "type": "markdown",
-      "label": "\ud83e\uddf1 Skill: createEdges (Normative)",
+      "label": "🧱 Skill: createEdges (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -117,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Preconditions\n\n1. Source and target nodes exist\n2. Port contracts respected (if used)\n3. Edge ID is unique\n4. No implicit rewiring\n5. Graph is mutable under Manifest\n\nAny violation \u2192 hard failure"
+        "markdown": "## Preconditions\n\n1. Source and target nodes exist\n2. Port contracts respected (if used)\n3. Edge ID is unique\n4. No implicit rewiring\n5. Graph is mutable under Manifest\n\nAny violation → hard failure"
       }
     },
     {

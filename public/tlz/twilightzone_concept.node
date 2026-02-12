@@ -36,9 +36,89 @@
   },
   "nodes": [
     {
+      "id": "7f3b8478-e85c-4603-baec-777bd00c28ff",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "7fddccc0-3c12-44e2-ae11-3d5a011a9d53",
+          "name": "Twilightzone Concept",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.269Z",
+          "updatedAt": "2026-02-12T17:26:06.269Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "node_tz",
       "type": "default",
-      "label": "The Twilite Zone \ud83c\udf0c",
+      "label": "The Twilite Zone 🌌",
       "position": {
         "x": 400,
         "y": 50
@@ -53,7 +133,7 @@
     {
       "id": "node_create",
       "type": "default",
-      "label": "Create \ud83d\udcdd",
+      "label": "Create 📝",
       "position": {
         "x": 28.92857175846484,
         "y": 208.21428582814275
@@ -98,7 +178,7 @@
     {
       "id": "node_connect",
       "type": "default",
-      "label": "Connect \ud83d\udd17",
+      "label": "Connect 🔗",
       "position": {
         "x": 388.21428574639924,
         "y": 209.28571439665188
@@ -143,7 +223,7 @@
     {
       "id": "node_visualize",
       "type": "default",
-      "label": "Visualize \ud83d\udcca",
+      "label": "Visualize 📊",
       "position": {
         "x": 757.142856850916,
         "y": 212.5000001021794
@@ -173,7 +253,7 @@
     {
       "id": "node_extend",
       "type": "default",
-      "label": "Extend \ud83d\ude80",
+      "label": "Extend 🚀",
       "position": {
         "x": 1037.1428567691726,
         "y": 217.85714294472518
@@ -213,7 +293,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# The Twilite Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it\u2019s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.node)"
+        "memo": "# The Twilite Zone\n\nA cyberpunk-inspired node graph editor. Create, connect, and visualize ideas in a networked *node space*. Link graphs with `tlz://` URLs and prepare for immersive VR experiences.\n\n**Why it’s special:**\n- Expressive workflows\n- Neon aesthetics\n- Future-ready for VR\n\nExplore node content examples: [Node Content Types](tlz://cpwith.me/tlz/node_content_types.node)"
       }
     },
     {
@@ -338,7 +418,7 @@
   "clusters": [
     {
       "id": "group_create",
-      "label": "Creation Zone \ud83d\udcdd",
+      "label": "Creation Zone 📝",
       "nodeIds": [
         "node_create",
         "node_create_graphs",
@@ -355,7 +435,7 @@
     },
     {
       "id": "group_connect",
-      "label": "Connection Zone \ud83d\udd17",
+      "label": "Connection Zone 🔗",
       "nodeIds": [
         "node_connect",
         "node_connect_graphs",
@@ -372,7 +452,7 @@
     },
     {
       "id": "group_visualize",
-      "label": "Visualization Zone \ud83d\udcca",
+      "label": "Visualization Zone 📊",
       "nodeIds": [
         "node_visualize",
         "node_visualize_data"
@@ -388,7 +468,7 @@
     },
     {
       "id": "group_extend",
-      "label": "Future Zone \ud83d\ude80",
+      "label": "Future Zone 🚀",
       "nodeIds": [
         "node_extend",
         "node_extend_vr"

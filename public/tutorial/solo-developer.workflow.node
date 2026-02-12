@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "d76031f7-cbda-4de9-8a67-9f01b7f811c0",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "3b83c136-100f-4dcc-b69e-cbfed5f1feeb",
+          "name": "Solo Developer.Workflow",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.323Z",
+          "updatedAt": "2026-02-12T17:26:06.323Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "title-graph-interface-010",
       "type": "markdown",
-      "label": "\ud83e\udde0 The Graph as Interface",
+      "label": "🧠 The Graph as Interface",
       "position": {
         "x": -449.90865157832354,
         "y": 240
@@ -70,13 +150,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# \ud83e\udde0 The Graph as Interface\n\n*A shared reasoning substrate for humans and AI*\n\nThis graph describes a way of working where:\n\n- Thought is **structured**, not buried in chat\n- State is **explicit**, not implicit\n- AI can **read, write, and reason** without taking control\n- Humans remain the source of judgment\n\nThe graph is not a visualization of work.\n\n**It is the interface where work happens.**"
+        "markdown": "# 🧠 The Graph as Interface\n\n*A shared reasoning substrate for humans and AI*\n\nThis graph describes a way of working where:\n\n- Thought is **structured**, not buried in chat\n- State is **explicit**, not implicit\n- AI can **read, write, and reason** without taking control\n- Humans remain the source of judgment\n\nThe graph is not a visualization of work.\n\n**It is the interface where work happens.**"
       }
     },
     {
       "id": "twilite-why-008",
       "type": "markdown",
-      "label": "\u2753 Why Use a Twilite Graph?",
+      "label": "❓ Why Use a Twilite Graph?",
       "position": {
         "x": -1180.8242452239183,
         "y": 21.047210308857103
@@ -87,13 +167,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why Use a Twilite Graph?\n\nA Twilite graph is a **shared reasoning substrate** for humans and AIs.\n\n**For AI:**\n- Read structured state (not just tokens)\n- Write without taking control\n- Reason over relationships\n\n**For humans:**\n- See the structure\n- Render on the web\n- Hold any idea, project, or system\n- Persists across sessions, models, and time\n\n---\n\nText is linear.  \nChats disappear.  \nAgents hide state.\n\nA Twilite graph makes thought **explicit, inspectable, and durable** \u2014 without automating judgment."
+        "markdown": "## Why Use a Twilite Graph?\n\nA Twilite graph is a **shared reasoning substrate** for humans and AIs.\n\n**For AI:**\n- Read structured state (not just tokens)\n- Write without taking control\n- Reason over relationships\n\n**For humans:**\n- See the structure\n- Render on the web\n- Hold any idea, project, or system\n- Persists across sessions, models, and time\n\n---\n\nText is linear.  \nChats disappear.  \nAgents hide state.\n\nA Twilite graph makes thought **explicit, inspectable, and durable** — without automating judgment."
       }
     },
     {
       "id": "twilite-not-009",
       "type": "markdown",
-      "label": "\ud83d\udeab What Twilite Is Not",
+      "label": "🚫 What Twilite Is Not",
       "position": {
         "x": -1179.62695036409,
         "y": 483.83378851968183
@@ -104,13 +184,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## What Twilite Is *Not*\n\nTwilite is intentionally **not**:\n\n- \u274c An autonomous agent system\n- \u274c A chatbot or conversational UI\n- \u274c A no-code replacement for thinking\n- \u274c A workflow engine that decides for you\n- \u274c A black-box AI controller\n\n---\n\nTwilite does **not**:\n\n- Decide what matters\n- Choose the next task\n- Hide state or reasoning\n- Replace human judgment\n\nIt provides **structure and memory**, not authority.\n\nIf Twilite feels like it is thinking *for* you, something has gone wrong."
+        "markdown": "## What Twilite Is *Not*\n\nTwilite is intentionally **not**:\n\n- ❌ An autonomous agent system\n- ❌ A chatbot or conversational UI\n- ❌ A no-code replacement for thinking\n- ❌ A workflow engine that decides for you\n- ❌ A black-box AI controller\n\n---\n\nTwilite does **not**:\n\n- Decide what matters\n- Choose the next task\n- Hide state or reasoning\n- Replace human judgment\n\nIt provides **structure and memory**, not authority.\n\nIf Twilite feels like it is thinking *for* you, something has gone wrong."
       }
     },
     {
       "id": "loop-state-001",
       "type": "markdown",
-      "label": "\ud83d\udcca Current Graph State",
+      "label": "📊 Current Graph State",
       "position": {
         "x": 591.438727832477,
         "y": 256.5873325523593
@@ -121,13 +201,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\udcca Current Graph State\n\nThis graph is the *only* shared context.\n\nIt represents:\n- What exists\n- What is connected\n- What has been decided\n\nThe LLM receives **this**, not a summary.\n\nThe graph **is** the memory."
+        "markdown": "## 📊 Current Graph State\n\nThis graph is the *only* shared context.\n\nIt represents:\n- What exists\n- What is connected\n- What has been decided\n\nThe LLM receives **this**, not a summary.\n\nThe graph **is** the memory."
       }
     },
     {
       "id": "loop-propose-002",
       "type": "markdown",
-      "label": "\ud83e\udd16 LLM Proposals",
+      "label": "🤖 LLM Proposals",
       "position": {
         "x": -449.90865157832354,
         "y": 720
@@ -138,13 +218,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83e\udd16 LLM Proposals\n\nThe LLM suggests **possible next tasks**:\n\n- Missing nodes or edges\n- Ambiguous relationships\n- Unanswered questions\n- Structural refactors\n\n---\n\nNo execution yet.\n\nOnly proposals."
+        "markdown": "## 🤖 LLM Proposals\n\nThe LLM suggests **possible next tasks**:\n\n- Missing nodes or edges\n- Ambiguous relationships\n- Unanswered questions\n- Structural refactors\n\n---\n\nNo execution yet.\n\nOnly proposals."
       }
     },
     {
       "id": "loop-negotiate-003",
       "type": "markdown",
-      "label": "\ud83d\udcac Negotiation",
+      "label": "💬 Negotiation",
       "position": {
         "x": 50.09134842167646,
         "y": 720
@@ -155,13 +235,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\udcac Negotiation\n\nHuman + LLM discuss:\n\n- Is this task valuable *now*?\n- Is the scope correct?\n- What should *not* be touched?\n\n---\n\nThis is where judgment lives.\n\nNo automation here."
+        "markdown": "## 💬 Negotiation\n\nHuman + LLM discuss:\n\n- Is this task valuable *now*?\n- Is the scope correct?\n- What should *not* be touched?\n\n---\n\nThis is where judgment lives.\n\nNo automation here."
       }
     },
     {
       "id": "loop-select-004",
       "type": "markdown",
-      "label": "\u2705 Selected Task",
+      "label": "✅ Selected Task",
       "position": {
         "x": 550.0913484216765,
         "y": 720
@@ -172,13 +252,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \u2705 Selected Task\n\nOne task survives.\n\nIt is:\n- Explicit\n- Bounded\n- Intentional\n\n---\n\nEverything else remains visible but inactive."
+        "markdown": "## ✅ Selected Task\n\nOne task survives.\n\nIt is:\n- Explicit\n- Bounded\n- Intentional\n\n---\n\nEverything else remains visible but inactive."
       }
     },
     {
       "id": "loop-mutate-005",
       "type": "markdown",
-      "label": "\ud83d\udee0\ufe0f Mutation",
+      "label": "🛠️ Mutation",
       "position": {
         "x": 1050.0913484216765,
         "y": 720
@@ -189,13 +269,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\udee0\ufe0f Graph Mutation\n\nThe selected task executes:\n\n- Create nodes\n- Update edges\n- Annotate decisions\n- Generate code\n\n---\n\nThis is the *only* moment the graph changes.\n\nAll changes are explicit."
+        "markdown": "## 🛠️ Graph Mutation\n\nThe selected task executes:\n\n- Create nodes\n- Update edges\n- Annotate decisions\n- Generate code\n\n---\n\nThis is the *only* moment the graph changes.\n\nAll changes are explicit."
       }
     },
     {
       "id": "loop-trigger-006",
       "type": "markdown",
-      "label": "\ud83d\udd01 Next Cycle",
+      "label": "🔁 Next Cycle",
       "position": {
         "x": 1586.5834800368668,
         "y": 716.682533489528
@@ -206,13 +286,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\udd01 Next Cycle\n\nThe updated graph becomes the input for the next LLM call.\n\n---\n\nNo additional memory is required.\n\nThe graph *is* the memory.\n\nThe loop continues."
+        "markdown": "## 🔁 Next Cycle\n\nThe updated graph becomes the input for the next LLM call.\n\n---\n\nNo additional memory is required.\n\nThe graph *is* the memory.\n\nThe loop continues."
       }
     },
     {
       "id": "work-modes-root",
       "type": "markdown",
-      "label": "\ud83e\udde0 Work Modes",
+      "label": "🧠 Work Modes",
       "position": {
         "x": -557.3523297341859,
         "y": 1638.7585045036756
@@ -223,13 +303,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# \ud83e\udde0 Work Modes\n\nThis graph exists to manage **cognitive load**, not tasks.\n\nWhen one mode is depleted, **switch modes** instead of stopping or forcing progress.\n\nProgress is defined as *sustainable movement*, not throughput."
+        "markdown": "# 🧠 Work Modes\n\nThis graph exists to manage **cognitive load**, not tasks.\n\nWhen one mode is depleted, **switch modes** instead of stopping or forcing progress.\n\nProgress is defined as *sustainable movement*, not throughput."
       }
     },
     {
       "id": "mode-architecture",
       "type": "markdown",
-      "label": "\ud83c\udfd7\ufe0f Structural",
+      "label": "🏗️ Structural",
       "position": {
         "x": 145.54054859990208,
         "y": 1303.8730349725392
@@ -240,13 +320,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83c\udfd7\ufe0f Structural / Architectural\n\n**Load:** Heavy  \n**Purpose:** Define invariants and boundaries\n\n**Examples:**\n- Core vs adapter vs app decisions\n- Refactors that move responsibility\n- Naming things that must last\n- Deciding what must *not* change\n\n**Capacity:** 1\u20132 decisions per day\n\n**Stop signals:**\n- Head pressure\n- Urge to walk\n- \"I can't hold this anymore\"\n\n\u27a1\ufe0f **Stop immediately** and switch modes."
+        "markdown": "## 🏗️ Structural / Architectural\n\n**Load:** Heavy  \n**Purpose:** Define invariants and boundaries\n\n**Examples:**\n- Core vs adapter vs app decisions\n- Refactors that move responsibility\n- Naming things that must last\n- Deciding what must *not* change\n\n**Capacity:** 1–2 decisions per day\n\n**Stop signals:**\n- Head pressure\n- Urge to walk\n- \"I can't hold this anymore\"\n\n➡️ **Stop immediately** and switch modes."
       }
     },
     {
       "id": "mode-implementation",
       "type": "markdown",
-      "label": "\ud83d\udee0\ufe0f Implementation",
+      "label": "🛠️ Implementation",
       "position": {
         "x": 745.5405485999021,
         "y": 1303.8730349725392
@@ -257,13 +337,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\udee0\ufe0f Implementation / Coding\n\n**Load:** Focused  \n**Purpose:** Execute already-made decisions\n\n**Examples:**\n- Writing functions\n- Moving code\n- Implementing a known refactor\n- Fixing bounded bugs\n\n**Capacity:** Medium\n\n**Stop signals:**\n- Sloppy code\n- Impatience\n- Tunnel vision\n\n\u27a1\ufe0f **Switch modes** when quality drops."
+        "markdown": "## 🛠️ Implementation / Coding\n\n**Load:** Focused  \n**Purpose:** Execute already-made decisions\n\n**Examples:**\n- Writing functions\n- Moving code\n- Implementing a known refactor\n- Fixing bounded bugs\n\n**Capacity:** Medium\n\n**Stop signals:**\n- Sloppy code\n- Impatience\n- Tunnel vision\n\n➡️ **Switch modes** when quality drops."
       }
     },
     {
       "id": "mode-externalization",
       "type": "markdown",
-      "label": "\ud83c\udf10 Externalization",
+      "label": "🌐 Externalization",
       "position": {
         "x": 154.43117153202297,
         "y": 1815.4841677591908
@@ -274,13 +354,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83c\udf10 Externalization / Web\n\n**Load:** Light  \n**Purpose:** Make the project visible and legible\n\n**Examples:**\n- Website (twilite.zone)\n- Canva layouts\n- README / copy\n- Explaining Twilite in words\n\n**Capacity:** High\n\n**Stop signal:**\n- Boredom (not fatigue)\n\n\u27a1\ufe0f Ideal after heavy architectural work."
+        "markdown": "## 🌐 Externalization / Web\n\n**Load:** Light  \n**Purpose:** Make the project visible and legible\n\n**Examples:**\n- Website (twilite.zone)\n- Canva layouts\n- README / copy\n- Explaining Twilite in words\n\n**Capacity:** High\n\n**Stop signal:**\n- Boredom (not fatigue)\n\n➡️ Ideal after heavy architectural work."
       }
     },
     {
       "id": "mode-planning",
       "type": "markdown",
-      "label": "\ud83d\uddfa\ufe0f Planning",
+      "label": "🗺️ Planning",
       "position": {
         "x": 752.772438276787,
         "y": 1817.1429010144266
@@ -291,7 +371,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## \ud83d\uddfa\ufe0f Planning / Parking\n\n**Load:** Recovery  \n**Purpose:** Relieve pressure without losing progress\n\n**Examples:**\n- TODO graphs\n- Parking future ideas\n- Writing \"later\" notes\n- Cleaning up thoughts\n\n**Capacity:** Very high\n\n**Stop signals:**\n- Calm returns\n- Mental space opens\n\n\u27a1\ufe0f This is the *best* way to end a day."
+        "markdown": "## 🗺️ Planning / Parking\n\n**Load:** Recovery  \n**Purpose:** Relieve pressure without losing progress\n\n**Examples:**\n- TODO graphs\n- Parking future ideas\n- Writing \"later\" notes\n- Cleaning up thoughts\n\n**Capacity:** Very high\n\n**Stop signals:**\n- Calm returns\n- Mental space opens\n\n➡️ This is the *best* way to end a day."
       }
     }
   ],

@@ -73,6 +73,86 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "116ee39d-bdeb-43c6-b710-cdf6d3f5aab9",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "14e40d0e-dcc6-4e91-b480-082cfd367199",
+          "name": "Breadboard.Demoapp",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.306Z",
+          "updatedAt": "2026-02-12T17:26:06.306Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "board-surface",
       "type": "svg",
       "label": "Breadboard Surface",
@@ -143,7 +223,7 @@
     {
       "id": "node-resistor-220",
       "type": "svg",
-      "label": "Resistor 220\u03a9",
+      "label": "Resistor 220Ω",
       "position": {
         "x": -20,
         "y": -40
@@ -173,7 +253,7 @@
         }
       ],
       "data": {
-        "svg": "<svg viewBox=\"0 0 180 90\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect x=\"10\" y=\"44\" width=\"160\" height=\"4\" fill=\"#3e2723\"/>\n  <polyline fill=\"none\" stroke=\"#fdd835\" stroke-width=\"6\" points=\"28,44 42,24 56,64 70,24 84,64 98,24 112,64 126,24 140,64 154,24 168,44\"/>\n  <line x1=\"4\" y1=\"44\" x2=\"28\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <line x1=\"168\" y1=\"44\" x2=\"176\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <text x=\"90\" y=\"80\" fill=\"#ffffff\" font-size=\"14\" font-family=\"monospace\" text-anchor=\"middle\">220\u03a9</text>\n</svg>",
+        "svg": "<svg viewBox=\"0 0 180 90\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect x=\"10\" y=\"44\" width=\"160\" height=\"4\" fill=\"#3e2723\"/>\n  <polyline fill=\"none\" stroke=\"#fdd835\" stroke-width=\"6\" points=\"28,44 42,24 56,64 70,24 84,64 98,24 112,64 126,24 140,64 154,24 168,44\"/>\n  <line x1=\"4\" y1=\"44\" x2=\"28\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <line x1=\"168\" y1=\"44\" x2=\"176\" y2=\"44\" stroke=\"#b0bec5\" stroke-width=\"6\"/>\n  <text x=\"90\" y=\"80\" fill=\"#ffffff\" font-size=\"14\" font-family=\"monospace\" text-anchor=\"middle\">220Ω</text>\n</svg>",
         "memo": "Limits current before the LED. Components define their own pins so wiring stays flexible."
       }
     },
@@ -316,7 +396,7 @@
       "width": 260,
       "height": 220,
       "data": {
-        "markdown": "## SVG Breadboard Demo\n- Drag the switch and watch the LED path highlight on the SVG grid.\n- The logic probe monitors the LED\u2019s cathode so you can capture when the slide switch pulls the rail to ground.\n- Every component node stores its own pin ports so the wiring feels like a real breadboard netlist.\n"
+        "markdown": "## SVG Breadboard Demo\n- Drag the switch and watch the LED path highlight on the SVG grid.\n- The logic probe monitors the LED’s cathode so you can capture when the slide switch pulls the rail to ground.\n- Every component node stores its own pin ports so the wiring feels like a real breadboard netlist.\n"
       }
     }
   ],

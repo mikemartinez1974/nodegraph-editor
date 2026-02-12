@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "988c324b-a38c-405b-a3cb-2885a55fe3c0",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "3be78f6c-9cc1-4d27-a5c5-22cd7feb5caf",
+          "name": "Core Protocols",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.615Z",
+          "updatedAt": "2026-02-12T17:26:05.615Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "protocols-root",
       "type": "markdown",
-      "label": "\u2696\ufe0f Core Protocols",
+      "label": "⚖️ Core Protocols",
       "position": {
         "x": 0,
         "y": 0
@@ -133,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Persistence Guarantees\n\n- Graphs must load without tools\n- Graphs must survive version drift\n- Graphs must remain interpretable by agents\n\nIf it can\u2019t survive time, it\u2019s not real."
+        "markdown": "## Persistence Guarantees\n\n- Graphs must load without tools\n- Graphs must survive version drift\n- Graphs must remain interpretable by agents\n\nIf it can’t survive time, it’s not real."
       }
     },
     {

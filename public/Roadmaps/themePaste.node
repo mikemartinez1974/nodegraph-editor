@@ -28,6 +28,86 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "e0aab6aa-c614-4ad8-8071-6b23ef181a9e",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "2e326dce-c388-4da4-a2ae-66d8385099c9",
+          "name": "ThemePaste",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.475Z",
+          "updatedAt": "2026-02-12T17:26:05.475Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "theme-goal",
       "type": "markdown",
       "label": "Goal",
@@ -40,7 +120,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\nPaste a theme **directly onto the canvas** as a command.\n\nFlow: ask AI for a color scheme \u2192 paste \u2192 graph updates theme instantly."
+        "markdown": "## Goal\nPaste a theme **directly onto the canvas** as a command.\n\nFlow: ask AI for a color scheme → paste → graph updates theme instantly."
       }
     },
     {

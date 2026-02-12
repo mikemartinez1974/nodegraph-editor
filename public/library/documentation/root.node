@@ -3,16 +3,214 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-10T15:54:14.916Z",
-    "modified": "2026-02-10T15:54:17.394Z",
+    "created": "2026-02-12T17:37:22.804Z",
+    "modified": "2026-02-12T17:37:26.017Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
+      "id": "ad1bc401-51fc-42a7-83b4-01a30793fc78",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -993.6118164191234,
+        "y": -494.97477328116327
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "163e3d23-9cfb-45ed-8fc6-527d7b338162",
+          "name": "Untitled Graph",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-11T18:25:56.571Z",
+          "updatedAt": "2026-02-11T18:25:56.571Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "fc7d456e-1d0c-497c-af92-6687e944dc2b",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -1365.2323977882345,
+        "y": 162.29005760902103
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "default",
+            "intent": "placeholder",
+            "implementation": "default renderer",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\\n- default: placeholder"
+      }
+    },
+    {
+      "id": "26990693-a5cf-4a4b-b646-96777692fe8f",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -1146.774663346112,
+        "y": -145.27809837232863
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "version": "0.1.0",
+            "source": "external"
+          }
+        ],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
+      "type": "node",
+      "label": "node",
+      "position": {
+        "x": -1199.3426180713511,
+        "y": 833.9554576773205
+      },
+      "width": 471.25,
+      "height": 271.25,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# The Library\n\n ---\n\nFrom here, you can view default node classes and the various contracts that define the Twilite node-graph platform."
+      }
+    },
+    {
+      "id": "0d0244b1-e68b-46a5-86cf-de534cfccf96",
+      "type": "port",
+      "label": "Port",
+      "position": {
+        "x": 975.2362461976643,
+        "y": -378.18406154941607
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "https://twilite.zone/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
       "id": "doc-root",
       "type": "markdown",
-      "label": "\ud83d\udcda Documentation Root",
+      "label": "📚 Documentation Root",
       "position": {
         "x": -320,
         "y": -220
@@ -208,165 +406,165 @@
       "type": "dataFlow",
       "source": "doc-root",
       "target": "doc-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "entry",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-doc-root-contracts",
       "type": "dataFlow",
       "source": "doc-root",
       "target": "doc-contracts",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "indexes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-nodes",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-nodes",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-edges",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-edges",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-ports",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-ports",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-manifest",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-manifest",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-skills",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-skills",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-doc-root-validation",
       "type": "dataFlow",
       "source": "doc-root",
       "target": "doc-validation",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 1,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-doc-root-boundary",
       "type": "dataFlow",
       "source": "doc-root",
       "target": "doc-boundary",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 1,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-doc-root-primitives",
       "type": "dataFlow",
       "source": "doc-root",
       "target": "doc-graph-primitives",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines",
       "style": {
         "width": 1,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-dictionaries",
       "type": "dataFlow",
       "source": "doc-contracts",
       "target": "doc-contract-dictionaries",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

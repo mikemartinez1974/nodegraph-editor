@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "6a37019f-83ac-497e-a5b8-54c872936ad1",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "0daf28ed-5280-48d2-9380-596630ad09cc",
+          "name": "Skill Schema Validation",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.976Z",
+          "updatedAt": "2026-02-12T17:26:05.976Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-schema-root",
       "type": "markdown",
-      "label": "\ud83e\uddf1 Skill: SchemaValidation (Normative)",
+      "label": "🧱 Skill: SchemaValidation (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing schema \u2192 error\n- Schema version mismatch \u2192 warn + block mutation\n- Invalid data shape \u2192 error\n- Port mismatch \u2192 error\n\nFailure blocks progress."
+        "markdown": "## Failure Modes\n\n- Missing schema → error\n- Schema version mismatch → warn + block mutation\n- Invalid data shape → error\n- Port mismatch → error\n\nFailure blocks progress."
       }
     },
     {

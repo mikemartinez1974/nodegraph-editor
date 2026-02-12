@@ -59,9 +59,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "9ee033c9-1ad8-4ff1-9edd-80a3104fd4a5",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "c0a889e3-bad7-4d94-ad85-a86c12014399",
+          "name": "Monetization",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.451Z",
+          "updatedAt": "2026-02-12T17:26:05.451Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "m0000000-0000-4aaa-8aaa-000000000001",
       "type": "markdown",
-      "label": "\ud83d\udcb0 Monetization Doctrine",
+      "label": "💰 Monetization Doctrine",
       "position": {
         "x": 720,
         "y": -140
@@ -81,7 +161,7 @@
     {
       "id": "m0000000-0000-4bbb-8bbb-000000000002",
       "type": "default",
-      "label": "\ud83d\udfe2 Safe Zone: Leverage",
+      "label": "🟢 Safe Zone: Leverage",
       "position": {
         "x": 925,
         "y": 250
@@ -91,7 +171,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "Charge for acceleration, power, scale, safety, and convenience \u2014 never for existence or access.",
+        "memo": "Charge for acceleration, power, scale, safety, and convenience — never for existence or access.",
         "link": "",
         "html": "",
         "svg": ""
@@ -100,7 +180,7 @@
     {
       "id": "m0000000-0000-4bbb-8bbb-000000000003",
       "type": "default",
-      "label": "\ud83d\udd34 Forbidden Zone: Ownership",
+      "label": "🔴 Forbidden Zone: Ownership",
       "position": {
         "x": 525,
         "y": 250
@@ -119,7 +199,7 @@
     {
       "id": "m0000000-0000-4bbb-8bbb-000000000004",
       "type": "default",
-      "label": "\u26a0\ufe0f Danger Zone: Premature Capture",
+      "label": "⚠️ Danger Zone: Premature Capture",
       "position": {
         "x": 125,
         "y": 250
@@ -138,7 +218,7 @@
     {
       "id": "m0000000-0000-4ccc-8ccc-000000000005",
       "type": "default",
-      "label": "\ud83d\udee0 Dev Tools (Primary Wedge)",
+      "label": "🛠 Dev Tools (Primary Wedge)",
       "position": {
         "x": 995,
         "y": 580
@@ -157,7 +237,7 @@
     {
       "id": "m0000000-0000-4ccc-8ccc-000000000006",
       "type": "default",
-      "label": "\ud83d\ude80 Acceleration > Access",
+      "label": "🚀 Acceleration > Access",
       "position": {
         "x": 595,
         "y": 580
@@ -176,7 +256,7 @@
     {
       "id": "m0000000-0000-4ccc-8ccc-000000000007",
       "type": "default",
-      "label": "\u2601\ufe0f Hosted Services",
+      "label": "☁️ Hosted Services",
       "position": {
         "x": 195,
         "y": 580
@@ -195,7 +275,7 @@
     {
       "id": "m0000000-0000-4ddd-8ddd-000000000008",
       "type": "default",
-      "label": "\ud83e\udde0 Trust as a Moat",
+      "label": "🧠 Trust as a Moat",
       "position": {
         "x": 935,
         "y": 900
@@ -214,7 +294,7 @@
     {
       "id": "m0000000-0000-4ddd-8ddd-000000000009",
       "type": "default",
-      "label": "\ud83d\udcc8 Monetization Arc",
+      "label": "📈 Monetization Arc",
       "position": {
         "x": 185,
         "y": 900
@@ -224,7 +304,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "Phase 1: Dev leverage \u2192 Phase 2: Team gravity \u2192 Phase 3: Infrastructure & SLAs.",
+        "memo": "Phase 1: Dev leverage → Phase 2: Team gravity → Phase 3: Infrastructure & SLAs.",
         "link": "",
         "html": "",
         "svg": ""
@@ -233,7 +313,7 @@
     {
       "id": "m0000000-0000-4eee-8eee-000000000010",
       "type": "markdown",
-      "label": "\ud83e\uddea Litmus Test",
+      "label": "🧪 Litmus Test",
       "position": {
         "x": 778.3333333333333,
         "y": 1220
@@ -243,7 +323,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Litmus Test\n\n**If this feature vanished tomorrow, would users still own their thinking?**\n\n- Yes \u2192 Safe to monetize\n- No \u2192 Do not ship\n\nCharge for leverage. Never charge for memory, continuity, or existence.",
+        "markdown": "# Litmus Test\n\n**If this feature vanished tomorrow, would users still own their thinking?**\n\n- Yes → Safe to monetize\n- No → Do not ship\n\nCharge for leverage. Never charge for memory, continuity, or existence.",
         "memo": "",
         "link": "",
         "html": "",

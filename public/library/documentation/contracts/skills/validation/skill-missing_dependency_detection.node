@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "873f149a-00a8-40fc-8566-f2f11efc3788",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "603743c1-e6e1-48b8-a577-bf8a903b521c",
+          "name": "Skill Missing Dependency Detection",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.938Z",
+          "updatedAt": "2026-02-12T17:26:05.938Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-deps-root",
       "type": "markdown",
-      "label": "\ud83d\udea8 Skill: MissingDependencyDetection (Normative)",
+      "label": "🚨 Skill: MissingDependencyDetection (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing dependency \u2192 block execution\n- Missing skill \u2192 block execution\n- Unknown node type \u2192 block execution\n\nFailure is safety."
+        "markdown": "## Failure Modes\n\n- Missing dependency → block execution\n- Missing skill → block execution\n- Unknown node type → block execution\n\nFailure is safety."
       }
     },
     {

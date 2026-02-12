@@ -35,9 +35,10 @@ export const TlzLink = ({ href, children, ...props }) => {
       e.preventDefault();
       e.stopPropagation();
       try {
+        const isVsCodeHost = typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode';
         eventBus.emit('tlzClick', { href });
         eventBus.emit('fetchUrl', { url: localPath, source: 'tlz-local' });
-        if (remoteHttps) {
+        if (remoteHttps && !isVsCodeHost) {
           eventBus.emit('fetchUrl', { url: remoteHttps, source: 'tlz-remote' });
         }
       } catch (err) {

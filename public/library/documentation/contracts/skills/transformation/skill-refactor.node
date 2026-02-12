@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "3ec6a5f3-7c4a-46d8-8f08-39e0f12a5fee",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "2960f749-4d9f-493a-a131-86d2494b203b",
+          "name": "Skill Refactor",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.917Z",
+          "updatedAt": "2026-02-12T17:26:05.917Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-norm-root",
       "type": "markdown",
-      "label": "\ud83d\udd01 Skill: NormalizeDenormalize (Normative)",
+      "label": "🔁 Skill: NormalizeDenormalize (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing source-of-truth \u2192 abort\n- Missing renormalization path \u2192 abort\n- Atomic update failure \u2192 rollback\n\nPartial states are forbidden."
+        "markdown": "## Failure Modes\n\n- Missing source-of-truth → abort\n- Missing renormalization path → abort\n- Atomic update failure → rollback\n\nPartial states are forbidden."
       }
     },
     {

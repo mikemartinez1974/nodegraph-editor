@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "f71b73b4-59bf-4cc9-b687-e0d531469b2f",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "e57d59a0-c28d-4b69-959e-4c58816f6c2b",
+          "name": "Migration Contract",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.663Z",
+          "updatedAt": "2026-02-12T17:26:05.663Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "schema-migration-root",
       "type": "markdown",
-      "label": "\ud83d\udd01 Schema Versioning & Migration Contract (Normative)",
+      "label": "🔁 Schema Versioning & Migration Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -133,7 +213,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Migration Units (REQUIRED)\n\n- One transform per version step\n- Pure functions only\n- graph@vN \u2192 graph@vN+1\n- Must emit migration metadata\n\nSide effects are forbidden."
+        "markdown": "## Migration Units (REQUIRED)\n\n- One transform per version step\n- Pure functions only\n- graph@vN → graph@vN+1\n- Must emit migration metadata\n\nSide effects are forbidden."
       }
     },
     {

@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "1d10cf1d-6b1c-44c9-855c-29b5d6cbf153",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "1c020615-4df0-469d-93ee-5f2e9d5f096d",
+          "name": "Skill Normalize Spacing",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.808Z",
+          "updatedAt": "2026-02-12T17:26:05.808Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-normalizespacing-root",
       "type": "markdown",
-      "label": "\ud83d\udccf Skill: NormalizeSpacing (Normative)",
+      "label": "📏 Skill: NormalizeSpacing (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If constraints conflict \u2192 skip node\n\nPartial normalization is allowed."
+        "markdown": "## Failure Modes\n\n- If constraints conflict → skip node\n\nPartial normalization is allowed."
       }
     },
     {

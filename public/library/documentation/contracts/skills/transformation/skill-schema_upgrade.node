@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "47fba508-7276-48f4-896c-d31e68939b36",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "bd8eacda-e7a7-40bf-8c9e-1898753342e0",
+          "name": "Skill Schema Upgrade",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.928Z",
+          "updatedAt": "2026-02-12T17:26:05.928Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-upgrade-root",
       "type": "markdown",
-      "label": "\u2b06\ufe0f Skill: SchemaUpgrade (Normative)",
+      "label": "⬆️ Skill: SchemaUpgrade (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing intermediate version \u2192 abort\n- Transform failure \u2192 rollback\n- Validation failure \u2192 abort\n\nPartial upgrades are forbidden."
+        "markdown": "## Failure Modes\n\n- Missing intermediate version → abort\n- Transform failure → rollback\n- Validation failure → abort\n\nPartial upgrades are forbidden."
       }
     },
     {

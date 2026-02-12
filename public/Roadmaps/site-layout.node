@@ -57,6 +57,86 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "c8d9e8c3-9e8f-44fe-96b1-b62545e9ae9d",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "49c61b8b-afac-484f-95dc-573bbcaf578f",
+          "name": "Site Layout",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.468Z",
+          "updatedAt": "2026-02-12T17:26:05.468Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "home-hero",
       "type": "markdown",
       "label": "Twilite",
@@ -69,7 +149,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# The graph is the product.\n\n**Twilite** is a **graph-native workspace** where visual thinking meets AI collaboration \u2014 treating graphs as **durable, portable artifacts** that humans and agents can both read and write.\n\n**One-liner:**\n> *\u201cFigma meets ChatGPT for visual thinking.\u201d* Describe what you want \u2192 an AI generates a graph \u2192 paste it into Twilite \u2192 it appears instantly.\n\n**Start:**\n- Full app: `/browser/`\n- Editor-only: `/editor/`\n\n**Follow the build:** `mailto:admin@twilite.zone?subject=Twilite%20%E2%80%94%20early%20access`",
+        "markdown": "# The graph is the product.\n\n**Twilite** is a **graph-native workspace** where visual thinking meets AI collaboration — treating graphs as **durable, portable artifacts** that humans and agents can both read and write.\n\n**One-liner:**\n> *“Figma meets ChatGPT for visual thinking.”* Describe what you want → an AI generates a graph → paste it into Twilite → it appears instantly.\n\n**Start:**\n- Full app: `/browser/`\n- Editor-only: `/editor/`\n\n**Follow the build:** `mailto:admin@twilite.zone?subject=Twilite%20%E2%80%94%20early%20access`",
         "memo": "",
         "link": "/",
         "html": "",
@@ -89,7 +169,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Twilite in one sentence\n\n*\u201cFigma meets ChatGPT for visual thinking.\u201d*\n\nDescribe what you want \u2192 an AI generates a graph \u2192 paste it into Twilite \u2192 it appears instantly.",
+        "markdown": "## Twilite in one sentence\n\n*“Figma meets ChatGPT for visual thinking.”*\n\nDescribe what you want → an AI generates a graph → paste it into Twilite → it appears instantly.",
         "memo": "",
         "link": "",
         "html": "",
@@ -129,7 +209,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Why graphs?\n\nA node can be anything: text, code, data, UI, API, AI model, video, live query.\n\nAn edge can mean anything: flows into, depends on, triggers, contains.\n\nYou decide what it means \u2014 and you can evolve it over time.\n\n**Capabilities**\n- \ud83c\udf10 Web-native\n- \ud83e\udd16 AI-first\n- \u26a1 Executable\n- \ud83d\udcc1 Portable\n- \ud83e\uddec Composable\n- \ud83e\uddfe Git-friendly",
+        "markdown": "## Why graphs?\n\nA node can be anything: text, code, data, UI, API, AI model, video, live query.\n\nAn edge can mean anything: flows into, depends on, triggers, contains.\n\nYou decide what it means — and you can evolve it over time.\n\n**Capabilities**\n- 🌐 Web-native\n- 🤖 AI-first\n- ⚡ Executable\n- 📁 Portable\n- 🧬 Composable\n- 🧾 Git-friendly",
         "memo": "",
         "link": "",
         "html": "",
@@ -149,7 +229,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The problem\n\n- \u274c Graphs are ephemeral \u2014 screenshots, not files\n- \u274c No stable identity \u2014 no diff, no review, no versioning\n- \u274c AI can\u2019t help \u2014 formats aren\u2019t machine-writable\n- \u274c Rebuild from scratch \u2014 no templates, no remix culture",
+        "markdown": "## The problem\n\n- ❌ Graphs are ephemeral — screenshots, not files\n- ❌ No stable identity — no diff, no review, no versioning\n- ❌ AI can’t help — formats aren’t machine-writable\n- ❌ Rebuild from scratch — no templates, no remix culture",
         "memo": "",
         "link": "",
         "html": "",
@@ -169,7 +249,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## How it works\n\nTwilite makes the graph a first-class artifact and gives AI a safe mutation contract.\n\n1. **Describe** what you want (to an AI or a teammate)\n2. **Generate** graph JSON (or deltas) with stable IDs\n3. **Paste** into Twilite \u2192 it renders instantly\n4. **Evolve** it tomorrow without losing coherence",
+        "markdown": "## How it works\n\nTwilite makes the graph a first-class artifact and gives AI a safe mutation contract.\n\n1. **Describe** what you want (to an AI or a teammate)\n2. **Generate** graph JSON (or deltas) with stable IDs\n3. **Paste** into Twilite → it renders instantly\n4. **Evolve** it tomorrow without losing coherence",
         "memo": "",
         "link": "",
         "html": "",
@@ -209,7 +289,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## AI mutation contract\n\nDeltas over rewrites. Validation gates. Minimal payloads. Dry-run previews.\n\nThe goal is predictable evolution, not chaos.\n\n```text\ncreate  \u2192 add nodes/edges\nupdate  \u2192 modify existing by ID\ndelete  \u2192 remove by ID\nbatch   \u2192 apply multiple operations\n```",
+        "markdown": "## AI mutation contract\n\nDeltas over rewrites. Validation gates. Minimal payloads. Dry-run previews.\n\nThe goal is predictable evolution, not chaos.\n\n```text\ncreate  → add nodes/edges\nupdate  → modify existing by ID\ndelete  → remove by ID\nbatch   → apply multiple operations\n```",
         "memo": "",
         "link": "",
         "html": "",
@@ -229,7 +309,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## What you can build\n\nRoadmaps, knowledge bases, dashboards, automation, agent memory, interactive docs, simulations \u2014 anything that benefits from explicit structure.\n\n- \ud83d\uddfa\ufe0f Planning\n- \ud83d\udcca Dashboards\n- \u26a1 Workflows\n- \ud83e\udd16 Agents\n- \ud83d\udcc4 Interactive docs\n- \ud83c\udfae Simulations",
+        "markdown": "## What you can build\n\nRoadmaps, knowledge bases, dashboards, automation, agent memory, interactive docs, simulations — anything that benefits from explicit structure.\n\n- 🗺️ Planning\n- 📊 Dashboards\n- ⚡ Workflows\n- 🤖 Agents\n- 📄 Interactive docs\n- 🎮 Simulations",
         "memo": "",
         "link": "",
         "html": "",
@@ -249,7 +329,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Status\n\nTwilite is under active development. The format is real. The editor is evolving.\n\nIf you\u2019re the kind of person who wants durable thinking artifacts (and doesn\u2019t mind sharp edges), you\u2019re invited.\n\n- Get early access: [admin@twilite.zone](subject=Twilite%20%E2%80%94%20early%20access)\n- Full app: `/browser/`\n- Editor-only: `/editor/`",
+        "markdown": "## Status\n\nTwilite is under active development. The format is real. The editor is evolving.\n\nIf you’re the kind of person who wants durable thinking artifacts (and doesn’t mind sharp edges), you’re invited.\n\n- Get early access: [admin@twilite.zone](subject=Twilite%20%E2%80%94%20early%20access)\n- Full app: `/browser/`\n- Editor-only: `/editor/`",
         "memo": "",
         "link": "",
         "html": "",

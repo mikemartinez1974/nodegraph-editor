@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "99b8ea3b-6d62-45d5-8ed0-87b21a33fa69",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "6882f5b0-1bcf-4afb-9609-d255f2762806",
+          "name": "Skill Port Compatibility Checks",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.962Z",
+          "updatedAt": "2026-02-12T17:26:05.962Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-portcheck-root",
       "type": "markdown",
-      "label": "\ud83d\udd12 Skill: PortCompatibilityChecks (Normative)",
+      "label": "🔒 Skill: PortCompatibilityChecks (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- Missing port \u2192 reject edge\n- Direction mismatch \u2192 reject edge\n- Semantic type mismatch (strict) \u2192 reject edge\n\nFailures must be explicit."
+        "markdown": "## Failure Modes\n\n- Missing port → reject edge\n- Direction mismatch → reject edge\n- Semantic type mismatch (strict) → reject edge\n\nFailures must be explicit."
       }
     },
     {

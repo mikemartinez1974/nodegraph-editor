@@ -66,9 +66,89 @@
   ],
   "nodes": [
     {
+      "id": "54644fe1-7cc9-4edc-b91a-500ced9fcac5",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "b59a08b7-a4bd-4e42-8549-b1100ad1ab18",
+          "name": "ThePitch",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.261Z",
+          "updatedAt": "2026-02-12T17:26:06.261Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "77521e68-d531-4eae-b39a-4d8c58bc0ef2",
       "type": "markdown",
-      "label": "\ud83d\udccd Start Here: The Spark",
+      "label": "📍 Start Here: The Spark",
       "position": {
         "x": -1088.3168420266343,
         "y": 138.69541511948094
@@ -317,7 +397,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "Not to highjack the thread, but there is *plenty* to know about particle effects, man.  That shit is like learning about special effects in movies.  I think I'm taking the easy route to content creation by \"only\" going after the particles.   Before long I'm realizing that creating the particle system is in fact where all the work is.  Once you can insert a particle effect into a scene, it is *absolutely trivial* to add anything else to that scene.  If you can add a particle emitter, you can add a block.  And at that point, you basically have a full 3d scene creator.  Stick a pin in that.\ud83d\udccc"
+        "memo": "Not to highjack the thread, but there is *plenty* to know about particle effects, man.  That shit is like learning about special effects in movies.  I think I'm taking the easy route to content creation by \"only\" going after the particles.   Before long I'm realizing that creating the particle system is in fact where all the work is.  Once you can insert a particle effect into a scene, it is *absolutely trivial* to add anything else to that scene.  If you can add a particle emitter, you can add a block.  And at that point, you basically have a full 3d scene creator.  Stick a pin in that.📌"
       }
     },
     {
@@ -370,7 +450,7 @@
     {
       "id": "4fdb3023-d6cc-4aa4-8921-7395b2eb1471",
       "type": "markdown",
-      "label": "\ud83c\udf00 Where it Goes From Here",
+      "label": "🌀 Where it Goes From Here",
       "position": {
         "x": 2767.4950574287122,
         "y": 545.5657557653126
@@ -381,7 +461,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "This isn't just a devlog \u2014 it's a mission. The road ahead is still unwritten.\n\nI don't know what form this project will ultimately take \u2014 VR tool, browser, engine, movement \u2014 but it feels inevitable now. Every piece that\u2019s come together is a reflection of a deeper need: *to be heard, to build, to belong*.\n\nIf you found yourself in this graph, then maybe it's yours too.\n\nThe work continues.",
+        "memo": "This isn't just a devlog — it's a mission. The road ahead is still unwritten.\n\nI don't know what form this project will ultimately take — VR tool, browser, engine, movement — but it feels inevitable now. Every piece that’s come together is a reflection of a deeper need: *to be heard, to build, to belong*.\n\nIf you found yourself in this graph, then maybe it's yours too.\n\nThe work continues.",
         "link": "",
         "html": "",
         "svg": ""

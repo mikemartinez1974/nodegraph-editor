@@ -1,62 +1,13 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-23T17:19:12.947Z",
-    "modified": "2026-01-23T17:19:12.947Z",
+    "created": "2026-02-12T17:00:46.622Z",
+    "modified": "2026-02-12T17:00:49.690Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 650,
-      "y": 305
-    },
-    "zoom": 1
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "home-hero",
@@ -72,7 +23,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# The graph is the product.\n\n**Twilite** is a storage format for thought \u2014 from a single idea to a complete executable system.\n\nEvery graph is a durable, portable artifact that humans and AI can both read and write.\n\n**Not a diagram tool. Not a note-taking app. A new format for storing human thought.**\n\n---\n\n**Try it:**\n- [Get Started](tlz://twilite.zone/tutorial/getting-started.document.node)\n\n\n**Contact the Developer:** [admin@twilite.zone](mailto:admin@twilite.zone?subject=Twilite%20Node%20Browser)"
+        "markdown": "# The graph is the product.\n\n**Twilite** is a storage format for thought — from a single idea to a complete executable system.\n\nEvery graph is a durable, portable artifact that humans and AI can both read and write.\n\n**Not a diagram tool. Not a note-taking app. A new format for storing human thought.**\n\n---\n\n**Try it:**\n- [Get Started](tlz://twilite.zone/tutorial/getting-started.document.node)\n\n\n**Contact the Developer:** [admin@twilite.zone](mailto:admin@twilite.zone?subject=Twilite%20Node%20Browser)"
       }
     },
     {
@@ -89,7 +40,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Full Spectrum\n\nA Twilite graph can store thought at any level of fidelity:\n\n- \ud83d\udcad **A concept** (one node, some text)\n- \ud83d\udcac **A conversation** (nodes as messages, edges as replies)\n- \ud83d\uddfa\ufe0f **A knowledge base** (concepts + relationships)\n- \u26a1 **A workflow** (tasks + dependencies)\n- \ud83c\udfae **A simulation** (state + transitions)\n- \ud83c\udf10 **An application** (UI + logic + data)\n\n**Same format. All renderable. All evolvable.**"
+        "markdown": "## The Full Spectrum\n\nA Twilite graph can store thought at any level of fidelity:\n\n- 💭 **A concept** (one node, some text)\n- 💬 **A conversation** (nodes as messages, edges as replies)\n- 🗺️ **A knowledge base** (concepts + relationships)\n- ⚡ **A workflow** (tasks + dependencies)\n- 🎮 **A simulation** (state + transitions)\n- 🌐 **An application** (UI + logic + data)\n\n**Same format. All renderable. All evolvable.**"
       }
     },
     {
@@ -140,7 +91,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Twilite Answer\n\n**One format for everything.**\n\nYour notes, diagrams, workflows, code, and conversations \u2014 all in the same graph.\n\n\u2713 **Portable** \u2014 JSON you can version in Git  \n\u2713 **Durable** \u2014 Stable IDs, incremental updates  \n\u2713 **Executable** \u2014 Graphs can run, not just display  \n\u2713 **AI-readable** \u2014 Agents can navigate and mutate  \n\u2713 **Web-native** \u2014 Renders anywhere  \n\u2713 **Composable** \u2014 Graphs link to graphs  "
+        "markdown": "## The Twilite Answer\n\n**One format for everything.**\n\nYour notes, diagrams, workflows, code, and conversations — all in the same graph.\n\n✓ **Portable** — JSON you can version in Git  \n✓ **Durable** — Stable IDs, incremental updates  \n✓ **Executable** — Graphs can run, not just display  \n✓ **AI-readable** — Agents can navigate and mutate  \n✓ **Web-native** — Renders anywhere  \n✓ **Composable** — Graphs link to graphs  "
       }
     },
     {
@@ -174,7 +125,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Safe Evolution\n\n**AI doesn't rewrite your graph. It mutates it.**\n\n```\ncreate  \u2192 add nodes/edges\nupdate  \u2192 modify by ID\ndelete  \u2192 remove by ID\nbatch   \u2192 atomic operations\n```\n\n**Deltas, not replacements.**\n\nYour graph has continuity. History. Identity.\n\nAI extends your thinking. It doesn't erase it."
+        "markdown": "## Safe Evolution\n\n**AI doesn't rewrite your graph. It mutates it.**\n\n```\ncreate  → add nodes/edges\nupdate  → modify by ID\ndelete  → remove by ID\nbatch   → atomic operations\n```\n\n**Deltas, not replacements.**\n\nYour graph has continuity. History. Identity.\n\nAI extends your thinking. It doesn't erase it."
       }
     },
     {
@@ -191,7 +142,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## The Vision\n\n**Twilite isn't just a tool. It's infrastructure.**\n\nThe file system for the next era of computing \u2014 where thought, code, and AI collaboration happen in the same unified format.\n\nA graph can start as a napkin sketch and evolve into a running application **without ever leaving the format.**\n\n**That's what we're building.**"
+        "markdown": "## The Vision\n\n**Twilite isn't just a tool. It's infrastructure.**\n\nThe file system for the next era of computing — where thought, code, and AI collaboration happen in the same unified format.\n\nA graph can start as a napkin sketch and evolve into a running application **without ever leaving the format.**\n\n**That's what we're building.**"
       }
     },
     {
@@ -270,7 +221,44 @@
           }
         },
         "html": "",
-        "svg": ""
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
       }
     }
   ],
@@ -280,126 +268,126 @@
       "type": "dataFlow",
       "source": "home-hero",
       "target": "home-spectrum",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "stores thought at every scale",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-hero-ai",
       "type": "dataFlow",
       "source": "home-hero",
       "target": "home-ai-native",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "AI-readable & writable",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-spectrum-problem",
       "type": "reference",
       "source": "home-spectrum",
       "target": "home-problem",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "vs. fragmented tools",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-ai-solution",
       "type": "reference",
       "source": "home-ai-native",
       "target": "home-solution",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "enables unified format",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-solution-format",
       "type": "dataFlow",
       "source": "home-solution",
       "target": "home-format",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "as portable JSON",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-solution-mutation",
       "type": "dataFlow",
       "source": "home-solution",
       "target": "home-mutation",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "with safe evolution",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-format-vision",
       "type": "reference",
       "source": "home-format",
       "target": "home-vision",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "infrastructure vision",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mutation-vision",
       "type": "reference",
       "source": "home-mutation",
       "target": "home-vision",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "continuity enables",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-vision-status",
       "type": "dataFlow",
       "source": "home-vision",
       "target": "home-status",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "join the build",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

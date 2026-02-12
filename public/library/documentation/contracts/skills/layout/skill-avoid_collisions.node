@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "41d03a88-b1dc-4910-845f-e1ab2d542685",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "3ee57a96-6da8-47f5-bb2d-b46824b9ccc8",
+          "name": "Skill Avoid Collisions",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.798Z",
+          "updatedAt": "2026-02-12T17:26:05.798Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-avoidcollisions-root",
       "type": "markdown",
-      "label": "\ud83e\udded Skill: AvoidCollisions (Normative)",
+      "label": "🧭 Skill: AvoidCollisions (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -85,7 +165,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Intent\n\nResolve overlaps with minimal disruption.\n\nPreserve the user\u2019s mental map.\n\nMovement must be explainable."
+        "markdown": "## Intent\n\nResolve overlaps with minimal disruption.\n\nPreserve the user’s mental map.\n\nMovement must be explainable."
       }
     },
     {
@@ -181,7 +261,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Failure Modes\n\n- If resolution impossible \u2192 stop early\n- Never teleport nodes\n\nPartial resolution is acceptable.\nTeleportation is not."
+        "markdown": "## Failure Modes\n\n- If resolution impossible → stop early\n- Never teleport nodes\n\nPartial resolution is acceptable.\nTeleportation is not."
       }
     },
     {

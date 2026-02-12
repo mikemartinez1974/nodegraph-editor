@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "c25c0421-cb72-4b83-80a2-8d1ae13dc06c",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "9293707b-b8c9-4f3a-beef-4c30b0ae1d85",
+          "name": "Skill Extract Subgraph",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.861Z",
+          "updatedAt": "2026-02-12T17:26:05.861Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "skill-extract-root",
       "type": "markdown",
-      "label": "\ud83e\udeb6 Skill: extract-subgraph (Normative)",
+      "label": "🪶 Skill: extract-subgraph (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -149,7 +229,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Identity Rules\n\n- fork=false \u2192 IDs preserved\n- fork=true \u2192 new IDs minted\n- newManifest=true \u2192 new graph identity\n- newManifest=false \u2192 caller supplies identity"
+        "markdown": "## Identity Rules\n\n- fork=false → IDs preserved\n- fork=true → new IDs minted\n- newManifest=true → new graph identity\n- newManifest=false → caller supplies identity"
       }
     },
     {
@@ -213,7 +293,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Idempotency\n\n- fork=false \u2192 idempotent\n- fork=true \u2192 not idempotent\n\nIdentity behavior must be explicit."
+        "markdown": "## Idempotency\n\n- fork=false → idempotent\n- fork=true → not idempotent\n\nIdentity behavior must be explicit."
       }
     },
     {

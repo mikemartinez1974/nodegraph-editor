@@ -10,9 +10,89 @@
   },
   "nodes": [
     {
+      "id": "a90c477e-d83a-4565-a875-cc8b4885424d",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "703ddb5e-d466-43d7-b439-3acadb01d34f",
+          "name": "Port Contract",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.694Z",
+          "updatedAt": "2026-02-12T17:26:05.694Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "port-contract-root",
       "type": "markdown",
-      "label": "\ud83d\udd0c Port Contract (Normative)",
+      "label": "🔌 Port Contract (Normative)",
       "position": {
         "x": 0,
         "y": 0
@@ -198,7 +278,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out \u2192 nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out \u2192 nodeA.data_out"
+        "markdown": "## Examples\n\n**Valid:**\nnodeA.data_out → nodeB.data_in\n\n**Invalid (must fail):**\nnodeA.data_out → nodeA.data_out"
       }
     },
     {

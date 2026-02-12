@@ -10,6 +10,86 @@
   },
   "nodes": [
     {
+      "id": "52cf9d5c-140b-4510-9b3a-0c0ea8f50eaf",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "4cce0ef7-2e9e-445d-8d7b-ae5b59be869f",
+          "name": "EdgeLayoutRoadmap",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.389Z",
+          "updatedAt": "2026-02-12T17:26:05.389Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "edge-layout-goal",
       "type": "markdown",
       "label": "Goal",
@@ -38,13 +118,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## LLM Payload Minimization (Principles)\n**Goal:** keep chatbot commands small while preserving power.\n\n- Prefer **intent** over geometry (\"connect A\u2192B\", not ports+coordinates)\n- Use **type defaults** + hydration on load (size/style/ports when needed)\n- Ports are **functional but optional**\n  - omit ports unless you need precise semantics\n  - rely on deterministic fallback attachment + routing\n- Avoid sending redundant fields (width/height/colors/positions) unless necessary\n- Provide robust editor-side tools: autolayout, reroute, incremental growth, debug toggles"
+        "markdown": "## LLM Payload Minimization (Principles)\n**Goal:** keep chatbot commands small while preserving power.\n\n- Prefer **intent** over geometry (\"connect A→B\", not ports+coordinates)\n- Use **type defaults** + hydration on load (size/style/ports when needed)\n- Ports are **functional but optional**\n  - omit ports unless you need precise semantics\n  - rely on deterministic fallback attachment + routing\n- Avoid sending redundant fields (width/height/colors/positions) unless necessary\n- Provide robust editor-side tools: autolayout, reroute, incremental growth, debug toggles"
       }
     },
     {
       "id": "edge-layout-phase-1",
       "type": "markdown",
-      "label": "Phase 1 \u2014 Ports & Edges",
+      "label": "Phase 1 — Ports & Edges",
       "position": {
         "x": 515,
         "y": -200
@@ -54,13 +134,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 1 \u2014 Ports & Edges (Foundation)\n**Goal:** edges attach predictably and route deterministically **without** requiring ports everywhere.\n\n### Status\n- \u2705 Ports are optional (functional but not required)\n- \u2705 Deterministic fallback attachment when ports omitted\n- \u2705 Reroute action (ELK routing without moving nodes)\n- \u2705 Node bounds defaults (create includes size; updates omit unless changed)\n- \u2705 Orthogonal-by-default edge style + centered labels\n\n---\n\n### Decisions\n- Ports are **functional but optional**\n  - omit ports unless you need precise semantics\n  - docs/markdown nodes should not require ports to connect\n- Do **not** force every node into left/right input/output ports\n- Practical routing policy\n  - **Live editing** uses deterministic geometry fallback (side-by-direction + orthogonal segments)\n  - **Beautify/Reroute** runs ELK and replaces fallback routes with ELK routes\n  - If ports exist, pass them to ELK as port constraints; otherwise omit and let ELK choose\n- If ports are omitted: use **geometry-based** deterministic attachment\n  - Choose side based on source\u2192target direction (top/right/bottom/left)\n  - Attach on the node boundary on that side\n  - Stable slotting: order by **edge id** to avoid stacking jitter\n- Reliable node bounds\n  - **Create** includes width/height unless the node type declares defaults\n  - **Update** omits width/height unless changing size\n- Minimize LLM payload: `source/target` required; `sourcePort/targetPort` optional; omit redundant node fields\n- Dev view: show ports + route points; expose as a toggle in **Edge Properties**"
+        "markdown": "## Phase 1 — Ports & Edges (Foundation)\n**Goal:** edges attach predictably and route deterministically **without** requiring ports everywhere.\n\n### Status\n- ✅ Ports are optional (functional but not required)\n- ✅ Deterministic fallback attachment when ports omitted\n- ✅ Reroute action (ELK routing without moving nodes)\n- ✅ Node bounds defaults (create includes size; updates omit unless changed)\n- ✅ Orthogonal-by-default edge style + centered labels\n\n---\n\n### Decisions\n- Ports are **functional but optional**\n  - omit ports unless you need precise semantics\n  - docs/markdown nodes should not require ports to connect\n- Do **not** force every node into left/right input/output ports\n- Practical routing policy\n  - **Live editing** uses deterministic geometry fallback (side-by-direction + orthogonal segments)\n  - **Beautify/Reroute** runs ELK and replaces fallback routes with ELK routes\n  - If ports exist, pass them to ELK as port constraints; otherwise omit and let ELK choose\n- If ports are omitted: use **geometry-based** deterministic attachment\n  - Choose side based on source→target direction (top/right/bottom/left)\n  - Attach on the node boundary on that side\n  - Stable slotting: order by **edge id** to avoid stacking jitter\n- Reliable node bounds\n  - **Create** includes width/height unless the node type declares defaults\n  - **Update** omits width/height unless changing size\n- Minimize LLM payload: `source/target` required; `sourcePort/targetPort` optional; omit redundant node fields\n- Dev view: show ports + route points; expose as a toggle in **Edge Properties**"
       }
     },
     {
       "id": "edge-layout-phase-1-blockers",
       "type": "markdown",
-      "label": "Phase 1 \u2014 Considerations",
+      "label": "Phase 1 — Considerations",
       "position": {
         "x": -121.66666666666674,
         "y": 220
@@ -70,13 +150,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 1 \u2014 Considerations / Blockers\n- Edge authority rules\n  - Live: geometry fallback\n  - Beautify/Reroute: ELK routes override\n  - Ports override fallback; passed to ELK when present\n- Reliable node bounds\n  - Create includes size (or node-type defaults exist)\n  - Updates omit size unless changing it\n- Stable slotting\n  - Use **edge id** ordering per node-side\n- Orthogonal-by-default\n  - Prefer ELK routes when available; otherwise use deterministic orthogonal fallback\n- Dev overlay\n  - Toggle in Edge Properties; render ports + route points in EdgeLayer\n- Validation + hydration\n  - Ports/positions optional; hydrate defaults so small LLM payloads don\u2019t fail"
+        "markdown": "## Phase 1 — Considerations / Blockers\n- Edge authority rules\n  - Live: geometry fallback\n  - Beautify/Reroute: ELK routes override\n  - Ports override fallback; passed to ELK when present\n- Reliable node bounds\n  - Create includes size (or node-type defaults exist)\n  - Updates omit size unless changing it\n- Stable slotting\n  - Use **edge id** ordering per node-side\n- Orthogonal-by-default\n  - Prefer ELK routes when available; otherwise use deterministic orthogonal fallback\n- Dev overlay\n  - Toggle in Edge Properties; render ports + route points in EdgeLayer\n- Validation + hydration\n  - Ports/positions optional; hydrate defaults so small LLM payloads don’t fail"
       }
     },
     {
       "id": "edge-layout-phase-2",
       "type": "markdown",
-      "label": "Phase 2 \u2014 Layered Layout",
+      "label": "Phase 2 — Layered Layout",
       "position": {
         "x": 618.3333333333333,
         "y": 260
@@ -86,13 +166,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 2 \u2014 Layered Layout (Readable DAGs)\n**Goal:** most pasted/generated graphs become readable without manual work.\n\n### Status\n- \u2705 Auto-layout trigger implemented: when positions are omitted in pasted `create` / `createNodes`\n- \u2705 Layout mutates node positions (positions persist when saved)\n- \u2705 Serpentine layout (MVP: chain graphs; max nodes per row)\n- \u2705 Cycles/non-DAG fallback: layered best-effort; **grid fallback** when graph is heavily cyclic\n- \u2705 \"Beautify\" consistency: any layout pass also reroutes edges (ELK)\n- \u2705 Document-level `documentSettings.layout` (mode + default layout + direction)\n\n### Remaining\n- (Optional) expose advanced layout tuning (spacing thresholds)\n\n---\n\n### Decisions\n- **Auto-layout trigger:** only when positions are **not present** in the pasted `create` command (positions optional by design)\n- \"Beautify\" is the explicit override (runs even if positions exist)\n- Layered direction: top-down default; support left-right\n- Tune spacing/padding defaults (node-node, layer spacing)\n- Avoid overlaps; respect node sizes\n- Port long chains with a **serpentine option**\n- Defer overlap prompts/toasts; later consider \"pin nodes\" for stability\n- Minimize LLM payload: positions optional; if missing, autolayout fills in"
+        "markdown": "## Phase 2 — Layered Layout (Readable DAGs)\n**Goal:** most pasted/generated graphs become readable without manual work.\n\n### Status\n- ✅ Auto-layout trigger implemented: when positions are omitted in pasted `create` / `createNodes`\n- ✅ Layout mutates node positions (positions persist when saved)\n- ✅ Serpentine layout (MVP: chain graphs; max nodes per row)\n- ✅ Cycles/non-DAG fallback: layered best-effort; **grid fallback** when graph is heavily cyclic\n- ✅ \"Beautify\" consistency: any layout pass also reroutes edges (ELK)\n- ✅ Document-level `documentSettings.layout` (mode + default layout + direction)\n\n### Remaining\n- (Optional) expose advanced layout tuning (spacing thresholds)\n\n---\n\n### Decisions\n- **Auto-layout trigger:** only when positions are **not present** in the pasted `create` command (positions optional by design)\n- \"Beautify\" is the explicit override (runs even if positions exist)\n- Layered direction: top-down default; support left-right\n- Tune spacing/padding defaults (node-node, layer spacing)\n- Avoid overlaps; respect node sizes\n- Port long chains with a **serpentine option**\n- Defer overlap prompts/toasts; later consider \"pin nodes\" for stability\n- Minimize LLM payload: positions optional; if missing, autolayout fills in"
       }
     },
     {
       "id": "edge-layout-phase-2-considerations",
       "type": "markdown",
-      "label": "Phase 2 \u2014 Considerations",
+      "label": "Phase 2 — Considerations",
       "position": {
         "x": 721.6666666666666,
         "y": 700
@@ -102,13 +182,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 2 \u2014 Considerations / Blockers\n- Positions policy\n  - \"Missing\" means **not present in the pasted create command**\n  - Positions are optional; include them only when intentional\n- Node bounds\n  - Nodes need a size to exist; default sizes must be reliable\n  - Avoid \"index card stack\" as the default look (tune spacing + direction)\n- Routing after layout\n  - Treat routes as **computed** (not canonical)\n  - **Beautify = layout + reroute** so edges match immediately\n  - If routes are stale, clear and fall back until reroute runs\n- Serpentine\n  - MVP rule: **max nodes per row** (explicit wrap count)\n  - Initial implementation: only when the selected graph is a true chain; otherwise fallback to hierarchical\n  - Will need deeper heuristics later\n- Clusters\n  - Treat as **logical** groupings for MVP (do not constrain layout yet)\n- Cycles/non-DAGs\n  - Default: layered **best effort** (accept some backward/feedback edges)\n  - Fallback: if graph is heavily cyclic (large SCC), use **grid** for stability\n  - Keep behavior deterministic (simple heuristic threshold)"
+        "markdown": "## Phase 2 — Considerations / Blockers\n- Positions policy\n  - \"Missing\" means **not present in the pasted create command**\n  - Positions are optional; include them only when intentional\n- Node bounds\n  - Nodes need a size to exist; default sizes must be reliable\n  - Avoid \"index card stack\" as the default look (tune spacing + direction)\n- Routing after layout\n  - Treat routes as **computed** (not canonical)\n  - **Beautify = layout + reroute** so edges match immediately\n  - If routes are stale, clear and fall back until reroute runs\n- Serpentine\n  - MVP rule: **max nodes per row** (explicit wrap count)\n  - Initial implementation: only when the selected graph is a true chain; otherwise fallback to hierarchical\n  - Will need deeper heuristics later\n- Clusters\n  - Treat as **logical** groupings for MVP (do not constrain layout yet)\n- Cycles/non-DAGs\n  - Default: layered **best effort** (accept some backward/feedback edges)\n  - Fallback: if graph is heavily cyclic (large SCC), use **grid** for stability\n  - Keep behavior deterministic (simple heuristic threshold)"
       }
     },
     {
       "id": "edge-layout-phase-3",
       "type": "markdown",
-      "label": "Phase 3 \u2014 Routing Polish",
+      "label": "Phase 3 — Routing Polish",
       "position": {
         "x": -18.33333333333337,
         "y": 730
@@ -118,13 +198,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 3 \u2014 Routing Polish (Edges Look Intentional)\n**Goal:** reduce crossings and visual noise.\n\n### Status\n- \u2705 Multi-edge lane spacing is configurable: `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n- \u2705 Multi-label contract: `edge.labels = [start, middle, end]` (strings render; missing slots are ignored)\n- \u2705 Label placement MVP: middle label uses the **center segment** (orthogonal)\n\n---\n\n### Work\n- Use ELK routing sections (orthogonal) as the default path\n- Improve crossing reduction by tuning ELK layered options\n- Port multi-edges/fan-in/fan-out (parallel edge spacing)\n  - Policy: if multiple edges share a port, fan them.\n  - If ports are omitted, slot edges on the chosen node side so endpoints don\u2019t overlap.\n- Add a \"Reroute edges\" action without moving nodes\n- Minimize payload: routes are computed (not stored in `.node` by default)"
+        "markdown": "## Phase 3 — Routing Polish (Edges Look Intentional)\n**Goal:** reduce crossings and visual noise.\n\n### Status\n- ✅ Multi-edge lane spacing is configurable: `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n- ✅ Multi-label contract: `edge.labels = [start, middle, end]` (strings render; missing slots are ignored)\n- ✅ Label placement MVP: middle label uses the **center segment** (orthogonal)\n\n---\n\n### Work\n- Use ELK routing sections (orthogonal) as the default path\n- Improve crossing reduction by tuning ELK layered options\n- Port multi-edges/fan-in/fan-out (parallel edge spacing)\n  - Policy: if multiple edges share a port, fan them.\n  - If ports are omitted, slot edges on the chosen node side so endpoints don’t overlap.\n- Add a \"Reroute edges\" action without moving nodes\n- Minimize payload: routes are computed (not stored in `.node` by default)"
       }
     },
     {
       "id": "edge-layout-phase-3-considerations",
       "type": "markdown",
-      "label": "Phase 3 \u2014 Considerations",
+      "label": "Phase 3 — Considerations",
       "position": {
         "x": -655,
         "y": 730
@@ -134,13 +214,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 3 \u2014 Considerations / Blockers\n- **Port/port side truth:** ELK routing looks best when port sides are known. If ports are omitted, fallback attachment must be stable/deterministic so reroutes don\u2019t \u201crandomize\u201d sides.\n  - Policy: if port ids exist and resolve \u2192 obey them.\n  - Otherwise choose side **per endpoint** from geometry (source side can differ from target side).\n  - This allows spatially sensible cases like \"exit left\" \u2192 \"enter top\" without special casing (orthogonal still works; curved edges can use the same endpoints).\n- **Dominant axis vs mixed sides:** don\u2019t force both ends to share one axis. Pick each end independently from the center\u2192center direction (or from routed segment tangent when available).\n- **When to recompute routes:** define triggers (node move, node resize, edge add/remove) to avoid stale routes or constant jitter.\n- **Bounds reliability:** rerouting only helps if the model has correct `node.width/height`.\n  - If a node can resize due to render/content (markdown, plugins), update width/height first, then reroute.\n- **Label placement MVP:** choose the segment that is \u201cmost central\u201d along the polyline (ELK-routed or fallback), and place the label on that segment.\n- **Multi-label contract:** `edge.labels = [start, middle, end]`\n  - A string renders a label; `null/undefined` means no label.\n  - If `edge.labels` exists, it overrides legacy `edge.label`.\n  - Default fallback: `edge.label` maps to `labels[1]`.\n- **Multi-edge spacing:** bundled edges need deterministic offsets (keyed by `edge.id`) so order doesn\u2019t change between sessions."
+        "markdown": "## Phase 3 — Considerations / Blockers\n- **Port/port side truth:** ELK routing looks best when port sides are known. If ports are omitted, fallback attachment must be stable/deterministic so reroutes don’t “randomize” sides.\n  - Policy: if port ids exist and resolve → obey them.\n  - Otherwise choose side **per endpoint** from geometry (source side can differ from target side).\n  - This allows spatially sensible cases like \"exit left\" → \"enter top\" without special casing (orthogonal still works; curved edges can use the same endpoints).\n- **Dominant axis vs mixed sides:** don’t force both ends to share one axis. Pick each end independently from the center→center direction (or from routed segment tangent when available).\n- **When to recompute routes:** define triggers (node move, node resize, edge add/remove) to avoid stale routes or constant jitter.\n- **Bounds reliability:** rerouting only helps if the model has correct `node.width/height`.\n  - If a node can resize due to render/content (markdown, plugins), update width/height first, then reroute.\n- **Label placement MVP:** choose the segment that is “most central” along the polyline (ELK-routed or fallback), and place the label on that segment.\n- **Multi-label contract:** `edge.labels = [start, middle, end]`\n  - A string renders a label; `null/undefined` means no label.\n  - If `edge.labels` exists, it overrides legacy `edge.label`.\n  - Default fallback: `edge.label` maps to `labels[1]`.\n- **Multi-edge spacing:** bundled edges need deterministic offsets (keyed by `edge.id`) so order doesn’t change between sessions."
       }
     },
     {
       "id": "edge-layout-phase-4",
       "type": "markdown",
-      "label": "Phase 4 \u2014 Incremental / Mental Map",
+      "label": "Phase 4 — Incremental / Mental Map",
       "position": {
         "x": -18.33333333333337,
         "y": 1180
@@ -150,13 +230,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 4 \u2014 Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the **affected** region (local reflow)\n  - Affected region = bounding box of the newly-added/changed nodes (+ padding)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-cluster layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
+        "markdown": "## Phase 4 — Incremental / Mental Map (Growth Without Mangling)\n**Goal:** graphs can grow while staying stable.\n\n- Place new nodes near the cursor or near their neighbors\n- Re-layout only the **affected** region (local reflow)\n  - Affected region = bounding box of the newly-added/changed nodes (+ padding)\n- \"Lock region\" / \"keep stable\" areas (opt-in)\n- Per-cluster layout for isolated subsystems\n- Clear, predictable triggers: paste/import, add-node, connect-edge\n- Minimize LLM payload: allow \"add node + connect\" with no coordinates; growth logic decides placement"
       }
     },
     {
       "id": "edge-layout-phase-4-considerations",
       "type": "markdown",
-      "label": "Phase 4 \u2014 Considerations",
+      "label": "Phase 4 — Considerations",
       "position": {
         "x": -655,
         "y": 1180
@@ -166,13 +246,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 4 \u2014 Considerations / Blockers\n- **Stability policy:** adding one node/edge should not reshuffle the whole graph; define \u201clocal reflow\u201d boundaries.\n- **Affected region:** use the bounding box of the newly-added/changed nodes (+ padding) as the default local-reflow scope.\n- **Overlaps (multiple collisions):** Option A \u2014 keep existing nodes fixed; move the incoming node/selection cluster to the nearest non-overlapping spot (grid/spiral search).\n- **Pinned/locked nodes:** do both\n  - Pinned nodes never move\n  - Treat pinned nodes as hard obstacles during placement/reflow (cannot overlap; cannot be pushed through)\n- **All additions follow the same rule:** paste/import, add-node, and programmatic create all go through the same placement + overlap-avoidance pipeline.\n- **Serpentine beyond chains:** current serpentine is intentionally strict; consider heuristics (longest path backbone, sidecar branches) so more real graphs benefit.\n- **Clusters:** MVP treats clusters as logical only; growth needs a predictable cluster policy.\n  - Cluster-as-obstacle: new nodes/clusters should not land on top of cluster bounds.\n  - Per-cluster vs global: allow a per-cluster layout override that runs layout **inside the cluster** (internal edges), then reroutes cross-cluster edges after.\n  - Cluster pinning: support `lockMembers` (members fixed) and `lockBounds` (cluster rectangle fixed) so users can stabilize subsystems."
+        "markdown": "## Phase 4 — Considerations / Blockers\n- **Stability policy:** adding one node/edge should not reshuffle the whole graph; define “local reflow” boundaries.\n- **Affected region:** use the bounding box of the newly-added/changed nodes (+ padding) as the default local-reflow scope.\n- **Overlaps (multiple collisions):** Option A — keep existing nodes fixed; move the incoming node/selection cluster to the nearest non-overlapping spot (grid/spiral search).\n- **Pinned/locked nodes:** do both\n  - Pinned nodes never move\n  - Treat pinned nodes as hard obstacles during placement/reflow (cannot overlap; cannot be pushed through)\n- **All additions follow the same rule:** paste/import, add-node, and programmatic create all go through the same placement + overlap-avoidance pipeline.\n- **Serpentine beyond chains:** current serpentine is intentionally strict; consider heuristics (longest path backbone, sidecar branches) so more real graphs benefit.\n- **Clusters:** MVP treats clusters as logical only; growth needs a predictable cluster policy.\n  - Cluster-as-obstacle: new nodes/clusters should not land on top of cluster bounds.\n  - Per-cluster vs global: allow a per-cluster layout override that runs layout **inside the cluster** (internal edges), then reroutes cross-cluster edges after.\n  - Cluster pinning: support `lockMembers` (members fixed) and `lockBounds` (cluster rectangle fixed) so users can stabilize subsystems."
       }
     },
     {
       "id": "edge-layout-phase-5",
       "type": "markdown",
-      "label": "Phase 5 \u2014 Extensibility",
+      "label": "Phase 5 — Extensibility",
       "position": {
         "x": -18.33333333333337,
         "y": 1600
@@ -182,7 +262,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Phase 5 \u2014 Extensibility (More Layouts Over Time)\n**Goal:** add new layout strategies without refactors.\n\n- Make layout **first-class** in the document (`documentSettings.layout`)\n  - `mode` (manual/auto), `algorithm`, `direction`, `spacingPreset`\n  - optional knobs: `serpentine.maxPerRow`, cycle fallback policy\n- Define a layout strategy API: `layout(graph, options) -> { positions, routes }`\n- Implement a few built-ins: layered, serpentine, grid, radial\n- Store per-document defaults + per-cluster overrides\n  - `cluster.layout.enabled`, `cluster.layout.algorithm`, `cluster.layout.direction`, `cluster.layout.serpentine.maxPerRow`\n  - `cluster.lockMembers`, `cluster.lockBounds` (growth constraints)\n- Consider a lightweight **\"sequence\" cluster** flavor (signals ordered content; serpentine becomes a natural default)\n- Allow plugins to register layout strategies\n- Add a small \"Layout\" panel: direction, spacing, routing mode\n- Minimize LLM payload: expose editor-side commands (Beautify/Reroute/Grow) so chat payload stays small"
+        "markdown": "## Phase 5 — Extensibility (More Layouts Over Time)\n**Goal:** add new layout strategies without refactors.\n\n- Make layout **first-class** in the document (`documentSettings.layout`)\n  - `mode` (manual/auto), `algorithm`, `direction`, `spacingPreset`\n  - optional knobs: `serpentine.maxPerRow`, cycle fallback policy\n- Define a layout strategy API: `layout(graph, options) -> { positions, routes }`\n- Implement a few built-ins: layered, serpentine, grid, radial\n- Store per-document defaults + per-cluster overrides\n  - `cluster.layout.enabled`, `cluster.layout.algorithm`, `cluster.layout.direction`, `cluster.layout.serpentine.maxPerRow`\n  - `cluster.lockMembers`, `cluster.lockBounds` (growth constraints)\n- Consider a lightweight **\"sequence\" cluster** flavor (signals ordered content; serpentine becomes a natural default)\n- Allow plugins to register layout strategies\n- Add a small \"Layout\" panel: direction, spacing, routing mode\n- Minimize LLM payload: expose editor-side commands (Beautify/Reroute/Grow) so chat payload stays small"
       }
     },
     {

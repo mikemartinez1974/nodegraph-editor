@@ -10,6 +10,86 @@
   },
   "nodes": [
     {
+      "id": "82a4e3e8-cd70-4424-9fa8-0492c88ee11e",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "cdbc1eea-be32-4790-9981-523f75064350",
+          "name": "GithubAndTimeline",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.409Z",
+          "updatedAt": "2026-02-12T17:26:05.409Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "a0000001-0000-4000-8000-000000000001",
       "type": "markdown",
       "label": "Design Axes",
@@ -32,7 +112,7 @@
     {
       "id": "b0000001-0000-4000-8000-000000000002",
       "type": "markdown",
-      "label": "GitHub Integration \u2014 Core Idea",
+      "label": "GitHub Integration — Core Idea",
       "position": {
         "x": 736.452095006724,
         "y": 11.9169377412818
@@ -52,7 +132,7 @@
     {
       "id": "d0000002-0000-4000-8000-000000000009",
       "type": "markdown",
-      "label": "Decision \u2014 Repo Scope",
+      "label": "Decision — Repo Scope",
       "position": {
         "x": 736.452095006724,
         "y": 396.9169377412818
@@ -72,7 +152,7 @@
     {
       "id": "b0000002-0000-4000-8000-000000000003",
       "type": "markdown",
-      "label": "GitHub Integration \u2014 MVP",
+      "label": "GitHub Integration — MVP",
       "position": {
         "x": 736.452095006724,
         "y": 751.9169377412818
@@ -92,7 +172,7 @@
     {
       "id": "d0000003-0000-4000-8000-000000000010",
       "type": "markdown",
-      "label": "Decision \u2014 Sync + Commits",
+      "label": "Decision — Sync + Commits",
       "position": {
         "x": 736.452095006724,
         "y": 1166.9169377412818
@@ -112,7 +192,7 @@
     {
       "id": "b0000003-0000-4000-8000-000000000004",
       "type": "markdown",
-      "label": "GitHub Integration \u2014 Advanced",
+      "label": "GitHub Integration — Advanced",
       "position": {
         "x": 736.452095006724,
         "y": 1531.9169377412818
@@ -132,7 +212,7 @@
     {
       "id": "c0000001-0000-4000-8000-000000000005",
       "type": "markdown",
-      "label": "Timeline \u2014 Core Concept",
+      "label": "Timeline — Core Concept",
       "position": {
         "x": 196.45209500672394,
         "y": 11.9169377412818
@@ -152,7 +232,7 @@
     {
       "id": "c0000002-0000-4000-8000-000000000006",
       "type": "markdown",
-      "label": "Timeline \u2014 MVP",
+      "label": "Timeline — MVP",
       "position": {
         "x": 196.45209500672394,
         "y": 371.9169377412818
@@ -172,7 +252,7 @@
     {
       "id": "d0000004-0000-4000-8000-000000000011",
       "type": "markdown",
-      "label": "Decision \u2014 Timeline Scope",
+      "label": "Decision — Timeline Scope",
       "position": {
         "x": 196.45209500672394,
         "y": 766.9169377412818
@@ -192,7 +272,7 @@
     {
       "id": "c0000003-0000-4000-8000-000000000007",
       "type": "markdown",
-      "label": "Timeline \u2014 Advanced",
+      "label": "Timeline — Advanced",
       "position": {
         "x": 196.45209500672394,
         "y": 1131.9169377412818

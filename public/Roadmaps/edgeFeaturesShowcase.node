@@ -10,9 +10,89 @@
   },
   "nodes": [
     {
+      "id": "30296338-5a74-4ce9-8848-a9018b7cccb2",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "a3691bde-e9de-4477-a61d-8fd9364d2211",
+          "name": "EdgeFeaturesShowcase",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.380Z",
+          "updatedAt": "2026-02-12T17:26:05.380Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "showcase-title",
       "type": "markdown",
-      "label": "Edge Features \u2014 Showcase",
+      "label": "Edge Features — Showcase",
       "position": {
         "x": -140,
         "y": -260
@@ -22,13 +102,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Edge Features Showcase\n\nThis graph demonstrates:\n- **Multi-label edges**: `edge.labels = [start, middle, end]`\n- **Center-segment label placement** (orthogonal)\n- **Multi-edge lane spacing** using `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n\nTry changing **Document Properties \u2192 Appearance \u2192 Edge lane spacing (px)** to see lanes widen/narrow."
+        "markdown": "# Edge Features Showcase\n\nThis graph demonstrates:\n- **Multi-label edges**: `edge.labels = [start, middle, end]`\n- **Center-segment label placement** (orthogonal)\n- **Multi-edge lane spacing** using `documentSettings.layout.edgeLaneGapPx` (default **10px**)\n\nTry changing **Document Properties → Appearance → Edge lane spacing (px)** to see lanes widen/narrow."
       }
     },
     {
       "id": "source",
       "type": "default",
-      "label": "\ud83d\udfe2 Source",
+      "label": "🟢 Source",
       "position": {
         "x": -120,
         "y": 0
@@ -44,7 +124,7 @@
     {
       "id": "t-a",
       "type": "default",
-      "label": "\ud83e\uddfc Clean",
+      "label": "🧼 Clean",
       "position": {
         "x": 169,
         "y": -63
@@ -60,7 +140,7 @@
     {
       "id": "t-b",
       "type": "default",
-      "label": "\ud83d\udd0d Validate",
+      "label": "🔍 Validate",
       "position": {
         "x": 280,
         "y": 40
@@ -76,7 +156,7 @@
     {
       "id": "t-c",
       "type": "default",
-      "label": "\u2728 Enrich",
+      "label": "✨ Enrich",
       "position": {
         "x": 280,
         "y": 170
@@ -92,7 +172,7 @@
     {
       "id": "merge",
       "type": "default",
-      "label": "\ud83e\udde9 Merge",
+      "label": "🧩 Merge",
       "position": {
         "x": 521,
         "y": 44
@@ -108,7 +188,7 @@
     {
       "id": "output",
       "type": "default",
-      "label": "\ud83d\udce6 Output",
+      "label": "📦 Output",
       "position": {
         "x": 1270,
         "y": 56
@@ -134,7 +214,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## What to look for\n\n1) **Multi-label edges**\n- Start label near the source\n- Middle label on the center segment\n- End label near the target\n\n2) **Multi-edge spacing**\n- Two edges from Source \u2192 Clean are parallel and should not overlap.\n\n3) **Backwards compatibility**\n- One edge uses legacy `edge.label` and should still render a middle label."
+        "markdown": "## What to look for\n\n1) **Multi-label edges**\n- Start label near the source\n- Middle label on the center segment\n- End label near the target\n\n2) **Multi-edge spacing**\n- Two edges from Source → Clean are parallel and should not overlap.\n\n3) **Backwards compatibility**\n- One edge uses legacy `edge.label` and should still render a middle label."
       }
     }
   ],

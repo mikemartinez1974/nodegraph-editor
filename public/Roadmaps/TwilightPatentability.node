@@ -59,9 +59,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "986e56ac-a75c-4114-ac5c-af9ee33cb41a",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "f63a7a31-2300-4a83-967f-86c9455c98b2",
+          "name": "TwilightPatentability",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.353Z",
+          "updatedAt": "2026-02-12T17:26:05.353Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "pat-01",
       "type": "markdown",
-      "label": "\ud83e\udded The Question",
+      "label": "🧭 The Question",
       "position": {
         "x": 831.6666666666666,
         "y": -445
@@ -71,7 +151,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Do we have something **patentable** \u2014 not just interesting, useful, or clever \u2014 but defensible as a *system*?",
+        "markdown": "Do we have something **patentable** — not just interesting, useful, or clever — but defensible as a *system*?",
         "memo": "",
         "link": "",
         "html": "",
@@ -81,7 +161,7 @@
     {
       "id": "pat-02",
       "type": "markdown",
-      "label": "\u274c Not Patentable (Alone)",
+      "label": "❌ Not Patentable (Alone)",
       "position": {
         "x": 395,
         "y": -85
@@ -101,7 +181,7 @@
     {
       "id": "pat-03",
       "type": "markdown",
-      "label": "\u2705 Potentially Patentable Core",
+      "label": "✅ Potentially Patentable Core",
       "position": {
         "x": 855,
         "y": -85
@@ -111,7 +191,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**System-level combination:**\n\n\u2022 Graph is the *primary persistent artifact*\n\u2022 Graph may be authored **headlessly** (no layout)\n\u2022 Rendering is a **derived projection**, not state\n\u2022 AI mutates graph structure, not pixels\n\u2022 Copy/paste transmits executable graph state\n\u2022 Stable IDs + history preserved across views\n\u2022 Offline (Codex) and online (agents/RAG) share the same graph",
+        "markdown": "**System-level combination:**\n\n• Graph is the *primary persistent artifact*\n• Graph may be authored **headlessly** (no layout)\n• Rendering is a **derived projection**, not state\n• AI mutates graph structure, not pixels\n• Copy/paste transmits executable graph state\n• Stable IDs + history preserved across views\n• Offline (Codex) and online (agents/RAG) share the same graph",
         "memo": "",
         "link": "",
         "html": "",
@@ -121,7 +201,7 @@
     {
       "id": "pat-04",
       "type": "markdown",
-      "label": "\u2696\ufe0f Why This Is Non-Obvious",
+      "label": "⚖️ Why This Is Non-Obvious",
       "position": {
         "x": 500,
         "y": 385
@@ -131,7 +211,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Most systems do:\n\nrender \u2192 edit \u2192 serialize\n\nTwilite does:\n\n**structure \u2192 persist \u2192 project**\n\nThis inversion changes how AI, humans, and tools interact with state.",
+        "markdown": "Most systems do:\n\nrender → edit → serialize\n\nTwilite does:\n\n**structure → persist → project**\n\nThis inversion changes how AI, humans, and tools interact with state.",
         "memo": "",
         "link": "",
         "html": "",
@@ -141,7 +221,7 @@
     {
       "id": "pat-05",
       "type": "markdown",
-      "label": "\ud83c\udfd7\ufe0f Competitive Context",
+      "label": "🏗️ Competitive Context",
       "position": {
         "x": 20,
         "y": 385
@@ -151,7 +231,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Big players (e.g. Google Antigravity):\n\n\u2022 UI-first\n\u2022 SaaS-hosted\n\u2022 Execution-centric\n\u2022 Rendering assumed\n\u2022 Ephemeral cognition\n\nTwilite is orthogonal, not replaceable.",
+        "markdown": "Big players (e.g. Google Antigravity):\n\n• UI-first\n• SaaS-hosted\n• Execution-centric\n• Rendering assumed\n• Ephemeral cognition\n\nTwilite is orthogonal, not replaceable.",
         "memo": "",
         "link": "",
         "html": "",
@@ -161,7 +241,7 @@
     {
       "id": "pat-06",
       "type": "markdown",
-      "label": "\ud83d\udccc Current Status",
+      "label": "📌 Current Status",
       "position": {
         "x": 980,
         "y": 405
@@ -171,7 +251,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "\u2022 Architecture is real\n\u2022 Insight recently crystallized\n\u2022 Patentability depends on **mechanism**, not philosophy\n\u2022 Needs concrete system description\n\u2022 Not ready to file \u2014 ready to *define*",
+        "markdown": "• Architecture is real\n• Insight recently crystallized\n• Patentability depends on **mechanism**, not philosophy\n• Needs concrete system description\n• Not ready to file — ready to *define*",
         "memo": "",
         "link": "",
         "html": "",
@@ -181,7 +261,7 @@
     {
       "id": "pat-07",
       "type": "markdown",
-      "label": "\ud83d\udee4\ufe0f Next Decision Fork",
+      "label": "🛤️ Next Decision Fork",
       "position": {
         "x": 960,
         "y": 805
@@ -191,7 +271,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Options:\n\n1. Draft plain-English system claim\n2. Identify prior art to distinguish\n3. Consult patent attorney (after #1)\n4. Decide *not* to patent (and why)\n\nNo urgency \u2014 clarity first.",
+        "markdown": "Options:\n\n1. Draft plain-English system claim\n2. Identify prior art to distinguish\n3. Consult patent attorney (after #1)\n4. Decide *not* to patent (and why)\n\nNo urgency — clarity first.",
         "memo": "",
         "link": "",
         "html": "",

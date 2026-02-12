@@ -10,6 +10,86 @@
   },
   "nodes": [
     {
+      "id": "c57eea12-477f-458d-9981-09a6e6e69584",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "e5693eb9-826b-46e8-8705-22e6f4b41457",
+          "name": "Twilite Skills Charter.Document",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.014Z",
+          "updatedAt": "2026-02-12T17:26:06.014Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "a1f2c001-6c7e-4f3b-9b1b-01a8a9e2c111",
       "type": "markdown",
       "label": "Task 1: Capability & Documentation Layer",
@@ -462,7 +542,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Encodes **meaningful states** that affect interpretation.\n\nExamples:\n- draft\n- stable\n- deprecated\n- experimental\n- error\n\nStates are semantic signals for humans, agents, and validators \u2014 not transient UI effects.",
+        "markdown": "Encodes **meaningful states** that affect interpretation.\n\nExamples:\n- draft\n- stable\n- deprecated\n- experimental\n- error\n\nStates are semantic signals for humans, agents, and validators — not transient UI effects.",
         "memo": "",
         "link": "",
         "html": "",
@@ -662,7 +742,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Execute **procedural or repeatable operations**.\n\nExamples:\n- script execution\n- batch mutation\n- procedural generation\n- simulation steps\n- compile graph \u2192 artifact\n- import / export\n\nThese skills make graphs executable and alive.",
+        "markdown": "Execute **procedural or repeatable operations**.\n\nExamples:\n- script execution\n- batch mutation\n- procedural generation\n- simulation steps\n- compile graph → artifact\n- import / export\n\nThese skills make graphs executable and alive.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1122,7 +1202,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "Apply many mutations as a single logical operation.\n\n**Implementation suggestion:**\n- Wrap in `batch` or `transaction`\n- Validate entire plan before execution\n- Roll back on partial failure\n- Preserve ordering (nodes \u2192 edges \u2192 clusters)\n\nBatching makes scale safe.",
+        "markdown": "Apply many mutations as a single logical operation.\n\n**Implementation suggestion:**\n- Wrap in `batch` or `transaction`\n- Validate entire plan before execution\n- Roll back on partial failure\n- Preserve ordering (nodes → edges → clusters)\n\nBatching makes scale safe.",
         "memo": "",
         "link": "",
         "html": "",
@@ -1172,7 +1252,7 @@
     {
       "id": "auto-compile-artifact-0005",
       "type": "markdown",
-      "label": "Compile Graph \u2192 Artifact",
+      "label": "Compile Graph → Artifact",
       "position": {
         "x": 1362.7168914905074,
         "y": 3451.4842556630138
@@ -1332,7 +1412,7 @@
     {
       "id": "req-docs-root-0001",
       "type": "markdown",
-      "label": "\ud83d\udccb Required Documentation",
+      "label": "📋 Required Documentation",
       "position": {
         "x": -4096.316352163827,
         "y": -1947.0154358548662
@@ -1532,7 +1612,7 @@
     {
       "id": "mvg-root-0001",
       "type": "markdown",
-      "label": "\u2705 Minimum Valid Graph",
+      "label": "✅ Minimum Valid Graph",
       "position": {
         "x": -4966.930080046055,
         "y": -416.4379608124502
@@ -1552,7 +1632,7 @@
     {
       "id": "mvg-manifest-required-0001",
       "type": "markdown",
-      "label": "\ud83c\udfaf Manifest Node (REQUIRED)",
+      "label": "🎯 Manifest Node (REQUIRED)",
       "position": {
         "x": -4405.486298650623,
         "y": -429.74423520054023
@@ -1572,7 +1652,7 @@
     {
       "id": "mvg-content-required-0001",
       "type": "markdown",
-      "label": "\ud83d\udcdd Content Nodes (REQUIRED)",
+      "label": "📝 Content Nodes (REQUIRED)",
       "position": {
         "x": -3911.994071393727,
         "y": -386.615744302216
@@ -1592,7 +1672,7 @@
     {
       "id": "mvg-structure-optional-0001",
       "type": "markdown",
-      "label": "\ud83d\udd17 Structure (edges, clusters)",
+      "label": "🔗 Structure (edges, clusters)",
       "position": {
         "x": -3510.3385429701143,
         "y": -386.6157443022163
@@ -1612,7 +1692,7 @@
     {
       "id": "mvg-style-recommended-0001",
       "type": "markdown",
-      "label": "\ud83c\udfa8 Style Node (RECOMMENDED)",
+      "label": "🎨 Style Node (RECOMMENDED)",
       "position": {
         "x": -4937.107863535821,
         "y": -29.04355992191404
@@ -1632,7 +1712,7 @@
     {
       "id": "mvg-definitions-conditional-0001",
       "type": "markdown",
-      "label": "\ud83d\udcd6 Definition Nodes (CONDITIONAL)",
+      "label": "📖 Definition Nodes (CONDITIONAL)",
       "position": {
         "x": -4930.596703872812,
         "y": 414.5619106678206
@@ -1692,7 +1772,7 @@
     {
       "id": "mvg-checklist-0001",
       "type": "markdown",
-      "label": "\u2713 Validity Checklist",
+      "label": "✓ Validity Checklist",
       "position": {
         "x": -4448.769068180734,
         "y": 563.3785794764826
@@ -1702,7 +1782,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "**Before committing a graph, verify:**\n\n\u2611 **Has exactly 1 Manifest node**\n- Declares identity, intent, dependencies\n\n\u2611 **Has at least 1 Content node**\n- Carries actual domain meaning\n\n\u2611 **Style node present** (recommended)\n- Makes graph portable\n\n\u2611 **Definitions included** (if needed)\n- Custom types are documented\n\n\u2611 **Structure makes sense**\n- Edges connect meaningfully\n- Clusters organize logically\n\n\u2611 **Passes validation rules**\n- No orphaned required fields\n- Port contracts respected",
+        "markdown": "**Before committing a graph, verify:**\n\n☑ **Has exactly 1 Manifest node**\n- Declares identity, intent, dependencies\n\n☑ **Has at least 1 Content node**\n- Carries actual domain meaning\n\n☑ **Style node present** (recommended)\n- Makes graph portable\n\n☑ **Definitions included** (if needed)\n- Custom types are documented\n\n☑ **Structure makes sense**\n- Edges connect meaningfully\n- Clusters organize logically\n\n☑ **Passes validation rules**\n- No orphaned required fields\n- Port contracts respected",
         "memo": "",
         "link": "",
         "html": "",
@@ -1722,7 +1802,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "This graph is a strong meta-documentation of Twilite OS principles. It preserves continuity by building layers incrementally\u2014from core protocols to detailed skills and contracts\u2014without assuming a blank slate. Key strengths:\n\n- Manifest emphasis: Reinforces identity and portability as foundational.\n- Skill breakdown: Procedural generation and validation skills align with stewardship mindset.\n- Boundaries clarified: Data vs UI separation protects history and diffs.\n\nSuggestions for evolution:\n- Add a ScriptNode to auto-validate against the Minimum Valid Graph checklist.\n- Link to external Git for versioning these contracts.\n- Expand automation skills with AI-specific hooks for agent collaboration.\n\nThis extends the workspace coherently; no overwrites needed.",
+        "markdown": "This graph is a strong meta-documentation of Twilite OS principles. It preserves continuity by building layers incrementally—from core protocols to detailed skills and contracts—without assuming a blank slate. Key strengths:\n\n- Manifest emphasis: Reinforces identity and portability as foundational.\n- Skill breakdown: Procedural generation and validation skills align with stewardship mindset.\n- Boundaries clarified: Data vs UI separation protects history and diffs.\n\nSuggestions for evolution:\n- Add a ScriptNode to auto-validate against the Minimum Valid Graph checklist.\n- Link to external Git for versioning these contracts.\n- Expand automation skills with AI-specific hooks for agent collaboration.\n\nThis extends the workspace coherently; no overwrites needed.",
         "memo": "",
         "link": "",
         "html": "",

@@ -1,5 +1,7 @@
 "use client";
 
+import { parsePortEndpoint } from "../utils/portEndpoint";
+
 const TOLERANCE = 4;
 
 const toNumber = (value) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
@@ -308,6 +310,78 @@ export function validateGraphInvariants({
     });
 
     checkRouteMetadata(edgeRoutes?.[edge.id], edge.id);
+  });
+
+  const portNodes = nodes.filter((node) => node?.type === "port");
+  portNodes.forEach((node) => {
+    const target = node?.data?.target;
+    if (!target || typeof target !== "object") {
+      errors.push({
+        code: "PORT_TARGET_REQUIRED",
+        message: `Port node \"${node.id}\" is missing data.target.`,
+        nodeId: node.id
+      });
+      return;
+    }
+
+    const endpoint = typeof target.endpoint === "string" ? target.endpoint.trim() : "";
+    if (!endpoint) {
+      errors.push({
+        code: "PORT_ENDPOINT_REQUIRED",
+        message: `Port node \"${node.id}\" is missing required target.endpoint.`,
+        nodeId: node.id
+      });
+      return;
+    }
+
+    const parsed = parsePortEndpoint(endpoint);
+    if (!parsed.ok) {
+      errors.push({
+        code: "PORT_ENDPOINT_INVALID",
+        message: `Port node \"${node.id}\" has invalid endpoint: ${parsed.error}`,
+        nodeId: node.id
+      });
+      return;
+    }
+
+    if (target.mode && !["navigate", "bridge", "boundary"].includes(target.mode)) {
+      errors.push({
+        code: "PORT_MODE_INVALID",
+        message: `Port node \"${node.id}\" has invalid target.mode \"${target.mode}\".`,
+        nodeId: node.id
+      });
+    }
+
+    const { filePath, nodeId, portId } = parsed.value;
+    if (typeof target.nodeId === "string" && target.nodeId.trim() && nodeId && target.nodeId.trim() !== nodeId) {
+      warnings.push({
+        code: "ENDPOINT_DERIVED_CONFLICT",
+        message: `Port node \"${node.id}\" target.nodeId conflicts with target.endpoint; endpoint takes precedence.`,
+        nodeId: node.id
+      });
+    }
+    if (typeof target.portId === "string" && target.portId.trim() && target.portId.trim() !== portId) {
+      warnings.push({
+        code: "ENDPOINT_DERIVED_CONFLICT",
+        message: `Port node \"${node.id}\" target.portId conflicts with target.endpoint; endpoint takes precedence.`,
+        nodeId: node.id
+      });
+    }
+    if (typeof target.url === "string" && target.url.trim()) {
+      const normalizedUrlPath = target.url.trim().replace(/^https?:\/\/[^/]+/i, "");
+      const normalizedFilePath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+      if (
+        normalizedUrlPath &&
+        normalizedUrlPath !== "/" &&
+        normalizedUrlPath !== normalizedFilePath
+      ) {
+        warnings.push({
+          code: "ENDPOINT_DERIVED_CONFLICT",
+          message: `Port node \"${node.id}\" target.url conflicts with target.endpoint; endpoint takes precedence.`,
+          nodeId: node.id
+        });
+      }
+    }
   });
 
   return {

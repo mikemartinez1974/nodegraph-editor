@@ -196,6 +196,13 @@ const GraphEditorContent = () => {
   } = rpc || {};
 
   const [editorThemeConfig, setEditorThemeConfig] = useState(null);
+  const [documentAccess, setDocumentAccess] = useState(() => ({
+    writable: true,
+    mode: 'writable',
+    sourceType: host === 'vscode' ? 'vscode-document' : 'session',
+    target: host === 'vscode' ? 'Active VS Code document' : 'Current session'
+  }));
+  const readOnlyNoticeShownRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -205,6 +212,91 @@ const GraphEditorContent = () => {
       setEditorThemeConfig(settings.theme);
     }
   }, [host]);
+
+  useEffect(() => {
+    if (host !== 'vscode') {
+      setDocumentAccess({
+        writable: true,
+        mode: 'writable',
+        sourceType: 'session',
+        target: 'Current session'
+      });
+      return;
+    }
+    setDocumentAccess({
+      writable: true,
+      mode: 'writable',
+      sourceType: 'vscode-document',
+      target: 'Active VS Code document'
+    });
+  }, [host]);
+
+  useEffect(() => {
+    const handleAccessChange = (payload = {}) => {
+      setDocumentAccess((prev) => ({
+        ...prev,
+        ...payload,
+        writable: payload.writable ?? prev.writable,
+        mode: payload.mode || (payload.writable === false ? 'read-only' : 'writable')
+      }));
+      if (payload.writable !== false) {
+        readOnlyNoticeShownRef.current = false;
+      }
+    };
+    const handleAccessPromoteWritable = () => {
+      setDocumentAccess((prev) => ({
+        ...prev,
+        writable: true,
+        mode: 'writable',
+        target: 'Active VS Code document'
+      }));
+      readOnlyNoticeShownRef.current = false;
+      if (typeof setSnackbar === 'function') {
+        setSnackbar({
+          open: true,
+          message: 'Save target rebound to the active VS Code document.',
+          severity: 'info'
+        });
+      }
+    };
+    eventBus.on('documentAccessChanged', handleAccessChange);
+    eventBus.on('documentAccessPromoteWritable', handleAccessPromoteWritable);
+    return () => {
+      eventBus.off('documentAccessChanged', handleAccessChange);
+      eventBus.off('documentAccessPromoteWritable', handleAccessPromoteWritable);
+    };
+  }, [setSnackbar]);
+
+  useEffect(() => {
+    if (host !== 'vscode') return;
+    if (documentAccess?.writable) return;
+    const events = [
+      'nodeAdded',
+      'nodeUpdated',
+      'nodeDeleted',
+      'edgeAdded',
+      'edgeUpdated',
+      'edgeDeleted',
+      'groupAdded',
+      'groupUpdated',
+      'groupDeleted'
+    ];
+    const notifyReadOnly = () => {
+      if (readOnlyNoticeShownRef.current) return;
+      readOnlyNoticeShownRef.current = true;
+      if (typeof setSnackbar === 'function') {
+        setSnackbar({
+          open: true,
+          message: 'Read-only graph: changes will not save until you bind a save target.',
+          severity: 'warning'
+        });
+      }
+    };
+    events.forEach((eventName) => eventBus.on(eventName, notifyReadOnly));
+    return () => {
+      events.forEach((eventName) => eventBus.off(eventName, notifyReadOnly));
+    };
+  }, [documentAccess?.writable, host, setSnackbar]);
 
   const mergeThemeConfigs = useCallback((baseConfig, overrideConfig) => {
     if (!baseConfig && !overrideConfig) return null;
@@ -1217,6 +1309,7 @@ const GraphEditorContent = () => {
         if (!window.__Twilite_HOST_GRAPH_READY__) return;
         if (window.__Twilite_SYNCING__) return;
         if (isDraggingRef.current) return;
+        if (!documentAccess?.writable) return;
         const exporter = window.__Twilite_EXPORT_GRAPH__;
         if (typeof exporter !== 'function') return;
         try {
@@ -1248,6 +1341,7 @@ const GraphEditorContent = () => {
     };
   }, [
     host,
+    documentAccess?.writable,
     nodes,
     edges,
     groups,
@@ -1545,6 +1639,7 @@ const skipPropertiesCloseRef = useRef(false);
         <Toolbar
           host={host}
           uiTheme={documentMuiTheme}
+          documentAccess={documentAccess}
           onToggleNodeList={handleToggleNodeListIntent}
           showNodeList={showNodeList}
           onToggleGroupList={handleToggleGroupListIntent}

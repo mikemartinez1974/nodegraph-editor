@@ -130,6 +130,39 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     }
   };
 
+  // If an address points to a folder, load root.node from that folder.
+  const resolveFolderToRootNode = (url) => {
+    if (typeof url !== 'string') return url;
+    const trimmed = url.trim();
+    if (!trimmed) return trimmed;
+
+    // Absolute http(s) URLs
+    if (/^https?:\/\//i.test(trimmed)) {
+      try {
+        const parsed = new URL(trimmed);
+        const pathname = parsed.pathname || '/';
+        if (pathname.endsWith('/')) {
+          parsed.pathname = `${pathname}root.node`;
+          return parsed.toString();
+        }
+        return trimmed;
+      } catch {
+        return trimmed;
+      }
+    }
+
+    // Local/relative paths
+    if (trimmed.endsWith('/')) {
+      return `${trimmed}root.node`;
+    }
+    return trimmed;
+  };
+
+  const toFetchableUrl = (url) => {
+    const converted = convertTlzToFetchUrl(url);
+    return resolveFolderToRootNode(converted);
+  };
+
   // Push a canonical url into the history (keeps refs and state in sync)
   const pushHistory = (url) => {
     if (!url) return;
@@ -192,7 +225,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
         setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        const fetchable = convertTlzToFetchUrl(url);
+        const fetchable = toFetchableUrl(url);
         eventBus.emit('fetchUrl', { url: fetchable });
       }
     }
@@ -213,7 +246,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
         setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        const fetchable = convertTlzToFetchUrl(url);
+        const fetchable = toFetchableUrl(url);
         eventBus.emit('fetchUrl', { url: fetchable });
       }
     }
@@ -222,7 +255,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const handleRefresh = () => {
     const url = currentUrl || address;
     if (url) {
-      const fetchable = convertTlzToFetchUrl(url);
+      const fetchable = toFetchableUrl(url);
       eventBus.emit('fetchUrl', { url: fetchable });
     }
   };
@@ -234,7 +267,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       return;
     }
     setAddress(homeUrl);
-    const fetchable = convertTlzToFetchUrl(homeUrl);
+    const fetchable = toFetchableUrl(homeUrl);
     eventBus.emit('fetchUrl', { url: fetchable });
   };
 
@@ -253,7 +286,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       return;
     }
     try {
-      const fetchable = convertTlzToFetchUrl(candidate);
+      const fetchable = toFetchableUrl(candidate);
       localStorage.setItem('homeUrl', fetchable);
       setHomeUrl(fetchable);
       alert('Home set to: ' + fetchable);
@@ -300,7 +333,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     if (!url) return;
     setAddress(url);
     handleCloseBookmarksMenu();
-    eventBus.emit('fetchUrl', { url });
+    eventBus.emit('fetchUrl', { url: toFetchableUrl(url) });
   };
 
   const handleRemoveBookmark = (url) => {
@@ -314,7 +347,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     if (!template || !template.resolvedUrl) return;
     setGalleryOpen(false);
     setAddress(template.resolvedUrl);
-    eventBus.emit('fetchUrl', { url: template.resolvedUrl });
+    eventBus.emit('fetchUrl', { url: toFetchableUrl(template.resolvedUrl) });
   };
 
   useEffect(() => {
@@ -403,11 +436,11 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   if (!trimmed) return '';
                   
                   // Already handled protocol?
-                  if (trimmed.startsWith('tlz://')) return convertTlzToFetchUrl(trimmed);
-                  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+                  if (trimmed.startsWith('tlz://')) return toFetchableUrl(trimmed);
+                  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return toFetchableUrl(trimmed);
                   
                   // Local paths (explicit)
-                  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return trimmed;
+                  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return toFetchableUrl(trimmed);
                   
                   // If it's a bare .node filename, assume local first
                   if (trimmed.endsWith('.node')) return '/' + trimmed;
@@ -418,16 +451,16 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   if (firstPart.includes('.') && 
                       !firstPart.endsWith('.node') && 
                       !firstPart.endsWith('.json')) {
-                    return 'https://' + trimmed;
+                    return toFetchableUrl('https://' + trimmed);
                   }
                   
                   // Default to local path if it doesn't look like anything else
-                  return '/' + trimmed;
+                  return toFetchableUrl('/' + trimmed);
                 })(address);
                 if (fetchUrl) {
                   eventBus.emit('fetchUrl', { url: fetchUrl });
                 } else {
-                  eventBus.emit('fetchUrl', { url: address });
+                  eventBus.emit('fetchUrl', { url: toFetchableUrl(address) });
                 }
               }
             }}

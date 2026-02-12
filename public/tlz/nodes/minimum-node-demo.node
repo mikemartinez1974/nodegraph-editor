@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-11T17:20:04.488Z",
-    "modified": "2026-02-11T17:24:10.346Z",
+    "created": "2026-02-12T17:22:16.499Z",
+    "modified": "2026-02-12T17:22:19.732Z",
     "author": "",
     "tags": []
   },
@@ -47,7 +47,7 @@
           "skills": [],
           "schemaVersions": {
             "nodes": ">=1.0.0",
-            "handles": ">=1.0.0"
+            "ports": ">=1.0.0"
           },
           "optional": []
         },

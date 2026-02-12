@@ -112,9 +112,12 @@ const baseNodeTypeRegistry = {
     defaultData: {
       intent: 'external',
       target: {
+        endpoint: 'root.node:root',
+        mode: 'navigate',
         url: '',
         graphId: '',
         nodeId: '',
+        portId: 'root',
         label: ''
       }
     }
@@ -352,9 +355,12 @@ export const nodeTypeMetadata = [
     defaultData: {
       intent: 'external',
       target: {
+        endpoint: 'root.node:root',
+        mode: 'navigate',
         url: '',
         graphId: '',
         nodeId: '',
+        portId: 'root',
         label: ''
       }
     }

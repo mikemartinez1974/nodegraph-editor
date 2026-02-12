@@ -10,6 +10,86 @@
   },
   "nodes": [
     {
+      "id": "e0c8f049-cddb-4a3c-add1-1d34b7b683fb",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "1c8fa016-7d2a-4cbe-9392-9286f9fb72ca",
+          "name": "LiveDocuments",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:05.442Z",
+          "updatedAt": "2026-02-12T17:26:05.442Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "live-docs-goal",
       "type": "markdown",
       "label": "Goal",
@@ -22,7 +102,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Live Documents \u2014 Goal\nMake document-backed graphs feel **live**: edits to the underlying source should be reflected in the open editor without a full manual workflow.\n\nFirst target: a clear **Reload** button."
+        "markdown": "## Live Documents — Goal\nMake document-backed graphs feel **live**: edits to the underlying source should be reflected in the open editor without a full manual workflow.\n\nFirst target: a clear **Reload** button."
       }
     },
     {
@@ -38,7 +118,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Local vs Web Documents\n**Web (http/https):** can be polled or pushed (SSE/WebSocket).\n\n**Local file (file picker / local://):** browsers can\u2019t reliably watch disk changes; needs manual reload, polling a local server, or a desktop wrapper."
+        "markdown": "## Local vs Web Documents\n**Web (http/https):** can be polled or pushed (SSE/WebSocket).\n\n**Local file (file picker / local://):** browsers can’t reliably watch disk changes; needs manual reload, polling a local server, or a desktop wrapper."
       }
     },
     {
@@ -54,7 +134,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## MVP \u2014 Reload Button\n- Add **Reload document** action in toolbar\n- Re-fetch/re-read the current document source\n- Replace graph state (simple) or apply a patch (later)\n- Show a snackbar: \"Reloaded\" / \"No changes\" / \"Failed\""
+        "markdown": "## MVP — Reload Button\n- Add **Reload document** action in toolbar\n- Re-fetch/re-read the current document source\n- Replace graph state (simple) or apply a patch (later)\n- Show a snackbar: \"Reloaded\" / \"No changes\" / \"Failed\""
       }
     },
     {
@@ -86,7 +166,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Web Documents \u2014 Live Modes\n- **Polling**: `HEAD`/`GET` every N seconds (ETag/Last-Modified)\n- **Push**: SSE/WebSocket sends \"doc changed\" events\n- Prefer polling first (MVP), add push later"
+        "markdown": "## Web Documents — Live Modes\n- **Polling**: `HEAD`/`GET` every N seconds (ETag/Last-Modified)\n- **Push**: SSE/WebSocket sends \"doc changed\" events\n- Prefer polling first (MVP), add push later"
       }
     },
     {
@@ -102,7 +182,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Local Documents \u2014 Options\n- **Manual reload** (MVP)\n- **Local server**: serve the file over http://localhost and use web polling\n- **Desktop wrapper** (Electron/Tauri): true filesystem watch\n\nDecision: keep web-first; document local limitations clearly."
+        "markdown": "## Local Documents — Options\n- **Manual reload** (MVP)\n- **Local server**: serve the file over http://localhost and use web polling\n- **Desktop wrapper** (Electron/Tauri): true filesystem watch\n\nDecision: keep web-first; document local limitations clearly."
       }
     },
     {

@@ -1,55 +1,114 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2025-11-01T23:17:49.112Z",
-    "modified": "2025-11-01T23:17:49.112Z",
+    "created": "2026-02-12T17:36:45.378Z",
+    "modified": "2026-02-12T17:36:48.648Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "primary": "#3949ab",
-      "primaryContrast": "#fff",
-      "secondary": "#5e35b1",
-      "secondaryContrast": "#fff",
-      "background": "#0a0e27",
-      "paper": "#1a1f3a",
-      "textPrimary": "#fff",
-      "textSecondary": "rgba(255, 255, 255, 0.7)",
-      "divider": "rgba(255, 255, 255, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 764.5378426931716,
-      "y": 161.97412696389486
-    },
-    "zoom": 1.9955003959136064
-  },
-  "document": null,
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
   "nodes": [
+    {
+      "id": "83d67b7c-afe5-4adf-bf6f-3e65f2777fa6",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "6633ab1c-24b5-480b-853f-5cf096623467",
+          "name": "Intro2",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.148Z",
+          "updatedAt": "2026-02-12T17:26:06.148Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
     {
       "id": "intro-1",
       "type": "markdown",
@@ -63,7 +122,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "# Welcome to NodeGraph Editor\n\nStart here \u2014 follow the guides:\n\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n- [Features](tlz://cpwith.me/tlz/Features.node)\n\nThis node is a markdown example that links to other TLZ documents."
+        "memo": "# Welcome to NodeGraph Editor\n\nStart here — follow the guides:\n\n- [Getting Started](tlz://cpwith.me/tlz/GettingStarted.node)\n- [Features](tlz://cpwith.me/tlz/Features.node)\n\nThis node is a markdown example that links to other TLZ documents."
       }
     },
     {
@@ -104,19 +163,21 @@
       "id": "intro-edge-1",
       "source": "intro-1",
       "target": "intro-2",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Next",
       "style": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "intro-edge-2",
       "source": "intro-2",
       "target": "intro-3",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "Example",
       "style": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

@@ -57,9 +57,89 @@
   "scripts": [],
   "nodes": [
     {
+      "id": "193d0fa8-2f05-457e-8043-4455efb865ca",
+      "label": "Manifest",
+      "type": "manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "identity": {
+          "graphId": "3e183042-1bb2-442a-a434-8a9c5a9215a5",
+          "name": "About Twilite.Document",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-02-12T17:26:06.296Z",
+          "updatedAt": "2026-02-12T17:26:06.296Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
       "id": "root-editor",
       "type": "markdown",
-      "label": "\u26a1 The Graph Editor",
+      "label": "⚡ The Graph Editor",
       "position": {
         "x": 500,
         "y": 0
@@ -70,13 +150,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# \u26a1 The Graph Editor\n\nJust nodes and edges.\n\nThat's all you start with.\n\nEverything else **emerges**."
+        "markdown": "# ⚡ The Graph Editor\n\nJust nodes and edges.\n\nThat's all you start with.\n\nEverything else **emerges**."
       }
     },
     {
       "id": "node-content-creation",
       "type": "markdown",
-      "label": "\ud83d\udcdd Node Content Creation",
+      "label": "📝 Node Content Creation",
       "position": {
         "x": 500,
         "y": -220
@@ -93,7 +173,7 @@
     {
       "id": "emerge-structure",
       "type": "markdown",
-      "label": "\ud83d\udcd0 Structure for Any Thought",
+      "label": "📐 Structure for Any Thought",
       "position": {
         "x": 100,
         "y": 280
@@ -110,7 +190,7 @@
     {
       "id": "emerge-navigation",
       "type": "markdown",
-      "label": "\ud83e\udded Navigation as Interface",
+      "label": "🧭 Navigation as Interface",
       "position": {
         "x": 480,
         "y": 280
@@ -127,7 +207,7 @@
     {
       "id": "emerge-identity",
       "type": "markdown",
-      "label": "\ud83d\udd17 Persistent Identity",
+      "label": "🔗 Persistent Identity",
       "position": {
         "x": 860,
         "y": 280
@@ -144,7 +224,7 @@
     {
       "id": "emerge-composability",
       "type": "markdown",
-      "label": "\ud83e\udde9 Composability",
+      "label": "🧩 Composability",
       "position": {
         "x": 100,
         "y": 540
@@ -161,7 +241,7 @@
     {
       "id": "emerge-executable",
       "type": "markdown",
-      "label": "\u2699\ufe0f Executability",
+      "label": "⚙️ Executability",
       "position": {
         "x": 480,
         "y": 540
@@ -172,13 +252,13 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Executability\n\nA graph can **DO** something.\n\nNot just represent\u2014**RUN**.\n\nWorkflows, simulations, applications."
+        "markdown": "## Executability\n\nA graph can **DO** something.\n\nNot just represent—**RUN**.\n\nWorkflows, simulations, applications."
       }
     },
     {
       "id": "emerge-ai-collab",
       "type": "markdown",
-      "label": "\ud83e\udd16 AI Collaboration",
+      "label": "🤖 AI Collaboration",
       "position": {
         "x": 860,
         "y": 540
@@ -195,7 +275,7 @@
     {
       "id": "emerge-version-control",
       "type": "markdown",
-      "label": "\ud83d\udce6 Version Control",
+      "label": "📦 Version Control",
       "position": {
         "x": 100,
         "y": 800
@@ -212,7 +292,7 @@
     {
       "id": "emerge-reasoning",
       "type": "markdown",
-      "label": "\ud83e\udde0 Shared Reasoning Substrate",
+      "label": "🧠 Shared Reasoning Substrate",
       "position": {
         "x": 483.5412771840443,
         "y": 798.8195742719852
@@ -229,7 +309,7 @@
     {
       "id": "emerge-memory",
       "type": "markdown",
-      "label": "\ud83d\udcbe Memory Across Sessions",
+      "label": "💾 Memory Across Sessions",
       "position": {
         "x": 860,
         "y": 800
@@ -246,7 +326,7 @@
     {
       "id": "emerge-rendering",
       "type": "markdown",
-      "label": "\ud83c\udfa8 Rendering at Any Scale",
+      "label": "🎨 Rendering at Any Scale",
       "position": {
         "x": 100,
         "y": 1060
@@ -263,7 +343,7 @@
     {
       "id": "emerge-file-format",
       "type": "markdown",
-      "label": "\ud83d\udcc4 A New File Format",
+      "label": "📄 A New File Format",
       "position": {
         "x": 480,
         "y": 1060
@@ -280,7 +360,7 @@
     {
       "id": "emerge-email",
       "type": "markdown",
-      "label": "\ud83d\udce7 Email as Graphs",
+      "label": "📧 Email as Graphs",
       "position": {
         "x": 860,
         "y": 1060
@@ -297,7 +377,7 @@
     {
       "id": "emerge-community",
       "type": "markdown",
-      "label": "\ud83d\udc65 Communities as Graphs",
+      "label": "👥 Communities as Graphs",
       "position": {
         "x": 100,
         "y": 1320
@@ -314,7 +394,7 @@
     {
       "id": "emerge-nodespace",
       "type": "markdown",
-      "label": "\ud83c\udf0c Node Space Itself",
+      "label": "🌌 Node Space Itself",
       "position": {
         "x": 480,
         "y": 1320
@@ -331,7 +411,7 @@
     {
       "id": "emerge-unknown",
       "type": "markdown",
-      "label": "\u2753 What You Haven't Imagined Yet",
+      "label": "❓ What You Haven't Imagined Yet",
       "position": {
         "x": 860,
         "y": 1320
