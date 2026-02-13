@@ -157,7 +157,11 @@ const PortNode = (props) => {
           <input
             value={endpointDraft}
             placeholder="root.node:root"
-            onChange={(event) => setEndpointDraft(event.target.value)}
+            onChange={(event) => {
+              const nextEndpoint = event.target.value;
+              setEndpointDraft(nextEndpoint);
+              commitTarget(nextEndpoint, modeDraft);
+            }}
             onBlur={() => {
               if (isDirty) commitTarget(endpointDraft, modeDraft);
             }}

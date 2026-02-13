@@ -1,71 +1,26 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Legend Node Contract",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-21T19:20:00.000Z",
-    "modified": "2026-01-21T19:20:00.000Z",
+    "created": "2026-02-13T00:14:58.764Z",
+    "modified": "2026-02-13T00:15:14.374Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 0,
-      "y": 0
-    },
-    "zoom": 1
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "2d91e8d3-ea13-4241-9d1e-89cfe1447595",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
-        "x": -260,
-        "y": -160
+        "x": -1247.7271359638632,
+        "y": -405.8658428288046
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "5593353e-eb71-4d28-8d2f-1e839242c70c",
@@ -126,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -141,8 +114,8 @@
       "type": "markdown",
       "label": "Legend Node Contract",
       "position": {
-        "x": -320,
-        "y": -220
+        "x": -536,
+        "y": -362
       },
       "width": 520,
       "height": 240,
@@ -255,6 +228,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-role",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines",
       "style": {
         "width": 2,
@@ -268,6 +243,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-required",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -281,6 +258,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-optional",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "allows",
       "style": {
         "width": 2,
@@ -294,6 +273,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-format",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "formats",
       "style": {
         "width": 2,
@@ -307,6 +288,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-mapping",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "maps",
       "style": {
         "width": 2,
@@ -320,6 +303,8 @@
       "type": "dataFlow",
       "source": "legend-contract-root",
       "target": "legend-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "governs",
       "style": {
         "width": 2,

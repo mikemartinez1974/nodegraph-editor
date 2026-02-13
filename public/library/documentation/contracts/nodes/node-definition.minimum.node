@@ -1,67 +1,18 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-23T01:39:12.996Z",
-    "modified": "2026-01-23T01:39:12.996Z",
+    "created": "2026-02-13T00:14:15.622Z",
+    "modified": "2026-02-13T00:14:16.886Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#6d4c41",
-        "light": "#9c786c",
-        "dark": "#40241a",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#efebe9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 1615.578351255273,
-      "y": 473.64808761835366
-    },
-    "zoom": 0.9931759298278694
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "min-def-root",
       "type": "markdown",
-      "label": "\u2705 Minimum Node Definition",
+      "label": "✅ Minimum Node Definition",
       "position": {
         "x": -322.01374191614434,
         "y": -221.00687095807217
@@ -165,7 +116,44 @@
           }
         },
         "html": "",
-        "svg": ""
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
       }
     }
   ],
@@ -175,6 +163,8 @@
       "type": "dataFlow",
       "source": "min-def-root",
       "target": "min-def-required",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -188,6 +178,8 @@
       "type": "dataFlow",
       "source": "min-def-root",
       "target": "min-def-declared",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,

@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-24T15:47:27.696Z",
-    "modified": "2026-01-24T15:47:27.696Z",
+    "created": "2026-02-13T00:11:02.788Z",
+    "modified": "2026-02-13T00:11:03.948Z",
     "author": "",
     "tags": []
   },
@@ -12,10 +12,10 @@
     {
       "id": "dictionary-contract-root",
       "type": "markdown",
-      "label": "\ud83d\udcd6 Dictionary Node Contract",
+      "label": "📖 Dictionary Node Contract",
       "position": {
-        "x": -320,
-        "y": -220
+        "x": -1008.4928817190681,
+        "y": 568.6323283245501
       },
       "width": 520,
       "height": 240,
@@ -30,11 +30,11 @@
       "type": "markdown",
       "label": "Role",
       "position": {
-        "x": -820,
-        "y": 140
+        "x": -866.1515888075525,
+        "y": -325.2421704589221
       },
-      "width": 360,
-      "height": 220,
+      "width": 537.8633926885486,
+      "height": 431.3738869632027,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -46,11 +46,11 @@
       "type": "markdown",
       "label": "Required Fields",
       "position": {
-        "x": -360,
-        "y": 140
+        "x": 706.7745250215028,
+        "y": -258.97886984759896
       },
-      "width": 360,
-      "height": 220,
+      "width": 546.0426718907329,
+      "height": 205.28234153780704,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -62,11 +62,11 @@
       "type": "markdown",
       "label": "Optional Fields",
       "position": {
-        "x": 100,
-        "y": 140
+        "x": 625.2362452957213,
+        "y": 781.701673600425
       },
-      "width": 360,
-      "height": 220,
+      "width": 496.61970742743586,
+      "height": 196.8004270406241,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -78,11 +78,11 @@
       "type": "markdown",
       "label": "Data Format",
       "position": {
-        "x": 560,
-        "y": 140
+        "x": 791.4603842108685,
+        "y": 26.424011029332092
       },
-      "width": 420,
-      "height": 260,
+      "width": 837.5923132687664,
+      "height": 200.71220243715044,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -94,11 +94,11 @@
       "type": "markdown",
       "label": "Rules",
       "position": {
-        "x": -320,
-        "y": 460
+        "x": 379.3826180582824,
+        "y": 1653.9624763170455
       },
-      "width": 520,
-      "height": 220,
+      "width": 430.23016738927276,
+      "height": 219.39271527619508,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -110,11 +110,11 @@
       "type": "markdown",
       "label": "Dictionary Precedence",
       "position": {
-        "x": 240,
-        "y": 700
+        "x": 517.1498361233158,
+        "y": 1356.674417038071
       },
-      "width": 520,
-      "height": 220,
+      "width": 697.8633926885486,
+      "height": 181.33404506770682,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -126,11 +126,11 @@
       "type": "markdown",
       "label": "Runtime Merge Behavior",
       "position": {
-        "x": 760,
-        "y": 700
+        "x": 753.1490924526647,
+        "y": 382.57461697345457
       },
-      "width": 520,
-      "height": 240,
+      "width": 685.6179272613672,
+      "height": 227.8103779105477,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -140,17 +140,17 @@
     {
       "id": "dictionary-skills",
       "type": "markdown",
-      "label": "\ud83e\udde0 Skill Requirements",
+      "label": "🧠 Skill Requirements",
       "position": {
-        "x": 200,
-        "y": 420
+        "x": 501.43993208276197,
+        "y": 1041.1489509584187
       },
-      "width": 520,
-      "height": 260,
+      "width": 581.8655278916691,
+      "height": 216.17858441006774,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary `nodeDefs` map node type \u2192 definition file; definition declares skills.\n- Dictionary `skills` provides the dependency reference list used by the manifest.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
+        "markdown": "## Skill Requirements\n\n- A node definition may declare required skills.\n- Skill declarations live **inside the definition graph** (not the host graph).\n- Dictionary `nodeDefs` map node type → definition file; definition declares skills.\n- Dictionary `skills` provides the dependency reference list used by the manifest.\n- Implementations may live in script nodes **in the definition graph** or in external registries, but the declaration is authoritative.\n\n**Rule:** custom node types that introduce behavior must declare at least one skill."
       }
     },
     {
@@ -214,36 +214,32 @@
         "html": "",
         "svg": "",
         "settings": {
-          "theme": {
-            "mode": "light",
-            "primary": {
-              "main": "#2e7d32",
-              "light": "#60ad5e",
-              "dark": "#005005",
-              "contrastText": "#fff"
-            },
-            "secondary": {
-              "main": "#00897b",
-              "light": "#4ebaaa",
-              "dark": "#005b4f",
-              "contrastText": "#fff"
-            },
-            "background": {
-              "default": "#e8f5e9",
-              "paper": "#ffffff"
-            },
-            "text": {
-              "primary": "rgba(0, 0, 0, 0.87)",
-              "secondary": "rgba(0, 0, 0, 0.6)"
-            },
-            "divider": "rgba(0, 0, 0, 0.12)"
-          },
+          "theme": null,
           "backgroundImage": null,
           "defaultNodeColor": "#1976d2",
           "defaultEdgeColor": "#666666",
           "snapToGrid": false,
           "gridSize": 20,
-          "edgeRouting": "orthogonal",
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -261,7 +257,7 @@
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": -1958,
+        "x": -1901.9381044440406,
         "y": 223.5
       },
       "width": 320,
@@ -301,120 +297,120 @@
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-role",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-required",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-required",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-optional",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-optional",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "allows",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-format",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-format",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "formats",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-rules",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "governs",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-skills",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-skills",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-precedence",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-precedence",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "orders",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-dict-runtime-merge",
       "type": "dataFlow",
       "source": "dictionary-contract-root",
       "target": "dictionary-runtime-merge",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "implements",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

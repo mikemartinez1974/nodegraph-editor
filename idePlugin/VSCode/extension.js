@@ -8,6 +8,29 @@ const panelStates = new Set();
 const documentCache = new Map();
 const edgeRouteCache = new Map();
 let elkInstance = null;
+const normalizeUriString = (value) => {
+  if (!value || typeof value !== 'string') return null;
+  try {
+    return vscode.Uri.parse(value).toString();
+  } catch {
+    return value;
+  }
+};
+
+const uriMatches = (left, right) => {
+  if (!left || !right) return false;
+  const leftNorm = normalizeUriString(left);
+  const rightNorm = normalizeUriString(right);
+  if (leftNorm === rightNorm) return true;
+  try {
+    const leftFs = vscode.Uri.parse(left).fsPath;
+    const rightFs = vscode.Uri.parse(right).fsPath;
+    if (!leftFs || !rightFs) return false;
+    return leftFs.toLowerCase() === rightFs.toLowerCase();
+  } catch {
+    return false;
+  }
+};
 
 const getElk = () => {
   if (elkInstance) return elkInstance;
@@ -23,7 +46,20 @@ class TwiliteNodeEditorProvider {
   }
 
   resolveCustomTextEditor(document, webviewPanel) {
-    
+    // Single-editor mode: keep only one Twilite custom editor panel alive.
+    // Opening any .node file closes previously opened Twilite panels.
+    for (const entry of [...panelStates]) {
+      if (!entry || entry.webviewPanel === webviewPanel) continue;
+      try {
+        entry.disposables?.forEach((disposable) => disposable.dispose());
+      } catch {}
+      panelState.delete(entry.webviewPanel);
+      panelStates.delete(entry);
+      try {
+        entry.webviewPanel.dispose();
+      } catch {}
+    }
+
     const panelId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const priorState = panelState.get(webviewPanel);
     const docUri = document.uri?.toString?.();
@@ -37,6 +73,8 @@ class TwiliteNodeEditorProvider {
       } catch {}
       return;
     }
+    // Strict pinning: one webview panel must stay bound to one document URI.
+    // If VS Code attempts to reuse this panel for a different URI, open a fresh editor for that URI.
     if (priorState && priorState.documentUri && priorState.documentUri !== document.uri.toString()) {
       const viewColumn = webviewPanel.viewColumn;
       try {
@@ -83,7 +121,7 @@ class TwiliteNodeEditorProvider {
     }
     webviewPanel.webview.options = {
       enableScripts: true,
-      retainContextWhenHidden: false,
+      retainContextWhenHidden: true,
       localResourceRoots
     };
 
@@ -91,7 +129,11 @@ class TwiliteNodeEditorProvider {
     documentCache.set(document.uri.toString(), initialText);
     webviewPanel.webview.html = this.getHtml(webviewPanel.webview, initialText, panelId);
     state.htmlInitialized = true;
-    webviewPanel.title = document.uri?.path?.split('/').pop() || '.node editor';
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+    const relativeDocPath = workspaceFolder
+      ? vscode.workspace.asRelativePath(document.uri, false)
+      : (document.uri?.path?.split('/').pop() || '.node editor');
+    webviewPanel.title = relativeDocPath || '.node editor';
 
     // Pin the editor to avoid VSCode preview-tab reuse (true multi-preview per file).
     vscode.commands.executeCommand('workbench.action.keepEditor').catch(() => {});
@@ -113,7 +155,8 @@ class TwiliteNodeEditorProvider {
       if (!currentDoc) return;
       const uri = currentDoc.uri?.toString?.();
       const text = getCachedText();
-      if (!force && state.lastSentText === text) return;
+      const uriChanged = Boolean(uri && state.lastSentUri && uri !== state.lastSentUri);
+      if (!force && !uriChanged && state.lastSentText === text) return;
       const previousText = state.lastSentText;
       state.lastSentText = text;
       const switchedFile = uri && state.lastSentUri && uri !== state.lastSentUri;
@@ -185,10 +228,11 @@ class TwiliteNodeEditorProvider {
           return;
         }
       }
-      postText(true);
+      // Avoid unnecessary reloads when simply switching tabs.
+      postText(false);
     });
 
-    const messageSubscription = webviewPanel.webview.onDidReceiveMessage((message) => {
+    const messageSubscription = webviewPanel.webview.onDidReceiveMessage(async (message) => {
       if (!message) return;
       if (message.type === 'webviewReady') {
         if (!state.webviewReadyHandled) {
@@ -340,20 +384,102 @@ class TwiliteNodeEditorProvider {
         return;
       }
       if (message.type === 'update' || message.type === 'graphUpdated') {
+        const messageUri = typeof message.uri === 'string' ? message.uri : null;
+        const messagePanelId = typeof message.panelId === 'string' ? message.panelId : null;
+        const expectedUri = state.document?.uri?.toString?.() || document.uri.toString();
+        const effectiveUri = messageUri || expectedUri;
+        if (!uriMatches(effectiveUri, expectedUri)) {
+          console.warn('[Twilite] Ignoring graphUpdated due to URI mismatch', {
+            expectedUri,
+            messageUri: effectiveUri,
+            panelId,
+            messagePanelId
+          });
+          return;
+        }
+        if (messagePanelId && messagePanelId !== panelId) {
+          console.warn('[Twilite] Ignoring graphUpdated due to panel mismatch', {
+            panelId,
+            messagePanelId,
+            expectedUri
+          });
+          return;
+        }
         const incomingText = typeof message.text === 'string' ? message.text : '';
-        const currentText = document.getText();
+        const activeDoc = state.document || document;
+        const currentText = activeDoc.getText();
         if (incomingText === currentText) {
           return;
         }
         state.suppressNextDocumentUpdate = true;
         const edit = new vscode.WorkspaceEdit();
         const fullRange = new vscode.Range(
-          document.positionAt(0),
-          document.positionAt(document.getText().length)
+          activeDoc.positionAt(0),
+          activeDoc.positionAt(activeDoc.getText().length)
         );
-        edit.replace(document.uri, fullRange, incomingText);
+        edit.replace(activeDoc.uri, fullRange, incomingText);
         vscode.workspace.applyEdit(edit);
-        documentCache.set(document.uri.toString(), incomingText);
+        documentCache.set(activeDoc.uri.toString(), incomingText);
+        return;
+      }
+      if (message.type === 'saveFile') {
+        const messageUri = typeof message.uri === 'string' ? message.uri : null;
+        const messagePanelId = typeof message.panelId === 'string' ? message.panelId : null;
+        const expectedUri = state.document?.uri?.toString?.() || document.uri.toString();
+        const effectiveUri = messageUri || expectedUri;
+        if (!uriMatches(effectiveUri, expectedUri)) {
+          console.warn('[Twilite] Ignoring saveFile due to URI mismatch', {
+            expectedUri,
+            messageUri: effectiveUri,
+            panelId,
+            messagePanelId
+          });
+          return;
+        }
+        if (messagePanelId && messagePanelId !== panelId) {
+          console.warn('[Twilite] Ignoring saveFile due to panel mismatch', {
+            panelId,
+            messagePanelId,
+            expectedUri
+          });
+          return;
+        }
+        const incomingText = typeof message.text === 'string' ? message.text : '';
+        const activeDoc = state.document || document;
+        try {
+          const currentText = activeDoc.getText();
+          if (incomingText !== currentText) {
+            state.suppressNextDocumentUpdate = true;
+            const edit = new vscode.WorkspaceEdit();
+            const fullRange = new vscode.Range(
+              activeDoc.positionAt(0),
+              activeDoc.positionAt(activeDoc.getText().length)
+            );
+            edit.replace(activeDoc.uri, fullRange, incomingText);
+            const applied = await vscode.workspace.applyEdit(edit);
+            if (!applied) {
+              webviewPanel.webview.postMessage({
+                type: 'saveFileResult',
+                ok: false,
+                error: 'Workspace edit was rejected'
+              });
+              return;
+            }
+            documentCache.set(activeDoc.uri.toString(), incomingText);
+          }
+          const saved = await activeDoc.save();
+          webviewPanel.webview.postMessage({
+            type: 'saveFileResult',
+            ok: Boolean(saved),
+            error: saved ? null : 'Save returned false'
+          });
+        } catch (err) {
+          webviewPanel.webview.postMessage({
+            type: 'saveFileResult',
+            ok: false,
+            error: String(err?.message || err)
+          });
+        }
         return;
       }
     });
@@ -490,6 +616,8 @@ class TwiliteNodeEditorProvider {
         const vscode = acquireVsCodeApi();
         window.__Twilite_EMBED__ = true;
         window.__Twilite_HOST__ = 'vscode';
+        window.__Twilite_PANEL_ID__ = ${JSON.stringify(panelId)};
+        window.__Twilite_ACTIVE_URI__ = '';
         window.__Twilite_POST_MESSAGE__ = (payload) => vscode.postMessage(payload);
         window.__Twilite_ELK_WORKER_URL__ = ${JSON.stringify(elkWorkerUrl || '')};
         window.next = window.next || {};
@@ -574,6 +702,9 @@ class TwiliteNodeEditorProvider {
         };
         window.addEventListener('message', (event) => {
           const message = event.data;
+          if (message && message.panelId && message.panelId !== window.__Twilite_PANEL_ID__) {
+            return;
+          }
           if (message && message.type === 'elkLayoutResult') {
             try {
               window.dispatchEvent(new CustomEvent('Twilite-elkLayout', { detail: message }));
@@ -587,6 +718,7 @@ class TwiliteNodeEditorProvider {
             return;
           }
           if (!message || message.type !== 'setText') return;
+          if (!message.panelId || message.panelId !== window.__Twilite_PANEL_ID__) return;
           const raw = message.text || '';
           const uri = message.uri || '';
           const seq = typeof message.seq === 'number' ? message.seq : 0;
@@ -599,6 +731,9 @@ class TwiliteNodeEditorProvider {
           }
           if (uri && uri !== lastUri) {
             lastUri = uri;
+          }
+          if (uri) {
+            window.__Twilite_ACTIVE_URI__ = uri;
           }
           
           try {

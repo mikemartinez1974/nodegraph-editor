@@ -1,71 +1,26 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-20T21:46:56.855Z",
-    "modified": "2026-01-20T21:46:56.855Z",
+    "created": "2026-02-13T00:12:38.020Z",
+    "modified": "2026-02-13T00:12:48.302Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 208,
-      "y": 93.5
-    },
-    "zoom": 1
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "43536dd5-3134-4510-8dd8-df3a5f3cb679",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "e200773f-5b62-4e68-8a3d-0a5a98e0ecba",
@@ -126,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -141,8 +114,8 @@
       "type": "markdown",
       "label": "🔗 Edge Contract (Normative)",
       "position": {
-        "x": 0,
-        "y": 0
+        "x": 102,
+        "y": 16
       },
       "width": 560,
       "height": 280,
@@ -319,110 +292,110 @@
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-meta",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-required",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-required",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-optional",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-optional",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-port",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-port-policy",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-types",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-types",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-forbidden",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-forbidden",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-validate",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-validation",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-mutations",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-mutations",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-agents",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-agent-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e-root-portable",
       "type": "governs",
       "source": "edge-contract-root",
       "target": "edge-portability",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": []

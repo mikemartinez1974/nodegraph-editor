@@ -128,6 +128,7 @@ const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
 
 const loadStoredGraph = () => {
   if (typeof window === 'undefined' || !window.localStorage) return null;
+  if (window.__Twilite_HOST__ === 'vscode' || window.__Twilite_EMBED__ === true) return null;
   try {
     const raw = window.localStorage.getItem(GRAPH_STORAGE_KEY);
     if (!raw) return null;

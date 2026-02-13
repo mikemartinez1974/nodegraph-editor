@@ -1,71 +1,26 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-20T21:53:58.068Z",
-    "modified": "2026-01-20T21:53:58.068Z",
+    "created": "2026-02-13T00:14:13.415Z",
+    "modified": "2026-02-13T00:14:14.416Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 498.54614009915696,
-      "y": 127.70313852224928
-    },
-    "zoom": 0.35133848637110354
-  },
-  "document": null,
-  "scripts": [],
   "nodes": [
     {
       "id": "1be91e18-f754-4509-afa1-5a3afcb65f50",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "7497dd6e-e74a-44bd-a8ed-a9ecffb19433",
@@ -126,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -383,6 +356,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-meta",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -392,6 +367,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-meaning",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -401,6 +378,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-required-fields",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -410,6 +389,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-optional-fields",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -419,6 +400,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-data-shape",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -428,6 +411,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-ports",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -437,6 +422,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-allowed-mutations",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -446,6 +433,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-forbidden-mutations",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -455,6 +444,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-validation",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -464,6 +455,8 @@
       "type": "references",
       "source": "node-schema-contract-root",
       "target": "node-schema-examples",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -473,6 +466,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-migrations",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -482,6 +477,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-agent-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -491,6 +488,8 @@
       "type": "references",
       "source": "node-schema-contract-root",
       "target": "node-schema-human-notes",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}
@@ -500,6 +499,8 @@
       "type": "governs",
       "source": "node-schema-contract-root",
       "target": "node-schema-view-requirement",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "",
       "style": {},
       "data": {}

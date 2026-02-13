@@ -122,16 +122,15 @@ export default function useGraphShortcuts({
     }
 
     function handleKeyboardShortcuts(e) {
-      // Only trigger graph shortcuts if not editing text
-      if (isTextInputActive()) return;
       const mod = e.ctrlKey || e.metaKey;
-
-      // Save (Ctrl/Cmd+S)
+      // Save must work even while typing in an input/editor field.
       if (mod && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         eventBus.emit('saveGraph');
         return;
       }
+      // Only trigger graph shortcuts if not editing text
+      if (isTextInputActive()) return;
 
       // Undo (Ctrl/Cmd+Z)
       if (mod && (e.key === 'z' || e.key === 'Z')) {

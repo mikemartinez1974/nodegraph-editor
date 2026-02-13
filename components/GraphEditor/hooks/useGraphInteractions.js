@@ -193,21 +193,13 @@ export default function useGraphInteractions({
         return;
       }
 
-      setSelectedEdgeIds((prev) => {
-        const already = prev.includes(edgeId);
-        if (already) {
-          setShowEdgePanel((s) => !s);
-          return prev;
-        }
-        setShowEdgePanel(true);
-        return [edgeId];
-      });
+      setSelectedEdgeIds([edgeId]);
       setSelectedNodeIds([]);
     };
 
     eventBus.on('edgeClick', handleEdgeClick);
     return () => eventBus.off('edgeClick', handleEdgeClick);
-  }, [setSelectedEdgeIds, setSelectedNodeIds, setShowEdgePanel, selectionHook]);
+  }, [setSelectedEdgeIds, setSelectedNodeIds]);
 
   useEffect(() => {
     const handleEdgeHover = ({ edgeId }) => {

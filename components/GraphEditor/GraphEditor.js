@@ -384,6 +384,16 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           lastLoadedHashRef.current.set(incomingUri, incomingHash);
         }
         currentDocUriRef.current = incomingUri;
+        try {
+          if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
+            eventBus.emit('documentAccessChanged', {
+              writable: true,
+              mode: 'writable',
+              sourceType: 'vscode-document',
+              target: incomingUri
+            });
+          }
+        } catch {}
       }
       const nextNodes = Array.isArray(payload.nodes) ? payload.nodes : [];
       const nextEdges = Array.isArray(payload.edges) ? payload.edges : [];
@@ -1860,6 +1870,14 @@ useEffect(() => {
       try {
         if (!url) return;
         if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
+          if (source === 'port-node') {
+            setSnackbar({
+              open: true,
+              message: 'Port-node navigation is disabled in the VS Code plugin.',
+              severity: 'warning'
+            });
+            return;
+          }
           const isWorkspacePath = (value) =>
             typeof value === 'string' &&
             (value.startsWith('/') || value.startsWith('./') || value.startsWith('../'));
@@ -1982,33 +2000,6 @@ useEffect(() => {
 
         // Log the final URL and fetch options
         const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit' };
-
-        const classifyUrlSourceType = (candidateUrl) => {
-          if (typeof candidateUrl !== 'string' || !candidateUrl.trim()) return 'unknown';
-          const trimmed = candidateUrl.trim();
-          if (trimmed.startsWith('local://')) return 'local-file';
-          if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return 'workspace-path';
-          try {
-            const parsed = new URL(trimmed, typeof window !== 'undefined' ? window.location.origin : undefined);
-            const localHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
-            const sameOrigin = typeof window !== 'undefined' && parsed.origin === window.location.origin;
-            if (sameOrigin || localHostnames.has(parsed.hostname)) return 'workspace-path';
-            return 'remote-url';
-          } catch (err) {
-            return 'unknown';
-          }
-        };
-
-        const sourceType = classifyUrlSourceType(fullUrl);
-        if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
-          // URL navigation in VS Code is treated as read-only until user explicitly rebinds save target.
-          eventBus.emit('documentAccessChanged', {
-            writable: false,
-            mode: 'read-only',
-            sourceType,
-            target: fullUrl
-          });
-        }
 
         // Update address/history immediately so header/back works
         try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
@@ -2375,15 +2366,6 @@ useEffect(() => {
               setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             }
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
-            if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
-              eventBus.emit('documentAccessChanged', {
-                writable: false,
-                mode: 'read-only',
-                sourceType: classifyUrlSourceType(fullUrl),
-                target: fullUrl
-              });
-            }
-
             try {
               const parsedUrl = new URL(fullUrl, typeof window !== 'undefined' ? window.location.origin : undefined);
               const params = parsedUrl.searchParams;

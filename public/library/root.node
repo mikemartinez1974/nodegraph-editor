@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-12T17:37:16.715Z",
-    "modified": "2026-02-12T17:37:18.571Z",
+    "created": "2026-02-12T23:58:48.332Z",
+    "modified": "2026-02-12T23:58:49.353Z",
     "author": "",
     "tags": []
   },
@@ -163,8 +163,8 @@
       "type": "node",
       "label": "node",
       "position": {
-        "x": 164.5940651920355,
-        "y": -162.78729659824154
+        "x": 185.5940651920355,
+        "y": -195.78729659824154
       },
       "width": 471.25,
       "height": 271.25,
@@ -183,8 +183,8 @@
       "type": "port",
       "label": "Port",
       "position": {
-        "x": 708.4325016036811,
-        "y": 35.307266915923464
+        "x": 187.4325016036811,
+        "y": 102.30726691592346
       },
       "width": 220,
       "height": 140,
@@ -195,7 +195,7 @@
         "link": "",
         "intent": "external",
         "target": {
-          "endpoint": "https://twilite.zone/library/root.node:root",
+          "endpoint": "https://twilite.zone/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",

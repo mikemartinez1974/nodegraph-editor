@@ -233,6 +233,10 @@ const GraphEditorContent = () => {
 
   useEffect(() => {
     const handleAccessChange = (payload = {}) => {
+      if (host === 'vscode' && payload?.writable === false) {
+        // In plugin local-file mode we keep editing writable; navigation is already restricted.
+        return;
+      }
       setDocumentAccess((prev) => ({
         ...prev,
         ...payload,
@@ -265,7 +269,7 @@ const GraphEditorContent = () => {
       eventBus.off('documentAccessChanged', handleAccessChange);
       eventBus.off('documentAccessPromoteWritable', handleAccessPromoteWritable);
     };
-  }, [setSnackbar]);
+  }, [host, setSnackbar]);
 
   useEffect(() => {
     if (host !== 'vscode') return;
@@ -1297,6 +1301,30 @@ const GraphEditorContent = () => {
     if (!window.__Twilite_EMBED__ || host !== 'vscode') return;
     let timer = null;
     let lastSentHash = null;
+    const flushGraphUpdate = () => {
+      if (!window.__Twilite_HOST_GRAPH_READY__) return;
+      if (window.__Twilite_SYNCING__) return;
+      if (isDraggingRef.current) return;
+      if (!documentAccess?.writable) return;
+      const exporter = window.__Twilite_EXPORT_GRAPH__;
+      if (typeof exporter !== 'function') return;
+      try {
+        const payload = exporter();
+        const hash = JSON.stringify({
+          nodes: payload?.nodes || [],
+          edges: payload?.edges || [],
+          clusters: payload?.clusters || []
+        });
+        if (hash === lastSentHash) return;
+        lastSentHash = hash;
+        const text = JSON.stringify(payload, null, 2);
+        const uri = typeof window !== 'undefined' ? (window.__Twilite_ACTIVE_URI__ || null) : null;
+        const panelId = typeof window !== 'undefined' ? (window.__Twilite_PANEL_ID__ || null) : null;
+        postHostMessage({ type: 'graphUpdated', text, uri, panelId });
+      } catch (err) {
+        // ignore serialize errors
+      }
+    };
     const startDrag = () => { isDraggingRef.current = true; };
     const endDrag = () => { isDraggingRef.current = false; };
     eventBus.on('nodeDragStart', startDrag);
@@ -1306,29 +1334,28 @@ const GraphEditorContent = () => {
     const schedule = () => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        if (!window.__Twilite_HOST_GRAPH_READY__) return;
-        if (window.__Twilite_SYNCING__) return;
-        if (isDraggingRef.current) return;
-        if (!documentAccess?.writable) return;
-        const exporter = window.__Twilite_EXPORT_GRAPH__;
-        if (typeof exporter !== 'function') return;
-        try {
-          const payload = exporter();
-          const hash = JSON.stringify({
-            nodes: payload?.nodes || [],
-            edges: payload?.edges || [],
-            clusters: payload?.clusters || []
-          });
-          if (hash === lastSentHash) return;
-          lastSentHash = hash;
-          const text = JSON.stringify(payload, null, 2);
-          postHostMessage({ type: 'graphUpdated', text });
-        } catch (err) {
-          // ignore serialize errors
-        }
-      }, 1200);
+        flushGraphUpdate();
+      }, 200);
     };
     schedule();
+    const handleWindowBlur = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      flushGraphUpdate();
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        flushGraphUpdate();
+      }
+    };
+    window.addEventListener('blur', handleWindowBlur);
+    document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       if (timer) {
         clearTimeout(timer);
@@ -1338,6 +1365,8 @@ const GraphEditorContent = () => {
       eventBus.off('nodeDragEnd', endDrag);
       eventBus.off('groupDragStart', startDrag);
       eventBus.off('groupDragEnd', endDrag);
+      window.removeEventListener('blur', handleWindowBlur);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [
     host,
@@ -1353,6 +1382,28 @@ const GraphEditorContent = () => {
     defaultEdgeColor,
     snapToGrid
   ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.__Twilite_EMBED__ || host !== 'vscode') return;
+    const handleSaveGraph = () => {
+      if (!documentAccess?.writable) return;
+      if (window.__Twilite_SYNCING__) return;
+      const exporter = window.__Twilite_EXPORT_GRAPH__;
+      if (typeof exporter !== 'function') return;
+      try {
+        const payload = exporter();
+        const text = JSON.stringify(payload, null, 2);
+        const uri = window.__Twilite_ACTIVE_URI__ || null;
+        const panelId = window.__Twilite_PANEL_ID__ || null;
+        postHostMessage({ type: 'saveFile', text, uri, panelId });
+      } catch (err) {
+        // ignore serialize errors
+      }
+    };
+    eventBus.on('saveGraph', handleSaveGraph);
+    return () => eventBus.off('saveGraph', handleSaveGraph);
+  }, [host, documentAccess?.writable]);
 
   const isGraphEmpty = (!nodes || nodes.length === 0) && (!edges || edges.length === 0) && (!groups || groups.length === 0);
   // The gallery/new-tab surface now appears only when explicitly requested.

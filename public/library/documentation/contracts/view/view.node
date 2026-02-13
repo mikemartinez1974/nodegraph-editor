@@ -1,67 +1,18 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-23T00:41:59.435Z",
-    "modified": "2026-01-23T00:41:59.435Z",
+    "created": "2026-02-13T00:14:03.561Z",
+    "modified": "2026-02-13T00:14:04.556Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1565c0",
-        "light": "#5e92f3",
-        "dark": "#003c8f",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00838f",
-        "light": "#4fb3bf",
-        "dark": "#005662",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e3f2fd",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 1490.8585297296001,
-      "y": 356.33612257519485
-    },
-    "zoom": 1.1741789708254555
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "view-contract-root",
       "type": "markdown",
-      "label": "\ud83d\udc41\ufe0f View Node Contract",
+      "label": "👁️ View Node Contract",
       "position": {
         "x": -320,
         "y": -220
@@ -213,7 +164,44 @@
           }
         },
         "html": "",
-        "svg": ""
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
       }
     }
   ],
@@ -223,6 +211,8 @@
       "type": "dataFlow",
       "source": "view-contract-root",
       "target": "view-role",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines",
       "style": {
         "width": 2,
@@ -236,6 +226,8 @@
       "type": "dataFlow",
       "source": "view-contract-root",
       "target": "view-required",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -249,6 +241,8 @@
       "type": "dataFlow",
       "source": "view-contract-root",
       "target": "view-hosts",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "targets",
       "style": {
         "width": 2,
@@ -262,6 +256,8 @@
       "type": "dataFlow",
       "source": "view-contract-root",
       "target": "view-format",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "encodes",
       "style": {
         "width": 2,
@@ -275,6 +271,8 @@
       "type": "dataFlow",
       "source": "view-contract-root",
       "target": "view-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "governs",
       "style": {
         "width": 2,
