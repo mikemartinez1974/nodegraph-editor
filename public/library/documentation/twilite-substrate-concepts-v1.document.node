@@ -3,22 +3,24 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-10T15:52:06.598Z",
-    "modified": "2026-02-10T15:54:05.361Z",
+    "created": "2026-02-14T19:01:27.262Z",
+    "modified": "2026-02-14T19:01:28.412Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
       "id": "33a0d07e-06c7-4a3f-a8ae-75d6ad0e2761",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "990430d8-4339-4cdd-b14e-d5b584cad57c",
@@ -79,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -256,120 +276,120 @@
       "type": "reference",
       "source": "substrate-root",
       "target": "cluster-identity",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "exists as",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-root-behavior",
       "type": "reference",
       "source": "substrate-root",
       "target": "cluster-behavior",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "allows",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-root-constraints",
       "type": "reference",
       "source": "substrate-root",
       "target": "cluster-constraints",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "is bounded by",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-root-semantics",
       "type": "reference",
       "source": "substrate-root",
       "target": "cluster-semantics",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "is understood through",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-root-execution",
       "type": "reference",
       "source": "substrate-root",
       "target": "cluster-execution",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "may produce",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contract-behavior",
       "type": "reference",
       "source": "skill-contract",
       "target": "cluster-behavior",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "governs",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contract-constraints",
       "type": "reference",
       "source": "skill-contract",
       "target": "cluster-constraints",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-template-contract",
       "type": "reference",
       "source": "skill-contract-template",
       "target": "skill-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "formalizes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
   "clusters": [

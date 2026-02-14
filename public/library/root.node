@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-14T00:21:37.693Z",
-    "modified": "2026-02-14T00:25:43.317Z",
+    "created": "2026-02-14T17:27:54.872Z",
+    "modified": "2026-02-14T18:32:46.798Z",
     "author": "",
     "tags": []
   },
@@ -163,11 +163,11 @@
       "type": "node",
       "label": "node",
       "position": {
-        "x": 185.5940651920355,
-        "y": -195.78729659824154
+        "x": 182.5940651920355,
+        "y": -192.78729659824154
       },
-      "width": 471.25,
-      "height": 271.25,
+      "width": 567.578125,
+      "height": 160,
       "visible": true,
       "showLabel": true,
       "data": {
@@ -183,11 +183,23 @@
       "type": "port",
       "label": "Port",
       "position": {
-        "x": 187.4325016036811,
-        "y": 102.30726691592346
+        "x": 183.62073697463643,
+        "y": 7.5818298452231545
       },
-      "width": 220,
-      "height": 140,
+      "width": 259.80514625642917,
+      "height": 90,
+      "ports": [
+        {
+          "id": "root",
+          "label": "root",
+          "direction": "bidirectional",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
       "visible": true,
       "showLabel": true,
       "data": {
@@ -212,11 +224,11 @@
       "type": "port",
       "label": "New Node",
       "position": {
-        "x": 518.9096752084901,
-        "y": 236.27582201803716
+        "x": 536.9567345954964,
+        "y": 7.440529872559281
       },
-      "width": 220,
-      "height": 140,
+      "width": 216.3934341260102,
+      "height": 90,
       "visible": true,
       "showLabel": true,
       "data": {

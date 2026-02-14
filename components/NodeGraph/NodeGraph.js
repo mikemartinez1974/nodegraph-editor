@@ -73,12 +73,30 @@ export default function NodeGraph({
   gridSize = 20,
   defaultEdgeRouting = 'auto',
   edgeLaneGapPx = 10,
+  watermarkEnabled = true,
+  watermarkStrength = 100,
   lockedNodes = new Set(),
   lockedEdges = new Set(),
   showAllEdgeLabels = false,
   edgeRoutes = {},
 }) {
   const theme = useTheme();
+  const isDarkMode = theme?.palette?.mode === 'dark';
+  const normalizedWatermarkStrength = Number.isFinite(Number(watermarkStrength))
+    ? Math.max(0, Math.min(100, Number(watermarkStrength)))
+    : 100;
+  const watermarkStyle = useMemo(() => ({
+    position: 'absolute',
+    inset: 0,
+    zIndex: -1,
+    pointerEvents: 'none',
+    backgroundImage: "url('/logo_light.svg')",
+    backgroundSize: 'min(56vmin, 680px)',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    opacity: (isDarkMode ? 0.09 : 0.045) * (normalizedWatermarkStrength / 100),
+    filter: isDarkMode ? 'invert(1) brightness(1.08)' : 'none'
+  }), [isDarkMode, normalizedWatermarkStrength]);
   const clampZoom = useCallback((value) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value)), []);
   
   // Auto-update group bounds when nodes move
@@ -1142,6 +1160,13 @@ export default function NodeGraph({
           backgroundImage: backgroundImage ? `url('${backgroundImage}')` : 'none'
         }}
       />
+
+      {watermarkEnabled && (
+        <div
+          id="graph-editor-watermark"
+          style={watermarkStyle}
+        />
+      )}
 
       {(() => {
         return null;

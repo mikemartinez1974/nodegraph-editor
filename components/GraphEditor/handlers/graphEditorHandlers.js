@@ -6,6 +6,7 @@ import eventBus from '../../NodeGraph/eventBus.js';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from '../utils/idUtils.js';
 import { validateNodes, validateEdges, validateGroups, summarizeValidationErrors } from './validation.js';
 import { convertHandlesObjectToArray } from '../utils/handleUtils.js';
+import { centerViewportOnNode, getGraphRootNode } from '../utils/rootNode.js';
 
 // Debounce guard for delete operations (must be outside function to persist)
 let deleteInProgress = false;
@@ -692,14 +693,15 @@ export function createGraphEditorHandlers({
     setSelectedGroupIds([]);
     saveToHistory(nextNodes, normalizedEdges);
 
-    if (nextNodes.length > 0) {
-      const firstNode = nextNodes[0];
-      state.setPan({
-        x: window.innerWidth / 2 - firstNode.position.x * zoom,
-        y: window.innerHeight / 2 - firstNode.position.y * zoom
+    const rootNode = getGraphRootNode(nextNodes);
+    if (rootNode) {
+      centerViewportOnNode({
+        node: rootNode,
+        zoom,
+        setPan: state.setPan
       });
-      // Do not auto-select or open the properties panel after loading a file
     }
+    // Do not auto-select or open the properties panel after loading a file
   };
   
   // ===== GROUP HANDLERS =====

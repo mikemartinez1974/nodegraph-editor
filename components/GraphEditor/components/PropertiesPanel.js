@@ -2144,6 +2144,24 @@ export default function PropertiesPanel({
               selectedNode && onUpdateNode(selectedNode.id, { label: event.target.value })
             }
           />
+          <Box sx={{ mt: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="caption" color="text.secondary">
+              Root node
+            </Typography>
+            <Switch
+              size="small"
+              checked={Boolean(selectedNode?.data?.isRoot)}
+              onChange={(event) =>
+                selectedNode &&
+                onUpdateNode(selectedNode.id, {
+                  data: {
+                    ...(selectedNode.data || {}),
+                    isRoot: event.target.checked
+                  }
+                })
+              }
+            />
+          </Box>
         </Box>
       )}
       {availableNodeTypeOptions.length > 0 && isNodeSelected && (

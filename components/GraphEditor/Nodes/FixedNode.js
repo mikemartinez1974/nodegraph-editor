@@ -164,6 +164,7 @@ const FixedNode = ({
 
   const hasMemo = node?.data?.memo && node.data.memo.trim().length > 0;
   const hasLink = node?.data?.link && node.data.link.trim().length > 0;
+  const isRootNode = Boolean(node?.isRoot || node?.data?.isRoot || node?.data?.root);
 
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const nodeColor = (node?.color && node.color.trim()) ? node.color : null;
@@ -302,6 +303,30 @@ const FixedNode = ({
       }}
     >
       {/* Render node label/markdown if present (unless hideDefaultContent is true) */}
+      {isRootNode && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 6,
+            left: 6,
+            zIndex: 3,
+            pointerEvents: 'none',
+            padding: '2px 6px',
+            borderRadius: 999,
+            background: alpha(theme.palette.warning.main, 0.2),
+            border: `1px solid ${alpha(theme.palette.warning.main, 0.55)}`,
+            color: theme.palette.warning.main,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: 0.4,
+            textTransform: 'uppercase',
+            lineHeight: 1.2
+          }}
+          title="Root node"
+        >
+          Root
+        </div>
+      )}
       {!hideDefaultContent && node?.label && (
         <div style={{ 
           textAlign: 'center', 

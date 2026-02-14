@@ -3,22 +3,24 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-02T04:25:21.619Z",
-    "modified": "2026-02-02T04:25:23.134Z",
+    "created": "2026-02-14T16:17:03.566Z",
+    "modified": "2026-02-14T16:17:14.878Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
       "id": "082c200d-b5d6-45e2-b884-431d9662ca8e",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "f0a4fb28-39af-417b-adde-3c788542a31c",
@@ -79,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",

@@ -536,6 +536,11 @@ export default function DocumentPropertiesDialog({
       edgeRouting: 'auto',
       layout
     }));
+    setSettings((prev) => ({
+      ...prev,
+      watermarkEnabled: true,
+      watermarkStrength: 100
+    }));
   };
 
   const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
@@ -1789,6 +1794,45 @@ export default function DocumentPropertiesDialog({
                 Canvas & Background
               </Typography>
               <BackgroundControls backgroundUrl={backgroundUrl} backgroundInteractive={false} />
+              <Stack spacing={1.5} sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={settings.watermarkEnabled !== false}
+                      onChange={(event) => {
+                        const nextEnabled = event.target.checked;
+                        setSettings((prev) => ({ ...prev, watermarkEnabled: nextEnabled }));
+                        eventBus.emit('updateEditorWatermark', {
+                          enabled: nextEnabled,
+                          strength: typeof settings.watermarkStrength === 'number' ? settings.watermarkStrength : 100
+                        });
+                      }}
+                    />
+                  }
+                  label="Show logo watermark"
+                />
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    Watermark strength: {Math.round(typeof settings.watermarkStrength === 'number' ? settings.watermarkStrength : 100)}%
+                  </Typography>
+                  <Slider
+                    value={typeof settings.watermarkStrength === 'number' ? settings.watermarkStrength : 100}
+                    onChange={(_, value) => {
+                      const nextStrength = Math.max(0, Math.min(100, Array.isArray(value) ? value[0] : value));
+                      setSettings((prev) => ({ ...prev, watermarkStrength: nextStrength }));
+                      eventBus.emit('updateEditorWatermark', {
+                        enabled: settings.watermarkEnabled !== false,
+                        strength: nextStrength
+                      });
+                    }}
+                    min={0}
+                    max={100}
+                    step={5}
+                    disabled={settings.watermarkEnabled === false}
+                    valueLabelDisplay="auto"
+                  />
+                </Box>
+              </Stack>
             </Paper>
           </Stack>
         )}

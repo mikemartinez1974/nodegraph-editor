@@ -129,6 +129,14 @@ const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
 const loadStoredGraph = () => {
   if (typeof window === 'undefined' || !window.localStorage) return null;
   if (window.__Twilite_HOST__ === 'vscode' || window.__Twilite_EMBED__ === true) return null;
+  let allowRestore = false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    allowRestore = params.get('restore') === '1' || window.__Twilite_RESTORE_LAST_GRAPH__ === true;
+  } catch (err) {
+    allowRestore = window.__Twilite_RESTORE_LAST_GRAPH__ === true;
+  }
+  if (!allowRestore) return null;
   try {
     const raw = window.localStorage.getItem(GRAPH_STORAGE_KEY);
     if (!raw) return null;

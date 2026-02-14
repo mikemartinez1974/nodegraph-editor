@@ -196,6 +196,13 @@ const GraphEditorContent = () => {
   } = rpc || {};
 
   const [editorThemeConfig, setEditorThemeConfig] = useState(null);
+  const [editorWatermarkEnabled, setEditorWatermarkEnabled] = useState(true);
+  const [editorWatermarkStrength, setEditorWatermarkStrength] = useState(100);
+  const [hostLoadReady, setHostLoadReady] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    if (window.__Twilite_HOST__ !== 'vscode' || !window.__Twilite_EMBED__) return true;
+    return Boolean(window.__Twilite_HOST_GRAPH_READY__) && !Boolean(window.__Twilite_WAITING_FOR_FULL_TEXT__);
+  });
   const [documentAccess, setDocumentAccess] = useState(() => ({
     writable: true,
     mode: 'writable',
@@ -206,8 +213,14 @@ const GraphEditorContent = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (host !== 'vscode') return;
     const settings = loadSettings();
+    setEditorWatermarkEnabled(settings?.watermarkEnabled !== false);
+    setEditorWatermarkStrength(
+      typeof settings?.watermarkStrength === 'number'
+        ? Math.max(0, Math.min(100, settings.watermarkStrength))
+        : 100
+    );
+    if (host !== 'vscode') return;
     if (settings?.theme) {
       setEditorThemeConfig(settings.theme);
     }
@@ -1127,6 +1140,8 @@ const GraphEditorContent = () => {
       gridSize={documentSettings.gridSize}
       defaultEdgeRouting={documentSettings.edgeRouting}
       edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
+      watermarkEnabled={editorWatermarkEnabled}
+      watermarkStrength={editorWatermarkStrength}
       lockedNodes={lockedNodes}
       lockedEdges={lockedEdges}
       onNodeDoubleClick={handleNodeDoubleClickOpenProperties}
@@ -1237,6 +1252,12 @@ const GraphEditorContent = () => {
         if (settings?.theme) {
           setEditorThemeConfig(settings.theme);
         }
+        setEditorWatermarkEnabled(settings?.watermarkEnabled !== false);
+        setEditorWatermarkStrength(
+          typeof settings?.watermarkStrength === 'number'
+            ? Math.max(0, Math.min(100, settings.watermarkStrength))
+            : 100
+        );
         return;
       }
 
@@ -1246,6 +1267,12 @@ const GraphEditorContent = () => {
         if (settings?.theme) {
           setEditorThemeConfig(settings.theme);
         }
+        setEditorWatermarkEnabled(settings?.watermarkEnabled !== false);
+        setEditorWatermarkStrength(
+          typeof settings?.watermarkStrength === 'number'
+            ? Math.max(0, Math.min(100, settings.watermarkStrength))
+            : 100
+        );
         if (nodesRef) nodesRef.current = nodesToLoad;
         if (edgesRef) edgesRef.current = edgesToLoad;
         return;
@@ -1297,6 +1324,42 @@ const GraphEditorContent = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    const handler = ({ enabled, strength } = {}) => {
+      if (typeof enabled === 'boolean') {
+        setEditorWatermarkEnabled(enabled);
+      }
+      if (typeof strength === 'number' && Number.isFinite(strength)) {
+        setEditorWatermarkStrength(Math.max(0, Math.min(100, strength)));
+      }
+    };
+    eventBus.on('updateEditorWatermark', handler);
+    return () => eventBus.off('updateEditorWatermark', handler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (host !== 'vscode' || !window.__Twilite_EMBED__) {
+      setHostLoadReady(true);
+      return;
+    }
+    const sync = (event) => {
+      if (event?.detail && typeof event.detail === 'object') {
+        const waiting = Boolean(event.detail.waitingForFullText);
+        const ready = Boolean(event.detail.hostGraphReady);
+        setHostLoadReady(ready && !waiting);
+        return;
+      }
+      setHostLoadReady(
+        Boolean(window.__Twilite_HOST_GRAPH_READY__) && !Boolean(window.__Twilite_WAITING_FOR_FULL_TEXT__)
+      );
+    };
+    sync();
+    window.addEventListener('Twilite-hostLoadState', sync);
+    return () => window.removeEventListener('Twilite-hostLoadState', sync);
+  }, [host]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     if (!window.__Twilite_EMBED__) return;
     let pending = null;
     const emitDirty = () => {
@@ -1338,6 +1401,7 @@ const GraphEditorContent = () => {
     let lastSentHash = null;
     const flushGraphUpdate = () => {
       if (!window.__Twilite_HOST_GRAPH_READY__) return;
+      if (window.__Twilite_WAITING_FOR_FULL_TEXT__) return;
       if (window.__Twilite_SYNCING__) return;
       if (isDraggingRef.current) return;
       if (!documentAccess?.writable) return;
@@ -1822,9 +1886,24 @@ const skipPropertiesCloseRef = useRef(false);
               selectionCount: selectedNodeIds.length
             });
             setNodes(prev => {
+            const enforceSingleRoot =
+              updates?.isRoot === true ||
+              updates?.data?.isRoot === true ||
+              updates?.data?.root === true;
             const { data: nextDataPatch, replaceData, ...restUpdates } = updates || {};
             const next = prev.map(n => {
-              if (n.id !== id) return n;
+              if (n.id !== id) {
+                if (!enforceSingleRoot) return n;
+                return {
+                  ...n,
+                  isRoot: false,
+                  data: {
+                    ...(n.data || {}),
+                    isRoot: false,
+                    root: false
+                  }
+                };
+              }
               const nextData = nextDataPatch
                 ? (replaceData || options?.replaceData)
                   ? nextDataPatch
@@ -1959,6 +2038,15 @@ const skipPropertiesCloseRef = useRef(false);
           onShowMessage={showSnackbar}
           recentSnapshots={recentSnapshots}
           isFreeUser={isFreeUser}
+        />
+      ) : !hostLoadReady ? (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: theme.palette.background.default,
+            zIndex: 0
+          }}
         />
       ) : (
         createGraphRenderer()

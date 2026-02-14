@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-14T13:50:30.282Z",
-    "modified": "2026-02-14T13:50:31.197Z",
+    "created": "2026-02-14T19:01:30.710Z",
+    "modified": "2026-02-14T19:01:31.820Z",
     "author": "",
     "tags": []
   },
@@ -186,8 +186,8 @@
         "x": -1135.0945240288104,
         "y": 362.6910827700265
       },
-      "width": 220,
-      "height": 140,
+      "width": 240.9895782470703,
+      "height": 90,
       "visible": true,
       "showLabel": true,
       "data": {

@@ -34,6 +34,7 @@ import {
   setManifestDocumentUrl,
   setManifestSettings
 } from './utils/manifestUtils';
+import { centerViewportOnNode, getGraphRootNode } from './utils/rootNode';
 import { validateGraphInvariants } from './validators/validateGraphInvariants';
 
 const DEFAULT_NODE_WIDTH = 200;
@@ -451,6 +452,18 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       setSelectedNodeIds([]);
       setSelectedEdgeIds([]);
       setSelectedGroupIds([]);
+      const rootNode = getGraphRootNode(nextNodes);
+      if (rootNode) {
+        try {
+          centerViewportOnNode({
+            node: rootNode,
+            zoom,
+            setPan
+          });
+        } catch (err) {
+          // ignore viewport focus errors on load
+        }
+      }
       try {
         const manifestSettings = getManifestSettings(nextNodes);
         const settings = manifestSettings || payload.settings || {};
@@ -483,6 +496,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     setEdges,
     setGroups,
     setPan,
+    zoom,
     setZoom,
     setSelectedNodeIds,
     setSelectedEdgeIds,
@@ -1265,9 +1279,10 @@ useEffect(() => {
       if (!firstGraphLoadHandledRef.current) {
         firstGraphLoadHandledRef.current = true;
         if (Array.isArray(nodesToLoad) && nodesToLoad.length > 0) {
-          const firstNodeId = nodesToLoad[0]?.id;
-          if (firstNodeId) {
-            setSelectedNodeIds([firstNodeId]);
+          const rootNode = getGraphRootNode(nodesToLoad);
+          const rootNodeId = rootNode?.id || nodesToLoad[0]?.id;
+          if (rootNodeId) {
+            setSelectedNodeIds([rootNodeId]);
             setSelectedEdgeIds([]);
             setSelectedGroupIds([]);
           }

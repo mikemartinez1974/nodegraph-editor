@@ -37,6 +37,8 @@ const introGraph = {
 const defaultSettings = {
   themeName: 'light',
   backgroundImage: null,
+  watermarkEnabled: true,
+  watermarkStrength: 100,
   defaultNodeColor: '#1976d2',
   defaultEdgeColor: '#666666',
   pan: { x: 0, y: 0 },

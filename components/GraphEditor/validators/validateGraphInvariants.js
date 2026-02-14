@@ -58,6 +58,7 @@ export function validateGraphInvariants({
   mode = 'mutation',
   resolvedDictionary = null
 }) {
+  const isLoadMode = mode === "load";
   const isDraftMode = () => {
     if (typeof window === 'undefined') return false;
     if (window.__Twilite_DRAFT__ === true || window.__TWILITE_DRAFT__ === true) return true;
@@ -77,6 +78,10 @@ export function validateGraphInvariants({
 
   const errors = [];
   const warnings = [];
+  const pushLoadTolerantIssue = (issue) => {
+    if (isLoadMode) warnings.push(issue);
+    else errors.push(issue);
+  };
 
   const clusterList = Array.isArray(clusters) ? clusters : [];
   const nodeClusterMap = new Map();
@@ -266,7 +271,7 @@ export function validateGraphInvariants({
       { handleId: edge.targetPort, node: targetNode, nodeType: "target" }
     ].forEach(({ handleId, node, nodeType }) => {
       if (!handleId) {
-        errors.push({
+        pushLoadTolerantIssue({
           code: "PORT_REQUIRED",
           message: `Edge "${edge.id}" is missing required ${nodeType} port.`,
           edgeId: edge.id
@@ -274,7 +279,7 @@ export function validateGraphInvariants({
         return;
       }
       if (!node) {
-        errors.push({
+        pushLoadTolerantIssue({
           code: "NODE_NOT_FOUND",
           message: `Edge "${edge.id}" references ${nodeType} node "${nodeType === "source" ? edge.source : edge.target}" but it does not exist.`,
           edgeId: edge.id
@@ -284,7 +289,7 @@ export function validateGraphInvariants({
 
       const handle = findHandle(node, handleId);
       if (!handle) {
-        errors.push({
+        pushLoadTolerantIssue({
           code: "HANDLE_NOT_FOUND",
           message: `Edge "${edge.id}" references missing ${nodeType} handle "${handleId}".`,
           edgeId: edge.id,
@@ -336,7 +341,7 @@ export function validateGraphInvariants({
 
     const parsed = parsePortEndpoint(endpoint);
     if (!parsed.ok) {
-      errors.push({
+      pushLoadTolerantIssue({
         code: "PORT_ENDPOINT_INVALID",
         message: `Port node \"${node.id}\" has invalid endpoint: ${parsed.error}`,
         nodeId: node.id
@@ -345,7 +350,7 @@ export function validateGraphInvariants({
     }
 
     if (target.mode && !["navigate", "bridge", "boundary"].includes(target.mode)) {
-      errors.push({
+      pushLoadTolerantIssue({
         code: "PORT_MODE_INVALID",
         message: `Port node \"${node.id}\" has invalid target.mode \"${target.mode}\".`,
         nodeId: node.id

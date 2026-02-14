@@ -24,6 +24,8 @@ export default function GraphRendererAdapter({
   gridSize,
   defaultEdgeRouting,
   edgeLaneGapPx,
+  watermarkEnabled,
+  watermarkStrength,
   lockedNodes,
   lockedEdges,
   onNodeDoubleClick,
@@ -121,6 +123,8 @@ export default function GraphRendererAdapter({
         gridSize={gridSize}
         defaultEdgeRouting={defaultEdgeRouting}
         edgeLaneGapPx={edgeLaneGapPx}
+        watermarkEnabled={watermarkEnabled}
+        watermarkStrength={watermarkStrength}
         lockedNodes={lockedNodes}
         lockedEdges={lockedEdges}
         onNodeDoubleClick={onNodeDoubleClick}

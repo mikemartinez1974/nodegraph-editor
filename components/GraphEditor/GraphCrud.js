@@ -494,6 +494,29 @@ const applyNodeUpdates = (node, updates = {}) => {
   };
 };
 
+const updatesSetNodeAsRoot = (updates = {}) => {
+  if (!updates || typeof updates !== 'object') return false;
+  if (updates.isRoot === true) return true;
+  const data = updates.data;
+  if (!data || typeof data !== 'object') return false;
+  return data.isRoot === true || data.root === true;
+};
+
+const clearRootFlags = (node) => {
+  if (!node || typeof node !== 'object') return node;
+  const currentData = node.data && typeof node.data === 'object' ? node.data : {};
+  const nextData = {
+    ...currentData,
+    isRoot: false,
+    root: false
+  };
+  return {
+    ...node,
+    isRoot: false,
+    data: nextData
+  };
+};
+
 const applyEdgeUpdates = (edge, updates = {}) => {
   const mergedEdge = {
     ...edge,
@@ -602,7 +625,9 @@ export default class GraphCRUD {
         portPosition: 'center',
         showLabel: true
       };
-      const updatedNodes = deduplicateNodes([...currentNodes, newNode]);
+      const newNodeSetsRoot = newNode?.isRoot === true || newNode?.data?.isRoot === true || newNode?.data?.root === true;
+      const baseNodes = newNodeSetsRoot ? currentNodes.map(clearRootFlags) : currentNodes;
+      const updatedNodes = deduplicateNodes([...baseNodes, newNode]);
       this.setNodes(prev => {
         if (this.nodesRef) this.nodesRef.current = updatedNodes;
         return updatedNodes;
@@ -648,9 +673,13 @@ export default class GraphCRUD {
         return { success: false, error: `Node ${id} not found` };
       }
 
+      const enforceSingleRoot = updatesSetNodeAsRoot(updates);
       const updatedNodes = currentNodes.map(node => {
         if (node.id === id) {
           return applyNodeUpdates(node, updates);
+        }
+        if (enforceSingleRoot) {
+          return clearRootFlags(node);
         }
         return node;
       });
@@ -690,8 +719,13 @@ export default class GraphCRUD {
       }
 
       const updatedItems = [];
+      const enforceSingleRoot = updatesSetNodeAsRoot(updates);
+      const targetRootId = enforceSingleRoot ? ids[0] : null;
       const updatedNodes = currentNodes.map(node => {
         if (!idSet.has(node.id)) {
+          if (enforceSingleRoot && node.id !== targetRootId) {
+            return clearRootFlags(node);
+          }
           return node;
         }
         const nextNode = applyNodeUpdates(node, updates);
@@ -1024,8 +1058,18 @@ export default class GraphCRUD {
         }
       }
 
+      const createdRootNode = createdNodes.find(
+        (node) => node?.isRoot === true || node?.data?.isRoot === true || node?.data?.root === true
+      );
+      const baseNodes = createdRootNode ? currentNodes.map(clearRootFlags) : currentNodes;
+      const normalizedCreatedNodes = createdRootNode
+        ? createdNodes.map((node) => {
+            if (node.id === createdRootNode.id) return node;
+            return clearRootFlags(node);
+          })
+        : createdNodes;
       // Update state once with all nodes
-      const updatedNodes = deduplicateNodes([...currentNodes, ...createdNodes]);
+      const updatedNodes = deduplicateNodes([...baseNodes, ...normalizedCreatedNodes]);
       if (this.nodesRef) this.nodesRef.current = updatedNodes;
       this.setNodes(() => updatedNodes);
       this.saveToHistory(updatedNodes, this.getEdges());

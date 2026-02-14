@@ -618,9 +618,23 @@ class TwiliteNodeEditorProvider {
         window.__Twilite_HOST__ = 'vscode';
         window.__Twilite_PANEL_ID__ = ${JSON.stringify(panelId)};
         window.__Twilite_ACTIVE_URI__ = '';
+        window.__Twilite_WAITING_FOR_FULL_TEXT__ = true;
         window.__Twilite_POST_MESSAGE__ = (payload) => vscode.postMessage(payload);
         window.__Twilite_ELK_WORKER_URL__ = ${JSON.stringify(elkWorkerUrl || '')};
         window.next = window.next || {};
+        const emitHostLoadState = () => {
+          try {
+            window.dispatchEvent(
+              new CustomEvent('Twilite-hostLoadState', {
+                detail: {
+                  waitingForFullText: Boolean(window.__Twilite_WAITING_FOR_FULL_TEXT__),
+                  hostGraphReady: Boolean(window.__Twilite_HOST_GRAPH_READY__)
+                }
+              })
+            );
+          } catch {}
+        };
+        emitHostLoadState();
         
         let pendingPayload = null;
         let retryCount = 0;
@@ -738,12 +752,15 @@ class TwiliteNodeEditorProvider {
           
           try {
             const parsed = raw && raw.trim() ? JSON.parse(raw) : { nodes: [], edges: [], clusters: [] };
-            try { window.__Twilite_HOST_GRAPH_READY__ = true; } catch {}
             if (message.edgeRoutes) parsed.edgeRoutes = message.edgeRoutes;
             if (message.edgeRouteIds) parsed.edgeRouteIds = message.edgeRouteIds;
             const emptyGraph = isEmptyGraph(parsed);
             
             if (forceClear && emptyGraph) {
+              try {
+                window.__Twilite_WAITING_FOR_FULL_TEXT__ = true;
+              } catch {}
+              emitHostLoadState();
               applyGraph({ nodes: [], edges: [], clusters: [] });
               scheduleEmptyClear();
               try {
@@ -751,6 +768,11 @@ class TwiliteNodeEditorProvider {
               } catch {}
               return;
             }
+            try {
+              window.__Twilite_HOST_GRAPH_READY__ = true;
+              window.__Twilite_WAITING_FOR_FULL_TEXT__ = false;
+            } catch {}
+            emitHostLoadState();
             applyGraph(parsed);
             if (emptyGraph) {
               scheduleEmptyClear();
