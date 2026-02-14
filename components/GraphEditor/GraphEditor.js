@@ -728,6 +728,12 @@ useEffect(() => {
         width: node.width,
         height: node.height,
         color: node.color,
+        ports: Array.isArray(node.ports) ? node.ports : undefined,
+        inputs: Array.isArray(node.inputs) ? node.inputs : undefined,
+        outputs: Array.isArray(node.outputs) ? node.outputs : undefined,
+        state: node.state && typeof node.state === 'object' ? node.state : undefined,
+        style: node.style && typeof node.style === 'object' ? node.style : undefined,
+        extensions: node.extensions && typeof node.extensions === 'object' ? node.extensions : undefined,
         visible: node.visible !== false,
         showLabel: node.showLabel !== false,
         data: node.data || {}
@@ -2805,6 +2811,13 @@ useEffect(() => {
       handle
     }) => {
       try {
+        // Standard handle->handle connections are already created by NodeGraph's
+        // built-in handleDrop path. If we also create here, we duplicate edges.
+        const isDirectHandleConnection = Boolean(targetNode && targetPort);
+        if (isDirectHandleConnection) {
+          return;
+        }
+
         let resolvedValidation = validation;
         let resolvedTargetNodeId = targetNode;
         let resolvedTargetHandle = targetPort;

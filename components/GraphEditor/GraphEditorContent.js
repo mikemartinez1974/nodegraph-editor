@@ -387,12 +387,19 @@ const GraphEditorContent = () => {
   const resolvePublicPath = useCallback((ref) => {
     if (!ref || typeof ref !== 'string') return null;
     if (ref.startsWith('/')) return ref;
+    // Treat bare workspace-style paths as public-relative.
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(ref)) {
+      return `/${ref.replace(/^\/+/, '')}`;
+    }
     try {
       const parsed = new URL(ref);
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
       const isSameOrigin = origin && parsed.origin === origin;
       const isWebviewScheme = parsed.protocol === 'vscode-webview:' || parsed.protocol === 'vscode-resource:';
-      if ((isSameOrigin || isWebviewScheme) && parsed.pathname) {
+      const isTwiliteHost =
+        parsed.protocol.startsWith('http') &&
+        ['twilite.zone', 'www.twilite.zone'].includes((parsed.hostname || '').toLowerCase());
+      if ((isSameOrigin || isWebviewScheme || isTwiliteHost) && parsed.pathname) {
         return parsed.pathname;
       }
     } catch {}
@@ -1076,6 +1083,31 @@ const GraphEditorContent = () => {
       nodeId
     });
   }, [setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds]);
+
+  const handleNodeDoubleClickOpenProperties = useCallback((nodeId) => {
+    if (!nodeId) return;
+    setSelectedNodeIds([nodeId]);
+    setSelectedEdgeIds([]);
+    setSelectedGroupIds([]);
+    setShowPropertiesPanel(true);
+  }, [setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel]);
+
+  const handleEdgeDoubleClickOpenProperties = useCallback((edgeId) => {
+    if (!edgeId) return;
+    setSelectedEdgeIds([edgeId]);
+    setSelectedNodeIds([]);
+    setSelectedGroupIds([]);
+    setShowPropertiesPanel(true);
+  }, [setSelectedEdgeIds, setSelectedNodeIds, setSelectedGroupIds, setShowPropertiesPanel]);
+
+  const handleGroupDoubleClickOpenProperties = useCallback((groupId) => {
+    if (!groupId) return;
+    setSelectedGroupIds([groupId]);
+    setSelectedNodeIds([]);
+    setSelectedEdgeIds([]);
+    setShowPropertiesPanel(true);
+  }, [setSelectedGroupIds, setSelectedNodeIds, setSelectedEdgeIds, setShowPropertiesPanel]);
+
   const createGraphRenderer = () => (
     <GraphRendererAdapter
       graphKey={graphRendererKey}
@@ -1097,6 +1129,9 @@ const GraphEditorContent = () => {
       edgeLaneGapPx={documentSettings.layout?.edgeLaneGapPx}
       lockedNodes={lockedNodes}
       lockedEdges={lockedEdges}
+      onNodeDoubleClick={handleNodeDoubleClickOpenProperties}
+      onEdgeDoubleClick={handleEdgeDoubleClickOpenProperties}
+      onGroupDoubleClick={handleGroupDoubleClickOpenProperties}
       onEdgeClick={undefined}
       onEdgeHover={undefined}
       onNodeContextMenu={handleNodeContextMenu}

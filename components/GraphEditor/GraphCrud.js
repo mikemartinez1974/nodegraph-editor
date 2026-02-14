@@ -180,12 +180,17 @@ const getHandleList = (node, field) => {
   return list;
 };
 
-const normalizeHandleDefinitions = ({ handles, inputs, outputs }) => {
+const normalizeHandleDefinitions = ({ handles, ports, inputs, outputs }) => {
   const normalizedInputs = Array.isArray(inputs) ? inputs.map(handle => ({ ...handle })) : [];
   const normalizedOutputs = Array.isArray(outputs) ? outputs.map(handle => ({ ...handle })) : [];
+  const unifiedHandles = Array.isArray(handles) && handles.length > 0
+    ? handles
+    : Array.isArray(ports) && ports.length > 0
+    ? ports
+    : [];
 
-  if (Array.isArray(handles) && handles.length > 0) {
-    const normalizedHandles = handles
+  if (unifiedHandles.length > 0) {
+    const normalizedHandles = unifiedHandles
       .map((handle, index) => {
         if (!handle) return null;
         const id = handle.id || handle.key || handle.name || `handle-${index}`;
@@ -555,6 +560,7 @@ export default class GraphCRUD {
     inputs,
     outputs,
     handles,
+    ports,
     state,
     style,
     visible = true,
@@ -572,7 +578,7 @@ export default class GraphCRUD {
         nodeId = this._generateId();
       }
 
-      const normalizedHandles = normalizeHandleDefinitions({ handles, inputs, outputs });
+      const normalizedHandles = normalizeHandleDefinitions({ handles, ports, inputs, outputs });
       const sanitizedState = state ? cloneValue(state) : undefined;
       const sanitizedStyle = style ? cloneValue(style) : undefined;
       const sanitizedExtensions = cloneExtensions(extensions);

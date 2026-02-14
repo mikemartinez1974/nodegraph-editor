@@ -8,6 +8,36 @@ import { parsePortEndpoint, endpointToUrl } from "../utils/portEndpoint";
 
 const DEFAULT_INPUTS = [{ key: "in", label: "In", type: "value" }];
 const DEFAULT_OUTPUTS = [{ key: "out", label: "Out", type: "value" }];
+const NON_PASSIVE_LISTENER = { passive: false };
+const HANDLE_SIZE = 10;
+const HANDLE_OFFSET = -4;
+const RESIZE_HANDLES = [
+  { key: "nw", cursor: "nwse-resize", x: HANDLE_OFFSET, y: HANDLE_OFFSET },
+  { key: "n", cursor: "ns-resize", x: "50%", y: HANDLE_OFFSET, transform: "translate(-50%, 0)" },
+  { key: "ne", cursor: "nesw-resize", x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, y: HANDLE_OFFSET },
+  {
+    key: "e",
+    cursor: "ew-resize",
+    x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`,
+    y: "50%",
+    transform: "translate(0, -50%)"
+  },
+  {
+    key: "se",
+    cursor: "nwse-resize",
+    x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`,
+    y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`
+  },
+  {
+    key: "s",
+    cursor: "ns-resize",
+    x: "50%",
+    y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`,
+    transform: "translate(-50%, 0)"
+  },
+  { key: "sw", cursor: "nesw-resize", x: HANDLE_OFFSET, y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)` },
+  { key: "w", cursor: "ew-resize", x: HANDLE_OFFSET, y: "50%", transform: "translate(0, -50%)" }
+];
 
 const buildTargetLabel = (target = {}) => {
   if (!target || typeof target !== "object") return "No target";
@@ -23,65 +53,43 @@ const buildTargetLabel = (target = {}) => {
 const PortNode = (props) => {
   const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
+  const [isResizing, setIsResizing] = useState(false);
+  const isResizingRef = useRef(false);
+  const resizeStateRef = useRef({
+    handle: "se",
+    startX: 0,
+    startY: 0,
+    startWidth: 0,
+    startHeight: 0,
+    startPosX: 0,
+    startPosY: 0
+  });
+  const rafRef = useRef(null);
+  const pendingSizeRef = useRef(null);
+  const pendingPosRef = useRef(null);
+  const MIN_WIDTH = 140;
+  const MIN_HEIGHT = 90;
   const target = node?.data?.target || {};
-  const mode = target?.mode || "navigate";
   const targetLabel = buildTargetLabel(target);
-  const intent = node?.data?.intent || node?.data?.type || "port";
-
-  const [endpointDraft, setEndpointDraft] = useState(target.endpoint || "");
-  const [modeDraft, setModeDraft] = useState(mode);
-  const lastSyncedRef = useRef({ endpoint: target.endpoint || "", mode });
-
-  useEffect(() => {
-    const next = { endpoint: target.endpoint || "", mode };
-    if (
-      next.endpoint !== lastSyncedRef.current.endpoint ||
-      next.mode !== lastSyncedRef.current.mode
-    ) {
-      setEndpointDraft(next.endpoint);
-      setModeDraft(next.mode);
-      lastSyncedRef.current = next;
-    }
-  }, [target.endpoint, mode]);
+  const displayLabel = node?.label || "Port";
 
   const endpointResult = useMemo(
-    () => parsePortEndpoint((endpointDraft || "").trim()),
-    [endpointDraft]
+    () => parsePortEndpoint((target?.endpoint || "").trim()),
+    [target?.endpoint]
   );
   const endpointData = endpointResult.ok ? endpointResult.value : null;
   const targetUrl = useMemo(() => {
     if (typeof target.url === "string" && target.url.trim()) return target.url.trim();
-    return endpointToUrl(endpointData?.filePath || "");
-  }, [target.url, endpointData?.filePath]);
-
-  const isDirty = endpointDraft !== (target.endpoint || "") || modeDraft !== mode;
-
-  const commitTarget = useCallback(
-    (nextEndpoint, nextMode) => {
-      const normalizedEndpoint = (nextEndpoint || "").trim();
-      const parsed = parsePortEndpoint(normalizedEndpoint);
-      const nextTarget = {
-        ...(target || {}),
-        endpoint: normalizedEndpoint,
-        mode: nextMode || "navigate"
-      };
-
-      if (parsed.ok) {
-        nextTarget.portId = parsed.value.portId;
-      }
-
-      eventBus.emit("nodeUpdate", {
-        id: node.id,
-        updates: {
-          data: {
-            ...node.data,
-            target: nextTarget
-          }
-        }
-      });
-    },
-    [node.data, node.id, target]
-  );
+    const endpointRaw = typeof target?.endpoint === "string" ? target.endpoint.trim() : "";
+    if (endpointData?.filePath) {
+      return endpointToUrl(endpointData.filePath);
+    }
+    // Allow direct URL endpoints even when they omit `:portId`.
+    if (/^https?:\/\//i.test(endpointRaw)) {
+      return endpointRaw;
+    }
+    return endpointToUrl(endpointRaw);
+  }, [target.url, target?.endpoint, endpointData?.filePath]);
 
   const handleNavigate = useCallback(
     (event) => {
@@ -100,6 +108,123 @@ const PortNode = (props) => {
     [targetUrl]
   );
 
+  const getPointerPosition = (event) => {
+    if (!event) return null;
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    if (touch) return { x: touch.clientX, y: touch.clientY };
+    if (typeof event.clientX === "number" && typeof event.clientY === "number") {
+      return { x: event.clientX, y: event.clientY };
+    }
+    return null;
+  };
+
+  const flushResize = useCallback(() => {
+    rafRef.current = null;
+    if (!pendingSizeRef.current || !node?.id) return;
+    const { width, height } = pendingSizeRef.current;
+    eventBus.emit("nodeResize", { id: node.id, width, height });
+    if (pendingPosRef.current) {
+      eventBus.emit("nodeMove", { id: node.id, position: pendingPosRef.current });
+    }
+  }, [node?.id]);
+
+  const handleResizeStart = (event, handle) => {
+    const point = getPointerPosition(event);
+    if (!point) return;
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.cancelable && event.preventDefault) event.preventDefault();
+    isResizingRef.current = true;
+    setIsResizing(true);
+    resizeStateRef.current = {
+      handle,
+      startX: point.x,
+      startY: point.y,
+      startWidth: node.width || 220,
+      startHeight: node.height || 140,
+      startPosX: node.position?.x ?? node.x ?? 0,
+      startPosY: node.position?.y ?? node.y ?? 0
+    };
+    if (event.currentTarget?.setPointerCapture && event.pointerId !== undefined) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (err) {
+        // ignore pointer capture errors
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleResizeMove = (event) => {
+      if (!isResizingRef.current) return;
+      const point = getPointerPosition(event);
+      if (!point) return;
+      if (event.cancelable && event.preventDefault) event.preventDefault();
+
+      const zoom = props.zoom || 1;
+      const state = resizeStateRef.current;
+      const dx = (point.x - state.startX) / zoom;
+      const dy = (point.y - state.startY) / zoom;
+      let newWidth = state.startWidth;
+      let newHeight = state.startHeight;
+      let newX = state.startPosX;
+      let newY = state.startPosY;
+
+      if (state.handle.includes("e")) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth + dx);
+      }
+      if (state.handle.includes("s")) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight + dy);
+      }
+      if (state.handle.includes("w")) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth - dx);
+        newX = state.startPosX + (state.startWidth - newWidth);
+      }
+      if (state.handle.includes("n")) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight - dy);
+        newY = state.startPosY + (state.startHeight - newHeight);
+      }
+
+      pendingSizeRef.current = { width: newWidth, height: newHeight };
+      pendingPosRef.current = { x: newX, y: newY };
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(flushResize);
+      }
+    };
+
+    const handleResizeEnd = () => {
+      if (!isResizingRef.current) return;
+      isResizingRef.current = false;
+      setIsResizing(false);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      flushResize();
+      eventBus.emit("nodeResizeEnd", { id: node.id });
+    };
+
+    document.addEventListener("pointermove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("pointerup", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("pointercancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("mousemove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("mouseup", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchmove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchend", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchcancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+
+    return () => {
+      document.removeEventListener("pointermove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("pointerup", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("pointercancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("mousemove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("mouseup", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchmove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchend", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchcancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+    };
+  }, [flushResize, isResizing, node.id, props.zoom]);
+
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
       <div
@@ -108,171 +233,82 @@ const PortNode = (props) => {
           inset: 8,
           display: "flex",
           flexDirection: "column",
-          gap: 6,
+          justifyContent: "space-between",
+          gap: 8,
           pointerEvents: "auto"
         }}
         onClick={(event) => event.stopPropagation()}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 999,
-              background: theme.palette.primary.main,
-              boxShadow: `0 0 0 3px ${theme.palette.action.selected}`
-            }}
-          />
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Port</div>
-          <div
-            style={{
-              fontSize: 11,
-              padding: "2px 6px",
-              borderRadius: 999,
-              background:
-                theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
-              color: theme.palette.text.secondary
-            }}
-          >
-            {intent}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              padding: "2px 6px",
-              borderRadius: 999,
-              background:
-                theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
-              color: theme.palette.text.secondary
-            }}
-          >
-            {modeDraft}
-          </div>
-        </div>
-
-        <div style={{ fontSize: 12, color: theme.palette.text.secondary }}>{targetLabel}</div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 6 }}>
-          <input
-            value={endpointDraft}
-            placeholder="root.node:root"
-            onChange={(event) => {
-              const nextEndpoint = event.target.value;
-              setEndpointDraft(nextEndpoint);
-              commitTarget(nextEndpoint, modeDraft);
-            }}
-            onBlur={() => {
-              if (isDirty) commitTarget(endpointDraft, modeDraft);
-            }}
-            style={{
-              width: "100%",
-              minWidth: 0,
-              borderRadius: 6,
-              border: `1px solid ${theme.palette.divider}`,
-              background: theme.palette.background.paper,
-              color: theme.palette.text.primary,
-              padding: "6px 8px",
-              fontSize: 11
-            }}
-          />
-          <select
-            value={modeDraft}
-            onChange={(event) => {
-              const nextMode = event.target.value;
-              setModeDraft(nextMode);
-              commitTarget(endpointDraft, nextMode);
-            }}
-            style={{
-              borderRadius: 6,
-              border: `1px solid ${theme.palette.divider}`,
-              background: theme.palette.background.paper,
-              color: theme.palette.text.primary,
-              padding: "6px 8px",
-              fontSize: 11
-            }}
-          >
-            <option value="navigate">navigate</option>
-            <option value="bridge">bridge</option>
-            <option value="boundary">boundary</option>
-          </select>
-        </div>
-
-        <div style={{ display: "flex", gap: 6 }}>
-          <button
-            type="button"
-            onClick={handleNavigate}
-            disabled={!targetUrl}
-            style={{
-              borderRadius: 6,
-              border: `1px solid ${theme.palette.divider}`,
-              background: "transparent",
-              color: theme.palette.text.primary,
-              padding: "4px 8px",
-              fontSize: 11,
-              cursor: targetUrl ? "pointer" : "default",
-              opacity: targetUrl ? 1 : 0.55
-            }}
-          >
-            Open
-          </button>
-          <button
-            type="button"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              commitTarget(endpointDraft, modeDraft);
-            }}
-            disabled={!isDirty}
-            style={{
-              borderRadius: 6,
-              border: `1px solid ${theme.palette.divider}`,
-              background: "transparent",
-              color: theme.palette.text.primary,
-              padding: "4px 8px",
-              fontSize: 11,
-              cursor: isDirty ? "pointer" : "default",
-              opacity: isDirty ? 1 : 0.55
-            }}
-          >
-            Save
-          </button>
-        </div>
-
-        {(target.endpoint || target.url || target.graphId || target.nodeId) ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>{displayLabel}</div>
           <div
             style={{
               fontSize: 11,
               color: theme.palette.text.secondary,
-              border: `1px dashed ${theme.palette.divider}`,
-              borderRadius: 6,
-              padding: "4px 6px",
-              background: theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "#fafafa"
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
             }}
+            title={targetLabel}
           >
-            {target.endpoint ? `endpoint: ${target.endpoint}` : null}
-            {target.url ? `url: ${target.url}` : null}
-            {target.graphId ? `${target.endpoint || target.url ? " • " : ""}graph: ${target.graphId}` : null}
-            {target.nodeId
-              ? `${target.endpoint || target.url || target.graphId ? " • " : ""}node: ${target.nodeId}`
-              : null}
-            {target.portId
-              ? `${target.endpoint || target.url || target.graphId || target.nodeId ? " • " : ""}port: ${target.portId}`
-              : null}
+            {targetLabel}
           </div>
-        ) : null}
-
-        {endpointData ? (
-          <div style={{ fontSize: 11, color: theme.palette.text.secondary }}>
-            {endpointData.filePath}
-            {endpointData.nodeId ? ` #${endpointData.nodeId}` : ""}
-            {` :${endpointData.portId}`}
-          </div>
-        ) : null}
-
-        {!endpointResult.ok && endpointDraft ? (
-          <div style={{ fontSize: 11, color: theme.palette.error.main }}>{endpointResult.error}</div>
-        ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={handleNavigate}
+          disabled={!targetUrl}
+          style={{
+            alignSelf: "flex-start",
+            borderRadius: 6,
+            border: `1px solid ${theme.palette.divider}`,
+            background: "transparent",
+            color: theme.palette.text.primary,
+            padding: "4px 8px",
+            fontSize: 11,
+            cursor: targetUrl ? "pointer" : "default",
+            opacity: targetUrl ? 1 : 0.55
+          }}
+          title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
+        >
+          Navigate
+        </button>
+      </div>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {RESIZE_HANDLES.map((handle) => (
+          <div
+            key={handle.key}
+            onPointerDown={(event) => handleResizeStart(event, handle.key)}
+            onMouseDown={(event) => handleResizeStart(event, handle.key)}
+            onTouchStart={(event) => handleResizeStart(event.nativeEvent || event, handle.key)}
+            style={{
+              position: "absolute",
+              width: HANDLE_SIZE,
+              height: HANDLE_SIZE,
+              borderRadius: 3,
+              border: `1px solid ${theme.palette.divider}`,
+              background: theme.palette.background.paper,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+              cursor: handle.cursor,
+              opacity: isResizing ? 1 : 0,
+              transition: "opacity 0.2s ease",
+              zIndex: 3,
+              pointerEvents: "auto",
+              touchAction: "none",
+              userSelect: "none",
+              left: handle.x,
+              top: handle.y,
+              transform: handle.transform || "none"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = isResizing ? "1" : "0";
+            }}
+          />
+        ))}
       </div>
     </FixedNode>
   );

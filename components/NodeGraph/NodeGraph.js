@@ -52,6 +52,7 @@ export default function NodeGraph({
   onNodeContextMenu,
   onEdgeDoubleClick,
   onGroupClick, 
+  onGroupDoubleClick,
   onBackgroundClick, 
   pan, 
   zoom, 
@@ -1172,7 +1173,7 @@ export default function NodeGraph({
           zoom={zoom}
           selectedGroupIds={selectedGroupIds}
           onGroupClick={onGroupClick}
-          onGroupDoubleClick={onGroupClick}
+          onGroupDoubleClick={onGroupDoubleClick}
           onGroupDragStart={onGroupDragStart}
           onBackgroundClick={() => {}}
           theme={theme}

@@ -1,73 +1,26 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-08T20:30:56.893Z",
-    "modified": "2026-01-08T20:30:56.893Z",
+    "created": "2026-02-14T05:01:13.938Z",
+    "modified": "2026-02-14T05:01:14.652Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#1976d2",
-        "light": "#42a5f5",
-        "dark": "#1565c0",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#dc004e",
-        "light": "#ff4081",
-        "dark": "#9a0036",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8eaf6",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "auto",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": -34.728924970711205,
-      "y": -1317.8044239902797
-    },
-    "zoom": 1.4913301422492842
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "06f0615a-be44-4096-ab81-f41363589ee6",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "5f43215e-f62e-4198-9282-3a86bdd03dac",
@@ -128,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -196,8 +167,8 @@
       "type": "markdown",
       "label": "📋 Project Planning",
       "position": {
-        "x": 96.90752232069896,
-        "y": 675.4965399224511
+        "x": 56.53075951701169,
+        "y": 661.1693015082395
       },
       "width": 380,
       "height": 220,
@@ -232,11 +203,11 @@
       "type": "markdown",
       "label": "✨ Start Your Own",
       "position": {
-        "x": 310,
-        "y": 1007.2290914651184
+        "x": 334.74704817000185,
+        "y": 988.9944243924855
       },
       "width": 380,
-      "height": 220,
+      "height": 296.8460969489532,
       "color": "#607d8b",
       "visible": true,
       "showLabel": true,
@@ -250,8 +221,8 @@
       "type": "markdown",
       "label": "🤖 AI Integration Tips",
       "position": {
-        "x": 108.24660714480275,
-        "y": 1321.2231473547474
+        "x": 175.97537055743942,
+        "y": 1385.0444821089627
       },
       "width": 874.2194643032249,
       "height": 359.55602686110717,
@@ -261,6 +232,35 @@
       "data": {
         "markdown": "## 🤖 AI Integration Tips\n\n**How to work with AI on graphs:**\n\n1. **Copy the entire graph** (Ctrl+A, Ctrl+C)\n2. **Paste into Claude/ChatGPT** with your request\n3. **AI returns mutations** (create nodes, update edges, etc.)\n4. **Paste back into Twilite** → changes apply instantly\n\n**Example prompts:**\n- \"Add three more concepts related to X\"\n- \"Reorganize this by priority\"\n- \"Generate a project plan for Y\"\n- \"Add a technical architecture layer\""
       }
+    },
+    {
+      "id": "351c82c4-d939-4ef7-950e-8782e1e1d5b9",
+      "type": "port",
+      "label": "Create a Graph!",
+      "position": {
+        "x": 860.2417936499843,
+        "y": 966.7947807012351
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
+      }
     }
   ],
   "edges": [
@@ -269,98 +269,121 @@
       "type": "dataFlow",
       "source": "launcher-welcome",
       "target": "launcher-intro",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "start here",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-welcome-nodespace",
       "type": "dataFlow",
       "source": "launcher-welcome",
       "target": "launcher-nodespace",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "or explore",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-intro-practical",
       "type": "reference",
       "source": "launcher-intro",
       "target": "launcher-practical",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "then try",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-nodespace-technical",
       "type": "reference",
       "source": "launcher-nodespace",
       "target": "launcher-technical",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "or see",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-practical-blank",
       "type": "dataFlow",
       "source": "launcher-practical",
       "target": "launcher-blank",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "ready to build?",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-technical-blank",
       "type": "dataFlow",
       "source": "launcher-technical",
       "target": "launcher-blank",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "or start fresh",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-blank-tips",
       "type": "reference",
       "source": "launcher-blank",
       "target": "launcher-ai-tips",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "pro tips",
       "style": {
         "width": 2,
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
+    },
+    {
+      "id": "edge_1771026908386",
+      "type": "precedes",
+      "source": "launcher-blank",
+      "target": "351c82c4-d939-4ef7-950e-8782e1e1d5b9",
+      "sourcePort": "link1",
+      "targetPort": "root",
+      "portMeta": {
+        "source": {
+          "label": "to a link",
+          "type": "any"
+        },
+        "target": {
+          "label": "root",
+          "type": "any"
+        }
+      },
+      "label": "",
+      "style": {},
+      "data": {
+        "strength": "normal"
+      }
     }
   ],
   "clusters": []

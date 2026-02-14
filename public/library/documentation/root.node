@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-12T17:37:22.804Z",
-    "modified": "2026-02-12T17:37:26.017Z",
+    "created": "2026-02-14T13:50:30.282Z",
+    "modified": "2026-02-14T13:50:31.197Z",
     "author": "",
     "tags": []
   },
@@ -183,8 +183,8 @@
       "type": "port",
       "label": "Port",
       "position": {
-        "x": 975.2362461976643,
-        "y": -378.18406154941607
+        "x": -1135.0945240288104,
+        "y": 362.6910827700265
       },
       "width": 220,
       "height": 140,
@@ -228,15 +228,27 @@
       "type": "markdown",
       "label": "Onboarding Guide",
       "position": {
-        "x": -820,
-        "y": 140
+        "x": -988.7246491180971,
+        "y": -184.51533498014462
       },
-      "width": 360,
-      "height": 220,
+      "width": 388.051464140342,
+      "height": 391.81521785959467,
+      "ports": [
+        {
+          "id": "root",
+          "label": "root",
+          "direction": "bidirectional",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Onboarding\n\nEntry point for humans + agents.\n\nMust link to this root and the required contracts."
+        "markdown": "## Onboarding\n\n[Getting Started](tlz://twilite.zone/tutorial/getting-started.document.node:root)\n\nEntry point for humans + agents.\n\nMust link to this root and the required contracts.\n\n"
       }
     },
     {
@@ -252,7 +264,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Contracts Index\n\nAll canonical contracts live under:\n`public/documentation/contracts/**`\n\nThis index should enumerate required contracts."
+        "markdown": "## Contracts Index\n\nAll canonical contracts live under:\n`public/library/documentation/contracts/**`\n\nThis index should enumerate required contracts."
       }
     },
     {
@@ -268,7 +280,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Validation\n\nGlobal invariants and error policies.\n\nLocation: `public/documentation/contracts/validation/`"
+        "markdown": "## Validation\n\nGlobal invariants and error policies.\n\nLocation: `public/library/documentation/contracts/validation/`"
       }
     },
     {
@@ -284,7 +296,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Data vs UI Boundary\n\nDefines what belongs in graph data vs editor state.\n\nLocation: `public/documentation/contracts/boundary/`"
+        "markdown": "## Data vs UI Boundary\n\nDefines what belongs in graph data vs editor state.\n\nLocation: `public/library/documentation/contracts/boundary/`"
       }
     },
     {
@@ -316,7 +328,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Node Contracts\n\nLocation: `public/documentation/contracts/nodes/`"
+        "markdown": "## Node Contracts\n\nLocation: `public/library/documentation/contracts/nodes/`"
       }
     },
     {
@@ -332,7 +344,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Edge Contracts\n\nLocation: `public/documentation/contracts/edges/`"
+        "markdown": "## Edge Contracts\n\nLocation: `public/library/documentation/contracts/edges/`"
       }
     },
     {
@@ -348,7 +360,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Port Contracts\n\nLocation: `public/documentation/contracts/ports/`"
+        "markdown": "## Port Contracts\n\nLocation: `public/library/documentation/contracts/ports/`"
       }
     },
     {
@@ -356,15 +368,15 @@
       "type": "markdown",
       "label": "Manifest Contract",
       "position": {
-        "x": 460,
-        "y": 460
+        "x": 509.0900622455985,
+        "y": 458.2467834912286
       },
       "width": 360,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Manifest Contract\n\nLocation: `public/documentation/contracts/manifest/`"
+        "markdown": "## Manifest Contract\n\nLocation: `public/library/documentation/contracts/manifest/`"
       }
     },
     {
@@ -372,15 +384,15 @@
       "type": "markdown",
       "label": "Skill Contracts",
       "position": {
-        "x": 820,
-        "y": 460
+        "x": 914.6736914736542,
+        "y": 465.25964952631415
       },
       "width": 360,
       "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Skill Contracts\n\nLocation: `public/documentation/contracts/skills/`"
+        "markdown": "## Skill Contracts\n\nLocation: `public/library/documentation/contracts/skills/`"
       }
     },
     {
@@ -396,7 +408,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dictionary Contracts\n\nLocation: `public/documentation/contracts/dictionaries/`"
+        "markdown": "## Dictionary Contracts\n\nLocation: `public/library/documentation/contracts/dictionaries/`"
       }
     }
   ],

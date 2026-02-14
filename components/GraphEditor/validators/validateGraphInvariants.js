@@ -316,9 +316,9 @@ export function validateGraphInvariants({
   portNodes.forEach((node) => {
     const target = node?.data?.target;
     if (!target || typeof target !== "object") {
-      errors.push({
-        code: "PORT_TARGET_REQUIRED",
-        message: `Port node \"${node.id}\" is missing data.target.`,
+      warnings.push({
+        code: "PORT_TARGET_MISSING",
+        message: `Port node \"${node.id}\" has no target yet.`,
         nodeId: node.id
       });
       return;
@@ -326,9 +326,9 @@ export function validateGraphInvariants({
 
     const endpoint = typeof target.endpoint === "string" ? target.endpoint.trim() : "";
     if (!endpoint) {
-      errors.push({
-        code: "PORT_ENDPOINT_REQUIRED",
-        message: `Port node \"${node.id}\" is missing required target.endpoint.`,
+      warnings.push({
+        code: "PORT_ENDPOINT_MISSING",
+        message: `Port node \"${node.id}\" target.endpoint is empty.`,
         nodeId: node.id
       });
       return;

@@ -38,7 +38,12 @@
           "description": ""
         },
         "dependencies": {
-          "nodeTypes": [],
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "node"
+          ],
           "portContracts": [
             "core"
           ],
@@ -54,7 +59,7 @@
             "allowCreate": true,
             "allowUpdate": true,
             "allowDelete": false,
-            "appendOnly": true
+            "appendOnly": false
           },
           "actors": {
             "humans": true,
@@ -125,10 +130,10 @@
         "link": "",
         "entries": [
           {
-            "key": "concept",
-            "intent": "what it means",
-            "implementation": "how it appears",
-            "dictionaryKey": "concept"
+            "key": "node",
+            "intent": "content node",
+            "implementation": "dynamic node renderer",
+            "dictionaryKey": "node"
           }
         ],
         "html": "",
@@ -152,23 +157,14 @@
         "link": "",
         "nodeDefs": [
           {
-            "key": "default",
-            "ref": "",
-            "source": "local",
-            "version": ">=1.0.0"
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": "0.1.0"
           }
         ],
         "skills": [],
-        "views": [
-          {
-            "key": "default",
-            "intent": "node",
-            "payload": "twilite.web",
-            "ref": "",
-            "source": "local",
-            "version": ">=1.0.0"
-          }
-        ],
+        "views": [],
         "html": "",
         "svg": ""
       }

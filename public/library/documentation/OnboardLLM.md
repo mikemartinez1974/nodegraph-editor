@@ -28,8 +28,9 @@ This guide defines the operational rules for agents and tools that mutate graphs
 - Never reuse an existing ID for a new entity.
 
 ### Ports
-- Ports are **optional for portability**.
-- If ports are provided, they must exist on the node and respect direction/compatibility.
+- For current Twilite runtime, treat ports as **required for edge creation**.
+- If you create edges, each connected node must declare the referenced port IDs.
+- Use explicit `sourcePort` and `targetPort` on every edge (commonly `"out"` -> `"in"` or `"root"` -> `"root"`).
 
 ### Edge Types
 - Edge `type` is **required** for persisted graphs.
@@ -71,6 +72,9 @@ If a Manifest node exists, it is the highest authority.
 **Hard errors (must fail):**
 - Missing/invalid Manifest intent
 - Broken references (missing nodes/edges)
+- Edge references to non-existent node IDs
+- Missing edge ports (`sourcePort`/`targetPort`) during mutation
+- Edge ports that do not exist on referenced nodes
 - Semantic contradictions (intent vs content)
 - Forbidden mutations
 - Identity loss (delete+recreate)
@@ -78,7 +82,6 @@ If a Manifest node exists, it is the highest authority.
 **Warnings only (presentation):**
 - Missing position/size
 - Styling gaps
-- Ports are required (use `root` for defaults)
 
 The question is: **Does the graph make sense for its declared purpose?**
 
@@ -153,11 +156,64 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
 - `source`
 - `target`
 - `type`
+- `sourcePort`
+- `targetPort`
 
 **Optional:**
-- `label`, `data`, `style`, `sourcePort`, `targetPort`
+- `label`, `data`, `style`
 
-Ports are required; use `root` for defaults, and they must be valid.
+### Edge Creation Checklist
+- Edge IDs must be unique (no duplicates in the same payload/graph).
+- `source` and `target` must reference node IDs that exist (or are created earlier in the same transaction).
+- `sourcePort` and `targetPort` must match declared port IDs on those nodes.
+- Keep command order: `createNodes` first, then `createEdges`.
+
+### Edge Example (valid)
+```json
+{
+  "action": "transaction",
+  "commands": [
+    {
+      "action": "createNodes",
+      "nodes": [
+        {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "type": "default",
+          "label": "A",
+          "ports": [
+            { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+            { "id": "out", "label": "Out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+          ],
+          "data": {}
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "type": "default",
+          "label": "B",
+          "ports": [
+            { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+            { "id": "out", "label": "Out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
+          ],
+          "data": {}
+        }
+      ]
+    },
+    {
+      "action": "createEdges",
+      "edges": [
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "source": "11111111-1111-4111-8111-111111111111",
+          "sourcePort": "out",
+          "target": "22222222-2222-4222-8222-222222222222",
+          "targetPort": "in",
+          "type": "sequence"
+        }
+      ]
+    }
+  ]
+}
+```
 
 ---
 

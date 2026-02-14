@@ -2133,6 +2133,19 @@ export default function PropertiesPanel({
 
   const renderNodeView = () => (
     <>
+      {isNodeSelected && (
+        <Box sx={{ mt: 1, mb: 2 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Node Label"
+            value={selectedNode?.label || ""}
+            onChange={(event) =>
+              selectedNode && onUpdateNode(selectedNode.id, { label: event.target.value })
+            }
+          />
+        </Box>
+      )}
       {availableNodeTypeOptions.length > 0 && isNodeSelected && (
         <Box sx={{ mt: 1, mb: 2 }}>
           <FormControl fullWidth size="small">

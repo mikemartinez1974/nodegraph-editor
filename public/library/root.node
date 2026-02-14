@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-12T23:58:48.332Z",
-    "modified": "2026-02-12T23:58:49.353Z",
+    "created": "2026-02-14T00:21:37.693Z",
+    "modified": "2026-02-14T00:25:43.317Z",
     "author": "",
     "tags": []
   },
@@ -206,8 +206,62 @@
         "html": "",
         "svg": ""
       }
+    },
+    {
+      "id": "53dd7ffb-b110-4b46-81f3-71243afa716b",
+      "type": "port",
+      "label": "New Node",
+      "position": {
+        "x": 518.9096752084901,
+        "y": 236.27582201803716
+      },
+      "width": 220,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "target": {
+          "endpoint": "https://twilite.zone/library/documentation/root.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "608a302b-54f6-42c2-ad58-39b5bb64c6d2",
+      "type": "relates",
+      "source": "53dd7ffb-b110-4b46-81f3-71243afa716b",
+      "target": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "portMeta": {
+        "source": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
   "clusters": []
 }

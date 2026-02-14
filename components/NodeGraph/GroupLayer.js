@@ -72,6 +72,7 @@ const GroupLayer = forwardRef(({
               <div
                 onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); if (isSelected && onGroupDragStart) onGroupDragStart(e, group); }}
                 onClick={(e) => { e.stopPropagation(); if (onGroupClick) onGroupClick(group.id, e, 'toggle-collapse'); }}
+                onDoubleClick={(e) => { e.stopPropagation(); if (onGroupDoubleClick) onGroupDoubleClick(group.id, e); }}
                 style={{ display: 'flex', alignItems: 'center', gap: 8, background: borderColor, color: theme.palette.getContrastText(borderColor), padding: '4px 8px', borderRadius: 6, cursor: 'pointer', userSelect: 'none' }}
               >
                 <div style={{ flex: 1 }}>{group.label} ({group.nodeIds?.length || 0})</div>
@@ -104,6 +105,7 @@ const GroupLayer = forwardRef(({
               onMouseLeave={() => setHoveredGroupId(null)}
               style={{ position: 'absolute', top: -34, left: 6, padding: '6px 10px', backgroundColor: borderColor, color: theme.palette.getContrastText(borderColor), borderRadius: 6, fontSize: 12, fontWeight: 700, pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}
               onClick={(e) => { e.stopPropagation(); if (onGroupClick) onGroupClick(group.id, e, 'toggle-collapse'); }}
+              onDoubleClick={(e) => { e.stopPropagation(); if (onGroupDoubleClick) onGroupDoubleClick(group.id, e); }}
               onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); if (isSelected && onGroupDragStart) onGroupDragStart(e, group); }}
             >
               <div style={{ flex: 1, userSelect: 'none' }}>{group.label || `Group ${group.id}`}</div>

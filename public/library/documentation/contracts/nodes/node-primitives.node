@@ -1,67 +1,18 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-23T05:26:14.145Z",
-    "modified": "2026-01-23T05:26:14.145Z",
+    "created": "2026-02-14T13:51:15.825Z",
+    "modified": "2026-02-14T13:51:16.620Z",
     "author": "",
     "tags": []
   },
-  "settings": {
-    "theme": {
-      "mode": "light",
-      "primary": {
-        "main": "#2e7d32",
-        "light": "#60ad5e",
-        "dark": "#005005",
-        "contrastText": "#fff"
-      },
-      "secondary": {
-        "main": "#00897b",
-        "light": "#4ebaaa",
-        "dark": "#005b4f",
-        "contrastText": "#fff"
-      },
-      "background": {
-        "default": "#e8f5e9",
-        "paper": "#ffffff"
-      },
-      "text": {
-        "primary": "rgba(0, 0, 0, 0.87)",
-        "secondary": "rgba(0, 0, 0, 0.6)"
-      },
-      "divider": "rgba(0, 0, 0, 0.12)"
-    },
-    "backgroundImage": null,
-    "defaultNodeColor": "#1976d2",
-    "defaultEdgeColor": "#666666",
-    "snapToGrid": false,
-    "gridSize": 20,
-    "edgeRouting": "orthogonal",
-    "github": {
-      "repo": "",
-      "path": "",
-      "branch": "main"
-    },
-    "autoSave": false
-  },
-  "viewport": {
-    "pan": {
-      "x": 1618,
-      "y": 409
-    },
-    "zoom": 1
-  },
-  "document": {
-    "url": "/tlz/background.html"
-  },
-  "scripts": [],
   "nodes": [
     {
       "id": "required-node-roles-root",
       "type": "markdown",
-      "label": "\ud83d\udccc Required Node Roles",
+      "label": "📌 Required Node Roles",
       "position": {
         "x": -320,
         "y": -220
@@ -229,7 +180,44 @@
           }
         },
         "html": "",
-        "svg": ""
+        "svg": "",
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        },
+        "document": {
+          "url": ""
+        }
       }
     }
   ],
@@ -239,6 +227,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-manifest-node",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -252,6 +242,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-definitions-node",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -265,6 +257,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-legend-node",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -278,6 +272,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-style-node",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -291,6 +287,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-content-node",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
@@ -304,6 +302,8 @@
       "type": "dataFlow",
       "source": "required-node-roles-root",
       "target": "role-initial-types",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "enumerates",
       "style": {
         "width": 2,

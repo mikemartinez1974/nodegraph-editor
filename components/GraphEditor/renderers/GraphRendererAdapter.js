@@ -4,6 +4,8 @@ import React from 'react';
 import NodeGraph from '../../NodeGraph';
 import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
 
+const CANVAS_HIDDEN_NODE_TYPES = new Set(['manifest', 'dictionary', 'legend']);
+
 export default function GraphRendererAdapter({
   graphKey,
   nodeTypes,
@@ -24,6 +26,9 @@ export default function GraphRendererAdapter({
   edgeLaneGapPx,
   lockedNodes,
   lockedEdges,
+  onNodeDoubleClick,
+  onEdgeDoubleClick,
+  onGroupDoubleClick,
   onEdgeClick,
   onEdgeHover,
   onNodeContextMenu,
@@ -51,13 +56,38 @@ export default function GraphRendererAdapter({
     setSelectedGroupIds,
     hoveredNodeId
   } = state;
+  const renderNodes = React.useMemo(
+    () => (Array.isArray(nodes) ? nodes.filter((node) => !CANVAS_HIDDEN_NODE_TYPES.has(node?.type)) : []),
+    [nodes]
+  );
+  const renderNodeIds = React.useMemo(
+    () => new Set(renderNodes.map((node) => node.id)),
+    [renderNodes]
+  );
+  const renderEdges = React.useMemo(
+    () =>
+      Array.isArray(edges)
+        ? edges.filter((edge) => renderNodeIds.has(edge?.source) && renderNodeIds.has(edge?.target))
+        : [],
+    [edges, renderNodeIds]
+  );
+  const renderSelectedNodeIds = React.useMemo(
+    () => (Array.isArray(selectedNodeIds) ? selectedNodeIds.filter((id) => renderNodeIds.has(id)) : []),
+    [selectedNodeIds, renderNodeIds]
+  );
+  const renderSelectedEdgeIds = React.useMemo(() => {
+    if (!Array.isArray(selectedEdgeIds)) return [];
+    const edgeIdSet = new Set(renderEdges.map((edge) => edge.id));
+    return selectedEdgeIds.filter((id) => edgeIdSet.has(id));
+  }, [selectedEdgeIds, renderEdges]);
+
   return (
     <>
       <NodeGraph
         key={graphKey}
-        nodes={nodes}
+        nodes={renderNodes}
         setNodes={setNodes}
-        edges={edges}
+        edges={renderEdges}
         setEdges={setEdges}
         groups={groups}
         setGroups={setGroups}
@@ -65,10 +95,10 @@ export default function GraphRendererAdapter({
         zoom={zoom}
         setPan={setPan}
         setZoom={setZoom}
-        selectedNodeId={selectedNodeIds[0] || null}
-        selectedEdgeId={selectedEdgeIds[0] || null}
-        selectedNodeIds={selectedNodeIds}
-        selectedEdgeIds={selectedEdgeIds}
+        selectedNodeId={renderSelectedNodeIds[0] || null}
+        selectedEdgeId={renderSelectedEdgeIds[0] || null}
+        selectedNodeIds={renderSelectedNodeIds}
+        selectedEdgeIds={renderSelectedEdgeIds}
         selectedGroupIds={selectedGroupIds}
         setSelectedNodeIds={setSelectedNodeIds}
         setSelectedEdgeIds={setSelectedEdgeIds}
@@ -93,6 +123,9 @@ export default function GraphRendererAdapter({
         edgeLaneGapPx={edgeLaneGapPx}
         lockedNodes={lockedNodes}
         lockedEdges={lockedEdges}
+        onNodeDoubleClick={onNodeDoubleClick}
+        onEdgeDoubleClick={onEdgeDoubleClick}
+        onGroupDoubleClick={onGroupDoubleClick}
         onEdgeClick={onEdgeClick}
         onEdgeHover={onEdgeHover}
         onNodeContextMenu={onNodeContextMenu}

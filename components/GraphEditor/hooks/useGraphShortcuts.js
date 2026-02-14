@@ -180,7 +180,24 @@ export default function useGraphShortcuts({
       }
       // Delete selected on Delete key only (removed Backspace to avoid conflicts with text editing)
       else if (e.key === 'Delete') {
-        handleDeleteSelected();
+        // Edge-only delete fallback: some flows don't route edge selection through
+        // the shared delete handler reliably, so delete edges directly.
+        if (
+          Array.isArray(selectedEdgeIds) &&
+          selectedEdgeIds.length > 0 &&
+          (!Array.isArray(selectedNodeIds) || selectedNodeIds.length === 0)
+        ) {
+          if (graphCRUD && typeof graphCRUD.deleteEdges === 'function') {
+            graphCRUD.deleteEdges(selectedEdgeIds);
+          } else if (graphCRUD && typeof graphCRUD.deleteEdge === 'function') {
+            selectedEdgeIds.forEach((id) => graphCRUD.deleteEdge(id));
+          } else {
+            handleDeleteSelected();
+          }
+          setSelectedEdgeIds([]);
+        } else {
+          handleDeleteSelected();
+        }
       }
       // Escape to clear selection
       else if (e.key === 'Escape') {
