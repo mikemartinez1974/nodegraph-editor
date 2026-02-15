@@ -1242,6 +1242,7 @@ const GraphEditorContent = () => {
 
     const applyGraph = (data) => {
       if (!data || typeof data !== 'object') return;
+      setHostLoadReady(true);
       const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
       const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
       const groupsToLoad = Array.isArray(data.clusters) ? data.clusters : [];
@@ -1357,6 +1358,15 @@ const GraphEditorContent = () => {
     window.addEventListener('Twilite-hostLoadState', sync);
     return () => window.removeEventListener('Twilite-hostLoadState', sync);
   }, [host]);
+
+  useEffect(() => {
+    if (host !== 'vscode') return undefined;
+    if (hostLoadReady) return undefined;
+    const timer = setTimeout(() => {
+      setHostLoadReady(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [host, hostLoadReady]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

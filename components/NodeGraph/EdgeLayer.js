@@ -655,14 +655,20 @@ const EdgeLayer = forwardRef(({
 
       const routeStyle = style.route;
       const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
+      const hasPerEdgeRoutingOverride =
+        routeStyle === 'orthogonal' ||
+        routeStyle === 'curved' ||
+        typeof edge.style?.orthogonal === 'boolean' ||
+        typeof edge.style?.curved === 'boolean';
+      const applyForcedRouting = forceRouting && !hasPerEdgeRoutingOverride;
       const isOrthogonal = useRoutedSegments
         ? true
-        : forceRouting
+        : applyForcedRouting
         ? defaultEdgeRouting === 'orthogonal'
         : routeStyle === 'orthogonal' || style.orthogonal === true;
-      const isCurved = forceRouting
+      const isCurved = applyForcedRouting
         ? defaultEdgeRouting === 'curved'
-        : !isOrthogonal && style.curved;
+        : !isOrthogonal && (routeStyle === 'curved' || style.curved === true);
       let curveDirection = curveDirectionOverride || styleDef.curveDirection || 'auto';
       
       if (curveDirection === 'auto') {

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-14T17:21:58.253Z",
-    "modified": "2026-02-14T17:24:01.930Z",
+    "created": "2026-02-14T23:35:05.477Z",
+    "modified": "2026-02-14T23:39:11.951Z",
     "author": "",
     "tags": []
   },
@@ -163,11 +163,23 @@
       "type": "node",
       "label": "node",
       "position": {
-        "x": 165.4325966861761,
-        "y": -162.11282760410091
+        "x": 364.0763550295025,
+        "y": -463.052487520058
       },
-      "width": 471.25,
-      "height": 271.25,
+      "width": 457.2395935058594,
+      "height": 306.5755310058594,
+      "ports": [
+        {
+          "id": "root",
+          "label": "root",
+          "direction": "bidirectional",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
       "visible": true,
       "showLabel": true,
       "data": {
@@ -183,8 +195,8 @@
       "type": "port",
       "label": "To the Library",
       "position": {
-        "x": 172.5148653277577,
-        "y": 136.4955001098088
+        "x": 956.0031005256551,
+        "y": -495.26000689716693
       },
       "width": 284.6614685058594,
       "height": 90,
@@ -208,6 +220,43 @@
       }
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "edge_1771111131537",
+      "type": "relates",
+      "source": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
+      "target": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "portMeta": {
+        "source": {
+          "label": "root",
+          "type": "any"
+        },
+        "target": {
+          "label": "root",
+          "type": "any"
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 6,
+        "dash": [
+          0
+        ],
+        "curved": true,
+        "opacity": 1,
+        "showArrow": false,
+        "arrowSize": 8,
+        "arrowPosition": "end",
+        "orthogonal": false,
+        "color": "#114f92",
+        "animation": "glow"
+      },
+      "data": {
+        "strength": "strong"
+      }
+    }
+  ],
   "clusters": []
 }

@@ -751,7 +751,10 @@ class TwiliteNodeEditorProvider {
           }
           
           try {
-            const parsed = raw && raw.trim() ? JSON.parse(raw) : { nodes: [], edges: [], clusters: [] };
+            const sanitizedRaw = typeof raw === 'string' ? raw.replace(/^\uFEFF/, '') : '';
+            const parsed = sanitizedRaw && sanitizedRaw.trim()
+              ? JSON.parse(sanitizedRaw)
+              : { nodes: [], edges: [], clusters: [] };
             if (message.edgeRoutes) parsed.edgeRoutes = message.edgeRoutes;
             if (message.edgeRouteIds) parsed.edgeRouteIds = message.edgeRouteIds;
             const emptyGraph = isEmptyGraph(parsed);
@@ -777,7 +780,16 @@ class TwiliteNodeEditorProvider {
             if (emptyGraph) {
               scheduleEmptyClear();
             }
-          } catch (err) {}
+          } catch (err) {
+            try {
+              window.__Twilite_HOST_GRAPH_READY__ = true;
+              window.__Twilite_WAITING_FOR_FULL_TEXT__ = false;
+            } catch {}
+            emitHostLoadState();
+            try {
+              console.warn('[Twilite] Failed to parse graph payload; leaving current graph unchanged.', err);
+            } catch {}
+          }
         });
         
         vscode.postMessage({ type: 'webviewReady' });

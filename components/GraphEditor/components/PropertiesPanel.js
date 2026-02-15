@@ -53,6 +53,29 @@ const STYLE_PRESETS = [
   }
 ];
 
+const EDGE_STYLE_PRESETS = [
+  {
+    label: "Default",
+    value: "default",
+    style: { width: 2, dash: [], curved: true, opacity: 1, showArrow: true, arrowSize: 8, arrowPosition: "end" }
+  },
+  {
+    label: "Subtle",
+    value: "subtle",
+    style: { width: 1.5, dash: [3, 3], curved: true, opacity: 0.7, showArrow: false }
+  },
+  {
+    label: "Strong",
+    value: "strong",
+    style: { width: 3, dash: [], curved: false, opacity: 1, showArrow: true, arrowSize: 10, arrowPosition: "end" }
+  },
+  {
+    label: "Dashed",
+    value: "dashed",
+    style: { width: 2, dash: [8, 4], curved: true, opacity: 1, showArrow: true, arrowSize: 8, arrowPosition: "end" }
+  }
+];
+
 const describeValue = (value) => {
   if (value === null) return "null";
   if (Array.isArray(value)) return `Array (${value.length})`;
@@ -494,11 +517,12 @@ export default function PropertiesPanel({
   const handlePresetChange = useCallback(
     (value) => {
       setPreset(value);
-      if (!isNodeSelected || !selectedNode) return;
-      const presetStyle = STYLE_PRESETS.find((option) => option.value === value)?.style || {};
+      if (!activeSelectionId) return;
+      const presetSet = isEdgeSelected ? EDGE_STYLE_PRESETS : STYLE_PRESETS;
+      const presetStyle = presetSet.find((option) => option.value === value)?.style || {};
       applyStylePatch(presetStyle);
     },
-    [applyStylePatch, isNodeSelected, selectedNode]
+    [activeSelectionId, applyStylePatch, isEdgeSelected]
   );
 
   const handleApplyStyleJson = useCallback(() => {
@@ -1990,6 +2014,223 @@ export default function PropertiesPanel({
     </Section>
   );
 
+  const renderEdgeFormattingSection = () => (
+    <Section
+      title="Formatting"
+      value="formatting"
+      expanded={expandedSections.edge === "formatting"}
+      onToggle={handleAccordionChange("edge", "formatting")}
+      disabled={!isEdgeSelected}
+    >
+      <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+        <InputLabel>Preset style</InputLabel>
+        <Select value={preset} label="Preset style" onChange={(event) => handlePresetChange(event.target.value)}>
+          {EDGE_STYLE_PRESETS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Paper
+        variant="outlined"
+        sx={{
+          minHeight: 120,
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          borderRadius: 2
+        }}
+      >
+        <Typography variant="subtitle2">Style preview</Typography>
+        <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              height: 0,
+              flex: 1,
+              borderTopWidth: Number(selectedEdge?.style?.width ?? 2),
+              borderTopStyle: Array.isArray(selectedEdge?.style?.dash) && selectedEdge.style.dash.length > 0 ? "dashed" : "solid",
+              borderTopColor: selectedEdge?.style?.color || "text.secondary",
+              opacity: Number.isFinite(Number(selectedEdge?.style?.opacity)) ? Number(selectedEdge.style.opacity) : 1
+            }}
+          />
+          {selectedEdge?.style?.showArrow !== false && (
+            <Typography variant="caption" color="text.secondary">
+              →
+            </Typography>
+          )}
+        </Box>
+        <Stack direction="row" spacing={1} mt={1}>
+          <Button variant="text" size="small" onClick={() => copyToClipboard(JSON.stringify(selectedEdge?.style || {}))}>
+            Copy style
+          </Button>
+          <Button variant="contained" size="small" onClick={() => handlePresetChange(preset)} disabled={!activeSelectionId}>
+            Apply
+          </Button>
+        </Stack>
+      </Paper>
+    </Section>
+  );
+
+  const renderEdgeStyleSection = () => {
+    const opacityPercent = Number.isFinite(Number(selectionStyle.opacity))
+      ? Math.min(Math.max(Math.round(Number(selectionStyle.opacity) * 100), 0), 100)
+      : 100;
+    const dashValue = Array.isArray(selectionStyle.dash) ? selectionStyle.dash.join(", ") : "";
+    return (
+      <Section
+        title="Style"
+        value="style"
+        expanded={expandedSections.edge === "style"}
+        onToggle={handleAccordionChange("edge", "style")}
+        disabled={!isEdgeSelected}
+      >
+        <Stack spacing={1}>
+          <TextField
+            label="Color"
+            type="color"
+            fullWidth
+            size="small"
+            value={selectionStyle.color || "#666666"}
+            onChange={(event) => applyStylePatch({ color: event.target.value })}
+            disabled={!activeSelectionId}
+            sx={{ "& input": { height: 40 } }}
+          />
+          <TextField
+            label="Width (px)"
+            type="number"
+            fullWidth
+            size="small"
+            value={selectionStyle.width ?? 2}
+            onChange={(event) => applyStylePatch({ width: Number(event.target.value) || 1 })}
+            disabled={!activeSelectionId}
+          />
+          <TextField
+            label="Dash pattern"
+            placeholder="e.g. 8, 4"
+            fullWidth
+            size="small"
+            value={dashValue}
+            onChange={(event) => {
+              const nextDash = String(event.target.value || "")
+                .split(",")
+                .map((part) => Number(part.trim()))
+                .filter((value) => Number.isFinite(value) && value >= 0);
+              applyStylePatch({ dash: nextDash });
+            }}
+            disabled={!activeSelectionId}
+          />
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="caption">Curved</Typography>
+            <Switch
+              size="small"
+              checked={Boolean(selectionStyle.curved)}
+              onChange={(event) => applyStylePatch({ curved: event.target.checked })}
+              disabled={!activeSelectionId}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="caption">Orthogonal routing</Typography>
+            <Switch
+              size="small"
+              checked={Boolean(selectionStyle.orthogonal)}
+              onChange={(event) => applyStylePatch({ orthogonal: event.target.checked })}
+              disabled={!activeSelectionId}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="caption">Arrowheads</Typography>
+            <Switch
+              size="small"
+              checked={selectionStyle.showArrow !== false}
+              onChange={(event) => applyStylePatch({ showArrow: event.target.checked })}
+              disabled={!activeSelectionId}
+            />
+          </Box>
+          <TextField
+            label="Arrow size"
+            type="number"
+            fullWidth
+            size="small"
+            value={selectionStyle.arrowSize ?? 8}
+            onChange={(event) => applyStylePatch({ arrowSize: Number(event.target.value) || 8 })}
+            disabled={!activeSelectionId}
+          />
+          <FormControl fullWidth size="small">
+            <InputLabel>Arrow position</InputLabel>
+            <Select
+              value={selectionStyle.arrowPosition || "end"}
+              label="Arrow position"
+              onChange={(event) => applyStylePatch({ arrowPosition: event.target.value })}
+              disabled={!activeSelectionId}
+            >
+              <MenuItem value="start">start</MenuItem>
+              <MenuItem value="end">end</MenuItem>
+              <MenuItem value="both">both</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <InputLabel>Animation</InputLabel>
+            <Select
+              value={selectionStyle.animation || "none"}
+              label="Animation"
+              onChange={(event) =>
+                applyStylePatch({
+                  animation:
+                    event.target.value === "none"
+                      ? null
+                      : event.target.value === "marching"
+                      ? "dash"
+                      : event.target.value
+                })
+              }
+              disabled={!activeSelectionId}
+            >
+              <MenuItem value="none">none</MenuItem>
+              <MenuItem value="dash">dash</MenuItem>
+              <MenuItem value="pulse">pulse</MenuItem>
+              <MenuItem value="glow">glow</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Animation speed"
+            type="number"
+            fullWidth
+            size="small"
+            value={selectionStyle.animationSpeed ?? 1}
+            onChange={(event) => applyStylePatch({ animationSpeed: Number(event.target.value) || 1 })}
+            disabled={!activeSelectionId}
+          />
+          <Box>
+            <Typography variant="subtitle2">Opacity</Typography>
+            <Slider
+              value={opacityPercent}
+              min={0}
+              max={100}
+              onChange={(_, value) => {
+                if (Array.isArray(value)) return;
+                applyStylePatch({ opacity: Number(value) / 100 });
+              }}
+              disabled={!activeSelectionId}
+            />
+          </Box>
+          <Box display="flex" justifyContent="space-between" flexWrap="wrap" gap={1}>
+            <Button size="small" variant="outlined" onClick={() => setStyleJsonText(JSON.stringify(selectionStyle || {}, null, 2))} disabled={!activeSelectionId}>
+              Sync JSON
+            </Button>
+            <Button size="small" variant="outlined" onClick={handleApplyStyleJson} disabled={!activeSelectionId}>
+              Apply JSON
+            </Button>
+            <Button size="small" variant="outlined" onClick={handleResetStyle} disabled={!activeSelectionId}>
+              Reset style
+            </Button>
+          </Box>
+        </Stack>
+      </Section>
+    );
+  };
+
   const renderStyleSection = () => {
     const opacityPercent = Number.isFinite(Number(selectionStyle.opacity)) ? Math.min(Math.max(Math.round(Number(selectionStyle.opacity) * 100), 0), 100) : 100;
     return (
@@ -2337,6 +2578,8 @@ export default function PropertiesPanel({
           </Stack>
         </Stack>
       </Section>
+      {renderEdgeFormattingSection()}
+      {renderEdgeStyleSection()}
       <Section
         title="Connected nodes"
         value="nodes"
