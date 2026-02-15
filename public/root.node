@@ -36,11 +36,7 @@
         },
         "dependencies": {
           "nodeTypes": [
-            "manifest",
-            "legend",
-            "dictionary",
-            "default",
-            "markdown"
+            "node"
           ],
           "portContracts": [
             "core"
@@ -155,7 +151,24 @@
           }
         ],
         "skills": [],
-        "views": []
+        "views": [
+          {
+            "key": "node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": ">=0.1.0"
+          }
+        ]
       }
     },
     {
@@ -251,7 +264,8 @@
         "arrowPosition": "end",
         "orthogonal": false,
         "color": "#114f92",
-        "animation": "glow"
+        "animation": "glow",
+        "route": "curved"
       },
       "data": {
         "strength": "strong"

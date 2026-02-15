@@ -634,6 +634,35 @@ const EdgeLayer = forwardRef(({
         ctx.setLineDash(style.dash);
       }
       
+      // Routing geometry is controlled by per-edge properties (and global override),
+      // not by edge-type defaults.
+      const explicitRouteStyle = edge.style?.route ?? edge.style?.routing ?? edge.style?.router;
+      const hasStyleObject = edge.style && typeof edge.style === 'object';
+      const hasCurvedFlag = Boolean(hasStyleObject && Object.prototype.hasOwnProperty.call(edge.style, 'curved'));
+      const hasOrthogonalFlag = Boolean(hasStyleObject && Object.prototype.hasOwnProperty.call(edge.style, 'orthogonal'));
+      const curvedFlag = hasCurvedFlag ? edge.style.curved : undefined;
+      const orthogonalFlag = hasOrthogonalFlag ? edge.style.orthogonal : undefined;
+      const flagTruthy = (value) => !(
+        value === false ||
+        value === 'false' ||
+        value === 0 ||
+        value === '0' ||
+        value === null ||
+        value === undefined
+      );
+      const hasPerEdgeRoutingOverride =
+        explicitRouteStyle === 'orthogonal' ||
+        explicitRouteStyle === 'curved' ||
+        hasCurvedFlag ||
+        hasOrthogonalFlag;
+      const preferCurvedForEdge =
+        explicitRouteStyle === 'curved' ||
+        (hasCurvedFlag && flagTruthy(curvedFlag)) ||
+        (!explicitRouteStyle && !hasCurvedFlag && hasOrthogonalFlag && !flagTruthy(orthogonalFlag));
+      const preferOrthogonalForEdge =
+        explicitRouteStyle === 'orthogonal' ||
+        (hasOrthogonalFlag && flagTruthy(orthogonalFlag));
+
       const routeOverride = edgeRoutesRef.current?.[edge.id];
       const routedPointsRaw = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
       const draggedNodeIds = draggingInfoRef?.current?.nodeIds;
@@ -644,7 +673,11 @@ const EdgeLayer = forwardRef(({
         ? applyEndpointLaneOffsetsToPoints(routedPointsRaw, sourceFan, targetFan)
         : routedPointsRaw;
       const routedSegments = allowRoutedSegments ? buildSegmentsFromPoints(routedPoints) : null;
-      const useRoutedSegments = Boolean(routedSegments && routedSegments.length);
+      const useRoutedSegments = Boolean(
+        routedSegments &&
+        routedSegments.length &&
+        (!hasPerEdgeRoutingOverride || preferOrthogonalForEdge)
+      );
 
       if (useRoutedSegments) {
         sourcePos = { x: routedPoints[0].x, y: routedPoints[0].y };
@@ -653,22 +686,20 @@ const EdgeLayer = forwardRef(({
         targetFromHandle = true;
       }
 
-      const routeStyle = style.route;
       const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
-      const hasPerEdgeRoutingOverride =
-        routeStyle === 'orthogonal' ||
-        routeStyle === 'curved' ||
-        typeof edge.style?.orthogonal === 'boolean' ||
-        typeof edge.style?.curved === 'boolean';
       const applyForcedRouting = forceRouting && !hasPerEdgeRoutingOverride;
       const isOrthogonal = useRoutedSegments
         ? true
         : applyForcedRouting
         ? defaultEdgeRouting === 'orthogonal'
-        : routeStyle === 'orthogonal' || style.orthogonal === true;
+        : preferOrthogonalForEdge;
       const isCurved = applyForcedRouting
         ? defaultEdgeRouting === 'curved'
-        : !isOrthogonal && (routeStyle === 'curved' || style.curved === true);
+        : !isOrthogonal && (
+          preferCurvedForEdge ||
+          (hasCurvedFlag && flagTruthy(curvedFlag)) ||
+          (!hasPerEdgeRoutingOverride)
+        );
       let curveDirection = curveDirectionOverride || styleDef.curveDirection || 'auto';
       
       if (curveDirection === 'auto') {
@@ -716,7 +747,23 @@ const EdgeLayer = forwardRef(({
         const midPoint = getBezierPoint(0.5, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
         midX = midPoint.x;
         midY = midPoint.y;
+      } else if (isCurved) {
+        // Ensure curved edges are visibly curved even when endpoints are almost aligned.
+        const minBend = 36;
+        if (curveDirection === 'horizontal') {
+          const dy = targetPos.y - sourcePos.y;
+          const bendY = Math.abs(dy) < minBend ? (dy >= 0 ? minBend : -minBend) : dy;
+          cp1 = { x: midX, y: sourcePos.y + bendY * 0.5 };
+          cp2 = { x: midX, y: targetPos.y - bendY * 0.5 };
+        } else {
+          const dx = targetPos.x - sourcePos.x;
+          const bendX = Math.abs(dx) < minBend ? (dx >= 0 ? minBend : -minBend) : dx;
+          cp1 = { x: sourcePos.x + bendX * 0.5, y: midY };
+          cp2 = { x: targetPos.x - bendX * 0.5, y: midY };
+        }
+        curveDirection = 'custom';
       }
+      const hasBezierControls = Boolean(cp1 && cp2);
       
       const buildOrthogonalSegments = () => {
         const lead = 24;
@@ -858,7 +905,7 @@ const EdgeLayer = forwardRef(({
       } else if (isCurved) {
         ctx.beginPath();
         ctx.moveTo(sourcePos.x, sourcePos.y);
-        if (useHandleControls && cp1 && cp2) {
+        if (hasBezierControls) {
           ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
         } else if (curveDirection === 'horizontal') {
           ctx.bezierCurveTo(
@@ -895,7 +942,7 @@ const EdgeLayer = forwardRef(({
             angle = Math.atan2(last[1].y - last[0].y, last[1].x - last[0].x);
             arrowPos = targetPos;
           } else if (isCurved) {
-            if (useHandleControls && cp1 && cp2) {
+            if (hasBezierControls) {
               angle = getBezierAngle(0.99, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
               arrowPos = getBezierPoint(0.99, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
             } else if (curveDirection === 'horizontal') {
@@ -919,7 +966,7 @@ const EdgeLayer = forwardRef(({
             angle = Math.atan2(first[0].y - first[1].y, first[0].x - first[1].x);
             arrowPos = sourcePos;
           } else if (isCurved) {
-            if (useHandleControls && cp1 && cp2) {
+            if (hasBezierControls) {
               angle = getBezierAngle(0.01, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y) + Math.PI;
               arrowPos = getBezierPoint(0.01, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
             } else if (curveDirection === 'horizontal') {
@@ -950,7 +997,7 @@ const EdgeLayer = forwardRef(({
           if (isOrthogonal) {
             particlePos = getPointOnSegments(orthogonalSegments, t);
           } else if (isCurved) {
-            if (useHandleControls && cp1 && cp2) {
+            if (hasBezierControls) {
               particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
             } else if (curveDirection === 'horizontal') {
               particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);
@@ -998,7 +1045,7 @@ const EdgeLayer = forwardRef(({
           });
         } else if (isCurved) {
           ctx.moveTo(sourcePos.x, sourcePos.y);
-          if (useHandleControls && cp1 && cp2) {
+          if (hasBezierControls) {
             ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);
           } else if (curveDirection === 'horizontal') {
             ctx.bezierCurveTo(midX, sourcePos.y, midX, targetPos.y, targetPos.x, targetPos.y);

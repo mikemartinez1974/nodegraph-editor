@@ -1952,7 +1952,18 @@ const skipPropertiesCloseRef = useRef(false);
               try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
               return next;
             });
-            if (updates?.sourcePort !== undefined || updates?.targetPort !== undefined) {
+            const stylePatch = updates?.style && typeof updates.style === 'object' ? updates.style : null;
+            const routingStyleChanged = Boolean(
+              stylePatch &&
+              (
+                stylePatch.curved !== undefined ||
+                stylePatch.orthogonal !== undefined ||
+                stylePatch.route !== undefined ||
+                stylePatch.routing !== undefined ||
+                stylePatch.router !== undefined
+              )
+            );
+            if (updates?.sourcePort !== undefined || updates?.targetPort !== undefined || routingStyleChanged) {
               if (typeof setEdgeRoutes === 'function') {
                 setEdgeRoutes((prev) => {
                   if (!prev || !prev[id]) return prev;
