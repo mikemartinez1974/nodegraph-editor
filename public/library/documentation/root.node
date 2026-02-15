@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-15T16:04:04.973Z",
-    "modified": "2026-02-15T16:04:43.645Z",
+    "created": "2026-02-15T18:34:42.291Z",
+    "modified": "2026-02-15T18:37:14.948Z",
     "author": "",
     "tags": []
   },
@@ -183,8 +183,8 @@
       "type": "port",
       "label": "Port",
       "position": {
-        "x": -1135.0945240288104,
-        "y": 362.6910827700265
+        "x": -1147.0945240288104,
+        "y": 240.69108277002653
       },
       "width": 240.9895782470703,
       "height": 90,
@@ -195,7 +195,7 @@
         "link": "",
         "intent": "external",
         "target": {
-          "endpoint": "https://twilite.zone/root.node:root",
+          "endpoint": "https://twilite.zone/tutorial/getting-started.document.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -248,7 +248,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Onboarding\n\n[Getting Started](tlz://twilite.zone/tutorial/getting-started.document.node:root)\n\nEntry point for humans + agents.\n\nMust link to this root and the required contracts.\n\n"
+        "markdown": "## Onboarding\n\n[Getting Started](tlz://twilite.zone/tutorial/getting-started.document.node)\n\nEntry point for humans + agents.\n\nMust link to this root and the required contracts.\n\n"
       }
     },
     {
@@ -409,6 +409,75 @@
       "showLabel": true,
       "data": {
         "markdown": "## Dictionary Contracts\n\nLocation: `public/library/documentation/contracts/dictionaries/`"
+      }
+    },
+    {
+      "id": "a5bed43a-1b61-4ea6-b5a0-a3739154915c",
+      "type": "port",
+      "label": "To Contract Index",
+      "position": {
+        "x": -1283.2176180713511,
+        "y": 448.6638011831799
+      },
+      "width": 240.9895782470703,
+      "height": 90,
+      "ports": [
+        {
+          "id": "root",
+          "label": "Root",
+          "direction": "input",
+          "dataType": "value",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "root",
+          "label": "Root",
+          "direction": "output",
+          "dataType": "value",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "root",
+          "label": "Root",
+          "type": "value",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "root",
+          "label": "Root",
+          "type": "value",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "target": {
+          "url": "https://twilite.zone/library/documentation/contracts/root.node",
+          "nodeId": "root",
+          "handleId": "root"
+        },
+        "security": "allow"
       }
     }
   ],
@@ -571,6 +640,35 @@
       "sourcePort": "root",
       "targetPort": "root",
       "label": "includes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "9405dfa3-1b9b-44e2-99c6-f36f7052bb70",
+      "type": "relates",
+      "source": "a5bed43a-1b61-4ea6-b5a0-a3739154915c",
+      "target": "0d0244b1-e68b-46a5-86cf-de534cfccf96",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "portMeta": {
+        "source": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        }
+      },
+      "label": "",
       "style": {
         "width": 2,
         "dash": [],

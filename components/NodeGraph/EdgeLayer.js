@@ -567,11 +567,43 @@ const EdgeLayer = forwardRef(({
       const typeDef = edgeTypes[edge.type] || {};
       const styleDef = typeDef.style || {};
       
+      const normalizeDash = (dashValue, dashedFlag, dashPattern) => {
+        const toNums = (value) =>
+          String(value || '')
+            .split(',')
+            .map((part) => Number(part.trim()))
+            .filter((n) => Number.isFinite(n) && n > 0);
+
+        if (Array.isArray(dashValue)) {
+          const nums = dashValue
+            .map((n) => Number(n))
+            .filter((n) => Number.isFinite(n) && n > 0);
+          if (nums.length) return nums;
+        } else if (typeof dashValue === 'string') {
+          const nums = toNums(dashValue);
+          if (nums.length) return nums;
+        } else if (typeof dashValue === 'number' && Number.isFinite(dashValue) && dashValue > 0) {
+          return [dashValue, dashValue];
+        }
+
+        if (typeof dashPattern === 'string') {
+          const nums = toNums(dashPattern);
+          if (nums.length) return nums;
+        }
+
+        if (dashedFlag === true) return [8, 4];
+        return [];
+      };
+
       // Merge styles: edge.style overrides type defaults
       const style = {
         color: edge.color || edge.style?.color || styleDef.color || theme.palette.text.secondary,
         width: edge.style?.width ?? styleDef.width ?? 2,
-        dash: edge.style?.dash ?? styleDef.dash ?? [],
+        dash: normalizeDash(
+          edge.style?.dash ?? styleDef.dash,
+          edge.style?.dashed ?? styleDef.dashed,
+          edge.style?.dashPattern ?? styleDef.dashPattern
+        ),
         curved: edge.style?.curved ?? styleDef.curved ?? false,
         route: edge.style?.route ?? edge.style?.routing ?? edge.style?.router ?? styleDef.route,
         orthogonal: edge.style?.orthogonal ?? styleDef.orthogonal ?? false,
@@ -593,6 +625,16 @@ const EdgeLayer = forwardRef(({
         const pulseFactor = 0.5 + pulsePhase * 0.5; // 0 to 1
         lineWidth = lineWidth * (1 + pulseFactor * 0.5); // Pulse width 100% to 150%
         opacity = opacity * (0.6 + pulseFactor * 0.4); // Pulse opacity 60% to 100%
+      }
+      // Apply glow animation (modulate halo intensity)
+      if (style.animation === 'glow' && !isSelected) {
+        const glowPhase = Math.sin(time * Math.PI * 2 * style.animationSpeed);
+        const glowFactor = 0.5 + glowPhase * 0.5; // 0..1
+        ctx.shadowColor = style.color;
+        ctx.shadowBlur = 6 + glowFactor * 14; // 6..20
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        opacity = Math.min(1, opacity * (0.85 + glowFactor * 0.3));
       }
       
       if (isSelected) {

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-14T23:35:05.477Z",
-    "modified": "2026-02-14T23:39:11.951Z",
+    "created": "2026-02-15T22:40:24.736Z",
+    "modified": "2026-02-15T22:40:25.706Z",
     "author": "",
     "tags": []
   },
@@ -176,7 +176,7 @@
       "type": "node",
       "label": "node",
       "position": {
-        "x": 364.0763550295025,
+        "x": 363.0175315049416,
         "y": -463.052487520058
       },
       "width": 457.2395935058594,
@@ -208,8 +208,8 @@
       "type": "port",
       "label": "To the Library",
       "position": {
-        "x": 956.0031005256551,
-        "y": -495.26000689716693
+        "x": 960.0031005256551,
+        "y": -507.26000689716693
       },
       "width": 284.6614685058594,
       "height": 90,
@@ -258,14 +258,13 @@
           0
         ],
         "curved": true,
-        "opacity": 1,
-        "showArrow": false,
+        "opacity": 0.73,
+        "showArrow": true,
         "arrowSize": 8,
         "arrowPosition": "end",
         "orthogonal": false,
         "color": "#114f92",
-        "animation": "glow",
-        "route": "curved"
+        "animation": "glow"
       },
       "data": {
         "strength": "strong"

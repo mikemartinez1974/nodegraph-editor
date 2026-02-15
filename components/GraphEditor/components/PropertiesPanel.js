@@ -2122,6 +2122,25 @@ export default function PropertiesPanel({
             disabled={!activeSelectionId}
           />
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="caption">Dashed</Typography>
+            <Switch
+              size="small"
+              checked={Array.isArray(selectionStyle.dash) && selectionStyle.dash.some((v) => Number(v) > 0)}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  const current = Array.isArray(selectionStyle.dash) ? selectionStyle.dash : [];
+                  const normalized = current
+                    .map((v) => Number(v))
+                    .filter((v) => Number.isFinite(v) && v > 0);
+                  applyStylePatch({ dash: normalized.length ? normalized : [8, 4] });
+                } else {
+                  applyStylePatch({ dash: [] });
+                }
+              }}
+              disabled={!activeSelectionId}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Typography variant="caption">Curved</Typography>
             <Switch
               size="small"

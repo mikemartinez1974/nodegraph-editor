@@ -1,0 +1,636 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-15T18:00:28.506Z",
+    "modified": "2026-02-15T18:21:43.506Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "contracts-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -880,
+        "y": -220
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "contracts-root",
+          "name": "Contracts Index",
+          "version": "0.1.0",
+          "description": "Index of contract specs for the Twilite graph ecosystem.",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "documentation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "node"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "contracts-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -880,
+        "y": 20
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "node",
+            "intent": "documentation content",
+            "implementation": "node.node-class.node",
+            "dictionaryKey": "node"
+          },
+          {
+            "key": "port",
+            "intent": "navigation endpoint",
+            "implementation": "navigate by target.endpoint"
+          }
+        ],
+        "markdown": "## Contracts Index\\n- node: explanatory content\\n- port: navigation to contract specs"
+      }
+    },
+    {
+      "id": "contracts-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -880,
+        "y": 260
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "node",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
+            "source": "external",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "contracts-index-node",
+      "type": "node",
+      "label": "Contracts",
+      "position": {
+        "x": -380,
+        "y": -220
+      },
+      "width": 520,
+      "height": 320,
+      "ports": [
+        {
+          "id": "root",
+          "label": "root",
+          "direction": "bidirectional",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "isRoot": true,
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "content": "# Twilite Contracts\\n\\nThis graph indexes the primary contracts that govern Twilite graphs.\\n\\nUse the port nodes to jump directly to each contract document."
+      }
+    },
+    {
+      "id": "port-core-protocols",
+      "type": "port",
+      "label": "Core Protocols",
+      "position": {
+        "x": 220,
+        "y": -320
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/core-protocols.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-manifest",
+      "type": "port",
+      "label": "Manifest Contract",
+      "position": {
+        "x": 520,
+        "y": -320
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/manifest/manifest-contract.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-legend",
+      "type": "port",
+      "label": "Legend Contract",
+      "position": {
+        "x": 820,
+        "y": -320
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/legend/legend.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-dictionary",
+      "type": "port",
+      "label": "Dictionary Contract",
+      "position": {
+        "x": 220,
+        "y": -140
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/dictionaries/dictionary.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-node",
+      "type": "port",
+      "label": "Node Contract",
+      "position": {
+        "x": 520,
+        "y": -140
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/nodes/node-contract.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-port",
+      "type": "port",
+      "label": "Port Contract",
+      "position": {
+        "x": 820,
+        "y": -140
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/ports/port-contract.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-edge",
+      "type": "port",
+      "label": "Edge Contract",
+      "position": {
+        "x": 220,
+        "y": 40
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/edges/edge-contract.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-validation",
+      "type": "port",
+      "label": "Validation Rules",
+      "position": {
+        "x": 520,
+        "y": 40
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/validation/validation-rules.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-view",
+      "type": "port",
+      "label": "View Contract",
+      "position": {
+        "x": 820,
+        "y": 40
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/view/view.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-migration",
+      "type": "port",
+      "label": "Migration Contract",
+      "position": {
+        "x": 520,
+        "y": 220
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/contracts/migration/migration-contract.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-doc-root",
+      "type": "port",
+      "label": "Contracts Folder",
+      "position": {
+        "x": 820,
+        "y": 220
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/documentation/root.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "port-home",
+      "type": "port",
+      "label": "Back to Site Root",
+      "position": {
+        "x": 220,
+        "y": 220
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/root.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-core",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-core-protocols",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-manifest",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-manifest",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-legend",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-legend",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-dictionary",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-dictionary",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-node",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-port",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-port",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-edge",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-edge",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-validation",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-validation",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-view",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-view",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-migration",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-migration",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-folder",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-doc-root",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-home",
+      "type": "relates",
+      "source": "contracts-index-node",
+      "target": "port-home",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

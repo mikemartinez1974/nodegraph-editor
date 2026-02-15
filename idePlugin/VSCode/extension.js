@@ -106,6 +106,7 @@ class TwiliteNodeEditorProvider {
       suppressNextDocumentUpdate: false,
       postSequence: 0,
       webviewReadyHandled: false,
+      hostGraphLoaded: false,
       htmlInitialized,
       disposables: []
     };
@@ -168,6 +169,7 @@ class TwiliteNodeEditorProvider {
         : {};
       if (switchedFile) {
         state.postSequence += 1;
+        state.hostGraphLoaded = false;
         
         webviewPanel.webview.postMessage({
           type: 'setText',
@@ -185,6 +187,7 @@ class TwiliteNodeEditorProvider {
         return;
       }
       state.postSequence += 1;
+      state.hostGraphLoaded = false;
       webviewPanel.webview.postMessage({
         type: 'setText',
         text,
@@ -239,6 +242,12 @@ class TwiliteNodeEditorProvider {
           state.webviewReadyHandled = true;
           postText(true);
         }
+        return;
+      }
+      if (message.type === 'graphLoaded') {
+        const messagePanelId = typeof message.panelId === 'string' ? message.panelId : null;
+        if (messagePanelId && messagePanelId !== panelId) return;
+        state.hostGraphLoaded = true;
         return;
       }
       if (message.type === 'elkLayout') {
@@ -384,6 +393,9 @@ class TwiliteNodeEditorProvider {
         return;
       }
       if (message.type === 'update' || message.type === 'graphUpdated') {
+        if (!state.hostGraphLoaded) {
+          return;
+        }
         const messageUri = typeof message.uri === 'string' ? message.uri : null;
         const messagePanelId = typeof message.panelId === 'string' ? message.panelId : null;
         const expectedUri = state.document?.uri?.toString?.() || document.uri.toString();
@@ -423,6 +435,9 @@ class TwiliteNodeEditorProvider {
         return;
       }
       if (message.type === 'saveFile') {
+        if (!state.hostGraphLoaded) {
+          return;
+        }
         const messageUri = typeof message.uri === 'string' ? message.uri : null;
         const messagePanelId = typeof message.panelId === 'string' ? message.panelId : null;
         const expectedUri = state.document?.uri?.toString?.() || document.uri.toString();
@@ -777,6 +792,14 @@ class TwiliteNodeEditorProvider {
             } catch {}
             emitHostLoadState();
             applyGraph(parsed);
+            try {
+              vscode.postMessage({
+                type: 'graphLoaded',
+                panelId: window.__Twilite_PANEL_ID__,
+                uri,
+                seq
+              });
+            } catch {}
             if (emptyGraph) {
               scheduleEmptyClear();
             }
