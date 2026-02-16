@@ -36,6 +36,7 @@ import {
 import useIntentEmitter from './hooks/useIntentEmitter';
 import EdgeLayoutPanel from './components/EdgeLayoutPanel';
 import { summarizeContracts } from './contracts/contractManager';
+import { validateGraphInvariants } from './validators/validateGraphInvariants';
 
 const PANEL_WIDTHS = {
   entities: 320,
@@ -400,6 +401,16 @@ const GraphEditorContent = () => {
 
   const [resolvedDictionary, setResolvedDictionary] = useState(null);
   const definitionDictionaryCacheRef = useRef({});
+  const invariantReport = useMemo(() => {
+    return validateGraphInvariants({
+      nodes: Array.isArray(nodes) ? nodes : [],
+      edges: Array.isArray(edges) ? edges : [],
+      edgeRoutes: edgeRoutes && typeof edgeRoutes === 'object' ? edgeRoutes : {},
+      clusters: Array.isArray(groups) ? groups : [],
+      mode: 'load',
+      resolvedDictionary
+    });
+  }, [nodes, edges, edgeRoutes, groups, resolvedDictionary]);
 
   const resolvePublicPath = useCallback((ref) => {
     if (!ref || typeof ref !== 'string') return null;
@@ -2041,6 +2052,7 @@ const skipPropertiesCloseRef = useRef(false);
         open={showSystemNodesPanel}
         anchor={oppositeAnchor}
         nodes={nodes}
+        validationReport={invariantReport}
         onUpdateNode={handleUpdateNodeFromPanels}
         onClose={() => setShowSystemNodesPanel?.(false)}
       />

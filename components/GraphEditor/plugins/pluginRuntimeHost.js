@@ -630,7 +630,7 @@ export default class PluginRuntimeHost {
       try {
         this.iframe.remove();
       } catch {
-        if (this.iframe.parentNode) {
+        if (this.iframe.parentNode && this.iframe.parentNode.contains(this.iframe)) {
           this.iframe.parentNode.removeChild(this.iframe);
         }
       }

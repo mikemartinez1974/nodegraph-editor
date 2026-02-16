@@ -613,7 +613,15 @@ const Toolbar = ({
     link.download = filename;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    if (link.parentNode === document.body) {
+      document.body.removeChild(link);
+    } else {
+      try {
+        link.remove();
+      } catch {
+        // ignore detached-link cleanup failures
+      }
+    }
     URL.revokeObjectURL(url);
 
     // Update address bar assuming user kept the suggested filename

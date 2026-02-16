@@ -38,7 +38,13 @@ const ThreeDNode = React.memo((props) => {
     
     // Clear any existing canvas first
     while (containerRef.current.firstChild) {
-      containerRef.current.removeChild(containerRef.current.firstChild);
+      const child = containerRef.current.firstChild;
+      if (!child) break;
+      if (child.parentNode === containerRef.current) {
+        containerRef.current.removeChild(child);
+      } else {
+        break;
+      }
     }
     const width = Math.max(100, (node.width || 300) - 16);
     const height = Math.max(100, (node.height || 300) - 40);
@@ -123,7 +129,7 @@ const ThreeDNode = React.memo((props) => {
         const canvas = rendererRef.current.domElement;
         rendererRef.current.dispose();
         rendererRef.current = null;
-        if (containerRef.current && canvas && containerRef.current.contains(canvas)) {
+        if (containerRef.current && canvas && canvas.parentNode === containerRef.current) {
           containerRef.current.removeChild(canvas);
         }
       }

@@ -32,6 +32,8 @@ const uriMatches = (left, right) => {
   }
 };
 
+const isBlankText = (value) => typeof value === 'string' && value.trim().length === 0;
+
 const getElk = () => {
   if (elkInstance) return elkInstance;
   elkInstance = new ELK();
@@ -420,6 +422,15 @@ class TwiliteNodeEditorProvider {
         const incomingText = typeof message.text === 'string' ? message.text : '';
         const activeDoc = state.document || document;
         const currentText = activeDoc.getText();
+        // Guard against transient empty payloads from the webview lifecycle.
+        // This prevents accidental blanking of non-empty documents on tab/open races.
+        if (isBlankText(incomingText) && !isBlankText(currentText)) {
+          console.warn('[Twilite] Ignoring graphUpdated empty payload for non-empty document', {
+            expectedUri,
+            panelId
+          });
+          return;
+        }
         if (incomingText === currentText) {
           return;
         }
@@ -463,6 +474,14 @@ class TwiliteNodeEditorProvider {
         const activeDoc = state.document || document;
         try {
           const currentText = activeDoc.getText();
+          if (isBlankText(incomingText) && !isBlankText(currentText)) {
+            webviewPanel.webview.postMessage({
+              type: 'saveFileResult',
+              ok: false,
+              error: 'Ignored empty save payload for non-empty document'
+            });
+            return;
+          }
           if (incomingText !== currentText) {
             state.suppressNextDocumentUpdate = true;
             const edit = new vscode.WorkspaceEdit();

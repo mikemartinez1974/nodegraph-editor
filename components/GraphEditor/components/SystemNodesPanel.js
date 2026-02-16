@@ -11,7 +11,8 @@ import {
   TextField,
   Button,
   Alert,
-  Paper
+  Paper,
+  Chip
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,6 +23,7 @@ export default function SystemNodesPanel({
   onClose = () => {},
   anchor = "right",
   nodes = [],
+  validationReport = { errors: [], warnings: [] },
   onUpdateNode = () => {}
 }) {
   const manifestNode = useMemo(() => nodes.find((n) => n?.type === "manifest") || null, [nodes]);
@@ -39,6 +41,9 @@ export default function SystemNodesPanel({
   const [dictionaryNodeDefs, setDictionaryNodeDefs] = useState([]);
   const [dictionaryViews, setDictionaryViews] = useState([]);
   const [error, setError] = useState("");
+  const validationErrors = Array.isArray(validationReport?.errors) ? validationReport.errors : [];
+  const validationWarnings = Array.isArray(validationReport?.warnings) ? validationReport.warnings : [];
+  const totalIssues = validationErrors.length + validationWarnings.length;
 
   useEffect(() => {
     if (!manifestNode) return;
@@ -209,6 +214,42 @@ export default function SystemNodesPanel({
         <Typography variant="caption" color="text.secondary">
           Manifest, Legend, and Dictionary editing
         </Typography>
+        <Divider sx={{ my: 2 }} />
+
+        <Stack spacing={1.5} sx={{ mb: 2 }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="subtitle1">Validation</Typography>
+            <Chip
+              size="small"
+              label={totalIssues === 0 ? "No issues" : `${totalIssues} issue${totalIssues === 1 ? "" : "s"}`}
+              color={totalIssues === 0 ? "success" : "warning"}
+              variant={totalIssues === 0 ? "outlined" : "filled"}
+            />
+            <Chip size="small" label={`${validationErrors.length} errors`} color="error" variant="outlined" />
+            <Chip size="small" label={`${validationWarnings.length} warnings`} color="warning" variant="outlined" />
+          </Stack>
+          {validationErrors.map((issue, index) => (
+            <Alert key={`validation-error-${index}`} severity="error" variant="outlined">
+              <Typography variant="body2">{issue?.message || "Unknown error"}</Typography>
+              {issue?.code ? (
+                <Typography variant="caption" color="text.secondary">
+                  code: {issue.code}
+                </Typography>
+              ) : null}
+            </Alert>
+          ))}
+          {validationWarnings.map((issue, index) => (
+            <Alert key={`validation-warning-${index}`} severity="warning" variant="outlined">
+              <Typography variant="body2">{issue?.message || "Unknown warning"}</Typography>
+              {issue?.code ? (
+                <Typography variant="caption" color="text.secondary">
+                  code: {issue.code}
+                </Typography>
+              ) : null}
+            </Alert>
+          ))}
+        </Stack>
+
         <Divider sx={{ my: 2 }} />
 
         {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
