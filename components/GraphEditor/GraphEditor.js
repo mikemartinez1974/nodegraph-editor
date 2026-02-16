@@ -220,6 +220,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
   const [lockedEdges, setLockedEdges] = useState(new Set());
   const [showAllEdgeLabels, setShowAllEdgeLabels] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
+  const [showSystemNodesPanel, setShowSystemNodesPanel] = useState(false);
   const [showNodePalette, setShowNodePalette] = useState(false);
   const [graphRenderKey, setGraphRenderKey] = useState(0);
   const [mobileAddNodeOpen, setMobileAddNodeOpen] = useState(false);
@@ -1221,6 +1222,10 @@ useEffect(() => {
 
   const togglePropertiesPanel = useCallback(() => {
     setShowPropertiesPanel(prev => !prev);
+  }, []);
+
+  const toggleSystemNodesPanel = useCallback(() => {
+    setShowSystemNodesPanel(prev => !prev);
   }, []);
 
   const openEntitiesPanel = useCallback((view) => {
@@ -3191,6 +3196,14 @@ useEffect(() => {
     return () => eventBus.off('togglePropertiesPanel', handleTogglePropertiesPanel);
   }, [togglePropertiesPanel]);
 
+  useEffect(() => {
+    const handleToggleSystemNodesPanel = () => {
+      toggleSystemNodesPanel();
+    };
+    eventBus.on('toggleSystemNodesPanel', handleToggleSystemNodesPanel);
+    return () => eventBus.off('toggleSystemNodesPanel', handleToggleSystemNodesPanel);
+  }, [toggleSystemNodesPanel]);
+
   // Toggle document properties dialog via event
   useEffect(() => {
     const handleToggleDocumentProperties = () => {
@@ -3294,6 +3307,8 @@ useEffect(() => {
     setShowAllEdgeLabels,
     showPropertiesPanel,
     setShowPropertiesPanel,
+    showSystemNodesPanel,
+    setShowSystemNodesPanel,
     graphRenderKey,
     setGraphRenderKey,
     mobileAddNodeOpen,
@@ -3336,6 +3351,7 @@ useEffect(() => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleSystemNodesPanel,
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
@@ -3370,6 +3386,8 @@ useEffect(() => {
     setShowAllEdgeLabels,
     showPropertiesPanel,
     setShowPropertiesPanel,
+    showSystemNodesPanel,
+    setShowSystemNodesPanel,
     graphRenderKey,
     setGraphRenderKey,
     mobileAddNodeOpen,
@@ -3412,6 +3430,7 @@ useEffect(() => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleSystemNodesPanel,
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,

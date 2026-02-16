@@ -8,6 +8,7 @@ import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
 import MobileAddNodeSheet from './components/MobileAddNodeSheet';
 import PropertiesPanel from './components/PropertiesPanel';
+import SystemNodesPanel from './components/SystemNodesPanel';
 import NodePalettePanel from './components/NodePalettePanel';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import NewTabPage from './components/NewTabPage';
@@ -122,6 +123,8 @@ const GraphEditorContent = () => {
     setShowEdgePanel,
     showPropertiesPanel,
     setShowPropertiesPanel,
+    showSystemNodesPanel,
+    setShowSystemNodesPanel,
     graphRenderKey,
     mobileAddNodeOpen,
     mobileAddNodeSearch,
@@ -152,6 +155,7 @@ const GraphEditorContent = () => {
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
     togglePropertiesPanel,
+    toggleSystemNodesPanel,
     toggleNodePalette,
     toggleNodeList,
     toggleGroupList,
@@ -1121,6 +1125,93 @@ const GraphEditorContent = () => {
     setShowPropertiesPanel(true);
   }, [setSelectedGroupIds, setSelectedNodeIds, setSelectedEdgeIds, setShowPropertiesPanel]);
 
+  const handleUpdateNodeFromPanels = useCallback((id, updates, options) => {
+    emitEdgeIntent('updateNode', {
+      nodeId: id,
+      changeCount: Object.keys(updates || {}).length,
+      selectionCount: selectedNodeIds.length
+    });
+    setNodes(prev => {
+      const enforceSingleRoot =
+        updates?.isRoot === true ||
+        updates?.data?.isRoot === true ||
+        updates?.data?.root === true;
+      const { data: nextDataPatch, replaceData, ...restUpdates } = updates || {};
+      const next = prev.map(n => {
+        if (n.id !== id) {
+          if (!enforceSingleRoot) return n;
+          return {
+            ...n,
+            isRoot: false,
+            data: {
+              ...(n.data || {}),
+              isRoot: false,
+              root: false
+            }
+          };
+        }
+        const nextData = nextDataPatch
+          ? (replaceData || options?.replaceData)
+            ? nextDataPatch
+            : { ...n.data, ...nextDataPatch }
+          : n.data;
+        return { ...n, ...restUpdates, data: nextData };
+      });
+      nodesRef.current = next;
+      if (!options || options !== true) {
+        try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
+      }
+      return next;
+    });
+    const hasHandler = handlers && typeof handlers.handleUpdateNodeData === 'function';
+    if (!options || options !== true) {
+      try {
+        if (hasHandler) {
+          handlers.handleUpdateNodeData(id, updates, options);
+        }
+      } catch (err) {}
+    }
+    if (options === true || !hasHandler) {
+      try {
+        eventBus.emit('nodeUpdated', { id, patch: updates || {} });
+      } catch (err) {}
+    }
+  }, [emitEdgeIntent, selectedNodeIds.length, setNodes, nodesRef, historyHook, edgesRef, handlers]);
+
+  const handleUpdateEdgeFromPanels = useCallback((id, updates) => {
+    emitEdgeIntent('updateEdge', { edgeId: id, changeCount: Object.keys(updates || {}).length });
+    setEdges(prev => {
+      const next = prev.map(e => e.id === id ? { ...e, ...updates } : e);
+      edgesRef.current = next;
+      try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
+      return next;
+    });
+    const stylePatch = updates?.style && typeof updates.style === 'object' ? updates.style : null;
+    const routingStyleChanged = Boolean(
+      stylePatch &&
+      (
+        stylePatch.curved !== undefined ||
+        stylePatch.orthogonal !== undefined ||
+        stylePatch.route !== undefined ||
+        stylePatch.routing !== undefined ||
+        stylePatch.router !== undefined
+      )
+    );
+    if (updates?.sourcePort !== undefined || updates?.targetPort !== undefined || routingStyleChanged) {
+      if (typeof setEdgeRoutes === 'function') {
+        setEdgeRoutes((prev) => {
+          if (!prev || !prev[id]) return prev;
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }
+    }
+    try {
+      eventBus.emit('edgeUpdated', { id, patch: updates || {} });
+    } catch (err) {}
+  }, [emitEdgeIntent, setEdges, edgesRef, historyHook, nodesRef, setEdgeRoutes]);
+
   const createGraphRenderer = () => (
     <GraphRendererAdapter
       graphKey={graphRendererKey}
@@ -1866,8 +1957,10 @@ const skipPropertiesCloseRef = useRef(false);
           onToggleLayoutPanel={handleToggleEdgePanelIntent}
           onTogglePropertiesPanel={handleTogglePropertiesPanelIntent}
           onToggleEdgeList={handleToggleEdgeListIntent}
+          onToggleSystemNodesPanel={toggleSystemNodesPanel}
           showEdgePanel={showEdgePanel}
           showPropertiesPanel={showPropertiesPanel}
+          showSystemNodesPanel={showSystemNodesPanel}
           showEdgeList={showEdgeList}
         />
       )}
@@ -1889,96 +1982,8 @@ const skipPropertiesCloseRef = useRef(false);
         edges={edges}
         nodeTypeOptions={nodeTypeOptions}
         onSelectNode={handleSelectNodeFromProperties}
-          onUpdateNode={(id, updates, options) => {
-            emitEdgeIntent('updateNode', {
-              nodeId: id,
-              changeCount: Object.keys(updates || {}).length,
-              selectionCount: selectedNodeIds.length
-            });
-            setNodes(prev => {
-            const enforceSingleRoot =
-              updates?.isRoot === true ||
-              updates?.data?.isRoot === true ||
-              updates?.data?.root === true;
-            const { data: nextDataPatch, replaceData, ...restUpdates } = updates || {};
-            const next = prev.map(n => {
-              if (n.id !== id) {
-                if (!enforceSingleRoot) return n;
-                return {
-                  ...n,
-                  isRoot: false,
-                  data: {
-                    ...(n.data || {}),
-                    isRoot: false,
-                    root: false
-                  }
-                };
-              }
-              const nextData = nextDataPatch
-                ? (replaceData || options?.replaceData)
-                  ? nextDataPatch
-                  : { ...n.data, ...nextDataPatch }
-                : n.data;
-              return { ...n, ...restUpdates, data: nextData };
-            });
-            nodesRef.current = next;
-            // Only save to history if not explicitly skipped
-            if (!options || options !== true) {
-              try { historyHook.saveToHistory(next, edgesRef.current); } catch (err) {}
-            }
-            return next;
-          });
-            const hasHandler = handlers && typeof handlers.handleUpdateNodeData === 'function';
-            if (!options || options !== true) {
-              try {
-                if (hasHandler) {
-                  handlers.handleUpdateNodeData(id, updates, options);
-                }
-              } catch (err) {}
-            }
-            if (options === true || !hasHandler) {
-              try {
-                eventBus.emit('nodeUpdated', { id, patch: updates || {} });
-              } catch (err) {
-                // ignore event bus errors
-              }
-            }
-          }}
-          onUpdateEdge={(id, updates) => {
-            emitEdgeIntent('updateEdge', { edgeId: id, changeCount: Object.keys(updates || {}).length });
-            setEdges(prev => {
-              const next = prev.map(e => e.id === id ? { ...e, ...updates } : e);
-              edgesRef.current = next;
-              try { historyHook.saveToHistory(nodesRef.current, next); } catch (err) {}
-              return next;
-            });
-            const stylePatch = updates?.style && typeof updates.style === 'object' ? updates.style : null;
-            const routingStyleChanged = Boolean(
-              stylePatch &&
-              (
-                stylePatch.curved !== undefined ||
-                stylePatch.orthogonal !== undefined ||
-                stylePatch.route !== undefined ||
-                stylePatch.routing !== undefined ||
-                stylePatch.router !== undefined
-              )
-            );
-            if (updates?.sourcePort !== undefined || updates?.targetPort !== undefined || routingStyleChanged) {
-              if (typeof setEdgeRoutes === 'function') {
-                setEdgeRoutes((prev) => {
-                  if (!prev || !prev[id]) return prev;
-                  const next = { ...prev };
-                  delete next[id];
-                  return next;
-                });
-              }
-            }
-            try {
-              eventBus.emit('edgeUpdated', { id, patch: updates || {} });
-            } catch (err) {
-              // ignore event bus errors
-            }
-          }}
+          onUpdateNode={handleUpdateNodeFromPanels}
+          onUpdateEdge={handleUpdateEdgeFromPanels}
           onUpdateGroup={(id, updates) => {
             emitEdgeIntent('updateGroup', { clusterId: id, changeCount: Object.keys(updates || {}).length });
             setGroups(prev => {
@@ -2030,6 +2035,14 @@ const skipPropertiesCloseRef = useRef(false);
           isMobile={isMobile}
           onResize={setPropertiesPanelWidth}
         memoAutoExpandToken={memoAutoExpandToken}
+      />
+
+      <SystemNodesPanel
+        open={showSystemNodesPanel}
+        anchor={oppositeAnchor}
+        nodes={nodes}
+        onUpdateNode={handleUpdateNodeFromPanels}
+        onClose={() => setShowSystemNodesPanel?.(false)}
       />
 
           <EntitiesPanel

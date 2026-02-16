@@ -2,22 +2,21 @@
 import React from 'react';
 import { Menu, MenuItem, ListItemIcon, ListItemText, Divider, Typography } from '@mui/material';
 import * as Icons from '@mui/icons-material';
-import { getNodeTypesByCategory } from '../nodeTypeRegistry';
 import eventBus from '../../NodeGraph/eventBus';
-import usePluginRegistry from '../hooks/usePluginRegistry';
+import useAvailableNodeTypes from '../hooks/useAvailableNodeTypes';
 
 const AddNodeMenu = ({ anchorEl, open, onClose }) => {
-  const { plugins } = usePluginRegistry();
-  const nodesByCategory = React.useMemo(() => getNodeTypesByCategory(), [plugins]);
+  const { nodesByCategory } = useAvailableNodeTypes();
   
   // Category display order and labels
-  const categoryOrder = ['breadboard', 'basic', 'utility', 'logic', 'content', 'media', 'integration', 'advanced', 'other'];
+  const categoryOrder = ['breadboard', 'basic', 'utility', 'logic', 'content', 'definitions', 'media', 'integration', 'advanced', 'other'];
   const categoryLabels = {
     breadboard: 'Breadboard',
     basic: 'Basic Nodes',
     utility: 'Utility Nodes',
     logic: 'Logic Nodes',
     content: 'Content Nodes',
+    definitions: 'Dictionary Definitions',
     media: 'Media Nodes',
     integration: 'Integration',
     advanced: 'Advanced Nodes',

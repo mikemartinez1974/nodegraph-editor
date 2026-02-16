@@ -65,6 +65,7 @@ import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import ExtensionIcon from '@mui/icons-material/Extension';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import PluginManagerPanel from './PluginManagerPanel';
 import { getManifestSettings, getManifestDocumentUrl, setManifestDocumentUrl, setManifestSettings } from '../utils/manifestUtils';
 
@@ -134,6 +135,8 @@ const Toolbar = ({
   documentTheme = null,  // Document theme (not browser theme)
   githubSettings = null,  // GitHub sync target settings
   onOpenDocumentProperties = () => eventBus.emit('toggleDocumentProperties'),
+  onToggleSystemNodesPanel = () => eventBus.emit('toggleSystemNodesPanel'),
+  showSystemNodesPanel = false,
   uiTheme = null,
   documentAccess = null
 }) => {
@@ -993,6 +996,16 @@ const Toolbar = ({
             size="small"
           >
             <ExtensionIcon fontSize="small" />
+          </IconButton>
+
+          <IconButton
+            onClick={onToggleSystemNodesPanel}
+            title="System Nodes"
+            aria-label="Open System Nodes panel"
+            size="small"
+            color={showSystemNodesPanel ? 'primary' : 'default'}
+          >
+            <AccountTreeIcon fontSize="small" />
           </IconButton>
 
           <IconButton

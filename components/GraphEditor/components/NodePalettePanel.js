@@ -20,8 +20,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import * as Icons from '@mui/icons-material';
 import eventBus from '../../NodeGraph/eventBus';
-import { getNodeTypesByCategory } from '../nodeTypeRegistry';
-import usePluginRegistry from '../hooks/usePluginRegistry';
+import useAvailableNodeTypes from '../hooks/useAvailableNodeTypes';
 
 const FAVORITES_KEY = 'nodegraph-editor:palette:favorites';
 
@@ -133,66 +132,7 @@ export default function NodePalettePanel({
   const normalizedAnchor = typeof anchor === 'string' ? anchor.toLowerCase() : '';
   const safeAnchor = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : 'left';
 
-  const { plugins } = usePluginRegistry();
-  const nodesByCategory = useMemo(() => getNodeTypesByCategory(), [plugins]);
-  const [dictionaryEntries, setDictionaryEntries] = useState([]);
-  const baseTypeSet = useMemo(() => {
-    const set = new Set();
-    Object.values(nodesByCategory || {}).forEach((nodes) => {
-      nodes.forEach((meta) => {
-        if (meta?.type) set.add(meta.type);
-      });
-    });
-    return set;
-  }, [nodesByCategory]);
-
-  const buildEntriesFromDictionary = useCallback((dictionary) => {
-    const nodeDefs = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
-    return nodeDefs
-      .map((entry) => {
-        const type = entry?.key || entry?.type || entry?.nodeType;
-        if (!type || typeof type !== 'string') return null;
-        if (baseTypeSet.has(type)) return null;
-        return {
-          type,
-          label: entry?.label || entry?.title || type,
-          description: entry?.description || entry?.ref || entry?.source || '',
-          icon: entry?.icon || 'Extension',
-          category: 'definitions',
-          definition: entry
-        };
-      })
-      .filter(Boolean);
-  }, [baseTypeSet]);
-
-  useEffect(() => {
-    const handleDictionaryResolved = ({ dictionary } = {}) => {
-      setDictionaryEntries(buildEntriesFromDictionary(dictionary));
-    };
-    eventBus.on('dictionaryResolved', handleDictionaryResolved);
-    eventBus.emit('dictionaryRequest');
-    if (typeof window !== 'undefined' && window.graphAPI?.getNodes) {
-      try {
-        const nodes = window.graphAPI.getNodes() || [];
-        const dictionaryNode = nodes.find((node) => node?.type === 'dictionary') || null;
-        if (dictionaryNode) {
-          setDictionaryEntries(buildEntriesFromDictionary(dictionaryNode));
-        }
-      } catch (err) {
-        // ignore graphAPI lookup failures
-      }
-    }
-    return () => {
-      eventBus.off('dictionaryResolved', handleDictionaryResolved);
-    };
-  }, [baseTypeSet, buildEntriesFromDictionary]);
-
-  const mergedNodesByCategory = useMemo(() => {
-    if (!dictionaryEntries.length) return nodesByCategory;
-    const merged = { ...nodesByCategory };
-    merged.definitions = [...(merged.definitions || []), ...dictionaryEntries];
-    return merged;
-  }, [nodesByCategory, dictionaryEntries]);
+  const { nodesByCategory: mergedNodesByCategory } = useAvailableNodeTypes();
   const orderedCategories = useMemo(() => {
     const extraCategories = Object.keys(mergedNodesByCategory || {})
       .filter((category) => category && category !== 'favorites' && !BASE_CATEGORY_ORDER.includes(category))

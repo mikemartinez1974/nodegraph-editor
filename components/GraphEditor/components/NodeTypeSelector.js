@@ -2,10 +2,10 @@
 import React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import * as Icons from '@mui/icons-material';
-import { getNodeTypeList } from '../nodeTypeRegistry';
+import useAvailableNodeTypes from '../hooks/useAvailableNodeTypes';
 
 const NodeTypeSelector = ({ value, onChange, fullWidth = true, size = 'small', sx = {} }) => {
-  const nodeTypes = getNodeTypeList();
+  const { nodeTypeList: nodeTypes } = useAvailableNodeTypes();
 
   const getIcon = (iconName) => {
     const IconComponent = Icons[iconName];

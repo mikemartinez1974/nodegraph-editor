@@ -22,17 +22,22 @@ import CloseIcon from '@mui/icons-material/Close';
 import * as Icons from '@mui/icons-material';
 
 import eventBus from '../../NodeGraph/eventBus';
-import { getNodeTypesByCategory } from '../nodeTypeRegistry';
+import useAvailableNodeTypes from '../hooks/useAvailableNodeTypes';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const categoryOrder = ['basic', 'content', 'media', 'advanced', 'other'];
+const categoryOrder = ['breadboard', 'basic', 'utility', 'logic', 'content', 'definitions', 'media', 'integration', 'advanced', 'other'];
 const categoryLabels = {
+  breadboard: 'Breadboard',
   basic: 'Basic Nodes',
+  utility: 'Utility Nodes',
+  logic: 'Logic Nodes',
   content: 'Content Nodes',
+  definitions: 'Dictionary Definitions',
   media: 'Media Nodes',
+  integration: 'Integration',
   advanced: 'Advanced Nodes',
   other: 'Other'
 };
@@ -43,7 +48,7 @@ const getIcon = (iconName) => {
 };
 
 export default function MobileAddNodeSheet({ open, onClose, search, onSearchChange }) {
-  const nodesByCategory = useMemo(() => getNodeTypesByCategory(), []);
+  const { nodesByCategory } = useAvailableNodeTypes();
 
   const filteredCategories = useMemo(() => {
     const query = (search || '').trim().toLowerCase();

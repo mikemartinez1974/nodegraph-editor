@@ -2,7 +2,9 @@
 
 import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
-  Drawer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
   Box,
   Stack,
   Typography,
@@ -33,7 +35,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MarkdownRenderer from "./MarkdownRenderer";
 import edgeTypes from "../edgeTypes";
-import { getNodeTypeList } from "../nodeTypeRegistry";
+import useAvailableNodeTypes from "../hooks/useAvailableNodeTypes";
 
 const STYLE_PRESETS = [
   {
@@ -177,6 +179,7 @@ export default function PropertiesPanel({
   const pendingJsonPersistRef = useRef(false);
   const jsonDraftRef = useRef({ keys: {}, values: {} });
   const friendlyDraftRef = useRef({});
+  const { nodeTypeOptions: sharedNodeTypeOptions } = useAvailableNodeTypes();
 
   const activeSelection = selectedNode || selectedEdge || selectedGroup;
   const selectionStyle = selectedNode?.style || selectedEdge?.style || {};
@@ -453,17 +456,8 @@ export default function PropertiesPanel({
       .filter(Boolean);
   }, [selectedNode]);
 
-  const registryNodeTypeOptions = useMemo(
-    () =>
-      getNodeTypeList().map((meta) => ({
-        value: meta.type,
-        label: meta.label || meta.type
-      })),
-    []
-  );
-
   const mergedNodeTypeOptions = useMemo(() => {
-    const all = [...nodeTypeOptions, ...registryNodeTypeOptions];
+    const all = [...nodeTypeOptions, ...sharedNodeTypeOptions];
     const seen = new Set();
     return all.filter((option) => {
       if (!option || !option.value) return false;
@@ -471,7 +465,7 @@ export default function PropertiesPanel({
       seen.add(option.value);
       return true;
     });
-  }, [nodeTypeOptions, registryNodeTypeOptions]);
+  }, [nodeTypeOptions, sharedNodeTypeOptions]);
 
   const availableNodeTypeOptions =
     nodeTypeDerivedOptions.length > 0 ? nodeTypeDerivedOptions : mergedNodeTypeOptions;
@@ -2717,44 +2711,18 @@ export default function PropertiesPanel({
   );
 
   return (
-      <Drawer
-        anchor={anchorValue}
+    <Dialog
       open={open}
       onClose={onClose}
-      variant="persistent"
-      ModalProps={{ keepMounted: true }}
-      BackdropProps={{ invisible: true }}
+      fullWidth
+      maxWidth="lg"
       PaperProps={{
         sx: {
-          width: panelWidth,
-          position: "relative",
-          height: "100vh"
+          height: "88vh"
         }
       }}
     >
-      <Box
-        onPointerDown={handleResizeStart}
-        sx={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          width: 8,
-          cursor: "col-resize",
-          zIndex: 2,
-          ...(anchorValue === "right" ? { left: 0 } : { right: 0 }),
-          "&:hover": { backgroundColor: "action.hover" }
-        }}
-      />
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          bgcolor: "background.paper",
-          p: 2
-        }}
-      >
+      <DialogTitle sx={{ pb: 1 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
           <Box>
             <Typography variant="h6">{selectionLabel}</Typography>
@@ -2764,24 +2732,26 @@ export default function PropertiesPanel({
               </Typography>
             )}
           </Box>
-          <Chip size="small" label={selectionType} sx={{ textTransform: "capitalize" }} />
-          <IconButton onClick={onClose}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Chip size="small" label={selectionType} sx={{ textTransform: "capitalize" }} />
+            <IconButton onClick={onClose}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Stack>
         </Stack>
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ flex: "1 1 auto", overflowY: "auto" }}>
-          {activeView === "node" && renderNodeView()}
-          {activeView === "edge" && renderEdgeView()}
-          {activeView === "group" && renderGroupView()}
-          {!activeView && (
-            <Typography variant="body2" color="text.secondary">
-              Select a node, edge, or cluster to see its properties.
-            </Typography>
-          )}
-        </Box>
-      </Box>
-    </Drawer>
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ pt: 2 }}>
+        {activeView === "node" && renderNodeView()}
+        {activeView === "edge" && renderEdgeView()}
+        {activeView === "group" && renderGroupView()}
+        {!activeView && (
+          <Typography variant="body2" color="text.secondary">
+            Select a node, edge, or cluster to see its properties.
+          </Typography>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
