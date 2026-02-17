@@ -1864,7 +1864,7 @@ export default function DocumentPropertiesDialog({
                     }
                   }}
                   fullWidth
-                  helperText="Stored locally in this browser. Required for commit/load."
+                  helperText="Stored locally in this browser. Required for commit; optional for loading public repos."
                 />
                 <TextField
                   label="Repository (owner/name)"

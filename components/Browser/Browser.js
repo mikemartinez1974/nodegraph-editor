@@ -438,6 +438,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   // Already handled protocol?
                   if (trimmed.startsWith('tlz://')) return toFetchableUrl(trimmed);
                   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return toFetchableUrl(trimmed);
+                  if (trimmed.includes('://')) return trimmed;
                   
                   // Local paths (explicit)
                   if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return toFetchableUrl(trimmed);

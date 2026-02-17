@@ -79,6 +79,18 @@ const buildGitHubContentUrl = ({ owner, repo, path, branch, includeRef = false }
   }
   return url;
 };
+
+const buildGitHubHeaders = (token = '') => {
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  const trimmed = String(token || '').trim();
+  if (trimmed) {
+    headers.Authorization = `Bearer ${trimmed}`;
+  }
+  return headers;
+};
 const roundTo3 = (value) => Math.round(value * 1000) / 1000;
 const ensureNumber = (value, fallback) => {
   const num = Number(value);
@@ -1338,17 +1350,14 @@ useEffect(() => {
         showMessage('GitHub repo must be in the form owner/name.', 'error');
         return;
       }
-      const path = (settings.path || '').trim();
+      const path = (settings.path || '').trim().replace(/^\/+/, '');
       if (!path) {
         showMessage('GitHub file path is required.', 'error');
         return;
       }
       const branch = (settings.branch || 'main').trim();
       const { owner, repo } = repoInfo;
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github+json'
-      };
+      const headers = buildGitHubHeaders(token);
 
       try {
         showMessage('Committing graph to GitHub...', 'info');
@@ -1403,26 +1412,19 @@ useEffect(() => {
     };
 
     const handleGithubLoad = async ({ token, settings = {} } = {}) => {
-      if (!token) {
-        showMessage('GitHub PAT is required.', 'error');
-        return;
-      }
       const repoInfo = parseRepoString(settings.repo || '');
       if (!repoInfo) {
         showMessage('GitHub repo must be in the form owner/name.', 'error');
         return;
       }
-      const path = (settings.path || '').trim();
+      const path = (settings.path || '').trim().replace(/^\/+/, '');
       if (!path) {
         showMessage('GitHub file path is required.', 'error');
         return;
       }
       const branch = (settings.branch || 'main').trim();
       const { owner, repo } = repoInfo;
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github+json'
-      };
+      const headers = buildGitHubHeaders(token);
 
       try {
         showMessage('Loading graph from GitHub...', 'info');
@@ -1902,6 +1904,85 @@ useEffect(() => {
     const handleFetchUrl = async ({ url, source = 'unknown' }) => {
       try {
         if (!url) return;
+        if (typeof url === 'string' && url.startsWith('github://')) {
+          const raw = url.slice('github://'.length);
+          const [owner = '', repo = '', ...pathParts] = raw.split('/');
+          const path = pathParts.join('/').replace(/^\/+/, '');
+          if (!owner || !repo || !path) {
+            setSnackbar({
+              open: true,
+              message: 'Invalid GitHub URL. Expected github://owner/repo/path/to/file.node',
+              severity: 'error'
+            });
+            return;
+          }
+
+          const branch = (documentSettings?.github?.branch || 'main').trim();
+          const token = (() => {
+            try {
+              if (typeof window === 'undefined' || !window.localStorage) return '';
+              return window.localStorage.getItem('githubPat') || '';
+            } catch {
+              return '';
+            }
+          })();
+
+          setSnackbar({ open: true, message: 'Loading graph from GitHub URL...', severity: 'info' });
+          const headers = buildGitHubHeaders(token);
+          const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
+          const readResp = await fetch(readUrl, { headers });
+          if (!readResp.ok) {
+            const errorJson = await readResp.json().catch(() => ({}));
+            setSnackbar({
+              open: true,
+              message: `GitHub load failed: ${errorJson.message || readResp.statusText}`,
+              severity: 'error'
+            });
+            return;
+          }
+
+          const payload = await readResp.json();
+          if (!payload || payload.type !== 'file' || !payload.content) {
+            setSnackbar({
+              open: true,
+              message: 'GitHub response did not include file content.',
+              severity: 'error'
+            });
+            return;
+          }
+
+          const decoded = decodeBase64(payload.content.replace(/\n/g, ''));
+          const data = JSON.parse(decoded);
+          const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
+          const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
+          const groupsToLoad = Array.isArray(data.clusters)
+            ? data.clusters
+            : Array.isArray(data.clusters)
+            ? data.clusters
+            : [];
+          handleLoadGraph(nodesToLoad, edgesToLoad, groupsToLoad, {
+            replace: true,
+            source: 'fetchUrl:github'
+          });
+
+          try {
+            const manifestSettings = getManifestSettings(nodesToLoad);
+            const documentUrl = getManifestDocumentUrl(nodesToLoad) || data.document?.url || null;
+            eventBus.emit('loadSaveFile', {
+              settings: manifestSettings || data.settings || {},
+              viewport: data.viewport || {},
+              scripts: data.scripts || null,
+              filename: path.split('/').pop() || path,
+              documentUrl
+            });
+          } catch (err) {
+            console.warn('Failed to emit loadSaveFile after GitHub URL load:', err);
+          }
+
+          eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+          setSnackbar({ open: true, message: 'GitHub URL load successful.', severity: 'success' });
+          return;
+        }
         if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
           if (source === 'port-node') {
             setSnackbar({
