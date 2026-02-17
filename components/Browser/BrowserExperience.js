@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery, GlobalStyles } from '@mui/material';
 import Browser from './Browser';
 import themeMap from './themes';
 import GraphEditor from '@/components/GraphEditor/GraphEditor';
@@ -10,6 +10,33 @@ import eventBus from '@/components/NodeGraph/eventBus';
 const FALLBACK_DOC_URL = '/root.node';
 
 export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FALLBACK_DOC_URL }) {
+  const safeStorageGet = (key) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  };
+
+  const safeStorageSet = (key, value) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.setItem(key, value);
+    } catch {
+      // ignore storage write failures
+    }
+  };
+
+  const safeStorageRemove = (key) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.removeItem(key);
+    } catch {
+      // ignore storage remove failures
+    }
+  };
+
   const getSystemTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
@@ -35,19 +62,15 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
       const mapped = themeMap[themeConfigOrName] || themeMap.default;
       setMuiTheme(mapped);
       setThemeName(themeConfigOrName);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('themeName', themeConfigOrName);
-        localStorage.removeItem('browserThemeObject');
-      }
+      safeStorageSet('themeName', themeConfigOrName);
+      safeStorageRemove('browserThemeObject');
     } else {
       try {
         const customTheme = createTheme({ palette: themeConfigOrName });
         setMuiTheme(customTheme);
         setThemeName('custom');
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('browserThemeObject', JSON.stringify(themeConfigOrName));
-          localStorage.setItem('themeName', 'custom');
-        }
+        safeStorageSet('browserThemeObject', JSON.stringify(themeConfigOrName));
+        safeStorageSet('themeName', 'custom');
       } catch (err) {
         console.warn('Invalid theme config', err);
       }
@@ -64,8 +87,8 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
         return;
       }
 
-      const storedThemeObj = localStorage.getItem('browserThemeObject');
-      const storedThemeName = localStorage.getItem('themeName');
+      const storedThemeObj = safeStorageGet('browserThemeObject');
+      const storedThemeName = safeStorageGet('themeName');
 
       if (storedThemeObj) {
         try {
@@ -87,7 +110,6 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
         setThemeName(systemTheme);
         setMuiTheme(themeMap[systemTheme] || themeMap.default);
       }
-
       setThemeReady(true);
     }
   }, [isEmbedded]);
@@ -161,6 +183,16 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
 
   return (
     <ThemeProvider theme={muiTheme}>
+      <GlobalStyles
+        styles={(theme) => ({
+          '.MuiDrawer-paper': {
+            backgroundColor: theme.palette.background.paper
+          },
+          '.MuiDialog-paper': {
+            backgroundColor: theme.palette.background.paper
+          }
+        })}
+      />
       <div style={{ userSelect: "none", cursor: "default" }}>
         {!isEmbedded && (
           <Browser

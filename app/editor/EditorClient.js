@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery, GlobalStyles } from '@mui/material';
 import themeMap from '@/components/Browser/themes';
 import GraphEditor from '@/components/GraphEditor/GraphEditor';
 import eventBus from '../../components/NodeGraph/eventBus';
@@ -142,6 +142,16 @@ export default function EditorClient() {
 
   return (
     <ThemeProvider theme={muiTheme}>
+      <GlobalStyles
+        styles={(theme) => ({
+          '.MuiDrawer-paper': {
+            backgroundColor: theme.palette.background.paper
+          },
+          '.MuiDialog-paper': {
+            backgroundColor: theme.palette.background.paper
+          }
+        })}
+      />
       <div style={{ userSelect: "none", cursor: "default" }}>
         <GraphEditor
           isMobile={isMobile}

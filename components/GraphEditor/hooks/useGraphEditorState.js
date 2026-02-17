@@ -125,6 +125,22 @@ const isLayoutOnlyChange = (currentNodes = [], nextNodes = []) => {
 };
 
 const GRAPH_STORAGE_KEY = 'Twilite_local_graph';
+const safeStorageGet = (key) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+const safeStorageSet = (key, value) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    window.localStorage.setItem(key, value);
+  } catch {
+    // ignore storage write failures
+  }
+};
 
 const loadStoredGraph = () => {
   if (typeof window === 'undefined' || !window.localStorage) return null;
@@ -138,7 +154,7 @@ const loadStoredGraph = () => {
   }
   if (!allowRestore) return null;
   try {
-    const raw = window.localStorage.getItem(GRAPH_STORAGE_KEY);
+    const raw = safeStorageGet(GRAPH_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === 'object') {
@@ -205,17 +221,11 @@ export function useGraphEditorState() {
   
   // Color preferences
   const [defaultNodeColor, setDefaultNodeColor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('nodegraph_default_color') || '#1976d2';
-    }
-    return '#1976d2';
+    return safeStorageGet('nodegraph_default_color') || '#1976d2';
   });
   
   const [defaultEdgeColor, setDefaultEdgeColor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('nodegraph_default_edge_color') || '#666666';
-    }
-    return '#666666';
+    return safeStorageGet('nodegraph_default_edge_color') || '#666666';
   });
   
   // Refs for current state access
@@ -240,16 +250,12 @@ export function useGraphEditorState() {
 
   // Save color preferences
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('nodegraph_default_color', defaultNodeColor);
-    }
+    safeStorageSet('nodegraph_default_color', defaultNodeColor);
     eventBus.emit('defaultNodeColorChanged', { color: defaultNodeColor });
   }, [defaultNodeColor]);
   
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('nodegraph_default_edge_color', defaultEdgeColor);
-    }
+    safeStorageSet('nodegraph_default_edge_color', defaultEdgeColor);
     eventBus.emit('defaultEdgeColorChanged', { color: defaultEdgeColor });
   }, [defaultEdgeColor]);
   

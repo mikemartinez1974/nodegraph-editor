@@ -611,7 +611,14 @@ useEffect(() => {
   }, []);
 
   // Determine if user is free (replace with real logic)
-  const isFreeUser = localStorage.getItem('isFreeUser') === 'true';
+  const isFreeUser = (() => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return false;
+      return window.localStorage.getItem('isFreeUser') === 'true';
+    } catch {
+      return false;
+    }
+  })();
 
   // Initialize address bar to local file on mount
   useEffect(() => {

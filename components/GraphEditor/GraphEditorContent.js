@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { Snackbar, Alert, Backdrop, CircularProgress, Menu, MenuItem, Drawer, Box, IconButton, Typography } from '@mui/material';
+import { Snackbar, Alert, Backdrop, CircularProgress, Menu, MenuItem, Drawer, Box, IconButton, Typography, Button } from '@mui/material';
 import GraphRendererAdapter from './renderers/GraphRendererAdapter';
 import Toolbar from './components/Toolbar';
 import MobileFabToolbar from './components/MobileFabToolbar';
@@ -66,6 +66,7 @@ const GraphEditorContent = () => {
     ? (window.__Twilite_HOST__ || new URLSearchParams(window.location.search).get('host') || 'browser')
     : 'browser';
   const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
+  const [systemNodesPanelWidth, setSystemNodesPanelWidth] = useState(760);
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
   const [nodeEditorPanel, setNodeEditorPanel] = useState({ open: false, nodeId: null });
   const [nodeEditorDirty, setNodeEditorDirty] = useState({ nodeId: null, dirty: false });
@@ -1978,6 +1979,33 @@ const skipPropertiesCloseRef = useRef(false);
 
       {isMobile && <MobileFabToolbar />}
 
+      {!isMobile && (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={toggleSystemNodesPanel}
+          sx={{
+            position: 'fixed',
+            left: showSystemNodesPanel ? Math.max(0, systemNodesPanelWidth - 1) : 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed',
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderTopRightRadius: 10,
+            borderBottomRightRadius: 10,
+            minWidth: 0,
+            px: 0.8,
+            py: 1.2
+          }}
+          aria-label={showSystemNodesPanel ? "Close System Nodes" : "Open System Nodes"}
+        >
+          Legend
+        </Button>
+      )}
+
       <MobileAddNodeSheet
         open={Boolean(isMobile && mobileAddNodeOpen)}
         onClose={handleCloseMobileAddNode}
@@ -2050,9 +2078,11 @@ const skipPropertiesCloseRef = useRef(false);
 
       <SystemNodesPanel
         open={showSystemNodesPanel}
-        anchor={oppositeAnchor}
+        anchor="left"
         nodes={nodes}
         validationReport={invariantReport}
+        width={systemNodesPanelWidth}
+        onWidthChange={setSystemNodesPanelWidth}
         onUpdateNode={handleUpdateNodeFromPanels}
         onClose={() => setShowSystemNodesPanel?.(false)}
       />
