@@ -3,22 +3,24 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-10T15:54:38.981Z",
-    "modified": "2026-02-10T15:54:41.769Z",
+    "created": "2026-02-18T02:06:44.184Z",
+    "modified": "2026-02-18T02:06:45.409Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
       "id": "c57eea12-477f-458d-9981-09a6e6e69584",
-      "label": "Manifest",
       "type": "manifest",
+      "label": "Manifest",
       "position": {
         "x": -260,
         "y": -160
       },
       "width": 360,
       "height": 220,
+      "visible": true,
+      "showLabel": true,
       "data": {
         "identity": {
           "graphId": "e5693eb9-826b-46e8-8705-22e6f4b41457",
@@ -79,7 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": null,
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -1816,1161 +1836,1163 @@
       "type": "straight",
       "source": "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
       "target": "b2e3d002-1c3e-4f7d-8a61-12b2c3d4e222",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines invariants for",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e222bbbb-2b2b-4b2b-9b2b-222222222222",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "operates on",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e333cccc-3c3c-4c3c-9c3c-333333333333",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "formalizes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e444dddd-4d4d-4d4d-9d4d-444444444444",
       "type": "straight",
       "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
       "target": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "informs skills",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e555eeee-5e5e-4e5e-9e5e-555555555555",
       "type": "straight",
       "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
       "target": "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "enforced by",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mfest-id",
       "type": "straight",
       "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
       "target": "mfest-identity-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mfest-intent",
       "type": "straight",
       "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
       "target": "mfest-intent-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mfest-deps",
       "type": "straight",
       "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
       "target": "mfest-deps-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mfest-auth",
       "type": "straight",
       "source": "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
       "target": "mfest-authority-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "establishes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-role-manifest",
       "type": "straight",
       "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
       "target": "role-manifest-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-role-definitions",
       "type": "straight",
       "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
       "target": "role-definitions-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-role-content",
       "type": "straight",
       "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
       "target": "role-content-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-role-structure",
       "type": "straight",
       "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
       "target": "role-structure-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-role-style",
       "type": "straight",
       "source": "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
       "target": "role-style-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-style-roles",
       "type": "straight",
       "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
       "target": "style-roles-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-style-emphasis",
       "type": "straight",
       "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
       "target": "style-emphasis-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-style-state",
       "type": "straight",
       "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
       "target": "style-state-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-style-grouping",
       "type": "straight",
       "source": "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
       "target": "style-grouping-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "declares",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-boundary-meaning",
       "type": "straight",
       "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
       "target": "boundary-meaning-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "clarifies",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-boundary-portability",
       "type": "straight",
       "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
       "target": "boundary-portability-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "tests",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-boundary-ui",
       "type": "straight",
       "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
       "target": "boundary-ui-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "excludes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-boundary-diff",
       "type": "straight",
       "source": "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
       "target": "boundary-diffs-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "protects",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-skill-structural",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "skill-structural-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-skill-layout",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "skill-layout-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-skill-validation",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "skill-validation-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-skill-transform",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "skill-transform-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-skill-automation",
       "type": "straight",
       "source": "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
       "target": "skill-automation-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-1",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-create-nodes-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-2",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-create-edges-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-3",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-grouping-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-4",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-reparent-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-5",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-duplicate-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-struct-6",
       "type": "straight",
       "source": "skill-structural-0001",
       "target": "struct-extract-0006",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-layout-1",
       "type": "straight",
       "source": "skill-layout-0002",
       "target": "layout-auto-elk-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-layout-2",
       "type": "straight",
       "source": "skill-layout-0002",
       "target": "layout-reroute-edges-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-layout-3",
       "type": "straight",
       "source": "skill-layout-0002",
       "target": "layout-avoid-collisions-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-layout-4",
       "type": "straight",
       "source": "skill-layout-0002",
       "target": "layout-align-distribute-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-layout-5",
       "type": "straight",
       "source": "skill-layout-0002",
       "target": "layout-normalize-spacing-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-validate-1",
       "type": "straight",
       "source": "skill-validation-0003",
       "target": "validate-schema-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-validate-2",
       "type": "straight",
       "source": "skill-validation-0003",
       "target": "validate-ports-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-validate-3",
       "type": "straight",
       "source": "skill-validation-0003",
       "target": "validate-dependencies-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-validate-4",
       "type": "straight",
       "source": "skill-validation-0003",
       "target": "validate-orphans-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-validate-5",
       "type": "straight",
       "source": "skill-validation-0003",
       "target": "validate-unsafe-mutation-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-transform-1",
       "type": "straight",
       "source": "skill-transform-0004",
       "target": "transform-refactor-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-transform-2",
       "type": "straight",
       "source": "skill-transform-0004",
       "target": "transform-normalize-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-transform-3",
       "type": "straight",
       "source": "skill-transform-0004",
       "target": "transform-type-migration-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-transform-4",
       "type": "straight",
       "source": "skill-transform-0004",
       "target": "transform-schema-upgrade-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-transform-5",
       "type": "straight",
       "source": "skill-transform-0004",
       "target": "transform-inline-extract-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-1",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-script-exec-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-2",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-batch-mutation-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-3",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-procedural-gen-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-4",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-simulation-step-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-5",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-compile-artifact-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-auto-6",
       "type": "straight",
       "source": "skill-automation-0005",
       "target": "auto-import-export-0006",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-1",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-node-schemas-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-2",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-port-contracts-0002",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-3",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-schema-versioning-0003",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-4",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-skill-contracts-0004",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-5",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-manifest-contract-0005",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-contracts-6",
       "type": "straight",
       "source": "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555",
       "target": "doc-validation-rules-0006",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-node-schemas",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-node-schemas-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-ports",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-port-contracts-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-manifest",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-manifest-contract-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-skills",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-skill-contracts-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-versioning",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-versioning-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-validation",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-validation-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-protocols",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-protocols-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-boundary",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-boundary-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-req-root-to-onboarding",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "req-onboarding-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-manifest",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-manifest-required-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-content",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-content-required-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-structure",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-structure-optional-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "includes",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-style",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-style-recommended-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "recommends",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-definitions",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-definitions-conditional-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "may require",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-example-min",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-example-minimal-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "example",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-example-rec",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-example-recommended-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "example",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-mvg-to-checklist",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "mvg-checklist-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "validation",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-manifest-to-example-min",
       "type": "straight",
       "source": "mvg-manifest-required-0001",
       "target": "mvg-example-minimal-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "shown in",
       "style": {
         "width": 2,
@@ -2980,15 +3002,15 @@
         ],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-content-to-example-min",
       "type": "straight",
       "source": "mvg-content-required-0001",
       "target": "mvg-example-minimal-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "shown in",
       "style": {
         "width": 2,
@@ -2998,15 +3020,15 @@
         ],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "edge-style-to-example-rec",
       "type": "straight",
       "source": "mvg-style-recommended-0001",
       "target": "mvg-example-recommended-0001",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "shown in",
       "style": {
         "width": 2,
@@ -3016,202 +3038,38 @@
         ],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "e9f8a7b6-c5d4-4e3f-2a1b-0c9d8e7f6a5b",
       "type": "straight",
       "source": "mvg-root-0001",
       "target": "d0e1f2a3-b4c5-4d6e-9f7a-8b9c0d1e2f3a",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "assessed by",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     },
     {
       "id": "f0a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c",
       "type": "straight",
       "source": "req-docs-root-0001",
       "target": "d0e1f2a3-b4c5-4d6e-9f7a-8b9c0d1e2f3a",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "assessed by",
       "style": {
         "width": 2,
         "dash": [],
         "curved": true
       },
-      "data": {},
-      "sourcePort": "root",
-      "targetPort": "root"
+      "data": {}
     }
   ],
-  "clusters": [
-    {
-      "id": "g-task1-aaaa-bbbb-cccc-111111111111",
-      "label": "Task 1: Capabilities & Documentation",
-      "nodeIds": [
-        "a1f2c001-6c7e-4f3b-9b1b-01a8a9e2c111",
-        "a1f2c002-9c8d-4a7e-9c42-02b9d1a2c222",
-        "a1f2c003-1f3d-4b9e-8a51-03c4a3b2c333",
-        "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
-        "a1f2c005-7d9e-4a5f-9e22-05e6f7a2c555"
-      ],
-      "bounds": {
-        "x": -1285.388299524431,
-        "y": -1529.801082210012,
-        "width": 993.2505197995848,
-        "height": 5763.824638828263
-      },
-      "visible": true,
-      "style": {}
-    },
-    {
-      "id": "g-task2-dddd-eeee-ffff-222222222222",
-      "label": "Task 2: Graph as Web Artifact",
-      "nodeIds": [
-        "b2e3d001-8a9c-4d1e-9f55-11a1b2c3d111",
-        "b2e3d002-1c3e-4f7d-8a61-12b2c3d4e222",
-        "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
-        "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
-        "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
-        "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666"
-      ],
-      "bounds": {
-        "x": -1321.9550641643511,
-        "y": -1524.5615896616423,
-        "width": 513.415452093385,
-        "height": 2770.5524533986736
-      },
-      "visible": true,
-      "style": {}
-    },
-    {
-      "id": "group-7dcb1de8-fe92-458d-9329-375f0ae57295",
-      "label": "Cluster 3",
-      "nodeIds": [
-        "b2e3d005-2f4b-4a8e-9d94-15e5f6a7b555",
-        "role-manifest-0001",
-        "role-definitions-0002",
-        "role-content-0003",
-        "role-structure-0004",
-        "role-style-0005"
-      ],
-      "bounds": {
-        "x": -1292.1651112573434,
-        "y": -792.2955071658416,
-        "width": 2959.675570545406,
-        "height": 459.2631642811466
-      },
-      "visible": true,
-      "style": {
-        "backgroundColor": "rgba(25, 118, 210, 0.1)",
-        "borderColor": "#1976d2",
-        "borderWidth": 2,
-        "borderRadius": 8
-      }
-    },
-    {
-      "id": "group-303ad95e-bd6c-4036-88a0-0e96bebba788",
-      "label": "Cluster 4",
-      "nodeIds": [
-        "b2e3d003-5e7a-4c2d-9b72-13c3d4e5f333",
-        "mfest-identity-0001",
-        "mfest-intent-0002",
-        "mfest-deps-0003",
-        "mfest-authority-0004"
-      ],
-      "bounds": {
-        "x": -1301.732253504033,
-        "y": -252.5485913779632,
-        "width": 2456.564386582475,
-        "height": 497.01058076501556
-      },
-      "visible": true,
-      "style": {
-        "backgroundColor": "rgba(25, 118, 210, 0.1)",
-        "borderColor": "#1976d2",
-        "borderWidth": 2,
-        "borderRadius": 8
-      }
-    },
-    {
-      "id": "group-bb8ec51b-9b17-4a4b-8fa7-e762d7ba5381",
-      "label": "Cluster 5",
-      "nodeIds": [
-        "b2e3d004-9d1f-4e3b-8c83-14d4e5f6a444",
-        "style-roles-0001",
-        "style-emphasis-0002",
-        "style-state-0003",
-        "style-grouping-0004"
-      ],
-      "bounds": {
-        "x": -1311.6901623301835,
-        "y": 363.22901539172443,
-        "width": 2465.689563823188,
-        "height": 499.91510855568396
-      },
-      "visible": true,
-      "style": {
-        "backgroundColor": "rgba(25, 118, 210, 0.1)",
-        "borderColor": "#1976d2",
-        "borderWidth": 2,
-        "borderRadius": 8
-      }
-    },
-    {
-      "id": "group-841b0cbb-b8d2-4ac8-a628-75e039063067",
-      "label": "Cluster 6",
-      "nodeIds": [
-        "b2e3d006-6a8d-4c1f-8e05-16f6a7b8c666",
-        "boundary-meaning-0001",
-        "boundary-portability-0002",
-        "boundary-ui-0003",
-        "boundary-diffs-0004"
-      ],
-      "bounds": {
-        "x": -1321.9550641643511,
-        "y": 1005.9908637370311,
-        "width": 2449.6980211800555,
-        "height": 556.868708668002
-      },
-      "visible": true,
-      "style": {
-        "backgroundColor": "rgba(25, 118, 210, 0.1)",
-        "borderColor": "#1976d2",
-        "borderWidth": 2,
-        "borderRadius": 8
-      }
-    },
-    {
-      "id": "group-3cc1e704-ebc6-4dc4-ba3b-c95450007585",
-      "label": "Cluster 7",
-      "nodeIds": [
-        "a1f2c004-3b7e-4e1f-8b33-04d5e4f2c444",
-        "skill-structural-0001",
-        "skill-layout-0002",
-        "skill-validation-0003",
-        "skill-transform-0004",
-        "skill-automation-0005"
-      ],
-      "bounds": {
-        "x": -791.4219533571531,
-        "y": 1705.208604121633,
-        "width": 2468.95292969232,
-        "height": 572.6067495563125
-      },
-      "visible": true,
-      "style": {
-        "backgroundColor": "rgba(25, 118, 210, 0.1)",
-        "borderColor": "#1976d2",
-        "borderWidth": 2,
-        "borderRadius": 8
-      }
-    }
-  ]
+  "clusters": []
 }

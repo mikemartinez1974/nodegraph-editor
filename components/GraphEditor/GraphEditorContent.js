@@ -756,34 +756,110 @@ const GraphEditorContent = () => {
     return Boolean(allowUpdate) && !appendOnly;
   }, [manifestNode]);
 
-  const validateEditorFields = useCallback((viewNodes = [], ref = '') => {
+  const validateViewSchema = useCallback((viewNodes = [], ref = '') => {
     const warnings = [];
     const allowedTypes = new Set(['text', 'markdown', 'number', 'boolean']);
+    const allowedControlTypes = new Set(['button', 'toggle']);
+    const allowedControlActions = new Set(['openEditor', 'navigate', 'emit', 'toggle', 'setData']);
+    const allowedControlVariants = new Set(['outlined', 'contained', 'text', 'soft']);
+    const allowedControlPriorityWords = new Set(['highest', 'high', 'normal', 'medium', 'low', 'lowest']);
     viewNodes.forEach((viewNode) => {
       const viewData = viewNode?.data?.view || {};
       const payload = viewData.payload || '';
       const isEditor = viewData.intent === 'editor' || payload === 'editor.web';
-      if (!isEditor) return;
-      const editorWeb = viewNode?.data?.editor?.web || {};
-      if (!('fields' in editorWeb)) return;
-      if (!Array.isArray(editorWeb.fields)) {
-        warnings.push(`Editor view fields must be an array (${ref || 'view'})`);
+      if (isEditor) {
+        const editorWeb = viewNode?.data?.editor?.web || {};
+        if ('fields' in editorWeb) {
+          if (!Array.isArray(editorWeb.fields)) {
+            warnings.push(`Editor view fields must be an array (${ref || 'view'})`);
+            return;
+          }
+          editorWeb.fields.forEach((field, index) => {
+            if (!field || typeof field !== 'object') {
+              warnings.push(`Editor field #${index + 1} must be an object (${ref || 'view'})`);
+              return;
+            }
+            const key = field.key || field.path;
+            if (typeof key !== 'string' || !key.trim()) {
+              warnings.push(`Editor field #${index + 1} missing key/path (${ref || 'view'})`);
+            }
+            if (field.type && (!allowedTypes.has(field.type))) {
+              warnings.push(`Editor field "${key || index + 1}" has invalid type "${field.type}" (${ref || 'view'})`);
+            }
+            if (field.rows !== undefined && !(typeof field.rows === 'number' && Number.isFinite(field.rows))) {
+              warnings.push(`Editor field "${key || index + 1}" rows must be a number (${ref || 'view'})`);
+            }
+          });
+        }
+      }
+
+      const nodeWeb = viewNode?.data?.node?.web || {};
+      const rawControls = viewData?.controls !== undefined ? viewData.controls : nodeWeb.controls;
+      if (rawControls === undefined) return;
+      if (!Array.isArray(rawControls)) {
+        warnings.push(`Node view controls must be an array (${ref || 'view'})`);
         return;
       }
-      editorWeb.fields.forEach((field, index) => {
-        if (!field || typeof field !== 'object') {
-          warnings.push(`Editor field #${index + 1} must be an object (${ref || 'view'})`);
+      rawControls.forEach((control, index) => {
+        if (!control || typeof control !== 'object') {
+          warnings.push(`Control #${index + 1} must be an object (${ref || 'view'})`);
           return;
         }
-        const key = field.key || field.path;
-        if (typeof key !== 'string' || !key.trim()) {
-          warnings.push(`Editor field #${index + 1} missing key/path (${ref || 'view'})`);
+        const controlId = typeof control.id === 'string' && control.id.trim()
+          ? control.id.trim()
+          : `#${index + 1}`;
+        const controlType = String(control.type || 'button');
+        const action = String(control.action || (controlType === 'toggle' ? 'toggle' : '')).trim();
+        if (control.type && !allowedControlTypes.has(controlType)) {
+          warnings.push(`Control "${controlId}" has unsupported type "${control.type}" (${ref || 'view'})`);
         }
-        if (field.type && (!allowedTypes.has(field.type))) {
-          warnings.push(`Editor field "${key || index + 1}" has invalid type "${field.type}" (${ref || 'view'})`);
+        if (action && !allowedControlActions.has(action)) {
+          warnings.push(`Control "${controlId}" has unsupported action "${action}" (${ref || 'view'})`);
         }
-        if (field.rows !== undefined && !(typeof field.rows === 'number' && Number.isFinite(field.rows))) {
-          warnings.push(`Editor field "${key || index + 1}" rows must be a number (${ref || 'view'})`);
+        if (control.icon !== undefined && (typeof control.icon !== 'string' || !control.icon.trim())) {
+          warnings.push(`Control "${controlId}" icon must be a non-empty string (${ref || 'view'})`);
+        }
+        if (control.variant !== undefined) {
+          const variant = String(control.variant).trim().toLowerCase();
+          if (!allowedControlVariants.has(variant)) {
+            warnings.push(`Control "${controlId}" has unsupported variant "${control.variant}" (${ref || 'view'})`);
+          }
+        }
+        if (control.priority !== undefined) {
+          const priorityType = typeof control.priority;
+          if (priorityType === 'number') {
+            if (!Number.isFinite(control.priority)) {
+              warnings.push(`Control "${controlId}" priority must be finite (${ref || 'view'})`);
+            }
+          } else if (priorityType === 'string') {
+            const normalized = control.priority.trim().toLowerCase();
+            const numeric = Number(normalized);
+            if (!allowedControlPriorityWords.has(normalized) && !Number.isFinite(numeric)) {
+              warnings.push(`Control "${controlId}" priority must be numeric or one of high/normal/low (${ref || 'view'})`);
+            }
+          } else {
+            warnings.push(`Control "${controlId}" priority must be number or string (${ref || 'view'})`);
+          }
+        }
+        if (action === 'navigate') {
+          const hasTarget = Boolean(control.href || control.url || control.hrefPath || control.bind || control.path);
+          if (!hasTarget) {
+            warnings.push(`Control "${controlId}" navigate action needs href/url/hrefPath/bind (${ref || 'view'})`);
+          }
+        }
+        if (action === 'emit') {
+          if (typeof control.event !== 'string' || !control.event.trim()) {
+            warnings.push(`Control "${controlId}" emit action needs event (${ref || 'view'})`);
+          }
+        }
+        if (action === 'toggle' || action === 'setData') {
+          const hasBind = Boolean(control.bind || control.path);
+          if (!hasBind) {
+            warnings.push(`Control "${controlId}" ${action} action needs bind/path (${ref || 'view'})`);
+          }
+        }
+        if (action === 'setData' && !('value' in control)) {
+          warnings.push(`Control "${controlId}" setData action needs value (${ref || 'view'})`);
         }
       });
     });
@@ -817,17 +893,17 @@ const GraphEditorContent = () => {
         if (!viewNodes.length) {
           throw new Error('No view node found');
         }
-        const editorWarnings = validateEditorFields(viewNodes, ref);
+        const schemaWarnings = validateViewSchema(viewNodes, ref);
         setViewDefinitions((prev) => ({
           ...prev,
           [ref]: { status: 'ready', viewNodes }
         }));
-        if (editorWarnings.length > 0) {
+        if (schemaWarnings.length > 0) {
           try {
             setSnackbar((prev) => ({
               ...prev,
               open: true,
-              message: `Editor schema: ${editorWarnings[0]}${editorWarnings.length > 1 ? ` (+${editorWarnings.length - 1} more)` : ''}`,
+              message: `View schema: ${schemaWarnings[0]}${schemaWarnings.length > 1 ? ` (+${schemaWarnings.length - 1} more)` : ''}`,
               severity: 'warning'
             }));
           } catch (err) {
@@ -841,7 +917,7 @@ const GraphEditorContent = () => {
           [ref]: { status: 'error', error: err?.message || 'Failed to load view' }
         }));
       });
-  }, [readFileViaHost, resolvePublicPath, validateEditorFields]);
+  }, [readFileViaHost, resolvePublicPath, validateViewSchema]);
 
   useEffect(() => {
     if (!Array.isArray(nodes)) return;

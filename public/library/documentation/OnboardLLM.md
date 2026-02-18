@@ -147,6 +147,23 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
 - A definition graph **may contain only View nodes** and still be valid.
 - The **dictionary** assigns the node type name to that definition.
 
+### Dynamic Node Controls
+- Dynamic node views may declare top-right controls in:
+  - `viewNode.data.view.controls` (preferred override)
+  - or `viewNode.data.node.web.controls` (default)
+- Controls are declarative JSON, not executable code.
+- Supported control actions:
+  - `openEditor`
+  - `navigate`
+  - `emit`
+  - `toggle`
+  - `setData`
+- Presentation fields:
+  - `icon` (string)
+  - `variant` (`outlined`, `contained`, `text`, `soft`)
+  - `priority` (number or `high/normal/low` words)
+- If controls are not declared, dynamic nodes fall back to legacy Edit-button behavior when editor access is allowed.
+
 ---
 
 ## 8) Edges

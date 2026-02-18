@@ -105,10 +105,24 @@ const MarkdownNode = (props) => {
   // Render FixedNode with markdown content and resize handle
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
+      <div
+        title="Drag node"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 18,
+          zIndex: 3,
+          cursor: 'grab',
+          pointerEvents: 'auto',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0))'
+        }}
+      />
       {/* Markdown content */}
       <div className="markdown-content" data-allow-touch-scroll="true" style={{
         position: 'absolute',
-        top: '8px',
+        top: '18px',
         left: '8px',
         right: '8px',
         bottom: '24px',

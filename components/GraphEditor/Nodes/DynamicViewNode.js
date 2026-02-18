@@ -1,10 +1,20 @@
 "use client";
 import React, { useMemo, useRef, useState, useEffect } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import EditIcon from '@mui/icons-material/Edit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import LinkIcon from '@mui/icons-material/Link';
+import LaunchIcon from '@mui/icons-material/Launch';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import BoltIcon from '@mui/icons-material/Bolt';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import NavigationIcon from '@mui/icons-material/Navigation';
 import FixedNode from './FixedNode';
 import useNodePortSchema from '../hooks/useNodePortSchema';
 import eventBus from '../../NodeGraph/eventBus';
@@ -123,6 +133,80 @@ const RESIZE_HANDLES = [
   { key: 'sw', cursor: 'nesw-resize', x: HANDLE_OFFSET, y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)` },
   { key: 'w', cursor: 'ew-resize', x: HANDLE_OFFSET, y: '50%', transform: 'translate(0, -50%)' }
 ];
+const CONTROL_ICONS = {
+  edit: EditIcon,
+  openinnew: OpenInNewIcon,
+  open: OpenInNewIcon,
+  link: LinkIcon,
+  launch: LaunchIcon,
+  play: PlayArrowIcon,
+  run: PlayArrowIcon,
+  bolt: BoltIcon,
+  pin: PushPinIcon,
+  settings: SettingsIcon,
+  chevronright: ChevronRightIcon,
+  navigate: NavigationIcon
+};
+const CONTROL_VARIANTS = new Set(['outlined', 'contained', 'text', 'soft']);
+const CONTROL_PRIORITY_WORDS = {
+  highest: 0,
+  high: 25,
+  normal: 100,
+  medium: 100,
+  low: 175,
+  lowest: 250
+};
+
+const normalizeIconKey = (value) => String(value || '').trim().toLowerCase().replace(/[\s_-]/g, '');
+const resolveControlIcon = (icon) => CONTROL_ICONS[normalizeIconKey(icon)] || null;
+const normalizeControlVariant = (value) => {
+  const normalized = String(value || '').trim().toLowerCase();
+  return CONTROL_VARIANTS.has(normalized) ? normalized : 'outlined';
+};
+const normalizeControlPriority = (value, fallbackOrder = 100) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim().toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(CONTROL_PRIORITY_WORDS, trimmed)) {
+      return CONTROL_PRIORITY_WORDS[trimmed];
+    }
+    const parsed = Number(trimmed);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return fallbackOrder;
+};
+const buildTransparentHtmlDoc = (html) => {
+  const body = typeof html === 'string' ? html : '';
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent !important;
+        overflow: hidden;
+      }
+      #twilite-html-root {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background: transparent !important;
+      }
+      #twilite-html-root > *:first-child {
+        width: 100%;
+        min-height: 100%;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body><div id="twilite-html-root">${body}</div></body>
+</html>`;
+};
 
 const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, showEditButton = false, editLocked = false, ...props }) => {
   const theme = useTheme();
@@ -141,8 +225,8 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   const rafRef = useRef(null);
   const pendingSizeRef = useRef(null);
   const pendingPosRef = useRef(null);
-  const MIN_WIDTH = 220;
-  const MIN_HEIGHT = 160;
+  const MIN_WIDTH = Math.max(1, Number(node?.data?.minWidth) || 1);
+  const MIN_HEIGHT = Math.max(1, Number(node?.data?.minHeight) || 1);
   const viewIntent = viewEntry?.intent || viewDefinition?.viewNode?.data?.view?.intent || '';
   const viewPayloadKey = viewDefinition?.viewNode?.data?.view?.payload || viewEntry?.payload || viewEntry?.view || '';
   const isEditorView = viewPayloadKey === 'editor.web' || viewIntent === 'editor';
@@ -152,6 +236,14 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   const effectivePayloadKey = useEditorUI ? viewPayloadKey : (isEditorView ? 'node.web' : viewPayloadKey);
   const viewWantsEditButton = viewDefinition?.viewNode?.data?.view?.showEditButton
     ?? viewDefinition?.viewNode?.data?.node?.web?.showEditButton;
+  const nodeWebConfig = viewDefinition?.viewNode?.data?.node?.web || {};
+  const rawControls = useMemo(() => {
+    const viewControls = viewDefinition?.viewNode?.data?.view?.controls;
+    if (Array.isArray(viewControls)) return viewControls;
+    if (Array.isArray(nodeWebConfig?.controls)) return nodeWebConfig.controls;
+    return [];
+  }, [viewDefinition?.viewNode?.data?.view?.controls, nodeWebConfig?.controls]);
+  const hasDeclaredControls = rawControls.length > 0;
   const editorConfig = viewDefinition?.viewNode?.data?.editor?.web || null;
   const editorFields = Array.isArray(editorConfig?.fields) ? editorConfig.fields : [];
   const editorOverrides = node?.data?.editorOverrides || {};
@@ -439,6 +531,14 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
     return rawPayload;
   }, [rawPayload, node]);
   const contentType = useMemo(() => detectContentType(payload), [payload]);
+  const isHtmlCanvasMode = contentType === 'html' && !renderInPanel;
+  const isMarkdownCanvasMode = contentType === 'markdown' && !renderInPanel;
+  const htmlChromePreference =
+    viewDefinition?.viewNode?.data?.view?.html?.chrome ??
+    viewDefinition?.viewNode?.data?.node?.web?.html?.chrome ??
+    node?.data?.htmlChrome ??
+    node?.data?.chrome;
+  const showHtmlChrome = htmlChromePreference !== false;
 
   const sanitizeSchema = useMemo(() => ({
     ...defaultSchema,
@@ -494,6 +594,195 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
     }
     emitDirtyState(node.id, false);
     return { success: true };
+  };
+
+  const controls = useMemo(() => {
+    const normalized = rawControls
+      .map((control, index) => {
+        if (!control || typeof control !== 'object') return null;
+        const id = String(control.id || `control-${index + 1}`);
+        const type = String(control.type || 'button');
+        const inferredAction = type === 'toggle' ? 'toggle' : undefined;
+        const action = String(control.action || inferredAction || '').trim();
+        const variant = normalizeControlVariant(control.variant);
+        const priority = normalizeControlPriority(control.priority, 100 + index);
+        return {
+          ...control,
+          id,
+          type,
+          action,
+          variant,
+          priority,
+          _index: index
+        };
+      })
+      .filter(Boolean);
+
+    const hasOpenEditorControl = normalized.some((control) => control.action === 'openEditor');
+    if (showEditButton && viewWantsEditButton !== false && !hasOpenEditorControl) {
+      normalized.unshift({
+        id: 'edit',
+        type: 'button',
+        label: 'Edit',
+        action: 'openEditor',
+        variant: 'outlined',
+        priority: 0,
+        icon: 'edit',
+        _index: -1
+      });
+    }
+    return normalized
+      .sort((a, b) => {
+        if (a.priority !== b.priority) return a.priority - b.priority;
+        return a._index - b._index;
+      })
+      .map(({ _index, ...rest }) => rest);
+  }, [rawControls, showEditButton, viewWantsEditButton]);
+
+  const executeControl = (control, event) => {
+    if (!control) return;
+    if (event?.stopPropagation) event.stopPropagation();
+    if (!node?.id) return;
+
+    const action = control.action || (control.type === 'toggle' ? 'toggle' : '');
+    const bindPath = control.bind || control.path || '';
+    const isMutatingAction = action === 'toggle' || action === 'setData';
+    if (isMutatingAction && editLocked) return;
+
+    if (action === 'openEditor') {
+      eventBus.emit('toggleNodeEditorPanel', { nodeId: node.id });
+      return;
+    }
+
+    if (action === 'navigate') {
+      const rawUrl = control.href || control.url
+        || (bindPath ? getByPath(node, bindPath) : '')
+        || (control.hrefPath ? getByPath(node, control.hrefPath) : '');
+      const url = typeof rawUrl === 'string' ? applyTemplate(rawUrl, node) : '';
+      if (!url) return;
+      eventBus.emit('fetchUrl', { url, source: 'dynamic-control' });
+      return;
+    }
+
+    if (action === 'emit') {
+      const eventName = typeof control.event === 'string' ? control.event.trim() : '';
+      if (!eventName) return;
+      let payload = control.payload;
+      if (control.payloadPath) {
+        payload = getByPath(node, control.payloadPath);
+      }
+      eventBus.emit(eventName, payload);
+      return;
+    }
+
+    if (action === 'toggle') {
+      if (!bindPath) return;
+      const currentValue = Boolean(getByPath(node, bindPath));
+      const nextNode = setByPath(node, bindPath, !currentValue);
+      const updates = {};
+      if (nextNode.label !== node.label) updates.label = nextNode.label;
+      if (nextNode.data !== node.data) updates.data = nextNode.data;
+      if (!Object.keys(updates).length) return;
+      eventBus.emit('nodeUpdate', { id: node.id, updates });
+      return;
+    }
+
+    if (action === 'setData') {
+      if (!bindPath || !('value' in control)) return;
+      const nextNode = setByPath(node, bindPath, control.value);
+      const updates = {};
+      if (nextNode.label !== node.label) updates.label = nextNode.label;
+      if (nextNode.data !== node.data) updates.data = nextNode.data;
+      if (!Object.keys(updates).length) return;
+      eventBus.emit('nodeUpdate', { id: node.id, updates });
+    }
+  };
+
+  const renderControlBar = () => {
+    if (renderInPanel || !controls.length) return null;
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 2,
+          display: 'flex',
+          gap: 6,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          maxWidth: '70%',
+          justifyContent: 'flex-end'
+        }}
+      >
+        {controls.map((control) => {
+          const label = String(control.label || control.id || 'Action');
+          const bindPath = control.bind || control.path || '';
+          const isToggle = control.type === 'toggle' || control.action === 'toggle';
+          const checked = isToggle ? Boolean(getByPath(node, bindPath)) : false;
+          const mutating = control.action === 'toggle' || control.action === 'setData';
+          const disabled = Boolean(control.disabled) || (mutating && editLocked);
+          const variant = normalizeControlVariant(control.variant);
+          const IconComponent = resolveControlIcon(control.icon);
+          const baseBorder = `1px solid ${theme.palette.divider}`;
+          const styleByVariant = (() => {
+            if (variant === 'contained') {
+              return {
+                border: `1px solid ${theme.palette.primary.main}`,
+                color: theme.palette.primary.contrastText,
+                background: checked ? theme.palette.primary.dark : theme.palette.primary.main
+              };
+            }
+            if (variant === 'text') {
+              return {
+                border: '1px solid transparent',
+                color: checked ? theme.palette.primary.main : theme.palette.text.primary,
+                background: checked ? alpha(theme.palette.primary.main, 0.12) : 'transparent'
+              };
+            }
+            if (variant === 'soft') {
+              return {
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.35)}`,
+                color: theme.palette.primary.main,
+                background: checked
+                  ? alpha(theme.palette.primary.main, 0.2)
+                  : alpha(theme.palette.primary.main, 0.1)
+              };
+            }
+            return {
+              border: baseBorder,
+              color: checked ? theme.palette.primary.main : theme.palette.text.primary,
+              background: checked ? alpha(theme.palette.primary.main, 0.12) : theme.palette.background.paper
+            };
+          })();
+          return (
+            <button
+              key={control.id}
+              type="button"
+              onClick={(event) => executeControl(control, event)}
+              disabled={disabled}
+              style={{
+                ...styleByVariant,
+                borderRadius: 6,
+                padding: '4px 8px',
+                fontSize: 12,
+                lineHeight: 1.2,
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+              }}
+              title={control.title || ''}
+            >
+              {IconComponent ? <IconComponent style={{ fontSize: 14 }} /> : null}
+              {isToggle ? `${label}: ${checked ? 'On' : 'Off'}` : label}
+            </button>
+          );
+        })}
+      </div>
+    );
   };
 
   const renderContent = () => {
@@ -682,9 +971,17 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
       const html = typeof payload === 'string' ? payload : payload?.html || '';
       return (
         <iframe
-          srcDoc={html}
+          srcDoc={buildTransparentHtmlDoc(html)}
           sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-          style={{ border: 'none', width: '100%', height: '100%' }}
+          allowTransparency
+          style={{
+            border: 'none',
+            width: '100%',
+            height: '100%',
+            display: 'block',
+            background: 'transparent',
+            backgroundColor: 'transparent'
+          }}
           title={`View for ${node?.type || 'node'}`}
         />
       );
@@ -714,21 +1011,32 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
     <div
       style={{
         position: renderInPanel ? 'relative' : 'absolute',
-        inset: renderInPanel ? 'auto' : 8,
+        inset: renderInPanel ? 'auto' : (isHtmlCanvasMode ? 0 : 8),
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: isHtmlCanvasMode ? 0 : 8,
         pointerEvents: 'auto',
-        height: renderInPanel ? '100%' : 'auto'
+        height: renderInPanel ? '100%' : (isHtmlCanvasMode ? '100%' : 'auto'),
+        borderRadius: isHtmlCanvasMode && showHtmlChrome ? 8 : 0,
+        border: isHtmlCanvasMode && showHtmlChrome
+          ? `2px solid ${alpha(theme.palette.primary.main, 0.9)}`
+          : 'none',
+        boxSizing: 'border-box',
+        boxShadow: isHtmlCanvasMode && showHtmlChrome
+          ? `0 0 0 1px ${alpha(theme.palette.common.black, 0.18)}`
+          : 'none',
+        backgroundColor: 'transparent'
       }}
     >
-      <div style={{ fontSize: 12, color: theme.palette.text.secondary }}>
-        {effectivePayloadKey
-          ? `View: ${effectiveIntent || 'node'} / ${effectivePayloadKey}`
-          : 'View'}
-      </div>
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      {!isHtmlCanvasMode && (
+        <div style={{ fontSize: 12, color: theme.palette.text.secondary }}>
+          {effectivePayloadKey
+            ? `View: ${effectiveIntent || 'node'} / ${effectivePayloadKey}`
+            : 'View'}
+        </div>
+      )}
+      <div style={{ flex: 1, overflow: isHtmlCanvasMode ? 'hidden' : 'auto', minHeight: 0 }}>
         {renderContent()}
       </div>
     </div>
@@ -743,32 +1051,24 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   }
 
   return (
-    <FixedNode {...props} node={node} hideDefaultContent={true}>
-      {showEditButton && viewWantsEditButton !== false && (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            if (!node?.id) return;
-            eventBus.emit('toggleNodeEditorPanel', { nodeId: node.id });
-          }}
+    <FixedNode {...props} node={node} hideDefaultContent={true} disableChrome={isHtmlCanvasMode}>
+      {(isHtmlCanvasMode || isMarkdownCanvasMode) && (
+        <div
+          title="Drag node"
           style={{
             position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 2,
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 6,
-            padding: '4px 8px',
-            fontSize: 12,
-            color: theme.palette.text.primary,
-            background: theme.palette.background.paper,
-            cursor: 'pointer'
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 18,
+            zIndex: 4,
+            cursor: 'grab',
+            pointerEvents: 'auto',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0))'
           }}
-        >
-          Edit
-        </button>
+        />
       )}
+      {(controls.length > 0 || (!hasDeclaredControls && showEditButton && viewWantsEditButton !== false)) && renderControlBar()}
       {content}
       {!renderInPanel && (
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>

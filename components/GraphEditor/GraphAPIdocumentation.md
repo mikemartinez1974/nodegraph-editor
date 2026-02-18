@@ -293,6 +293,55 @@ When the manifest is installed, these descriptors are copied into the runtime re
 - Renders the node body using the `display` configuration.
 - Pipes the property descriptors into the consolidated Properties Panel so authors can edit plugin data without custom React components.
 
+### Dynamic Node Controls (`node.web.controls`)
+
+Dynamic class-based nodes can declare top-right action controls directly in the view definition.
+
+Schema (on a `view` node under `data.node.web.controls` or `data.view.controls`):
+
+```json
+[
+  {
+    "id": "edit",
+    "type": "button",
+    "label": "Edit",
+    "icon": "edit",
+    "variant": "outlined",
+    "priority": "high",
+    "action": "openEditor"
+  },
+  {
+    "id": "open-docs",
+    "type": "button",
+    "label": "Docs",
+    "icon": "openInNew",
+    "variant": "soft",
+    "priority": 60,
+    "action": "navigate",
+    "hrefPath": "data.target.endpoint"
+  }
+]
+```
+
+Supported fields:
+- `id` (string, recommended)
+- `type`: `button` or `toggle`
+- `label` (string)
+- `icon` (string key; unknown keys are ignored)
+- `variant`: `outlined`, `contained`, `text`, `soft`
+- `priority`: number, numeric string, or `highest|high|normal|medium|low|lowest` (lower renders first)
+- `action`: `openEditor`, `navigate`, `emit`, `toggle`, `setData`
+
+Action requirements:
+- `navigate`: include `href`, `url`, `hrefPath`, `bind`, or `path`
+- `emit`: include `event` (optional payload from `payload` or `payloadPath`)
+- `toggle`: include `bind` or `path`
+- `setData`: include `bind` or `path` and `value`
+
+Notes:
+- If no controls are declared, legacy `Edit` button behavior remains.
+- Mutating controls (`toggle`, `setData`) respect edit lock/policy.
+
 ### Runtime SDK
 
 Sandboxed bundles can still expose imperative functionality (RPC methods, telemetry, etc.) without touching window APIs. Load the helper that is injected into every sandbox (`/plugins/sdk/runtime.js`) and register your methods:

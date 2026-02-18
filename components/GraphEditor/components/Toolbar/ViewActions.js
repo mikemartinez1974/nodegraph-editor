@@ -62,7 +62,7 @@ export default function ViewActions({
             onClick={(e) => setAlignMenuAnchor(e.currentTarget)} 
             color="inherit"
             size="small"
-            disabled={isFreeUser || selectionCount < 2}
+            disabled={selectionCount < 2}
           >
             <FormatAlignCenterIcon fontSize="small" />
           </IconButton>

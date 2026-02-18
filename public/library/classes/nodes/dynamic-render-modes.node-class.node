@@ -1,0 +1,387 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Dynamic Render Modes Class",
+    "description": "Shared class definition with multiple node-view payload modes for testing DynamicViewNode rendering.",
+    "created": "2026-02-18T00:00:00.000Z",
+    "modified": "2026-02-18T00:00:00.000Z",
+    "author": "",
+    "tags": [
+      "dynamic",
+      "render",
+      "test"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "dynamic-render-class-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -560,
+        "y": -120
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "dynamic-render-class",
+          "name": "Dynamic Render Modes Class",
+          "version": "0.1.0",
+          "description": "Class definition for markdown/html/text/json dynamic rendering tests.",
+          "createdAt": "2026-02-18T00:00:00.000Z",
+          "updatedAt": "2026-02-18T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "definition",
+          "scope": "node"
+        },
+        "dependencies": {
+          "nodeTypes": [],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "dynamic-render-class-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -560,
+        "y": 160
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "dyn-md",
+            "intent": "Dynamic markdown renderer",
+            "implementation": "view payload render.markdown",
+            "dictionaryKey": "dyn-md"
+          },
+          {
+            "key": "dyn-html",
+            "intent": "Dynamic html renderer",
+            "implementation": "view payload render.html",
+            "dictionaryKey": "dyn-html"
+          },
+          {
+            "key": "dyn-text",
+            "intent": "Dynamic text renderer",
+            "implementation": "view payload render.text",
+            "dictionaryKey": "dyn-text"
+          },
+          {
+            "key": "dyn-json",
+            "intent": "Dynamic json renderer",
+            "implementation": "view payload render.json",
+            "dictionaryKey": "dyn-json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dynamic-render-class-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -560,
+        "y": 420
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "view-dyn-md",
+      "type": "view",
+      "label": "dyn-md (render.markdown)",
+      "position": {
+        "x": -80,
+        "y": -100
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "render.markdown",
+          "controls": [
+            {
+              "id": "md-docs",
+              "type": "button",
+              "label": "Docs",
+              "icon": "openInNew",
+              "variant": "soft",
+              "priority": "high",
+              "action": "navigate",
+              "href": "/library/documentation/root.node:root",
+              "title": "Open docs graph"
+            },
+            {
+              "id": "md-pin",
+              "type": "toggle",
+              "label": "Pin",
+              "icon": "pin",
+              "variant": "outlined",
+              "priority": "normal",
+              "action": "toggle",
+              "bind": "data.pinned",
+              "title": "Toggle pinned flag"
+            }
+          ]
+        },
+        "render": {
+          "markdown": "{{data.markdown}}"
+        }
+      }
+    },
+    {
+      "id": "view-dyn-html",
+      "type": "view",
+      "label": "dyn-html (render.html)",
+      "position": {
+        "x": 380,
+        "y": -100
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "render.html",
+          "controls": [
+            {
+              "id": "html-chrome",
+              "type": "toggle",
+              "label": "Chrome",
+              "icon": "settings",
+              "variant": "contained",
+              "priority": "high",
+              "action": "toggle",
+              "bind": "data.htmlChrome",
+              "title": "Toggle html node chrome border"
+            },
+            {
+              "id": "html-open",
+              "type": "button",
+              "label": "Root",
+              "icon": "navigate",
+              "variant": "outlined",
+              "priority": "normal",
+              "action": "navigate",
+              "href": "/root.node:root"
+            }
+          ]
+        },
+        "render": {
+          "html": {
+            "html": "{{data.html}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "view-dyn-text",
+      "type": "view",
+      "label": "dyn-text (render.text)",
+      "position": {
+        "x": -80,
+        "y": 180
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "render.text",
+          "controls": [
+            {
+              "id": "text-pulse",
+              "type": "button",
+              "label": "Pulse",
+              "icon": "bolt",
+              "variant": "contained",
+              "priority": "high",
+              "action": "emit",
+              "event": "demo:textPulse",
+              "payload": {
+                "source": "dyn-text"
+              }
+            },
+            {
+              "id": "text-mark",
+              "type": "button",
+              "label": "Mark",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "normal",
+              "action": "setData",
+              "bind": "data.textStatus",
+              "value": "checked"
+            }
+          ]
+        },
+        "render": {
+          "text": {
+            "text": "{{data.text}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "view-dyn-json",
+      "type": "view",
+      "label": "dyn-json (render.json)",
+      "position": {
+        "x": 380,
+        "y": 180
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "render.json",
+          "controls": [
+            {
+              "id": "json-mark",
+              "type": "button",
+              "label": "Reviewed",
+              "icon": "edit",
+              "variant": "contained",
+              "priority": "high",
+              "action": "setData",
+              "bind": "data.review",
+              "value": "approved"
+            },
+            {
+              "id": "json-toggle",
+              "type": "toggle",
+              "label": "Flag",
+              "icon": "pin",
+              "variant": "outlined",
+              "priority": "normal",
+              "action": "toggle",
+              "bind": "data.flagged"
+            }
+          ]
+        },
+        "render": {
+          "json": {
+            "suite": "dynamic-render-modes",
+            "status": "ok",
+            "items": [
+              "alpha",
+              "beta",
+              "gamma"
+            ],
+            "meta": {
+              "note": "JSON fallback mode"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "dynamic-render-class-notes",
+      "type": "markdown",
+      "label": "Notes",
+      "position": {
+        "x": 880,
+        "y": -20
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dynamic Render Modes\n\nThis class defines 4 node-view payloads used by dictionary view entries:\n\n- dyn-md -> render.markdown\n- dyn-html -> render.html\n- dyn-text -> render.text\n- dyn-json -> render.json"
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

@@ -1,0 +1,368 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-18T18:52:48.565Z",
+    "modified": "2026-02-18T19:47:49.774Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "dynamic-render-modes-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -980,
+        "y": -240
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "dynamic-render-modes-task",
+          "name": "Dynamic Render Modes Test",
+          "version": "0.1.0",
+          "description": "Test graph for DynamicViewNode markdown/html/text/json rendering paths.",
+          "createdAt": "2026-02-18T00:00:00.000Z",
+          "updatedAt": "2026-02-18T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "validation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "dyn-md",
+            "dyn-html",
+            "dyn-text",
+            "dyn-json"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "dynamic-render-modes-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -980,
+        "y": 60
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "dyn-md",
+            "intent": "markdown rendering path",
+            "implementation": "DynamicViewNode -> ReactMarkdown",
+            "dictionaryKey": "dyn-md"
+          },
+          {
+            "key": "dyn-html",
+            "intent": "html rendering path",
+            "implementation": "DynamicViewNode -> iframe srcDoc",
+            "dictionaryKey": "dyn-html"
+          },
+          {
+            "key": "dyn-text",
+            "intent": "text rendering path",
+            "implementation": "DynamicViewNode -> pre-wrap text",
+            "dictionaryKey": "dyn-text"
+          },
+          {
+            "key": "dyn-json",
+            "intent": "json rendering path",
+            "implementation": "DynamicViewNode -> JSON pre fallback",
+            "dictionaryKey": "dyn-json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dynamic-render-modes-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -980,
+        "y": 360
+      },
+      "width": 500,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "dyn-md",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-html",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-text",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-json",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "dyn-md",
+            "intent": "node",
+            "payload": "render.markdown",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-html",
+            "intent": "node",
+            "payload": "render.html",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-text",
+            "intent": "node",
+            "payload": "render.text",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dyn-json",
+            "intent": "node",
+            "payload": "render.json",
+            "ref": "/library/classes/nodes/dynamic-render-modes.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dynamic-render-title",
+      "type": "markdown",
+      "label": "Test Plan",
+      "position": {
+        "x": -420,
+        "y": -240
+      },
+      "width": 860,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Dynamic Render Modes Test\n\nOpen this graph in Web and VSCode and verify side-by-side rendering:\n\n1. `dyn-md` renders markdown headings/lists\n2. `dyn-html` renders HTML card in iframe\n3. `dyn-text` renders plain text exactly\n4. `dyn-json` renders JSON fallback block"
+      }
+    },
+    {
+      "id": "dynamic-md-node",
+      "type": "dyn-md",
+      "label": "Markdown Mode",
+      "position": {
+        "x": -396,
+        "y": -2.341156005859375
+      },
+      "width": 413.828125,
+      "height": 206.34115600585938,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Markdown Mode\n\n- Bullet A\n- Bullet B\n\n**Bold** and `inline code`."
+      }
+    },
+    {
+      "id": "dynamic-html-node",
+      "type": "dyn-html",
+      "label": "HTML Mode",
+      "position": {
+        "x": 66.66146087646484,
+        "y": -7
+      },
+      "width": 405.33853912353516,
+      "height": 216.9921875,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "html": "<div style='padding:12px;font-family:system-ui;background:#0d1b2a;color:#e0e1dd;border-radius:8px'><h3 style='margin:0 0 8px'>HTML Mode</h3><p style='margin:0'>Rendered in iframe via <code>srcDoc</code>.</p></div>"
+      }
+    },
+    {
+      "id": "dynamic-text-node",
+      "type": "dyn-text",
+      "label": "Text Mode",
+      "position": {
+        "x": -403,
+        "y": 322
+      },
+      "width": 400,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "text": "TEXT MODE\nLine 1: no markdown parsing\nLine 2: no html parsing\nLine 3: rendered as plain text"
+      }
+    },
+    {
+      "id": "dynamic-json-node",
+      "type": "dyn-json",
+      "label": "JSON Mode",
+      "position": {
+        "x": 68,
+        "y": 329
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "note": "JSON payload is defined in class view; this node should show JSON fallback block."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-test-md",
+      "type": "relates",
+      "source": "dynamic-render-title",
+      "target": "dynamic-md-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "verify",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-test-html",
+      "type": "relates",
+      "source": "dynamic-render-title",
+      "target": "dynamic-html-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "verify",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-test-text",
+      "type": "relates",
+      "source": "dynamic-render-title",
+      "target": "dynamic-text-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "verify",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-test-json",
+      "type": "relates",
+      "source": "dynamic-render-title",
+      "target": "dynamic-json-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "verify",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

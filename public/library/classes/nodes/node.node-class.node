@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-11T02:39:45.390Z",
-    "modified": "2026-02-11T02:39:47.871Z",
+    "created": "2026-02-18T14:43:54.824Z",
+    "modified": "2026-02-18T14:48:49.059Z",
     "author": "",
     "tags": []
   },
@@ -180,8 +180,8 @@
       "type": "view",
       "label": "Editor View (editor.web)",
       "position": {
-        "x": 8.893178251625848,
-        "y": 34.588229464544774
+        "x": 16.893178251625848,
+        "y": 21.588229464544774
       },
       "width": 380,
       "height": 220,
@@ -238,11 +238,11 @@
       "type": "markdown",
       "label": "Definition Notes",
       "position": {
-        "x": 20,
-        "y": 295
+        "x": 19,
+        "y": 259
       },
-      "width": 482.92114497051057,
-      "height": 305.74133579892896,
+      "width": 379.92114497051057,
+      "height": 320.74133579892896,
       "visible": true,
       "showLabel": true,
       "data": {
