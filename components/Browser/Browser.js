@@ -159,8 +159,21 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   };
 
   const toFetchableUrl = (url) => {
+    if (typeof url === 'string' && url.startsWith('local://')) {
+      const localPath = url.slice('local://'.length).trim();
+      if (!localPath) return null;
+      const normalizedPath = localPath.startsWith('/') ? localPath : `/${localPath}`;
+      const isVsCodeHost = typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode';
+      return isVsCodeHost ? normalizedPath : null;
+    }
     const converted = convertTlzToFetchUrl(url);
     return resolveFolderToRootNode(converted);
+  };
+
+  const emitFetchUrl = (rawUrl) => {
+    const fetchable = toFetchableUrl(rawUrl);
+    if (!fetchable) return;
+    eventBus.emit('fetchUrl', { url: fetchable });
   };
 
   // Push a canonical url into the history (keeps refs and state in sync)
@@ -225,8 +238,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
         setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        const fetchable = toFetchableUrl(url);
-        eventBus.emit('fetchUrl', { url: fetchable });
+        emitFetchUrl(url);
       }
     }
   };
@@ -246,8 +258,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         navigatingToUrlRef.current = url;  // Mark this URL as a navigation target
         setAddressCountRef.current = 0;  // Reset counter
         setAddress(url);
-        const fetchable = toFetchableUrl(url);
-        eventBus.emit('fetchUrl', { url: fetchable });
+        emitFetchUrl(url);
       }
     }
   };
@@ -255,8 +266,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const handleRefresh = () => {
     const url = currentUrl || address;
     if (url) {
-      const fetchable = toFetchableUrl(url);
-      eventBus.emit('fetchUrl', { url: fetchable });
+      emitFetchUrl(url);
     }
   };
 
@@ -267,8 +277,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       return;
     }
     setAddress(homeUrl);
-    const fetchable = toFetchableUrl(homeUrl);
-    eventBus.emit('fetchUrl', { url: fetchable });
+    emitFetchUrl(homeUrl);
   };
 
   const handleHomeContext = (e) => {
@@ -287,6 +296,11 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     }
     try {
       const fetchable = toFetchableUrl(candidate);
+      if (!fetchable) {
+        alert('This URL is not fetchable in this environment.');
+        setHomeMenuAnchor(null);
+        return;
+      }
       localStorage.setItem('homeUrl', fetchable);
       setHomeUrl(fetchable);
       alert('Home set to: ' + fetchable);
@@ -333,7 +347,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     if (!url) return;
     setAddress(url);
     handleCloseBookmarksMenu();
-    eventBus.emit('fetchUrl', { url: toFetchableUrl(url) });
+    emitFetchUrl(url);
   };
 
   const handleRemoveBookmark = (url) => {
@@ -347,7 +361,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     if (!template || !template.resolvedUrl) return;
     setGalleryOpen(false);
     setAddress(template.resolvedUrl);
-    eventBus.emit('fetchUrl', { url: toFetchableUrl(template.resolvedUrl) });
+    emitFetchUrl(template.resolvedUrl);
   };
 
   useEffect(() => {
@@ -458,11 +472,8 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   // Default to local path if it doesn't look like anything else
                   return toFetchableUrl('/' + trimmed);
                 })(address);
-                if (fetchUrl) {
-                  eventBus.emit('fetchUrl', { url: fetchUrl });
-                } else {
-                  eventBus.emit('fetchUrl', { url: toFetchableUrl(address) });
-                }
+                if (fetchUrl) emitFetchUrl(fetchUrl);
+                else emitFetchUrl(address);
               }
             }}
             InputProps={{

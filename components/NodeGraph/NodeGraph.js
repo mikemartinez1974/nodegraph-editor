@@ -94,7 +94,7 @@ export default function NodeGraph({
     backgroundSize: 'min(56vmin, 680px)',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    opacity: (isDarkMode ? 0.09 : 0.045) * (normalizedWatermarkStrength / 100),
+    opacity: (isDarkMode ? 0.11 : 0.055) * (normalizedWatermarkStrength / 100),
     filter: isDarkMode ? 'invert(1) brightness(1.08)' : 'none'
   }), [isDarkMode, normalizedWatermarkStrength]);
   const clampZoom = useCallback((value) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value)), []);

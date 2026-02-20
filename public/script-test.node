@@ -1,0 +1,295 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-02-20T03:00:02.752Z",
+    "modified": "2026-02-20T03:00:02.752Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "script-smoke-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -860,
+        "y": -220
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "script-node-smoke-test",
+          "name": "Script Node Smoke Test",
+          "version": "0.1.0",
+          "description": "Quick validation graph for Script node behavior.",
+          "createdAt": "2026-02-19T00:00:00.000Z",
+          "updatedAt": "2026-02-19T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "validation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "script"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "script-smoke-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -860,
+        "y": 40
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "script",
+            "intent": "Execute script logic",
+            "implementation": "Runs source and emits result",
+            "dictionaryKey": "script"
+          }
+        ]
+      }
+    },
+    {
+      "id": "script-smoke-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -860,
+        "y": 300
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "script-smoke-overview",
+      "type": "markdown",
+      "label": "How To Test",
+      "position": {
+        "x": -420,
+        "y": -220
+      },
+      "width": 840,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Script Node Smoke Test\n\n1. Select the **Script Runner** node.\n2. Click **RUN** on the node UI.\n3. Confirm the script updates both target nodes below.\n4. `Output Sink` and `Renderable Target` should change immediately.\n5. Confirm the `result` edge still emits the run payload."
+      }
+    },
+    {
+      "id": "script-smoke-trigger",
+      "type": "markdown",
+      "label": "Trigger Payload",
+      "position": {
+        "x": -420,
+        "y": 40
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Trigger Payload\n\nThis node provides an upstream trigger edge into the script node."
+      }
+    },
+    {
+      "id": "script-smoke-script",
+      "type": "script",
+      "label": "Script Runner",
+      "position": {
+        "x": -1,
+        "y": 5.993073837507566
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Smoke Test Script",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": true,
+        "autoRun": false,
+        "scriptId": "script_1771546904748",
+        "lastResult": null,
+        "lastRunAt": 1771539286381,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-smoke-output",
+      "type": "markdown",
+      "label": "Output Sink (Updated)",
+      "position": {
+        "x": 397.99570643859806,
+        "y": 24.619891543072242
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "{\n  \"type\": \"scriptResult\",\n  \"success\": true,\n  \"result\": {\n    \"success\": true,\n    \"message\": \"Script node executed\",\n    \"timestamp\": \"2026-02-20T02:02:54.809Z\",\n    \"random\": 542\n  },\n  \"runId\": \"1771552974795_secosar9ln\",\n  \"token\": \"j5w4ixvcxtnmlu8kf5f\"\n}"
+      }
+    },
+    {
+      "id": "script-smoke-view",
+      "type": "markdown",
+      "label": "Renderable Target (Updated)",
+      "position": {
+        "x": 686.4216654318823,
+        "y": 344.80953053145834
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "{\n  \"type\": \"scriptResult\",\n  \"success\": true,\n  \"result\": {\n    \"success\": true,\n    \"message\": \"Script node executed\",\n    \"timestamp\": \"2026-02-20T02:02:54.809Z\",\n    \"random\": 542\n  },\n  \"runId\": \"1771552974795_secosar9ln\",\n  \"token\": \"j5w4ixvcxtnmlu8kf5f\"\n}",
+        "viewState": {
+          "mode": "compact",
+          "updatedAt": "2026-02-19T22:14:49.050Z",
+          "random": 898
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "script-smoke-edge-overview",
+      "type": "relates",
+      "source": "script-smoke-overview",
+      "target": "script-smoke-trigger",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "setup",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-smoke-edge-trigger",
+      "type": "flows-to",
+      "source": "script-smoke-trigger",
+      "target": "script-smoke-script",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "trigger",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-smoke-edge-result",
+      "type": "flows-to",
+      "source": "script-smoke-script",
+      "target": "script-smoke-output",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "result",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-smoke-edge-view",
+      "type": "flows-to",
+      "source": "script-smoke-script",
+      "target": "script-smoke-view",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "result→view",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1771546904748",
+      "name": "test",
+      "source": "const now = new Date().toISOString();\nconst payload = {\n  success: true,\n  message: 'Script node executed',\n  timestamp: now,\n  random: Math.floor(Math.random() * 1000)\n};\nreturn payload;",
+      "tags": ""
+    }
+  ]
+}

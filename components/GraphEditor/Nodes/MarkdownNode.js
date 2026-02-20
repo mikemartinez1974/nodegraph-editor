@@ -101,6 +101,38 @@ const MarkdownNode = (props) => {
       document.removeEventListener('touchcancel', handleResizeEnd, NON_PASSIVE_LISTENER);
     };
   }, [isResizing, node.id, zoom]);
+
+  // Accept runtime values from connected edges and render them as markdown text.
+  useEffect(() => {
+    const handleNodeInput = ({ targetNodeId, value } = {}) => {
+      if (!targetNodeId || targetNodeId !== node.id) return;
+      const nextMarkdown =
+        typeof value === 'string'
+          ? value
+          : (value && typeof value === 'object' && typeof value.markdown === 'string')
+          ? value.markdown
+          : (() => {
+              try {
+                return JSON.stringify(value, null, 2);
+              } catch (err) {
+                return String(value ?? '');
+              }
+            })();
+      eventBus.emit('nodeUpdate', {
+        id: node.id,
+        updates: {
+          data: {
+            ...(node.data || {}),
+            markdown: nextMarkdown
+          }
+        },
+        source: 'node-input'
+      });
+    };
+
+    eventBus.on('nodeInput', handleNodeInput);
+    return () => eventBus.off('nodeInput', handleNodeInput);
+  }, [node.id, node.data]);
   
   // Render FixedNode with markdown content and resize handle
   return (

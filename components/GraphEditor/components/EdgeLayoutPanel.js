@@ -54,7 +54,8 @@ export default function EdgeLayoutPanel({
   documentSettings = {},
   setDocumentSettings = () => {},
   contractSummary = { version: "1.0", handleSummary: {} },
-  onApplyLayout = null
+  onApplyLayout = null,
+  embedded = false
 }) {
   const { emitEdgeIntent } = useIntentEmitter();
   const layout = documentSettings.layout || {};
@@ -170,21 +171,15 @@ export default function EdgeLayoutPanel({
       : "No ports";
   }, [contractSummary]);
 
-  return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      variant="persistent"
-      ModalProps={{ keepMounted: true }}
-      BackdropProps={{ invisible: true }}
-    >
-      <Box sx={{ width: 380, p: 3, display: "flex", flexDirection: "column", gap: 2 }}>
+  const panelContent = (
+      <Box sx={{ width: embedded ? "100%" : 380, p: embedded ? 0 : 3, display: "flex", flexDirection: "column", gap: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h6">Layout Panel</Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon fontSize="small" />
-          </IconButton>
+          {!embedded ? (
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Box>
         <Divider />
 
@@ -215,7 +210,7 @@ export default function EdgeLayoutPanel({
             </Typography>
           )}
           <Grid container spacing={2}>
-            <Grid xs={12}>
+            <Grid size={12}>
               <FormControl fullWidth size="small">
                 <InputLabel>Edge routing</InputLabel>
                 <Select
@@ -234,7 +229,7 @@ export default function EdgeLayoutPanel({
                 </Typography>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Auto-layout mode</InputLabel>
                 <Select
@@ -253,7 +248,7 @@ export default function EdgeLayoutPanel({
                 </Typography>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Default layout</InputLabel>
                 <Select
@@ -272,7 +267,7 @@ export default function EdgeLayoutPanel({
                 </Typography>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Direction</InputLabel>
                 <Select
@@ -291,7 +286,7 @@ export default function EdgeLayoutPanel({
                 </Typography>
               </FormControl>
             </Grid>
-            <Grid xs={12}>
+            <Grid size={12}>
               <Typography variant="subtitle2">Edge lane spacing (px)</Typography>
               <Slider
                 value={laneGap}
@@ -305,10 +300,10 @@ export default function EdgeLayoutPanel({
                 Spacing between parallel edges at node endpoints.
               </Typography>
             </Grid>
-            <Grid xs={12}>
+            <Grid size={12}>
               <Typography variant="subtitle2">Serpentine & fallback</Typography>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -323,7 +318,7 @@ export default function EdgeLayoutPanel({
                 inputProps={{ min: 2, max: 50 }}
               />
             </Grid>
-            <Grid xs={12} md={6} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid size={{ xs: 12, md: 6 }} sx={{ display: "flex", alignItems: "center" }}>
               <FormControlLabel
                 control={
                   <Switch
@@ -344,7 +339,7 @@ export default function EdgeLayoutPanel({
         <Stack spacing={2}>
           <Typography variant="subtitle2">ELK routing parameters</Typography>
           <Grid container spacing={2}>
-            <Grid xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Elk algorithm</InputLabel>
                 <Select
@@ -360,7 +355,7 @@ export default function EdgeLayoutPanel({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Elk edge routing</InputLabel>
                 <Select
@@ -376,7 +371,7 @@ export default function EdgeLayoutPanel({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Elk port constraints</InputLabel>
                 <Select
@@ -392,7 +387,7 @@ export default function EdgeLayoutPanel({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -407,7 +402,7 @@ export default function EdgeLayoutPanel({
                 inputProps={{ min: 20, max: 400 }}
               />
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -422,7 +417,7 @@ export default function EdgeLayoutPanel({
                 inputProps={{ min: 10, max: 200 }}
               />
             </Grid>
-            <Grid xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 size="small"
@@ -492,6 +487,22 @@ export default function EdgeLayoutPanel({
           </Typography>
         </Stack>
       </Box>
+  );
+
+  if (embedded) {
+    return panelContent;
+  }
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      variant="persistent"
+      ModalProps={{ keepMounted: true }}
+      BackdropProps={{ invisible: true }}
+    >
+      {panelContent}
     </Drawer>
   );
 }

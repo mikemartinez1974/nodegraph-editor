@@ -68,7 +68,17 @@ export default function useGraphInteractions({
 
   useEffect(() => {
     function handleLoadSaveFile(payload = {}) {
-      const { settings = {}, documentUrl } = payload || {};
+      const { settings = {}, documentUrl, scripts } = payload || {};
+      if (Array.isArray(scripts)) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.setItem('scripts', JSON.stringify(scripts));
+          }
+          eventBus.emit('scriptsChanged', { count: scripts.length });
+        } catch (err) {
+          console.warn('Failed to apply loaded scripts library:', err);
+        }
+      }
       try {
         if (settings.defaultNodeColor) state.defaultNodeColor = settings.defaultNodeColor;
         const resolvedDocumentUrl =

@@ -9,8 +9,6 @@ import {
   Typography,
   Box,
   Divider,
-  ToggleButton,
-  ToggleButtonGroup,
   Snackbar,
   Alert,
   ListItemIcon,
@@ -25,9 +23,6 @@ import {
   List as ListIcon,
   Save as SaveIcon,
   Folder as LoadIcon,
-  TouchApp as ManualIcon,
-  Navigation as NavIcon,
-  GridOn as AutoIcon,
   ContentPasteGo as ContentPasteGoIcon,
   ThumbDownOffAlt as ThumbDownOffAltIcon,
   FolderSpecial as GroupIcon,
@@ -64,17 +59,14 @@ import AddNodeMenu from './AddNodeMenu';
 import PlumbingIcon from '@mui/icons-material/Plumbing';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import ExtensionIcon from '@mui/icons-material/Extension';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import PluginManagerPanel from './PluginManagerPanel';
 import { getManifestSettings, getManifestDocumentUrl, setManifestDocumentUrl, setManifestSettings } from '../utils/manifestUtils';
+import { validateGraphInvariants } from '../validators/validateGraphInvariants';
 
 // Import toolbar section components
 import FileActions from './Toolbar/FileActions';
 import HistoryActions from './Toolbar/HistoryActions';
 import NodeActions from './Toolbar/NodeActions';
 import ViewActions from './Toolbar/ViewActions';
-import PanelActions from './Toolbar/PanelActions';
 
 const Toolbar = ({ 
   host = 'browser',
@@ -103,7 +95,6 @@ const Toolbar = ({
   onTogglePropertiesPanel = () => {},
   showPropertiesPanel = false,
   showEdgePanel = false,
-  onToggleScriptPanel = () => eventBus.emit('toggleScriptPanel'),
   mode,
   onModeChange,
   onAlignSelection = () => false,
@@ -148,7 +139,6 @@ const Toolbar = ({
   const [selectedCopied, setSelectedCopied] = useState(false);
   const [onboardCopied, setOnboardCopied] = useState(false);
   const [addNodeMenuAnchor, setAddNodeMenuAnchor] = useState(null);
-  const [pluginManagerOpen, setPluginManagerOpen] = useState(false);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
@@ -429,11 +419,16 @@ const Toolbar = ({
 
           try {
             const manifestSettings = getManifestSettings(nodesToLoad);
-            const documentUrl = getManifestDocumentUrl(nodesToLoad) || jsonData.document?.url || null;
+            const rawDocumentUrl = getManifestDocumentUrl(nodesToLoad);
+            const documentUrl =
+              typeof rawDocumentUrl === 'string'
+                ? rawDocumentUrl
+                : jsonData.document?.url || null;
             eventBus.emit('loadSaveFile', { 
               settings: manifestSettings || jsonData.settings || {}, 
               filename: file.name,
-              documentUrl
+              documentUrl,
+              scripts: Array.isArray(jsonData.scripts) ? jsonData.scripts : null
             });
           } catch (err) {
             console.warn('Failed to emit loadSaveFile event:', err);
@@ -495,9 +490,16 @@ const Toolbar = ({
       autoSave: false
     };
     const nodesWithManifestSettings = setManifestSettings(nodes, manifestSettings);
+    const rawManifestDocumentUrl = getManifestDocumentUrl(nodesWithManifestSettings);
+    const manifestHasDocumentUrl = typeof rawManifestDocumentUrl === 'string';
+    const manifestDocumentUrl = manifestHasDocumentUrl ? rawManifestDocumentUrl.trim() : '';
+    const backgroundUrlForSave =
+      typeof backgroundUrl === 'string' ? backgroundUrl.trim() : '';
+    // Manifest document.url is the source of truth when present (including intentional empty string).
+    const resolvedDocumentUrl = manifestHasDocumentUrl ? manifestDocumentUrl : backgroundUrlForSave;
     const nodesWithManifestData = setManifestDocumentUrl(
       nodesWithManifestSettings,
-      backgroundUrl || (typeof window !== 'undefined' ? localStorage.getItem('document') || '' : '')
+      resolvedDocumentUrl
     );
 
     const saveData = {
@@ -518,6 +520,12 @@ const Toolbar = ({
         width: node.width,
         height: node.height,
         color: node.color,
+        ports: Array.isArray(node.ports) ? node.ports : undefined,
+        inputs: Array.isArray(node.inputs) ? node.inputs : undefined,
+        outputs: Array.isArray(node.outputs) ? node.outputs : undefined,
+        state: node.state && typeof node.state === 'object' ? node.state : undefined,
+        style: node.style && typeof node.style === 'object' ? node.style : undefined,
+        extensions: node.extensions && typeof node.extensions === 'object' ? node.extensions : undefined,
         visible: node.visible !== false,
         showLabel: node.showLabel !== false,
         data: node.data || {}
@@ -551,8 +559,40 @@ const Toolbar = ({
         bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
         visible: group.visible !== false,
         style: group.style || {}
-      }))
+      })),
+      scripts: (() => {
+        try {
+          if (typeof window === 'undefined' || !window.localStorage) return [];
+          const raw = window.localStorage.getItem('scripts');
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          return [];
+        }
+      })()
     };
+
+    try {
+      const report = validateGraphInvariants({
+        nodes: saveData.nodes,
+        edges: saveData.edges,
+        clusters: saveData.clusters,
+        mode: 'load',
+        scriptLibrary: saveData.scripts
+      });
+      const scriptWarnings = (report?.warnings || []).filter((issue) =>
+        typeof issue?.code === 'string' && issue.code.startsWith('SCRIPT_')
+      );
+      if (scriptWarnings.length > 0) {
+        setSnackbar({
+          open: true,
+          message: `Script preflight: ${scriptWarnings[0].message}${scriptWarnings.length > 1 ? ` (+${scriptWarnings.length - 1} more)` : ''}`,
+          severity: 'warning'
+        });
+      }
+    } catch (err) {
+      // Keep save flow resilient.
+    }
 
     const jsonString = JSON.stringify(saveData, null, 2);
     
@@ -957,28 +997,9 @@ const Toolbar = ({
             }}
             showMinimap={showMinimap}
             snapToGrid={snapToGrid}
+            gridSize={gridSize}
+            onSetGridSize={(value) => eventBus.emit('setGridSize', { gridSize: value })}
             selectionCount={selectionCount}
-            isMobile={false}
-            isFreeUser={isFreeUser}
-          />
-        </ButtonGroup>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-        {/* Panel Actions Section */}
-        <ButtonGroup variant="contained" size="small">
-          <PanelActions 
-            onToggleNodeList={onToggleNodeList}
-            onToggleGroupList={onToggleGroupList}
-            onToggleEdgeList={onToggleEdgeList}
-            onToggleScriptPanel={onToggleScriptPanel}
-            onToggleLayoutPanel={onToggleLayoutPanel}
-            onTogglePropertiesPanel={onTogglePropertiesPanel}
-            showNodeList={showNodeList}
-            showGroupList={showGroupList}
-            showEdgeList={showEdgeList}
-            showPropertiesPanel={showPropertiesPanel}
-            showEdgePanel={showEdgePanel}
             isMobile={false}
             isFreeUser={isFreeUser}
           />
@@ -998,25 +1019,6 @@ const Toolbar = ({
           </IconButton>
 
           <IconButton
-            onClick={() => setPluginManagerOpen(true)}
-            title="Plugin Manager"
-            aria-label="Open Plugin Manager"
-            size="small"
-          >
-            <ExtensionIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
-            onClick={onToggleSystemNodesPanel}
-            title="System Nodes"
-            aria-label="Open System Nodes panel"
-            size="small"
-            color={showSystemNodesPanel ? 'primary' : 'default'}
-          >
-            <AccountTreeIcon fontSize="small" />
-          </IconButton>
-
-          <IconButton
           onClick={onOpenDocumentProperties}
             title="Editor Settings"
             aria-label="Open Editor Settings"
@@ -1026,30 +1028,6 @@ const Toolbar = ({
             <HistoryEduIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
-
-        {/* Mode Toggle */}
-          <ToggleButtonGroup
-            value={mode}
-            exclusive
-            onChange={(event, newMode) => {
-              if (newMode !== null) {
-                onModeChange(newMode);
-              }
-            }}
-            size="small"
-            sx={{ ml: 1 }}
-            disabled={isFreeUser}
-          >
-            <ToggleButton value="manual" title="Manual Mode">
-              <ManualIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="nav" title="Navigation Mode">
-              <NavIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="auto" title="Auto Layout Mode">
-              <AutoIcon fontSize="small" />
-            </ToggleButton>
-          </ToggleButtonGroup>
 
         {/* Viewport Indicator */}
         <Box
@@ -1087,11 +1065,6 @@ const Toolbar = ({
         accept=".json,.node"
         onChange={handleFileChange}
         style={{ display: 'none' }}
-      />
-
-      <PluginManagerPanel
-        open={pluginManagerOpen}
-        onClose={() => setPluginManagerOpen(false)}
       />
 
       <Snackbar

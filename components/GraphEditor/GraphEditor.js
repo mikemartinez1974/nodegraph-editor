@@ -322,7 +322,9 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     lastLoggedNodeIdRef.current = currentId;
     const node = Array.isArray(nodes) ? nodes.find((n) => n.id === currentId) : null;
     if (node) {
-      console.info('[GraphEditor] Selected node snapshot:', node);
+      if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined' && window.__TWILITE_DEBUG_SELECTION__) {
+        console.info('[GraphEditor] Selected node snapshot:', node);
+      }
     }
   }, [selectedNodeIds, nodes]);
 
@@ -429,18 +431,24 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
               cachedEdges.length === incomingEdgeIds.length &&
               cachedEdges.every((id, idx) => id === incomingEdgeIds[idx]);
             if (sameEdges && cached?.routes && typeof cached.routes === 'object') {
-              console.log('[EdgeReroute] cache hit for routes', { edgeCount: incomingEdgeIds.length });
+              if (window.__TWILITE_DEBUG_LAYOUT__) {
+                console.log('[EdgeReroute] cache hit for routes', { edgeCount: incomingEdgeIds.length });
+              }
               setEdgeRoutes(cached.routes);
               skipRerouteRef.current = true;
               cachedRoutesApplied = true;
             } else {
-              console.log('[EdgeReroute] cache miss (edge ids changed)', {
-                cachedCount: cachedEdges.length,
-                incomingCount: incomingEdgeIds.length
-              });
+              if (window.__TWILITE_DEBUG_LAYOUT__) {
+                console.log('[EdgeReroute] cache miss (edge ids changed)', {
+                  cachedCount: cachedEdges.length,
+                  incomingCount: incomingEdgeIds.length
+                });
+              }
             }
           } else {
-            console.log('[EdgeReroute] cache miss (no stored routes)');
+            if (window.__TWILITE_DEBUG_LAYOUT__) {
+              console.log('[EdgeReroute] cache miss (no stored routes)');
+            }
           }
         } catch (err) {
           // ignore cache errors
@@ -453,7 +461,9 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
           incomingEdgeRouteIds.length === incomingEdgeIds.length &&
           incomingEdgeRouteIds.every((id, idx) => id === incomingEdgeIds[idx]);
         if (sameEdges) {
-          console.log('[EdgeReroute] host cache applied', { edgeCount: incomingEdgeIds.length });
+          if (typeof window !== 'undefined' && window.__TWILITE_DEBUG_LAYOUT__) {
+            console.log('[EdgeReroute] host cache applied', { edgeCount: incomingEdgeIds.length });
+          }
           setEdgeRoutes(incomingEdgeRoutes);
           skipRerouteRef.current = true;
           cachedRoutesApplied = true;
@@ -480,7 +490,11 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
       try {
         const manifestSettings = getManifestSettings(nextNodes);
         const settings = manifestSettings || payload.settings || {};
-        const documentUrl = getManifestDocumentUrl(nextNodes) || payload.document?.url || null;
+        const rawDocumentUrl = getManifestDocumentUrl(nextNodes);
+        const documentUrl =
+          typeof rawDocumentUrl === 'string'
+            ? rawDocumentUrl
+            : payload.document?.url || null;
         eventBus.emit('loadSaveFile', { ...payload, settings, documentUrl });
       } catch (err) {
         console.warn('Failed to emit loadSaveFile from loadGraph message:', err);
@@ -544,7 +558,9 @@ useEffect(() => {
     const currentEdges = edgesRef.current || [];
     currentEdges.forEach(edge => {
       if (!edge || edge.source !== nodeId) return;
-      if (edge.sourcePort && outputName && edge.sourcePort !== outputName) return;
+      const edgeSourcePort = edge.sourcePort || 'root';
+      // Treat root as a wildcard source so simple graphs still propagate outputs.
+      if (edgeSourcePort !== 'root' && outputName && edgeSourcePort !== outputName) return;
       if (!edge.target) return;
       eventBus.emit('nodeInput', {
         targetNodeId: edge.target,
@@ -740,9 +756,16 @@ useEffect(() => {
       autoSave: false
     };
     const nodesWithManifestSettings = setManifestSettings(nodeList, manifestSettings);
+    const rawManifestDocumentUrl = getManifestDocumentUrl(nodesWithManifestSettings);
+    const manifestHasDocumentUrl = typeof rawManifestDocumentUrl === 'string';
+    const manifestDocumentUrl = manifestHasDocumentUrl ? rawManifestDocumentUrl.trim() : '';
+    const backgroundUrlForSave =
+      typeof backgroundUrl === 'string' ? backgroundUrl.trim() : '';
+    // Manifest document.url is authoritative when present, including intentional empty clears.
+    const resolvedDocumentUrl = manifestHasDocumentUrl ? manifestDocumentUrl : backgroundUrlForSave;
     const nodesWithManifestData = setManifestDocumentUrl(
       nodesWithManifestSettings,
-      backgroundUrl || ''
+      resolvedDocumentUrl
     );
     return {
       fileVersion: '1.0',
@@ -801,7 +824,17 @@ useEffect(() => {
         bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
         visible: group.visible !== false,
         style: group.style || {}
-      }))
+      })),
+      scripts: (() => {
+        try {
+          if (typeof window === 'undefined' || !window.localStorage) return [];
+          const raw = window.localStorage.getItem('scripts');
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          return [];
+        }
+      })()
     };
   }, [
     nodes,
@@ -1138,12 +1171,25 @@ useEffect(() => {
 
     const handleClearBackground = () => {
       setBackgroundUrl('');
+      setDocumentUrl('');
+      setNodes((prevNodes) => {
+        const nextNodes = setManifestDocumentUrl(prevNodes, '');
+        if (nodesRef && nodesRef.current) nodesRef.current = nextNodes;
+        return nextNodes;
+      });
       setBackgroundInteractive(false);
       setSnackbar({ open: true, message: 'Document cleared', severity: 'info' });
     };
 
     const handleSetBackgroundUrl = ({ url }) => {
-      setBackgroundUrl(url || '');
+      const nextUrl = (url || '').trim();
+      setBackgroundUrl(nextUrl);
+      setDocumentUrl(nextUrl);
+      setNodes((prevNodes) => {
+        const nextNodes = setManifestDocumentUrl(prevNodes, nextUrl);
+        if (nodesRef && nodesRef.current) nodesRef.current = nextNodes;
+        return nextNodes;
+      });
     };
 
     const handleSetBackgroundInteractive = ({ interactive }) => {
@@ -1228,7 +1274,17 @@ useEffect(() => {
       eventBus.off('exportGraph', handleExportGraph);
       eventBus.off('testBackgroundRpc', handleTestBackgroundRpc);
     };
-  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady]);
+  }, [pan, zoom, nodes, edges, groups, defaultNodeColor, defaultEdgeColor, setSnackbar, backgroundRpc, backgroundRpcReady, setDocumentUrl, setNodes, nodesRef]);
+
+  useEffect(() => {
+    const rawManifestDocumentUrl = getManifestDocumentUrl(nodes);
+    if (typeof rawManifestDocumentUrl !== 'string') return;
+    const manifestDocumentUrl = rawManifestDocumentUrl.trim();
+    const currentBackgroundUrl = typeof backgroundUrl === 'string' ? backgroundUrl.trim() : '';
+    if (manifestDocumentUrl === currentBackgroundUrl) return;
+    setBackgroundUrl(manifestDocumentUrl);
+    setDocumentUrl(manifestDocumentUrl);
+  }, [nodes, backgroundUrl, setBackgroundUrl, setDocumentUrl]);
 
   const handleOpenMobileAddNode = useCallback(() => {
     setMobileAddNodeOpen(true);
@@ -1458,7 +1514,11 @@ useEffect(() => {
 
         try {
           const manifestSettings = getManifestSettings(nodesToLoad);
-          const documentUrl = getManifestDocumentUrl(nodesToLoad) || data.document?.url || null;
+          const rawDocumentUrl = getManifestDocumentUrl(nodesToLoad);
+          const documentUrl =
+            typeof rawDocumentUrl === 'string'
+              ? rawDocumentUrl
+              : data.document?.url || null;
           eventBus.emit('loadSaveFile', {
             settings: manifestSettings || data.settings || {},
             viewport: data.viewport || {},
@@ -1525,6 +1585,12 @@ useEffect(() => {
   }, [backgroundPostEvent]);
 
   const handleAlignSelection = useCallback((mode) => {
+    if (mode === 'grid') {
+      eventBus.emit('alignToGrid');
+      emitEdgeIntent('alignSelection', { mode: 'grid', scope: 'graph' });
+      return true;
+    }
+
     const selectedSet = new Set(selectedNodeIds);
     if (!mode || selectedSet.size <= 1) {
       return false;
@@ -1884,13 +1950,18 @@ useEffect(() => {
       }
     };
     
-    // Log available helpers
-    console.log('🔧 Global helpers available:');
-    console.log('  - window.eventBus - Event bus');
-    console.log('  - window.graphAPI - Graph API');
-    console.log('  - window.testBackgroundRpc(method, args) - Test RPC');
-    console.log('  - window.backgroundRpcStatus() - Check RPC status');
-    console.log('  - window.testExecutionIntent(payload) - Test execution spine');
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined' &&
+      window.__TWILITE_DEBUG_HELPERS__
+    ) {
+      console.log('🔧 Global helpers available:');
+      console.log('  - window.eventBus - Event bus');
+      console.log('  - window.graphAPI - Graph API');
+      console.log('  - window.testBackgroundRpc(method, args) - Test RPC');
+      console.log('  - window.backgroundRpcStatus() - Check RPC status');
+      console.log('  - window.testExecutionIntent(payload) - Test execution spine');
+    }
     
     return () => {
       delete window.testBackgroundRpc;
@@ -1967,7 +2038,11 @@ useEffect(() => {
 
           try {
             const manifestSettings = getManifestSettings(nodesToLoad);
-            const documentUrl = getManifestDocumentUrl(nodesToLoad) || data.document?.url || null;
+            const rawDocumentUrl = getManifestDocumentUrl(nodesToLoad);
+            const documentUrl =
+              typeof rawDocumentUrl === 'string'
+                ? rawDocumentUrl
+                : data.document?.url || null;
             eventBus.emit('loadSaveFile', {
               settings: manifestSettings || data.settings || {},
               viewport: data.viewport || {},
@@ -2030,6 +2105,29 @@ useEffect(() => {
 
         if (typeof fullUrl === 'string' && fullUrl.startsWith('/tlz/')) {
           directTlzPath = fullUrl;
+        }
+
+        if (typeof fullUrl === 'string' && fullUrl.startsWith('local://')) {
+          const localPath = fullUrl.slice('local://'.length).trim();
+          if (!localPath) {
+            setSnackbar({
+              open: true,
+              message: 'Local URL is empty.',
+              severity: 'warning'
+            });
+            return;
+          }
+          const normalizedPath = localPath.startsWith('/') ? localPath : `/${localPath}`;
+          if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
+            fullUrl = normalizedPath;
+          } else {
+            setSnackbar({
+              open: true,
+              message: `Cannot fetch ${fullUrl} in browser mode. Open a path under /public or use tlz://.`,
+              severity: 'warning'
+            });
+            return;
+          }
         }
 
         const ensureAbsoluteFromRelative = (input) => {
@@ -2595,7 +2693,12 @@ useEffect(() => {
     const handleUnhandledRejection = (event) => {
       const reason = event && (event.reason || event.detail);
       const message = typeof reason === 'string' ? reason : (reason && reason.message) ? reason.message : '';
-      if (message && message.includes("A listener indicated an asynchronous response")) {
+      const isAsyncListenerClose =
+        message && message.includes("A listener indicated an asynchronous response");
+      const isEmptyReason =
+        reason == null ||
+        (typeof reason === 'object' && reason !== null && !reason.message && Object.keys(reason).length === 0);
+      if (isAsyncListenerClose || isEmptyReason) {
         // prevent the default logging of unhandledrejection
         event.preventDefault();
       }

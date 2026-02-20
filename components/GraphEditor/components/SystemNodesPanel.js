@@ -14,11 +14,16 @@ import {
   Paper,
   Chip,
   Tabs,
-  Tab
+  Tab,
+  List,
+  ListItemButton,
+  ListItemText
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import eventBus from "../../NodeGraph/eventBus";
 
 export default function SystemNodesPanel({
   open = false,
@@ -48,10 +53,81 @@ export default function SystemNodesPanel({
   const [dictionaryViews, setDictionaryViews] = useState([]);
   const [error, setError] = useState("");
   const [selectedSection, setSelectedSection] = useState("legend");
+  const [scripts, setScripts] = useState([]);
+  const [selectedScriptId, setSelectedScriptId] = useState("");
+  const [scriptName, setScriptName] = useState("");
+  const [scriptTags, setScriptTags] = useState("");
+  const [scriptRef, setScriptRef] = useState("");
+  const [scriptSource, setScriptSource] = useState("");
+  const [runningScript, setRunningScript] = useState(false);
+  const [scriptResult, setScriptResult] = useState(null);
   const resizeStateRef = useRef(null);
   const validationErrors = Array.isArray(validationReport?.errors) ? validationReport.errors : [];
   const validationWarnings = Array.isArray(validationReport?.warnings) ? validationReport.warnings : [];
   const totalIssues = validationErrors.length + validationWarnings.length;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const readScripts = () => {
+      try {
+        const raw = window.localStorage.getItem("scripts");
+        const parsed = raw ? JSON.parse(raw) : [];
+        const next = Array.isArray(parsed) ? parsed : [];
+        setScripts(next);
+        if (!next.length) {
+          setSelectedScriptId("");
+          return;
+        }
+        setSelectedScriptId((prev) => (prev && next.some((item) => item?.id === prev) ? prev : next[0].id));
+      } catch {
+        setScripts([]);
+        setSelectedScriptId("");
+      }
+    };
+    readScripts();
+    const onStorage = (event) => {
+      if (event?.key === "scripts") readScripts();
+    };
+    const onScriptsChanged = () => readScripts();
+    window.addEventListener("storage", onStorage);
+    eventBus.on("scriptsChanged", onScriptsChanged);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      eventBus.off("scriptsChanged", onScriptsChanged);
+    };
+  }, []);
+
+  useEffect(() => {
+    const selected = scripts.find((item) => item?.id === selectedScriptId) || null;
+    setScriptName(selected?.name || "");
+    setScriptTags(selected?.tags || "");
+    setScriptRef(selected?.ref || "");
+    setScriptSource(selected?.source || "");
+  }, [scripts, selectedScriptId]);
+
+  const persistScripts = (nextScripts) => {
+    setScripts(nextScripts);
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem("scripts", JSON.stringify(nextScripts));
+      }
+    } catch {}
+    eventBus.emit("scriptsChanged", { count: nextScripts.length });
+  };
+
+  const normalizeScriptRefUrl = (ref) => {
+    if (!ref || typeof ref !== "string") return null;
+    const trimmed = ref.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+    if (trimmed.startsWith("local://")) {
+      const localPath = trimmed.slice("local://".length).trim();
+      if (!localPath) return null;
+      return localPath.startsWith("/") ? localPath : `/${localPath}`;
+    }
+    if (trimmed.startsWith("/")) return trimmed;
+    return `/${trimmed.replace(/^\/+/, "")}`;
+  };
 
   const beginResize = (event) => {
     event.preventDefault();
@@ -231,6 +307,65 @@ export default function SystemNodesPanel({
     ]);
   };
 
+  const handleCreateScript = () => {
+    const id = `script_${Date.now()}`;
+    const next = [
+      {
+        id,
+        name: "New Script",
+        tags: "",
+        ref: "",
+        source: ""
+      },
+      ...scripts
+    ];
+    persistScripts(next);
+    setSelectedScriptId(id);
+  };
+
+  const handleSaveScript = () => {
+    if (!selectedScriptId) return;
+    const next = scripts.map((item) => (
+      item.id === selectedScriptId
+        ? { ...item, name: scriptName || "Untitled", tags: scriptTags, ref: scriptRef, source: scriptSource }
+        : item
+    ));
+    persistScripts(next);
+  };
+
+  const handleDeleteScript = () => {
+    if (!selectedScriptId) return;
+    const next = scripts.filter((item) => item.id !== selectedScriptId);
+    persistScripts(next);
+    setSelectedScriptId(next[0]?.id || "");
+  };
+
+  const handleRunScript = async () => {
+    if (typeof window === "undefined" || !window.__scriptRunner) {
+      setScriptResult({ success: false, error: "Script runner not available" });
+      return;
+    }
+    setRunningScript(true);
+    setScriptResult(null);
+    try {
+      let sourceForRun = scriptSource;
+      if (!sourceForRun.trim() && scriptRef.trim()) {
+        const url = normalizeScriptRefUrl(scriptRef);
+        if (!url) throw new Error("Invalid script ref");
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Failed to load script ref: ${url} (${response.status})`);
+        sourceForRun = await response.text();
+      }
+      if (!sourceForRun.trim()) throw new Error("Script source is empty");
+      const res = await window.__scriptRunner.run(sourceForRun, { dry: false, allowMutations: true });
+      setScriptResult(res);
+    } catch (err) {
+      setScriptResult({ success: false, error: String(err) });
+    } finally {
+      setRunningScript(false);
+    }
+  };
+
   return (
     <Drawer
       anchor={anchor}
@@ -251,17 +386,17 @@ export default function SystemNodesPanel({
           zIndex: 5,
           ...(anchor === "left" ? { right: -4 } : { left: -4 })
         }}
-        aria-label="Resize System Nodes panel"
+        aria-label="Resize Legend panel"
       />
       <Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">System Nodes</Typography>
+          <Typography variant="h6">Legend</Typography>
           <IconButton onClick={onClose}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </Stack>
         <Typography variant="caption" color="text.secondary">
-          Manifest, Legend, Dictionary, and validation
+          Manifest, Legend, Dictionary, Scripts, and validation
         </Typography>
         <Divider sx={{ my: 2 }} />
 
@@ -279,6 +414,7 @@ export default function SystemNodesPanel({
             <Tab value="legend" label="Legend" />
             <Tab value="manifest" label="Manifest" />
             <Tab value="dictionary" label="Dictionary" />
+            <Tab value="scripts" label="Scripts" />
             <Tab value="validation" label={`Validation (${totalIssues})`} />
           </Tabs>
 
@@ -399,6 +535,72 @@ export default function SystemNodesPanel({
                 ))}
                 <Button variant="text" size="small" startIcon={<AddIcon />} onClick={addViewEntry}>Add view</Button>
                 <Button variant="outlined" size="small" onClick={applyDictionary}>Apply Dictionary</Button>
+              </Stack>
+            ) : null}
+
+            {selectedSection === "scripts" ? (
+              <Stack spacing={1.5}>
+                <Typography variant="subtitle1">Scripts</Typography>
+                <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} sx={{ minHeight: 420 }}>
+                  <Paper variant="outlined" sx={{ width: { xs: "100%", md: 240 }, display: "flex", flexDirection: "column", minHeight: 280 }}>
+                    <Box sx={{ p: 1 }}>
+                      <Button fullWidth size="small" variant="contained" startIcon={<AddIcon />} onClick={handleCreateScript}>
+                        New Script
+                      </Button>
+                    </Box>
+                    <Divider />
+                    <List dense sx={{ p: 0, overflowY: "auto", flex: 1 }}>
+                      {scripts.length === 0 ? (
+                        <Box sx={{ p: 1.5 }}>
+                          <Typography variant="caption" color="text.secondary">No scripts yet.</Typography>
+                        </Box>
+                      ) : scripts.map((item) => (
+                        <ListItemButton key={item.id} selected={item.id === selectedScriptId} onClick={() => setSelectedScriptId(item.id)}>
+                          <ListItemText primary={item.name || item.id} secondary={item.tags || ""} />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Paper>
+
+                  <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+                    {!selectedScriptId ? (
+                      <Alert severity="info" variant="outlined">Select or create a script.</Alert>
+                    ) : (
+                      <>
+                        <TextField size="small" label="Script Name" value={scriptName} onChange={(e) => setScriptName(e.target.value)} />
+                        <TextField size="small" label="Tags" value={scriptTags} onChange={(e) => setScriptTags(e.target.value)} />
+                        <TextField size="small" label="Script Ref (optional)" value={scriptRef} onChange={(e) => setScriptRef(e.target.value)} placeholder="/scripts/my-script.js or https://..." />
+                        <TextField
+                          label="Script Source"
+                          multiline
+                          minRows={10}
+                          value={scriptSource}
+                          onChange={(e) => setScriptSource(e.target.value)}
+                          placeholder="Optional if Script Ref is provided"
+                          sx={{ "& textarea": { fontFamily: "monospace", fontSize: "0.85rem" } }}
+                        />
+                        <Stack direction="row" spacing={1}>
+                          <Button variant="contained" size="small" startIcon={<PlayArrowIcon />} onClick={handleRunScript} disabled={runningScript || (!scriptSource.trim() && !scriptRef.trim())}>
+                            {runningScript ? "Running..." : "Run"}
+                          </Button>
+                          <Button variant="outlined" size="small" onClick={handleSaveScript} disabled={!scriptSource.trim() && !scriptRef.trim()}>
+                            Save
+                          </Button>
+                          <Button variant="outlined" size="small" color="error" startIcon={<DeleteIcon />} onClick={handleDeleteScript}>
+                            Delete
+                          </Button>
+                        </Stack>
+                        {scriptResult ? (
+                          <Alert severity={scriptResult?.success === false ? "error" : "success"} variant="outlined">
+                            <Typography variant="body2">
+                              {scriptResult?.success === false ? (scriptResult?.error || "Script error") : "Script executed"}
+                            </Typography>
+                          </Alert>
+                        ) : null}
+                      </>
+                    )}
+                  </Stack>
+                </Stack>
               </Stack>
             ) : null}
           </Box>

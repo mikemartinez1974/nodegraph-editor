@@ -49,6 +49,16 @@ const BANNED_ROUTE_KEYS = [
   "animation",
   "decorations"
 ];
+const BUILTIN_NODE_TYPES = new Set([
+  "manifest",
+  "legend",
+  "dictionary",
+  "markdown",
+  "script",
+  "port",
+  "view",
+  "api"
+]);
 
 export function validateGraphInvariants({
   nodes = [],
@@ -56,7 +66,8 @@ export function validateGraphInvariants({
   edgeRoutes = {},
   clusters = [],
   mode = 'mutation',
-  resolvedDictionary = null
+  resolvedDictionary = null,
+  scriptLibrary = null
 }) {
   const isLoadMode = mode === "load";
   const isDraftMode = () => {
@@ -205,6 +216,9 @@ export function validateGraphInvariants({
 
     const { entryByKey, viewByKey } = resolveEntries(dictionary);
     dependencyTypes.forEach((nodeType) => {
+      if (BUILTIN_NODE_TYPES.has(nodeType)) {
+        return;
+      }
       const entry = entryByKey.get(nodeType);
       if (!entry) {
         warnings.push({
@@ -300,13 +314,15 @@ export function validateGraphInvariants({
 
       const side = handle.position?.side;
       const routePoints = edgeRoutes?.[edge.id]?.points;
-      if (side && node && Array.isArray(routePoints) && routePoints.length > 0) {
+      if (side && node && Array.isArray(routePoints) && routePoints.length > 1) {
         const bounds = getNodeBounds(node);
-        const startPoint = routePoints[0];
-        if (!portSideMatchesPoint(side, bounds, startPoint)) {
+        const routePoint = nodeType === "source"
+          ? routePoints[0]
+          : routePoints[routePoints.length - 1];
+        if (!portSideMatchesPoint(side, bounds, routePoint)) {
           warnings.push({
             code: "PORT_SIDE_MISMATCH",
-            message: `Edge "${edge.id}" does not start on the ${side} side.`,
+            message: `Edge "${edge.id}" ${nodeType === "source" ? "does not start" : "does not end"} on the ${side} side.`,
             edgeId: edge.id,
             nodeId: node.id
           });
@@ -386,6 +402,47 @@ export function validateGraphInvariants({
           nodeId: node.id
         });
       }
+    }
+  });
+
+  const resolveScriptLibrary = () => {
+    if (Array.isArray(scriptLibrary)) return scriptLibrary;
+    if (typeof window === "undefined" || !window.localStorage) return [];
+    try {
+      const raw = window.localStorage.getItem("scripts");
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const library = resolveScriptLibrary();
+  const scriptNodes = nodes.filter((node) => node?.type === "script");
+  if (scriptNodes.length > 0 && library.length === 0) {
+    warnings.push({
+      code: "SCRIPT_LIBRARY_EMPTY",
+      message: "Script library is empty; script nodes will not run until scripts are added."
+    });
+  }
+
+  scriptNodes.forEach((node) => {
+    const scriptId = typeof node?.data?.scriptId === "string" ? node.data.scriptId.trim() : "";
+    if (!scriptId) {
+      warnings.push({
+        code: "SCRIPT_NODE_SCRIPT_UNSET",
+        message: `Script node "${node.id}" has no selected script.`,
+        nodeId: node.id
+      });
+      return;
+    }
+    const exists = library.some((entry) => entry && entry.id === scriptId);
+    if (!exists) {
+      warnings.push({
+        code: "SCRIPT_NODE_SCRIPT_MISSING",
+        message: `Script node "${node.id}" references missing script "${scriptId}".`,
+        nodeId: node.id
+      });
     }
   });
 

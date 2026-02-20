@@ -227,6 +227,7 @@ const FixedNode = ({
       : `${theme.textColors?.light || '#fff'}`,
     zIndex: 100,
     pointerEvents: 'auto',
+    overflow: 'hidden',
     display: hideDefaultContent ? 'block' : 'flex',
     flexDirection: 'column',
     alignItems: 'center',

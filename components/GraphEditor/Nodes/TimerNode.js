@@ -38,6 +38,7 @@ export default function TimerNode({
   
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 250) * zoom;
+  const uiScale = Math.max(0.75, Math.min(1.1, zoom || 1));
   
   // Timer state
   const [elapsed, setElapsed] = useState(0);
@@ -257,9 +258,12 @@ export default function TimerNode({
         boxSizing: 'border-box',
         padding: 16,
         color: theme.palette.primary.contrastText,
+        fontSize: `${12 * uiScale}px`,
+        lineHeight: 1.25,
         transition: 'border 0.2s ease',
         zIndex: 100,
         pointerEvents: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

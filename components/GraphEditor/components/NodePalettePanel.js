@@ -25,6 +25,7 @@ import useAvailableNodeTypes from '../hooks/useAvailableNodeTypes';
 const FAVORITES_KEY = 'nodegraph-editor:palette:favorites';
 
 const BASE_CATEGORY_ORDER = ['favorites', 'breadboard', 'basic', 'utility', 'logic', 'content', 'definitions', 'media', 'integration', 'advanced', 'other'];
+const HIDDEN_PALETTE_TYPES = new Set(['manifest', 'legend', 'dictionary']);
 const categoryLabels = {
   favorites: 'Favorites',
   breadboard: 'Breadboard',
@@ -206,7 +207,9 @@ export default function NodePalettePanel({
 
     orderedCategories.forEach((category) => {
       if (category === 'favorites') return;
-      const nodes = (mergedNodesByCategory[category] || []).filter((meta) => matchesQuery(meta, query));
+      const nodes = (mergedNodesByCategory[category] || [])
+        .filter((meta) => !HIDDEN_PALETTE_TYPES.has(meta?.type))
+        .filter((meta) => matchesQuery(meta, query));
       if (nodes.length > 0) {
         sections.push({
           key: category,

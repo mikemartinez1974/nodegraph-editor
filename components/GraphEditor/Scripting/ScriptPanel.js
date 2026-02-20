@@ -39,6 +39,7 @@ export default function ScriptPanel() {
   const [scripts, setScripts] = useLocalStorage('scripts', []);
   const [selectedId, setSelectedId] = useState(scripts[0]?.id || '');
   const [source, setSource] = useState('');
+  const [scriptRef, setScriptRef] = useState('');
   const [result, setResult] = useState(null);
   const [running, setRunning] = useState(false);
 
@@ -76,10 +77,21 @@ export default function ScriptPanel() {
   useEffect(() => {
     if (selectedScript) {
       setSource(selectedScript.source || '');
+      setScriptRef(selectedScript.ref || '');
     } else if (scripts.length > 0) {
       setSelectedId(scripts[0].id);
     }
   }, [selectedId, selectedScript, scripts]);
+
+  // Keep selected script source synchronized with editor text, so ScriptNode dropdown
+  // sees updates immediately without requiring an explicit Save click.
+  useEffect(() => {
+    try {
+      eventBus.emit('scriptsChanged', { count: Array.isArray(scripts) ? scripts.length : 0 });
+    } catch (err) {
+      // ignore event bus errors
+    }
+  }, [scripts]);
 
   // External toggle handler
   useEffect(() => {
@@ -173,6 +185,7 @@ export default function ScriptPanel() {
       id,
       name: 'New Script',
       source: '// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };',
+      ref: '',
       tags: ''
     };
     setScripts(prev => [newScript, ...prev]);
@@ -183,12 +196,12 @@ export default function ScriptPanel() {
     if (!selectedId || !selectedScript) return;
     setScripts(prev => prev.map(s => 
       s.id === selectedId 
-        ? { ...s, source, name: s.name || 'Untitled' }
+        ? { ...s, source, ref: scriptRef, name: s.name || 'Untitled' }
         : s
     ));
     setResult({ success: true, message: 'Saved successfully' });
     setTimeout(() => setResult(null), 3000);
-  }, [selectedId, selectedScript, source, setScripts]);
+  }, [selectedId, selectedScript, source, scriptRef, setScripts]);
 
   const handleUpdateName = useCallback((newName) => {
     if (!selectedId) return;
@@ -204,6 +217,20 @@ export default function ScriptPanel() {
     ));
   }, [selectedId, setScripts]);
 
+  const normalizeScriptRefUrl = useCallback((ref) => {
+    if (!ref || typeof ref !== 'string') return null;
+    const trimmed = ref.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    if (trimmed.startsWith('local://')) {
+      const localPath = trimmed.slice('local://'.length).trim();
+      if (!localPath) return null;
+      return localPath.startsWith('/') ? localPath : `/${localPath}`;
+    }
+    if (trimmed.startsWith('/')) return trimmed;
+    return `/${trimmed.replace(/^\/+/, '')}`;
+  }, []);
+
   const handleRun = useCallback(async (dry = false) => {
     if (typeof window === 'undefined' || !window.__scriptRunner) {
       setResult({ success: false, error: 'Script runner not available' });
@@ -215,7 +242,20 @@ export default function ScriptPanel() {
     
     try {
       const meta = { dry: dry || dryRun, allowMutations: allowMutations };
-      const res = await window.__scriptRunner.run(source, meta);
+      let sourceForRun = source;
+      if (!sourceForRun.trim() && scriptRef.trim()) {
+        const url = normalizeScriptRefUrl(scriptRef);
+        if (!url) throw new Error('Invalid script ref');
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to load script ref: ${url} (${response.status})`);
+        }
+        sourceForRun = await response.text();
+      }
+      if (!sourceForRun.trim()) {
+        throw new Error('Script source is empty (no inline source or ref)');
+      }
+      const res = await window.__scriptRunner.run(sourceForRun, meta);
       setResult(res);
       
       const p = res?.proposals || res?.proposed || res?.proposedChanges || null;
@@ -229,7 +269,7 @@ export default function ScriptPanel() {
     } finally {
       setRunning(false);
     }
-  }, [source, dryRun, allowMutations]);
+  }, [source, scriptRef, dryRun, allowMutations, normalizeScriptRefUrl]);
 
   const handleDuplicate = useCallback(() => {
     if (!selectedScript) return;
@@ -493,6 +533,22 @@ export default function ScriptPanel() {
                     value={selectedScript.tags || ''}
                     onChange={(e) => handleUpdateTags(e.target.value)}
                     placeholder="api, utility, example"
+                    sx={{ mb: 1 }}
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Script Ref (optional)"
+                    value={scriptRef}
+                    onChange={(e) => {
+                      const nextRef = e.target.value;
+                      setScriptRef(nextRef);
+                      if (!selectedId) return;
+                      setScripts((prev) => prev.map((item) => (
+                        item.id === selectedId ? { ...item, ref: nextRef } : item
+                      )));
+                    }}
+                    placeholder="/public/scripts/my-script.js or https://..."
                   />
                 </Box>
 
@@ -503,7 +559,16 @@ export default function ScriptPanel() {
                     multiline
                     variant="outlined"
                     value={source}
-                    onChange={(e) => setSource(e.target.value)}
+                    onChange={(e) => {
+                      const nextSource = e.target.value;
+                      setSource(nextSource);
+                      if (!selectedId) return;
+                      setScripts((prev) => prev.map((item) => (
+                        item.id === selectedId
+                          ? { ...item, source: nextSource }
+                          : item
+                      )));
+                    }}
                     placeholder="Write your script here..."
                     sx={{
                       flexGrow: 1,
@@ -638,7 +703,7 @@ export default function ScriptPanel() {
                     size="small"
                     startIcon={<PlayArrowIcon />}
                     onClick={() => handleRun()}
-                    disabled={running || !source.trim()}
+                    disabled={running || (!source.trim() && !scriptRef.trim())}
                   >
                     {running ? 'Running...' : 'Run'}
                   </Button>
@@ -647,7 +712,7 @@ export default function ScriptPanel() {
                     size="small"
                     startIcon={<SaveIcon />}
                     onClick={handleSave}
-                    disabled={!source.trim()}
+                    disabled={!source.trim() && !scriptRef.trim()}
                   >
                     Save
                   </Button>

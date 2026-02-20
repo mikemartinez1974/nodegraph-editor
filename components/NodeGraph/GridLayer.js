@@ -29,11 +29,14 @@ const GridLayer = ({ pan, zoom, gridSize = 20, theme }) => {
     const offsetX = pan.x % gridSpacing;
     const offsetY = pan.y % gridSpacing;
 
-    ctx.strokeStyle = theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+    const isDark = theme.palette.mode === 'dark';
+    const baseStroke = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.14)';
+    const majorStroke = isDark ? 'rgba(255,255,255,0.26)' : 'rgba(0,0,0,0.22)';
     ctx.lineWidth = 1;
 
     // Draw vertical lines
-    for (let x = offsetX; x < canvas.width; x += gridSpacing) {
+    for (let x = offsetX, i = 0; x < canvas.width; x += gridSpacing, i += 1) {
+      ctx.strokeStyle = i % 5 === 0 ? majorStroke : baseStroke;
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, canvas.height);
@@ -41,7 +44,8 @@ const GridLayer = ({ pan, zoom, gridSize = 20, theme }) => {
     }
 
     // Draw horizontal lines
-    for (let y = offsetY; y < canvas.height; y += gridSpacing) {
+    for (let y = offsetY, i = 0; y < canvas.height; y += gridSpacing, i += 1) {
+      ctx.strokeStyle = i % 5 === 0 ? majorStroke : baseStroke;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(canvas.width, y);
@@ -59,7 +63,7 @@ const GridLayer = ({ pan, zoom, gridSize = 20, theme }) => {
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: -1
+        zIndex: 0
       }}
     />
   );

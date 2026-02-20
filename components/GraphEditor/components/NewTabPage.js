@@ -75,11 +75,16 @@ export default function NewTabPage({
 
         eventBus.emit('setAddress', `local://${file.name}`);
         const manifestSettings = getManifestSettings(nodesToLoad);
-        const documentUrl = getManifestDocumentUrl(nodesToLoad) || jsonData.document?.url || null;
+        const rawDocumentUrl = getManifestDocumentUrl(nodesToLoad);
+        const documentUrl =
+          typeof rawDocumentUrl === 'string'
+            ? rawDocumentUrl
+            : jsonData.document?.url || null;
         eventBus.emit('loadSaveFile', {
           settings: manifestSettings || jsonData.settings || {},
           filename: file.name,
-          documentUrl
+          documentUrl,
+          scripts: Array.isArray(jsonData.scripts) ? jsonData.scripts : null
         });
       } catch (err) {
         console.error('Failed to import graph', err);

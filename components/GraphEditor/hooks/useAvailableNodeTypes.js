@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import eventBus from "../../NodeGraph/eventBus";
 import { getNodeTypeList, getNodeTypesByCategory } from "../nodeTypeRegistry";
 import usePluginRegistry from "./usePluginRegistry";
+import {
+  shouldShowInTypeSelectors,
+  HIDDEN_SYSTEM_SELECTOR_TYPES
+} from "../constants/nodeTypeSelectorConfig";
 
 const getDictionaryNodeDefs = (dictionary) => {
   const nodeDefs = dictionary?.data?.nodeDefs;
@@ -26,7 +30,13 @@ const buildDictionaryTypeMeta = (entry) => {
 
 export default function useAvailableNodeTypes() {
   const { plugins } = usePluginRegistry();
-  const registryList = useMemo(() => getNodeTypeList(), [plugins]);
+  const registryList = useMemo(
+    () =>
+      getNodeTypeList().filter(
+        (meta) => shouldShowInTypeSelectors(meta?.type)
+      ),
+    [plugins]
+  );
   const registryByCategory = useMemo(() => getNodeTypesByCategory(), [plugins]);
   const registryTypeSet = useMemo(
     () => new Set(registryList.map((meta) => meta?.type).filter(Boolean)),
@@ -42,6 +52,9 @@ export default function useAvailableNodeTypes() {
       getDictionaryNodeDefs(dictionary).forEach((entry) => {
         const meta = buildDictionaryTypeMeta(entry);
         if (!meta || !meta.type) return;
+        // Keep dictionary-defined custom types visible in selectors.
+        // Only suppress core system types (manifest/legend/dictionary).
+        if (HIDDEN_SYSTEM_SELECTOR_TYPES.has(meta.type)) return;
         if (registryTypeSet.has(meta.type) || seen.has(meta.type)) return;
         seen.add(meta.type);
         next.push(meta);
@@ -84,10 +97,16 @@ export default function useAvailableNodeTypes() {
   }, [dictionaryTypeList, registryList]);
 
   const nodesByCategory = useMemo(() => {
-    if (!dictionaryTypeList.length) return registryByCategory;
+    const filteredBase = Object.entries(registryByCategory || {}).reduce((acc, [category, nodes]) => {
+      acc[category] = (Array.isArray(nodes) ? nodes : []).filter(
+        (meta) => shouldShowInTypeSelectors(meta?.type)
+      );
+      return acc;
+    }, {});
+    if (!dictionaryTypeList.length) return filteredBase;
     return {
-      ...registryByCategory,
-      definitions: [...(registryByCategory.definitions || []), ...dictionaryTypeList]
+      ...filteredBase,
+      definitions: [...(filteredBase.definitions || []), ...dictionaryTypeList]
     };
   }, [dictionaryTypeList, registryByCategory]);
 

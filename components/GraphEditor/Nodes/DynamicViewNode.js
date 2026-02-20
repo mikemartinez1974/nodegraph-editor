@@ -48,19 +48,130 @@ const asString = (value) => {
   }
 };
 
+const isLikelyImageSource = (value) => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim().toLowerCase();
+  return (
+    trimmed.startsWith('data:image/') ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    /\.(png|jpe?g|gif|webp|bmp|avif|svg)(\?|#|$)/.test(trimmed)
+  );
+};
+
 const detectContentType = (payload) => {
   if (payload === undefined || payload === null) return 'empty';
   if (typeof payload === 'string') {
     const trimmed = payload.trim();
+    if (trimmed.startsWith('<svg') && trimmed.includes('</svg>')) return 'svg';
+    if (isLikelyImageSource(trimmed)) return 'image';
     if (trimmed.startsWith('<') && trimmed.includes('>')) return 'html';
     return 'markdown';
   }
   if (typeof payload === 'object') {
+    if (typeof payload.canvas === 'object' && payload.canvas) return 'canvas';
+    if (typeof payload.svg === 'string') return 'svg';
+    if (typeof payload.image === 'string' || typeof payload.src === 'string') return 'image';
     if (typeof payload.html === 'string') return 'html';
     if (typeof payload.markdown === 'string') return 'markdown';
     if (typeof payload.text === 'string') return 'text';
   }
   return 'json';
+};
+
+const drawCanvasSpec = (ctx, spec = {}, width, height) => {
+  ctx.clearRect(0, 0, width, height);
+  if (spec.background) {
+    ctx.fillStyle = spec.background;
+    ctx.fillRect(0, 0, width, height);
+  }
+  const shapes = Array.isArray(spec.shapes) ? spec.shapes : [];
+  shapes.forEach((shape) => {
+    const type = String(shape?.type || '').toLowerCase();
+    if (type === 'rect') {
+      const x = Number(shape.x) || 0;
+      const y = Number(shape.y) || 0;
+      const w = Number(shape.width) || 0;
+      const h = Number(shape.height) || 0;
+      if (shape.fill) {
+        ctx.fillStyle = shape.fill;
+        ctx.fillRect(x, y, w, h);
+      }
+      if (shape.stroke) {
+        ctx.strokeStyle = shape.stroke;
+        ctx.lineWidth = Number(shape.lineWidth) || 1;
+        ctx.strokeRect(x, y, w, h);
+      }
+      return;
+    }
+    if (type === 'circle') {
+      const x = Number(shape.x) || 0;
+      const y = Number(shape.y) || 0;
+      const radius = Number(shape.radius) || 0;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      if (shape.fill) {
+        ctx.fillStyle = shape.fill;
+        ctx.fill();
+      }
+      if (shape.stroke) {
+        ctx.strokeStyle = shape.stroke;
+        ctx.lineWidth = Number(shape.lineWidth) || 1;
+        ctx.stroke();
+      }
+      return;
+    }
+    if (type === 'line') {
+      ctx.beginPath();
+      ctx.moveTo(Number(shape.x1) || 0, Number(shape.y1) || 0);
+      ctx.lineTo(Number(shape.x2) || 0, Number(shape.y2) || 0);
+      ctx.strokeStyle = shape.stroke || '#000';
+      ctx.lineWidth = Number(shape.lineWidth) || 1;
+      ctx.stroke();
+      return;
+    }
+    if (type === 'text') {
+      ctx.fillStyle = shape.color || '#000';
+      const size = Number(shape.fontSize) || 14;
+      const family = shape.fontFamily || 'sans-serif';
+      ctx.font = `${size}px ${family}`;
+      ctx.textAlign = shape.align || 'left';
+      ctx.textBaseline = shape.baseline || 'top';
+      ctx.fillText(String(shape.text || ''), Number(shape.x) || 0, Number(shape.y) || 0);
+    }
+  });
+};
+
+const CanvasRuntimeView = ({ payload }) => {
+  const canvasRef = useRef(null);
+  const spec = payload?.canvas || payload || {};
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const width = Math.max(1, parent.clientWidth || Number(spec.width) || 320);
+    const height = Math.max(1, parent.clientHeight || Number(spec.height) || 180);
+    const ratio = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    drawCanvasSpec(ctx, spec, width, height);
+  }, [spec]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ display: 'block', width: '100%', height: '100%', background: 'transparent' }}
+    />
+  );
 };
 
 const getByPath = (source, path) => {
@@ -985,6 +1096,48 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
           title={`View for ${node?.type || 'node'}`}
         />
       );
+    }
+    if (contentType === 'svg') {
+      const svg = typeof payload === 'string' ? payload : payload?.svg || '';
+      if (!svg) {
+        return <div style={{ color: theme.palette.text.secondary }}>No SVG payload found.</div>;
+      }
+      const encoded = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+      return (
+        <img
+          src={encoded}
+          alt={payload?.alt || node?.label || 'svg-view'}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'block',
+            objectFit: payload?.fit || 'contain',
+            background: 'transparent'
+          }}
+        />
+      );
+    }
+    if (contentType === 'image') {
+      const src = typeof payload === 'string' ? payload : payload?.image || payload?.src || '';
+      if (!src) {
+        return <div style={{ color: theme.palette.text.secondary }}>No image source found.</div>;
+      }
+      return (
+        <img
+          src={src}
+          alt={payload?.alt || node?.label || 'image-view'}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'block',
+            objectFit: payload?.fit || 'contain',
+            background: 'transparent'
+          }}
+        />
+      );
+    }
+    if (contentType === 'canvas') {
+      return <CanvasRuntimeView payload={payload} />;
     }
     if (contentType === 'markdown') {
       const markdown = typeof payload === 'string' ? payload : payload?.markdown || '';

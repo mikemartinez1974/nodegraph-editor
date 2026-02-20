@@ -13,7 +13,6 @@ import NodePalettePanel from './components/NodePalettePanel';
 import DocumentPropertiesDialog from './components/DocumentPropertiesDialog';
 import NewTabPage from './components/NewTabPage';
 import ScriptRunner from './Scripting/ScriptRunner';
-import ScriptPanel from './Scripting/ScriptPanel';
 import BackgroundFrame from './components/BackgroundFrame';
 import EdgeTypes from './edgeTypes';
 import EntitiesPanel from './components/EntitiesPanel';
@@ -34,9 +33,9 @@ import {
   useGraphEditorRpcContext
 } from './providers/GraphEditorContext';
 import useIntentEmitter from './hooks/useIntentEmitter';
-import EdgeLayoutPanel from './components/EdgeLayoutPanel';
 import { summarizeContracts } from './contracts/contractManager';
 import { validateGraphInvariants } from './validators/validateGraphInvariants';
+import { shouldShowInTypeSelectors } from './constants/nodeTypeSelectorConfig';
 
 const PANEL_WIDTHS = {
   entities: 320,
@@ -153,6 +152,7 @@ const GraphEditorContent = () => {
     showEntitiesPanel,
     setShowEntitiesPanel,
     entityView,
+    setEntityView,
     handleOpenDocumentProperties,
     handleOpenMobileAddNode,
     handleCloseMobileAddNode,
@@ -178,7 +178,7 @@ const GraphEditorContent = () => {
   } = layout || {};
 
   const panelAnchor = nodePanelAnchor || "left";
-  const oppositeAnchor = panelAnchor === "left" ? "right" : "left";
+  const entitiesAnchor = "right";
 
   const {
     handlers,
@@ -385,13 +385,17 @@ const GraphEditorContent = () => {
   );
   const nodeTypeOptions = useMemo(() => {
     if (Array.isArray(nodeTypeMetadata) && nodeTypeMetadata.length) {
-      return nodeTypeMetadata.map((meta) => ({
+      return nodeTypeMetadata
+        .filter((meta) => shouldShowInTypeSelectors(meta?.type))
+        .map((meta) => ({
         value: meta.type,
         label: meta.label || meta.type
       }));
     }
     if (nodeTypes && typeof nodeTypes === "object") {
-      return Object.keys(nodeTypes).map((type) => ({ value: type, label: type }));
+      return Object.keys(nodeTypes)
+        .filter((type) => shouldShowInTypeSelectors(type))
+        .map((type) => ({ value: type, label: type }));
     }
     return [];
   }, [nodeTypeMetadata, nodeTypes]);
@@ -1105,7 +1109,8 @@ const GraphEditorContent = () => {
         if (!edge) return;
         if (edge.source !== nodeId) return;
         const edgeSourceHandle = edge.sourcePort || 'root';
-        if (edgeSourceHandle !== sourcePort) return;
+        // Treat root as a wildcard source so simple graphs still propagate outputs.
+        if (edgeSourceHandle !== 'root' && edgeSourceHandle !== sourcePort) return;
         const targetPort = edge.targetPort || 'root';
         eventBus.emit('nodeInput', {
           targetNodeId: edge.target,
@@ -1136,9 +1141,9 @@ const GraphEditorContent = () => {
       }
     }
     if (showEntitiesPanel) {
-      if (oppositeAnchor === 'left') {
+      if (entitiesAnchor === 'left') {
         offsets.left = Math.max(offsets.left, PANEL_WIDTHS.entities);
-      } else if (oppositeAnchor === 'right') {
+      } else if (entitiesAnchor === 'right') {
         offsets.right = Math.max(offsets.right, PANEL_WIDTHS.entities);
       }
     }
@@ -1146,7 +1151,7 @@ const GraphEditorContent = () => {
       offsets.right = Math.max(offsets.right, PANEL_WIDTHS.layout);
     }
     return offsets;
-  }, [oppositeAnchor, panelAnchor, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
+  }, [entitiesAnchor, panelAnchor, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
   const resolveDefinitionUrl = useCallback((nodeId) => {
     if (!nodeId) return null;
     const node = nodes?.find((candidate) => candidate.id === nodeId);
@@ -1774,7 +1779,7 @@ const GraphEditorContent = () => {
     toggleEdgeList?.();
   }, [emitEdgeIntent, toggleEdgeList, showEdgeList]);
 
-  const handleSelectEdgeFromList = useCallback((edgeId) => {
+  const handleSelectEdgeFromList = useCallback((edgeId, openProperties = false) => {
     if (!edgeId) return;
     emitEdgeIntent('edgeListSelect', { edgeId });
     if (typeof setSelectedNodeIds === 'function') {
@@ -1784,7 +1789,7 @@ const GraphEditorContent = () => {
       setSelectedEdgeIds([edgeId]);
     }
     handlers?.handleEdgeFocus?.(edgeId);
-    if (typeof setShowPropertiesPanel === 'function') {
+    if (openProperties && typeof setShowPropertiesPanel === 'function') {
       setShowPropertiesPanel(true);
     }
   }, [emitEdgeIntent, setSelectedEdgeIds, setSelectedNodeIds, setShowPropertiesPanel, handlers]);
@@ -1803,11 +1808,12 @@ const GraphEditorContent = () => {
 const skipPropertiesCloseRef = useRef(false);
 
   const handleToggleEdgePanelIntent = useCallback(() => {
-    emitEdgeIntent('toggleEdgePanel', { open: !showEdgePanel });
-    if (typeof setShowEdgePanel === 'function') {
-      setShowEdgePanel(prev => !prev);
+    emitEdgeIntent('openDocumentPropertiesTab', { tab: 'layout' });
+    if (typeof setShowDocumentPropertiesDialog === 'function') {
+      setShowDocumentPropertiesDialog(true);
     }
-  }, [emitEdgeIntent, showEdgePanel, setShowEdgePanel]);
+    eventBus.emit('openDocumentPropertiesTab', { tab: 'layout' });
+  }, [emitEdgeIntent, setShowDocumentPropertiesDialog]);
 
   const focusNodeFromEntities = useCallback(
     (nodeId) => {
@@ -1827,11 +1833,24 @@ const skipPropertiesCloseRef = useRef(false);
     [emitEdgeIntent, handlers]
   );
 
-  const handleEntitiesPanelSelectNode = useCallback(
-    (nodeId) => {
-      focusNodeFromEntities(nodeId);
+  const handleEntitiesPanelSelectGroup = useCallback(
+    (clusterId, openProperties = false) => {
+      focusGroupFromEntities(clusterId);
+      if (openProperties && typeof setShowPropertiesPanel === 'function') {
+        setShowPropertiesPanel(true);
+      }
     },
-    [focusNodeFromEntities]
+    [focusGroupFromEntities, setShowPropertiesPanel]
+  );
+
+  const handleEntitiesPanelSelectNode = useCallback(
+    (nodeId, openProperties = false) => {
+      focusNodeFromEntities(nodeId);
+      if (openProperties && typeof setShowPropertiesPanel === 'function') {
+        setShowPropertiesPanel(true);
+      }
+    },
+    [focusNodeFromEntities, setShowPropertiesPanel]
   );
 
   const handleSelectEdgeFromProperties = useCallback((edgeId) => {
@@ -1903,11 +1922,6 @@ const skipPropertiesCloseRef = useRef(false);
       skipPropertiesCloseRef.current = false;
     }
   }, [selectedNodeIds, selectedEdgeIds, selectedGroupIds, showPropertiesPanel, setShowPropertiesPanel]);
-
-  const handleToggleScriptPanelIntent = useCallback(() => {
-    emitEdgeIntent('toggleScriptPanel');
-    eventBus.emit('toggleScriptPanel');
-  }, [emitEdgeIntent]);
 
   const handleNodeListFocusIntent = useCallback((nodeId) => {
     emitEdgeIntent('nodeListFocus', { nodeId });
@@ -2034,7 +2048,6 @@ const skipPropertiesCloseRef = useRef(false);
           onRerouteEdges={handleRerouteEdges}
           githubSettings={documentSettings.github}
           onToggleProperties={handleTogglePropertiesPanelIntent}
-          onToggleScriptPanel={handleToggleScriptPanelIntent}
           onOpenDocumentProperties={handleOpenDocumentPropertiesIntent}
           documentTheme={documentTheme}
           addressBarHeight={addressBarHeight}
@@ -2074,11 +2087,57 @@ const skipPropertiesCloseRef = useRef(false);
             borderBottomRightRadius: 10,
             minWidth: 0,
             px: 0.8,
-            py: 1.2
+            py: 1.2,
+            bgcolor: showSystemNodesPanel ? 'secondary.main' : 'primary.main',
+            color: showSystemNodesPanel ? 'secondary.contrastText' : 'primary.contrastText',
+            '&:hover': {
+              bgcolor: showSystemNodesPanel ? 'secondary.dark' : 'primary.dark'
+            }
           }}
-          aria-label={showSystemNodesPanel ? "Close System Nodes" : "Open System Nodes"}
+          aria-label={showSystemNodesPanel ? "Close Legend" : "Open Legend"}
         >
           Legend
+        </Button>
+      )}
+
+      {!isMobile && (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => {
+            if (showEntitiesPanel) {
+              setShowEntitiesPanel?.(false);
+              return;
+            }
+            if (typeof setEntityView === 'function' && !entityView) {
+              setEntityView('nodes');
+            }
+            setShowEntitiesPanel?.(true);
+          }}
+          sx={{
+            position: 'fixed',
+            right: showEntitiesPanel ? Math.max(0, PANEL_WIDTHS.entities - 1) : 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            writingMode: 'vertical-lr',
+            textOrientation: 'mixed',
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: 10,
+            minWidth: 0,
+            px: 0.8,
+            py: 1.2,
+            bgcolor: showEntitiesPanel ? 'secondary.main' : 'primary.main',
+            color: showEntitiesPanel ? 'secondary.contrastText' : 'primary.contrastText',
+            '&:hover': {
+              bgcolor: showEntitiesPanel ? 'secondary.dark' : 'primary.dark'
+            }
+          }}
+          aria-label={showEntitiesPanel ? "Close Elements" : "Open Elements"}
+        >
+          Elements
         </Button>
       )}
 
@@ -2165,7 +2224,7 @@ const skipPropertiesCloseRef = useRef(false);
 
           <EntitiesPanel
             open={showEntitiesPanel}
-            anchor={oppositeAnchor}
+            anchor={entitiesAnchor}
             entityView={entityView}
             nodes={nodes}
             edges={edges}
@@ -2175,7 +2234,8 @@ const skipPropertiesCloseRef = useRef(false);
             selectedGroupId={selectedGroupIds[0] || null}
             onSelectNode={handleEntitiesPanelSelectNode}
             onSelectEdge={handleSelectEdgeFromList}
-            onSelectGroup={focusGroupFromEntities}
+            onSelectGroup={handleEntitiesPanelSelectGroup}
+            onEntityViewChange={(view) => setEntityView?.(view)}
             onClose={handleCloseEntitiesPanel}
           />
 
@@ -2205,8 +2265,6 @@ const skipPropertiesCloseRef = useRef(false);
       )}
 
       {!isEmbedded && <ScriptRunner onRequest={handleScriptRequest} />}
-      {!isEmbedded && <ScriptPanel />}
-
       <DocumentPropertiesDialog
         open={showDocumentPropertiesDialog}
         onClose={() => setShowDocumentPropertiesDialog(false)}
@@ -2222,15 +2280,6 @@ const skipPropertiesCloseRef = useRef(false);
         recentSnapshots={recentSnapshots}
         storySnapshots={storySnapshots}
       />
-      <EdgeLayoutPanel
-        open={showEdgePanel}
-        onClose={handleCloseEdgePanel}
-        documentSettings={documentSettings}
-        setDocumentSettings={setDocumentSettings}
-        contractSummary={contractSummary}
-        onApplyLayout={modesHook.applyAutoLayout}
-      />
-
       <Drawer
         anchor="bottom"
         open={nodeEditorPanel.open}

@@ -4,10 +4,13 @@ import { DEFAULT_ELK_ROUTING_SETTINGS, ELK_EDGE_ROUTING_OPTIONS } from '../layou
 
 let elkInstance = null;
 let elkNoWorkerInstance = null;
+let warnedMalformedElkSections = false;
 const getElk = async () => {
   if (elkInstance) return elkInstance;
   const { default: ELK } = await import('elkjs/lib/elk.bundled.js');
-  if (typeof window !== 'undefined' && window.__Twilite_ELK_WORKER_URL__) {
+  const shouldUseWorker =
+    typeof window !== 'undefined' && window.__Twilite_ELK_USE_WORKER__ === true;
+  if (shouldUseWorker && typeof window !== 'undefined' && window.__Twilite_ELK_WORKER_URL__) {
     try {
       elkInstance = new ELK({ workerUrl: window.__Twilite_ELK_WORKER_URL__ });
       return elkInstance;
@@ -15,8 +18,7 @@ const getElk = async () => {
       // fall through to default worker resolution
     }
   }
-  const workerUrl = new URL('elkjs/lib/elk-worker.min.js', import.meta.url);
-  elkInstance = new ELK({ workerUrl: workerUrl.toString() });
+  elkInstance = new ELK();
   return elkInstance;
 };
 const getElkNoWorker = async () => {
@@ -662,6 +664,34 @@ const rerouteEdges = useCallback(async () => {
       return;
     }
 
+    const topologySignature = JSON.stringify({
+      edgeRouting,
+      layoutElk: layoutSettings?.elk || null,
+      nodes: nodes.map((node) => ({
+        id: node.id,
+        x: Number(node?.position?.x) || 0,
+        y: Number(node?.position?.y) || 0,
+        width: Number(node?.width) || 0,
+        height: Number(node?.height) || 0,
+        ports: Array.isArray(node?.ports)
+          ? node.ports.map((port) => ({
+              id: port?.id || '',
+              side: port?.position?.side || '',
+              offset: Number(port?.position?.offset) || 0
+            }))
+          : []
+      })),
+      edges: edges.map((edge) => ({
+        id: edge?.id || '',
+        source: edge?.source || '',
+        target: edge?.target || '',
+        sourcePort: edge?.sourcePort || '',
+        targetPort: edge?.targetPort || ''
+      }))
+    });
+    if (rerouteSignatureRef.current === topologySignature) return;
+    rerouteSignatureRef.current = topologySignature;
+
     const elkSettings = getElkSettings(layoutSettings, edgeRouting);
     try {
     const elk = await getElk();
@@ -725,6 +755,34 @@ const rerouteEdges = useCallback(async () => {
         return ports.some((p) => p.id === portId) ? portId : null;
       };
 
+      const edgeIdCounts = new Map();
+      const elkEdges = edges
+        .filter((edge) => edge && edge.source && edge.target && validNodeIds.has(edge.source) && validNodeIds.has(edge.target))
+        .map((edge, index) => {
+          const sourcePort = resolvePort(edge.source, edge.sourcePort);
+          const targetPort = resolvePort(edge.target, edge.targetPort);
+          const sourceRef = sourcePort || edge.source;
+          const targetRef = targetPort || edge.target;
+          if (!sourceRef || !targetRef) return null;
+
+          const baseId = edge.id || `edge_${index}`;
+          const nextCount = (edgeIdCounts.get(baseId) || 0) + 1;
+          edgeIdCounts.set(baseId, nextCount);
+          const id = nextCount === 1 ? baseId : `${baseId}__${nextCount}`;
+
+          return {
+            id,
+            sources: [sourceRef],
+            targets: [targetRef]
+          };
+        })
+        .filter(Boolean);
+
+      if (elkEdges.length === 0) {
+        if (typeof setEdgeRoutes === 'function') setEdgeRoutes({});
+        return;
+      }
+
       const elkGraph = {
         id: 'root',
         layoutOptions: buildElkLayoutOptions(elkSettings),
@@ -742,21 +800,10 @@ const rerouteEdges = useCallback(async () => {
             ports: ports.length ? ports : undefined
           };
         }),
-        edges: edges
-          .filter((edge) => edge && edge.source && edge.target && validNodeIds.has(edge.source) && validNodeIds.has(edge.target))
-          .map((edge, index) => {
-            const id = edge.id || `edge_${index}`;
-            const sourcePort = resolvePort(edge.source, edge.sourcePort);
-            const targetPort = resolvePort(edge.target, edge.targetPort);
-            return {
-              id,
-              sources: [sourcePort || edge.source],
-              targets: [targetPort || edge.target]
-            };
-          })
+        edges: elkEdges
       };
 
-        const layout = await elk.layout(elkGraph);
+      const layout = await elk.layout(elkGraph);
       const routeMap = edgeRouting === 'straight'
         ? buildStraightEdgeRoutes(edges, nodes)
         : buildElkEdgeRoutes(layout.edges || []);
@@ -764,7 +811,25 @@ const rerouteEdges = useCallback(async () => {
         setEdgeRoutes(routeMap);
       }
     } catch (err) {
-      console.warn('[EdgeReroute] ELK routing failed:', err);
+      const message = String(err?.message || err || '');
+      const isMissingSectionsError = message.includes('exactly one edge section') || message.includes('Found: 0');
+      if (isMissingSectionsError) {
+        if (
+          !warnedMalformedElkSections &&
+          typeof window !== 'undefined' &&
+          window.__TWILITE_DEBUG_LAYOUT__
+        ) {
+          warnedMalformedElkSections = true;
+          console.warn('[EdgeReroute] ELK returned malformed edge sections; using straight fallback routes.');
+        }
+        if (typeof setEdgeRoutes === 'function') {
+          setEdgeRoutes(buildStraightEdgeRoutes(edges, nodes));
+        }
+        return;
+      }
+      if (typeof window !== 'undefined' && window.__TWILITE_DEBUG_LAYOUT__) {
+        console.warn('[EdgeReroute] ELK routing failed:', err);
+      }
       if (typeof setEdgeRoutes === 'function') {
         setEdgeRoutes({});
       }
@@ -772,10 +837,11 @@ const rerouteEdges = useCallback(async () => {
   }, [nodes, edges, setEdgeRoutes, buildElkEdgeRoutes, layoutSettings, edgeRouting]);
 
   const rerouteTimerRef = useRef(null);
+  const rerouteSignatureRef = useRef(null);
   useEffect(() => {
     if (typeof window === 'undefined') return () => {};
     if (skipRerouteRef?.current) {
-      console.log('[EdgeReroute] skipped (cached routes applied)');
+      rerouteSignatureRef.current = null;
       skipRerouteRef.current = false;
       return () => {};
     }

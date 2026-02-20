@@ -4,6 +4,31 @@ import { useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
 
+const withAlpha = (color, alpha) => {
+  if (!color || typeof color !== 'string') return `rgba(25, 118, 210, ${alpha})`;
+  const trimmed = color.trim();
+  const hexMatch = trimmed.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    if (hex.length === 3) {
+      hex = hex.split('').map((ch) => ch + ch).join('');
+    }
+    const int = parseInt(hex, 16);
+    const r = (int >> 16) & 255;
+    const g = (int >> 8) & 255;
+    const b = int & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  const rgbMatch = trimmed.match(/^rgba?\(([^)]+)\)$/i);
+  if (rgbMatch) {
+    const parts = rgbMatch[1].split(',').map((p) => p.trim());
+    if (parts.length >= 3) {
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+    }
+  }
+  return `rgba(25, 118, 210, ${alpha})`;
+};
+
 const GroupLayer = forwardRef(({ 
   groups = [],
   nodes = [],
@@ -57,8 +82,12 @@ const GroupLayer = forwardRef(({
         const isSelected = selectedGroupIds.includes(group.id);
         const bounds = getLiveBounds(group);
         const style = group.style || {};
-        const backgroundColor = style.backgroundColor || 'rgba(25, 118, 210, 0.06)';
+        const baseBackgroundColor = style.backgroundColor || 'rgba(25, 118, 210, 0.12)';
         const borderColor = style.borderColor || '#1976d2';
+        const selectedBackgroundColor =
+          style.selectedBackgroundColor ||
+          withAlpha(borderColor, theme.palette.mode === 'dark' ? 0.24 : 0.20);
+        const backgroundColor = isSelected ? selectedBackgroundColor : baseBackgroundColor;
 
         // Collapsed: show only the title box positioned above group's bounds
         if (group.collapsed) {
@@ -96,7 +125,19 @@ const GroupLayer = forwardRef(({
         return (
           <div
             key={group.id}
-            style={{ position: 'absolute', left, top, width, height, border: `2px solid ${borderColor}`, borderRadius: 8, backgroundColor, pointerEvents: isSelected ? 'auto' : 'none', zIndex: isSelected ? 30 : 10 }}
+            style={{
+              position: 'absolute',
+              left,
+              top,
+              width,
+              height,
+              border: `2px solid ${borderColor}`,
+              borderRadius: 8,
+              backgroundColor,
+              pointerEvents: isSelected ? 'auto' : 'none',
+              zIndex: isSelected ? 30 : 10,
+              transition: 'background-color 120ms ease'
+            }}
             onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); if (isSelected && onGroupDragStart) onGroupDragStart(e, group); }}
           >
             <div

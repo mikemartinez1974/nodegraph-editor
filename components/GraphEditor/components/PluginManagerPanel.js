@@ -35,7 +35,7 @@ import { pluginGallery } from '../data/pluginGallery';
 import { fetchManifest } from '../plugins/pluginRegistry';
 import validatePluginManifest from '../plugins/manifestSchema';
 
-export default function PluginManagerPanel({ open, onClose }) {
+export default function PluginManagerPanel({ open, onClose, embedded = false }) {
   const [manifestUrl, setManifestUrl] = useState('');
   const [activeTab, setActiveTab] = useState('installed');
   const [gallerySearch, setGallerySearch] = useState('');
@@ -174,13 +174,8 @@ const compareVersions = (a = '', b = '') => {
       : `Install version ${previewManifestData.version}`
     : '';
 
-  return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{ sx: { width: { xs: '100%', sm: 420 }, display: 'flex', flexDirection: 'column' } }}
-    >
+  const panelContent = (
+    <>
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" component="h2">
           Plugin Manager
@@ -192,9 +187,11 @@ const compareVersions = (a = '', b = '') => {
           <Button size="small" onClick={handleCheckUpdates} disabled={checkingUpdates} sx={{ mr: 1 }}>
             {checkingUpdates ? 'Checking…' : 'Check updates'}
           </Button>
-          <IconButton onClick={onClose} size="small" aria-label="Close plugin manager">
-            <CloseIcon fontSize="small" />
-          </IconButton>
+          {!embedded && (
+            <IconButton onClick={onClose} size="small" aria-label="Close plugin manager">
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          )}
         </Box>
       </Box>
       <Divider />
@@ -505,6 +502,25 @@ const compareVersions = (a = '', b = '') => {
           </DialogActions>
         </Dialog>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 520, height: '100%' }}>
+        {panelContent}
+      </Box>
+    );
+  }
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{ sx: { width: { xs: '100%', sm: 420 }, display: 'flex', flexDirection: 'column' } }}
+    >
+      {panelContent}
     </Drawer>
   );
 }

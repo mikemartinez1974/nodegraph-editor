@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
@@ -43,6 +43,47 @@ const waitForScriptRunnerReady = () => {
   });
 };
 
+const readScriptsFromStorage = () => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return [];
+    const raw = window.localStorage.getItem('scripts');
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (err) {
+    return [];
+  }
+};
+
+const scriptSourceCache = new Map();
+
+const normalizeScriptRefUrl = (ref) => {
+  if (!ref || typeof ref !== 'string') return null;
+  const trimmed = ref.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+  if (trimmed.startsWith('local://')) {
+    const localPath = trimmed.slice('local://'.length).trim();
+    if (!localPath) return null;
+    return localPath.startsWith('/') ? localPath : `/${localPath}`;
+  }
+  if (trimmed.startsWith('/')) return trimmed;
+  return `/${trimmed.replace(/^\/+/, '')}`;
+};
+
+const loadScriptSourceByRef = async (ref) => {
+  const url = normalizeScriptRefUrl(ref);
+  if (!url) throw new Error('Invalid script ref');
+  if (scriptSourceCache.has(url)) return scriptSourceCache.get(url);
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Failed to load script ref: ${url} (${response.status})`);
+  }
+  const text = await response.text();
+  const source = String(text || '');
+  scriptSourceCache.set(url, source);
+  return source;
+};
+
 export default function ScriptNode({
   node: origNode,
   pan = { x: 0, y: 0 },
@@ -62,6 +103,7 @@ export default function ScriptNode({
 
   const width = (node?.width || 260) * zoom;
   const height = (node?.height || 160) * zoom;
+  const uiScale = Math.max(0.75, Math.min(1.1, zoom || 1));
 
   const [scriptLibrary, setScriptLibrary] = useState([]);
   const [selectedScriptId, setSelectedScriptId] = useState(node?.data?.scriptId || '');
@@ -80,7 +122,10 @@ export default function ScriptNode({
   const pendingNodeIdsRef = useRef(new Set());
   const lastDragEndRef = useRef(new Map());
   const runQueuedRef = useRef(false);
-  const scriptSource = useMemo(() => node?.data?.script || node?.data?.source || '', [node?.data]);
+  const shouldDebugScripts =
+    process.env.NODE_ENV === 'development' &&
+    typeof window !== 'undefined' &&
+    window.__TWILITE_DEBUG_SCRIPTS__;
 
   useEffect(() => {
     if (nodeRef.current && nodeRefs) {
@@ -89,15 +134,34 @@ export default function ScriptNode({
     }
   }, [node.id, nodeRefs]);
 
-  // load script library from session (localStorage 'scripts')
+  const refreshScriptLibrary = () => {
+    setScriptLibrary(readScriptsFromStorage());
+  };
+
+  // Load and keep script library in sync with ScriptPanel/localStorage updates.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('scripts');
-      const arr = raw ? JSON.parse(raw) : [];
-      setScriptLibrary(Array.isArray(arr) ? arr : []);
-    } catch (err) {
-      setScriptLibrary([]);
+    refreshScriptLibrary();
+
+    const handleScriptsChanged = () => {
+      refreshScriptLibrary();
+    };
+    const handleStorage = (event) => {
+      if (event?.key === 'scripts') {
+        refreshScriptLibrary();
+      }
+    };
+
+    eventBus.on('scriptsChanged', handleScriptsChanged);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorage);
     }
+
+    return () => {
+      eventBus.off('scriptsChanged', handleScriptsChanged);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorage);
+      }
+    };
   }, []);
 
   // persist node settings when changed
@@ -108,6 +172,8 @@ export default function ScriptNode({
         updates: {
           data: {
             ...node.data,
+            script: '',
+            source: '',
             scriptId: selectedScriptId,
             allowMutations,
             dryRun,
@@ -120,23 +186,34 @@ export default function ScriptNode({
     } catch (err) {}
   }, [selectedScriptId, allowMutations, dryRun, lastResult, lastRunAt]);
 
+  // Keep local selected script in sync with external node updates.
+  useEffect(() => {
+    const nextId = node?.data?.scriptId || '';
+    setSelectedScriptId((prev) => (prev === nextId ? prev : nextId));
+  }, [node?.data?.scriptId]);
+
   // helper to find script by id
   const getSelectedScript = () => {
     if (!selectedScriptId) return null;
-    return scriptLibrary.find(s => s.id === selectedScriptId) || null;
+    const fromState = scriptLibrary.find((s) => s.id === selectedScriptId);
+    if (fromState) return fromState;
+    const fromStorage = readScriptsFromStorage();
+    return fromStorage.find((s) => s.id === selectedScriptId) || null;
   };
 
   // run the selected script
   const runScript = async (meta = {}) => {
-    console.log('[ScriptNode] runScript invoked', node.id, meta);
+    if (shouldDebugScripts) {
+      console.log('[ScriptNode] runScript invoked', node.id, meta);
+    }
     if (isEmbedded) {
       const result = { success: false, error: 'Script runner disabled in embedded mode' };
       setLastResult(result);
       return result;
     }
-    const script = scriptSource ? { source: scriptSource, name: node?.data?.name || 'Script' } : getSelectedScript();
-    if (!script) {
-      const result = { success: false, error: 'No script selected' };
+    const selectedScript = getSelectedScript();
+    if (!selectedScript) {
+      const result = { success: false, error: 'No library script selected' };
       setLastResult(result);
       return result;
     }
@@ -163,8 +240,19 @@ export default function ScriptNode({
 
     try {
       const runMeta = { dry: dryRun || meta.dry, allowMutations: allowMutations || meta.allowMutations };
-      const res = await runner.run(script.source || script, runMeta);
-      console.log('[ScriptNode] runScript complete', node.id, res);
+      let scriptSource = selectedScript.source || selectedScript.script || '';
+      if (!scriptSource.trim() && selectedScript.ref) {
+        scriptSource = await loadScriptSourceByRef(selectedScript.ref);
+      }
+      if (!scriptSource.trim()) {
+        const result = { success: false, error: 'Selected script has no source (inline or ref)' };
+        setLastResult(result);
+        return result;
+      }
+      const res = await runner.run(scriptSource, runMeta);
+      if (shouldDebugScripts) {
+        console.log('[ScriptNode] runScript complete', node.id, res);
+      }
 
       // ignore stale runs
       if (token !== runTokenRef.current) return res;
@@ -211,7 +299,7 @@ export default function ScriptNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, scriptSource, node.id]);
+  }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, node.id]);
 
   useEffect(() => {
     if (isEmbedded) return undefined;
@@ -225,17 +313,19 @@ export default function ScriptNode({
 
   useEffect(() => {
     if (isEmbedded) return;
-    if (node?.data?.autoRun && !autoRunTriggered.current && scriptSource) {
-      console.log('[ScriptNode] initial autoRun trigger', node.id);
+    if (node?.data?.autoRun && !autoRunTriggered.current && selectedScriptId) {
+      if (shouldDebugScripts) {
+        console.log('[ScriptNode] initial autoRun trigger', node.id);
+      }
       autoRunTriggered.current = true;
       runScriptRef.current?.();
     }
-  }, [isEmbedded, node?.data?.autoRun, scriptSource, node.id]);
+  }, [isEmbedded, node?.data?.autoRun, selectedScriptId, node.id]);
 
   useEffect(() => {
     if (isEmbedded) return undefined;
     const shouldAutoRun =
-      !!scriptSource &&
+      !!selectedScriptId &&
       !!node?.data?.autoRun &&
       node?.data?.scriptId === 'breadboard-autowire-runtime';
     if (!shouldAutoRun) return undefined;
@@ -264,7 +354,9 @@ export default function ScriptNode({
         const pendingIds = Array.from(pendingNodeIdsRef.current);
         pendingNodeIdsRef.current.clear();
       // Keep this concise; main debug signal for autowire runs.
-      console.info('[ScriptNode] auto-run', node.id, { from: eventName, count: pendingIds.length });
+      if (shouldDebugScripts) {
+        console.info('[ScriptNode] auto-run', node.id, { from: eventName, count: pendingIds.length });
+      }
         Promise.resolve(runScriptRef.current?.())
           .catch(() => {})
           .finally(() => {
@@ -410,7 +502,7 @@ export default function ScriptNode({
       }
       if (typeof offDrag === 'function') offDrag();
     };
-  }, [node?.data?.autoRun, node?.data?.scriptId, scriptSource, node.id]);
+  }, [node?.data?.autoRun, node?.data?.scriptId, selectedScriptId, node.id, shouldDebugScripts]);
 
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;
@@ -438,9 +530,12 @@ export default function ScriptNode({
         boxSizing: 'border-box',
         padding: 12,
         color: theme.palette.primary.contrastText,
+        fontSize: `${12 * uiScale}px`,
+        lineHeight: 1.25,
         transition: 'border 0.2s ease',
         zIndex: 100,
         pointerEvents: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'stretch',
@@ -461,23 +556,67 @@ export default function ScriptNode({
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-        <select value={selectedScriptId} onChange={e => setSelectedScriptId(e.target.value)} style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white' }}>
+        <select
+          value={selectedScriptId}
+          onFocus={refreshScriptLibrary}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onChange={e => setSelectedScriptId(e.target.value)}
+          style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white' }}
+        >
           <option value="">(select script)</option>
           {scriptLibrary.map(s => (
             <option key={s.id} value={s.id}>{s.name || s.id}</option>
           ))}
         </select>
-        <button onClick={(e) => { e.stopPropagation(); runScript(); }} disabled={running || !selectedScriptId} style={{ padding: '6px 10px', borderRadius: 6, border: 'none', background: theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}>RUN</button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); runScript(); }}
+          disabled={running || !selectedScriptId}
+          style={{
+            padding: '6px 10px',
+            borderRadius: 6,
+            border: 'none',
+            background: theme.palette.primary.dark,
+            color: 'white',
+            cursor: 'pointer'
+          }}
+        >
+          RUN
+        </button>
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
         <label style={{ fontSize: 11, opacity: 0.85 }}>
-          <input type="checkbox" checked={allowMutations} onChange={e => setAllowMutations(e.target.checked)} /> Allow Mutations
+          <input
+            type="checkbox"
+            checked={allowMutations}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+            onChange={e => setAllowMutations(e.target.checked)}
+          /> Allow Mutations
         </label>
         <label style={{ fontSize: 11, opacity: 0.85 }}>
-          <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)} /> Dry Run
+          <input
+            type="checkbox"
+            checked={dryRun}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+            onChange={e => setDryRun(e.target.checked)}
+          /> Dry Run
         </label>
-        <button onClick={e => { e.stopPropagation(); setShowResult(v => !v); }} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, border: 'none', background: showResult ? theme.palette.secondary.dark : theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}>{showResult ? 'Hide Result' : 'Show Result'}</button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); setShowResult(v => !v); }}
+          style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, border: 'none', background: showResult ? theme.palette.secondary.dark : theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}
+        >
+          {showResult ? 'Hide Result' : 'Show Result'}
+        </button>
       </div>
 
       {showResult && lastResult && (

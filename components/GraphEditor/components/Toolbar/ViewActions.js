@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Box, TextField } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
@@ -18,6 +18,8 @@ export default function ViewActions({
   onDistributeNodes,
   showMinimap,
   snapToGrid,
+  gridSize = 20,
+  onSetGridSize = () => {},
   selectionCount,
   isMobile,
   isFreeUser
@@ -80,6 +82,23 @@ export default function ViewActions({
         </MenuItem>
         <MenuItem onClick={() => { onAlignNodes('grid'); setGridMenuAnchor(null); }}>
           Align to Grid
+        </MenuItem>
+        <Divider />
+        <MenuItem disableRipple disableTouchRipple sx={{ cursor: 'default' }}>
+          <Box sx={{ width: 180, pt: 0.5 }} onClick={(e) => e.stopPropagation()}>
+            <TextField
+              size="small"
+              label="Grid Size"
+              type="number"
+              value={gridSize}
+              onChange={(e) => {
+                const value = Math.max(5, Math.min(100, Number(e.target.value) || 20));
+                onSetGridSize(value);
+              }}
+              inputProps={{ min: 5, max: 100, step: 5 }}
+              fullWidth
+            />
+          </Box>
         </MenuItem>
       </Menu>
 

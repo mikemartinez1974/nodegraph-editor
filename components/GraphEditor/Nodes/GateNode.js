@@ -29,6 +29,7 @@ export default function GateNode({
 
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 300) * zoom;
+  const uiScale = Math.max(0.75, Math.min(1.1, zoom || 1));
 
   // Local editable state derived from node.data
   const initialInputs = node?.data?.inputs || { a: false, b: false };
@@ -164,9 +165,12 @@ export default function GateNode({
         boxSizing: 'border-box',
         padding: 12,
         color: theme.palette.primary.contrastText,
+        fontSize: `${12 * uiScale}px`,
+        lineHeight: 1.25,
         transition: 'border 0.2s ease',
         zIndex: 100,
         pointerEvents: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'stretch',

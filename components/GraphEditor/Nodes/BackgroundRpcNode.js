@@ -27,6 +27,7 @@ export default function BackgroundRpcNode({
 
   const width = (node?.width || CARD_WIDTH) * zoom;
   const height = (node?.height || CARD_HEIGHT) * zoom;
+  const uiScale = Math.max(0.75, Math.min(1.1, zoom || 1));
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;
 
@@ -216,13 +217,16 @@ export default function BackgroundRpcNode({
     padding: 12,
     boxSizing: 'border-box',
     color: theme.palette.text.primary,
+    fontSize: `${12 * uiScale}px`,
+    lineHeight: 1.25,
     fontFamily: 'Inter, system-ui, sans-serif',
     pointerEvents: 'auto',
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     gap: 8,
     ...style
-  }), [baseLeft, baseTop, width, height, isSelected, theme, style]);
+  }), [baseLeft, baseTop, width, height, isSelected, theme, style, uiScale]);
 
   // Add a static method for properties panel support
   BackgroundRpcNode.getProperties = function(node) {

@@ -57,6 +57,7 @@ export default function ValueTriggerNode({
 
   const width = (node?.width || 250) * zoom;
   const height = (node?.height || 300) * zoom;
+  const uiScale = Math.max(0.75, Math.min(1.1, zoom || 1));
 
   const [mode, setMode] = useState(node?.data?.mode || 'rising');
   const [lastValue, setLastValue] = useState(
@@ -187,9 +188,12 @@ export default function ValueTriggerNode({
         boxSizing: 'border-box',
         padding: 12,
         color: theme.palette.primary.contrastText,
+        fontSize: `${12 * uiScale}px`,
+        lineHeight: 1.25,
         transition: 'border 0.2s ease',
         zIndex: 100,
         pointerEvents: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         gap: 8,

@@ -44,6 +44,8 @@ import { loadSettings, saveSettings, resetSettings } from '../settingsManager';
 import eventBus from '../../NodeGraph/eventBus';
 import BackgroundControls from './BackgroundControls';
 import ThemeBuilder from './ThemeBuilder';
+import EdgeLayoutPanel from './EdgeLayoutPanel';
+import PluginManagerPanel from './PluginManagerPanel';
 import ThemeButtonGroup from '../../Browser/ThemeButtonGroup';
 import themeMap from '../../Browser/themes';
 import { themeConfigFromMuiTheme } from '../utils/themeUtils';
@@ -186,6 +188,7 @@ export default function DocumentPropertiesDialog({
   const [liveStorySnapshots, setLiveStorySnapshots] = useState([]);
   const [liveRecentSnapshots, setLiveRecentSnapshots] = useState([]);
   const wasOpenRef = useRef(false);
+  const requestedTabRef = useRef('');
 
   const handleBrowserThemeChange = useCallback((nextThemeName) => {
     if (!nextThemeName) return;
@@ -356,7 +359,9 @@ export default function DocumentPropertiesDialog({
     setMeta(mapProjectMeta(projectMeta, defaultShareLink));
     setDocSettings(documentSettings || {});
     if (!wasOpen) {
-      setActiveTab('overview');
+      const requestedTab = requestedTabRef.current;
+      setActiveTab(requestedTab || 'overview');
+      requestedTabRef.current = '';
       setTagInput('');
       setNewCollaborator({ name: '', email: '', role: 'Editor' });
     }
@@ -368,6 +373,20 @@ export default function DocumentPropertiesDialog({
       setGithubPat('');
     }
   }, [open, projectMeta, defaultShareLink, documentSettings]);
+
+  useEffect(() => {
+    const handleOpenTab = ({ tab } = {}) => {
+      if (typeof tab === 'string' && tab.trim()) {
+        const nextTab = tab.trim();
+        requestedTabRef.current = nextTab;
+        setActiveTab(nextTab);
+      }
+    };
+    eventBus.on('openDocumentPropertiesTab', handleOpenTab);
+    return () => {
+      eventBus.off('openDocumentPropertiesTab', handleOpenTab);
+    };
+  }, []);
 
   useEffect(() => {
     if (!resolvedStorySnapshots.length) return;
@@ -586,7 +605,7 @@ export default function DocumentPropertiesDialog({
       fullScreen={isMobile}
       PaperProps={isMobile ? { sx: { m: 0 } } : undefined}
     >
-      <DialogTitle>Editor Settings</DialogTitle>
+      <DialogTitle>Twilite Settings</DialogTitle>
       <DialogContent sx={isMobile ? { p: 0, flex: '1 1 auto', overflowY: 'auto' } : {}}>
         <Box sx={{ px: isMobile ? 2 : 3, pt: isMobile ? 2 : 3, pb: 2 }}>
           <Typography variant="h6">{meta.title || 'Untitled Project'}</Typography>
@@ -602,7 +621,8 @@ export default function DocumentPropertiesDialog({
           sx={{ px: isMobile ? 1 : 3, borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab label="Overview" value="overview" />
-          <Tab label="System Nodes" value="system" />
+          <Tab label="Layout" value="layout" />
+          <Tab label="Plugins" value="plugins" />
           <Tab label="Activity" value="activity" />
           <Tab label="Appearance" value="appearance" />
           <Tab label="GitHub" value="github" />
@@ -743,6 +763,29 @@ export default function DocumentPropertiesDialog({
                   Sides: {handleSideSummary}
                 </Typography>
               </Box>
+            </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'layout' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <EdgeLayoutPanel
+                embedded
+                open
+                onClose={() => {}}
+                documentSettings={docSettings}
+                setDocumentSettings={setDocSettings}
+                contractSummary={contractSummary}
+              />
+            </Paper>
+          </Stack>
+        )}
+
+        {activeTab === 'plugins' && (
+          <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 0, overflow: 'hidden' }}>
+              <PluginManagerPanel embedded open onClose={() => {}} />
             </Paper>
           </Stack>
         )}
