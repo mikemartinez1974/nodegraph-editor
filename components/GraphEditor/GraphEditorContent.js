@@ -363,9 +363,10 @@ const GraphEditorContent = () => {
     emitEdgeIntent('toolbarReroute');
   }, [emitEdgeIntent]);
 
-  const handleApplyLayout = useCallback(() => {
-    emitEdgeIntent('applyLayout', { layoutType: modesHook.autoLayoutType });
-    modesHook.applyAutoLayout();
+  const handleApplyLayout = useCallback((layoutType) => {
+    const resolvedLayoutType = layoutType || modesHook.autoLayoutType;
+    emitEdgeIntent('applyLayout', { layoutType: resolvedLayoutType });
+    modesHook.applyAutoLayout(resolvedLayoutType);
   }, [emitEdgeIntent, modesHook.applyAutoLayout, modesHook.autoLayoutType]);
 
   const effectiveThemeConfig = useMemo(() => {
@@ -2063,6 +2064,7 @@ const skipPropertiesCloseRef = useRef(false);
           showPropertiesPanel={showPropertiesPanel}
           showSystemNodesPanel={showSystemNodesPanel}
           showEdgeList={showEdgeList}
+          dockInBrowserBar={host !== 'vscode'}
         />
       )}
 
@@ -2273,6 +2275,7 @@ const skipPropertiesCloseRef = useRef(false);
         setBackgroundUrl={setBackgroundUrl}
         documentSettings={documentSettings}
         onDocumentSettingsChange={setDocumentSettings}
+        onApplyLayout={handleApplyLayout}
         projectMeta={projectMeta}
         onProjectMetaChange={handleUpdateProjectMeta}
         onResetProjectMeta={handleResetProjectMeta}

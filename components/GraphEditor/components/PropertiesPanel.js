@@ -78,6 +78,48 @@ const EDGE_STYLE_PRESETS = [
   }
 ];
 
+const buildEdgeSemanticStylePatch = (patch = {}) => {
+  const stylePatch = {};
+
+  if (patch.strength) {
+    if (patch.strength === "weak") {
+      stylePatch.width = 1.5;
+      stylePatch.opacity = 0.7;
+    } else if (patch.strength === "strong") {
+      stylePatch.width = 3;
+      stylePatch.opacity = 1;
+    } else {
+      stylePatch.width = 2;
+      stylePatch.opacity = 0.9;
+    }
+  }
+
+  if (patch.flow) {
+    if (patch.flow === "data") {
+      stylePatch.animation = "flow";
+    } else if (patch.flow === "energy") {
+      stylePatch.animation = "glow";
+    } else if (patch.flow === "control") {
+      stylePatch.animation = "pulse";
+    } else {
+      stylePatch.animation = null;
+    }
+  }
+
+  if (patch.direction) {
+    stylePatch.showArrow = true;
+    if (patch.direction === "reverse") {
+      stylePatch.arrowPosition = "start";
+    } else if (patch.direction === "bidirectional") {
+      stylePatch.arrowPosition = "both";
+    } else {
+      stylePatch.arrowPosition = "end";
+    }
+  }
+
+  return stylePatch;
+};
+
 const describeValue = (value) => {
   if (value === null) return "null";
   if (Array.isArray(value)) return `Array (${value.length})`;
@@ -142,6 +184,8 @@ const DEFAULT_EXPANDED_SECTIONS = {
 const DEFAULT_PANEL_WIDTH = 420;
 const MIN_PANEL_WIDTH = 260;
 const MAX_PANEL_WIDTH = 720;
+const NODE_STYLE_PRESETS_STORAGE_KEY = "twilite.nodeStylePresets";
+const EDGE_STYLE_PRESETS_STORAGE_KEY = "twilite.edgeStylePresets";
 
 export default function PropertiesPanel({
   open = false,
@@ -167,6 +211,9 @@ export default function PropertiesPanel({
   const anchorValue = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : "right";
   const [payloadView, setPayloadView] = useState("friendly");
   const [preset, setPreset] = useState("default");
+  const [presetNameDraft, setPresetNameDraft] = useState("");
+  const [customNodePresets, setCustomNodePresets] = useState([]);
+  const [customEdgePresets, setCustomEdgePresets] = useState([]);
   const [dataEntries, setDataEntries] = useState([]);
   const [markdownPreviewMode, setMarkdownPreviewMode] = useState({});
   const [expandedSections, setExpandedSections] = useState({ ...DEFAULT_EXPANDED_SECTIONS });
@@ -231,7 +278,9 @@ export default function PropertiesPanel({
       return { id: nodeId, label: `Node ${nodeId}`, type: "unknown" };
     });
   }, [selectedGroup, nodes]);
-  const selectedPreset = STYLE_PRESETS.find((option) => option.value === preset) || STYLE_PRESETS[0];
+  const nodePresetOptions = useMemo(() => [...STYLE_PRESETS, ...customNodePresets], [customNodePresets]);
+  const edgePresetOptions = useMemo(() => [...EDGE_STYLE_PRESETS, ...customEdgePresets], [customEdgePresets]);
+  const selectedPreset = nodePresetOptions.find((option) => option.value === preset) || nodePresetOptions[0];
   const isNodeSelected = Boolean(selectedNode);
   const isEdgeSelected = Boolean(selectedEdge) && !isNodeSelected;
   const isGroupSelected = Boolean(selectedGroup) && !isNodeSelected && !isEdgeSelected;
@@ -486,6 +535,28 @@ export default function PropertiesPanel({
     setStyleJsonText(JSON.stringify(selectionStyle || {}, null, 2));
   }, [selectionStyle]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const rawNode = window.localStorage.getItem(NODE_STYLE_PRESETS_STORAGE_KEY);
+      if (rawNode) {
+        const parsedNode = JSON.parse(rawNode);
+        if (Array.isArray(parsedNode)) setCustomNodePresets(parsedNode);
+      }
+    } catch {
+      // ignore storage parse failures
+    }
+    try {
+      const rawEdge = window.localStorage.getItem(EDGE_STYLE_PRESETS_STORAGE_KEY);
+      if (rawEdge) {
+        const parsedEdge = JSON.parse(rawEdge);
+        if (Array.isArray(parsedEdge)) setCustomEdgePresets(parsedEdge);
+      }
+    } catch {
+      // ignore storage parse failures
+    }
+  }, []);
+
   const handleAccordionChange = useCallback(
     (view, panel) => (event, isExpanded) => {
       setExpandedSections((prev) => ({ ...prev, [view]: isExpanded ? panel : "" }));
@@ -512,12 +583,67 @@ export default function PropertiesPanel({
     (value) => {
       setPreset(value);
       if (!activeSelectionId) return;
-      const presetSet = isEdgeSelected ? EDGE_STYLE_PRESETS : STYLE_PRESETS;
+      const presetSet = isEdgeSelected ? edgePresetOptions : nodePresetOptions;
       const presetStyle = presetSet.find((option) => option.value === value)?.style || {};
       applyStylePatch(presetStyle);
     },
-    [activeSelectionId, applyStylePatch, isEdgeSelected]
+    [activeSelectionId, applyStylePatch, isEdgeSelected, edgePresetOptions, nodePresetOptions]
   );
+
+  const persistCustomPresets = useCallback((key, presets) => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(key, JSON.stringify(presets));
+    } catch {
+      // ignore storage write failures
+    }
+  }, []);
+
+  const handleSaveCurrentStylePreset = useCallback(() => {
+    if (!activeSelectionId) return;
+    const label = (presetNameDraft || "").trim();
+    if (!label) return;
+    const value = `custom-${Date.now().toString(36)}`;
+    const nextPreset = {
+      label,
+      value,
+      style: { ...(selectionStyle || {}) },
+      custom: true
+    };
+    if (isEdgeSelected) {
+      const next = [...customEdgePresets, nextPreset];
+      setCustomEdgePresets(next);
+      persistCustomPresets(EDGE_STYLE_PRESETS_STORAGE_KEY, next);
+    } else {
+      const next = [...customNodePresets, nextPreset];
+      setCustomNodePresets(next);
+      persistCustomPresets(NODE_STYLE_PRESETS_STORAGE_KEY, next);
+    }
+    setPreset(value);
+    setPresetNameDraft("");
+  }, [
+    activeSelectionId,
+    customEdgePresets,
+    customNodePresets,
+    isEdgeSelected,
+    persistCustomPresets,
+    presetNameDraft,
+    selectionStyle
+  ]);
+
+  const handleDeletePreset = useCallback(() => {
+    if (!preset.startsWith("custom-")) return;
+    if (isEdgeSelected) {
+      const next = customEdgePresets.filter((option) => option.value !== preset);
+      setCustomEdgePresets(next);
+      persistCustomPresets(EDGE_STYLE_PRESETS_STORAGE_KEY, next);
+    } else {
+      const next = customNodePresets.filter((option) => option.value !== preset);
+      setCustomNodePresets(next);
+      persistCustomPresets(NODE_STYLE_PRESETS_STORAGE_KEY, next);
+    }
+    setPreset("default");
+  }, [customEdgePresets, customNodePresets, isEdgeSelected, persistCustomPresets, preset]);
 
   const handleApplyStyleJson = useCallback(() => {
     if (!selectedNode && !selectedEdge) return;
@@ -542,6 +668,17 @@ export default function PropertiesPanel({
       if (!selectedEdge) return;
       const nextData = { ...(selectedEdge.data || {}), ...patch };
       onUpdateEdge(selectedEdge.id, { data: nextData });
+    },
+    [onUpdateEdge, selectedEdge]
+  );
+
+  const handleEdgeSemanticChange = useCallback(
+    (patch) => {
+      if (!selectedEdge) return;
+      const nextData = { ...(selectedEdge.data || {}), ...patch };
+      const semanticStylePatch = buildEdgeSemanticStylePatch(patch);
+      const nextStyle = { ...(selectedEdge.style || {}), ...semanticStylePatch };
+      onUpdateEdge(selectedEdge.id, { data: nextData, style: nextStyle });
     },
     [onUpdateEdge, selectedEdge]
   );
@@ -1958,8 +2095,12 @@ export default function PropertiesPanel({
     >
       <FormControl fullWidth size="small" sx={{ mb: 1 }}>
         <InputLabel>Preset style</InputLabel>
-        <Select value={preset} label="Preset style" onChange={(event) => handlePresetChange(event.target.value)}>
-          {STYLE_PRESETS.map((option) => (
+        <Select
+          value={nodePresetOptions.some((option) => option.value === preset) ? preset : "default"}
+          label="Preset style"
+          onChange={(event) => handlePresetChange(event.target.value)}
+        >
+          {nodePresetOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -2000,8 +2141,28 @@ export default function PropertiesPanel({
           <Button variant="text" size="small" onClick={() => copyToClipboard(JSON.stringify(selectedPreset.style))}>
             Copy style
           </Button>
-          <Button variant="contained" size="small" onClick={() => handlePresetChange(preset)}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handlePresetChange(nodePresetOptions.some((option) => option.value === preset) ? preset : "default")}
+          >
             Apply
+          </Button>
+        </Stack>
+        <Stack direction="row" spacing={1} mt={1}>
+          <TextField
+            size="small"
+            fullWidth
+            label="Save current style as"
+            placeholder="Preset name"
+            value={presetNameDraft}
+            onChange={(event) => setPresetNameDraft(event.target.value)}
+          />
+          <Button variant="outlined" size="small" onClick={handleSaveCurrentStylePreset} disabled={!presetNameDraft.trim() || !activeSelectionId}>
+            Save
+          </Button>
+          <Button variant="outlined" size="small" onClick={handleDeletePreset} disabled={!preset.startsWith("custom-")}>
+            Delete
           </Button>
         </Stack>
       </Paper>
@@ -2018,8 +2179,12 @@ export default function PropertiesPanel({
     >
       <FormControl fullWidth size="small" sx={{ mb: 1 }}>
         <InputLabel>Preset style</InputLabel>
-        <Select value={preset} label="Preset style" onChange={(event) => handlePresetChange(event.target.value)}>
-          {EDGE_STYLE_PRESETS.map((option) => (
+        <Select
+          value={edgePresetOptions.some((option) => option.value === preset) ? preset : "default"}
+          label="Preset style"
+          onChange={(event) => handlePresetChange(event.target.value)}
+        >
+          {edgePresetOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -2059,8 +2224,29 @@ export default function PropertiesPanel({
           <Button variant="text" size="small" onClick={() => copyToClipboard(JSON.stringify(selectedEdge?.style || {}))}>
             Copy style
           </Button>
-          <Button variant="contained" size="small" onClick={() => handlePresetChange(preset)} disabled={!activeSelectionId}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handlePresetChange(edgePresetOptions.some((option) => option.value === preset) ? preset : "default")}
+            disabled={!activeSelectionId}
+          >
             Apply
+          </Button>
+        </Stack>
+        <Stack direction="row" spacing={1} mt={1}>
+          <TextField
+            size="small"
+            fullWidth
+            label="Save current style as"
+            placeholder="Preset name"
+            value={presetNameDraft}
+            onChange={(event) => setPresetNameDraft(event.target.value)}
+          />
+          <Button variant="outlined" size="small" onClick={handleSaveCurrentStylePreset} disabled={!presetNameDraft.trim() || !activeSelectionId}>
+            Save
+          </Button>
+          <Button variant="outlined" size="small" onClick={handleDeletePreset} disabled={!preset.startsWith("custom-")}>
+            Delete
           </Button>
         </Stack>
       </Paper>
@@ -2139,7 +2325,12 @@ export default function PropertiesPanel({
             <Switch
               size="small"
               checked={Boolean(selectionStyle.curved)}
-              onChange={(event) => applyStylePatch({ curved: event.target.checked })}
+              onChange={(event) => {
+                const nextCurved = event.target.checked;
+                const nextOrthogonal = Boolean(selectionStyle.orthogonal);
+                const nextRoute = nextOrthogonal ? "orthogonal" : (nextCurved ? "curved" : "straight");
+                applyStylePatch({ curved: nextCurved, route: nextRoute });
+              }}
               disabled={!activeSelectionId}
             />
           </Box>
@@ -2148,7 +2339,12 @@ export default function PropertiesPanel({
             <Switch
               size="small"
               checked={Boolean(selectionStyle.orthogonal)}
-              onChange={(event) => applyStylePatch({ orthogonal: event.target.checked })}
+              onChange={(event) => {
+                const nextOrthogonal = event.target.checked;
+                const nextCurved = Boolean(selectionStyle.curved);
+                const nextRoute = nextOrthogonal ? "orthogonal" : (nextCurved ? "curved" : "straight");
+                applyStylePatch({ orthogonal: nextOrthogonal, route: nextRoute });
+              }}
               disabled={!activeSelectionId}
             />
           </Box>
@@ -2525,7 +2721,7 @@ export default function PropertiesPanel({
               labelId="edge-strength-label"
               label="Strength"
               value={selectedEdge?.data?.strength || "normal"}
-              onChange={(event) => handleEdgeDataChange({ strength: event.target.value })}
+              onChange={(event) => handleEdgeSemanticChange({ strength: event.target.value })}
             >
               <MenuItem value="weak">Weak</MenuItem>
               <MenuItem value="normal">Normal</MenuItem>
@@ -2538,7 +2734,7 @@ export default function PropertiesPanel({
               labelId="edge-flow-label"
               label="Flow"
               value={selectedEdge?.data?.flow || "none"}
-              onChange={(event) => handleEdgeDataChange({ flow: event.target.value })}
+              onChange={(event) => handleEdgeSemanticChange({ flow: event.target.value })}
             >
               <MenuItem value="none">None</MenuItem>
               <MenuItem value="data">Data</MenuItem>
@@ -2552,7 +2748,7 @@ export default function PropertiesPanel({
               labelId="edge-direction-label"
               label="Direction"
               value={selectedEdge?.data?.direction || "forward"}
-              onChange={(event) => handleEdgeDataChange({ direction: event.target.value })}
+              onChange={(event) => handleEdgeSemanticChange({ direction: event.target.value })}
             >
               <MenuItem value="forward">Forward</MenuItem>
               <MenuItem value="reverse">Reverse</MenuItem>
@@ -2566,29 +2762,6 @@ export default function PropertiesPanel({
             value={selectedEdge?.data?.intent || ""}
             onChange={(event) => handleEdgeDataChange({ intent: event.target.value })}
           />
-          <Stack direction="row" spacing={1}>
-            <Button size="small" variant="text" onClick={() => onSelectEdge?.(selectedEdge.id)}>
-              Focus edge
-            </Button>
-            <Button
-              size="small"
-              variant="text"
-              onClick={() => {
-                if (edgeSourceNode) onSelectNode?.(edgeSourceNode.id);
-              }}
-            >
-              Focus source
-            </Button>
-            <Button
-              size="small"
-              variant="text"
-              onClick={() => {
-                if (edgeTargetNode) onSelectNode?.(edgeTargetNode.id);
-              }}
-            >
-              Focus target
-            </Button>
-          </Stack>
         </Stack>
       </Section>
       {renderEdgeFormattingSection()}

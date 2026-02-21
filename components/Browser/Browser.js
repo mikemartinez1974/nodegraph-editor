@@ -383,12 +383,26 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         background: `linear-gradient(135deg, ${muiTheme.palette.primary.light} 0%, ${muiTheme.palette.primary.dark} 100%)`,
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
       }}>
-        <Toolbar variant={isMobile ? "dense" : "regular"}>
+        <Toolbar
+          variant={isMobile ? "dense" : "regular"}
+          sx={{
+            minHeight: isMobile ? 42 : 50,
+            px: isMobile ? 0.5 : 1,
+            gap: 0.5
+          }}
+        >
 
           {/* Navigation buttons - hide on mobile portrait, show on landscape */}
           {(!isMobile || (isMobile && isLandscape)) && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <ButtonGroup variant="outlined" size="small" sx={{ borderColor: muiTheme.palette.divider }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <ButtonGroup
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderColor: muiTheme.palette.divider,
+                  '& .MuiIconButton-root': { p: 0.6 }
+                }}
+              >
                 <IconButton
                   onClick={handleBrowserBack}
                   disabled={historyIndex <= 0}
@@ -485,8 +499,8 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
             }}
             sx={{
               width: isMobile && isPortrait ? '100%' : 
-                     isMobile && isLandscape ? 300 :
-                     isSmallScreen ? 350 : 525,
+                     isMobile && isLandscape ? 280 :
+                     isSmallScreen ? 320 : 480,
               flexGrow: (isMobile && isPortrait) ? 1 : 0,
               '& .MuiOutlinedInput-root': {
                 backgroundColor: muiTheme.palette.background.paper,
@@ -497,7 +511,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
           
           {/* Bookmark buttons - show in landscape, hide in portrait on mobile */}
           {(!isMobile || (isMobile && isLandscape)) && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <IconButton
                 onClick={handleToggleBookmark}
                 disabled={!currentUrl}

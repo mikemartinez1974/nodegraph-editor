@@ -316,12 +316,16 @@ const HandleLayer = forwardRef(({
           h => h.key === resolvedSourceHandle && (h.type === 'output' || h.type === 'bidirectional')
         );
         if (handle) return { ...handle.position, fromHandle: true };
+        const fallbackHandle = sourceHandles.find(h => h.key === resolvedSourceHandle);
+        if (fallbackHandle) return { ...fallbackHandle.position, fromHandle: true };
       }
       if (direction === 'target' && resolvedTargetHandle) {
         const handle = targetHandles.find(
           h => h.key === resolvedTargetHandle && (h.type === 'input' || h.type === 'bidirectional')
         );
         if (handle) return { ...handle.position, fromHandle: true };
+        const fallbackHandle = targetHandles.find(h => h.key === resolvedTargetHandle);
+        if (fallbackHandle) return { ...fallbackHandle.position, fromHandle: true };
       }
       if (direction === 'source') {
         const tFrame = getNodeFrame(targetNode);

@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
+import { useTheme, ThemeProvider, createTheme, alpha } from '@mui/material/styles';
 import {
   Paper,
   IconButton,
@@ -129,7 +129,8 @@ const Toolbar = ({
   onToggleSystemNodesPanel = () => eventBus.emit('toggleSystemNodesPanel'),
   showSystemNodesPanel = false,
   uiTheme = null,
-  documentAccess = null
+  documentAccess = null,
+  dockInBrowserBar = false
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -838,22 +839,23 @@ const Toolbar = ({
 
   const toolbarContent = (
     <>
-      {/* Hover trigger area just below address bar */}
-      <Box
-        onMouseEnter={handleMouseEnter}
-        sx={{
-          position: 'fixed',
-          top: addressBarHeight,
-          left: 0,
-          right: 0,
-          height: 8,
-          zIndex: 1299,
-          pointerEvents: 'auto',
-          '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, 0.03)'
-          }
-        }}
-      />
+      {!dockInBrowserBar && (
+        <Box
+          onMouseEnter={handleMouseEnter}
+          sx={{
+            position: 'fixed',
+            top: addressBarHeight,
+            left: 0,
+            right: 0,
+            height: 8,
+            zIndex: 1299,
+            pointerEvents: 'auto',
+            '&:hover': {
+              backgroundColor: theme.palette.action.hover
+            }
+          }}
+        />
+      )}
 
       {/* Retractable toolbar */}
       <Paper
@@ -864,27 +866,42 @@ const Toolbar = ({
         aria-label="Graph editor toolbar"
         sx={{
           position: 'fixed',
-          top: addressBarHeight,
-          left: 0,
-          right: 0,
-          zIndex: 1000, // Behind address bar (which is typically 1100)
-          backgroundColor: theme.palette.background.paper,
+          top: dockInBrowserBar ? 8 : addressBarHeight,
+          left: dockInBrowserBar ? 'auto' : 0,
+          right: dockInBrowserBar ? 8 : 0,
+          zIndex: dockInBrowserBar ? 1201 : 1000,
+          backgroundColor: dockInBrowserBar
+            ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.28 : 0.22)
+            : theme.palette.background.paper,
+          backgroundImage: dockInBrowserBar
+            ? `linear-gradient(135deg, ${alpha(theme.palette.primary.light, theme.palette.mode === 'dark' ? 0.35 : 0.28)} 0%, ${alpha(theme.palette.primary.dark, theme.palette.mode === 'dark' ? 0.35 : 0.28)} 100%)`
+            : 'none',
           borderBottom: `1px solid ${theme.palette.divider}`,
-          borderBottomLeftRadius: 12,
+          border: dockInBrowserBar
+            ? `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.18 : 0.42)}`
+            : undefined,
+          borderBottomLeftRadius: dockInBrowserBar ? 12 : 12,
           borderBottomRightRadius: 12,
-          transform: isExpanded ? 'translateY(0)' : 'translateY(-100%)',
+          borderTopLeftRadius: dockInBrowserBar ? 12 : 0,
+          borderTopRightRadius: dockInBrowserBar ? 12 : 0,
+          transform: dockInBrowserBar ? 'none' : (isExpanded ? 'translateY(0)' : 'translateY(-100%)'),
           transition: 'transform 0.3s ease-in-out',
-          maxWidth: '100vw',
-          overflow: 'auto'
+          maxWidth: dockInBrowserBar ? 'calc(100vw - 16px)' : '100vw',
+          overflow: dockInBrowserBar ? 'hidden' : 'auto',
+          backdropFilter: dockInBrowserBar ? 'blur(10px) saturate(140%)' : 'none',
+          boxShadow: dockInBrowserBar
+            ? `0 8px 22px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.38 : 0.18)}`
+            : undefined
         }}
       >
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: 1, 
-          p: 1,
-          flexWrap: 'wrap',
-          justifyContent: 'center'
+          gap: dockInBrowserBar ? 0.5 : 1,
+          p: dockInBrowserBar ? 0.5 : 1,
+          flexWrap: dockInBrowserBar ? 'nowrap' : 'wrap',
+          justifyContent: 'center',
+          overflowX: dockInBrowserBar ? 'auto' : 'visible'
         }}>
         {host === 'vscode' && (
           <>
@@ -895,8 +912,8 @@ const Toolbar = ({
                 borderRadius: 999,
                 fontSize: 12,
                 fontWeight: 600,
-                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.18)' : 'rgba(59, 130, 246, 0.12)',
-                color: theme.palette.mode === 'dark' ? '#93c5fd' : '#1d4ed8'
+                backgroundColor: alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.22 : 0.14),
+                color: theme.palette.info.main
               }}
             >
               Dev Mode
@@ -909,11 +926,11 @@ const Toolbar = ({
                 fontSize: 12,
                 fontWeight: 600,
                 backgroundColor: documentAccess?.writable
-                  ? (theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.12)')
-                  : (theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.18)' : 'rgba(245, 158, 11, 0.12)'),
+                  ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.22 : 0.14)
+                  : alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.22 : 0.14),
                 color: documentAccess?.writable
-                  ? (theme.palette.mode === 'dark' ? '#6ee7b7' : '#047857')
-                  : (theme.palette.mode === 'dark' ? '#fcd34d' : '#92400e')
+                  ? theme.palette.success.main
+                  : theme.palette.warning.main
               }}
               title={documentAccess?.target || 'Active VS Code document'}
             >

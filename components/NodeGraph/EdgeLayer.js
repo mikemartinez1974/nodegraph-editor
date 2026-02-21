@@ -240,7 +240,16 @@ const EdgeLayer = forwardRef(({
 
   const getObstacleRects = useCallback((nodes, sourceId, targetId, padding = 12) => {
     return (nodes || [])
-      .filter((node) => node && node.id !== sourceId && node.id !== targetId && node.visible !== false)
+      .filter(
+        (node) =>
+          node &&
+          node.id !== sourceId &&
+          node.id !== targetId &&
+          node.visible !== false &&
+          node.type !== 'manifest' &&
+          node.type !== 'legend' &&
+          node.type !== 'dictionary'
+      )
       .map((node) => {
         const w = node.width || 60;
         const h = node.height || 60;
@@ -280,6 +289,123 @@ const EdgeLayer = forwardRef(({
     }
     return true;
   }, [segmentIntersectsRect]);
+
+  const routeHasSelfOverlap = useCallback((segments = []) => {
+    const eps = 0.5;
+    const overlap1D = (a1, a2, b1, b2) => {
+      const minA = Math.min(a1, a2);
+      const maxA = Math.max(a1, a2);
+      const minB = Math.min(b1, b2);
+      const maxB = Math.max(b1, b2);
+      return Math.min(maxA, maxB) - Math.max(minA, minB) > eps;
+    };
+
+    for (let i = 0; i < segments.length; i += 1) {
+      const [a1, a2] = segments[i];
+      if (!a1 || !a2) continue;
+      const aHorizontal = Math.abs(a1.y - a2.y) < eps;
+      const aVertical = Math.abs(a1.x - a2.x) < eps;
+      if (!aHorizontal && !aVertical) continue;
+
+      for (let j = i + 2; j < segments.length; j += 1) {
+        const [b1, b2] = segments[j];
+        if (!b1 || !b2) continue;
+        const bHorizontal = Math.abs(b1.y - b2.y) < eps;
+        const bVertical = Math.abs(b1.x - b2.x) < eps;
+
+        // Ignore touching at endpoints; we only want true overlap.
+        if (
+          (Math.abs(a2.x - b1.x) < eps && Math.abs(a2.y - b1.y) < eps) ||
+          (Math.abs(a1.x - b2.x) < eps && Math.abs(a1.y - b2.y) < eps)
+        ) {
+          continue;
+        }
+
+        if (aHorizontal && bHorizontal && Math.abs(a1.y - b1.y) < eps) {
+          if (overlap1D(a1.x, a2.x, b1.x, b2.x)) return true;
+        } else if (aVertical && bVertical && Math.abs(a1.x - b1.x) < eps) {
+          if (overlap1D(a1.y, a2.y, b1.y, b2.y)) return true;
+        }
+      }
+    }
+    return false;
+  }, []);
+
+  const simplifyOrthogonalSegments = useCallback((segments = []) => {
+    if (!Array.isArray(segments) || segments.length < 2) return segments;
+
+    const eps = 0.5;
+    const notchThreshold = 18;
+    const points = [segments[0][0], ...segments.map(([, end]) => end)].filter(Boolean).map((p) => ({ x: p.x, y: p.y }));
+    if (points.length < 3) return segments;
+
+    const orientation = (a, b) => {
+      if (!a || !b) return 'none';
+      const dx = Math.abs((b.x || 0) - (a.x || 0));
+      const dy = Math.abs((b.y || 0) - (a.y || 0));
+      if (dx < eps && dy < eps) return 'none';
+      return dx >= dy ? 'h' : 'v';
+    };
+
+    let changed = true;
+    while (changed) {
+      changed = false;
+
+      // Remove zero-length and perfectly collinear waypoints.
+      for (let i = 1; i < points.length - 1; i += 1) {
+        const a = points[i - 1];
+        const b = points[i];
+        const c = points[i + 1];
+        const ab = orientation(a, b);
+        const bc = orientation(b, c);
+        if (ab === 'none' || bc === 'none' || ab === bc) {
+          points.splice(i, 1);
+          changed = true;
+          break;
+        }
+      }
+      if (changed) continue;
+
+      // Remove tiny "crook/notch" patterns: h-v-h or v-h-v with a very short middle leg.
+      for (let i = 0; i < points.length - 3; i += 1) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const p2 = points[i + 2];
+        const p3 = points[i + 3];
+        const o01 = orientation(p0, p1);
+        const o12 = orientation(p1, p2);
+        const o23 = orientation(p2, p3);
+        if (o01 === 'none' || o12 === 'none' || o23 === 'none') continue;
+        if (o01 !== o23 || o01 === o12) continue;
+
+        const midLen = Math.hypot((p2.x || 0) - (p1.x || 0), (p2.y || 0) - (p1.y || 0));
+        if (midLen > notchThreshold) continue;
+
+        if (o01 === 'h' && Math.abs((p0.y || 0) - (p3.y || 0)) <= eps) {
+          const m = { x: p2.x, y: p0.y };
+          points.splice(i + 1, 2, m);
+          changed = true;
+          break;
+        }
+        if (o01 === 'v' && Math.abs((p0.x || 0) - (p3.x || 0)) <= eps) {
+          const m = { x: p0.x, y: p2.y };
+          points.splice(i + 1, 2, m);
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    const simplified = [];
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const a = points[i];
+      const b = points[i + 1];
+      if (!a || !b) continue;
+      if (Math.abs(a.x - b.x) < eps && Math.abs(a.y - b.y) < eps) continue;
+      simplified.push([a, b]);
+    }
+    return simplified.length ? simplified : segments;
+  }, []);
   
   // Animation refs
   const animationStartTimeRef = useRef(null);
@@ -695,6 +821,7 @@ const EdgeLayer = forwardRef(({
       const hasPerEdgeRoutingOverride =
         explicitRouteStyle === 'orthogonal' ||
         explicitRouteStyle === 'curved' ||
+        explicitRouteStyle === 'straight' ||
         hasCurvedFlag ||
         hasOrthogonalFlag;
       const preferCurvedForEdge =
@@ -704,21 +831,39 @@ const EdgeLayer = forwardRef(({
       const preferOrthogonalForEdge =
         explicitRouteStyle === 'orthogonal' ||
         (hasOrthogonalFlag && flagTruthy(orthogonalFlag));
+      const preferStraightForEdge = explicitRouteStyle === 'straight';
+      const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
 
       const routeOverride = edgeRoutesRef.current?.[edge.id];
       const routedPointsRaw = Array.isArray(routeOverride?.points) ? routeOverride.points : null;
+      const routedMatchesEndpoints = Array.isArray(routedPointsRaw) && routedPointsRaw.length >= 2
+        ? (() => {
+            const first = routedPointsRaw[0];
+            const last = routedPointsRaw[routedPointsRaw.length - 1];
+            if (!first || !last) return false;
+            const distStart = Math.hypot((first.x || 0) - sourcePos.x, (first.y || 0) - sourcePos.y);
+            const distEnd = Math.hypot((last.x || 0) - targetPos.x, (last.y || 0) - targetPos.y);
+            // Ignore stale cached routes that no longer touch current endpoints.
+            return distStart <= 48 && distEnd <= 48;
+          })()
+        : false;
       const draggedNodeIds = draggingInfoRef?.current?.nodeIds;
       const allowRoutedSegments = Array.isArray(draggedNodeIds)
         ? !(draggedNodeIds.includes(edge.source) || draggedNodeIds.includes(edge.target))
         : true;
       const routedPoints = allowRoutedSegments
-        ? applyEndpointLaneOffsetsToPoints(routedPointsRaw, sourceFan, targetFan)
-        : routedPointsRaw;
+        ? applyEndpointLaneOffsetsToPoints(routedMatchesEndpoints ? routedPointsRaw : null, sourceFan, targetFan)
+        : (routedMatchesEndpoints ? routedPointsRaw : null);
       const routedSegments = allowRoutedSegments ? buildSegmentsFromPoints(routedPoints) : null;
       const useRoutedSegments = Boolean(
         routedSegments &&
         routedSegments.length &&
-        (!hasPerEdgeRoutingOverride || preferOrthogonalForEdge)
+        // When global routing is forced, ignore cached/ELK route points and
+        // render from the requested global style.
+        !forceRouting &&
+        // Only apply cached/ELK routes when the edge has no explicit per-edge routing override.
+        // Per-edge routing should be resolved from live geometry to keep behavior stable while editing.
+        !hasPerEdgeRoutingOverride
       );
 
       if (useRoutedSegments) {
@@ -728,16 +873,15 @@ const EdgeLayer = forwardRef(({
         targetFromHandle = true;
       }
 
-      const forceRouting = defaultEdgeRouting && defaultEdgeRouting !== 'auto';
-      const applyForcedRouting = forceRouting && !hasPerEdgeRoutingOverride;
+      const applyForcedRouting = forceRouting;
       const isOrthogonal = useRoutedSegments
         ? true
         : applyForcedRouting
         ? defaultEdgeRouting === 'orthogonal'
-        : preferOrthogonalForEdge;
+        : (!preferStraightForEdge && preferOrthogonalForEdge);
       const isCurved = applyForcedRouting
         ? defaultEdgeRouting === 'curved'
-        : !isOrthogonal && (
+        : !preferStraightForEdge && !isOrthogonal && (
           preferCurvedForEdge ||
           (hasCurvedFlag && flagTruthy(curvedFlag)) ||
           (!hasPerEdgeRoutingOverride)
@@ -848,40 +992,253 @@ const EdgeLayer = forwardRef(({
             if (a.x === b.x && a.y === b.y) return;
             fullSegments.push([a, b]);
           };
-          add(sourcePos, sourceLeadAdj);
+          // Keep endpoint leads orthogonal so edges leave/enter nodes cleanly
+          // instead of diagonal cuts that can appear to run under a node.
+          add(sourcePos, sourceLead);
+          add(sourceLead, sourceLeadAdj);
           coreSegments.forEach(([a, b]) => add(a, b));
-          add(targetLeadAdj, targetPos);
+          add(targetLeadAdj, targetLead);
+          add(targetLead, targetPos);
           return fullSegments;
         };
 
         const tryRoutes = (candidates) => {
-          for (const coreSegments of candidates) {
+          const orientation = ([a, b]) => {
+            if (!a || !b) return 'none';
+            const dx = Math.abs((b.x || 0) - (a.x || 0));
+            const dy = Math.abs((b.y || 0) - (a.y || 0));
+            if (dx < 0.5 && dy < 0.5) return 'none';
+            return dx >= dy ? 'h' : 'v';
+          };
+
+          const routeTurnCount = (segments = []) => {
+            let turns = 0;
+            let prev = null;
+            for (const seg of segments) {
+              const o = orientation(seg);
+              if (o === 'none') continue;
+              if (prev && o !== prev) turns += 1;
+              prev = o;
+            }
+            return turns;
+          };
+
+          const routeLength = (segments = []) =>
+            segments.reduce((sum, [a, b]) => sum + Math.hypot((b.x || 0) - (a.x || 0), (b.y || 0) - (a.y || 0)), 0);
+
+          const obstacleHits = (segments = [], obstacles = []) => {
+            let hits = 0;
+            for (const [a, b] of segments) {
+              for (const rect of obstacles) {
+                if (segmentIntersectsRect(a, b, rect)) hits += 1;
+              }
+            }
+            return hits;
+          };
+
+          const scored = [];
+          candidates.forEach((coreSegments, index) => {
             const fullSegments = finalize(coreSegments);
-            if (routeIsClear(fullSegments, obstacleRects)) return fullSegments;
+            if (routeHasSelfOverlap(fullSegments)) return;
+            scored.push({
+              index,
+              fullSegments,
+              laneCost: index,
+              obstacleCost: obstacleHits(fullSegments, obstacleRects),
+              turns: routeTurnCount(fullSegments),
+              length: routeLength(fullSegments)
+            });
+          });
+
+          if (scored.length) {
+            scored.sort((a, b) => {
+              if (a.laneCost !== b.laneCost) return a.laneCost - b.laneCost;
+              if (a.obstacleCost !== b.obstacleCost) return a.obstacleCost - b.obstacleCost;
+              if (a.turns !== b.turns) return a.turns - b.turns;
+              if (Math.abs(a.length - b.length) > 0.5) return a.length - b.length;
+              return a.index - b.index;
+            });
+            return scored[0].fullSegments;
           }
+
           return finalize(candidates[0] || []);
         };
 
         if (sourceAxis === 'horizontal' && targetAxis === 'horizontal') {
-          const baseMid = (sourceLeadAdj.x + targetLeadAdj.x) / 2 + bundleOffset;
           const offsets = [0, 40, -40, 80, -80, 120, -120];
-          const candidates = offsets.map((offset) => {
-            const mid = baseMid + offset;
+          const candidates = [];
+
+          const sourceBounds = sourceNode
+            ? {
+                left: (sourceNode.position?.x ?? sourceNode.x ?? 0),
+                right: (sourceNode.position?.x ?? sourceNode.x ?? 0) + (sourceNode.width || 60)
+              }
+            : null;
+          const targetBounds = targetNode
+            ? {
+                left: (targetNode.position?.x ?? targetNode.x ?? 0),
+                right: (targetNode.position?.x ?? targetNode.x ?? 0) + (targetNode.width || 60)
+              }
+            : null;
+          const outsideMargin = Math.max(36, lead + 12 + Math.abs(bundleOffset));
+
+          // Prefer a side-respecting "digital 5" route for opposite horizontal ports.
+          // We need two outside columns so each endpoint approaches from the correct side.
+          if (sourceSide === 'right' && targetSide === 'left' && sourceBounds && targetBounds) {
+            // If source is left of target, a single vertical lane between them is cleaner.
+            if (sourceLeadAdj.x <= targetLeadAdj.x - 8) {
+              const minLaneX = sourceLeadAdj.x + 10;
+              const maxLaneX = targetLeadAdj.x - 10;
+              const baseLaneX = Math.max(minLaneX, Math.min(maxLaneX, (sourceLeadAdj.x + targetLeadAdj.x) / 2));
+              offsets.forEach((offset) => {
+                const laneX = Math.max(minLaneX, Math.min(maxLaneX, baseLaneX + offset));
+                const p1 = { x: laneX, y: sourceLeadAdj.y };
+                const p2 = { x: laneX, y: targetLeadAdj.y };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
+              });
+            } else {
+              // Crossing case: keep two outside columns to preserve entry side constraints.
+              const sourceOuterX = sourceBounds.right + outsideMargin;
+              const targetOuterX = targetBounds.left - outsideMargin;
+              const baseMidY = (sourceLeadAdj.y + targetLeadAdj.y) / 2 + bundleOffset;
+              offsets.forEach((offset) => {
+                const midY = baseMidY + offset;
+                const p1 = { x: sourceOuterX, y: sourceLeadAdj.y };
+                const p2 = { x: sourceOuterX, y: midY };
+                const p3 = { x: targetOuterX, y: midY };
+                const p4 = { x: targetOuterX, y: targetLeadAdj.y };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, p3], [p3, p4], [p4, targetLeadAdj]]);
+              });
+            }
+          } else if (sourceSide === 'left' && targetSide === 'right' && sourceBounds && targetBounds) {
+            if (sourceLeadAdj.x >= targetLeadAdj.x + 8) {
+              const minLaneX = targetLeadAdj.x + 10;
+              const maxLaneX = sourceLeadAdj.x - 10;
+              const baseLaneX = Math.max(minLaneX, Math.min(maxLaneX, (sourceLeadAdj.x + targetLeadAdj.x) / 2));
+              offsets.forEach((offset) => {
+                const laneX = Math.max(minLaneX, Math.min(maxLaneX, baseLaneX + offset));
+                const p1 = { x: laneX, y: sourceLeadAdj.y };
+                const p2 = { x: laneX, y: targetLeadAdj.y };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
+              });
+            } else {
+              const sourceOuterX = sourceBounds.left - outsideMargin;
+              const targetOuterX = targetBounds.right + outsideMargin;
+              const baseMidY = (sourceLeadAdj.y + targetLeadAdj.y) / 2 + bundleOffset;
+              offsets.forEach((offset) => {
+                const midY = baseMidY + offset;
+                const p1 = { x: sourceOuterX, y: sourceLeadAdj.y };
+                const p2 = { x: sourceOuterX, y: midY };
+                const p3 = { x: targetOuterX, y: midY };
+                const p4 = { x: targetOuterX, y: targetLeadAdj.y };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, p3], [p3, p4], [p4, targetLeadAdj]]);
+              });
+            }
+          }
+
+          const sameSideClearance = Math.max(16, lead);
+          let baseMid = (sourceLeadAdj.x + targetLeadAdj.x) / 2 + bundleOffset;
+          let midGenerator = (offset) => baseMid + offset;
+          if (sourceSide === 'right' && targetSide === 'right') {
+            const outsideBase = Math.max(sourceLeadAdj.x, targetLeadAdj.x) + sameSideClearance;
+            midGenerator = (offset) => outsideBase + Math.abs(offset);
+          } else if (sourceSide === 'left' && targetSide === 'left') {
+            const outsideBase = Math.min(sourceLeadAdj.x, targetLeadAdj.x) - sameSideClearance;
+            midGenerator = (offset) => outsideBase - Math.abs(offset);
+          }
+          offsets.forEach((offset) => {
+            const mid = midGenerator(offset);
             const p1 = { x: mid, y: sourceLeadAdj.y };
             const p2 = { x: mid, y: targetLeadAdj.y };
-            return [[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]];
+            candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
           });
           return tryRoutes(candidates);
         }
 
         if (sourceAxis === 'vertical' && targetAxis === 'vertical') {
-          const baseMid = (sourceLeadAdj.y + targetLeadAdj.y) / 2 + bundleOffset;
           const offsets = [0, 40, -40, 80, -80, 120, -120];
-          const candidates = offsets.map((offset) => {
-            const mid = baseMid + offset;
+          const candidates = [];
+          const sourceBounds = sourceNode
+            ? {
+                top: (sourceNode.position?.y ?? sourceNode.y ?? 0),
+                bottom: (sourceNode.position?.y ?? sourceNode.y ?? 0) + (sourceNode.height || 60)
+              }
+            : null;
+          const targetBounds = targetNode
+            ? {
+                top: (targetNode.position?.y ?? targetNode.y ?? 0),
+                bottom: (targetNode.position?.y ?? targetNode.y ?? 0) + (targetNode.height || 60)
+              }
+            : null;
+          const outsideMargin = Math.max(36, lead + 12 + Math.abs(bundleOffset));
+
+          if (sourceSide === 'bottom' && targetSide === 'top' && sourceBounds && targetBounds) {
+            // Normal top-down flow: route through a single middle horizontal lane.
+            if (sourceLeadAdj.y <= targetLeadAdj.y - 8) {
+              const minLaneY = sourceLeadAdj.y + 10;
+              const maxLaneY = targetLeadAdj.y - 10;
+              const baseLaneY = Math.max(minLaneY, Math.min(maxLaneY, (sourceLeadAdj.y + targetLeadAdj.y) / 2));
+              offsets.forEach((offset) => {
+                const laneY = Math.max(minLaneY, Math.min(maxLaneY, baseLaneY + offset));
+                const p1 = { x: sourceLeadAdj.x, y: laneY };
+                const p2 = { x: targetLeadAdj.x, y: laneY };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
+              });
+            } else {
+              // Crossing case: keep two outside rows to preserve endpoint side constraints.
+              const sourceOuterY = sourceBounds.bottom + outsideMargin;
+              const targetOuterY = targetBounds.top - outsideMargin;
+              const baseMidX = (sourceLeadAdj.x + targetLeadAdj.x) / 2 + bundleOffset;
+              offsets.forEach((offset) => {
+                const midX = baseMidX + offset;
+                const p1 = { x: sourceLeadAdj.x, y: sourceOuterY };
+                const p2 = { x: midX, y: sourceOuterY };
+                const p3 = { x: midX, y: targetOuterY };
+                const p4 = { x: targetLeadAdj.x, y: targetOuterY };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, p3], [p3, p4], [p4, targetLeadAdj]]);
+              });
+            }
+          } else if (sourceSide === 'top' && targetSide === 'bottom' && sourceBounds && targetBounds) {
+            if (sourceLeadAdj.y >= targetLeadAdj.y + 8) {
+              const minLaneY = targetLeadAdj.y + 10;
+              const maxLaneY = sourceLeadAdj.y - 10;
+              const baseLaneY = Math.max(minLaneY, Math.min(maxLaneY, (sourceLeadAdj.y + targetLeadAdj.y) / 2));
+              offsets.forEach((offset) => {
+                const laneY = Math.max(minLaneY, Math.min(maxLaneY, baseLaneY + offset));
+                const p1 = { x: sourceLeadAdj.x, y: laneY };
+                const p2 = { x: targetLeadAdj.x, y: laneY };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
+              });
+            } else {
+              const sourceOuterY = sourceBounds.top - outsideMargin;
+              const targetOuterY = targetBounds.bottom + outsideMargin;
+              const baseMidX = (sourceLeadAdj.x + targetLeadAdj.x) / 2 + bundleOffset;
+              offsets.forEach((offset) => {
+                const midX = baseMidX + offset;
+                const p1 = { x: sourceLeadAdj.x, y: sourceOuterY };
+                const p2 = { x: midX, y: sourceOuterY };
+                const p3 = { x: midX, y: targetOuterY };
+                const p4 = { x: targetLeadAdj.x, y: targetOuterY };
+                candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, p3], [p3, p4], [p4, targetLeadAdj]]);
+              });
+            }
+          }
+
+          const sameSideClearance = Math.max(16, lead);
+          let baseMid = (sourceLeadAdj.y + targetLeadAdj.y) / 2 + bundleOffset;
+          let midGenerator = (offset) => baseMid + offset;
+          if (sourceSide === 'bottom' && targetSide === 'bottom') {
+            const outsideBase = Math.max(sourceLeadAdj.y, targetLeadAdj.y) + sameSideClearance;
+            midGenerator = (offset) => outsideBase + Math.abs(offset);
+          } else if (sourceSide === 'top' && targetSide === 'top') {
+            const outsideBase = Math.min(sourceLeadAdj.y, targetLeadAdj.y) - sameSideClearance;
+            midGenerator = (offset) => outsideBase - Math.abs(offset);
+          }
+          offsets.forEach((offset) => {
+            const mid = midGenerator(offset);
             const p1 = { x: sourceLeadAdj.x, y: mid };
             const p2 = { x: targetLeadAdj.x, y: mid };
-            return [[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]];
+            candidates.push([[sourceLeadAdj, p1], [p1, p2], [p2, targetLeadAdj]]);
           });
           return tryRoutes(candidates);
         }
@@ -927,23 +1284,118 @@ const EdgeLayer = forwardRef(({
         return segments[segments.length - 1][1];
       };
 
+      const buildOrthBridge = (start, end, axisPreference = 'horizontal') => {
+        if (!start || !end) return [];
+        if (start.x === end.x && start.y === end.y) return [];
+        if (start.x === end.x || start.y === end.y) return [[start, end]];
+        if (axisPreference === 'vertical') {
+          const mid = { x: start.x, y: end.y };
+          return [[start, mid], [mid, end]];
+        }
+        const mid = { x: end.x, y: start.y };
+        return [[start, mid], [mid, end]];
+      };
+
+      const stitchRoutedToPorts = (segments) => {
+        if (!Array.isArray(segments) || !segments.length) return segments;
+        const stitched = [];
+        const sourceNormal = getSideNormal(sourceSide);
+        const targetNormal = getSideNormal(targetSide);
+        const lead = 24;
+        const sourceExit = sourceNormal
+          ? { x: sourcePos.x + sourceNormal.x * lead, y: sourcePos.y + sourceNormal.y * lead }
+          : sourcePos;
+        const targetEntry = targetNormal
+          ? { x: targetPos.x + targetNormal.x * lead, y: targetPos.y + targetNormal.y * lead }
+          : targetPos;
+
+        const first = segments[0][0];
+        const last = segments[segments.length - 1][1];
+        const sourceAxis = sourceNormal && sourceNormal.x !== 0 ? 'horizontal' : 'vertical';
+        const targetAxis = targetNormal && targetNormal.x !== 0 ? 'horizontal' : 'vertical';
+
+        stitched.push(...buildOrthBridge(sourcePos, sourceExit, sourceAxis));
+        stitched.push(...buildOrthBridge(sourceExit, first, sourceAxis));
+        stitched.push(...segments);
+        stitched.push(...buildOrthBridge(last, targetEntry, targetAxis));
+        stitched.push(...buildOrthBridge(targetEntry, targetPos, targetAxis));
+
+        const cleaned = stitched.filter(([a, b]) => a && b && !(a.x === b.x && a.y === b.y));
+        return cleaned.length ? cleaned : segments;
+      };
+
+      const drawRoundedOrthogonalPath = (segments, radius = 12) => {
+        if (!Array.isArray(segments) || !segments.length) return false;
+        const points = [segments[0][0], ...segments.map(([, end]) => end)];
+        if (points.length < 2) return false;
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+
+        for (let i = 1; i < points.length - 1; i += 1) {
+          const prev = points[i - 1];
+          const curr = points[i];
+          const next = points[i + 1];
+
+          const inDx = curr.x - prev.x;
+          const inDy = curr.y - prev.y;
+          const outDx = next.x - curr.x;
+          const outDy = next.y - curr.y;
+          const inLen = Math.hypot(inDx, inDy);
+          const outLen = Math.hypot(outDx, outDy);
+
+          if (inLen === 0 || outLen === 0) {
+            ctx.lineTo(curr.x, curr.y);
+            continue;
+          }
+
+          const inUx = inDx / inLen;
+          const inUy = inDy / inLen;
+          const outUx = outDx / outLen;
+          const outUy = outDy / outLen;
+
+          // Straight-through segments should not introduce a curve.
+          const dot = inUx * outUx + inUy * outUy;
+          if (Math.abs(dot) > 0.999) {
+            ctx.lineTo(curr.x, curr.y);
+            continue;
+          }
+
+          const cornerRadius = Math.max(0, Math.min(radius, inLen * 0.5, outLen * 0.5));
+          const p1 = { x: curr.x - inUx * cornerRadius, y: curr.y - inUy * cornerRadius };
+          const p2 = { x: curr.x + outUx * cornerRadius, y: curr.y + outUy * cornerRadius };
+
+          ctx.lineTo(p1.x, p1.y);
+          ctx.quadraticCurveTo(curr.x, curr.y, p2.x, p2.y);
+        }
+
+        const last = points[points.length - 1];
+        ctx.lineTo(last.x, last.y);
+        ctx.stroke();
+        return true;
+      };
+
       const orthogonalSegmentsRaw = isOrthogonal
         ? (useRoutedSegments ? routedSegments : buildOrthogonalSegments())
         : null;
       const orthogonalSegments = isOrthogonal
         ? (Array.isArray(orthogonalSegmentsRaw) && orthogonalSegmentsRaw.length
-          ? orthogonalSegmentsRaw
+          ? (useRoutedSegments ? stitchRoutedToPorts(orthogonalSegmentsRaw) : orthogonalSegmentsRaw)
           : [[sourcePos, targetPos]])
         : null;
+      const orthogonalSegmentsFinal = isOrthogonal ? simplifyOrthogonalSegments(orthogonalSegments) : null;
+      const useRoundedOrthogonal = isOrthogonal && hasCurvedFlag && flagTruthy(curvedFlag);
 
       // Draw edge path
       if (isOrthogonal) {
-        ctx.beginPath();
-        ctx.moveTo(sourcePos.x, sourcePos.y);
-        orthogonalSegments.forEach(([, end]) => {
-          ctx.lineTo(end.x, end.y);
-        });
-        ctx.stroke();
+        if (!useRoundedOrthogonal || !drawRoundedOrthogonalPath(orthogonalSegmentsFinal, 14)) {
+          ctx.beginPath();
+          ctx.moveTo(sourcePos.x, sourcePos.y);
+          orthogonalSegmentsFinal.forEach(([, end]) => {
+            ctx.lineTo(end.x, end.y);
+          });
+          ctx.stroke();
+        }
       } else if (isCurved) {
         ctx.beginPath();
         ctx.moveTo(sourcePos.x, sourcePos.y);
@@ -980,7 +1432,7 @@ const EdgeLayer = forwardRef(({
         if (style.arrowPosition === 'end' || style.arrowPosition === 'both') {
           let angle, arrowPos;
           if (isOrthogonal) {
-            const last = orthogonalSegments[orthogonalSegments.length - 1];
+            const last = orthogonalSegmentsFinal[orthogonalSegmentsFinal.length - 1];
             angle = Math.atan2(last[1].y - last[0].y, last[1].x - last[0].x);
             arrowPos = targetPos;
           } else if (isCurved) {
@@ -1004,7 +1456,7 @@ const EdgeLayer = forwardRef(({
         if (style.arrowPosition === 'start' || style.arrowPosition === 'both') {
           let angle, arrowPos;
           if (isOrthogonal) {
-            const first = orthogonalSegments[0];
+            const first = orthogonalSegmentsFinal[0];
             angle = Math.atan2(first[0].y - first[1].y, first[0].x - first[1].x);
             arrowPos = sourcePos;
           } else if (isCurved) {
@@ -1037,7 +1489,7 @@ const EdgeLayer = forwardRef(({
           
           let particlePos;
           if (isOrthogonal) {
-            particlePos = getPointOnSegments(orthogonalSegments, t);
+            particlePos = getPointOnSegments(orthogonalSegmentsFinal, t);
           } else if (isCurved) {
             if (hasBezierControls) {
               particlePos = getBezierPoint(t, sourcePos.x, sourcePos.y, cp1.x, cp1.y, cp2.x, cp2.y, targetPos.x, targetPos.y);

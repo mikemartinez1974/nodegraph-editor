@@ -1102,7 +1102,7 @@ const rerouteEdges = useCallback(async () => {
     autoLayoutType,
     handleModeChange,
     setAutoLayoutType, // <-- ensure this is exported
-    applyAutoLayout: () => applyAutoLayout(autoLayoutType),
+    applyAutoLayout: (layoutType) => applyAutoLayout(layoutType || autoLayoutType),
     applyLayoutPositions: animateToPositions,
     rerouteEdges
   };

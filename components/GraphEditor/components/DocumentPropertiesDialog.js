@@ -158,8 +158,10 @@ export default function DocumentPropertiesDialog({
   onClose,
   host = 'browser',
   backgroundUrl = '',
+  setBackgroundUrl = () => {},
   documentSettings,
   onDocumentSettingsChange,
+  onApplyLayout = null,
   projectMeta,
   onProjectMetaChange,
   onResetProjectMeta,
@@ -189,6 +191,7 @@ export default function DocumentPropertiesDialog({
   const [liveRecentSnapshots, setLiveRecentSnapshots] = useState([]);
   const wasOpenRef = useRef(false);
   const requestedTabRef = useRef('');
+  const skipLayoutSyncRef = useRef(false);
 
   const handleBrowserThemeChange = useCallback((nextThemeName) => {
     if (!nextThemeName) return;
@@ -357,6 +360,7 @@ export default function DocumentPropertiesDialog({
 
     setSettings(loadSettings());
     setMeta(mapProjectMeta(projectMeta, defaultShareLink));
+    skipLayoutSyncRef.current = true;
     setDocSettings(documentSettings || {});
     if (!wasOpen) {
       const requestedTab = requestedTabRef.current;
@@ -564,6 +568,24 @@ export default function DocumentPropertiesDialog({
 
   const contentPadding = isMobile ? { px: 2, pb: 4 } : { px: 3, pb: 4 };
   const sectionSpacing = 3;
+  const handleLayoutPanelDocumentSettingsChange = useCallback((updater) => {
+    setDocSettings((prev = {}) => (typeof updater === 'function' ? updater(prev) : (updater || prev)));
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    if (activeTab !== 'layout') return;
+    if (skipLayoutSyncRef.current) {
+      skipLayoutSyncRef.current = false;
+      return;
+    }
+    if (typeof onDocumentSettingsChange === 'function') {
+      onDocumentSettingsChange((prev) => ({
+        ...prev,
+        ...docSettings
+      }));
+    }
+  }, [open, activeTab, docSettings, onDocumentSettingsChange]);
 
   const applySystemNodeData = useCallback((type, data, setError, defaultsRef) => {
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
@@ -775,8 +797,9 @@ export default function DocumentPropertiesDialog({
                 open
                 onClose={() => {}}
                 documentSettings={docSettings}
-                setDocumentSettings={setDocSettings}
+                setDocumentSettings={handleLayoutPanelDocumentSettingsChange}
                 contractSummary={contractSummary}
+                onApplyLayout={onApplyLayout}
               />
             </Paper>
           </Stack>
