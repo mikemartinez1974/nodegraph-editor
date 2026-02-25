@@ -1,15 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "image-node Node Class",
-    "description": "Image presentation node with caption.",
-    "created": "2026-02-24T20:05:15Z",
-    "modified": "2026-02-24T20:05:15Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-24T20:18:04.432Z",
+    "modified": "2026-02-24T20:18:22.961Z",
     "author": "",
-    "tags": [
-      "node-class",
-      "image-node"
-    ]
+    "tags": []
   },
   "nodes": [
     {
@@ -84,6 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -245,10 +261,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## image-node\n\nUse dictionary entry:\n\n- `key`: `image-node`\n- `ref`: `/library/classes/nodes/image-node.node-class.node`\n\nThis is the canonical class graph for `image-node`."
+        "markdown": "## image-node\\n\\nUse dictionary entry:\\n\\n- `key`: `image-node`\\n- `ref`: `/library/classes/nodes/image-node.node-class.node`\\n\\nThis is the canonical class graph for `image-node`."
       }
     }
   ],
   "edges": [],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }

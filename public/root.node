@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
+    "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-22T23:34:27.996Z",
-    "modified": "2026-02-24T22:24:39Z",
+    "created": "2026-02-25T02:36:46.915Z",
+    "modified": "2026-02-25T02:37:12.302Z",
     "author": "",
     "tags": []
   },
@@ -39,6 +39,7 @@
             "manifest",
             "legend",
             "dictionary",
+            "default",
             "markdown"
           ],
           "portContracts": [
@@ -80,6 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -126,25 +146,9 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "nodeDefs": [
-          {
-            "key": "youtube",
-            "ref": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
-            "source": "My private stash.",
-            "version": "1.0"
-          }
-        ],
+        "nodeDefs": [],
         "skills": [],
-        "views": [
-          {
-            "key": "youtube",
-            "intent": "node",
-            "payload": "node.web",
-            "ref": "",
-            "source": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
-            "version": "1.0"
-          }
-        ]
+        "views": []
       }
     },
     {
@@ -152,8 +156,8 @@
       "type": "markdown",
       "label": "Welcome to Twilite",
       "position": {
-        "x": 100,
-        "y": -300
+        "x": -350.6341165477113,
+        "y": -252.02326867549147
       },
       "width": 480,
       "height": 320,
@@ -197,7 +201,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Welcome to Twilite \u2728\n\n**A persistent graph workspace where ideas connect and evolve.**\n\nTwilight is a visual thinking environment built on graphs. Every node is a thought, every edge is a relationship, and the whole canvas is your workspace.\n\n## What makes Twilite different?\n\n- **Persistent state** - Your graph is the source of truth\n- **Semantic connections** - Edges carry meaning and type\n- **Contract-driven** - Manifests define intent and authority\n- **Incremental updates** - Small, targeted changes preserve history\n\nExplore the nodes below to get started! \ud83d\udc47",
+        "markdown": "# Welcome to Twilite ✨\n\n**A persistent graph workspace where ideas connect and evolve.**\n\nTwilight is a visual thinking environment built on graphs. Every node is a thought, every edge is a relationship, and the whole canvas is your workspace.\n\n## What makes Twilite different?\n\n- **Persistent state** - Your graph is the source of truth\n- **Semantic connections** - Edges carry meaning and type\n- **Contract-driven** - Manifests define intent and authority\n- **Incremental updates** - Small, targeted changes preserve history\n\nExplore the nodes below to get started! 👇",
         "memo": "",
         "link": "",
         "html": "",
@@ -497,133 +501,6 @@
         "html": "",
         "svg": ""
       }
-    },
-    {
-      "id": "81d62441-815a-4404-8972-8ad9a447434c",
-      "type": "youtube-embedded",
-      "label": "youtube-embedded",
-      "position": {
-        "x": 671.1315163453673,
-        "y": -261.5
-      },
-      "width": 291,
-      "height": 197,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "videoId": "BzyQ6SWVaxU",
-        "autoplay": "true"
-      }
-    },
-    {
-      "id": "port-kernel-core-ontology",
-      "type": "port",
-      "label": "Core Ontology",
-      "position": {
-        "x": 1040,
-        "y": 420
-      },
-      "width": 260,
-      "height": 140,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "Twilite Kernel ontology primitives",
-        "link": "",
-        "intent": "external",
-        "target": {
-          "endpoint": "/twilite-core-ontology.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": ""
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "port-kernel-node-class-library",
-      "type": "port",
-      "label": "Node Class Library",
-      "position": {
-        "x": 1040,
-        "y": 590
-      },
-      "width": 260,
-      "height": 140,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "Canonical class graphs",
-        "link": "",
-        "intent": "external",
-        "target": {
-          "endpoint": "/node-class-library.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": ""
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "port-kernel-documentation",
-      "type": "port",
-      "label": "Twilite Documentation",
-      "position": {
-        "x": 1040,
-        "y": 760
-      },
-      "width": 260,
-      "height": 140,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "memo": "Self-describing docs graph",
-        "link": "",
-        "intent": "external",
-        "target": {
-          "endpoint": "/twilite-documentation.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": ""
-        },
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "contact-developer",
-      "type": "markdown",
-      "label": "Contact",
-      "position": {
-        "x": 1040,
-        "y": -60
-      },
-      "width": 360,
-      "height": 160,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Contact the developer\n\nadmin@twilite.zone"
-      }
     }
   ],
   "edges": [
@@ -733,60 +610,8 @@
         "curved": true
       },
       "data": {}
-    },
-    {
-      "id": "edge-root-to-core-ontology",
-      "type": "reference",
-      "source": "example-node",
-      "target": "port-kernel-core-ontology",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "kernel",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-root-to-class-library",
-      "type": "reference",
-      "source": "example-node",
-      "target": "port-kernel-node-class-library",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "classes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "edge-root-to-docs",
-      "type": "reference",
-      "source": "example-node",
-      "target": "port-kernel-documentation",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "docs",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
     }
   ],
   "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ]
+  "scripts": []
 }

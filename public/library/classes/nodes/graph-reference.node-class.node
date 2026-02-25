@@ -1,15 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "graph-reference Node Class",
-    "description": "Reference another graph/document with optional endpoint.",
-    "created": "2026-02-24T20:05:15Z",
-    "modified": "2026-02-24T20:05:15Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-24T20:12:21.577Z",
+    "modified": "2026-02-24T20:17:38.821Z",
     "author": "",
-    "tags": [
-      "node-class",
-      "graph-reference"
-    ]
+    "tags": []
   },
   "nodes": [
     {
@@ -84,6 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -236,7 +252,7 @@
         },
         "node": {
           "web": {
-            "markdown": "### {{data.title}}\n\n`{{data.endpoint}}`\n\n{{data.notes}}"
+            "markdown": "### {{data.title}}\\n\\n`{{data.endpoint}}`\\n\\n{{data.notes}}"
           }
         }
       }
@@ -254,10 +270,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## graph-reference\n\nUse dictionary entry:\n\n- `key`: `graph-reference`\n- `ref`: `/library/classes/nodes/graph-reference.node-class.node`\n\nThis is the canonical class graph for `graph-reference`."
+        "markdown": "## graph-reference\\n\\nUse dictionary entry:\\n\\n- `key`: `graph-reference`\\n- `ref`: `/library/classes/nodes/graph-reference.node-class.node`\\n\\nThis is the canonical class graph for `graph-reference`."
       }
     }
   ],
   "edges": [],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }
