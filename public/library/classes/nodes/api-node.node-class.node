@@ -1,15 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "api-node Node Class",
-    "description": "HTTP/API invocation node definition.",
-    "created": "2026-02-24T20:05:15Z",
-    "modified": "2026-02-24T20:05:15Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-24T20:20:37.130Z",
+    "modified": "2026-02-24T20:20:37.867Z",
     "author": "",
-    "tags": [
-      "node-class",
-      "api-node"
-    ]
+    "tags": []
   },
   "nodes": [
     {
@@ -84,6 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -234,7 +250,7 @@
         },
         "node": {
           "web": {
-            "markdown": "### API Node\n\n`{{data.method}} {{data.url}}`\n\n```json\n{{data.body}}\n```"
+            "markdown": "### API Node\\n\\n`{{data.method}} {{data.url}}`\\n\\n```json\\n{{data.body}}\\n```"
           }
         }
       }
@@ -252,10 +268,11 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## api-node\n\nUse dictionary entry:\n\n- `key`: `api-node`\n- `ref`: `/library/classes/nodes/api-node.node-class.node`\n\nThis is the canonical class graph for `api-node`."
+        "markdown": "## api-node\\n\\nUse dictionary entry:\\n\\n- `key`: `api-node`\\n- `ref`: `/library/classes/nodes/api-node.node-class.node`\\n\\nThis is the canonical class graph for `api-node`."
       }
     }
   ],
   "edges": [],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }

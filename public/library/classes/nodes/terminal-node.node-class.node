@@ -1,15 +1,12 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "terminal-node Node Class",
-    "description": "Terminal command/result node.",
-    "created": "2026-02-24T20:05:15Z",
-    "modified": "2026-02-24T20:05:15Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-24T20:18:38.164Z",
+    "modified": "2026-02-24T20:18:59.539Z",
     "author": "",
-    "tags": [
-      "node-class",
-      "terminal-node"
-    ]
+    "tags": []
   },
   "nodes": [
     {
@@ -84,6 +81,25 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
           "github": {
             "repo": "",
             "path": "",
@@ -229,7 +245,7 @@
         },
         "node": {
           "web": {
-            "markdown": "### Terminal\n\n`$ {{data.command}}`\n\n```\n{{data.stdout}}\n```"
+            "markdown": "### Terminal\\n\\n`$ {{data.command}}`\\n\\n```\\n{{data.stdout}}\\n```"
           }
         }
       }
@@ -242,15 +258,16 @@
         "x": 20,
         "y": 220
       },
-      "width": 880,
-      "height": 220,
+      "width": 897.7223943952126,
+      "height": 406.08514114973264,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## terminal-node\n\nUse dictionary entry:\n\n- `key`: `terminal-node`\n- `ref`: `/library/classes/nodes/terminal-node.node-class.node`\n\nThis is the canonical class graph for `terminal-node`."
+        "markdown": "## terminal-node\\n\\nUse dictionary entry:\\n\\n- `key`: `terminal-node`\\n- `ref`: `/library/classes/nodes/terminal-node.node-class.node`\\n\\nThis is the canonical class graph for `terminal-node`."
       }
     }
   ],
   "edges": [],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }
