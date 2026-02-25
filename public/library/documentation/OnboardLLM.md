@@ -1,191 +1,93 @@
 # Twilite LLM Onboarding Guide (Current Capability)
 
-Twilite is a persistent graph workspace. The graph is the state. Your job is to act as a careful steward: extend existing graphs without breaking continuity, respect contracts, and make intent explicit.
-
-This guide defines the operational rules for agents and tools that mutate graphs.
+Twilite is a persistent graph workspace. The graph is state. Mutate it with small, explicit deltas.
 
 ---
 
-## 1) Core Principles
+## 1) Non-Negotiable Rules
 
-- **Continuity over convenience.** Never replace a graph by re-emitting a full `nodegraph-data` object.
-- **Intent before action.** Use the Manifest node (if present) to understand purpose and authority.
-- **Semantics over presentation.** Validation focuses on meaning, not layout polish.
-- **Explicit over implicit.** Prefer explicit ports, types, and IDs; avoid guessing.
-- **Small diffs, high trust.** Use targeted updates; preserve IDs whenever possible.
-
----
-
-## 2) Mandatory Rules
-
-### Graph Mutation
-- **Do not** output a full `nodegraph-data` object unless the user explicitly requests a wipe/reset.
-- Use **state deltas only**: `createNodes`, `createEdges`, `update`, `delete`, `move`, `translate`, `batch`, `transaction`.
-- Always create **nodes first**, then **edges**, then **clusters**.
-
-### IDs
-- Use RFC 4122 v4 UUIDs for new nodes/edges/clusters.
-- Never reuse an existing ID for a new entity.
-
-### Ports
-- For current Twilite runtime, treat ports as **required for edge creation**.
-- If you create edges, each connected node must declare the referenced port IDs.
-- Use explicit `sourcePort` and `targetPort` on every edge (commonly `"out"` -> `"in"` or `"root"` -> `"root"`).
-
-### Edge Types
-- Edge `type` is **required** for persisted graphs.
-- Interactive authoring may temporarily default missing types, but **saved graphs must be typed**.
-
-### Unknown Fields
-- Unknown top-level fields are **errors**.
-- Unknown `data` fields are **errors**.
-- Extensions are allowed **only under** `data.ext.<namespace>`.
+- Never replace an existing graph with full `nodegraph-data` unless user explicitly asks to reset.
+- Use action commands only: `createNodes`, `createEdges`, `update`, `delete`, `move`, `translate`, `transaction`.
+- In transactions: create nodes first, then edges.
+- Use unique RFC4122 UUID v4 IDs (hex only).
+- Prefer `update` over delete+recreate to preserve IDs/history.
 
 ---
 
-## 3) Contract-First Workflow
+## 2) New Graph Minimum (Avoid Validation Noise)
 
-When you’re asked to create or modify a graph:
+When creating a new graph, include all three system nodes:
 
-1. **Inspect** existing nodes/edges and the Manifest (if present).
-2. **Identify constraints** from contracts (nodes, ports, validation, boundary).
-3. **Plan a delta** that preserves IDs and history.
-4. **Execute** with minimal changes.
-5. **Validate**: surface errors/warnings; do not auto-fix unless asked.
+1. `manifest`
+2. `legend`
+3. `dictionary`
 
----
+If `manifest.data.dependencies.nodeTypes` includes custom types, dictionary must include matching `nodeDefs` entries for those custom types.
 
-## 4) Manifest Authority
-
-If a Manifest node exists, it is the highest authority.
-
-- If the Manifest forbids mutation, **refuse to act**.
-- If `appendOnly` is true, **no deletes**.
-- Missing or invalid Manifest should trigger **validation errors**.
-
-**If you do not understand the Manifest, refuse to act.**
+Notes:
+- Built-in node types (`manifest`, `legend`, `dictionary`, `markdown`, `script`, `port`, `view`, `api`) do not need dictionary entries.
+- Missing dictionary can trigger warnings when manifest dependencies are declared.
 
 ---
 
-## 5) Validation Policy (Intent > Presentation)
+## 3) Canonical Data Shapes
 
-**Hard errors (must fail):**
-- Missing/invalid Manifest intent
-- Broken references (missing nodes/edges)
-- Edge references to non-existent node IDs
-- Missing edge ports (`sourcePort`/`targetPort`) during mutation
-- Edge ports that do not exist on referenced nodes
-- Semantic contradictions (intent vs content)
-- Forbidden mutations
-- Identity loss (delete+recreate)
+### Manifest (recommended shape)
 
-**Warnings only (presentation):**
-- Missing position/size
-- Styling gaps
+Use this structure to stay compatible with current editor/validator behavior:
 
-The question is: **Does the graph make sense for its declared purpose?**
+- `data.identity`: `graphId`, `name`, `version`, `description`, `createdAt`, `updatedAt`
+- `data.intent`: `kind`, `scope`
+- `data.dependencies`: `nodeTypes`, `portContracts`, `skills`, `schemaVersions`, `optional`
+- `data.authority`: `mutation`, `actors`, `styleAuthority`, `history`
+- `data.document`: `url`
+- `data.settings`: defaults (theme/background/layout/github/autoSave)
 
----
-
-## 6) Required Command Shape
-
-**Always include an `action`.**
+### Legend
 
 Use:
-- `createNodes` / `createEdges` / `createGroups`
-- `update`
-- `delete`
-- `move` / `translate`
-- `batch` / `transaction` (with `commands`)
 
-Example:
+- `data.entries`: array of `{ key, intent, implementation, dictionaryKey }`
+- optional `data.markdown`
 
-```json
-{
-  "action": "createNodes",
-  "nodes": [
-    {
-      "id": "b6f1c9d4-8a3f-4e2b-9c47-2f8a1e6b7c3d",
-      "type": "markdown",
-      "label": "New Node",
-      "width": 280,
-      "height": 180,
-      "data": { "markdown": "Hello" }
-    }
-  ]
-}
-```
+### Dictionary
 
-For `batch` / `transaction`, use `commands` (not `operations`):
+Use:
 
-```json
-{
-  "action": "transaction",
-  "commands": [
-    { "action": "createNodes", "nodes": [/* ... */] },
-    { "action": "createEdges", "edges": [/* ... */] }
-  ]
-}
-```
+- `data.nodeDefs`: array of `{ key, ref, source, version }`
+- `data.skills`: array
+- `data.views`: array (optional but recommended for custom types)
 
 ---
 
-## 7) Nodes
+## 4) Edges and Ports
 
-**Required (portable minimum):**
-- `id`
-- `type`
-- `data`
+Required for edge mutations:
 
-**Optional:**
-- `label`, `position`, `width`, `height`, `style`, `ports`, `extensions`
+- `id`, `source`, `target`, `sourcePort`, `targetPort`, `type`
 
-If missing `position` or `width`/`height`, the renderer/layout will supply defaults.
+Rules:
 
-### Node Definitions (Minimum)
-- A node definition graph is valid if it contains **at least one View node**.
-- A definition graph **may contain only View nodes** and still be valid.
-- The **dictionary** assigns the node type name to that definition.
-
-### Dynamic Node Controls
-- Dynamic node views may declare top-right controls in:
-  - `viewNode.data.view.controls` (preferred override)
-  - or `viewNode.data.node.web.controls` (default)
-- Controls are declarative JSON, not executable code.
-- Supported control actions:
-  - `openEditor`
-  - `navigate`
-  - `emit`
-  - `toggle`
-  - `setData`
-- Presentation fields:
-  - `icon` (string)
-  - `variant` (`outlined`, `contained`, `text`, `soft`)
-  - `priority` (number or `high/normal/low` words)
-- If controls are not declared, dynamic nodes fall back to legacy Edit-button behavior when editor access is allowed.
+- `source`/`target` must exist.
+- `sourcePort`/`targetPort` must exist on nodes.
+- `root` is treated as a valid virtual port.
+- Prefer explicit ports (`in`/`out`) for functional flow.
+- Use a known edge type; safe default is `relates`.
 
 ---
 
-## 8) Edges
+## 5) Common Failure Modes
 
-**Required:**
-- `id`
-- `source`
-- `target`
-- `type`
-- `sourcePort`
-- `targetPort`
+- Duplicate edge IDs in one payload.
+- Invalid UUIDs (non-hex chars).
+- Custom node type declared in manifest dependencies but missing in dictionary `nodeDefs`.
+- Using non-canonical manifest/legend/dictionary data shapes.
+- Missing `sourcePort`/`targetPort`.
 
-**Optional:**
-- `label`, `data`, `style`
+---
 
-### Edge Creation Checklist
-- Edge IDs must be unique (no duplicates in the same payload/graph).
-- `source` and `target` must reference node IDs that exist (or are created earlier in the same transaction).
-- `sourcePort` and `targetPort` must match declared port IDs on those nodes.
-- Keep command order: `createNodes` first, then `createEdges`.
+## 6) Command Template (Safe Starter)
 
-### Edge Example (valid)
 ```json
 {
   "action": "transaction",
@@ -195,23 +97,94 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
       "nodes": [
         {
           "id": "11111111-1111-4111-8111-111111111111",
-          "type": "default",
-          "label": "A",
-          "ports": [
-            { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
-            { "id": "out", "label": "Out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
-          ],
-          "data": {}
+          "type": "manifest",
+          "label": "Manifest",
+          "position": { "x": -520, "y": -220 },
+          "width": 420,
+          "height": 280,
+          "data": {
+            "identity": {
+              "graphId": "starter-graph",
+              "name": "Starter Graph",
+              "version": "0.1.0",
+              "description": "Starter graph",
+              "createdAt": "2026-02-22T00:00:00.000Z",
+              "updatedAt": "2026-02-22T00:00:00.000Z"
+            },
+            "intent": { "kind": "graph", "scope": "foundation" },
+            "dependencies": {
+              "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+              "portContracts": ["core"],
+              "skills": [],
+              "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+              "optional": []
+            },
+            "authority": {
+              "mutation": {
+                "allowCreate": true,
+                "allowUpdate": true,
+                "allowDelete": true,
+                "appendOnly": false
+              },
+              "actors": { "humans": true, "agents": true, "tools": true },
+              "styleAuthority": "descriptive",
+              "history": { "rewriteAllowed": false, "squashAllowed": false }
+            },
+            "document": { "url": "" },
+            "settings": {
+              "theme": null,
+              "backgroundImage": null,
+              "defaultNodeColor": "#1976d2",
+              "defaultEdgeColor": "#666666",
+              "snapToGrid": false,
+              "gridSize": 20,
+              "edgeRouting": "auto",
+              "github": { "repo": "", "path": "", "branch": "main" },
+              "autoSave": false
+            }
+          }
         },
         {
           "id": "22222222-2222-4222-8222-222222222222",
-          "type": "default",
-          "label": "B",
+          "type": "legend",
+          "label": "Legend",
+          "position": { "x": -520, "y": 90 },
+          "width": 360,
+          "height": 220,
+          "data": {
+            "entries": [
+              {
+                "key": "markdown",
+                "intent": "documentation",
+                "implementation": "markdown node",
+                "dictionaryKey": "markdown"
+              }
+            ]
+          }
+        },
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "type": "dictionary",
+          "label": "Dictionary",
+          "position": { "x": -520, "y": 360 },
+          "width": 360,
+          "height": 220,
+          "data": { "nodeDefs": [], "skills": [], "views": [] }
+        },
+        {
+          "id": "44444444-4444-4444-8444-444444444444",
+          "type": "markdown",
+          "label": "Start Here",
+          "position": { "x": 60, "y": -40 },
+          "width": 420,
+          "height": 240,
           "ports": [
             { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
             { "id": "out", "label": "Out", "direction": "output", "dataType": "any", "position": { "side": "right", "offset": 0.5 } }
           ],
-          "data": {}
+          "data": {
+            "markdown": "# Twilite Starter\n\nThis graph is valid and ready for extension."
+          }
         }
       ]
     },
@@ -219,12 +192,20 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
       "action": "createEdges",
       "edges": [
         {
-          "id": "33333333-3333-4333-8333-333333333333",
+          "id": "55555555-5555-4555-8555-555555555555",
           "source": "11111111-1111-4111-8111-111111111111",
-          "sourcePort": "out",
+          "sourcePort": "root",
           "target": "22222222-2222-4222-8222-222222222222",
+          "targetPort": "root",
+          "type": "relates"
+        },
+        {
+          "id": "66666666-6666-4666-8666-666666666666",
+          "source": "11111111-1111-4111-8111-111111111111",
+          "sourcePort": "root",
+          "target": "44444444-4444-4444-8444-444444444444",
           "targetPort": "in",
-          "type": "sequence"
+          "type": "relates"
         }
       ]
     }
@@ -234,52 +215,9 @@ If missing `position` or `width`/`height`, the renderer/layout will supply defau
 
 ---
 
-## 9) Clusters
+## 7) Behavior When Unsure
 
-Clusters are logical groupings. They do **not** change meaning.
-
-- Do not move nodes implicitly based on membership alone.
-
----
-
-## 10) Skills
-
-Skills are **graph operations**, not UI features.
-
-Categories:
-- Structural (create/delete/group/duplicate)
-- Layout (auto-layout, reroute)
-- Validation (schema, ports, manifest, intent)
-- Transformation (refactor, migration)
-- Automation (script/batch/import/export)
-
-All skill behavior must respect contracts and Manifest authority.
-
----
-
-## 11) Error Handling
-
-On failure:
-- Perform no partial mutations.
-- Return structured errors.
-- Identify offending nodes/edges.
-
-Prefer refusal over silent correction.
-
----
-
-## 12) Safe Defaults for AI Agents
-
-- Assume the graph already exists.
-- Preserve IDs unless explicitly told otherwise.
-- Prefer `update` over delete+recreate.
-- Use dry-run when unsure.
-- Ask if intent is unclear.
-
----
-
-## 13) When You Are Unsure
-
-Do nothing. Ask. Append a markdown node that names the uncertainty.
-
-Twilite rewards clarity over speed.
+- Do not guess schema.
+- Ask for missing constraints.
+- Prefer warnings over destructive auto-fixes.
+- Keep diffs small and reversible.

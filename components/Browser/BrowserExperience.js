@@ -142,15 +142,21 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
     };
 
     const fetchUrl = resolveDocUrl(doc);
+    window.__Twilite_PENDING_FETCH_URL__ = fetchUrl;
     eventBus.emit('setAddress', fetchUrl);
     const emitFetch = () => {
       eventBus.emit('fetchUrl', { url: fetchUrl, source: 'query-doc' });
     };
     emitFetch();
-    const timers = [50, 200, 600].map((delay) =>
+    const timers = [50, 200, 600, 1500, 3000].map((delay) =>
       setTimeout(emitFetch, delay)
     );
-    return () => timers.forEach((timer) => clearTimeout(timer));
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      if (window.__Twilite_PENDING_FETCH_URL__ === fetchUrl) {
+        delete window.__Twilite_PENDING_FETCH_URL__;
+      }
+    };
   }, [themeReady, isEmbedded]);
 
   useEffect(() => {

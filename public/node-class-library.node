@@ -1,0 +1,457 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-24T22:59:02.022Z",
+    "modified": "2026-02-24T22:59:03.883Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "class-library-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -560,
+        "y": -220
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "twilite-node-class-library",
+          "name": "Node Class Library Graph",
+          "version": "0.1.0",
+          "description": "Canonical reusable node classes for Twilite.",
+          "createdAt": "2026-02-24T20:05:15Z",
+          "updatedAt": "2026-02-24T20:05:15Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "class-library-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -560,
+        "y": 80
+      },
+      "width": 440,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "Canonical markdown content node class.",
+            "implementation": "/library/classes/nodes/markdown.node-class.node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "youtube-embedded",
+            "intent": "Embeds a YouTube player from videoId.",
+            "implementation": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "dictionaryKey": "youtube-embedded"
+          },
+          {
+            "key": "graph-reference",
+            "intent": "Navigable graph/document reference node.",
+            "implementation": "/library/classes/nodes/graph-reference.node-class.node",
+            "dictionaryKey": "graph-reference"
+          },
+          {
+            "key": "code-execution",
+            "intent": "Script/code execution wrapper class.",
+            "implementation": "/library/classes/nodes/code-execution.node-class.node",
+            "dictionaryKey": "code-execution"
+          },
+          {
+            "key": "api-node",
+            "intent": "HTTP API invocation node class.",
+            "implementation": "/library/classes/nodes/api-node.node-class.node",
+            "dictionaryKey": "api-node"
+          },
+          {
+            "key": "image-node",
+            "intent": "Image display node class.",
+            "implementation": "/library/classes/nodes/image-node.node-class.node",
+            "dictionaryKey": "image-node"
+          },
+          {
+            "key": "terminal-node",
+            "intent": "Terminal command/result node class.",
+            "implementation": "/library/classes/nodes/terminal-node.node-class.node",
+            "dictionaryKey": "terminal-node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "class-library-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -560,
+        "y": 380
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "markdown",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "youtube-embedded",
+            "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "graph-reference",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "code-execution",
+            "ref": "/library/classes/nodes/code-execution.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "api-node",
+            "ref": "/library/classes/nodes/api-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "image-node",
+            "ref": "/library/classes/nodes/image-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "terminal-node",
+            "ref": "/library/classes/nodes/terminal-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "manifest",
+            "ref": "/library/documentation/contracts/manifest/manifest-contract.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "legend",
+            "ref": "/library/documentation/contracts/legend/legend.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "dictionary",
+            "ref": "/library/documentation/contracts/dictionaries/dictionary.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "port",
+            "ref": "/library/documentation/contracts/ports/port-contract.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "markdown",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "class-library-overview",
+      "type": "markdown",
+      "label": "Node Class Library",
+      "position": {
+        "x": -40,
+        "y": -220
+      },
+      "width": 860,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Node Class Library Graph\n\nThis graph indexes canonical reusable classes for Twilite.\n\nEach class is itself a canonical class graph under `/library/classes/nodes/` and can be referenced from any dictionary."
+      }
+    },
+    {
+      "id": "class-library-port-markdown",
+      "type": "port",
+      "label": "markdown",
+      "position": {
+        "x": -40,
+        "y": 40
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Canonical markdown content node class.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/markdown.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-youtube-embedded",
+      "type": "port",
+      "label": "youtube-embedded",
+      "position": {
+        "x": 290,
+        "y": 40
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Embeds a YouTube player from videoId.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/youtube-embedded.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-graph-reference",
+      "type": "port",
+      "label": "graph-reference",
+      "position": {
+        "x": 620,
+        "y": 40
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Navigable graph/document reference node.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/graph-reference.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-code-execution",
+      "type": "port",
+      "label": "code-execution",
+      "position": {
+        "x": 950,
+        "y": 40
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Script/code execution wrapper class.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/code-execution.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-api-node",
+      "type": "port",
+      "label": "api-node",
+      "position": {
+        "x": -40,
+        "y": 230
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "HTTP API invocation node class.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/api-node.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-image-node",
+      "type": "port",
+      "label": "image-node",
+      "position": {
+        "x": 290,
+        "y": 230
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Image display node class.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/image-node.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "class-library-port-terminal-node",
+      "type": "port",
+      "label": "terminal-node",
+      "position": {
+        "x": 620,
+        "y": 230
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Terminal command/result node class.",
+        "link": "",
+        "intent": "navigate",
+        "target": {
+          "endpoint": "/library/classes/nodes/terminal-node.node-class.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        },
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": [],
+  "scripts": []
+}

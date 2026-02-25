@@ -1,0 +1,254 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "image-node Node Class",
+    "description": "Image presentation node with caption.",
+    "created": "2026-02-24T20:05:15Z",
+    "modified": "2026-02-24T20:05:15Z",
+    "author": "",
+    "tags": [
+      "node-class",
+      "image-node"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "image-node-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "image_node_class",
+          "name": "image-node Node Class",
+          "version": "0.1.0",
+          "description": "Image presentation node with caption.",
+          "createdAt": "2026-02-24T20:05:15Z",
+          "updatedAt": "2026-02-24T20:05:15Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "image-node-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 210
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "image-node",
+            "intent": "Image presentation node with caption.",
+            "implementation": "editor.web + render.html",
+            "dictionaryKey": "image-node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-node-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 470
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "image-node",
+            "ref": "/library/classes/nodes/image-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "image-node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/image-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "image-node",
+            "intent": "node",
+            "payload": "render.html",
+            "ref": "/library/classes/nodes/image-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-node-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": 20,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "src",
+                "label": "Image URL",
+                "type": "text",
+                "path": "data.src",
+                "placeholder": "/logo_dark.png"
+              },
+              {
+                "key": "caption",
+                "label": "Caption",
+                "type": "text",
+                "path": "data.caption",
+                "placeholder": "Image caption"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "image-node-node-view",
+      "type": "view",
+      "label": "Node View (render.html)",
+      "position": {
+        "x": 470,
+        "y": -80
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "render.html",
+          "controls": [
+            {
+              "id": "image-node-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "render": {
+          "html": {
+            "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;gap:8px;overflow:hidden'><img src='{{data.src}}' alt='{{data.caption}}' style='width:100%;height:calc(100% - 24px);object-fit:contain;border-radius:8px' /><div style='font:500 12px system-ui'>{{data.caption}}</div></div>"
+          }
+        }
+      }
+    },
+    {
+      "id": "image-node-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": 20,
+        "y": 220
+      },
+      "width": 880,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## image-node\n\nUse dictionary entry:\n\n- `key`: `image-node`\n- `ref`: `/library/classes/nodes/image-node.node-class.node`\n\nThis is the canonical class graph for `image-node`."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

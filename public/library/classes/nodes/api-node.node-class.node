@@ -1,0 +1,261 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "api-node Node Class",
+    "description": "HTTP/API invocation node definition.",
+    "created": "2026-02-24T20:05:15Z",
+    "modified": "2026-02-24T20:05:15Z",
+    "author": "",
+    "tags": [
+      "node-class",
+      "api-node"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "api-node-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "api_node_class",
+          "name": "api-node Node Class",
+          "version": "0.1.0",
+          "description": "HTTP/API invocation node definition.",
+          "createdAt": "2026-02-24T20:05:15Z",
+          "updatedAt": "2026-02-24T20:05:15Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "api-node-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 210
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "api-node",
+            "intent": "HTTP/API invocation node definition.",
+            "implementation": "editor.web + node.web",
+            "dictionaryKey": "api-node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "api-node-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 470
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "api-node",
+            "ref": "/library/classes/nodes/api-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "api-node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/api-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "api-node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/api-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "api-node-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": 20,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "method",
+                "label": "Method",
+                "type": "text",
+                "path": "data.method",
+                "placeholder": "GET"
+              },
+              {
+                "key": "url",
+                "label": "URL",
+                "type": "text",
+                "path": "data.url",
+                "placeholder": "https://api.example.com"
+              },
+              {
+                "key": "body",
+                "label": "Body",
+                "type": "json",
+                "path": "data.body",
+                "placeholder": "{}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "api-node-node-view",
+      "type": "view",
+      "label": "Node View (node.web)",
+      "position": {
+        "x": 470,
+        "y": -80
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web",
+          "controls": [
+            {
+              "id": "api-node-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "markdown": "### API Node\n\n`{{data.method}} {{data.url}}`\n\n```json\n{{data.body}}\n```"
+          }
+        }
+      }
+    },
+    {
+      "id": "api-node-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": 20,
+        "y": 220
+      },
+      "width": 880,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## api-node\n\nUse dictionary entry:\n\n- `key`: `api-node`\n- `ref`: `/library/classes/nodes/api-node.node-class.node`\n\nThis is the canonical class graph for `api-node`."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

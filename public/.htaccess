@@ -1,3 +1,27 @@
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
 </IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/json .node
+    AddType application/json .document.node
+    AddType application/json .task.node
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(node|document\.node|task\.node)$">
+        Header set Content-Type "application/json; charset=utf-8"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.(html)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# Keep existing files (including /_next/* and *.node) from being rewritten.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+</IfModule>

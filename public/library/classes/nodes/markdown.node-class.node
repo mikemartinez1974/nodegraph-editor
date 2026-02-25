@@ -1,0 +1,249 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "markdown Node Class",
+    "description": "Canonical markdown content node.",
+    "created": "2026-02-24T20:05:15Z",
+    "modified": "2026-02-24T20:05:15Z",
+    "author": "",
+    "tags": [
+      "node-class",
+      "markdown"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "markdown-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "markdown_class",
+          "name": "markdown Node Class",
+          "version": "0.1.0",
+          "description": "Canonical markdown content node.",
+          "createdAt": "2026-02-24T20:05:15Z",
+          "updatedAt": "2026-02-24T20:05:15Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "markdown-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 210
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "Canonical markdown content node.",
+            "implementation": "editor.web + node.web",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "markdown-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 470
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "markdown",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "markdown",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "markdown",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "markdown-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": 20,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "content",
+                "label": "Markdown",
+                "type": "markdown",
+                "path": "data.content",
+                "placeholder": "# Markdown",
+                "multiline": true,
+                "rows": 12
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "markdown-node-view",
+      "type": "view",
+      "label": "Node View (node.web)",
+      "position": {
+        "x": 470,
+        "y": -80
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web",
+          "controls": [
+            {
+              "id": "markdown-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "markdown": "{{data.content}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "markdown-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": 20,
+        "y": 220
+      },
+      "width": 880,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## markdown\n\nUse dictionary entry:\n\n- `key`: `markdown`\n- `ref`: `/library/classes/nodes/markdown.node-class.node`\n\nThis is the canonical class graph for `markdown`."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

@@ -1,0 +1,256 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "terminal-node Node Class",
+    "description": "Terminal command/result node.",
+    "created": "2026-02-24T20:05:15Z",
+    "modified": "2026-02-24T20:05:15Z",
+    "author": "",
+    "tags": [
+      "node-class",
+      "terminal-node"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "terminal-node-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "terminal_node_class",
+          "name": "terminal-node Node Class",
+          "version": "0.1.0",
+          "description": "Terminal command/result node.",
+          "createdAt": "2026-02-24T20:05:15Z",
+          "updatedAt": "2026-02-24T20:05:15Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "terminal-node-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 210
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "terminal-node",
+            "intent": "Terminal command/result node.",
+            "implementation": "editor.web + node.web",
+            "dictionaryKey": "terminal-node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "terminal-node-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 470
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "terminal-node",
+            "ref": "/library/classes/nodes/terminal-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "terminal-node",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/terminal-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "terminal-node",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/terminal-node.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "terminal-node-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": 20,
+        "y": -80
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "command",
+                "label": "Command",
+                "type": "text",
+                "path": "data.command",
+                "placeholder": "npm test"
+              },
+              {
+                "key": "stdout",
+                "label": "Output",
+                "type": "textarea",
+                "path": "data.stdout",
+                "placeholder": "stdout...",
+                "multiline": true,
+                "rows": 8
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "terminal-node-node-view",
+      "type": "view",
+      "label": "Node View (node.web)",
+      "position": {
+        "x": 470,
+        "y": -80
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web",
+          "controls": [
+            {
+              "id": "terminal-node-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "markdown": "### Terminal\n\n`$ {{data.command}}`\n\n```\n{{data.stdout}}\n```"
+          }
+        }
+      }
+    },
+    {
+      "id": "terminal-node-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": 20,
+        "y": 220
+      },
+      "width": 880,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## terminal-node\n\nUse dictionary entry:\n\n- `key`: `terminal-node`\n- `ref`: `/library/classes/nodes/terminal-node.node-class.node`\n\nThis is the canonical class graph for `terminal-node`."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

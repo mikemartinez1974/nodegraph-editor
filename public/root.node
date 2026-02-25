@@ -1,16 +1,16 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Project",
+    "title": "Untitled Graph",
     "description": "",
-    "created": "2026-02-16T16:23:54.604Z",
-    "modified": "2026-02-16T16:23:59.026Z",
+    "created": "2026-02-22T23:34:27.996Z",
+    "modified": "2026-02-24T22:24:39Z",
     "author": "",
     "tags": []
   },
   "nodes": [
     {
-      "id": "ad1bc401-51fc-42a7-83b4-01a30793fc78",
+      "id": "7e27254f-374b-47ba-99a9-827c926fb47f",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -23,12 +23,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "163e3d23-9cfb-45ed-8fc6-527d7b338162",
+          "graphId": "d8ba0171-dd00-4782-92e8-420d599f988b",
           "name": "Untitled Graph",
           "version": "0.1.0",
           "description": "",
-          "createdAt": "2026-02-11T18:25:56.571Z",
-          "updatedAt": "2026-02-11T18:25:56.571Z"
+          "createdAt": "2026-02-22T22:38:51.769Z",
+          "updatedAt": "2026-02-22T22:38:51.769Z"
         },
         "intent": {
           "kind": "graph",
@@ -36,7 +36,10 @@
         },
         "dependencies": {
           "nodeTypes": [
-            "node"
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
           ],
           "portContracts": [
             "core"
@@ -77,25 +80,6 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": {
-            "mode": "autoOnMissingPositions",
-            "defaultLayout": "layered",
-            "direction": "DOWN",
-            "edgeLaneGapPx": 10,
-            "serpentine": {
-              "maxPerRow": 6
-            },
-            "cycleFallback": {
-              "enabled": true
-            },
-            "elk": {
-              "algorithm": "fixed",
-              "edgeRouting": "ORTHOGONAL",
-              "portConstraints": "FIXED_SIDE",
-              "nodeSpacing": 120,
-              "layeredEdgeSpacing": 80
-            }
-          },
           "github": {
             "repo": "",
             "path": "",
@@ -106,12 +90,12 @@
       }
     },
     {
-      "id": "fc7d456e-1d0c-497c-af92-6687e944dc2b",
+      "id": "c1b98bf9-6821-4248-bb63-9908781f6ab7",
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -267.14121892134773,
-        "y": 335.87148107251517
+        "x": 140,
+        "y": 100
       },
       "width": 340,
       "height": 220,
@@ -130,7 +114,7 @@
       }
     },
     {
-      "id": "26990693-a5cf-4a4b-b646-96777692fe8f",
+      "id": "8f7060d2-cf36-45d5-ae78-4e381a54cafa",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -144,55 +128,389 @@
       "data": {
         "nodeDefs": [
           {
-            "key": "node",
-            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
-            "version": "0.1.0",
-            "source": "external"
+            "key": "youtube",
+            "ref": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
+            "source": "My private stash.",
+            "version": "1.0"
           }
         ],
         "skills": [],
         "views": [
           {
-            "key": "node",
-            "intent": "editor",
-            "payload": "editor.web",
-            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
-            "source": "external",
-            "version": ">=0.1.0"
-          },
-          {
-            "key": "node",
+            "key": "youtube",
             "intent": "node",
             "payload": "node.web",
-            "ref": "https://twilite.zone/library/classes/nodes/node.node-class.node",
-            "source": "external",
-            "version": ">=0.1.0"
+            "ref": "",
+            "source": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
+            "version": "1.0"
           }
         ]
       }
     },
     {
-      "id": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
-      "type": "node",
-      "label": "node",
+      "id": "welcome-hero",
+      "type": "markdown",
+      "label": "Welcome to Twilite",
       "position": {
-        "x": 363.0175315049416,
-        "y": -463.052487520058
+        "x": 100,
+        "y": -300
       },
-      "width": 457.2395935058594,
-      "height": 306.5755310058594,
+      "width": 480,
+      "height": 320,
+      "color": "#1976d2",
       "ports": [
         {
-          "id": "root",
-          "label": "root",
-          "direction": "bidirectional",
+          "id": "in",
+          "label": "In",
+          "direction": "input",
           "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Welcome to Twilite \u2728\n\n**A persistent graph workspace where ideas connect and evolve.**\n\nTwilight is a visual thinking environment built on graphs. Every node is a thought, every edge is a relationship, and the whole canvas is your workspace.\n\n## What makes Twilite different?\n\n- **Persistent state** - Your graph is the source of truth\n- **Semantic connections** - Edges carry meaning and type\n- **Contract-driven** - Manifests define intent and authority\n- **Incremental updates** - Small, targeted changes preserve history\n\nExplore the nodes below to get started! \ud83d\udc47",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "core-concepts",
+      "type": "markdown",
+      "label": "Core Concepts",
+      "position": {
+        "x": -200,
+        "y": 100
+      },
+      "width": 360,
+      "height": 420,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
           "position": {
             "side": "right",
             "offset": 0.5
           }
         }
       ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Core Concepts\n\n### Nodes\nThe atoms of your workspace. Each node has:\n- **Type** - What kind of thing it is\n- **Data** - Its actual content\n- **Ports** - Connection points\n- **ID** - Permanent identity\n\n### Edges\nTyped relationships between nodes:\n- `sequence` - Ordering/flow\n- `reference` - Citations/links\n- `dependency` - Requirements\n- `hierarchy` - Parent/child\n\n### Manifest\nThe contract that defines:\n- **Intent** - What this graph is for\n- **Authority** - Who can modify it\n- **Constraints** - What rules apply\n\n### State Deltas\nChanges happen through commands:\n- `createNodes` / `createEdges`\n- `update` / `delete`\n- `transaction` for atomic updates",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "quick-start",
+      "type": "markdown",
+      "label": "Quick Start Guide",
+      "position": {
+        "x": 250,
+        "y": 100
+      },
+      "width": 360,
+      "height": 380,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Quick Start\n\n### 1. Inspect Before Acting\nAlways look at existing nodes and the Manifest before making changes.\n\n### 2. Use State Deltas\nNever emit a full graph. Use targeted commands:\n```json\n{\n  \"action\": \"createNodes\",\n  \"nodes\": [/* ... */]\n}\n```\n\n### 3. Preserve Identity\nKeep existing IDs. Never delete+recreate.\n\n### 4. Create in Order\n1. Nodes first\n2. Then edges\n3. Finally clusters\n\n### 5. Validate Semantics\nAsk: \"Does this graph make sense for its declared purpose?\"\n\n### 6. When Uncertain, Ask\nClarity beats speed. Append a note if you're unsure.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "example-node",
+      "type": "markdown",
+      "label": "Example Node",
+      "position": {
+        "x": 700,
+        "y": 100
+      },
+      "width": 300,
+      "height": 200,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## I'm a Node!\n\nI have:\n- A unique ID\n- A type (markdown)\n- Some data (this text)\n- Ports for connections\n\nNodes can be:\n- Markdown documents\n- Code snippets\n- Data structures\n- Custom types you define",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "principles",
+      "type": "markdown",
+      "label": "Design Principles",
+      "position": {
+        "x": -200,
+        "y": 600
+      },
+      "width": 360,
+      "height": 320,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Design Principles\n\n### Continuity over Convenience\nPreserve graph history and identity. Small diffs build trust.\n\n### Intent before Action\nUnderstand purpose through the Manifest before mutating.\n\n### Semantics over Presentation\nValidate meaning, not styling. Missing positions are warnings, not errors.\n\n### Explicit over Implicit\nDeclare ports, types, and IDs. Don't guess.\n\n### Contract-First\nRespect declared constraints and authority boundaries.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "try-it",
+      "type": "markdown",
+      "label": "Try It Yourself",
+      "position": {
+        "x": 250,
+        "y": 600
+      },
+      "width": 360,
+      "height": 280,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Ready to Build?\n\nTry creating your first node:\n\n```json\n{\n  \"action\": \"createNodes\",\n  \"nodes\": [{\n    \"id\": \"my-first-node\",\n    \"type\": \"markdown\",\n    \"label\": \"My First Node\",\n    \"data\": {\n      \"markdown\": \"Hello Twilite!\"\n    },\n    \"ports\": [\n      { \"id\": \"in\", \"direction\": \"input\" },\n      { \"id\": \"out\", \"direction\": \"output\" }\n    ]\n  }]\n}\n```\n\nRemember: nodes first, edges second!",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "resources",
+      "type": "markdown",
+      "label": "Resources",
+      "position": {
+        "x": 700,
+        "y": 400
+      },
+      "width": 300,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Learn More\n\n### Documentation\n- Core principles\n- Node type reference\n- Edge type catalog\n- Manifest specification\n- Command reference\n\n### Examples\n- Simple workflows\n- Knowledge graphs\n- Project planning\n- Documentation sites\n\n**Questions?** Just ask!",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "81d62441-815a-4404-8972-8ad9a447434c",
+      "type": "youtube-embedded",
+      "label": "youtube-embedded",
+      "position": {
+        "x": 671.1315163453673,
+        "y": -261.5
+      },
+      "width": 291,
+      "height": 197,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
       "visible": true,
       "showLabel": true,
       "data": {
@@ -200,27 +518,28 @@
         "link": "",
         "html": "",
         "svg": "",
-        "content": "# Welcome\n\n ---\n\nYou are about to enter a new dimension.  Not only of sight and sound, but of mind. At the node up ahead, the next stop...\n\n\n\n## The Twilite Zone"
+        "videoId": "BzyQ6SWVaxU",
+        "autoplay": "true"
       }
     },
     {
-      "id": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "id": "port-kernel-core-ontology",
       "type": "port",
-      "label": "To the Library",
+      "label": "Core Ontology",
       "position": {
-        "x": 960.0031005256551,
-        "y": -507.26000689716693
+        "x": 1040,
+        "y": 420
       },
-      "width": 284.6614685058594,
-      "height": 90,
+      "width": 260,
+      "height": 140,
       "visible": true,
       "showLabel": true,
       "data": {
-        "memo": "",
+        "memo": "Twilite Kernel ontology primitives",
         "link": "",
         "intent": "external",
         "target": {
-          "endpoint": "/library/root.node:root",
+          "endpoint": "/twilite-core-ontology.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -231,45 +550,243 @@
         "html": "",
         "svg": ""
       }
+    },
+    {
+      "id": "port-kernel-node-class-library",
+      "type": "port",
+      "label": "Node Class Library",
+      "position": {
+        "x": 1040,
+        "y": 590
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Canonical class graphs",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "/node-class-library.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "port-kernel-documentation",
+      "type": "port",
+      "label": "Twilite Documentation",
+      "position": {
+        "x": 1040,
+        "y": 760
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Self-describing docs graph",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "/twilite-documentation.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "contact-developer",
+      "type": "markdown",
+      "label": "Contact",
+      "position": {
+        "x": 1040,
+        "y": -60
+      },
+      "width": 360,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contact the developer\n\nadmin@twilite.zone"
+      }
     }
   ],
   "edges": [
     {
-      "id": "edge_1771111131537",
-      "type": "relates",
-      "source": "d2eccb3c-fa5c-4b8a-a9a2-1415287da513",
-      "target": "c807086b-d375-4ff2-83e7-94ee816a4b08",
+      "id": "edge-001",
+      "type": "hierarchy",
+      "source": "7e27254f-374b-47ba-99a9-827c926fb47f",
+      "target": "welcome-hero",
       "sourcePort": "root",
-      "targetPort": "root",
+      "targetPort": "in",
       "portMeta": {
         "source": {
+          "key": "root",
           "label": "root",
-          "type": "any"
+          "type": "value",
+          "direction": "output"
         },
         "target": {
-          "label": "root",
-          "type": "any"
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
         }
       },
-      "label": "",
+      "label": "governs",
       "style": {
-        "width": 6,
-        "dash": [
-          0
-        ],
-        "curved": true,
-        "opacity": 0.73,
-        "showArrow": true,
-        "arrowSize": 8,
-        "arrowPosition": "end",
-        "orthogonal": false,
-        "color": "#114f92",
-        "animation": "glow"
+        "width": 2,
+        "dash": [],
+        "curved": true
       },
-      "data": {
-        "strength": "strong"
-      }
+      "data": {}
+    },
+    {
+      "id": "edge-004",
+      "type": "reference",
+      "source": "quick-start",
+      "target": "example-node",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "demonstrates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-007",
+      "type": "reference",
+      "source": "example-node",
+      "target": "resources",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "provides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-core-ontology",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-core-ontology",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "kernel",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-class-library",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-node-class-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "classes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-docs",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-documentation",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "docs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
     }
   ],
-  "clusters": []
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
 }

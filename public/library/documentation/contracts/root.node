@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-15T18:00:28.506Z",
-    "modified": "2026-02-15T18:21:43.506Z",
+    "created": "2026-02-24T22:57:38.269Z",
+    "modified": "2026-02-24T22:58:00.312Z",
     "author": "",
     "tags": []
   },
@@ -131,7 +131,7 @@
             "implementation": "navigate by target.endpoint"
           }
         ],
-        "markdown": "## Contracts Index\\n- node: explanatory content\\n- port: navigation to contract specs"
+        "markdown": "## Contracts Index\n- node: explanatory content\n- port: navigation to contract specs"
       }
     },
     {
@@ -206,7 +206,7 @@
         "link": "",
         "html": "",
         "svg": "",
-        "content": "# Twilite Contracts\\n\\nThis graph indexes the primary contracts that govern Twilite graphs.\\n\\nUse the port nodes to jump directly to each contract document."
+        "content": "# Twilite Contracts\n\nThis graph indexes the primary contracts that govern Twilite graphs.\n\nUse the port nodes to jump directly to each contract document."
       }
     },
     {
@@ -632,5 +632,6 @@
       "data": {}
     }
   ],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }

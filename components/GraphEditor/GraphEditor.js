@@ -2211,7 +2211,7 @@ useEffect(() => {
         }
 
         // Log the final URL and fetch options
-        const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit' };
+        const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store' };
 
         // Update address/history immediately so header/back works
         try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
@@ -2678,6 +2678,17 @@ useEffect(() => {
     eventBus.on('fetchUrl', handleFetchUrl);
     return () => eventBus.off('fetchUrl', handleFetchUrl);
   }, [pan, zoom, setNodes, nodesRef, historyHook, setSnackbar, handlers]);
+
+  // If initial fetch events were missed during mount ordering, recover once.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const pendingUrl = window.__Twilite_PENDING_FETCH_URL__;
+    if (!pendingUrl || typeof pendingUrl !== 'string') return;
+    const timer = setTimeout(() => {
+      eventBus.emit('fetchUrl', { url: pendingUrl, source: 'pending-initial-url' });
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Suppress specific error message about asynchronous responses
   useEffect(() => {

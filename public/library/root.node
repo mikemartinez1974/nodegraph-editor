@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-18T02:36:04.071Z",
-    "modified": "2026-02-18T02:36:05.981Z",
+    "created": "2026-02-24T22:56:16.822Z",
+    "modified": "2026-02-24T22:56:17.367Z",
     "author": "",
     "tags": []
   },
@@ -280,5 +280,6 @@
       "data": {}
     }
   ],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }

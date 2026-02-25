@@ -73,6 +73,170 @@ const isColorString = (value) => {
   return /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed);
 };
 
+const SYSTEM_NODE_TYPES = new Set(['manifest', 'legend', 'dictionary']);
+
+const collectSystemNodeCreates = (command = {}, acc = []) => {
+  if (!command || typeof command !== 'object') return acc;
+  const action = command.action;
+  if (action === 'createNodes') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : [];
+    nodes.forEach((node) => {
+      const type = node?.type;
+      if (SYSTEM_NODE_TYPES.has(type)) {
+        acc.push({ type, id: node?.id || null });
+      }
+    });
+    return acc;
+  }
+  if (action === 'create') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
+    nodes.forEach((node) => {
+      const type = node?.type;
+      if (SYSTEM_NODE_TYPES.has(type)) {
+        acc.push({ type, id: node?.id || null });
+      }
+    });
+    return acc;
+  }
+  if (action === 'transaction' || action === 'batch') {
+    const commands = Array.isArray(command.commands) ? command.commands : [];
+    commands.forEach((entry) => collectSystemNodeCreates(entry, acc));
+    return acc;
+  }
+  return acc;
+};
+
+const summarizeSystemNodeTypes = (items = []) => {
+  const counts = new Map();
+  items.forEach((item) => {
+    const type = item?.type;
+    if (!type) return;
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+  return Array.from(counts.entries())
+    .map(([type, count]) => `${type} x${count}`)
+    .join(', ');
+};
+
+const buildSystemNodeIdRemap = (command = {}, existingByType = new Map(), remap = new Map()) => {
+  if (!command || typeof command !== 'object') return remap;
+  const action = command.action;
+  if (action === 'createNodes') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : [];
+    nodes.forEach((node) => {
+      const type = node?.type;
+      const id = node?.id;
+      if (!id || !SYSTEM_NODE_TYPES.has(type)) return;
+      const existingId = existingByType.get(type);
+      if (existingId && existingId !== id) remap.set(id, existingId);
+    });
+    return remap;
+  }
+  if (action === 'create') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
+    nodes.forEach((node) => {
+      const type = node?.type;
+      const id = node?.id;
+      if (!id || !SYSTEM_NODE_TYPES.has(type)) return;
+      const existingId = existingByType.get(type);
+      if (existingId && existingId !== id) remap.set(id, existingId);
+    });
+    return remap;
+  }
+  if (action === 'transaction' || action === 'batch') {
+    const commands = Array.isArray(command.commands) ? command.commands : [];
+    commands.forEach((entry) => buildSystemNodeIdRemap(entry, existingByType, remap));
+  }
+  return remap;
+};
+
+const remapEdgeRefs = (edge = {}, idRemap = new Map()) => ({
+  ...edge,
+  source: idRemap.get(edge.source) || edge.source,
+  target: idRemap.get(edge.target) || edge.target
+});
+
+const remapGroupRefs = (group = {}, idRemap = new Map()) => ({
+  ...group,
+  nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.map((id) => idRemap.get(id) || id) : group.nodeIds
+});
+
+const normalizeSystemNodePaste = (command = {}, idRemap = new Map()) => {
+  if (!command || typeof command !== 'object') return command;
+  const action = command.action;
+
+  if (action === 'transaction' || action === 'batch') {
+    const commands = Array.isArray(command.commands) ? command.commands : [];
+    const normalizedCommands = [];
+    commands.forEach((entry) => {
+      const normalized = normalizeSystemNodePaste(entry, idRemap);
+      if (Array.isArray(normalized)) normalizedCommands.push(...normalized);
+      else if (normalized) normalizedCommands.push(normalized);
+    });
+    return { ...command, commands: normalizedCommands };
+  }
+
+  if (action === 'createNodes') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : [];
+    const createNodes = [];
+    const updateCommands = [];
+    nodes.forEach((node) => {
+      const mappedId = idRemap.get(node?.id);
+      if (mappedId && mappedId !== node?.id) {
+        const { id, ...updates } = node || {};
+        updateCommands.push({ action: 'update', type: 'node', id: mappedId, updates });
+      } else {
+        createNodes.push(node);
+      }
+    });
+    const out = [];
+    if (createNodes.length > 0) out.push({ ...command, nodes: createNodes });
+    out.push(...updateCommands);
+    return out;
+  }
+
+  if (action === 'createEdges') {
+    const edges = Array.isArray(command.edges) ? command.edges : [];
+    return { ...command, edges: edges.map((edge) => remapEdgeRefs(edge, idRemap)) };
+  }
+
+  if (action === 'createGroups') {
+    const clusters = Array.isArray(command.clusters) ? command.clusters : [];
+    return { ...command, clusters: clusters.map((cluster) => remapGroupRefs(cluster, idRemap)) };
+  }
+
+  if (action === 'create') {
+    const nodes = Array.isArray(command.nodes) ? command.nodes : (command.node ? [command.node] : []);
+    const edges = Array.isArray(command.edges) ? command.edges : (command.edge ? [command.edge] : []);
+    const clusters = Array.isArray(command.clusters) ? command.clusters : (command.group ? [command.group] : []);
+    const createNodes = [];
+    const updateCommands = [];
+    nodes.forEach((node) => {
+      const mappedId = idRemap.get(node?.id);
+      if (mappedId && mappedId !== node?.id) {
+        const { id, ...updates } = node || {};
+        updateCommands.push({ action: 'update', type: 'node', id: mappedId, updates });
+      } else {
+        createNodes.push(node);
+      }
+    });
+    const createCommand = {
+      ...command,
+      nodes: createNodes,
+      edges: edges.map((edge) => remapEdgeRefs(edge, idRemap)),
+      clusters: clusters.map((cluster) => remapGroupRefs(cluster, idRemap))
+    };
+    const out = [];
+    if (createNodes.length > 0 || createCommand.edges.length > 0 || createCommand.clusters.length > 0) {
+      out.push(createCommand);
+    }
+    out.push(...updateCommands);
+    return out;
+  }
+
+  return command;
+};
+
 const validateThemeSection = (section, keys, path, errors) => {
   if (section === undefined || section === null) return;
   if (!isPlainObject(section)) {
@@ -535,13 +699,46 @@ export async function pasteFromClipboardUnified({ handlers, state, historyHook, 
       }
       // Check if this is a CRUD command (has action property)
       if (parsed.action) {
+        let commandToExecute = parsed;
+        const incomingSystemCreates = collectSystemNodeCreates(parsed, []);
+        if (incomingSystemCreates.length > 0) {
+          const existingNodes = Array.isArray(nodesRef?.current) ? nodesRef.current : [];
+          const existingByType = new Map();
+          existingNodes.forEach((node) => {
+            const type = node?.type;
+            if (!SYSTEM_NODE_TYPES.has(type)) return;
+            if (!existingByType.has(type) && node?.id) {
+              existingByType.set(type, node.id);
+            }
+          });
+          const existingSystemTypes = new Set(
+            existingNodes
+              .map((node) => node?.type)
+              .filter((type) => SYSTEM_NODE_TYPES.has(type))
+          );
+          const overlaps = incomingSystemCreates.filter((entry) => existingSystemTypes.has(entry.type));
+          if (overlaps.length > 0 && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+            const requested = summarizeSystemNodeTypes(incomingSystemCreates);
+            const overlapping = summarizeSystemNodeTypes(overlaps);
+            const approved = window.confirm(
+              `Paste includes system nodes (${requested}). Existing graph already has (${overlapping}). Continue?`
+            );
+            if (!approved) {
+              if (onShowMessage) onShowMessage('Paste cancelled: system node overwrite was not confirmed.', 'info');
+              return { nodes: 0, edges: 0, clusters: 0 };
+            }
+            const idRemap = buildSystemNodeIdRemap(parsed, existingByType, new Map());
+            commandToExecute = normalizeSystemNodePaste(parsed, idRemap);
+          }
+        }
+
         const intentAPI =
           (handlers && handlers.graphAPI && handlers.graphAPI.current)
             ? handlers.graphAPI.current
             : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
         const apiToUse = intentAPI || graphCRUD;
         if (apiToUse) {
-          const result = await executeCRUDCommand(parsed, apiToUse, onShowMessage);
+          const result = await executeCRUDCommand(commandToExecute, apiToUse, onShowMessage);
           return result;
         }
       }
