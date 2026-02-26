@@ -57,7 +57,8 @@ const BUILTIN_NODE_TYPES = new Set([
   "script",
   "port",
   "view",
-  "api"
+  "api",
+  "graph-reference"
 ]);
 
 export function validateGraphInvariants({
@@ -93,6 +94,36 @@ export function validateGraphInvariants({
     if (isLoadMode) warnings.push(issue);
     else errors.push(issue);
   };
+
+  nodes.forEach((node) => {
+    if (!node || node.type !== "graph-reference") return;
+    const src =
+      (typeof node.data?.src === "string" && node.data.src.trim()) ||
+      (typeof node.data?.url === "string" && node.data.url.trim()) ||
+      (typeof node.data?.ref === "string" && node.data.ref.trim()) ||
+      (typeof node.data?.endpoint === "string" && node.data.endpoint.trim()) ||
+      (typeof node.data?.target?.endpoint === "string" && node.data.target.endpoint.trim()) ||
+      "";
+    if (!src) {
+      warnings.push({
+        code: "GRAPH_REFERENCE_SOURCE_MISSING",
+        message: `Graph reference node "${node.id}" is missing source (data.src or data.endpoint).`,
+        nodeId: node.id
+      });
+      return;
+    }
+
+    const looksLikeUrl = /^https?:\/\//i.test(src);
+    const looksLikePath = src.startsWith("/") || src.endsWith(".node") || src.includes(".node?");
+    const parsed = parsePortEndpoint(src);
+    if (!looksLikeUrl && !looksLikePath && !parsed.ok) {
+      warnings.push({
+        code: "GRAPH_REFERENCE_SOURCE_INVALID",
+        message: `Graph reference node "${node.id}" has invalid source "${src}". Use a URL/path or endpoint file.node:port.`,
+        nodeId: node.id
+      });
+    }
+  });
 
   const clusterList = Array.isArray(clusters) ? clusters : [];
   const nodeClusterMap = new Map();

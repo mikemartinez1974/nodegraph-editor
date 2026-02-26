@@ -23,6 +23,7 @@ import DictionaryNode from './Nodes/DictionaryNode.js';
 import LegendNode from './Nodes/LegendNode.js';
 import ViewNode from './Nodes/ViewNode.js';
 import PortNode from './Nodes/PortNode.js';
+import GraphReferenceNode from './Nodes/GraphReferenceNode.js';
 import { getInstalledPlugins } from './plugins/pluginRegistry.js';
 import { convertHandlesObjectToArray } from './utils/handleUtils.js';
 
@@ -694,6 +695,19 @@ const getPluginNodeEntries = () => {
 
 const buildRegistry = () => ({
   ...baseNodeTypeRegistry,
+  'graph-reference': {
+    component: GraphReferenceNode,
+    label: 'Graph Reference',
+    description: 'Embeds another .node graph in an isolated iframe runtime',
+    icon: 'AccountTree',
+    category: 'structure',
+    defaultWidth: 420,
+    defaultHeight: 300,
+    defaultData: {
+      src: '/root.node',
+      mode: 'preview'
+    }
+  },
   ...getPluginNodeEntries()
 });
 

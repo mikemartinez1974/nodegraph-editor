@@ -9,7 +9,11 @@ import eventBus from '@/components/NodeGraph/eventBus';
 
 const FALLBACK_DOC_URL = '/root.node';
 
-export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FALLBACK_DOC_URL }) {
+export default function BrowserExperience({
+  addressBarHeight,
+  defaultDocUrl = FALLBACK_DOC_URL,
+  hideBrowser = false
+}) {
   const safeStorageGet = (key) => {
     try {
       if (typeof window === 'undefined' || !window.localStorage) return null;
@@ -48,6 +52,7 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
   const [themeReady, setThemeReady] = useState(false);
   const [muiTheme, setMuiTheme] = useState(() => themeMap.default);
   const isEmbedded = typeof window !== 'undefined' && window.__TWILIGHT_EMBED__ === true;
+  const shouldHideBrowser = hideBrowser || isEmbedded;
 
   const isMobile = useMediaQuery('(max-width:768px)');
   const isTablet = useMediaQuery('(min-width:769px) and (max-width:1024px)');
@@ -185,6 +190,53 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
     }
   }, [themeName]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.parent === window) return;
+    let token = '';
+    let parentOrigin = '*';
+    try {
+      const params = new URLSearchParams(window.location.search);
+      token = (params.get('embedToken') || '').trim();
+      const originParam = (params.get('parentOrigin') || '').trim();
+      if (originParam) parentOrigin = originParam;
+    } catch {
+      // ignore URL parse issues
+    }
+    if (!token) return;
+
+    const post = (type, extra = {}) => {
+      try {
+        window.parent.postMessage(
+          {
+            type,
+            token,
+            contextId: window.__TWILITE_PANEL_ID__ || null,
+            ...extra
+          },
+          parentOrigin
+        );
+      } catch {
+        // ignore postMessage errors
+      }
+    };
+
+    post('twilite:embed-ready', { at: Date.now() });
+    const handleMessage = (event) => {
+      if (parentOrigin !== '*' && event.origin !== parentOrigin) return;
+      const message = event.data;
+      if (!message || typeof message !== 'object') return;
+      if (message.token !== token) return;
+      if (message.type === 'twilite:embed-ping') {
+        post('twilite:embed-ready', { at: Date.now() });
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
   if (!themeReady) return null;
 
   return (
@@ -200,7 +252,7 @@ export default function BrowserExperience({ addressBarHeight, defaultDocUrl = FA
         })}
       />
       <div style={{ userSelect: "none", cursor: "default" }}>
-        {!isEmbedded && (
+        {!shouldHideBrowser && (
           <Browser
             themeName={themeName}
             setThemeName={setThemeName}

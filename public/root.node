@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-02-25T02:37:31.198Z",
-    "modified": "2026-02-25T02:37:32.014Z",
+    "created": "2026-02-25T19:09:59.089Z",
+    "modified": "2026-02-25T19:10:37.453Z",
     "author": "",
     "tags": []
   },
@@ -39,7 +39,6 @@
             "manifest",
             "legend",
             "dictionary",
-            "default",
             "markdown"
           ],
           "portContracts": [
@@ -106,7 +105,9 @@
             "branch": "main"
           },
           "autoSave": false
-        }
+        },
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -130,7 +131,9 @@
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\\n- default: placeholder"
+        "markdown": "## Legend\\n- default: placeholder",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -146,9 +149,27 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "nodeDefs": [],
+        "nodeDefs": [
+          {
+            "key": "youtube",
+            "ref": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
+            "source": "My private stash.",
+            "version": "1.0"
+          }
+        ],
         "skills": [],
-        "views": []
+        "views": [
+          {
+            "key": "youtube",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "",
+            "source": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
+            "version": "1.0"
+          }
+        ],
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -156,8 +177,8 @@
       "type": "markdown",
       "label": "Welcome to Twilite",
       "position": {
-        "x": -350.6341165477113,
-        "y": -252.02326867549147
+        "x": 100,
+        "y": -300
       },
       "width": 480,
       "height": 320,
@@ -205,7 +226,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -262,7 +285,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -270,8 +295,8 @@
       "type": "markdown",
       "label": "Quick Start Guide",
       "position": {
-        "x": 250,
-        "y": 100
+        "x": 217,
+        "y": 123
       },
       "width": 360,
       "height": 380,
@@ -319,7 +344,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -327,8 +354,8 @@
       "type": "markdown",
       "label": "Example Node",
       "position": {
-        "x": 700,
-        "y": 100
+        "x": 759,
+        "y": 154
       },
       "width": 300,
       "height": 200,
@@ -376,7 +403,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -417,7 +446,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -458,7 +489,9 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -466,8 +499,8 @@
       "type": "markdown",
       "label": "Resources",
       "position": {
-        "x": 700,
-        "y": 400
+        "x": 685,
+        "y": 821
       },
       "width": 300,
       "height": 240,
@@ -499,7 +532,365 @@
         "memo": "",
         "link": "",
         "html": "",
-        "svg": ""
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "81d62441-815a-4404-8972-8ad9a447434c",
+      "type": "youtube-embedded",
+      "label": "youtube-embedded",
+      "position": {
+        "x": 721.1315163453673,
+        "y": -280.5
+      },
+      "width": 291,
+      "height": 197,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "videoId": "BzyQ6SWVaxU",
+        "autoplay": "true",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "port-kernel-core-ontology",
+      "type": "port",
+      "label": "Core Ontology",
+      "position": {
+        "x": 1293,
+        "y": 330
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Twilite Kernel ontology primitives",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "/twilite-core-ontology.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "port-kernel-node-class-library",
+      "type": "port",
+      "label": "Node Class Library",
+      "position": {
+        "x": 1348,
+        "y": 625
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Canonical class graphs",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "/node-class-library.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "port-kernel-documentation",
+      "type": "port",
+      "label": "Twilite Documentation",
+      "position": {
+        "x": 1330,
+        "y": 853
+      },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Self-describing docs graph",
+        "link": "",
+        "intent": "external",
+        "target": {
+          "endpoint": "/twilite-documentation.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": ""
+        },
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "contact-developer",
+      "type": "markdown",
+      "label": "Contact",
+      "position": {
+        "x": 1040,
+        "y": -60
+      },
+      "width": 360,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Contact the developer\n\nadmin@twilite.zone",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "type": "markdown",
+      "label": "For Humans: Start Here",
+      "position": {
+        "x": -1121.8809161402162,
+        "y": -335.0105943140684
+      },
+      "width": 400,
+      "height": 340,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Welcome, Human! 👋\n\n**Twilite is your visual thinking space.**\n\nForget about JSON and schemas for a moment. This is a place where you can:\n\n- **Map your thoughts** visually on an infinite canvas\n- **Connect ideas** with meaningful relationships\n- **Build systems** that grow with your understanding\n- **Think spatially** instead of linearly\n\nThink of it like:\n- A whiteboard that remembers\n- A mind map that can execute\n- A notebook where pages can talk to each other\n\n**Start exploring →**",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true
+      }
+    },
+    {
+      "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "type": "markdown",
+      "label": "What Can You Build?",
+      "position": {
+        "x": -619.2664700541632,
+        "y": 62.8795104600874
+      },
+      "width": 360,
+      "height": 420,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## What Can You Build?\n\n### 📚 Personal Knowledge Base\nCapture notes, link concepts, build your second brain\n\n### 🎯 Project Planning\nBreak down goals, track dependencies, visualize progress\n\n### 🧠 Brainstorming\nFree-form idea generation with emergent structure\n\n### 📖 Story Development\nCharacters, plots, world-building with relationships\n\n### 🗺️ Learning Maps\nSubjects connect, prerequisites emerge naturally\n\n### 🔄 Workflows\nProcess steps with decision points and feedback loops\n\n### 💡 Idea Gardens\nCapture seeds, watch them grow into systems",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "type": "markdown",
+      "label": "Your First Graph",
+      "position": {
+        "x": -1100.946491567872,
+        "y": 114.99958529994456
+      },
+      "width": 360,
+      "height": 380,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Create Your First Graph\n\n### The Easy Way\nJust tell me what you want to build:\n\n*\"Create a graph for planning my book project\"*\n\n*\"I want to map out my learning path for web development\"*\n\n*\"Help me organize my research on climate change\"*\n\nI'll build it for you, then you can evolve it.\n\n### What Happens Next\n1. I'll create nodes for your main concepts\n2. Connect them with relationships\n3. Add structure (categories, flows, hierarchies)\n4. You can ask me to modify, expand, or reorganize\n\n**The graph grows with your thinking.**",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "type": "markdown",
+      "label": "Visual Thinking",
+      "position": {
+        "x": -602.8953420534617,
+        "y": -335.2412785044552
+      },
+      "width": 340,
+      "height": 340,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "content"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Graphs?\n\n### Spatial Reasoning\nYour brain is *really good* at remembering locations and relationships in space.\n\n### Non-Linear\nIdeas don't flow in straight lines. Neither should your workspace.\n\n### Emergent Structure\nStart messy, find patterns, organize as you go.\n\n### Multiple Perspectives\nSame nodes, different layouts = different insights\n\n### Living Documents\nGraphs evolve. Add nodes, forge connections, discover structure.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     }
   ],
@@ -604,6 +995,161 @@
         }
       },
       "label": "provides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-core-ontology",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-core-ontology",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "kernel",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-class-library",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-node-class-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "classes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-root-to-docs",
+      "type": "reference",
+      "source": "example-node",
+      "target": "port-kernel-documentation",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "docs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+      "type": "reference",
+      "source": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "target": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "content",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "why",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+      "type": "reference",
+      "source": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "target": "welcome-hero",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "context",
+      "style": {
+        "width": 2,
+        "dash": [
+          5,
+          5
+        ],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+      "type": "hierarchy",
+      "source": "7e27254f-374b-47ba-99a9-827c926fb47f",
+      "target": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "sourcePort": "root",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "human track",
       "style": {
         "width": 2,
         "dash": [],

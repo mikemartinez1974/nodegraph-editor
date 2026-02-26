@@ -1084,7 +1084,6 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
         <iframe
           srcDoc={buildTransparentHtmlDoc(html)}
           sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-          allowTransparency
           style={{
             border: 'none',
             width: '100%',

@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Project",
     "description": "",
-    "created": "2026-01-30T21:33:04.463Z",
-    "modified": "2026-01-30T21:33:14.114Z",
+    "created": "2026-02-26T06:33:06.978Z",
+    "modified": "2026-02-26T06:33:07.938Z",
     "author": "",
     "tags": []
   },
@@ -112,7 +112,7 @@
     {
       "id": "vscode-plugin-architecture-root",
       "type": "markdown",
-      "label": "\ud83e\udde9 VSCode Plugin Architecture",
+      "label": "🧩 VSCode Plugin Architecture",
       "position": {
         "x": 663,
         "y": -927
@@ -212,6 +212,8 @@
       "type": "semantic",
       "source": "vscode-plugin-architecture-root",
       "target": "vscode-plugin-architecture-lifecycle",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "lifecycle",
       "style": {
         "width": 2,
@@ -225,6 +227,8 @@
       "type": "semantic",
       "source": "vscode-plugin-architecture-lifecycle",
       "target": "vscode-plugin-architecture-transport",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "sends text",
       "style": {
         "width": 2,
@@ -238,6 +242,8 @@
       "type": "semantic",
       "source": "vscode-plugin-architecture-transport",
       "target": "vscode-plugin-architecture-iframe",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "loads graph",
       "style": {
         "width": 2,
@@ -251,6 +257,8 @@
       "type": "semantic",
       "source": "vscode-plugin-architecture-iframe",
       "target": "vscode-plugin-architecture-failure",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "can fail",
       "style": {
         "width": 2,
@@ -264,6 +272,8 @@
       "type": "semantic",
       "source": "vscode-plugin-architecture-failure",
       "target": "vscode-plugin-architecture-fix",
+      "sourcePort": "root",
+      "targetPort": "root",
       "label": "mitigations",
       "style": {
         "width": 2,
@@ -273,5 +283,6 @@
       "data": {}
     }
   ],
-  "clusters": []
+  "clusters": [],
+  "scripts": []
 }

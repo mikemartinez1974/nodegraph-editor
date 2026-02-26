@@ -841,6 +841,7 @@ export default function PropertiesPanel({
   }, [onUpdateGroup, selectedGroup]);
 
   const isPortNode = Boolean(isNodeSelected && selectedNode?.type === "port");
+  const isGraphReferenceNode = Boolean(isNodeSelected && selectedNode?.type === "graph-reference");
   const portData = selectedNode?.data || {};
   const portTarget = portData?.target || {};
 
@@ -857,6 +858,14 @@ export default function PropertiesPanel({
     (patch) => {
       if (!selectedNode) return;
       onUpdateNode(selectedNode.id, { data: patch });
+    },
+    [onUpdateNode, selectedNode]
+  );
+
+  const updateGraphReferenceField = useCallback(
+    (patch) => {
+      if (!selectedNode) return;
+      onUpdateNode(selectedNode.id, { data: { ...(selectedNode.data || {}), ...patch } });
     },
     [onUpdateNode, selectedNode]
   );
@@ -2085,6 +2094,48 @@ export default function PropertiesPanel({
     </Section>
   );
 
+  const renderGraphReferenceSection = () => (
+    <Section
+      title="Graph reference"
+      value="graph-reference"
+      expanded={expandedSections.node === "graph-reference"}
+      onToggle={handleAccordionChange("node", "graph-reference")}
+      disabled={!isGraphReferenceNode}
+    >
+      <Stack spacing={1}>
+        <TextField
+          label="Source graph"
+          size="small"
+          fullWidth
+          placeholder="/root.node"
+          value={selectedNode?.data?.src || ""}
+          onChange={(event) => updateGraphReferenceField({ src: event.target.value })}
+          helperText="Path/URL to child graph. Endpoint format file.node:port is accepted."
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Mode</InputLabel>
+          <Select
+            value={selectedNode?.data?.mode || "preview"}
+            label="Mode"
+            onChange={(event) => updateGraphReferenceField({ mode: event.target.value })}
+          >
+            <MenuItem value="preview">preview</MenuItem>
+            <MenuItem value="interactive">interactive</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          label="Notes"
+          size="small"
+          fullWidth
+          multiline
+          minRows={2}
+          value={selectedNode?.data?.notes || ""}
+          onChange={(event) => updateGraphReferenceField({ notes: event.target.value })}
+        />
+      </Stack>
+    </Section>
+  );
+
   const renderFormattingSection = () => (
     <Section
       title="Formatting"
@@ -2635,6 +2686,7 @@ export default function PropertiesPanel({
       )}
       {renderPayloadSection()}
       {isPortNode && renderPortSection()}
+      {isGraphReferenceNode && renderGraphReferenceSection()}
       {renderHandlesSection()}
       {renderNodeEdgesSection()}
       {renderFormattingSection()}

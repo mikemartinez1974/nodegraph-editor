@@ -7,6 +7,7 @@ export const HIDDEN_SYSTEM_SELECTOR_TYPES = new Set([
 export const CORE_SELECTOR_TYPES = new Set([
   "markdown",
   "port",
+  "graph-reference",
   "script",
   "view",
   "api"

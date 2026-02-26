@@ -1,0 +1,162 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Graph Reference Nesting Smoke",
+    "description": "Parent graph that embeds the multi-embed smoke graph.",
+    "created": "2026-02-26T00:00:00.000Z",
+    "modified": "2026-02-26T00:00:00.000Z",
+    "author": "",
+    "tags": ["graph-reference", "nesting", "smoke-test"]
+  },
+  "nodes": [
+    {
+      "id": "nesting-smoke-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -900, "y": -220 },
+      "width": 390,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "graph-reference-nesting-smoke",
+          "name": "Graph Reference Nesting Smoke",
+          "version": "0.1.0",
+          "description": "Embeds the multi-embed smoke graph as a child runtime.",
+          "createdAt": "2026-02-26T00:00:00.000Z",
+          "updatedAt": "2026-02-26T00:00:00.000Z"
+        },
+        "intent": { "kind": "task", "scope": "validation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown", "graph-reference"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": { "allowCreate": true, "allowUpdate": true, "allowDelete": true, "appendOnly": false },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "nesting-smoke-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -900, "y": 60 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "graph-reference",
+            "intent": "Embed graph in isolated child context",
+            "implementation": "iframe-based graph-reference renderer",
+            "dictionaryKey": "graph-reference"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nesting-smoke-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -900, "y": 320 },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "graph-reference",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "graph-reference",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "graph-reference",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nesting-smoke-notes",
+      "type": "markdown",
+      "label": "What To Check",
+      "position": { "x": -430, "y": -220 },
+      "width": 540,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Nesting Smoke Test\n\nThis graph embeds the previous multi-embed smoke graph.\n\nChecks:\n- child graph renders\n- nested embeds inside child render\n- no cycle/depth warnings unless intentionally triggered"
+      }
+    },
+    {
+      "id": "nesting-smoke-parent-ref",
+      "type": "graph-reference",
+      "label": "Embed: Multi-Embed Smoke",
+      "position": { "x": 170, "y": -220 },
+      "width": 640,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "src": "/graph-reference-multi-embed-smoke.node",
+        "mode": "interactive",
+        "maxDepth": 4,
+        "notes": "Parent embeds the prior multi-embed smoke graph."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "nesting-smoke-edge-1",
+      "type": "relates",
+      "source": "nesting-smoke-notes",
+      "target": "nesting-smoke-parent-ref",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "verify",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

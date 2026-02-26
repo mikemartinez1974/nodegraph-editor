@@ -1,0 +1,243 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-02-26T05:07:01.808Z",
+    "modified": "2026-02-26T05:07:01.808Z",
+    "author": "",
+    "tags": []
+  },
+  "nodes": [
+    {
+      "id": "graph-ref-smoke-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -900,
+        "y": -220
+      },
+      "width": 390,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "graph-reference-embed-smoke",
+          "name": "Graph Reference Embed Smoke Test",
+          "version": "0.1.0",
+          "description": "Validates isolated child graph rendering.",
+          "createdAt": "2026-02-26T00:00:00.000Z",
+          "updatedAt": "2026-02-26T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "validation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "graph-reference"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "graph-ref-smoke-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -900,
+        "y": 60
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "graph-reference",
+            "intent": "Embed child graph in isolated runtime",
+            "implementation": "iframe-backed graph reference node",
+            "dictionaryKey": "graph-reference"
+          }
+        ]
+      }
+    },
+    {
+      "id": "graph-ref-smoke-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -900,
+        "y": 320
+      },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "graph-reference",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "graph-reference",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "graph-reference",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "graph-ref-smoke-instructions",
+      "type": "markdown",
+      "label": "Test Instructions",
+      "position": {
+        "x": -430,
+        "y": -220
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph Reference Embed Smoke Test\n\n1. Enable embed flag (`?graphEmbed=1` or env var).\n2. Confirm child graph renders inside the reference node.\n3. Set `mode` to `preview` and verify child is not interactive.\n4. Set `mode` to `interactive` and verify child is interactive.\n5. Confirm parent graph nodes/IDs remain independent."
+      }
+    },
+    {
+      "id": "graph-ref-smoke-node",
+      "type": "graph-reference",
+      "label": "Embedded Child Graph",
+      "position": {
+        "x": 190,
+        "y": -221.01120723431927
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "title": "Root Graph Embed",
+        "src": "/root.node",
+        "mode": "interactive",
+        "notes": "Switch mode to interactive to test pointer/event isolation behavior.",
+        "endpoint": "/root.node"
+      }
+    },
+    {
+      "id": "graph-ref-smoke-checks",
+      "type": "markdown",
+      "label": "Expected Results",
+      "position": {
+        "x": 190,
+        "y": 180
+      },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Expected Results\n\n- Child graph uses its own manifest and dictionary.\n- Child graph state does not merge into parent graph namespace.\n- Multiple graph-reference nodes can coexist.\n- Existing non-reference nodes in parent still behave normally."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-graph-ref-smoke-1",
+      "type": "relates",
+      "source": "graph-ref-smoke-instructions",
+      "target": "graph-ref-smoke-node",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "validate",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-graph-ref-smoke-2",
+      "type": "relates",
+      "source": "graph-ref-smoke-node",
+      "target": "graph-ref-smoke-checks",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "expected",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

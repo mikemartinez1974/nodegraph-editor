@@ -1,0 +1,187 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Graph Reference Multi-Embed Smoke",
+    "description": "Validates multiple isolated graph-reference runtimes in one parent graph.",
+    "created": "2026-02-26T00:00:00.000Z",
+    "modified": "2026-02-26T00:00:00.000Z",
+    "author": "",
+    "tags": ["graph-reference", "multi-context", "smoke-test"]
+  },
+  "nodes": [
+    {
+      "id": "multi-embed-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -930, "y": -220 },
+      "width": 390,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "graph-reference-multi-embed-smoke",
+          "name": "Graph Reference Multi-Embed Smoke",
+          "version": "0.1.0",
+          "description": "Smoke test for multiple embedded graph contexts.",
+          "createdAt": "2026-02-26T00:00:00.000Z",
+          "updatedAt": "2026-02-26T00:00:00.000Z"
+        },
+        "intent": { "kind": "task", "scope": "validation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown", "graph-reference"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": { "allowCreate": true, "allowUpdate": true, "allowDelete": true, "appendOnly": false },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "multi-embed-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -930, "y": 60 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "graph-reference",
+            "intent": "isolated child graph runtime",
+            "implementation": "iframe-backed embed",
+            "dictionaryKey": "graph-reference"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-embed-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -930, "y": 320 },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "graph-reference",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "graph-reference",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "graph-reference",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/graph-reference.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-embed-instructions",
+      "type": "markdown",
+      "label": "Instructions",
+      "position": { "x": -450, "y": -220 },
+      "width": 560,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Multi-Embed Smoke\n\n1. Ensure graph-reference embed is enabled.\n2. Verify both child graphs render at once.\n3. Interact with one child graph and verify the other stays stable.\n4. Confirm parent graph nodes/IDs are unchanged.\n5. Save/reload and verify both embeds return."
+      }
+    },
+    {
+      "id": "multi-embed-a",
+      "type": "graph-reference",
+      "label": "Embed A: Root",
+      "position": { "x": 180, "y": -230 },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "src": "/root.node",
+        "mode": "preview",
+        "notes": "Parent root graph."
+      }
+    },
+    {
+      "id": "multi-embed-b",
+      "type": "graph-reference",
+      "label": "Embed B: Library Root",
+      "position": { "x": 180, "y": 140 },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "src": "/library/root.node",
+        "mode": "preview",
+        "notes": "Library root graph."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "multi-embed-edge-1",
+      "type": "relates",
+      "source": "multi-embed-instructions",
+      "target": "multi-embed-a",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "check",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    },
+    {
+      "id": "multi-embed-edge-2",
+      "type": "relates",
+      "source": "multi-embed-a",
+      "target": "multi-embed-b",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "coexist",
+      "style": { "width": 2, "curved": true },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}
