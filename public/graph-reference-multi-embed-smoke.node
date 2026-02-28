@@ -1,19 +1,22 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Graph Reference Multi-Embed Smoke",
-    "description": "Validates multiple isolated graph-reference runtimes in one parent graph.",
-    "created": "2026-02-26T00:00:00.000Z",
-    "modified": "2026-02-26T00:00:00.000Z",
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-02-26T20:46:35.089Z",
+    "modified": "2026-02-26T20:46:35.881Z",
     "author": "",
-    "tags": ["graph-reference", "multi-context", "smoke-test"]
+    "tags": []
   },
   "nodes": [
     {
       "id": "multi-embed-manifest",
       "type": "manifest",
       "label": "Manifest",
-      "position": { "x": -930, "y": -220 },
+      "position": {
+        "x": -930,
+        "y": -220
+      },
       "width": 390,
       "height": 260,
       "visible": true,
@@ -27,21 +30,49 @@
           "createdAt": "2026-02-26T00:00:00.000Z",
           "updatedAt": "2026-02-26T00:00:00.000Z"
         },
-        "intent": { "kind": "task", "scope": "validation" },
+        "intent": {
+          "kind": "task",
+          "scope": "validation"
+        },
         "dependencies": {
-          "nodeTypes": ["manifest", "legend", "dictionary", "markdown", "graph-reference"],
-          "portContracts": ["core"],
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "graph-reference"
+          ],
+          "portContracts": [
+            "core"
+          ],
           "skills": [],
-          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
           "optional": []
         },
         "authority": {
-          "mutation": { "allowCreate": true, "allowUpdate": true, "allowDelete": true, "appendOnly": false },
-          "actors": { "humans": true, "agents": true, "tools": true },
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
           "styleAuthority": "descriptive",
-          "history": { "rewriteAllowed": false, "squashAllowed": false }
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
         },
-        "document": { "url": "" },
+        "document": {
+          "url": ""
+        },
         "settings": {
           "theme": null,
           "backgroundImage": null,
@@ -50,7 +81,30 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "github": { "repo": "", "path": "", "branch": "main" },
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
           "autoSave": false
         }
       }
@@ -59,7 +113,10 @@
       "id": "multi-embed-legend",
       "type": "legend",
       "label": "Legend",
-      "position": { "x": -930, "y": 60 },
+      "position": {
+        "x": -930,
+        "y": 60
+      },
       "width": 360,
       "height": 220,
       "visible": true,
@@ -79,7 +136,10 @@
       "id": "multi-embed-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
-      "position": { "x": -930, "y": 320 },
+      "position": {
+        "x": -930,
+        "y": 320
+      },
       "width": 380,
       "height": 230,
       "visible": true,
@@ -118,7 +178,10 @@
       "id": "multi-embed-instructions",
       "type": "markdown",
       "label": "Instructions",
-      "position": { "x": -450, "y": -220 },
+      "position": {
+        "x": -450,
+        "y": -220
+      },
       "width": 560,
       "height": 260,
       "visible": true,
@@ -131,7 +194,10 @@
       "id": "multi-embed-a",
       "type": "graph-reference",
       "label": "Embed A: Root",
-      "position": { "x": 180, "y": -230 },
+      "position": {
+        "x": 180,
+        "y": -230
+      },
       "width": 560,
       "height": 340,
       "visible": true,
@@ -146,7 +212,10 @@
       "id": "multi-embed-b",
       "type": "graph-reference",
       "label": "Embed B: Library Root",
-      "position": { "x": 180, "y": 140 },
+      "position": {
+        "x": 180,
+        "y": 140
+      },
       "width": 560,
       "height": 340,
       "visible": true,
@@ -167,7 +236,10 @@
       "sourcePort": "root",
       "targetPort": "root",
       "label": "check",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     },
     {
@@ -178,7 +250,10 @@
       "sourcePort": "root",
       "targetPort": "root",
       "label": "coexist",
-      "style": { "width": 2, "curved": true },
+      "style": {
+        "width": 2,
+        "curved": true
+      },
       "data": {}
     }
   ],

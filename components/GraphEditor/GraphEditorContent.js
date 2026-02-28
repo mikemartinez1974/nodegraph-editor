@@ -2155,6 +2155,7 @@ const skipPropertiesCloseRef = useRef(false);
         selectedNode={selectedNodeIds.length === 1 ? nodes.find(n => n.id === selectedNodeIds[0]) : null}
         selectedEdge={selectedEdgeIds.length === 1 ? edges.find(e => e.id === selectedEdgeIds[0]) : null}
         selectedGroup={selectedGroupIds.length === 1 ? groups.find(g => g.id === selectedGroupIds[0]) : null}
+        nodes={nodes}
         edges={edges}
         nodeTypeOptions={nodeTypeOptions}
         onSelectNode={handleSelectNodeFromProperties}

@@ -6,6 +6,7 @@ const createDefaultProjectMeta = () => {
     title: 'Untitled Project',
     description: '',
     tags: [],
+    preferredViewer: 'https://twilite.zone',
     shareLink: '',
     allowComments: true,
     allowEdits: true,

@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Project",
+    "title": "Untitled Graph",
     "description": "",
-    "created": "2026-02-25T19:09:59.089Z",
-    "modified": "2026-02-25T19:10:37.453Z",
+    "created": "2026-02-26T18:58:19.315Z",
+    "modified": "2026-02-26T18:58:19.315Z",
     "author": "",
     "tags": []
   },
@@ -80,25 +80,6 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "layout": {
-            "mode": "autoOnMissingPositions",
-            "defaultLayout": "layered",
-            "direction": "DOWN",
-            "edgeLaneGapPx": 10,
-            "serpentine": {
-              "maxPerRow": 6
-            },
-            "cycleFallback": {
-              "enabled": true
-            },
-            "elk": {
-              "algorithm": "fixed",
-              "edgeRouting": "ORTHOGONAL",
-              "portConstraints": "FIXED_SIDE",
-              "nodeSpacing": 120,
-              "layeredEdgeSpacing": 80
-            }
-          },
           "github": {
             "repo": "",
             "path": "",
@@ -542,7 +523,7 @@
       "type": "youtube-embedded",
       "label": "youtube-embedded",
       "position": {
-        "x": 721.1315163453673,
+        "x": 720.1315163453673,
         "y": -280.5
       },
       "width": 291,
@@ -558,7 +539,7 @@
         "html": "",
         "svg": "",
         "videoId": "BzyQ6SWVaxU",
-        "autoplay": "true",
+        "autoplay": "false",
         "isRoot": false,
         "root": false
       }
@@ -661,8 +642,8 @@
       "type": "markdown",
       "label": "Contact",
       "position": {
-        "x": 1040,
-        "y": -60
+        "x": -215.7262932479178,
+        "y": -547.6684942299594
       },
       "width": 360,
       "height": 160,
@@ -729,7 +710,8 @@
         "link": "",
         "html": "",
         "svg": "",
-        "isRoot": true
+        "isRoot": false,
+        "root": false
       }
     },
     {
@@ -891,6 +873,30 @@
         "svg": "",
         "isRoot": false,
         "root": false
+      }
+    },
+    {
+      "id": "52c59ed8-0498-4e47-934b-087ef833232f",
+      "type": "markdown",
+      "label": "A note from the author",
+      "position": {
+        "x": -1123.8809161402162,
+        "y": -573.5105943140684
+      },
+      "width": 858,
+      "height": 209,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "",
+        "link": "",
+        "markdown": "Before you begin, I want to explain what this is for.\n\nTwilite is a tool that allows you to create a node graph in collaboration with an AI assistant (a large language model).  The assistant understands the graph in essentially the same way you do.\n\nOpen a chatbot (it does not matter which).  Find the onboard button on the toolbar.  It looks like a lighbulb in a cycle.  When you click that button, instructions for the AI will be copied to your clipboard.  Paste them into the AI chatbox and press enter.  The AI will no doubt be  thrilled to receive this information.  Then tell it what you want.  \"Make a graph about sushi\" or whatever you like.  It doesn't matter.  It will produce some code that you can copy and paste into your browser.  Just do it.  Talk to the AI about your graph.  Make changes.  Make it better.  The AI will do the heavy lifting.\n\nAt the end of the day, the graph renders on the web, and your graph can be whatever you can figure out how to render on the web.  And the AI is quite helpful!  The potential here is outrageous, and it's time to get some hands on it.",
+        "html": "",
+        "svg": "",
+        "isRoot": true
       }
     }
   ],

@@ -39,6 +39,7 @@ import { validateGraphInvariants } from './validators/validateGraphInvariants';
 
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
+const DEFAULT_PREFERRED_VIEWER = 'https://twilite.zone';
 const encodeBase64 = (value) => {
   if (typeof window === 'undefined') return '';
   return window.btoa(unescape(encodeURIComponent(value)));
@@ -80,6 +81,18 @@ const buildGitHubContentUrl = ({ owner, repo, path, branch, includeRef = false }
   return url;
 };
 
+const buildGitHubRepoUrl = ({ owner, repo }) =>
+  `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+
+const buildGitHubRefUrl = ({ owner, repo, branch }) =>
+  `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/ref/heads/${encodeURIComponent(branch)}`;
+
+const buildGitHubRefsUrl = ({ owner, repo }) =>
+  `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/refs`;
+
+const buildGitHubPagesUrl = ({ owner, repo }) =>
+  `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pages`;
+
 const buildGitHubHeaders = (token = '') => {
   const headers = {
     Accept: 'application/vnd.github+json',
@@ -90,6 +103,12 @@ const buildGitHubHeaders = (token = '') => {
     headers.Authorization = `Bearer ${trimmed}`;
   }
   return headers;
+};
+
+const parseGithubError = async (resp) => {
+  const payload = await resp.json().catch(() => ({}));
+  const message = payload?.message || resp.statusText || `HTTP ${resp.status}`;
+  return { payload, message };
 };
 const roundTo3 = (value) => Math.round(value * 1000) / 1000;
 const ensureNumber = (value, fallback) => {
@@ -775,7 +794,10 @@ useEffect(() => {
         created: projectMeta?.createdAt || now,
         modified: now,
         author: '',
-        tags: Array.isArray(projectMeta?.tags) ? projectMeta.tags : []
+        tags: Array.isArray(projectMeta?.tags) ? projectMeta.tags : [],
+        preferredViewer:
+          (typeof projectMeta?.preferredViewer === 'string' && projectMeta.preferredViewer.trim()) ||
+          DEFAULT_PREFERRED_VIEWER
       },
       nodes: nodesWithManifestData.map((node) => ({
         id: node.id,
@@ -802,8 +824,14 @@ useEffect(() => {
         const targetNodeId = typeof edge.target === 'object' && edge.target
           ? (edge.target.nodeId ?? edge.target.id ?? '')
           : edge.target;
-        const sourcePort = edge.sourcePort || (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined);
-        const targetPort = edge.targetPort || (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined);
+        const sourcePort =
+          edge.sourcePort ||
+          (typeof edge.source === 'object' && edge.source ? edge.source.handleKey : undefined) ||
+          'root';
+        const targetPort =
+          edge.targetPort ||
+          (typeof edge.target === 'object' && edge.target ? edge.target.handleKey : undefined) ||
+          'root';
         return {
           id: edge.id,
           type: edge.type,
@@ -1396,6 +1424,243 @@ useEffect(() => {
       }
     };
 
+    const ensureGithubRepoAndBranch = async ({ owner, repo, branch, headers, settings = {} }) => {
+      const repoUrl = buildGitHubRepoUrl({ owner, repo });
+      let repoInfo = null;
+      let repoCreated = false;
+
+      const repoResp = await fetch(repoUrl, { headers });
+      if (repoResp.ok) {
+        repoInfo = await repoResp.json();
+      } else if (repoResp.status === 404 && settings.autoCreateRepo !== false) {
+        showMessage(`Repository ${owner}/${repo} not found. Creating it now...`, 'info');
+        const createResp = await fetch('https://api.github.com/user/repos', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: repo,
+            private: settings.repoVisibility !== 'public',
+            auto_init: true,
+            description: settings.repoDescription || 'Twilite graph repository'
+          })
+        });
+        if (!createResp.ok) {
+          const { message } = await parseGithubError(createResp);
+          throw new Error(`GitHub repo create failed: ${message}`);
+        }
+        repoInfo = await createResp.json();
+        repoCreated = true;
+      } else if (repoResp.status === 404) {
+        throw new Error(`Repository ${owner}/${repo} not found.`);
+      } else {
+        const { message } = await parseGithubError(repoResp);
+        throw new Error(`GitHub repo read failed: ${message}`);
+      }
+
+      const defaultBranch = (repoInfo?.default_branch || 'main').trim() || 'main';
+      const targetBranch = (branch || defaultBranch).trim() || defaultBranch;
+
+      if (targetBranch !== defaultBranch) {
+        const refUrl = buildGitHubRefUrl({ owner, repo, branch: targetBranch });
+        const targetRefResp = await fetch(refUrl, { headers });
+        if (targetRefResp.status === 404) {
+          const baseRefUrl = buildGitHubRefUrl({ owner, repo, branch: defaultBranch });
+          const baseRefResp = await fetch(baseRefUrl, { headers });
+          if (!baseRefResp.ok) {
+            const { message } = await parseGithubError(baseRefResp);
+            throw new Error(`Failed to resolve base branch "${defaultBranch}": ${message}`);
+          }
+          const baseRefJson = await baseRefResp.json();
+          const baseSha = baseRefJson?.object?.sha;
+          if (!baseSha) {
+            throw new Error(`Failed to resolve base branch "${defaultBranch}" SHA.`);
+          }
+          const createRefResp = await fetch(buildGitHubRefsUrl({ owner, repo }), {
+            method: 'POST',
+            headers: {
+              ...headers,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ref: `refs/heads/${targetBranch}`,
+              sha: baseSha
+            })
+          });
+          if (!createRefResp.ok) {
+            const { message } = await parseGithubError(createRefResp);
+            throw new Error(`Failed to create branch "${targetBranch}": ${message}`);
+          }
+          showMessage(`Created branch "${targetBranch}" from "${defaultBranch}".`, 'success');
+        } else if (!targetRefResp.ok) {
+          const { message } = await parseGithubError(targetRefResp);
+          throw new Error(`Failed to read branch "${targetBranch}": ${message}`);
+        }
+      }
+
+      const resolvedOwner = repoInfo?.owner?.login || owner;
+      const resolvedRepo = repoInfo?.name || repo;
+
+      return {
+        repoInfo,
+        repoCreated,
+        defaultBranch,
+        branch: targetBranch,
+        owner: resolvedOwner,
+        repo: resolvedRepo
+      };
+    };
+
+    const commitTextFileToGithub = async ({
+      owner,
+      repo,
+      branch,
+      path,
+      content,
+      message,
+      headers
+    }) => {
+      const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
+      const putUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: false });
+      let sha = null;
+
+      const readResp = await fetch(readUrl, { headers });
+      if (readResp.ok) {
+        const existing = await readResp.json();
+        if (existing && existing.type === 'file' && existing.sha) {
+          sha = existing.sha;
+        } else {
+          throw new Error(`Path "${path}" points to a directory, not a file.`);
+        }
+      } else if (readResp.status !== 404) {
+        const { message: readMessage } = await parseGithubError(readResp);
+        throw new Error(`GitHub read failed (${path}): ${readMessage}`);
+      }
+
+      const payload = {
+        message: (message || '').trim() || `Update ${path}`,
+        content: encodeBase64(content),
+        branch
+      };
+      if (sha) payload.sha = sha;
+
+      const writeResp = await fetch(putUrl, {
+        method: 'PUT',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!writeResp.ok) {
+        const { message: writeMessage } = await parseGithubError(writeResp);
+        throw new Error(`GitHub commit failed (${path}): ${writeMessage}`);
+      }
+    };
+
+    const seedGithubLandingFiles = async ({ owner, repo, branch, path, headers }) => {
+      const normalizedPath = (path || 'root.node').trim().replace(/^\/+/, '') || 'root.node';
+      const twiliteDocUrl = `github://${owner}/${repo}/${normalizedPath}`;
+      const twiliteLaunchUrl = `https://twilite.zone/?doc=${encodeURIComponent(twiliteDocUrl)}`;
+      const readme = [
+        `# ${repo}`,
+        '',
+        'This repository was initialized by Twilite.',
+        '',
+        `- Open in Twilite: ${twiliteLaunchUrl}`,
+        `- Graph file: \`${normalizedPath}\``,
+        '',
+        '## Quick Start',
+        '',
+        `1. Open ${twiliteLaunchUrl}`,
+        '2. Edit graph content',
+        '3. Commit updates back to this repository'
+      ].join('\n');
+      const html = [
+        '<!doctype html>',
+        '<html lang="en">',
+        '<head>',
+        '  <meta charset="utf-8" />',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1" />',
+        `  <title>${repo} - Twilite Graph</title>`,
+        '  <script>',
+        '    (function () {',
+        "      var params = new URLSearchParams(window.location.search || '');",
+        "      var doc = (params.get('doc') || '').trim();",
+        "      var path = (params.get('path') || '').trim();",
+        "      var host = window.location.hostname || '';",
+        "      var ownerGuess = host.endsWith('.github.io') ? host.replace('.github.io', '') : '';",
+        "      var pathname = window.location.pathname || '/';",
+        "      var segments = pathname.split('/').filter(Boolean);",
+        "      var repoGuess = segments.length > 0 ? segments[0] : '';",
+        "      if (!doc) {",
+        "        var effectivePath = path || 'root.node';",
+        "        if (ownerGuess && repoGuess) {",
+        "          doc = 'github://' + ownerGuess + '/' + repoGuess + '/' + effectivePath;",
+        '        } else {',
+        `          doc = '${twiliteDocUrl}';`,
+        '        }',
+        '      }',
+        "      var target = 'https://twilite.zone/?doc=' + encodeURIComponent(doc);",
+        '      window.location.replace(target);',
+        '    })();',
+        '  </script>',
+        '</head>',
+        '<body>',
+        `  <p>Redirecting to <a href="${twiliteLaunchUrl}">Twilite</a>...</p>`,
+        '  <p>You can override the graph with <code>?doc=github://owner/repo/file.node</code>.</p>',
+        '  <p>Or use <code>?path=file.node</code> to target a file in this same repository.</p>',
+        '</body>',
+        '</html>'
+      ].join('\n');
+
+      await commitTextFileToGithub({
+        owner,
+        repo,
+        branch,
+        path: 'README.md',
+        content: readme,
+        message: 'Seed README for Twilite',
+        headers
+      });
+      await commitTextFileToGithub({
+        owner,
+        repo,
+        branch,
+        path: 'index.html',
+        content: html,
+        message: 'Seed Twilite landing page',
+        headers
+      });
+    };
+
+    const ensureGithubPages = async ({ owner, repo, branch, headers }) => {
+      const pagesUrl = buildGitHubPagesUrl({ owner, repo });
+      const getResp = await fetch(pagesUrl, { headers });
+      if (getResp.ok) return;
+      if (getResp.status !== 404) {
+        const { message } = await parseGithubError(getResp);
+        throw new Error(`GitHub Pages check failed: ${message}`);
+      }
+      const createResp = await fetch(pagesUrl, {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          source: { branch, path: '/' }
+        })
+      });
+      if (!createResp.ok) {
+        const { message } = await parseGithubError(createResp);
+        throw new Error(`GitHub Pages enable failed: ${message}`);
+      }
+      showMessage('GitHub Pages enabled for this repository.', 'success');
+    };
+
     const handleGithubCommit = async ({ token, settings = {}, message } = {}) => {
       if (!token) {
         showMessage('GitHub PAT is required.', 'error');
@@ -1411,59 +1676,57 @@ useEffect(() => {
         showMessage('GitHub file path is required.', 'error');
         return;
       }
-      const branch = (settings.branch || 'main').trim();
       const { owner, repo } = repoInfo;
       const headers = buildGitHubHeaders(token);
 
       try {
         showMessage('Committing graph to GitHub...', 'info');
-        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
-        const putUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: false });
-        let sha = null;
-
-        const readResp = await fetch(readUrl, { headers });
-        if (readResp.ok) {
-          const existing = await readResp.json();
-          if (existing && existing.type === 'file' && existing.sha) {
-            sha = existing.sha;
-          } else {
-            showMessage('GitHub path points to a directory, not a file.', 'error');
-            return;
-          }
-        } else if (readResp.status !== 404) {
-          const errorJson = await readResp.json().catch(() => ({}));
-          showMessage(`GitHub read failed: ${errorJson.message || readResp.statusText}`, 'error');
-          return;
-        }
-
-        const payload = {
-          message: (message || '').trim() || `Update ${path}`,
-          content: encodeBase64(JSON.stringify(buildGraphSaveData(), null, 2)),
-          branch
-        };
-        if (sha) {
-          payload.sha = sha;
-        }
-
-        const writeResp = await fetch(putUrl, {
-          method: 'PUT',
-          headers: {
-            ...headers,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
+        const ensured = await ensureGithubRepoAndBranch({
+          owner,
+          repo,
+          branch: (settings.branch || 'main').trim(),
+          headers,
+          settings
         });
-        if (!writeResp.ok) {
-          const errorJson = await writeResp.json().catch(() => ({}));
-          showMessage(`GitHub commit failed: ${errorJson.message || writeResp.statusText}`, 'error');
-          return;
+        const branch = ensured.branch;
+        const resolvedOwner = ensured.owner || owner;
+        const resolvedRepo = ensured.repo || repo;
+
+        if (resolvedOwner !== owner || resolvedRepo !== repo) {
+          showMessage(
+            `Using repository ${resolvedOwner}/${resolvedRepo} (requested ${owner}/${repo}).`,
+            'warning'
+          );
+        }
+
+        if (settings.seedOnCommit === true) {
+          showMessage('Seeding landing files...', 'info');
+          await seedGithubLandingFiles({ owner: resolvedOwner, repo: resolvedRepo, branch, path, headers });
+        }
+
+        await commitTextFileToGithub({
+          owner: resolvedOwner,
+          repo: resolvedRepo,
+          branch,
+          path,
+          content: JSON.stringify(buildGraphSaveData(), null, 2),
+          message: (message || '').trim() || `Update ${path}`,
+          headers
+        });
+
+        if (settings.enableGithubPages === true) {
+          await ensureGithubPages({ owner: resolvedOwner, repo: resolvedRepo, branch, headers });
         }
 
         showMessage('GitHub commit successful.', 'success');
-        eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+        eventBus.emit('setAddress', `github://${resolvedOwner}/${resolvedRepo}/${path}`);
         captureStorySnapshot('github');
       } catch (err) {
-        showMessage(`GitHub commit error: ${err.message || String(err)}`, 'error');
+        const detail = err?.message || String(err);
+        const hint = detail.includes('not found')
+          ? ' Check repo owner/name and token access (repo scope).'
+          : '';
+        showMessage(`GitHub commit error: ${detail}${hint}`, 'error');
       }
     };
 
@@ -1978,14 +2241,17 @@ useEffect(() => {
         if (typeof url === 'string' && url.startsWith('github://')) {
           const raw = url.slice('github://'.length);
           const [owner = '', repo = '', ...pathParts] = raw.split('/');
-          const path = pathParts.join('/').replace(/^\/+/, '');
-          if (!owner || !repo || !path) {
+          let path = pathParts.join('/').replace(/^\/+/, '');
+          if (!owner || !repo) {
             setSnackbar({
               open: true,
               message: 'Invalid GitHub URL. Expected github://owner/repo/path/to/file.node',
               severity: 'error'
             });
             return;
+          }
+          if (!path || path.endsWith('/')) {
+            path = `${path}root.node`.replace(/^\/+/, '');
           }
 
           const branch = (documentSettings?.github?.branch || 'main').trim();

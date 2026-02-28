@@ -511,7 +511,8 @@ const Toolbar = ({
         created: now,
         modified: now,
         author: "",
-        tags: []
+        tags: [],
+        preferredViewer: "https://twilite.zone"
       },
       nodes: nodesWithManifestData.map(node => ({
         id: node.id,

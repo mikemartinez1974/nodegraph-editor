@@ -353,8 +353,8 @@ export default function NodeGraph({
           id: `edge_${Date.now()}`,
           source: handle.nodeId,
           target: targetPort.nodeId,
-          sourcePort: handle.key,
-          targetPort: targetPort.key,
+          sourcePort: handle.key || 'root',
+          targetPort: targetPort.key || 'root',
           portMeta: {
             source: { label: handle.label, type: handle.handleType },
             target: { label: targetPort.label, type: targetPort.handleType }

@@ -231,32 +231,66 @@ export default function PropertiesPanel({
   const activeSelection = selectedNode || selectedEdge || selectedGroup;
   const selectionStyle = selectedNode?.style || selectedEdge?.style || {};
   const connectedEdges = useMemo(() => buildConnectedEdges(selectedNode, edges), [selectedNode, edges]);
-  const edgeSourceNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.source) : null), [nodes, selectedEdge]);
-  const edgeTargetNode = useMemo(() => (selectedEdge ? nodes.find((node) => node.id === selectedEdge.target) : null), [nodes, selectedEdge]);
+  const edgeSourceNode = useMemo(() => {
+    if (!selectedEdge) return null;
+    const sourceId =
+      typeof selectedEdge.source === "object" && selectedEdge.source
+        ? selectedEdge.source.nodeId || selectedEdge.source.id
+        : selectedEdge.source;
+    return nodes.find((node) => node.id === sourceId) || null;
+  }, [nodes, selectedEdge]);
+  const edgeTargetNode = useMemo(() => {
+    if (!selectedEdge) return null;
+    const targetId =
+      typeof selectedEdge.target === "object" && selectedEdge.target
+        ? selectedEdge.target.nodeId || selectedEdge.target.id
+        : selectedEdge.target;
+    return nodes.find((node) => node.id === targetId) || null;
+  }, [nodes, selectedEdge]);
+  const getEdgeHandleOptions = useCallback((node) => {
+    if (!node) return [{ id: "root", label: "root" }];
+    const options = [];
+    const pushUnique = (id, label) => {
+      const nextId = String(id || "").trim();
+      if (!nextId) return;
+      if (options.some((entry) => entry.id === nextId)) return;
+      options.push({ id: nextId, label: String(label || nextId) });
+    };
+
+    if (Array.isArray(node.ports)) {
+      node.ports.forEach((handle) => {
+        pushUnique(handle?.id || handle?.key, handle?.label || handle?.id || handle?.key);
+      });
+    }
+
+    const legacyInputs = Array.isArray(node.inputs) ? node.inputs : [];
+    const legacyOutputs = Array.isArray(node.outputs) ? node.outputs : [];
+    [...legacyInputs, ...legacyOutputs].forEach((handle, index) => {
+        const id = handle?.id || handle?.key || handle?.name || `handle-${index}`;
+        pushUnique(id, handle?.label || id);
+    });
+
+    if (!options.some((entry) => entry.id === "root")) {
+      options.unshift({ id: "root", label: "root" });
+    }
+    return options.length ? options : [{ id: "root", label: "root" }];
+  }, []);
   const edgeSourceHandles = useMemo(() => {
-    if (!edgeSourceNode) return [{ id: "root", label: "root" }];
-    const handles = Array.isArray(edgeSourceNode.ports) ? edgeSourceNode.ports : [];
-    const mapped = handles.map((handle) => ({
-      id: handle?.id || handle?.key || "",
-      label: handle?.label || handle?.id || handle?.key || ""
-    })).filter((handle) => handle.id);
-    if (!mapped.some((handle) => handle.id === "root")) {
-      mapped.unshift({ id: "root", label: "root" });
+    const options = getEdgeHandleOptions(edgeSourceNode);
+    const current = String(selectedEdge?.sourcePort || "root").trim() || "root";
+    if (!options.some((entry) => entry.id === current)) {
+      options.unshift({ id: current, label: current });
     }
-    return mapped.length ? mapped : [{ id: "root", label: "root" }];
-  }, [edgeSourceNode]);
+    return options;
+  }, [edgeSourceNode, getEdgeHandleOptions, selectedEdge?.sourcePort]);
   const edgeTargetHandles = useMemo(() => {
-    if (!edgeTargetNode) return [{ id: "root", label: "root" }];
-    const handles = Array.isArray(edgeTargetNode.ports) ? edgeTargetNode.ports : [];
-    const mapped = handles.map((handle) => ({
-      id: handle?.id || handle?.key || "",
-      label: handle?.label || handle?.id || handle?.key || ""
-    })).filter((handle) => handle.id);
-    if (!mapped.some((handle) => handle.id === "root")) {
-      mapped.unshift({ id: "root", label: "root" });
+    const options = getEdgeHandleOptions(edgeTargetNode);
+    const current = String(selectedEdge?.targetPort || "root").trim() || "root";
+    if (!options.some((entry) => entry.id === current)) {
+      options.unshift({ id: current, label: current });
     }
-    return mapped.length ? mapped : [{ id: "root", label: "root" }];
-  }, [edgeTargetNode]);
+    return options;
+  }, [edgeTargetNode, getEdgeHandleOptions, selectedEdge?.targetPort]);
   const edgeConnectedNodes = useMemo(() => {
     if (!selectedEdge) return [];
     const list = [];
@@ -282,6 +316,7 @@ export default function PropertiesPanel({
   const edgePresetOptions = useMemo(() => [...EDGE_STYLE_PRESETS, ...customEdgePresets], [customEdgePresets]);
   const selectedPreset = nodePresetOptions.find((option) => option.value === preset) || nodePresetOptions[0];
   const isNodeSelected = Boolean(selectedNode);
+  const isMarkdownNode = Boolean(isNodeSelected && selectedNode?.type === "markdown");
   const isEdgeSelected = Boolean(selectedEdge) && !isNodeSelected;
   const isGroupSelected = Boolean(selectedGroup) && !isNodeSelected && !isEdgeSelected;
   const isManifestNode = isNodeSelected && selectedNode?.type === "manifest";
@@ -355,6 +390,39 @@ export default function PropertiesPanel({
   const [manifestListDrafts, setManifestListDrafts] = useState({});
   const selectedType = selectedNode?.type || "";
   const handleEntriesRef = useRef([]);
+  const markdownFieldRef = useRef(null);
+  const [markdownEditorRevision, setMarkdownEditorRevision] = useState(0);
+
+  const getMarkdownValueFromNode = useCallback((node) => {
+    if (!node || typeof node !== "object") return "";
+    return node?.data?.markdown ?? node?.data?.content ?? node?.data?.memo ?? "";
+  }, []);
+
+  useEffect(() => {
+    if (!isMarkdownNode || !selectedNode) return;
+    setMarkdownEditorRevision((prev) => prev + 1);
+  }, [isMarkdownNode, selectedNode?.id]);
+
+  const commitMarkdownDraft = useCallback((nextValue) => {
+    if (!selectedNode || !isMarkdownNode) return;
+    const value =
+      typeof nextValue === "string"
+        ? nextValue
+        : (markdownFieldRef.current?.value ?? "");
+    const previous = getMarkdownValueFromNode(selectedNode);
+    if (value === previous) return;
+    onUpdateNode(selectedNode.id, {
+      data: {
+        ...(selectedNode.data || {}),
+        markdown: value
+      }
+    });
+  }, [getMarkdownValueFromNode, isMarkdownNode, onUpdateNode, selectedNode]);
+
+  const revertMarkdownDraft = useCallback(() => {
+    if (!selectedNode || !isMarkdownNode) return;
+    setMarkdownEditorRevision((prev) => prev + 1);
+  }, [isMarkdownNode, selectedNode]);
 
   useEffect(() => {
     handleEntriesRef.current = handleEntries;
@@ -2094,6 +2162,65 @@ export default function PropertiesPanel({
     </Section>
   );
 
+  const renderMarkdownSection = () => (
+    <Section
+      title="Markdown"
+      value="markdown"
+      expanded={expandedSections.node === "markdown"}
+      onToggle={handleAccordionChange("node", "markdown")}
+      disabled={!isMarkdownNode}
+    >
+      <Stack spacing={1}>
+        <Typography variant="caption" color="text.secondary">
+          Markdown content (commits on blur or Ctrl/Cmd+Enter)
+        </Typography>
+        <Box
+          key={`markdown-editor-${selectedNode?.id || "none"}-${markdownEditorRevision}`}
+          sx={{
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+            p: 1,
+            backgroundColor: "background.paper"
+          }}
+        >
+          <textarea
+            ref={markdownFieldRef}
+            defaultValue={getMarkdownValueFromNode(selectedNode)}
+            onBlur={(event) => commitMarkdownDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                event.preventDefault();
+                commitMarkdownDraft(event.currentTarget.value);
+              }
+            }}
+            spellCheck
+            style={{
+              width: "100%",
+              minHeight: 220,
+              border: "none",
+              outline: "none",
+              resize: "vertical",
+              fontFamily: "inherit",
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: "inherit",
+              background: "transparent"
+            }}
+          />
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+          <Button size="small" variant="outlined" onClick={revertMarkdownDraft}>
+            Revert
+          </Button>
+          <Button size="small" variant="contained" onClick={() => commitMarkdownDraft()}>
+            Apply
+          </Button>
+        </Box>
+      </Stack>
+    </Section>
+  );
+
   const renderGraphReferenceSection = () => (
     <Section
       title="Graph reference"
@@ -2637,13 +2764,20 @@ export default function PropertiesPanel({
       {isNodeSelected && (
         <Box sx={{ mt: 1, mb: 2 }}>
           <TextField
+            key={`node-label-${selectedNode?.id || "none"}`}
             fullWidth
             size="small"
             label="Node Label"
-            value={selectedNode?.label || ""}
-            onChange={(event) =>
+            defaultValue={selectedNode?.label || ""}
+            onBlur={(event) =>
               selectedNode && onUpdateNode(selectedNode.id, { label: event.target.value })
             }
+            onKeyDown={(event) => {
+              if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                event.preventDefault();
+                selectedNode && onUpdateNode(selectedNode.id, { label: event.currentTarget.value });
+              }
+            }}
           />
           <Box sx={{ mt: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Typography variant="caption" color="text.secondary">
@@ -2684,7 +2818,8 @@ export default function PropertiesPanel({
           </FormControl>
         </Box>
       )}
-      {renderPayloadSection()}
+      {!isMarkdownNode && renderPayloadSection()}
+      {isMarkdownNode && renderMarkdownSection()}
       {isPortNode && renderPortSection()}
       {isGraphReferenceNode && renderGraphReferenceSection()}
       {renderHandlesSection()}

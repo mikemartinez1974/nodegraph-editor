@@ -83,6 +83,7 @@ const mapProjectMeta = (meta = {}, fallbackLink = '') => {
     title: meta?.title || 'Untitled Project',
     description: meta?.description || '',
     tags: Array.isArray(meta?.tags) ? [...meta.tags] : [],
+    preferredViewer: meta?.preferredViewer || 'https://twilite.zone',
     shareLink: meta?.shareLink || fallbackLink,
     allowComments: typeof meta?.allowComments === 'boolean' ? meta.allowComments : true,
     allowEdits: typeof meta?.allowEdits === 'boolean' ? meta.allowEdits : true,
@@ -1950,6 +1951,51 @@ export default function DocumentPropertiesDialog({
                   value={docSettings.github?.branch || 'main'}
                   onChange={(event) => handleGithubSettingsChange({ branch: event.target.value })}
                   fullWidth
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.github?.autoCreateRepo !== false}
+                      onChange={(event) =>
+                        handleGithubSettingsChange({ autoCreateRepo: event.target.checked })
+                      }
+                    />
+                  }
+                  label="Auto-create repo if missing"
+                />
+                <TextField
+                  label="Repository visibility (when auto-created)"
+                  select
+                  value={docSettings.github?.repoVisibility || 'private'}
+                  onChange={(event) =>
+                    handleGithubSettingsChange({ repoVisibility: event.target.value })
+                  }
+                  fullWidth
+                >
+                  <MenuItem value="private">Private</MenuItem>
+                  <MenuItem value="public">Public</MenuItem>
+                </TextField>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.github?.seedOnCommit === true}
+                      onChange={(event) =>
+                        handleGithubSettingsChange({ seedOnCommit: event.target.checked })
+                      }
+                    />
+                  }
+                  label="Seed/overwrite landing files on commit"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={docSettings.github?.enableGithubPages === true}
+                      onChange={(event) =>
+                        handleGithubSettingsChange({ enableGithubPages: event.target.checked })
+                      }
+                    />
+                  }
+                  label="Enable GitHub Pages on commit"
                 />
                 <TextField
                   label="Commit message"

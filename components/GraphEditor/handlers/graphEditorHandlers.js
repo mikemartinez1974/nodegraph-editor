@@ -90,6 +90,12 @@ export function createGraphEditorHandlers({
     normalized.logic = normalized.logic && typeof normalized.logic === 'object' ? { ...normalized.logic } : undefined;
     normalized.routing = normalized.routing && typeof normalized.routing === 'object' ? { ...normalized.routing } : undefined;
     normalized.extensions = normalized.extensions && typeof normalized.extensions === 'object' ? { ...normalized.extensions } : undefined;
+    normalized.sourcePort = typeof normalized.sourcePort === 'string' && normalized.sourcePort.trim()
+      ? normalized.sourcePort.trim()
+      : 'root';
+    normalized.targetPort = typeof normalized.targetPort === 'string' && normalized.targetPort.trim()
+      ? normalized.targetPort.trim()
+      : 'root';
     return normalized;
   };
 
@@ -228,8 +234,8 @@ export function createGraphEditorHandlers({
     }
     basePoint = pickFromTargets(basePoint);
 
-    const centerX = basePoint.x;
-    const centerY = basePoint.y;
+    const centerX = basePoint.x - resolvedWidth / 2;
+    const centerY = basePoint.y - resolvedHeight / 2;
     // console.log('[handleAddNode] placement debug', { hasPointer, pointer, fallbackX, fallbackY, basePoint });
     let api = graphAPI && graphAPI.current ? graphAPI.current : (typeof window !== 'undefined' && window.graphAPI ? window.graphAPI : null);
     if (!api || typeof api.createNode !== 'function') {
@@ -1126,16 +1132,18 @@ export function handleAddNodeLocal({ nodesRef, setNodes, pan, zoom, defaultNodeC
   setNodes(prev => {
     const existingIds = new Set(prev.map(n => n.id));
     const id = generateUUID(existingIds);
-    const centerX = (window.innerWidth / 2 - (pan?.x || 0)) / (zoom || 1);
-    const centerY = (window.innerHeight / 2 - (pan?.y || 0)) / (zoom || 1);
+    const width = 120;
+    const height = 60;
+    const centerX = (window.innerWidth / 2 - (pan?.x || 0)) / (zoom || 1) - width / 2;
+    const centerY = (window.innerHeight / 2 - (pan?.y || 0)) / (zoom || 1) - height / 2;
 
     const newNode = {
       id,
       label: 'New Node',
       type: nodeType,
       position: { x: centerX, y: centerY },
-      width: 120,
-      height: 60,
+      width,
+      height,
       color: defaultNodeColor,
       data: {}
     };

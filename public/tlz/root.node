@@ -1,0 +1,227 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "twilite-samples-repo",
+          "name": "Twilite Samples Repository",
+          "version": "1.0.0",
+          "description": "Collection of example graphs demonstrating Twilite capabilities",
+          "createdAt": "2026-02-27T18:30:00.000Z",
+          "updatedAt": "2026-02-27T18:30:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "type": "markdown",
+      "label": "Welcome to Twilite Samples",
+      "position": { "x": 60, "y": -220 },
+      "width": 480,
+      "height": 340,
+      "color": "#1976d2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Twilite Samples Repository\n\n**A collection of example graphs showcasing what's possible with Twilite.**\n\nThis repository contains working examples that demonstrate:\n\n- **Core concepts** - Understanding nodes, edges, and graph structure\n- **Real-world use cases** - From documentation to project planning\n- **AI collaboration** - How LLMs and humans build together\n- **Advanced patterns** - Custom node types, complex relationships\n\n## What is Twilite?\n\nTwilite is a persistent graph workspace where:\n- Ideas become nodes\n- Connections become edges\n- Structure emerges naturally\n- AI and humans collaborate seamlessly\n\nEach sample is a `.node` file containing a complete, working graph that you can explore, modify, and learn from."
+      }
+    },
+    {
+      "id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+      "type": "markdown",
+      "label": "Repository Structure",
+      "position": { "x": 620, "y": -220 },
+      "width": 400,
+      "height": 360,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Repository Structure\n\n```\ntwilight-samples/\n├── root.node              # This file - repo introduction\n├── basics/\n│   ├── hello-world.node   # Your first graph\n│   ├── node-types.node    # Common node types\n│   └── edge-types.node    # Relationship patterns\n├── examples/\n│   ├── documentation.node # Doc site structure\n│   ├── project-plan.node  # Project management\n│   ├── knowledge-map.node # Personal wiki\n│   └── workflow.node      # Process automation\n├── advanced/\n│   ├── custom-types.node  # Custom node definitions\n│   ├── port-contracts.node# Advanced connections\n│   └── nested-graphs.node # Composition patterns\n└── community/\n    └── [your samples here]\n```\n\nEach `.node` file is a complete, self-contained graph."
+      }
+    },
+    {
+      "id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "type": "markdown",
+      "label": "How to Use These Samples",
+      "position": { "x": 60, "y": 180 },
+      "width": 420,
+      "height": 400,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "flow", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## How to Use These Samples\n\n### 1. Browse in GitHub\nEach `.node` file contains JSON that describes a graph. You can read them directly.\n\n### 2. Open in Twilite\n- Load any `.node` file into the Twilite browser\n- Explore the graph visually\n- See how nodes connect and relate\n\n### 3. Modify and Experiment\n- Copy a sample as a starting point\n- Use an LLM to help you modify it\n- Learn by doing\n\n### 4. Contribute Your Own\n- Create something cool\n- Submit a pull request to `community/`\n- Share your discoveries\n\n### 5. Chat with AI\nUse the onboard button in Twilite to copy instructions, then paste them into any LLM chat to collaborate on graph creation."
+      }
+    },
+    {
+      "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+      "type": "markdown",
+      "label": "Getting Started",
+      "position": { "x": 560, "y": 200 },
+      "width": 380,
+      "height": 340,
+      "color": "#7b1fa2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Start Here\n\n### New to Twilite?\n1. Open `basics/hello-world.node` first\n2. Read through the core concepts\n3. Try modifying the example\n4. Move on to more complex samples\n\n### Have an LLM?\nPerfect! Tell it:\n- \"Load the Twilite onboarding guide\"\n- \"Help me create a graph about [topic]\"\n- \"Modify this sample to add [feature]\"\n\nThe LLM understands graph structure and can help you build.\n\n### Want to Build Something?\nStart with a sample that's close to what you need, then evolve it. The graph grows with your ideas.\n\n**Remember:** Small changes, preserve IDs, validate semantics."
+      }
+    },
+    {
+      "id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+      "type": "markdown",
+      "label": "What Makes a Good Sample",
+      "position": { "x": 60, "y": 640 },
+      "width": 420,
+      "height": 320,
+      "color": "#0288d1",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## What Makes a Good Sample?\n\n### Clear Purpose\nEach sample should demonstrate one concept or use case well.\n\n### Self-Documenting\nInclude markdown nodes that explain what's happening and why.\n\n### Complete & Valid\nAll required system nodes (manifest, legend, dictionary) present.\n\n### Minimal but Meaningful\nSmall enough to understand quickly, complex enough to be useful.\n\n### Well-Connected\nShow relationship patterns that make sense semantically.\n\n### Ready to Extend\nEasy for someone to take and build upon.\n\nThink of samples as teaching tools, not just demos."
+      }
+    },
+    {
+      "id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+      "type": "markdown",
+      "label": "Contributing",
+      "position": { "x": 560, "y": 600 },
+      "width": 380,
+      "height": 360,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Contributing Samples\n\n### We Welcome Contributions!\n\nIf you've created something useful in Twilite, share it!\n\n**Submission Guidelines:**\n1. Place your `.node` file in `community/`\n2. Include descriptive markdown nodes\n3. Ensure all system nodes are present\n4. Test that it loads correctly\n5. Submit a pull request\n\n**Good Sample Ideas:**\n- Tutorial workflows\n- Domain-specific templates\n- Interesting visualization patterns\n- Novel use cases\n- Integration examples\n\n### Questions?\nOpen an issue or reach out to:\n**admin@twilite.zone**\n\nLet's build the sample library together."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a",
+      "source": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "sourcePort": "root",
+      "target": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
+      "source": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "sourcePort": "out",
+      "target": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c",
+      "source": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+      "sourcePort": "out",
+      "target": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "a3b4c5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7d",
+      "source": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "sourcePort": "out",
+      "target": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "b4c5d6e7-f8a9-4b0c-1d2e-3f4a5b6c7d8e",
+      "source": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "sourcePort": "out",
+      "target": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f",
+      "source": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+      "sourcePort": "out",
+      "target": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2026-02-27T18:30:00.000Z",
+  "nodeCount": 9,
+  "edgeCount": 6
+}

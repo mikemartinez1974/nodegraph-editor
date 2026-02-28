@@ -72,7 +72,11 @@ export const createDefaultManifestNode = ({ kind = 'graph' } = {}) => {
         github: {
           repo: '',
           path: '',
-          branch: 'main'
+          branch: 'main',
+          autoCreateRepo: true,
+          repoVisibility: 'private',
+          seedOnCommit: false,
+          enableGithubPages: false
         },
         autoSave: false
       }

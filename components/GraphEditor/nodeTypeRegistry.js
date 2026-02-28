@@ -48,7 +48,10 @@ const baseNodeTypeRegistry = {
     label: 'Markdown Node',
     description: 'Node with markdown rendering',
     icon: 'Article',
-    category: 'content'
+    category: 'content',
+    defaultData: {
+      markdown: ''
+    }
   },
   dictionary: {
     component: DictionaryNode,
@@ -311,7 +314,10 @@ export const nodeTypeMetadata = [
     icon: 'Article',
     category: 'content',
     defaultWidth: 260,
-    defaultHeight: 220
+    defaultHeight: 220,
+    defaultData: {
+      markdown: ''
+    }
   },
   {
     type: 'dictionary',

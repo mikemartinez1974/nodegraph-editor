@@ -18,6 +18,15 @@ export function useKeyboardAndPaste(state, handlers, historyHook) {
   // Keyboard navigation and undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const target = e.target;
+      const isTextInput = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable ||
+        target.getAttribute?.('contenteditable') === 'true'
+      );
+      if (isTextInput) return;
+
       const mod = e.ctrlKey || e.metaKey;
       
       // Undo (Ctrl/Cmd+Z)

@@ -16,7 +16,11 @@ const createInitialDocumentSettings = () => ({
   github: {
     repo: '',
     path: '',
-    branch: 'main'
+    branch: 'main',
+    autoCreateRepo: true,
+    repoVisibility: 'private',
+    seedOnCommit: false,
+    enableGithubPages: false
   }
 });
 
