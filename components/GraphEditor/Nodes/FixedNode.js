@@ -11,6 +11,7 @@ import NoteIcon from '@mui/icons-material/Note';
 import LinkIcon from '@mui/icons-material/Link';
 import { alpha } from '@mui/material';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // Helper to check if a color is a gradient
 const isGradientColor = (color) => {
@@ -303,13 +304,14 @@ const FixedNode = ({
         eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
       }}
     >
+      <NodeTypeBadge type={node?.type} />
       {/* Render node label/markdown if present (unless hideDefaultContent is true) */}
       {isRootNode && (
         <div
           style={{
             position: 'absolute',
             top: 6,
-            left: 6,
+            right: 6,
             zIndex: 3,
             pointerEvents: 'none',
             padding: '2px 6px',
@@ -330,14 +332,18 @@ const FixedNode = ({
       )}
       {!hideDefaultContent && node?.label && (
         <div style={{ 
-          textAlign: 'center', 
-          fontWeight: 500, 
-          fontSize: Math.max(12, 14 * zoom), 
-          marginTop: 4,
-          padding: '0 4px',
+          position: 'absolute',
+          top: 7,
+          left: 56,
+          right: 8,
+          textAlign: 'left',
+          fontWeight: 600, 
+          fontSize: 12,
+          lineHeight: 1.2,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          maxWidth: '100%'
+          whiteSpace: 'nowrap',
+          zIndex: 4
         }}>
           {node.label.includes('**') || node.label.includes('*') || node.label.includes('#') ? (
             <div style={{

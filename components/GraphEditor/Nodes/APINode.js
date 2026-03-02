@@ -4,6 +4,7 @@ import eventBus from '../../NodeGraph/eventBus';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CancelIcon from '@mui/icons-material/Cancel';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- Unified handle schema ---
 const API_INPUTS = [
@@ -231,6 +232,7 @@ export default function APINode({
         if (onDoubleClick) onDoubleClick(e);
       }}
     >
+      <NodeTypeBadge type={node?.type} />
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
         <div style={{ flexGrow: 1, marginRight: 8 }}>
           <input

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 220;
@@ -265,6 +266,7 @@ export default function BackgroundRpcNode({
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <NodeTypeBadge type={node?.type} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
             Background RPC

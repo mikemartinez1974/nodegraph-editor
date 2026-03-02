@@ -1,0 +1,177 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "8f6b8af5-8ba8-4bc3-94f8-b0e8b9f2d101",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "project1-root-index",
+          "name": "Project1 Root",
+          "version": "0.1.0",
+          "description": "Navigation root for Bride of Charlie episodes.",
+          "createdAt": "2026-03-01T00:00:00.000Z",
+          "updatedAt": "2026-03-01T00:00:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "navigation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "dictionary", "markdown", "port"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "a8ac8614-42f7-45aa-9f9e-0bdc87e81002",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "b145df91-5f53-4b77-8de2-d0f5de6be003",
+      "type": "markdown",
+      "label": "Bride of Charlie",
+      "position": { "x": 40, "y": -120 },
+      "width": 540,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Bride of Charlie\n\nEpisode navigation for the Project1 storyline."
+      },
+      "isRoot": true
+    },
+    {
+      "id": "9c481165-657a-4f0f-b72f-1b6a5c3e2004",
+      "type": "port",
+      "label": "Episode 1",
+      "position": { "x": -60, "y": 230 },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Bride of Charlie - Episode 1",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tlz/project1/bride-of-charlie-ep1.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "3f973f36-3fa0-4236-b856-75f9f6186005",
+      "type": "port",
+      "label": "Episode 2",
+      "position": { "x": 240, "y": 230 },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Bride of Charlie - Episode 2",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tlz/project1/bride-of-charlie-ep2.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    },
+    {
+      "id": "31dc9dd5-15c0-4ce5-a4cb-bcf30d95b006",
+      "type": "port",
+      "label": "Episode 3",
+      "position": { "x": 540, "y": 230 },
+      "width": 260,
+      "height": 140,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Bride of Charlie - Episode 3",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tlz/project1/bride-of-charlie-ep3.node:root",
+          "mode": "navigate",
+          "portId": "root"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0f5b9aa-0f6a-44ac-8f7a-9adbbf4f1001",
+      "type": "reference",
+      "source": "b145df91-5f53-4b77-8de2-d0f5de6be003",
+      "sourcePort": "out",
+      "target": "9c481165-657a-4f0f-b72f-1b6a5c3e2004",
+      "targetPort": "root",
+      "style": { "curved": true, "route": "curved", "width": 2 }
+    },
+    {
+      "id": "e0f5b9aa-0f6a-44ac-8f7a-9adbbf4f1002",
+      "type": "reference",
+      "source": "b145df91-5f53-4b77-8de2-d0f5de6be003",
+      "sourcePort": "out",
+      "target": "3f973f36-3fa0-4236-b856-75f9f6186005",
+      "targetPort": "root",
+      "style": { "curved": true, "route": "curved", "width": 2 }
+    },
+    {
+      "id": "e0f5b9aa-0f6a-44ac-8f7a-9adbbf4f1003",
+      "type": "reference",
+      "source": "b145df91-5f53-4b77-8de2-d0f5de6be003",
+      "sourcePort": "out",
+      "target": "31dc9dd5-15c0-4ce5-a4cb-bcf30d95b006",
+      "targetPort": "root",
+      "style": { "curved": true, "route": "curved", "width": 2 }
+    }
+  ],
+  "timestamp": "2026-03-01T00:00:00.000Z",
+  "nodeCount": 6,
+  "edgeCount": 3
+}

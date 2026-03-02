@@ -2103,6 +2103,21 @@ export default function PropertiesPanel({
     >
       <Stack spacing={1}>
         <TextField
+          label="Reference (ref)"
+          size="small"
+          fullWidth
+          value={portTarget.ref || ""}
+          onChange={(event) => updatePortTarget({ ref: event.target.value })}
+          helperText="Canonical target. Supports github://, local://, tlz://, /path, https://"
+        />
+        <TextField
+          label="Endpoint (file.node:port)"
+          size="small"
+          fullWidth
+          value={portTarget.endpoint || ""}
+          onChange={(event) => updatePortTarget({ endpoint: event.target.value })}
+        />
+        <TextField
           label="Target URL"
           size="small"
           fullWidth
@@ -2127,8 +2142,8 @@ export default function PropertiesPanel({
           label="Target portId"
           size="small"
           fullWidth
-          value={portTarget.handleId || ""}
-          onChange={(event) => updatePortTarget({ handleId: event.target.value })}
+          value={portTarget.portId || portTarget.handleId || ""}
+          onChange={(event) => updatePortTarget({ portId: event.target.value, handleId: event.target.value })}
         />
         <TextField
           label="Target label"
@@ -2231,13 +2246,22 @@ export default function PropertiesPanel({
     >
       <Stack spacing={1}>
         <TextField
-          label="Source graph"
+          label="Reference (ref)"
           size="small"
           fullWidth
-          placeholder="/root.node"
-          value={selectedNode?.data?.src || ""}
-          onChange={(event) => updateGraphReferenceField({ src: event.target.value })}
-          helperText="Path/URL to child graph. Endpoint format file.node:port is accepted."
+          placeholder="github://owner/repo/path/file.node"
+          value={selectedNode?.data?.ref || selectedNode?.data?.src || ""}
+          onChange={(event) => updateGraphReferenceField({ ref: event.target.value, src: event.target.value })}
+          helperText="Canonical source. Supports github://, local://, tlz://, /path, https://"
+        />
+        <TextField
+          label="Endpoint (file.node:port)"
+          size="small"
+          fullWidth
+          placeholder="/root.node:root"
+          value={selectedNode?.data?.endpoint || ""}
+          onChange={(event) => updateGraphReferenceField({ endpoint: event.target.value })}
+          helperText="Optional endpoint form. Parsed to file path for load."
         />
         <FormControl fullWidth size="small">
           <InputLabel>Mode</InputLabel>

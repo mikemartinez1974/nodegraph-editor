@@ -1,0 +1,389 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -600, "y": -300 },
+      "width": 420,
+      "height": 320,
+      "data": {
+        "identity": {
+          "graphId": "twilite-os-whitepaper",
+          "name": "Twilite OS Whitepaper",
+          "version": "1.0.0",
+          "description": "A Graph-Native Operating System for Thought, Tools, and Agents",
+          "createdAt": "2026-02-27T18:30:00.000Z",
+          "updatedAt": "2026-02-27T18:30:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -600, "y": 80 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -600, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Twilite OS: Executive Summary",
+      "position": { "x": 0, "y": -300 },
+      "width": 500,
+      "height": 340,
+      "color": "#1976d2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Twilite OS\n## A Graph-Native Operating System for Thought, Tools, and Agents\n\n### tl;dr\n\nTwilight is a **graph-native workspace** where visual thinking becomes executable, collaborative, and portable. Unlike traditional node editors, Twilite treats graphs as **first-class artifacts**: machine-readable, AI-writable, and web-distributable.\n\nIt is not just an editor—it's:\n- A new kind of file format\n- A platform for agent collaboration  \n- A governance layer for evolving ideas into tools\n\n**Graphs become infrastructure.**"
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "The Problem",
+      "position": { "x": 580, "y": -300 },
+      "width": 460,
+      "height": 400,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Problem: Graphs Are Treated as UI State\n\nModern visual tools suffer from:\n\n### ❌ Ephemeral graphs\nJust screenshots, not durable files\n\n### ❌ Lack of identity\nNo diffing, versioning, or history\n\n### ❌ AI-incompatibility\nNo machine-readable formats\n\n### ❌ No reuse or composability\nAlways build from scratch\n\n### ❌ Vendor lock-in\nIdeas trapped inside proprietary UIs\n\n---\n\n**Core issue:** Graphs are not treated as *the thing*. They're treated as a *picture* of the thing."
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "The Vision",
+      "position": { "x": 580, "y": 160 },
+      "width": 460,
+      "height": 440,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Vision: Graphs as Durable Artifacts\n\nTwilight redefines what a node graph is:\n\n### 🌐 Web-Native\nGraphs are addressable by URL, embed-friendly, Git-storable\n\n### 🤖 AI-First\nStructured JSON format with safe mutation contracts for agents\n\n### ⚡ Executable\nNodes can run scripts, call APIs, validate schemas, mutate themselves\n\n### 🧠 Composable\nGraphs can contain graphs, act as templates, and evolve over time\n\n---\n\n**The result:** Graphs become infrastructure.\n\nThey are:\n- Version controlled\n- Diff-able\n- Shareable as links\n- Editable by humans AND agents\n- Portable across tools"
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "The Graph Model",
+      "position": { "x": 0, "y": 80 },
+      "width": 500,
+      "height": 460,
+      "color": "#7b1fa2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "flow", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Twilite Graph Model\n\nA `.node` file is a structured, versioned artifact:\n\n```json\n{\n  \"type\": \"nodegraph-data\",\n  \"nodes\": [...],\n  \"edges\": [...],\n  \"timestamp\": \"...\",\n  \"nodeCount\": 10,\n  \"edgeCount\": 8\n}\n```\n\n### Key Design Concepts\n\n**Stable Identity**  \nUUIDs for every node/edge enable version control\n\n**Contracts over Snapshots**  \nAI edits via deltas, not rewrites\n\n**Progressive Complexity**  \nFrom static diagrams to executable workflows\n\n**Machine-Readable**  \nJSON structure that both humans and agents understand\n\n**Web-Distributable**  \nHost anywhere, link anywhere, embed anywhere"
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "Canonical Roles",
+      "position": { "x": 580, "y": 660 },
+      "width": 460,
+      "height": 480,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Canonical Roles\n\nEach graph organizes content by **semantic role**, not just node type:\n\n### 📜 Manifest\nDeclares identity, intent, dependencies, and authority\n\n### 📘 Content\nCarries actual meaning—notes, logic, tasks, data\n\n### 🔗 Structure\nRelationships—edges, clusters, hierarchies\n\n### 🎨 Style\nVisual semantics—color roles, emphasis, state, grouping\n\n### 📖 Definitions\nSchema, port contracts, constraints (optional but formal)\n\n---\n\nThis separation allows:\n- Clear governance (manifest)\n- Rich semantics (content)\n- Flexible layout (structure)\n- Meaningful visuals (style)\n- Contract enforcement (definitions)"
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "Skill System",
+      "position": { "x": 1120, "y": 660 },
+      "width": 460,
+      "height": 520,
+      "color": "#0288d1",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Skill System: How Graphs Evolve\n\nTwilight graphs support **skills**—procedural operations that mutate or interpret structure.\n\n### Categories\n\n**🧱 Structural**  \nCreate/delete/group nodes, extract subgraphs\n\n**📐 Layout**  \nAuto-layout, edge rerouting, spacing normalization\n\n**✅ Validation**  \nSchema checks, dependency checks, orphan detection\n\n**🔄 Transformation**  \nRefactor, type migration, schema upgrades\n\n**⚙️ Automation**  \nScript execution, batch mutation, procedural generation\n\n### Skill Contracts\n\nEach skill has a machine-readable contract defining:\n- Preconditions / postconditions\n- Valid inputs and outputs\n- Dry run mode\n- Failure handling\n\nSkills enable graphs to become self-modifying systems."
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "AI Mutation Protocol",
+      "position": { "x": 0, "y": 600 },
+      "width": 500,
+      "height": 500,
+      "color": "#ad1457",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## AI Mutation Protocol\n\nAgents interact with Twilite via safe, predictable deltas:\n\n```json\n{\n  \"action\": \"transaction\",\n  \"commands\": [\n    { \"action\": \"createNodes\", \"nodes\": [...] },\n    { \"action\": \"createEdges\", \"edges\": [...] },\n    { \"action\": \"update\", \"nodeId\": \"...\", \"data\": {...} },\n    { \"action\": \"delete\", \"nodeId\": \"...\" }\n  ]\n}\n```\n\n### Core Principles\n\n**Deltas over snapshots**  \nNever replace entire graph, only mutate specific elements\n\n**Validation before application**  \nCheck constraints before committing changes\n\n**Dry run for safety**  \nTest mutations without side effects\n\n**Minimal payloads**  \nPositions optional, IDs required\n\n**Preserve identity**  \nUpdate existing nodes rather than delete+recreate\n\nThis protocol enables safe AI collaboration on shared graphs."
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "Minimum Valid Graph",
+      "position": { "x": 0, "y": 1160 },
+      "width": 500,
+      "height": 400,
+      "color": "#558b2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Minimum Valid Graph (MVG)\n\nTo ensure interoperability and portability, every graph must:\n\n### ✅ Required\n- **One Manifest node** — Identity and governance\n- **One Legend node** — Documentation of node types\n- **One Dictionary node** — Schema definitions\n- **At least one Content node** — Actual meaning\n\n### ⚠️ Optional but Recommended\n- Structure nodes (clusters, groups)\n- Style specifications\n- Port definitions\n- Custom node type definitions\n\n### Validation Rules\n- No orphaned nodes (except system nodes)\n- No invalid port references\n- All declared dependencies satisfied\n- Valid UUIDs for all IDs\n\nThese rules are enforced by agents and tools alike."
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Documentation & Governance",
+      "position": { "x": 580, "y": 1160 },
+      "width": 460,
+      "height": 440,
+      "color": "#5e35b1",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Documentation & Governance Contracts\n\nTwilight ships with formal spec files in `contracts/`:\n\n### Core Specifications\n\n**manifest.md**  \nManifest fields, validation rules\n\n**nodes/*.md**  \nNode type schemas and behaviors\n\n**ports/*.md**  \nPort compatibility and contracts\n\n**skills/*.md**  \nSkill behavior contracts\n\n**migrations.md**  \nSchema upgrade paths\n\n**validation.md**  \nInvariants and rules\n\n**boundary.md**  \nData vs UI separation\n\n**onboarding.md**  \nHuman-first intro to Twilite OS\n\nThese contracts ensure consistency across tools, agents, and implementations."
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "Defensibility",
+      "position": { "x": 580, "y": 1660 },
+      "width": 460,
+      "height": 420,
+      "color": "#d84315",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Defensibility: A Governance Moat\n\nTwilight isn't just \"a better graph tool.\" It's a **graph operating system** built on enforceable contracts.\n\n### Moat Elements\n\n**Schema standardization**  \nThe `.node` format becomes the standard\n\n**Mutation safety**  \nAgents can't break graphs accidentally\n\n**Layout + diff hygiene**  \nClean version control and collaboration\n\n**Plugin extensibility**  \nWithout fragmentation or incompatibility\n\n**Git-native workflows**  \nPull requests, code review, CI/CD for graphs\n\n---\n\nThis isn't lock-in through proprietary formats—it's **standards leadership** through superior design and governance."
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "Call to Action",
+      "position": { "x": 1120, "y": 1240 },
+      "width": 460,
+      "height": 480,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Call to Action\n\nTwilight is more than an app—it's a platform.\n\n### For Builders\n**Build with it**  \nFork templates, create workflows, wire up agents\n\n### For Developers\n**Extend it**  \nAdd node types, publish plugins, define new skills\n\n### For the Community\n**Govern it**  \nParticipate in spec evolution, schema standards, and graph law\n\n### For Investors\n**Fund it**  \nThis is infrastructure for the next generation of tools\n\n### For Users\n**Use it**  \nTurn your thoughts into systems, your notes into workflows\n\n---\n\n## Start with a graph. Ship a system.\n\n**Contact:** admin@twilite.zone  \n**Web:** twilite.zone  \n**Repo:** github.com/twilite-zone"
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "Use Cases",
+      "position": { "x": 1120, "y": 160 },
+      "width": 460,
+      "height": 440,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Use Cases\n\nWhat can you build with graph-native infrastructure?\n\n### 📚 Knowledge Management\nPersonal wikis that link, evolve, and AI-generate\n\n### 🔄 Workflow Automation\nVisual process design that executes\n\n### 📊 Data Pipelines\nETL as a graph, versioned and reviewable\n\n### 🎯 Project Planning\nTasks, dependencies, timelines as living graphs\n\n### 🧠 AI Agent Coordination\nMulti-agent systems with visual orchestration\n\n### 🏗️ System Architecture\nDiagrams that validate and generate code\n\n### 📖 Documentation Sites\nSelf-hosting docs that are also executable graphs\n\n### 🎮 Game Design\nNarrative graphs, quest systems, world building\n\nAny domain where **structure matters** benefits from Twilite."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-004",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-005",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-007",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-010",
+      "source": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-011",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-012",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-013",
+      "source": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-014",
+      "source": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "sequence"
+    }
+  ],
+  "timestamp": "2026-02-27T18:35:00.000Z",
+  "nodeCount": 15,
+  "edgeCount": 14
+}

@@ -61,6 +61,37 @@ const BUILTIN_NODE_TYPES = new Set([
   "graph-reference"
 ]);
 
+const getValueByPath = (obj, path) => {
+  if (!path || typeof path !== "string") return undefined;
+  const parts = path.split(".").filter(Boolean);
+  let current = obj;
+  for (const part of parts) {
+    if (current == null || typeof current !== "object") return undefined;
+    current = current[part];
+  }
+  return current;
+};
+
+const matchesSchemaType = (value, expectedType) => {
+  if (!expectedType || typeof expectedType !== "string") return true;
+  switch (expectedType) {
+    case "string":
+      return typeof value === "string";
+    case "number":
+      return typeof value === "number" && Number.isFinite(value);
+    case "integer":
+      return typeof value === "number" && Number.isInteger(value);
+    case "boolean":
+      return typeof value === "boolean";
+    case "array":
+      return Array.isArray(value);
+    case "object":
+      return value !== null && typeof value === "object" && !Array.isArray(value);
+    default:
+      return true;
+  }
+};
+
 export function validateGraphInvariants({
   nodes = [],
   edges = [],
@@ -229,6 +260,139 @@ export function validateGraphInvariants({
     return { entryByKey, viewByKey };
   };
 
+  const validateNodeClassData = (node, nodeDefEntry) => {
+    const issues = [];
+    if (!node || !nodeDefEntry) return issues;
+
+    const nodeData = node?.data && typeof node.data === "object" ? node.data : {};
+    const explicitValidation = nodeDefEntry?.validation && typeof nodeDefEntry.validation === "object"
+      ? nodeDefEntry.validation
+      : {};
+    const dataSchema = nodeDefEntry?.dataSchema && typeof nodeDefEntry.dataSchema === "object"
+      ? nodeDefEntry.dataSchema
+      : null;
+
+    const requiredKeysFromSchema = Array.isArray(dataSchema?.required) ? dataSchema.required : [];
+    requiredKeysFromSchema.forEach((key) => {
+      const path = String(key || "").trim();
+      if (!path) return;
+      const value = getValueByPath(nodeData, path);
+      if (value === undefined || value === null || value === "") {
+        issues.push({
+          code: "NODECLASS_DATA_REQUIRED",
+          message: `Node "${node.id}" (${node.type}) missing required data key "${path}".`,
+          nodeId: node.id
+        });
+      }
+    });
+
+    const properties = dataSchema?.properties && typeof dataSchema.properties === "object"
+      ? dataSchema.properties
+      : null;
+    if (properties) {
+      Object.entries(properties).forEach(([key, descriptor]) => {
+        if (!descriptor || typeof descriptor !== "object") return;
+        const value = nodeData[key];
+        if (value === undefined || value === null) return;
+        const expectedType = typeof descriptor.type === "string" ? descriptor.type : "";
+        if (!matchesSchemaType(value, expectedType)) {
+          issues.push({
+            code: "NODECLASS_DATA_TYPE",
+            message: `Node "${node.id}" (${node.type}) data.${key} should be "${expectedType}".`,
+            nodeId: node.id
+          });
+        }
+      });
+    }
+
+    const requiredKeys = Array.isArray(explicitValidation?.requiredDataKeys)
+      ? explicitValidation.requiredDataKeys
+      : [];
+    requiredKeys.forEach((pathValue) => {
+      const path = String(pathValue || "").trim();
+      if (!path) return;
+      const normalizedPath = path.startsWith("data.") ? path.slice("data.".length) : path;
+      const value = getValueByPath(nodeData, normalizedPath);
+      if (value === undefined || value === null || value === "") {
+        issues.push({
+          code: "NODECLASS_VALIDATION_REQUIRED",
+          message: `Node "${node.id}" (${node.type}) missing required validation path "${path}".`,
+          nodeId: node.id
+        });
+      }
+    });
+
+    const rules = Array.isArray(explicitValidation?.rules) ? explicitValidation.rules : [];
+    rules.forEach((rule) => {
+      if (!rule || typeof rule !== "object") return;
+      const path = String(rule.path || "").trim();
+      if (!path) return;
+      const normalizedPath = path.startsWith("data.") ? path.slice("data.".length) : path;
+      const value = getValueByPath(nodeData, normalizedPath);
+      const kind = String(rule.kind || "").trim();
+      const message = String(rule.message || "").trim() || `Validation rule failed at "${path}".`;
+      const severity = String(rule.severity || "").trim() === "error" ? "error" : "warning";
+      if (value === undefined || value === null) {
+        if (kind === "required") {
+          issues.push({
+            code: "NODECLASS_RULE_REQUIRED",
+            message: `Node "${node.id}" (${node.type}): ${message}`,
+            nodeId: node.id,
+            severity
+          });
+        }
+        return;
+      }
+      if (kind === "type" && rule.type && !matchesSchemaType(value, String(rule.type))) {
+        issues.push({
+          code: "NODECLASS_RULE_TYPE",
+          message: `Node "${node.id}" (${node.type}): ${message}`,
+          nodeId: node.id,
+          severity
+        });
+      }
+      if (kind === "enum" && Array.isArray(rule.enum) && !rule.enum.includes(value)) {
+        issues.push({
+          code: "NODECLASS_RULE_ENUM",
+          message: `Node "${node.id}" (${node.type}): ${message}`,
+          nodeId: node.id,
+          severity
+        });
+      }
+      if (kind === "range" && typeof value === "number") {
+        const min = typeof rule.min === "number" ? rule.min : null;
+        const max = typeof rule.max === "number" ? rule.max : null;
+        const tooSmall = min !== null && value < min;
+        const tooLarge = max !== null && value > max;
+        if (tooSmall || tooLarge) {
+          issues.push({
+            code: "NODECLASS_RULE_RANGE",
+            message: `Node "${node.id}" (${node.type}): ${message}`,
+            nodeId: node.id,
+            severity
+          });
+        }
+      }
+      if (kind === "pattern" && rule.pattern && typeof value === "string") {
+        try {
+          const regex = new RegExp(String(rule.pattern));
+          if (!regex.test(value)) {
+            issues.push({
+              code: "NODECLASS_RULE_PATTERN",
+              message: `Node "${node.id}" (${node.type}): ${message}`,
+              nodeId: node.id,
+              severity
+            });
+          }
+        } catch (err) {
+          // ignore invalid regex in rule definition here
+        }
+      }
+    });
+
+    return issues;
+  };
+
   const manifestsToValidate = manifestNodes.length ? manifestNodes : [];
   manifestsToValidate.forEach((manifest) => {
     const dependencyTypes = Array.isArray(manifest?.data?.dependencies?.nodeTypes)
@@ -274,6 +438,27 @@ export function validateGraphInvariants({
       }
     });
   });
+
+  if (resolvedDictionary?.data && typeof resolvedDictionary.data === "object") {
+    const { entryByKey } = resolveEntries(resolvedDictionary);
+    nodes.forEach((node) => {
+      if (!node?.id || !node?.type) return;
+      if (BUILTIN_NODE_TYPES.has(node.type)) return;
+      const nodeDefEntry = entryByKey.get(node.type);
+      if (!nodeDefEntry) return;
+      const issues = validateNodeClassData(node, nodeDefEntry);
+      issues.forEach((issue) => {
+        const severity = issue?.severity === "error" ? "error" : "warning";
+        const stripped = { ...issue };
+        delete stripped.severity;
+        if (severity === "error") {
+          pushLoadTolerantIssue(stripped);
+        } else {
+          warnings.push(stripped);
+        }
+      });
+    });
+  }
 
   const findHandle = (node, handleId) => {
     if (!handleId || !node) return undefined;

@@ -1,0 +1,290 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-03-01T17:57:05.866Z",
+    "modified": "2026-03-01T17:57:22.425Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "complaint-node-class",
+          "name": "Complaint Node Class",
+          "version": "0.1.0",
+          "description": "A node type for annotating problems, issues, and complaints in graphs.",
+          "createdAt": "2026-02-27T18:50:00.000Z",
+          "updatedAt": "2026-02-28T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "definition",
+          "scope": "node"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "view"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "complaint",
+            "intent": "annotation",
+            "implementation": "editor.web + node.web views",
+            "dictionaryKey": "complaint"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 360
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "complaint",
+            "ref": "/tlz/project1/complaint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "complaint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/tlz/project1/complaint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "complaint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/tlz/project1/complaint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "view",
+      "label": "Node View (node.web)",
+      "position": {
+        "x": 60,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web"
+        },
+        "node": {
+          "web": {
+            "markdown": "## Complaint: {{label}}\n\n**Severity:** {{data.severity}}  \n**Status:** {{data.status}}  \n**Reported By:** {{data.reportedBy}}\n\n{{data.complaint}}\n\n{{data.content}}\n\n{{data.markdown}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": 60,
+        "y": 100
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "complaint",
+                "label": "Complaint",
+                "type": "markdown",
+                "path": "data.complaint",
+                "placeholder": "Describe the issue...",
+                "multiline": true,
+                "rows": 8
+              },
+              {
+                "key": "content",
+                "label": "Legacy Content (optional)",
+                "type": "markdown",
+                "path": "data.content",
+                "placeholder": "Optional fallback content",
+                "multiline": true,
+                "rows": 4
+              },
+              {
+                "key": "severity",
+                "label": "Severity",
+                "type": "text",
+                "path": "data.severity",
+                "placeholder": "minor | moderate | major | critical"
+              },
+              {
+                "key": "status",
+                "label": "Status",
+                "type": "text",
+                "path": "data.status",
+                "placeholder": "open | acknowledged | resolved | dismissed"
+              },
+              {
+                "key": "reportedBy",
+                "label": "Reported By",
+                "type": "text",
+                "path": "data.reportedBy",
+                "placeholder": "Who reported this?"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "Usage Notes",
+      "position": {
+        "x": 560,
+        "y": -220
+      },
+      "width": 420,
+      "height": 400,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Complaint Node Type\n\n## Purpose\n\nUse this node to annotate problems, issues, or complaints in graphs.\n\n## Data Shape\n\n- `data.complaint` (required): description\n- `data.severity`: minor | moderate | major | critical\n- `data.status`: open | acknowledged | resolved | dismissed\n- `data.reportedBy`: optional reporter name\n\n## Usage Pattern\n\n1. Create a `complaint` node.\n2. Connect it to the relevant node with a `relates` edge.\n3. Track status over time."
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": [],
+  "scripts": []
+}

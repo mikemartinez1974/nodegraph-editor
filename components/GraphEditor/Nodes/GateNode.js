@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
 const GATE_INPUTS = [
@@ -195,6 +196,7 @@ export default function GateNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+      <NodeTypeBadge type={node?.type} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 12 }}>
         <div style={{ fontWeight: 700 }}>{node?.label || 'Gate'}</div>
         <label style={{ display: 'flex', flexDirection: 'column', fontSize: 11, opacity: 0.85 }}>

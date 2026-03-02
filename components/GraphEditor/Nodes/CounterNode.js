@@ -6,6 +6,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import PinIcon from '@mui/icons-material/Pin';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
 const COUNTER_INPUTS = [
@@ -175,6 +176,7 @@ export default function CounterNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+      <NodeTypeBadge type={node?.type} />
       {/* Header */}
       <div style={{ 
         display: 'flex', 

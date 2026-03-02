@@ -15,9 +15,9 @@ const DEFAULT_MAX_EMBED_DEPTH = 4;
 const resolveGraphUrl = (node) => {
   const data = node?.data || {};
   const explicit =
+    (typeof data.ref === "string" && data.ref.trim()) ||
     (typeof data.src === "string" && data.src.trim()) ||
     (typeof data.url === "string" && data.url.trim()) ||
-    (typeof data.ref === "string" && data.ref.trim()) ||
     (typeof data.graphUrl === "string" && data.graphUrl.trim()) ||
     "";
   if (explicit) {
@@ -25,7 +25,7 @@ const resolveGraphUrl = (node) => {
     if (parsedExplicit.ok && parsedExplicit.value?.filePath) {
       return endpointToUrl(parsedExplicit.value.filePath);
     }
-    if (/^https?:\/\//i.test(explicit) || explicit.startsWith("/")) return explicit;
+    if (/^(https?:\/\/|github:\/\/|local:\/\/|tlz:\/\/)/i.test(explicit) || explicit.startsWith("/")) return explicit;
     return `/${explicit}`;
   }
 
@@ -36,7 +36,7 @@ const resolveGraphUrl = (node) => {
   if (!endpoint) return "";
   const parsed = parsePortEndpoint(endpoint);
   if (parsed.ok && parsed.value?.filePath) return endpointToUrl(parsed.value.filePath);
-  if (/^https?:\/\//i.test(endpoint)) return endpoint;
+  if (/^(https?:\/\/|github:\/\/|local:\/\/|tlz:\/\/)/i.test(endpoint)) return endpoint;
   return endpointToUrl(endpoint);
 };
 

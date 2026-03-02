@@ -1,0 +1,353 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "bride-of-charlie-episode-1",
+          "name": "Bride of Charlie - Episode 1 Summary",
+          "version": "1.0.0",
+          "description": "Summary and analysis of Candace Owens investigative episode on Erica Kirk",
+          "createdAt": "2026-02-27T19:00:00.000Z",
+          "updatedAt": "2026-02-27T19:00:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Overview",
+      "position": { "x": 0, "y": -220 },
+      "width": 500,
+      "height": 320,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Bride of Charlie - Episode 1\n\n**Investigative Series by Candace Owens**\n\n## Central Question\n\nWho is Erica Kirk, the woman now leading Turning Point USA after Charlie Kirk's assassination?\n\n## Core Premise\n\n- Erica Kirk assumed control of $250M+ charity organization\n- Claims of being raised by single mother don't align with evidence\n- Multiple inconsistencies in public statements about her background\n- Aggressive PR campaign to suppress investigation\n- Public figures claiming inquiry makes you \"sheer evil\"\n\n## Investigation Goal\n\nVerify basic facts about Erica Kirk's background and family history through public records and interviews."
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Elizabeth Lane Analysis",
+      "position": { "x": 580, "y": -220 },
+      "width": 460,
+      "height": 420,
+      "color": "#7b1fa2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Elizabeth Lane's Viral Assessment\n\n### Key Observations\n\n**Public Reaction Pattern**\n- Viewers report physical discomfort watching her\n- \"I can't watch her\" - not criticism, visceral response\n- Emotional incongruence triggers avoidance\n\n**Personality Adaptation**\n- Rapid reshaping of public identity after relationship begins\n- Aesthetic, tone, values all shift overnight\n- \"Devoted Christian, modest, supportive housewife\"\n- Pattern typical of social climbers\n\n**Behavioral Indicators**\n- Days after husband's death, laying out company plans on Zoom\n- \"Born for the stage\" - comes naturally to her\n- Lack of emotional continuity in grief presentation\n- Performance feels rehearsed rather than genuine\n\n### Lane's Conclusion\n\nBased on acting/modeling background, believes Erica exhibits traits consistent with calculated ambition and performative behavior patterns."
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "Single Mother Claim - DISPUTED",
+      "position": { "x": 0, "y": 160 },
+      "width": 500,
+      "height": 460,
+      "color": "#d84315",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Single Mother Narrative\n\n### Public Claims\n\n**Erica's Statement (NYT Interview)**\n- Least traumatizing part of Charlie's death was prospect of raising kids alone\n- Had seen example set by mother Lorie France\n- Raised by \"strong, independent, entrepreneurial single mother\"\n\n**People Magazine Echo**\n- \"Erica Kirk learned a lot from her mother\"\n- Lorie divorced Kent Fray, raised Erica as single mom in Scottsdale\n- Lorie founded multiple companies in network security\n\n### Evidence Says Otherwise\n\n**Father Kent France (Kenneth France)**\n- Always in her life\n- Stay-at-home dad for \"a couple of years\" when Erica was ~4\n- Parents didn't divorce until Erica was 10 (1998)\n- Featured in high school yearbook with grandparents Carl and Elaine\n\n**Stepfather Larry Ginta**\n- Present since before parents' divorce finalized\n- Featured prominently in yearbook collage\n- Both Larry and his son included in family photos\n- Together since Erica's elementary school days\n\n### Reality\n\n\"Bonus dad\" situation - both biological father and stepfather present throughout childhood in Scottsdale area."
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Birthday & Marriage Date Anomalies",
+      "position": { "x": 580, "y": 260 },
+      "width": 460,
+      "height": 520,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Document Inconsistencies\n\n### Erica's Birthday\n\n**Official Records**\n- Birth announcement: November 20, 1988\n- Hospital: Good Samaritan (formerly US Marines Hospital)\n- Erica maintains November 20th today\n\n**Parents' Divorce Filing**\n- Both parents list birthday as November 22, 1988\n- Two days different from official record\n\n### Parents' Marriage Date - Four Versions\n\n**Version 1 (Initial Filing)**\n- Married November 20, 1995 in Marblehead, MA\n- (Same date as Erica's claimed 7th birthday)\n\n**Version 2 (Unnottarized Separation Agreement)**\n- Marriage date: November 7, 1982\n- 13 years earlier - document not notarized\n\n**Version 3 (Divorce Decree - Hand Edited)**\n- Started as November 20, 1995\n- Someone edited by hand to 1985 (10 years earlier)\n\n**Version 4 (Another Separation Agreement)**\n- Yet another date, still not notarized\n- Kent waives rights to attorney with no notary present\n\n### Problems\n\n- Hand-edited court documents (not legal procedure)\n- Multiple unnottarized separation agreements\n- No marriage record found in Marblehead, MA\n- Marblehead = birthplace of Marine Corps (recurring theme)"
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "The Swedish 'Morfar' Mystery",
+      "position": { "x": 0, "y": 680 },
+      "width": 500,
+      "height": 480,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Grandfather Problem\n\n### Swedish Language Rules\n\n**Morfar** = Mother's Father (literally \"mor\" + \"far\")\n**Farfar** = Father's Father (literally \"far\" + \"far\")\n\nThese are NOT interchangeable. Words are literal.\n\n### What Erica Does\n\nRepeatedly refers to Carl Kenneth France (her grandfather) as \"morfar\" in social media posts:\n- 2016 post about losing him\n- Multiple references over the years\n- Also calls grandmother Elaine \"mormor\" (mother's mother)\n\n### The Problem\n\nIf Kent France is her father:\n- Carl Kenneth France = her FARFAR (father's father)\n- Would NEVER be called \"morfar\"\n- No Swedish grandfather would allow this error\n- \"Would be like allowing grandchild to call you uncle\"\n\n### Why It Matters\n\n- Erica is obsessed with Swedish heritage\n- Began dual citizenship process in 2019\n- Posts extensively about Swedish roots\n- Claims raised by single mother (Lebanese side)\n- Yet deeply identifies with Swedish grandfather's side\n\n**Swedish viewers report:** This language error is fundamental and impossible for native speaker to make or allow."
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "The Rothstein Connection",
+      "position": { "x": 580, "y": 840 },
+      "width": 460,
+      "height": 520,
+      "color": "#0288d1",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Zion's Gate & The Rothsteins\n\n### The Instagram Post (March 2019)\n\nErica in Jerusalem at Zion's Gate, posts:\n- \"My family's dedication sign for restoring Zion Gate\"\n- Photo with Romanian Jewish woman named Darla\n\n### The Problem\n\nZion's Gate restoration = **Jack Solomon's dedication**\n\nNot France family. Not Erica's family by any known relation.\n\n### Nicole Rothstein Claims\n\n**Public statements after Charlie's death:**\n- Called Erica her \"best friend and cousin\"\n- Said \"half of their family is Jewish\"\n- Nicole = daughter of Alan Rothstein\n\n### The Absurd Family Tree (If Erica Telling Truth)\n\nNicole Rothstein would be:\n\"Father's sister's husband's previous wife's daughter's daughter\"\n\n**Zero blood relation.**\n\nYet Erica:\n- Calls Alan Rothstein \"uncle\"\n- Extremely close to Rothstein family\n- Claims their dedication as her family's\n\n### How It Makes Sense\n\n**If Carl Kenneth France = morfar (mother's father):**\n- Kent's sister Carla married Jack Solomon in 2002\n- Jack Solomon financed Zion's Gate restoration\n- If Carla is actually Erica's mother, Nicole = actual blood cousin\n- Family tree aligns perfectly"
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "Jack Solomon: Slot Machines & Power",
+      "position": { "x": 580, "y": 1420 },
+      "width": 460,
+      "height": 480,
+      "color": "#558b2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Jack Solomon Profile\n\n**Connection:** Married to Kent's sister Carla in 2002\n\n### Background\n\n- Lives in Utah with Carla\n- Graduated from Utah Valley University (formerly UVSC)\n- Created Center for Jewish Studies at UVU\n- Former BYU professor (Political Science)\n- Former director of BYU's Jerusalem Center\n- Financed Zion's Gate restoration in Jerusalem\n\n### Business: Gambling Empire\n\n**1968:** Co-founded Advanced Patent Technology with Norman Vance\n- Manufactured slot machines\n\n**1974:** Raised $5M+ to purchase United Coin\n- Slot machine manufacturer\n- Profitable Southern Nevada slot routes\n\n**1979:** Announced Colorado Bell Hotel and Casino plans\n- First of planned Vegas-area hotel series\n\n### Questions Raised\n\n- Why didn't Carla go to hospital when Charlie shot?\n- Family has power at UVU (where shooting happened)\n- Still lives in Utah (shooting in their backyard)\n- Why Stacy Sheridan on Air Force 2 instead of \"Auntie Carla\"?\n\n### Pattern Note\n\n**Recurring theme:** Gambling, casinos, slot machines throughout both sides of family tree."
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "Gambling Families: Both Sides",
+      "position": { "x": 0, "y": 1220 },
+      "width": 500,
+      "height": 460,
+      "color": "#ad1457",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Gambling Connection\n\n### Maternal Side: Abbis Family (Syrian)\n\n**Great-grandmother Loretta Abbis**\n- Came from Syria\n- Constantly arrested for running illegal slot machines\n- 1941: Testified to running numbers lottery\n- 1944: Pleaded guilty to lottery charge, search found number slips\n- Sentenced: $200 or 5 months county jail\n\n**Great-grandfather Mason Abbis**\n- \"Magnificently fraudulent\"\n- 1935: High-speed chase, threw 100 lottery tickets from car\n- Arrested for conducting lottery\n- $1,000 bond + $10 fine for refusing to stop\n\n### Paternal Side: France Family (Swedish)\n\n**Grandfather Carl Kenneth France**\n- Horse racing participant\n- Executive at American Bank Note Company\n- **Printed Illinois state lottery tickets**\n- 1974 newspaper: Examining first lottery ticket press run\n\n**Extended Family: Jack Solomon**\n- Slot machine manufacturer\n- Casino owner\n- Las Vegas hotel developer\n\n### Investigative Note\n\n\"Sear into your mind: gambling, casinos, slot machines - it keeps coming up on both sides.\""
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Tesseract School: Looking Glass",
+      "position": { "x": 1120, "y": 260 },
+      "width": 500,
+      "height": 600,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The School That Time Traveled\n\n### Tesseract Schools Background\n\n**Founded by:**\n- John T. Goalie (ex-Monsanto Roundup exec)\n- Walton Family\n- Bush Family (Jeb Bush)\n\nAnnounced on Good Morning America as charter school project.\n\n**Named after:** Children's book \"A Wrinkle in Time\"\n- Story about time travel using a tesseract\n- Flying through space and time\n- Battle between good and evil\n\n### The Specific School Erica Attended\n\n**Paradise Valley Tesseract**\n- Small elite school\n- Rented building from Jewish school\n- School name: **\"Gan Yaladim's Looking Glass School\"**\n- Tesseract put inside a \"Looking Glass\"\n- Heavily Jewish administration and teachers\n- Shut down in 2000\n\n### Erica's Attendance (Confirmed)\n\n- 1995-1996: First Grade\n- 1996-1997: Second Grade  \n- 1997-1998: Third Grade\n\nYearbooks obtained show attendance.\n\n### Why This Matters\n\n**Candace's earlier mention of \"Project Looking Glass\":**\n- CIA program allegedly using stolen tech to peer into future\n- Caused massive freakout from Erica's supporters\n- Now discovered Erica attended school literally named \"Looking Glass\"\n- \"They probably thought I already knew about this school\"\n\n### School Investigation Unlocked\n\nFinding this school opened access to:\n- Classmates for interviews\n- Yearbook connections\n- Timeline verification\n- \"Interesting players\" involved in school\n- Fraud connections (some went down for fraud)"
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "PR Campaign & Threats",
+      "position": { "x": 1120, "y": -220 },
+      "width": 500,
+      "height": 420,
+      "color": "#d32f2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Aggressive Response to Investigation\n\n### After 2-Minute Trailer Release\n\n**Personal targeting:**\n- Photos of manager's infant daughter posted\n- Makeup artist targeted\n- Family members targeted\n- Voicemails to producer\n\n**Public campaign:**\n- \"Sheer evil\" for investigating\n- Signed letter from Secretary of Treasury defending Turning Point\n- \"Flurry of homosexual men making dramatic videos\"\n- \"Pray for Erica, pray for her children\"\n- Media: \"She's a grieving widow\" (repeated constantly)\n\n### Message to Public\n\n\"You have no right to know or ask anything about her because her husband was murdered.\"\n\n### Candace's Response\n\n**Comparison made:**\n- Hillary Clinton: investigated, books written\n- Michelle Obama: investigated, exposés done  \n- Meghan Markle: investigated, analyzed\n- All public figures, all fair game\n\n**Current status:**\n- Erica at helm of $250M+ charity (no taxes)\n- Deal with \"Pierre\" for future billions\n- Public entitled to know who's running it\n- \"Truth doesn't require multi-million dollar PR campaign\"\n\n### Series Expansion\n\nOriginally planned: 3 episodes\nNow considering: Season 2 and Season 3\n\n\"If you haven't figured me out yet: I don't like it when innocent people are targeted, attacked, and on rare occasions shot in the neck in broad daylight.\""
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "Investigation Method & Questions",
+      "position": { "x": 1120, "y": 920 },
+      "width": 500,
+      "height": 440,
+      "color": "#5e35b1",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Investigation Process\n\n### Sources Consulted\n\n- Public records (birth, divorce, court documents)\n- High school yearbooks\n- Ex-boyfriends (interviewed)\n- Old classmates (interviewed)\n- Social media history\n- Newspaper archives\n- Swedish language experts\n\n### Questions Submitted to Erica\n\n**Initial:** 10 questions\n**Reduced to:** 4 questions\n\n**Examples:**\n1. Why pursue Swedish citizenship if raised by single Lebanese mother?\n2. Is marriage to Larry Ginta real or just using his name?\n3. Basic timeline clarifications\n4. Past statement reconciliation\n\n**Erica's excuse for not answering:**\n\"Attending Trump's State of the Union\"\n\n### Investigative Philosophy\n\n**Candace's concern:**\n\"What alarms me isn't that she lies - it's that I don't know if she's aware she's lying. Like the version she's telling today was just downloaded into her mind. Faulty memory or something.\"\n\n**Pattern observed:**\n- Minor tweaks over time\n- Date wrong here, age miscalculation there\n- Small adjustments that aren't immediately noticeable\n- Ultimately amounts to big lie\n- Strategy documented in Xavier Poussard's book on Breitbart\n\n### Goal\n\n\"Get a sense of who Erica was\" through verifiable facts, not speculation."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-005",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-007",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-008",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-010",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-011",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-012",
+      "source": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "root",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "sequence"
+    }
+  ],
+  "timestamp": "2026-02-27T19:00:00.000Z",
+  "nodeCount": 12,
+  "edgeCount": 12
+}

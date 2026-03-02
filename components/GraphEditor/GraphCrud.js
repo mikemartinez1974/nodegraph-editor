@@ -455,6 +455,9 @@ const buildEdgePayload = (edgeInput, { nodeMap, existingEdgeIds, generateId, def
 };
 
 const applyNodeUpdates = (node, updates = {}) => {
+  const dataMode = updates.__twiliteDataMode || 'merge-shallow';
+  const replaceData = updates.replaceData === true;
+  const { __twiliteDataMode, replaceData: _replaceData, ...cleanUpdates } = updates;
   const nextInputs = updates.inputs
     ? updates.inputs.map(handle => ({ ...handle }))
     : node.inputs;
@@ -479,11 +482,19 @@ const applyNodeUpdates = (node, updates = {}) => {
 
   return {
     ...node,
-    ...updates,
+    ...cleanUpdates,
     inputs: nextInputs,
     outputs: nextOutputs,
     ports: nextHandles,
-    data: updates.data ? { ...node.data, ...updates.data } : node.data,
+    data: updates.data
+      ? (
+        replaceData || dataMode === 'replace'
+          ? cloneValue(updates.data)
+          : dataMode === 'merge-deep'
+            ? mergeExtensionValues(node.data || {}, updates.data || {})
+            : { ...(node.data || {}), ...(updates.data || {}) }
+      )
+      : node.data,
     position: updates.position ? { ...node.position, ...updates.position } : node.position,
     state: updates.state ? { ...node.state, ...updates.state } : node.state,
     style: updates.style ? { ...node.style, ...updates.style } : node.style,
@@ -492,6 +503,74 @@ const applyNodeUpdates = (node, updates = {}) => {
         ? node.extensions
         : mergeExtensions(node.extensions, updates.extensions)
   };
+};
+
+const BUILTIN_NODE_TYPES = new Set([
+  'manifest',
+  'legend',
+  'dictionary',
+  'markdown',
+  'script',
+  'port',
+  'view',
+  'api',
+  'graph-reference',
+  'default'
+]);
+
+const toNodeClassKey = (entry) => String(entry?.key || entry?.nodeType || entry?.type || '').trim();
+
+const resolveNodeClassEntry = (nodes = [], nodeType = '') => {
+  const type = String(nodeType || '').trim();
+  if (!type || BUILTIN_NODE_TYPES.has(type)) return null;
+  const dictionaries = Array.isArray(nodes) ? nodes.filter((node) => node?.type === 'dictionary') : [];
+  for (const dict of dictionaries) {
+    const nodeDefs = Array.isArray(dict?.data?.nodeDefs) ? dict.data.nodeDefs : [];
+    const match = nodeDefs.find((entry) => toNodeClassKey(entry) === type);
+    if (match) return match;
+  }
+  return null;
+};
+
+const resolveNodeClassPolicy = (entry) => {
+  const overrides = entry?.overrides && typeof entry.overrides === 'object' ? entry.overrides : {};
+  return {
+    allowLabel: overrides.allowLabel !== false,
+    allowSize: overrides.allowSize !== false,
+    allowColor: overrides.allowColor !== false,
+    allowPorts: overrides.allowPorts !== false,
+    allowData: overrides.allowData !== false,
+    dataMode: ['replace', 'merge-shallow', 'merge-deep'].includes(String(overrides.dataMode || ''))
+      ? overrides.dataMode
+      : 'merge-deep'
+  };
+};
+
+const resolveNodeClassDefaults = (entry) => {
+  const defaults = entry?.defaults && typeof entry.defaults === 'object' ? entry.defaults : {};
+  const dataDefaults = defaults?.data && typeof defaults.data === 'object' ? defaults.data : {};
+  return {
+    label: typeof defaults.label === 'string' ? defaults.label : '',
+    size: defaults?.size && typeof defaults.size === 'object' ? defaults.size : {},
+    color: defaults?.color,
+    visible: typeof defaults?.visible === 'boolean' ? defaults.visible : undefined,
+    showLabel: typeof defaults?.showLabel === 'boolean' ? defaults.showLabel : undefined,
+    ports: Array.isArray(defaults?.ports) ? defaults.ports : [],
+    data: dataDefaults
+  };
+};
+
+const mergeNodeClassDataForCreate = (inputData, defaultsData, policy, hadDataInput) => {
+  if (!policy.allowData) return cloneValue(defaultsData || {});
+  const incoming = inputData && typeof inputData === 'object' ? inputData : {};
+  const base = defaultsData && typeof defaultsData === 'object' ? defaultsData : {};
+  if (policy.dataMode === 'replace') {
+    return cloneValue(hadDataInput ? incoming : base);
+  }
+  if (policy.dataMode === 'merge-shallow') {
+    return { ...cloneValue(base), ...cloneValue(incoming) };
+  }
+  return mergeExtensionValues(base, incoming);
 };
 
 const updatesSetNodeAsRoot = (updates = {}) => {
@@ -580,6 +659,7 @@ export default class GraphCRUD {
     data = {},
     width,
     height,
+    color,
     inputs,
     outputs,
     handles,
@@ -606,24 +686,53 @@ export default class GraphCRUD {
       const sanitizedStyle = style ? cloneValue(style) : undefined;
       const sanitizedExtensions = cloneExtensions(extensions);
       const sanitizedData = sanitizeNodeData(data);
+      const nodeClassEntry = resolveNodeClassEntry(currentNodes, type);
+      const policy = resolveNodeClassPolicy(nodeClassEntry);
+      const defaults = resolveNodeClassDefaults(nodeClassEntry);
+      const defaultHandles = defaults.ports.length
+        ? normalizeHandleDefinitions({ ports: defaults.ports })
+        : null;
+      const usingDefaultPorts = defaults.ports.length > 0 && (!policy.allowPorts || !(Array.isArray(ports) || Array.isArray(handles) || Array.isArray(inputs) || Array.isArray(outputs)));
+      const resolvedHandles = usingDefaultPorts && defaultHandles
+        ? defaultHandles
+        : normalizedHandles;
+      const hadDataInput = data && typeof data === 'object';
+      const resolvedData = mergeNodeClassDataForCreate(sanitizedData, defaults.data, policy, hadDataInput);
+      const fallbackWidth = defaults.size?.width !== undefined ? defaults.size.width : 80;
+      const fallbackHeight = defaults.size?.height !== undefined ? defaults.size.height : 48;
+      const resolvedWidth = !policy.allowSize && defaults.size?.width !== undefined
+        ? defaults.size.width
+        : (width !== undefined ? width : fallbackWidth);
+      const resolvedHeight = !policy.allowSize && defaults.size?.height !== undefined
+        ? defaults.size.height
+        : (height !== undefined ? height : fallbackHeight);
+      const resolvedLabel = !policy.allowLabel && defaults.label
+        ? defaults.label
+        : (hasContent(label) ? label : (defaults.label || label));
+      const resolvedColor = !policy.allowColor
+        ? defaults.color
+        : (color !== undefined ? color : defaults.color);
+      const resolvedVisible = defaults.visible !== undefined ? defaults.visible : visible;
+      const resolvedShowLabel = defaults.showLabel !== undefined ? defaults.showLabel : true;
       const newNode = {
         id: nodeId,
         type,
-        label,
+        label: resolvedLabel,
         position,
-        width: width !== undefined ? width : 80,
-        height: height !== undefined ? height : 48,
-        data: sanitizedData,
-        inputs: normalizedHandles.inputs,
-        outputs: normalizedHandles.outputs,
-        ports: normalizedHandles.ports,
-        visible,
+        width: resolvedWidth,
+        height: resolvedHeight,
+        color: resolvedColor,
+        data: resolvedData,
+        inputs: resolvedHandles.inputs,
+        outputs: resolvedHandles.outputs,
+        ports: resolvedHandles.ports,
+        visible: resolvedVisible,
         state: sanitizedState,
         style: sanitizedStyle,
         extensions: sanitizedExtensions,
         resizable: true,
         portPosition: 'center',
-        showLabel: true
+        showLabel: resolvedShowLabel
       };
       const newNodeSetsRoot = newNode?.isRoot === true || newNode?.data?.isRoot === true || newNode?.data?.root === true;
       const baseNodes = newNodeSetsRoot ? currentNodes.map(clearRootFlags) : currentNodes;
@@ -672,11 +781,45 @@ export default class GraphCRUD {
       if (nodeIndex === -1) {
         return { success: false, error: `Node ${id} not found` };
       }
+      const currentNode = currentNodes[nodeIndex];
+      try {
+        eventBus.emit('nodeBeforeUpdate', {
+          id,
+          node: cloneValue(currentNode),
+          patch: cloneValue(updates || {})
+        });
+      } catch (err) {
+        // ignore lifecycle emit failures
+      }
+      const nodeClassEntry = resolveNodeClassEntry(currentNodes, currentNode?.type);
+      const policy = resolveNodeClassPolicy(nodeClassEntry);
+      const filteredUpdates = { ...(updates || {}) };
+      if (!policy.allowLabel) {
+        delete filteredUpdates.label;
+      }
+      if (!policy.allowSize) {
+        delete filteredUpdates.width;
+        delete filteredUpdates.height;
+      }
+      if (!policy.allowColor) {
+        delete filteredUpdates.color;
+      }
+      if (!policy.allowPorts) {
+        delete filteredUpdates.ports;
+        delete filteredUpdates.inputs;
+        delete filteredUpdates.outputs;
+        delete filteredUpdates.handles;
+      }
+      if (!policy.allowData) {
+        delete filteredUpdates.data;
+      } else if (filteredUpdates.data && typeof filteredUpdates.data === 'object') {
+        filteredUpdates.__twiliteDataMode = policy.dataMode;
+      }
 
-      const enforceSingleRoot = updatesSetNodeAsRoot(updates);
+      const enforceSingleRoot = updatesSetNodeAsRoot(filteredUpdates);
       const updatedNodes = currentNodes.map(node => {
         if (node.id === id) {
-          return applyNodeUpdates(node, updates);
+          return applyNodeUpdates(node, filteredUpdates);
         }
         if (enforceSingleRoot) {
           return clearRootFlags(node);
@@ -719,7 +862,46 @@ export default class GraphCRUD {
       }
 
       const updatedItems = [];
-      const enforceSingleRoot = updatesSetNodeAsRoot(updates);
+      const updatesById = new Map();
+      ids.forEach((targetId) => {
+        const node = currentNodes.find((candidate) => candidate.id === targetId);
+        if (!node) return;
+        try {
+          eventBus.emit('nodeBeforeUpdate', {
+            id: targetId,
+            node: cloneValue(node),
+            patch: cloneValue(updates || {})
+          });
+        } catch (err) {
+          // ignore lifecycle emit failures
+        }
+        const nodeClassEntry = resolveNodeClassEntry(currentNodes, node?.type);
+        const policy = resolveNodeClassPolicy(nodeClassEntry);
+        const filtered = { ...(updates || {}) };
+        if (!policy.allowLabel) {
+          delete filtered.label;
+        }
+        if (!policy.allowSize) {
+          delete filtered.width;
+          delete filtered.height;
+        }
+        if (!policy.allowColor) {
+          delete filtered.color;
+        }
+        if (!policy.allowPorts) {
+          delete filtered.ports;
+          delete filtered.inputs;
+          delete filtered.outputs;
+          delete filtered.handles;
+        }
+        if (!policy.allowData) {
+          delete filtered.data;
+        } else if (filtered.data && typeof filtered.data === 'object') {
+          filtered.__twiliteDataMode = policy.dataMode;
+        }
+        updatesById.set(targetId, filtered);
+      });
+      const enforceSingleRoot = ids.some((targetId) => updatesSetNodeAsRoot(updatesById.get(targetId)));
       const targetRootId = enforceSingleRoot ? ids[0] : null;
       const updatedNodes = currentNodes.map(node => {
         if (!idSet.has(node.id)) {
@@ -728,7 +910,7 @@ export default class GraphCRUD {
           }
           return node;
         }
-        const nextNode = applyNodeUpdates(node, updates);
+        const nextNode = applyNodeUpdates(node, updatesById.get(node.id) || updates);
         updatedItems.push(nextNode);
         return nextNode;
       });
@@ -765,6 +947,15 @@ export default class GraphCRUD {
       const nodeExists = currentNodes.some(n => n.id === id);
       if (!nodeExists) {
         return { success: false, error: `Node ${id} not found` };
+      }
+      const nodeBeforeDelete = currentNodes.find((n) => n.id === id) || null;
+      try {
+        eventBus.emit('nodeBeforeDelete', {
+          id,
+          node: cloneValue(nodeBeforeDelete)
+        });
+      } catch (err) {
+        // ignore lifecycle emit failures
       }
 
       const updatedNodes = currentNodes.filter(n => n.id !== id);
@@ -1022,6 +1213,19 @@ export default class GraphCRUD {
             outputs: opts.outputs
           });
           const sanitizedData = sanitizeNodeData(opts.data);
+          const nodeType = opts.type || 'default';
+          const nodeClassEntry = resolveNodeClassEntry(currentNodes, nodeType);
+          const policy = resolveNodeClassPolicy(nodeClassEntry);
+          const defaults = resolveNodeClassDefaults(nodeClassEntry);
+          const defaultHandles = defaults.ports.length
+            ? normalizeHandleDefinitions({ ports: defaults.ports })
+            : null;
+          const usingDefaultPorts = defaults.ports.length > 0 && (!policy.allowPorts || !(Array.isArray(opts.ports) || Array.isArray(opts.inputs) || Array.isArray(opts.outputs)));
+          const resolvedHandles = usingDefaultPorts && defaultHandles
+            ? defaultHandles
+            : normalizedHandles;
+          const hadDataInput = opts.data && typeof opts.data === 'object';
+          const resolvedData = mergeNodeClassDataForCreate(sanitizedData, defaults.data, policy, hadDataInput);
           const hasExplicitPosition = opts && Object.prototype.hasOwnProperty.call(opts, 'position');
           const fallbackPosition = hasExplicitPosition
             ? opts.position
@@ -1030,26 +1234,46 @@ export default class GraphCRUD {
                 y: 100 + Math.floor(autoPlacedIndex / 4) * 160
               };
           if (!hasExplicitPosition) autoPlacedIndex += 1;
+          const defaultWidth = defaults.size?.width !== undefined ? defaults.size.width : 160;
+          const defaultHeight = defaults.size?.height !== undefined ? defaults.size.height : 80;
+          const resolvedWidth = !policy.allowSize && defaults.size?.width !== undefined
+            ? defaults.size.width
+            : (opts.width !== undefined ? opts.width : defaultWidth);
+          const resolvedHeight = !policy.allowSize && defaults.size?.height !== undefined
+            ? defaults.size.height
+            : (opts.height !== undefined ? opts.height : defaultHeight);
+          const resolvedLabel = !policy.allowLabel && defaults.label
+            ? defaults.label
+            : (hasContent(opts.label) ? opts.label : (defaults.label || opts.label || ''));
+          const resolvedColor = !policy.allowColor
+            ? defaults.color
+            : (opts.color !== undefined ? opts.color : defaults.color);
+          const resolvedVisible = defaults.visible !== undefined
+            ? defaults.visible
+            : (opts.visible !== undefined ? opts.visible : true);
+          const resolvedShowLabel = defaults.showLabel !== undefined
+            ? defaults.showLabel
+            : (opts.showLabel !== undefined ? opts.showLabel : true);
 
           const newNode = {
             id: nodeId,
-            type: opts.type || 'default',
-            label: opts.label || '',
+            type: nodeType,
+            label: resolvedLabel,
             position: fallbackPosition || { x: 100, y: 100 },
-            width: opts.width !== undefined ? opts.width : 160,
-            height: opts.height !== undefined ? opts.height : 80,
-            color: opts.color,
-            visible: opts.visible !== undefined ? opts.visible : true,
-            data: sanitizedData,
-            inputs: normalizedHandles.inputs,
-            outputs: normalizedHandles.outputs,
-            ports: normalizedHandles.ports,
+            width: resolvedWidth,
+            height: resolvedHeight,
+            color: resolvedColor,
+            visible: resolvedVisible,
+            data: resolvedData,
+            inputs: resolvedHandles.inputs,
+            outputs: resolvedHandles.outputs,
+            ports: resolvedHandles.ports,
             state: opts.state ? cloneValue(opts.state) : undefined,
             style: opts.style ? cloneValue(opts.style) : undefined,
             extensions: cloneExtensions(opts.extensions),
             resizable: opts.resizable !== undefined ? opts.resizable : true,
             portPosition: opts.portPosition || 'center',
-            showLabel: opts.showLabel !== undefined ? opts.showLabel : true
+            showLabel: resolvedShowLabel
           };
 
           createdNodes.push(newNode);

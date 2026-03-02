@@ -1,0 +1,463 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "bride-of-charlie-episode-2",
+          "name": "Bride of Charlie - Episode 2 Summary",
+          "version": "1.0.0",
+          "description": "Summary of Episode 2: Occult connections, Dr. Jerry France, Tesseract School, and elite psychology operations",
+          "createdAt": "2026-02-27T19:30:00.000Z",
+          "updatedAt": "2026-02-27T19:30:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Episode 2 Overview",
+      "position": { "x": 0, "y": -220 },
+      "width": 500,
+      "height": 340,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Bride of Charlie - Episode 2\n## Background: Elite Occult Practices & Psychology Operations\n\n### Central Themes\n\n**Occult Elite Establishment**\n- Operation Paperclip rescued occultists, not scientists\n- Same families maintain power through generations\n- Psychology used as social engineering tool\n- MK Ultra never stopped\n\n**Key Figure Introduced**\n- Dr. Jerry France (Kent's first wife)\n- Connected to Mormon elite, military, DuPont\n- Helped design Tesseract School methods\n- Ties to controversial psychologists\n\n**Military Connections Established**\n- Good Samaritan Hospital (Marines)\n- Marblehead, MA (Marine Corps birthplace)\n- Carl Kenneth France (Army Corps of Engineers)\n- Social engineering operations"
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Aleister Crowley & Elite Occultism",
+      "position": { "x": 580, "y": -220 },
+      "width": 480,
+      "height": 520,
+      "color": "#d32f2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Aleister Crowley: The World's Wickedest Man\n\n### \"The elites practice occult sex magic. You just got to accept that.\"\n\n**Background**\n- Termed \"world's wickedest man\"\n- Hosted satanic sex parties worldwide\n- Created religion: Thelema / Black magic\n- Attempted to summon demons repeatedly\n\n### The 1923 Sicily Incident\n\n**Raul Loveday - The Magical Heir**\n- 23-year-old Oxford student\n- Crowley saw \"IT factor,\" groomed as heir\n- Taken to Sicily for spell work\n- **Working on invisibility charm**\n\n**What Happened**\n- Both got sick during ceremony\n- Crowley survived\n- Nurse said Raul \"became fainter and fainter until he completely disappeared\"\n- Crowley buried him in \"empty coffin\"\n- 1929: Changed story to \"inflammation of intestines\"\n\n**Aftermath**\n- Mussolini kicked Crowley out of Italy for being Satanist\n- Didn't matter - friends with elites worldwide\n\n### Bush Family Connection\n\n**Pauline Robinson**\n- Friend of Aleister Crowley\n- 8.5 months after spending time with Crowley...\n- Gives birth to **Barbara Bush**\n- Mother of George Bush\n- **Rumored to be Crowley's biological daughter**\n\n### Why This Matters\n\n\"Important as we connect dots throughout this series that you fully digest Operation Paperclip was not about rescuing brilliant Jewish scientists - it was about rescuing wealthy occult perverts.\""
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "Jack Parsons & The Genius Myth",
+      "position": { "x": 1140, "y": -220 },
+      "width": 460,
+      "height": 520,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Jack Parsons: NASA's Occult Founder\n\n### The Official Story\n\n**\"Genius\" Narrative**\n- Unbelievably wealthy kid\n- Created Jet Propulsion Laboratory\n- Precursor to NASA's Apollo program\n- Presented as scientific genius\n\n### The Reality\n\n**Aleister Crowley's Protégé**\n- Literally trying to summon demons\n- Throwing elite sex parties\n- \"Creating a moonchild\" ceremonies\n- Sex, drugs, occult rituals\n\n## The Pattern of Fake Geniuses\n\n### Bill Gates\n- \"Of course he's in the Epstein files\"\n- \"Look at his face. You really think this guy is just such a genius?\"\n- Computers → Pharmaceuticals → \"Poisoning African kids\"\n\n### Elon Musk\n- \"Seems like a nice guy\"\n- \"Do I believe he's running 17 companies while having 49 baby mamas? No.\"\n\n### The System\n\n**How It Works:**\n1. Offensively wealthy kid\n2. Butler does homework\n3. Declared \"tech genius\"\n4. Media amplifies the myth\n5. Same families stay in power\n\n**The Choice:**\n- Play ball with elites (hand over control)\n- OR\n- Say no → wind up dead\n\n\"Poor and middle class people know - we can never go on to become geniuses. It doesn't work like that.\""
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Why Public Execution?",
+      "position": { "x": 0, "y": 180 },
+      "width": 500,
+      "height": 440,
+      "color": "#ad1457",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Psychological Operation: Charlie's Assassination\n\n### The Question\n\n\"Why did the military choose to have us all watch Charlie's execution?\"\n\n**Could Have Been:**\n- Poisoned drink\n- Standard brake tampering\n- Car accident\n- Any other method\n\n**But no - they wanted us to watch it.**\n\n### The Purpose\n\n**Emotional Manipulation**\n1. Make everyone watch the execution\n2. Trigger emotional reaction\n3. Harness emotions to support Erica\n4. \"She's the grieving widow\" (repeated constantly)\n\n**The Spell**\n- \"She's a grieving widow\"\n- \"This year's 'trust the science'\"\n- \"Let your granddad die alone in the hospital\"\n- Same messaging, new year\n\n### What's Wrong With The Picture\n\n**Erica's Behavior**\n- No concern for investigation\n- Never emotional about Charlie when speaking\n- \"Yeah, I just like to work\"\n- First trace of emotion: about her mother (who's alive)\n- Charlie's dead, but no emotion\n\n**Everyone recognized something was off.**\n\n### The Defense Strategy\n\n**Aggressive PR:**\n- Multi-million dollar campaign\n- Secretary of Treasury letter\n- \"Sheer evil\" to investigate\n- \"Pray for Erica, pray for children\"\n- Media blackout on questions\n\n**The Message:**\n\"You have no right to know or ask anything about her because her husband was murdered.\""
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "Dr. Jerry France: Kent's First Wife",
+      "position": { "x": 580, "y": 360 },
+      "width": 480,
+      "height": 600,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Dr. Jerry France Profile\n\n**Born:** Jerry Pittz, 1943  \n**Died:** 2024 (Arizona)  \n**Connection:** Kent France's FIRST wife (before Lorie)\n\n### Early Life - Child Rape Victim\n\n**At Age 14:**\n- Ran away from strict Mormon family (Indianapolis)\n- Got pregnant\n- Married Carl Pangerl (5-6 years older)\n- Forged birth certificate with Clarisol\n- \"I loved my boyfriend. We saw an opportunity.\"\n- Six months later, asked to come home\n- **Parents welcomed them back**\n\n**Red Flags:**\n- Normalizes child rape as \"love story\"\n- Husband becomes Mormon bishop later\n- Mother at 14, divorced before 18\n- Yet somehow gets \"good job\" in accounting\n\n### Career Path - Suspicious Connections\n\n**1965:** Marries Kenneth Himsil\n- Captain in Indiana National Guard\n- Later becomes Major General\n- **Now has military connections**\n\n**Same Year:** Bachelor's degree in psychology\n- Specializes in child psychology\n- \"I don't love anybody that was a psychologist in the '70s\"\n\n**1970:** Age 27, becomes social worker in Indiana\n- **Indiana = major MK Ultra hub**\n- Universities involved in experimentation\n- Indiana manufactured LSD for government experiments\n- \"You can thank Indiana for the hippies movement\""
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "Dr. Jerry France: Quaker Oats Era",
+      "position": { "x": 580, "y": 1020 },
+      "width": 480,
+      "height": 460,
+      "color": "#558b2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Quaker Oats: 1971-1974\n\n### Official Story\n\n**Position:** Psychologist for marketing\n- \"Help us sell these oats\"\n- Three years in Chicago\n- Marketing psychology\n\n### The Dark Reality\n\n**\"A Spoonful of Sugar Helps the Radioactive Oatmeal Go Down\"**\n\nQuaker Oats partnered with Atomic Energy Commission:\n- Went into mental institutions\n- **Force-fed radioactive oats to little boys**\n- Conducted experiments on unsuspecting children\n\n### Questions Raised\n\n**Unanswerable:**\n- How long did experiments go on?\n- Did Jerry France play a part?\n- Was this related to MK Ultra?\n\n**Why Unanswerable:**\n\"In 1975 the military orders the destruction of all files related to MK Ultra.\"\n\nWhat we have today is \"just a skeleton of just how far-reaching that CIA program was.\"\n\n### Jerry Meets Kent France\n\nWhile working at Quaker Oats:\n- Marries Kent France\n- Few years older than him\n- Continue climbing ranks\n- Gets master's degree, doctorate\n- Now \"Dr. France\"\n- Move to Paradise Valley, Arizona\n- **Then divorce**\n\n\"Supposed to believe that. They're divorced. Never going to see each other again.\""
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "Dr. Jerry France: DuPont Era",
+      "position": { "x": 580, "y": 1540 },
+      "width": 480,
+      "height": 500,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Working for the Most Powerful Families\n\n### DuPont Director of Employee Relations\n\n**Role:** Organizational psychology\n- \"Finding the psychopaths that should head up corporations run by elite bloodlines\"\n- Working for French family (DuPont)\n- \"I could never do a series where you're not there, France\"\n\n**DuPont Background:**\n- Mass poisoning people\n- Innumerable lawsuits\n- Giving people cancer\n- \"Jerry's apparently a good fit\"\n\n### The Biggest Merger in History\n\n**1983:** DuPont + Conoco Oil\n- Largest corporate merger in history\n- Thanks to Reagan and George Bush\n- Deregulation made it possible\n- Headquarters moved to Wilmington, Delaware\n\n### Candace's Realization\n\n**Flashback moment:**\n\"I like to pause and reflect... when I'm looking into the Charlie Egyptian plains and I'm like, 'What's going on in Wilmington, Delaware?' And I instantly hit the DuPont family.\n\nAnd then Erica's out there nervously at AmFest cracking not funny jokes about Egyptian planes. She's like, 'No, nobody Egyptian planes are here.'\n\n**Tell you something, her jokes are going to become less and less funny as we get deeper into this series.**\""
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "Radford University Gender Clinic",
+      "position": { "x": 1140, "y": 1540 },
+      "width": 480,
+      "height": 520,
+      "color": "#7b1fa2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 1983: Gender Research Center\n\n### Awarded Entire Clinic\n\n**Radford University, Virginia**\n- Gender clinic\n- \"She's a feminist\"\n- Research facility\n- **Giving lessons to the military**\n\n**Question:** \"On what gender? What? Why do we need a research facility?\"\n\n### Purpose of Academic Research Centers\n\n**How The System Works:**\n\nCorporations and government need:\n- \"Completely fictitious academic reports\"\n- \"Studies to justify the psychopathic things they're doing worldwide\"\n- \"You got to have the experts\"\n- \"Psychopathic experts that will produce the reports\"\n\n**Example given:**\n\"Like the COVID vaccine. Oh, well, Dr. France maybe says if you don't get the vaccine, it's because you're a psychopath. If you don't line up and get the shot, it's cuz you're crazy and she's an expert.\"\n\n### Dr. Jerry France: Total Fraud\n\n**Evidence:** Report on Native Americans and Appalachian\n\n**Center for Gender Studies report authors:**\n1. Marjorie Wayland = **Her mother**\n2. Richard Caster = **Her nephew** (sister's son)\n3. George Bourne = ?\n4. Susan Friedman = ?\n5. Jerry France\n\n**Reaction:**\n\"She's a whole fraud. That's just effectively Mormon mafia, right? We've done a report. I guess we can go onto the reservation. These women want to be free.\"\n\n**Pattern:** \"Mormons conducting research. Students conducting research.\""
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Dr. John Money Connection",
+      "position": { "x": 1140, "y": 2120 },
+      "width": 480,
+      "height": 480,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Dr. Jerry France's Colleague: Dr. John Money\n\n### \"One of the Greatest Villains in History\"\n\n**Background:**\n- Father of gender ideology\n- Brought to Radford by Dr. Jerry France\n- Friends and colleagues with Jerry\n\n### The David Reimer Case\n\n**What Happened:**\n- Twin boys\n- One had genitalia destroyed in botched circumcision\n- Money convinced parents he could raise boy as girl\n- \"Sexuality was fluid\" - his belief\n- Experiment \"succeeded\" according to Money's reports\n\n**The Truth:**\n- Boy was \"every bit a boy\"\n- When told what was done to him, \"it destroyed him\"\n- Eventually committed suicide\n- Money was celebrated as hero for years\n- Truth only came out when young man told his story\n\n**The Abuse:**\n- Money \"abused those boys horribly\"\n- \"Made them perform sex acts on each other\"\n- All while claiming scientific breakthrough\n\n### The Pattern\n\n**Dr. Jerry France:**\n- Victim of child rape at 14\n- Normalizes it as \"love story\"\n- Goes on to hold power over children\n- Colleagues with notorious child abuser\n- \"Child abuse and psychology go hand in hand\"\n\n**Statement:**\n\"I am telling you all of the psychologists are perverted... these people with power and that are within close proximity to the elites.\""
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "Tesseract School: The Experiment",
+      "position": { "x": 0, "y": 680 },
+      "width": 500,
+      "height": 600,
+      "color": "#d84315",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Tesseract School = Psychological Experiment\n\n### Erica's Attendance\n\n**1993-1999:** Paradise Valley location\n- First grade photo shown\n- Second grade photo (short hair - \"mom chopped it off\")\n- Third grade photo\n- **Note:** Candace suspects stay-at-home dad years\n\n### \"Without question a school being designed by the elites\"\n\n**Backers:**\n- Bush family\n- Walton family  \n- Other elite families\n- Getting government money (charter school model)\n- \"We'll show you a better way to use tax dollars\"\n\n### The Tesseract Way\n\n**Dr. Jerry France's Role:**\n- Kent's ex-wife\n- Entire Mormon family in Arizona\n- Had home with Kent in Paradise Valley\n- **Helped draft psychological models**\n- **Developed \"The Tesseract Way\"**\n- May or may not have met Erica directly\n- \"Shocked if she didn't know about Dr. France\"\n\n**Key Players:**\n\n**John T. Goalie** (CEO)\n- Ex-Monsanto Roundup\n- Appeared on Good Morning America with Jeb Bush\n- Natural alliance with Jerry (both poisoning population)\n\n**Phil Bliss** (Board Member)\n- Stanford University in the '70s (**MK Ultra era**)\n- \"Drug counselor\" during LSD experiments\n- Addiction research at Stanford Hospital\n- Co-founded Mid Peninsula High School (Palo Alto)\n- Made himself principal\n- **School had shooting in 1996**\n- Shooter had been working with Bliss on depression\n- Also on board of French American school"
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "Tesseract School: More Players & Abuse",
+      "position": { "x": 0, "y": 1340 },
+      "width": 500,
+      "height": 560,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## More Tesseract Leadership\n\n### Jill Kesler (Executive Director)\n- Moved to Arizona for husband's job\n- Husband = \"pediatric developmental behavioral pediatrician\"\n- \"Specializes in children and behavior\"\n\n### Susan B. Silverstein (VP of Development)\n- \"I have a very strong indication of who Susan B. Silverstein is\"\n- \"Unless I'm certain, I'm not going to show the face\"\n- Strong suspicion, but withholding for now\n\n### John Walton (Board Member)\n- Son of Walmart founder Sam Walton\n- Major investor\n\n## The School's Collapse\n\n**2000:** Paradise Valley location shuttered\n\n**Accusations:**\n- Financial impropriety\n- Method of tracking student success was \"complete scam\"\n- No control groups in studies\n- \"That would track with anything Dr. Jerry France had her hands in\"\n- \"She's a whole fraud. You can't just have your mommy do an experiment.\"\n\n### The Coverup\n\n\"They have done a very good job of wiping anything and everything about this particular Tesseract in Paradise Valley from history.\"\n\n**Evidence:**\n- Books about the collapse: \"The book is just gone. You cannot find this book anywhere.\"\n\n## Sexual Abuse Allegations\n\n**From family who provided yearbooks:**\n- Child (now adult) at the school\n- Multiple children actually\n- **\"Has always maintained he was sexually abused by very specific people at the top of this school\"**\n- Candace believes the account\n- \"Child abuse and psychology go hand in hand\""
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "Lorie France: The Stage Mother",
+      "position": { "x": 1140, "y": 360 },
+      "width": 480,
+      "height": 560,
+      "color": "#ff6f00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Lorie France: The Woman Behind Erica\n\n### Universal Assessment\n\n\"Everyone that I have spoken to says that Lorie is **exceedingly problematic**.\"\n\n**What People Say:**\n- \"She is the person, has always been the person in Erica's ear\"\n- \"Type A person\"\n- \"Tells her who to go after in each and every room\"\n- \"Knows who those people are\"\n- \"Who Erica should instantly transform into\"\n- \"What she has to say\"\n\n### Ex-Boyfriend Warning\n\n**From beauty pageant world:**\n\"I was warned by another person... that girl will do anything to get to the top and **her mother will do anything to help her get to the top**.\"\n\n### Lorie's Background\n\n**Former model herself**\n- That hunger for fame\n- Pushing Erica to the top\n- \"Wanted Erica to be famous\"\n\n### The Single Mother Lie\n\n**Why Erica Says It:**\n\"People suspect probably Lori is the person in her ear getting her to say that because **it makes Lori look good**.\"\n\n### Untouchable Subject\n\n**The Defense:**\n\"There's always this 'well she's sick now you can't talk about her mother at all'\"\n\n**Candace's Response:**\n\"But to get into the Erica story you have to know who Lorie France is and you have to know who this cast of characters is around her.\"\n\n### Joint Ambition\n\n**Erica's Part:**\n- \"Without question a climber\"\n- \"Desperately wanted to be famous. No one can deny that.\"\n- \"She's never dated a normal guy\"\n- \"Never dated a guy with a nine-to-five job\"\n\n**Pattern:** NFL, MLB, Amazing Race contestants\n\"Her goal was to make it.\""
+      }
+    },
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "type": "markdown",
+      "label": "Erica Lies About Pageants",
+      "position": { "x": 1140, "y": 980 },
+      "width": 480,
+      "height": 500,
+      "color": "#1b5e20",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Pageant Origin Story - FALSE\n\n### Erica's 2020 Interview Claims\n\n**Her Story:**\n\"The pageant world to me... was nothing that I was ever groomed for. It was nothing that was ever on my radar.\n\nI just wanted to play professional basketball. That was my thing ever since I was five. I was a gym rat.\n\nI remember getting something in the mail when I had come home from school one summer and it was like, 'Hey, you should compete at Miss Arizona USA. Someone nominated you.'\n\nAnd I was like, 'I don't know who would nominate me for that, but okay.'\n\nThe pageant world for me was something that was not a form of narcissism. It was more along the terms of being a steward for my state.\"\n\n### The Truth\n\n**\"That's just not right. That's not true.\"**\n\n**Facts:**\n- Erica involved in pageants \"from the very beginning\"\n- Mother definitely pushed it\n- She does love basketball (that part true)\n- \"This idea that she didn't want it is just not true. It's so objectively not true.\"\n\n**Pattern Recognition:**\n\"Erica without question and anybody who's being objective and honest and looking at her history of the people that she dated and the people that she wanted to be in close proximity to can guarantee to you that **this girl wanted to be famous like very badly wanted to be famous** one way or the other.\""
+      }
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "type": "markdown",
+      "label": "Tyler Boyer Connection",
+      "position": { "x": 580, "y": 2100 },
+      "width": 480,
+      "height": 520,
+      "color": "#006064",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Tyler Boyer: The Key Connection\n\n### Most Important Relationship at TPUSA\n\n\"Easily the most important relationship that Erica had at Turning Point USA is Tyler Boyer.\"\n\n**His Role:**\n- Introduced Erica to Charlie\n- Set up that relationship\n- Head of Turning Point Action\n\n### The Unanswered Question\n\n**Candace asked Erica directly:**\n\"How does Erica Kirk know Tyler Boyer?\"\n\n**Response:**\n- She couldn't recall in person\n- Can't get an answer\n- \"Seems to be something she doesn't want to answer\"\n\n### The Missing Money\n\n**Initial Rumor:**\nSomeone very close to Charlie said:\n- Charlie told them he established DOGE because **$10 million was missing**\n- Candace asked Justin Shrife (COO)\n- Response: \"No, no, no, that's not true\"\n\n**Current Confirmation:**\nAfter firing many people, sources confirm:\n- **Millions missing from Turning Point USA**\n- **Specifically from Turning Point Action**\n- **Tyler Boyer heads Turning Point Action**\n- \"I can back that up 100%\"\n\n### Tyler's Connection to Lorie\n\n**The Board Position:**\n- Lorie put on board of data collection company\n- \"Nobody really knows what it does\"\n- Erica's explanation: \"We needed a familiar name\"\n\n**Candace's Reaction:**\n\"I guess there's just not enough billionaires that donate to Turning Point USA for them to have put someone other than Lori, who we are told is very sick.\""
+      }
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "type": "markdown",
+      "label": "Eastern Europe Connections Preview",
+      "position": { "x": 0, "y": 1960 },
+      "width": 500,
+      "height": 400,
+      "color": "#311b92",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Coming Next: Romania\n\n### The Mormon Mission Question\n\n\"Mormons conducting research... this is a background episode, but that's going to become very relevant as we examine **Erica Kirk's ties to Eastern Europe**.\"\n\n### The Players Going to Eastern Europe\n\n**Dr. Jerry France**\n- Gets involved in Eastern Europe\n- Especially Romania\n\n**Tyler Boyer**\n- \"I know about your time in Romania\"\n- \"I've got the receipts now\"\n- Direct address: \"Tyler Boyer, I'm kind of speaking to you, my friend\"\n\n**Erica Kirk**\n- Also Eastern Europe connections\n- Romania specifically\n\n### The Marines Again\n\n\"Everybody's in Eastern Europe with the Marines and doing good things always. They never do anything bad. What are you talking about?\n\nThe Marines gave Good Samaritan Hospital out of their hearts. They just said, 'I heart you Catholics. Here, have this hospital.'\n\nYeah, that's how it goes.\"\n\n### Tomorrow's Episode\n\n**Focus:**\n- Erica's pageant years\n- How she meets Tyler Boyer\n- Connections in Romania\n- \"When she kind of hits the map\"\n\n**Timeline:**\n\"Dr. Jerry France timeline... what Dr. France is doing in Eastern Europe and then Tyler is going to get into Eastern Europe and Erica's going to get into Eastern Europe.\""
+      }
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "type": "markdown",
+      "label": "The Spell Is Breaking",
+      "position": { "x": 1700, "y": 360 },
+      "width": 460,
+      "height": 480,
+      "color": "#1a237e",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"They Try to Cast a Spell Every Time They Lie, But It Doesn't Land Anymore\"\n\n### The Awakening\n\n\"None of us were awake to this years ago. We were all at one another's throats and now we've finally turning around and looking at the elites and going:\n\n**'Who are you? What families are you from? Why are you behaving like this?'**\n\nWe're the psychologists now, right? We're diagnosing them. And they're a bunch of psychopaths.\"\n\n### What No Longer Works\n\n**Their Tactics:**\n- Peer pressure\n- Making people terrified\n- \"You're going to lose everything\"\n- \"We'll crush you\"\n- Money/influence campaigns\n- Screaming theatrics\n\n**Public Response:**\n\"Nobody cares about that anymore.\n\nGoodbye. Okay, just goodbye.\"\n\n### Truth vs. Money\n\n**What They Can Buy:**\n- Influencers\n- Ad spots  \n- Platforms for people who would naturally fail\n- \"Their companies keep growing\" even with no viewers\n- \"That's the elites. That's their money. The factory never ends.\"\n\n**What They Can't Buy:**\n\n\"The one thing they can't purchase is **truth**. They can't.\n\nAnd so be happy. Be happy. That's not a thing.\"\n\n### The Victory\n\n\"In the end, God wins. Okay? God, he's already won.\n\nThat's why they can't defeat truth. They don't know what to do.\n\nThey're spending so much money. They can buy everything... but the one thing they can't purchase is truth.\""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-005",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-006",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-007",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-010",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-011",
+      "source": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-012",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-013",
+      "source": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "sourcePort": "out",
+      "target": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-014",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-015",
+      "source": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "sourcePort": "root",
+      "target": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-016",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "root",
+      "target": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2026-02-27T19:30:00.000Z",
+  "nodeCount": 17,
+  "edgeCount": 16
+}

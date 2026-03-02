@@ -44,6 +44,7 @@ const buildTargetLabel = (target = {}) => {
   const label = target.label || target.name || target.nodeLabel;
   if (label) return label;
   if (target.endpoint) return target.endpoint;
+  if (target.ref) return target.ref;
   if (target.nodeId) return `node:${target.nodeId}`;
   if (target.graphId) return `graph:${target.graphId}`;
   if (target.url) return target.url;
@@ -79,6 +80,8 @@ const PortNode = (props) => {
   );
   const endpointData = endpointResult.ok ? endpointResult.value : null;
   const targetUrl = useMemo(() => {
+    if (typeof target.ref === "string" && target.ref.trim()) return endpointToUrl(target.ref.trim());
+    if (typeof node?.data?.ref === "string" && node.data.ref.trim()) return endpointToUrl(node.data.ref.trim());
     if (typeof target.url === "string" && target.url.trim()) return target.url.trim();
     const endpointRaw = typeof target?.endpoint === "string" ? target.endpoint.trim() : "";
     if (endpointData?.filePath) {
@@ -89,7 +92,7 @@ const PortNode = (props) => {
       return endpointRaw;
     }
     return endpointToUrl(endpointRaw);
-  }, [target.url, target?.endpoint, endpointData?.filePath]);
+  }, [target.ref, target.url, target?.endpoint, node?.data?.ref, endpointData?.filePath]);
 
   const handleNavigate = useCallback(
     (event) => {
@@ -230,7 +233,10 @@ const PortNode = (props) => {
       <div
         style={{
           position: "absolute",
-          inset: 8,
+          left: 8,
+          right: 8,
+          top: 28,
+          bottom: 8,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",

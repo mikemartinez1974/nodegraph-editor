@@ -154,6 +154,15 @@ export default function useGraphInteractions({
     const handleNodeUpdate = ({ id, updates }) => {
       const nodeExists = nodes.find((n) => n.id === id);
       if (!nodeExists) return;
+      try {
+        eventBus.emit('nodeBeforeUpdate', {
+          id,
+          node: nodeExists,
+          patch: updates || {}
+        });
+      } catch (err) {
+        // ignore lifecycle emit failures
+      }
 
       setNodes((prev) =>
         prev.map((node) =>
@@ -169,6 +178,14 @@ export default function useGraphInteractions({
             : node
         )
       );
+      try {
+        eventBus.emit('nodeUpdated', {
+          id,
+          patch: updates || {}
+        });
+      } catch (err) {
+        // ignore lifecycle emit failures
+      }
     };
 
     eventBus.on('nodeUpdate', handleNodeUpdate);

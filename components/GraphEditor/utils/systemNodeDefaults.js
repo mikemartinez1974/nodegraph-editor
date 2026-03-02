@@ -30,7 +30,7 @@ export const createDefaultManifestNode = ({ kind = 'graph' } = {}) => {
         scope: 'mixed'
       },
       dependencies: {
-        nodeTypes: ['manifest', 'legend', 'dictionary', 'default', 'markdown'],
+        nodeTypes: ['manifest', 'dictionary', 'default', 'markdown'],
         portContracts: ['core'],
         skills: [],
         schemaVersions: {

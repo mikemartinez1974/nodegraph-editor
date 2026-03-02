@@ -16,11 +16,12 @@ Twilite is a persistent graph workspace. The graph is state. Mutate it with smal
 
 ## 2) New Graph Minimum (Avoid Validation Noise)
 
-When creating a new graph, include all three system nodes:
+When creating a new graph, include these system nodes:
 
 1. `manifest`
-2. `legend`
-3. `dictionary`
+2. `dictionary`
+
+`legend` is optional. The UI can derive legend behavior from `dictionary.nodeDefs`.
 
 If `manifest.data.dependencies.nodeTypes` includes custom types, dictionary must include matching `nodeDefs` entries for those custom types.
 
@@ -43,9 +44,9 @@ Use this structure to stay compatible with current editor/validator behavior:
 - `data.document`: `url`
 - `data.settings`: defaults (theme/background/layout/github/autoSave)
 
-### Legend
+### Legend (optional explicit override)
 
-Use:
+Use only when you need explicit curated entries:
 
 - `data.entries`: array of `{ key, intent, implementation, dictionaryKey }`
 - optional `data.markdown`
@@ -81,7 +82,7 @@ Rules:
 - Duplicate edge IDs in one payload.
 - Invalid UUIDs (non-hex chars).
 - Custom node type declared in manifest dependencies but missing in dictionary `nodeDefs`.
-- Using non-canonical manifest/legend/dictionary data shapes.
+- Using non-canonical manifest/dictionary (and explicit legend, if present) data shapes.
 - Missing `sourcePort`/`targetPort`.
 
 ---
@@ -113,7 +114,7 @@ Rules:
             },
             "intent": { "kind": "graph", "scope": "foundation" },
             "dependencies": {
-              "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+              "nodeTypes": ["manifest", "dictionary", "markdown"],
               "portContracts": ["core"],
               "skills": [],
               "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
@@ -145,24 +146,6 @@ Rules:
           }
         },
         {
-          "id": "22222222-2222-4222-8222-222222222222",
-          "type": "legend",
-          "label": "Legend",
-          "position": { "x": -520, "y": 90 },
-          "width": 360,
-          "height": 220,
-          "data": {
-            "entries": [
-              {
-                "key": "markdown",
-                "intent": "documentation",
-                "implementation": "markdown node",
-                "dictionaryKey": "markdown"
-              }
-            ]
-          }
-        },
-        {
           "id": "33333333-3333-4333-8333-333333333333",
           "type": "dictionary",
           "label": "Dictionary",
@@ -175,7 +158,7 @@ Rules:
           "id": "44444444-4444-4444-8444-444444444444",
           "type": "markdown",
           "label": "Start Here",
-          "position": { "x": 60, "y": -40 },
+          "position": { "x": 40, "y": -40 },
           "width": 420,
           "height": 240,
           "ports": [
@@ -191,14 +174,6 @@ Rules:
     {
       "action": "createEdges",
       "edges": [
-        {
-          "id": "55555555-5555-4555-8555-555555555555",
-          "source": "11111111-1111-4111-8111-111111111111",
-          "sourcePort": "root",
-          "target": "22222222-2222-4222-8222-222222222222",
-          "targetPort": "root",
-          "type": "relates"
-        },
         {
           "id": "66666666-6666-4666-8666-666666666666",
           "source": "11111111-1111-4111-8111-111111111111",

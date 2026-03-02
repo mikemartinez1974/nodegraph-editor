@@ -6,6 +6,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import TimerIcon from '@mui/icons-material/Timer';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
 const TIMER_INPUTS = [
@@ -288,6 +289,7 @@ export default function TimerNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+      <NodeTypeBadge type={node?.type} />
       {/* Header */}
       <div style={{ 
         display: 'flex', 

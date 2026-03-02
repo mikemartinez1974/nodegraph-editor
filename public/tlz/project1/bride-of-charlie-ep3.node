@@ -1,0 +1,892 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Project",
+    "description": "",
+    "created": "2026-03-01T17:57:00.587Z",
+    "modified": "2026-03-01T17:57:03.101Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "bride-of-charlie-episode-3",
+          "name": "Bride of Charlie - Episode 3 Summary",
+          "version": "1.0.0",
+          "description": "Summary of Episode 3: The Urbenbeck scandal, Lorie's fraud connections, Erica's missing year, and the dating lie",
+          "createdAt": "2026-02-27T20:00:00.000Z",
+          "updatedAt": "2026-02-27T20:00:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "foundation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": {
+            "mode": "autoOnMissingPositions",
+            "defaultLayout": "layered",
+            "direction": "DOWN",
+            "edgeLaneGapPx": 10,
+            "serpentine": {
+              "maxPerRow": 6
+            },
+            "cycleFallback": {
+              "enabled": true
+            },
+            "elk": {
+              "algorithm": "fixed",
+              "edgeRouting": "ORTHOGONAL",
+              "portConstraints": "FIXED_SIDE",
+              "nodeSpacing": 120,
+              "layeredEdgeSpacing": 80
+            }
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -520,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -520,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Episode 3 Overview",
+      "position": {
+        "x": 0,
+        "y": -220
+      },
+      "width": 500,
+      "height": 360,
+      "color": "#c62828",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Bride of Charlie - Episode 3\n## \"Fraud Surrounds Lorie\"\n\n### Central Figure: Lorie France\n\n\"Who is Erica Kirk? My answer is Lorie's child. I think Lorie comes first. Lorie has always come first, and Lorie is exceedingly problematic.\"\n\n### Main Revelations\n\n**The Pattern:**\n- Fraud surrounds Lorie everywhere she goes\n- From parents to grandparents to business associates\n- Money goes missing everywhere she's involved\n- \"Too many LLCs, too many households, always lurking behind her daughter\"\n\n**Key Connections:**\n- Richard Urbenbeck (witness to divorce docs)\n- Urbenbeck family: $34M home building fraud\n- Tyler Boyer partnership at Super Feed Technologies\n- Lorie on board despite being \"very sick\"\n\n**The Dating Lie:**\nErica claimed 5 years without dating before Charlie\nReality: Multiple boyfriends throughout 2013-2018"
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Lorie's Mysterious LLCs",
+      "position": {
+        "x": 580,
+        "y": -220
+      },
+      "width": 480,
+      "height": 600,
+      "color": "#7b1fa2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## \"LLCs Coming Out of Her Ears\"\n\n### The Urbenbeck Family LLC Network (25 Years)\n\nRichard or Donna Urbenbeck featured as secretary, incorporator, or notary across all:\n\n**1993:** Eurotec (Rick featured)\n**1995:** Eurotec International UK (Lorie + Rick)\n**1993:** Techmetrics International (Rick as secretary in 1998 docs)\n**1995:** Techmetrics Limited International UK\n**1999:** Virtual Registration (Donna + Rick signed off)\n**1997:** A-Tech (Arizona) - later renamed E3 Tech in 2017\n\n### The Red Flags\n\n**Candace's Instinct:**\n\"When I see a ton of LLCs and I don't know what the heck they're doing, especially when they're identifying themselves as tech... my mind goes to money laundering.\"\n\n### Lorie's Backstory Problem\n\n**Career Progression - Suspicious:**\n- Model\n- Secretary by second marriage\n- \"Must have fallen and bumped her head\"\n- **Suddenly: Technological genius**\n- \"Putting together tech companies as many people do\"\n\n**Quote:** \"I am waiting for that late stage technological brilliance to fall upon me cuz I can barely sort through my apps.\"\n\n### What Do These Companies Actually Do?\n\n**Answer:** \"Nobody knows.\"\n\n\"It should be easily identifiable. You're a tech genius in my mind... That should be easily identifiable.\""
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "The Urbenbeck Scandal: $34M Fraud",
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "width": 500,
+      "height": 680,
+      "color": "#d84315",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Urban Beck Company Scandal (Ohio/Kentucky)\n\n### The Family\n\n**Four Brothers:**\n- Bill Urbenbeck\n- **Rick Urbenbeck** (Lorie's business partner)\n- Gary Urbenbeck (married to Donna - the notary)\n- Jeff Urbenbeck\n\n**Plus:** Dad Tony, Sister Lorianne Urban\n\n### The Crime\n\n**The Scheme:**\n- Approached new homeowners\n- Offered construction help\n- \"Pay us directly, we'll handle the rest\"\n- Targeted first-time young homebuyers\n\n**The Reality:**\n- Homes were NOT being built\n- Mortgages were NOT being paid\n- **$34 million evaporated**\n- \"Hundreds of homeowners on the hook for millions\"\n\n### The Courtroom Drama\n\n**Evidence of:**\n- Forged documents\n- Shady subcontractors\n- Missing money\n- \"Real courtroom drama... for the ages\"\n\n**Bill's Lavish Lifestyle:**\n- Some money went to Bill's spending\n- Rest of money: \"One big Scooby-Doo mystery\"\n\n### The Victims\n\n\"Homeowners never got their money back. Where did it go?\"\n\n**Bill served:** 21 years after pleading guilty (2003)\n- Later attempted to stash cash at country club\n- Friend buried cooler full of money on golf course\n- FBI dug it up in 2009"
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Sister Lorianne Wears Wire for FBI",
+      "position": {
+        "x": 580,
+        "y": 440
+      },
+      "width": 480,
+      "height": 600,
+      "color": "#f57c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Lorianne Urban: The Family Turncoat\n\n### By 2004: Family Falling Apart\n\n**What Lorianne Knew:**\n- Brother Bill had thought about killing her\n- Dad Tony offered her $500 for birthday\n- Then asked her to lie under oath about Bill\n- \"Tony offered her money to change her testimony\"\n\n### The FBI Operation\n\n**Lorianne's Choice:**\n- Told her lawyer about conversation\n- FBI looped in\n- **Agreed to wear a wire**\n\n**What She Captured:**\n- Met with dad and Bill over next few days\n- They tried to convince her to fake storyline\n- Blame herself for starting fraud to help cash flow\n- Let Bill assume responsibility\n\n**Result:** FBI arrested both men\n\n### The Threats\n\n**Family Response:**\n- \"You never go against the family\"\n- Started threatening her\n- Lorianne goes into hiding\n\n**The Trap:**\n- Dad Tony calls: \"Last time you might see me\"\n- She thinks he's going to commit suicide\n- Runs to house, comes out of hiding\n- **Brothers Bill, Gary, Rick all there**\n\n**But Lorianne doesn't care:**\n- Wears wire again\n- Meets with dad\n- Recording played in court\n\n### The Sentences\n\n**Bill:** 30 years (served 21)\n- Additional charges for threatening to kill sister\n\n**Lorianne:** 1 year, one count bank fraud\n\n**Gary & Jeff:** Got off scot-free\n\n**Rick:** Avoided charges (name not on business)"
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "Tony's Million-Dollar Murder Plot",
+      "position": {
+        "x": 0,
+        "y": 940
+      },
+      "width": 500,
+      "height": 560,
+      "color": "#ad1457",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## \"The Proposed Million-Dollar Hits\"\n\n### From Federal Prison\n\nTony Urban had been in federal medical prison in Lexington for just a few months when:\n\n**The Hit List:**\n- Senior US District Judge S. Arthur Spiegel (kill)\n- Retired US Attorney Kathleen Brinkman (kill)\n- **FBI agent's THREE CHILDREN** (kidnap)\n\n### The Children Plot\n\n**Tony's Instructions to Hitman:**\n\"Bury the agent's three kids in a casket with:\n- Crackers\n- Water  \n- An air pipe\n- **For 10 days**\"\n\n### The Recruitment\n\n**Fellow Inmate:**\n- About to be released from prison\n- Tony recruited him to commit crimes\n- **Inmate flipped on Tony**\n- Wore wire for FBI\n\n### The Payment Plan\n\n**Recording Caught Tony Offering:**\n\n**First:** Half million dollars in gold stock\n\n**Then:** Another half million from offshore accounts\n- Cayman Islands accounts\n- **After news of kidnappings hit newspapers**\n\n### The Sentence\n\n**Original:** 5 years 10 months (bank fraud) + 60 months concurrent (obstruction)\n\n**Added:** 20 more years for:\n- Attempted murder of federal judge\n- Attempted murder of US attorney  \n- Conspiracy to kidnap FBI agent's children"
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "Rick Urbenbeck: The Mystery Brother",
+      "position": {
+        "x": 580,
+        "y": 1100
+      },
+      "width": 480,
+      "height": 560,
+      "color": "#558b2f",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Rick: The Youngest Who Escaped\n\n### How Rick Avoided Charges\n\n**Official Story:**\n- \"Just a hardworking kid\"\n- \"Worked two jobs, three jobs through college\"\n- \"Two jobs through law school\"\n- \"While dad was helping out the other boys\"\n- Name was NOT on the business\n\n**But:** Had to testify\n\n### The Biggest Mystery\n\n**The Question:**\n\"Why did Tony Urbenbeck agree to shift so much money into Rick Urbenbeck's control?\"\n\n**Rick's Deposition Answer:**\n\"You'd have to ask my dad what was in his head. I saw it as a good investment. He had always helped the other boys out from the beginning. I was the one who worked... and he wanted to give me the opportunity to purchase these assets.\"\n\n### What Happened to the Money?\n\n**Bill's part:** Lavish lifestyle (some)\n**Rest:** \"Where did the rest of the money get siphoned off to?\"\n\n**Answer:** \"One big Scooby-Doo mystery\"\n\n### Rick's Outcome\n\n**Consequences:**\n- Agreed to let go of Kentucky legal license\n- Otherwise avoided any charges\n- **\"Rick made out real nice\"**\n\n### The Notary Problem\n\n**Court Testimony:**\nNotary testified that Bill would sometimes ask her to **notarize documents while the person involved was not even present**.\n\n\"That's illegal. And it is exactly what I pointed out to you guys... that jumps out at me. I'm a notary.\""
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "Lorie's Connection to Urbenbecks",
+      "position": {
+        "x": 1140,
+        "y": -220
+      },
+      "width": 460,
+      "height": 640,
+      "color": "#1565c0",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Why Is This Relevant?\n\n### Lorie's Divorce Documents\n\n**Witness:** Richard Urbenbeck\n- His address allowed definitive confirmation\n- Urbenbeck is \"not an unusual name when it comes to Lorie's businesses\"\n- **Family she uses to notarize or incorporate her LLCs**\n\n**Timeline:** Urbenbeck scandal went down around 2002\n- **Same year Lorie and Erica move out to Notre Dame Prep**\n\n### The Pattern\n\n\"Fraud surrounds Lorie. From her parents to her grandparents to the person that's doing her documents, it's just always around her.\"\n\n**What Lorie Knew:**\n- Who the Urbenbecks were\n- Case included coordinated murder attempts\n- Kidnapping of children\n- Putting them into boxes\n\n### Lorie's Response: Not Scared\n\n**Candace's Take:**\n\"Despite her obviously being very much aware of who the Urbenbecks were... Lorie didn't seem scared.\n\nI know it sounds like you really were just at school and you don't know why you got all this money, but I'm good.\n\nIf my lawyer's family's in prison for murdering and putting people in boxes... I'd say, you know what, I can probably figure out how to incorporate my LLC by myself.\n\nNot Lori. No, not for Lori.\"\n\n### The Documents Problem\n\n**Candace reviewed remaining divorce docs:**\n- Erica's birthday: November 22nd on ALL of them\n- Name spelled differently (Erica with C)\n- \"It was not corrected\"\n- \"Erica's birthday never does seem to go back to the 20th\"\n\n**Quote:** \"Just so happens to be that she's got some docs look a little shady.\""
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "The Pattern: Money Disappears",
+      "position": {
+        "x": 1140,
+        "y": 480
+      },
+      "width": 460,
+      "height": 520,
+      "color": "#6a1b9a",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Everywhere Lorie Goes, Money Evaporates\n\n### Tesseract School\n\n\"Lori sends Erica to Tesseract in Arizona and the school then suddenly has to shutter its doors because... another financial scandal. Money evaporates. Nobody knows where it went.\"\n\n### Super Feed Technologies\n\n**Lorie's Role:** Board member\n**Tyler Boyer:** COO of Turning Point Action\n\n**Together at Super Feed:**\n- \"Effectively business partners\"\n- \"They have been for a while\"\n- Lorie was first a director\n\n**Rumors:** \"Money from Turning Point Action has been routed into Super Feed\"\n- \"I'm not a forensic accountant, so I can neither confirm nor deny\"\n\n**Known Scandal:**\n- Yahoo News headline: \"Kari Lake's bribery scandal involves a shady GOP tech firm\"\n- Referring to Super Feed Technologies\n- **Business revoked by state of Arizona**\n- Former COO Jeff DeWit employed there\n- Lake received $100k+ from entity\n\n### Tyler Boyer's Record\n\n**Recent:** \"Required a literal federal pardon from the president\"\n- For fraud\n- \"Credibly accused of nine felonies\"\n- Related to trying to subvert election\n- Including: fraud, forgery, conspiracy\n- **Still facing state charges**\n\n### Turning Point Real Estate Venture\n\n**Tyler's New Plan:**\n\"Going to get into the real estate business to help young homeowners because it was Charlie's vision.\"\n\n**The Logic:**\n- Charlie told students not to go to college\n- Get married young instead\n- Therefore: Turning Point should help with home ownership\n\n**Candace's Reaction:** \"Trust the science. If you think that's weird, it's because you're demonic.\""
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Marblehead Marriage Mystery",
+      "position": {
+        "x": 1140,
+        "y": 1060
+      },
+      "width": 460,
+      "height": 420,
+      "color": "#00695c",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## The Marriage That Can't Be Found\n\n### Marblehead, Massachusetts Search\n\n**Volunteer Researcher:**\n\"Someone in Marblehead said, 'How can I help? I have access to documents here.'\"\n\n**Results:**\n- Could NOT pull up any marriage documents\n- \"Doesn't mean they don't exist\"\n- But WERE able to pull up property deeds\n\n### The Rhode Island Connection\n\n**Property Deeds Show:**\nLorie and Kent listing as \"having been a couple from Rhode Island\"\n- Specifically: North Kingstown, Rhode Island\n\n**Problem #1:** \"North Kingston\" as written doesn't exist\n- There's Kingston (2 miles - just URI campus)\n- South Kingstown\n- North Kingstown\n- But not \"North Kingston\"\n\n**Problem #2:** \"I can't find a trace of Lorie and Kent having lived in Rhode Island\"\n\n### The Questions\n\n**Candace's Appeal:**\n\"Rhode Island sleuths, people down at the county, if you want to take a peek and see if you can find this couple.\n\nMaybe they got married in Rhode Island? Well, no, because divorce docs say Marblehead. But people can't find those docs.\n\nThis makes it seem like maybe they got married in Rhode Island. But you can maybe just get married in Marblehead while living in Rhode Island. Maybe renting property?\n\nI don't know, but I want to know.\"\n\n### The Confusion\n\n\"I don't know if a marriage can occur across 16 years. I don't know if it can happen that many times across two documents.\""
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "Erica Timeline: 2000-2007",
+      "position": {
+        "x": 0,
+        "y": 1560
+      },
+      "width": 500,
+      "height": 680,
+      "color": "#4a148c",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Erica's Early Timeline\n\n### 2000: Tesseract Closes\n\nLeaves Tesseract because \"school facing financial crisis\"\n\n### 2000-2002: Mystery Ohio Period\n\n**Evidence suggests:** Back to Ohio for ~3 years\n\n**St. Ursula Villa:**\n- Separate from St. Ursula Academy\n- Despite name and location, NOT owned by nuns\n- **Private funding** (not Catholic Church)\n- \"Cannot pull up who was funding this school\"\n\n**Call for Info:** Yearbooks 2000-2003 with Erica France\n\n### 2003: Notre Dame Prep\n\n**Important Note:** \"Notre Dame Prep was formerly the Tesseract School\"\n- The one they shuttered in North Scottsdale\n- Doors reopened as Notre Dame Prep\n\n**Activities:**\n- Playing volleyball\n- Involved in sports\n\n### 2005: Pageants Begin\n\n**National American Miss Arizona:**\n- First runner up\n- Will represent Arizona at All-American Miss Pageant\n- November 2005 in Los Angeles\n\n**Lorie Business:** Listed in House bill budget for DHS\n- IMAT Laboratories\n- \"Don't ask me what any of her businesses do. It's not clear.\"\n\n### 2006: Senior Year\n\n**August:** Wins National American Miss Teen Pageant\n- Travels to DC\n- Presents plans to Rep. JD Hayworth and Sen. John Kyl\n\n**Charity Work:** Andrea's Closet\n- Hospital in Winslow, Arizona for kids\n- \"Stops by often on way to basketball games\"\n- Wants to establish own charity\n\n**Father Kent:** Listed as risk assessment contractor\n- Resident of Surprise, Arizona\n- Trying to get DHS funding\n\n**Lorie:** Virtual Registration forced to close (no tax filing)\n\n### 2007: Miss American Teen Year\n\n**Spring:** Graduates Notre Dame Prep\n- Full basketball AND academic scholarship\n- Regis University, Denver\n- Finalist: Arizona Everyday Heroes Award\n\n**Note:** \"That's the first time hearing 'Everyday Heroes' - becomes her charity name in 2009\""
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "2007-2008: The Missing Year",
+      "position": {
+        "x": 580,
+        "y": 1720
+      },
+      "width": 480,
+      "height": 660,
+      "color": "#d32f2f",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Erica Goes Missing\n\n### 2007-2008: Regis University\n\n**Basketball Season Begins:**\n- Two newspaper entries found:\n  - November 24th game\n  - December 1st against South Dakota\n\n**Then:** Nothing\n\n### The Discrepancy\n\n**Erica's Claims:** Played basketball 2 years\n- Noted in Notre Dame alumni packet\n- Says she played at Regis for two years\n\n**Regis University Records:**\n- Basketball stat page still up\n- **Only shows 2007-2008 season**\n- \"I could not confirm\" second year\n\n**Candace's Theories:**\n1. Maybe stopped playing, focused on studies\n2. Maybe just academic scholarship continued\n3. But no: \"I think something else happened\"\n\n### 2008: Erica Confirms She Went Missing\n\n**From Obscure 2020 Interview (since removed):**\n\n\"I prayed for God to just strip my ego from all of that stuff. All of that world. All of the plastic hat crown stuff with the banner.\n\nThe hometown hero thing was just weird and unhealthy and ego fueling.\n\n**I locked myself in my room basically turned into a hermit for about a good eight months.**\n\n**The only person I would see outside of my family was my pastor's wife.**\n\nWe would go to the church and she would just pour into me every single day. I just was reading scripture and read the Bible cover to cover multiple times.\"\n\n### The Questions\n\n**Candace's Suspicion:**\n\"How can an active college student purport to see no one but her mother and her pastor's wife for eight months?\n\nI suspect this could potentially represent a time when Erica **trained to become a Christian**.\n\nGiven what we've learned about Fort Huachuca, an intel base that literally trains Christians, I'm asking: **Was she training?**\n\nWas she training to impress people like Charlie by always having a Bible verse?\""
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "The Pastor's Wife: Hillsong Connection",
+      "position": {
+        "x": 580,
+        "y": 2440
+      },
+      "width": 480,
+      "height": 580,
+      "color": "#ff6f00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Who Is The Pastor's Wife?\n\n### Research Via Locked Twitter Account\n\n\"Shout out to the Mommy Sleuth who said, 'Hey, Candace, I have access. Do you want my password?'\"\n\n### Possible Church: City of Grace\n\n**Location:** Scottsdale\n**Pastor:** Terry Crist\n**Wife:** Judith Crist\n\n**Evidence from Erica's tweets (2011+):**\n- \"Pastor Terry is awesome\"\n- \"I cherish your friendship and I am grateful for your love, Judith Crist. You are the epitome of Proverbs.\"\n- \"I am totally obsessed with City of Grace\"\n- \"Sunday mornings with my Tyler Massie\" *(boyfriend - didn't date anyone?)*\n- \"Congratulations, Terry Crist, Judith Crist\"\n\n### The Brian Houston Connection\n\n**Pastor Terry Crist:**\n- \"Very close\" with Brian Houston\n- Houston = Hillsong Church founder\n\n**Brian Houston's Father:**\n- Pedophile\n- Houston attempted to cover it up\n- Father never charged\n\n**Houston's Own Words:**\n\"I have no doubt now that my father was a serial pedophile and will probably never know the extent of it.\"\n\n**Friendship:** Erica friends with them since 1994\n\n### Both Resigned\n\n**Brian Houston:** Eventually resigned\n\n**Pastor Terry Crist:** Also resigned right afterward\n- \"But he said it wasn't related\"\n- \"Nothing to see there\"\n\n### The Bag Allegation\n\n**Word on the Street:**\n\"Pastor Terry Crist and wife accused of having congregants throw up into bags to get rid of big bad spirits.\"\n\n**Allegedly.**"
+      }
+    },
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "type": "markdown",
+      "label": "The 5-Year Dating Lie - EXPOSED",
+      "position": {
+        "x": 1140,
+        "y": 1540
+      },
+      "width": 460,
+      "height": 640,
+      "color": "#1b5e20",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Erica's Bari Weiss Interview Lie\n\n### The Claim (Pre-Rehearsed)\n\n**Erica knew questions ahead of time:**\n- \"She received the questions ahead of time\"\n- \"She knew Barry was going to ask about me\"\n- \"They didn't rehearse answers, but she knew what they were going to ask\"\n- \"None of the questions caught her off guard\"\n\n**The Statement:**\n\"When I lived out here [NYC], I was here for 5 years. **I never dated here** because I saw vicariously through my roommate how terrible it was.\n\nI always thought it was very strange how she would go to drinks with one guy and then go to dinner with another.\n\nI was not dating in New York City. I was not in that headspace. I just wasn't.\n\nMy situation was a little different. The Lord knew that in order for me to know that was my man, he had to blanket Charlie as a job interview.\n\nIf he came to me and said, 'Let's go on a date,' I'd be like, 'I thank you, but no, we're not doing this.' That was my mindset.\"\n\n### Body Language Analysis\n\n**Candace's Observation:**\n\"I want you to pay special attention to her body language as she's about to tell us she didn't date anybody for 5 years before she met Charlie.\"\n\n\"Even crazier in retrospect\"\n\n### The Truth\n\n**From 2013-2018 (5 years before Charlie):**\n\n**Erica had MULTIPLE boyfriends**\n\n**Evidence:**\n- \"She rang in the new year with a boyfriend in 2018\"\n- \"There was not actually a single year that we could find that Erica France was single\"\n- **\"Opposite of what she says to be true\"**\n\n### The Purpose\n\n**Candace's Question:**\n\"What is the intended purpose of that lie? Who is the intended audience for that lie?\n\nThat is completely unnecessary.\""
+      }
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "type": "markdown",
+      "label": "The Lord vs The Lorie",
+      "position": {
+        "x": 1140,
+        "y": 2240
+      },
+      "width": 460,
+      "height": 480,
+      "color": "#311b92",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## \"Is It The Lord or The Lorie?\"\n\n### The Alternative Explanation\n\n**If Erica Really Had Boyfriends:**\n\n\"The correct sentence should be: **I did not have a boyfriend in New York. I didn't go out to meet a boyfriend cuz I already had one and maybe he was living in DC or something.**\n\nBut that's the reason I didn't go. I had a boyfriend. That's the answer.\n\n**I always had a boyfriend and they were in different cities.**\"\n\n### Who Orchestrated This?\n\n**Candace's Theory:**\n\n\"Who is the Lord? **Is it the Lori?**\n\nIs it the Lori or Lord? Is it the Lori?\n\nI don't know. But I'm going to find out.\"\n\n### The Pattern\n\n**What People Say About Lorie:**\n\n\"The voice in Erica's ear is Lori.\n\nPeople say Lori tells her:\n- What to say\n- Who to target in every room\n\nI find that to be likely.\n\n**When people are saying it across various points in her life that the comment on maybe is Lori. Yeah, that feels right to me.**\"\n\n### The Meeting With Charlie\n\n**How It Really Happened:**\n\n\"The **Lori** knew. The Lori knew exactly what I needed, which was Charlie.\n\nAnd the **Tyler** knew that I would have to be sat down and told that it was a business opportunity.\n\nAnd what the **Lorie** knew was probably everything about Charlie.\n\nJust like people say Lori tells her what to say and who to target in every room.\"\n\n### The Unnecessary Lie\n\n\"No one would judge Erica if she was like, 'You know what? I was down. I was eating pizza at 3am at Artichoke. And then my life cleaned up after that.'\n\n**There's no expectation for her to pretend she never dated anybody.**\""
+      }
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "type": "markdown",
+      "label": "Lorie: The Grandpa Joe Vibes",
+      "position": {
+        "x": 1680,
+        "y": -220
+      },
+      "width": 440,
+      "height": 520,
+      "color": "#bf360c",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## \"That's Lori. That's Lori.\"\n\n### The Willy Wonka Comparison\n\n**Candace's Take:**\n\n\"Lori reminds me... I look at her and I just know. She gives me **Grandpa Joe vibes**.\n\nGrandpa Joe was number one. He got away with it. Nobody even thinks about Grandpa Joe.\n\nHe was out there: 'Oh, hey, Charlie. Oh, I'm sick. Hey, nice to see you.'\n\n**Charlie pulled out golden ticket. Grandpa Joe did a whole dance routine.**\n\nHe said, 'Oh, look. I'm good. Let's go.'\n\nThat's Lori.\n\nAnd then Grandpa Joe gets down to the factory. Charlie was a good kid. Very good kid.\n\nGrandpa Joe tells him: **'Steal the recipe. Give it to Slugworth.'**\n\n**Vibes. I never misread them. Vibes.**\"\n\n### The Sick Mother Defense\n\n**The PR Campaign:**\n- Erica curating videos about Lorie being ill\n- \"I don't dispute that\"\n- \"I do dispute Erica was with her September 10th receiving treatment\"\n\n**The Board Position:**\n- Recently put on Super Feed Technologies board\n- Despite being \"very ill\"\n- Business partners with Tyler Boyer\n\n**The Argument:**\n\"How dare you have any questions. Do you know where Erica's go? She lost her husband and her mom's sick.\n\nI think these people are sick in the head.\n\n**There is something very wrong with Lorie. There is something very wrong with Erica.**\n\nAnd there was something very wrong with this picture of Lori, Tyler, and Erica Kirk being together.\"\n\n### The Bottom Line\n\n\"They really think we are this stupid.\""
+      }
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "type": "markdown",
+      "label": "Comments: The Awakening",
+      "position": {
+        "x": 1680,
+        "y": 360
+      },
+      "width": 440,
+      "height": 500,
+      "color": "#004d40",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Audience Response\n\n### The Dishonesty Campaign\n\n**Candace's Response:**\n\n\"I am sickened by how dishonest people are right now.\n\nEveryone out here: 'Nothing to see here. She's just a grieving widow.'\n\n**These people didn't even write their own speeches for his memorial. Take it to the bank.**\n\nThey had people writing their speeches. That's how little these people cared about Charlie Kirk.\n\n**Charlie was a means to them.**\"\n\n### The Failed Psyop\n\n\"How's that psyop going? **It's failing.**\n\nWe literally do not care at all what everybody is saying on the internet that is clearly being paid to say the same thing.\"\n\n### Left and Right United\n\n\"I love that it's bringing the left and the right together.\n\nMy audience has never been more left and right at the same time.\n\nI think we're really starting to see **who rules over us** and is constantly trying to keep us engaged in the Republican versus Democrat game.\n\nWhich serves nobody except the **elite pedophiles that are ruling over us**.\"\n\n### The Men Making Videos\n\n\"Just as a man, this is a serious question: As a man, if you see 45 other dudes at the microphone all being theatrical...\n\n'Demonic! Oh, this is crazy! I'm coming for you, Candace!'\n\nThey were saying what they were going to do violently.\n\n**What are you doing?** It just never lands when men get all fired up and are shouting about a trailer dropped by a girl.\n\n**None of you are brave. You're all being emotionally impacted by a trailer that hasn't even come out.**\n\nIt's lame. It's very lame.\""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "type": "relates",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "root",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-002",
+      "type": "sequence",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-003",
+      "type": "reference",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-004",
+      "type": "reference",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-005",
+      "type": "sequence",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-006",
+      "type": "reference",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-007",
+      "type": "sequence",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-008",
+      "type": "sequence",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-009",
+      "type": "reference",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-010",
+      "type": "reference",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-011",
+      "type": "sequence",
+      "source": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-012",
+      "type": "sequence",
+      "source": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-013",
+      "type": "reference",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "target": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-014",
+      "type": "sequence",
+      "source": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "target": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-015",
+      "type": "reference",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "target": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "edge-016",
+      "type": "sequence",
+      "source": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "target": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "root",
+      "targetPort": "in",
+      "label": "",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

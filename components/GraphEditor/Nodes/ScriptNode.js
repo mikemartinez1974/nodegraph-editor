@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
 const SCRIPT_INPUTS = [
@@ -549,6 +550,7 @@ export default function ScriptNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+      <NodeTypeBadge type={node?.type} />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <div style={{ fontWeight: 700 }}>{node?.label || 'Script'}</div>

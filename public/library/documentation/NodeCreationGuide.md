@@ -46,10 +46,10 @@ Important:
 A class graph should contain at least:
 
 1. `manifest` node
-2. `legend` node
-3. `dictionary` node
-4. at least one `view` node for `node.web`
-5. optional `view` node for `editor.web`
+2. `dictionary` node
+3. at least one `view` node for `node.web`
+4. optional `view` node for `editor.web`
+5. optional `legend` node (override/curation only)
 6. optional `markdown` notes node
 
 Recommended identity:
@@ -57,9 +57,7 @@ Recommended identity:
 - `data.intent.kind`: `"definition"`
 - `data.intent.scope`: `"node"`
 
-Legend entry should document:
-- what the type means
-- what view payloads it provides
+Legend behavior can be derived from dictionary entries. Use an explicit legend node only when you need curated overrides/documentation.
 
 Dictionary in class graph should contain entries for class-local keys if needed, but the host graph still needs its own dictionary registration for usage.
 
@@ -180,7 +178,7 @@ Then iterate:
 
 - Type key mismatch between instance `type` and dictionary `nodeDefs.key`.
 - Broken `ref` path (wrong prefix, wrong case, wrong folder).
-- Class graph missing required system nodes.
+- Class graph missing required system nodes (`manifest`, `dictionary`).
 - Edge creation without explicit ports.
 - Single giant transaction trying to mutate multiple files/contexts at once.
 
@@ -237,4 +235,3 @@ Then iterate:
 - Need embedded child graph runtime: use **graph-reference**.
 - Need one-off text link: use **markdown + tlz://**.
 - Need custom executable extension: use **plugin/script** with explicit trust model.
-

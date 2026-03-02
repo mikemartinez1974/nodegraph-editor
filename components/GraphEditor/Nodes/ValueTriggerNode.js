@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 const INPUTS = [{ key: 'value', label: 'Value', type: 'value' }];
 const OUTPUTS = [{ key: 'trigger', label: 'Trigger', type: 'trigger' }];
@@ -215,6 +216,7 @@ export default function ValueTriggerNode({
         if (onDoubleClick) onDoubleClick(e);
       }}
     >
+      <NodeTypeBadge type={node?.type} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <strong>{node?.label || 'Value → Trigger'}</strong>
         <span style={{ fontSize: 12, opacity: 0.8 }}>Fired: {triggerCount}</span>

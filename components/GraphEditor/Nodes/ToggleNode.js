@@ -4,6 +4,7 @@ import eventBus from '../../NodeGraph/eventBus';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
 const TOGGLE_INPUTS = [
@@ -158,6 +159,7 @@ export default function ToggleNode({
       onMouseEnter={e => eventBus.emit('nodeMouseEnter', { id: node.id, event: e })}
       onMouseLeave={e => eventBus.emit('nodeMouseLeave', { id: node.id, event: e })}
     >
+      <NodeTypeBadge type={node?.type} />
       {/* Header */}
       <div style={{ 
         display: 'flex', 

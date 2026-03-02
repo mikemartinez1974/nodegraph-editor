@@ -50,5 +50,6 @@ export function endpointToUrl(filePath) {
   if (typeof filePath !== "string" || !filePath.trim()) return "";
   const trimmed = filePath.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(github|local|tlz):\/\//i.test(trimmed)) return trimmed;
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }

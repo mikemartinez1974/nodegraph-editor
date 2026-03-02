@@ -62,6 +62,7 @@ import {
   createDefaultDictionaryNode,
   findSystemNode
 } from '../utils/systemNodeDefaults';
+import { validateDictionaryAgainstNodeClassContract } from '../utils/nodeClassContract';
 
 const formatTimestamp = (iso) => {
   if (!iso) return '—';
@@ -1517,19 +1518,45 @@ export default function DocumentPropertiesDialog({
                     )}
                     <Button
                       variant="contained"
-                      onClick={() =>
+                      onClick={() => {
+                        const normalizedNodeDefs = (Array.isArray(dictionaryDraft.nodeDefs) ? dictionaryDraft.nodeDefs : [])
+                          .map((entry) => ({
+                            key: String(entry?.key || '').trim(),
+                            ref: String(entry?.ref || '').trim(),
+                            source: String(entry?.source || '').trim(),
+                            version: String(entry?.version || '').trim(),
+                            legend: {
+                              visible: entry?.legend?.visible !== false && entry?.legendVisible !== false
+                            }
+                          }))
+                          .filter((entry) => entry.key);
+                        const normalizedViews = (Array.isArray(dictionaryDraft.views) ? dictionaryDraft.views : [])
+                          .map((entry) => ({
+                            key: String(entry?.key || '').trim(),
+                            intent: String(entry?.intent || '').trim(),
+                            payload: String(entry?.payload || '').trim(),
+                            ref: String(entry?.ref || '').trim(),
+                            source: String(entry?.source || '').trim(),
+                            version: String(entry?.version || '').trim()
+                          }))
+                          .filter((entry) => entry.key);
+                        const contractErrors = validateDictionaryAgainstNodeClassContract(normalizedNodeDefs, normalizedViews);
+                        if (contractErrors.length) {
+                          setDictionaryError(`Dictionary NodeClass contract validation failed: ${contractErrors[0]}${contractErrors.length > 1 ? ` (+${contractErrors.length - 1} more)` : ''}`);
+                          return;
+                        }
                         applySystemNodeData(
                           'dictionary',
                           {
                             ...(dictionaryInfo.node?.data || {}),
-                            nodeDefs: dictionaryDraft.nodeDefs,
+                            nodeDefs: normalizedNodeDefs,
                             skills: dictionaryDraft.skills,
-                            views: dictionaryDraft.views
+                            views: normalizedViews
                           },
                           setDictionaryError,
                           implicitDictionaryRef
-                        )
-                      }
+                        );
+                      }}
                     >
                       Apply
                     </Button>

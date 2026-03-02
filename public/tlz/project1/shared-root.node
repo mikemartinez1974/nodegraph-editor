@@ -1,0 +1,248 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "twilite-shared-index",
+          "name": "Shared Graphs Index",
+          "version": "1.0.0",
+          "description": "Public index of shared Twilite graphs",
+          "createdAt": "2026-02-27T18:45:00.000Z",
+          "updatedAt": "2026-02-27T18:45:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown", "port"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "port",
+            "intent": "navigation",
+            "implementation": "external port node",
+            "dictionaryKey": "port"
+          }
+        ]
+      }
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "type": "markdown",
+      "label": "Shared Graphs",
+      "position": { "x": 60, "y": -100 },
+      "width": 480,
+      "height": 220,
+      "color": "#1976d2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Shared Graphs\n\nPublic collection of Twilite node graphs.\n\nEach graph below is a complete, self-contained `.node` file that you can explore, learn from, or use as a starting point for your own work."
+      }
+    },
+    {
+      "id": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "type": "port",
+      "label": "Introduction",
+      "position": { "x": -100, "y": 200 },
+      "width": 280,
+      "height": 180,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "memo": "Getting started with Twilite",
+        "intent": "external",
+        "target": {
+          "endpoint": "/IntroGraph.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+      "type": "port",
+      "label": "Whitepaper",
+      "position": { "x": 260, "y": 200 },
+      "width": 280,
+      "height": 180,
+      "color": "#7b1fa2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "memo": "Technical documentation",
+        "intent": "external",
+        "target": {
+          "endpoint": "/twilite-os-whitepaper.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "a7a7a7a7-a7a7-4a7a-8a7a-a7a7a7a7a7a7",
+      "type": "port",
+      "label": "The Pitch",
+      "position": { "x": -100, "y": 440 },
+      "width": 280,
+      "height": 180,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "memo": "Project story and vision",
+        "intent": "external",
+        "target": {
+          "endpoint": "/ThePitch.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "b8b8b8b8-b8b8-4b8b-8b8b-b8b8b8b8b8b8",
+      "type": "port",
+      "label": "Sample Repository",
+      "position": { "x": 260, "y": 440 },
+      "width": 280,
+      "height": 180,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "memo": "Example graphs and templates",
+        "intent": "external",
+        "target": {
+          "endpoint": "/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "sourcePort": "root",
+      "target": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "out",
+      "target": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-003",
+      "source": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "out",
+      "target": "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "out",
+      "target": "a7a7a7a7-a7a7-4a7a-8a7a-a7a7a7a7a7a7",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-005",
+      "source": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "out",
+      "target": "b8b8b8b8-b8b8-4b8b-8b8b-b8b8b8b8b8b8",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2026-02-27T18:45:00.000Z",
+  "nodeCount": 8,
+  "edgeCount": 5
+}

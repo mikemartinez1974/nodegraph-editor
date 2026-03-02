@@ -1,0 +1,135 @@
+{
+  "contractVersion": "1.0.0",
+  "nodeType": "youtube-embedded",
+  "name": "YouTube Embedded Node",
+  "description": "Renders a YouTube iframe from data.videoId and exposes editor/node views.",
+  "classRef": "github://twilitellc/samples/library/classes/nodes/youtube-embedded.node-class.node",
+  "classVersion": ">=0.1.0",
+  "source": "github",
+  "tags": [
+    "media",
+    "embed",
+    "demo"
+  ],
+  "dataSchema": {
+    "type": "object",
+    "required": [
+      "videoId"
+    ],
+    "properties": {
+      "videoId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "autoplay": {
+        "type": "boolean",
+        "default": false
+      },
+      "startSeconds": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "additionalProperties": false
+  },
+  "defaults": {
+    "label": "YouTube",
+    "size": {
+      "width": 420,
+      "height": 260
+    },
+    "color": null,
+    "visible": true,
+    "showLabel": true,
+    "data": {
+      "videoId": "BzyQ6SWVaxU",
+      "autoplay": false,
+      "startSeconds": 0
+    },
+    "ports": [
+      {
+        "id": "in",
+        "label": "In",
+        "direction": "input",
+        "dataType": "any",
+        "position": {
+          "side": "left",
+          "offset": 0.5
+        }
+      },
+      {
+        "id": "out",
+        "label": "Out",
+        "direction": "output",
+        "dataType": "any",
+        "position": {
+          "side": "right",
+          "offset": 0.5
+        }
+      }
+    ]
+  },
+  "views": {
+    "node": {
+      "intent": "node",
+      "payload": "node.web",
+      "ref": "github://twilitellc/samples/library/classes/nodes/youtube-embedded.node-class.node",
+      "source": "github",
+      "version": ">=0.1.0"
+    },
+    "editor": {
+      "intent": "editor",
+      "payload": "editor.web",
+      "ref": "github://twilitellc/samples/library/classes/nodes/youtube-embedded.node-class.node",
+      "source": "github",
+      "version": ">=0.1.0"
+    }
+  },
+  "overrides": {
+    "allowLabel": true,
+    "allowSize": true,
+    "allowColor": true,
+    "allowPorts": false,
+    "allowData": true,
+    "dataMode": "merge-deep"
+  },
+  "validation": {
+    "requiredDataKeys": [
+      "videoId"
+    ],
+    "rules": [
+      {
+        "id": "video-id-required",
+        "kind": "required",
+        "path": "data.videoId",
+        "message": "videoId is required.",
+        "severity": "error"
+      },
+      {
+        "id": "start-seconds-min",
+        "kind": "range",
+        "path": "data.startSeconds",
+        "message": "startSeconds must be >= 0.",
+        "severity": "warning",
+        "min": 0
+      }
+    ],
+    "onError": "block"
+  },
+  "lifecycle": {
+    "hooks": {
+      "onCreate": {
+        "kind": "script",
+        "ref": "script://youtube-on-create",
+        "timeoutMs": 1500
+      }
+    }
+  },
+  "compatibility": {
+    "minTwiliteVersion": "1.0.0",
+    "legacyAdapters": [
+      "legacy-youtube-v0-adapter"
+    ],
+    "deprecatedFields": []
+  }
+}

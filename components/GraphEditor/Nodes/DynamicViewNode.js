@@ -1065,7 +1065,11 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
       );
     }
     if (isNodeWebView || (isEditorView && !renderInPanel)) {
-      const markdown = typeof node?.data?.content === 'string' ? node.data.content : '';
+      const markdown = (() => {
+        if (typeof payload === 'string') return payload;
+        if (payload && typeof payload === 'object' && typeof payload.markdown === 'string') return payload.markdown;
+        return typeof node?.data?.content === 'string' ? node.data.content : '';
+      })();
       return (
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
@@ -1181,7 +1185,7 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
         backgroundColor: 'transparent'
       }}
     >
-      {!isHtmlCanvasMode && (
+      {!isHtmlCanvasMode && renderInPanel && (
         <div style={{ fontSize: 12, color: theme.palette.text.secondary }}>
           {effectivePayloadKey
             ? `View: ${effectiveIntent || 'node'} / ${effectivePayloadKey}`

@@ -25,6 +25,8 @@ import {
   createDefaultLegendNode,
   createDefaultDictionaryNode
 } from './utils/systemNodeDefaults';
+
+const DEFINITION_CACHE_TTL_MS = 5 * 60 * 1000;
 import {
   useGraphEditorStateContext,
   useGraphEditorLayoutContext,
@@ -36,6 +38,7 @@ import useIntentEmitter from './hooks/useIntentEmitter';
 import { summarizeContracts } from './contracts/contractManager';
 import { validateGraphInvariants } from './validators/validateGraphInvariants';
 import { shouldShowInTypeSelectors } from './constants/nodeTypeSelectorConfig';
+import { validateDictionaryAgainstNodeClassContract } from './utils/nodeClassContract';
 
 const PANEL_WIDTHS = {
   entities: 320,
@@ -264,8 +267,36 @@ const GraphEditorContent = () => {
       }));
       if (payload.writable !== false) {
         readOnlyNoticeShownRef.current = false;
-      }
-    };
+  }
+};
+
+const isPlainObject = (value) => (
+  value !== null &&
+  typeof value === 'object' &&
+  !Array.isArray(value)
+);
+
+const deepMergeData = (base, patch) => {
+  if (!isPlainObject(base)) {
+    if (!isPlainObject(patch)) return patch;
+    return Object.keys(patch).reduce((acc, key) => {
+      acc[key] = deepMergeData(undefined, patch[key]);
+      return acc;
+    }, {});
+  }
+  if (!isPlainObject(patch)) return patch;
+  const out = { ...base };
+  Object.keys(patch).forEach((key) => {
+    const prev = out[key];
+    const next = patch[key];
+    if (isPlainObject(prev) && isPlainObject(next)) {
+      out[key] = deepMergeData(prev, next);
+      return;
+    }
+    out[key] = next;
+  });
+  return out;
+};
     const handleAccessPromoteWritable = () => {
       setDocumentAccess((prev) => ({
         ...prev,
@@ -406,9 +437,11 @@ const GraphEditorContent = () => {
   }, [viewDefinitions]);
 
   const [resolvedDictionary, setResolvedDictionary] = useState(null);
+  const [dictionaryContractIssues, setDictionaryContractIssues] = useState([]);
+  const [definitionsRefreshToken, setDefinitionsRefreshToken] = useState(0);
   const definitionDictionaryCacheRef = useRef({});
   const invariantReport = useMemo(() => {
-    return validateGraphInvariants({
+    const base = validateGraphInvariants({
       nodes: Array.isArray(nodes) ? nodes : [],
       edges: Array.isArray(edges) ? edges : [],
       edgeRoutes: edgeRoutes && typeof edgeRoutes === 'object' ? edgeRoutes : {},
@@ -416,7 +449,18 @@ const GraphEditorContent = () => {
       mode: 'load',
       resolvedDictionary
     });
-  }, [nodes, edges, edgeRoutes, groups, resolvedDictionary]);
+    const warnings = Array.isArray(base?.warnings) ? [...base.warnings] : [];
+    (Array.isArray(dictionaryContractIssues) ? dictionaryContractIssues : []).forEach((message) => {
+      warnings.push({
+        code: 'NODECLASS_CONTRACT',
+        message
+      });
+    });
+    return {
+      ...base,
+      warnings
+    };
+  }, [nodes, edges, edgeRoutes, groups, resolvedDictionary, dictionaryContractIssues]);
 
   const resolvePublicPath = useCallback((ref) => {
     if (!ref || typeof ref !== 'string') return null;
@@ -438,6 +482,54 @@ const GraphEditorContent = () => {
       }
     } catch {}
     return null;
+  }, []);
+
+  const parseGithubRef = useCallback((ref) => {
+    if (typeof ref !== 'string' || !ref.startsWith('github://')) return null;
+    const raw = ref.slice('github://'.length);
+    const [owner = '', repo = '', ...pathParts] = raw.split('/');
+    if (!owner || !repo) return null;
+    let path = pathParts.join('/').replace(/^\/+/, '');
+    if (!path || path.endsWith('/')) {
+      path = `${path}root.node`.replace(/^\/+/, '');
+    }
+    return { owner, repo, path };
+  }, []);
+
+  const fetchGithubRefText = useCallback(async ({ owner, repo, path, branch }) => {
+    const token = (() => {
+      try {
+        if (typeof window === 'undefined' || !window.localStorage) return '';
+        return window.localStorage.getItem('githubPat') || '';
+      } catch {
+        return '';
+      }
+    })();
+    const headers = {
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    if (token.trim()) {
+      headers.Authorization = `Bearer ${token.trim()}`;
+    }
+    const safePath = path
+      .split('/')
+      .map((segment) => encodeURIComponent(segment))
+      .join('/');
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${safePath}?ref=${encodeURIComponent(branch)}`;
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload?.message || `GitHub HTTP ${response.status}`);
+    }
+    const payload = await response.json();
+    if (!payload || payload.type !== 'file' || !payload.content) {
+      throw new Error('GitHub response did not include file content.');
+    }
+    const decoded = typeof window !== 'undefined'
+      ? decodeURIComponent(escape(window.atob(String(payload.content).replace(/\n/g, ''))))
+      : '';
+    return decoded;
   }, []);
 
   const readFileViaHost = useCallback((refPath) => {
@@ -471,6 +563,28 @@ const GraphEditorContent = () => {
       });
     });
   }, []);
+
+  const fetchRefText = useCallback(async (ref) => {
+    const githubRef = parseGithubRef(ref);
+    if (githubRef) {
+      const branch = (documentSettings?.github?.branch || 'main').trim() || 'main';
+      return fetchGithubRefText({ ...githubRef, branch });
+    }
+
+    const publicPath = resolvePublicPath(ref);
+    if (publicPath) {
+      const hostResult = await readFileViaHost(publicPath);
+      if (hostResult && !hostResult.error) {
+        return hostResult.text || '';
+      }
+    }
+
+    const response = await fetch(ref);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.text();
+  }, [parseGithubRef, documentSettings?.github?.branch, fetchGithubRefText, resolvePublicPath, readFileViaHost]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -533,6 +647,98 @@ const GraphEditorContent = () => {
     return Array.from(merged.values());
   }, [getDictionaryEntryKey]);
 
+  const normalizeDefinitionRef = useCallback((value) => {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (raw.startsWith('github://')) {
+      const withoutScheme = raw.slice('github://'.length);
+      const parts = withoutScheme.split('/').filter(Boolean);
+      if (parts.length >= 2) {
+        const [owner, repo, ...pathParts] = parts;
+        const path = pathParts.length ? pathParts.join('/') : 'root.node';
+        return `github://${owner}/${repo}/${path}`;
+      }
+      return raw;
+    }
+    if (raw.startsWith('local://')) {
+      const localPath = raw.slice('local://'.length).trim();
+      if (!localPath) return '';
+      return localPath.startsWith('/') ? localPath : `/${localPath}`;
+    }
+    try {
+      const parsed = new URL(raw);
+      const host = (parsed.hostname || '').toLowerCase();
+      const parts = parsed.pathname.split('/').filter(Boolean);
+      if (host === 'github.com' && parts.length >= 5 && parts[2] === 'blob') {
+        return `github://${parts[0]}/${parts[1]}/${parts.slice(4).join('/')}`;
+      }
+      if (host === 'raw.githubusercontent.com' && parts.length >= 4) {
+        return `github://${parts[0]}/${parts[1]}/${parts.slice(3).join('/')}`;
+      }
+      return raw;
+    } catch {
+      // non-URL
+    }
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw)) return raw;
+    return raw.startsWith('/') ? raw : `/${raw.replace(/^\/+/, '')}`;
+  }, []);
+
+  const inferSourceFromRef = useCallback((ref) => {
+    const normalized = String(ref || '').trim();
+    if (!normalized) return 'external';
+    if (normalized.startsWith('github://')) return 'github';
+    if (normalized.startsWith('tlz://')) return 'tlz';
+    if (normalized.startsWith('http://')) return 'http';
+    if (normalized.startsWith('https://')) return 'https';
+    if (normalized.startsWith('/')) return 'local';
+    return 'external';
+  }, []);
+
+  const normalizeDictionaryNodeDef = useCallback((entry) => {
+    const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
+    const ref = normalizeDefinitionRef(entry?.ref || entry?.path || entry?.file || '');
+    const source = String(entry?.source || '').trim() || inferSourceFromRef(ref);
+    const version = String(entry?.version || '').trim();
+    return { ...entry, key, ref, source, version };
+  }, [inferSourceFromRef, normalizeDefinitionRef]);
+
+  const normalizeDictionaryView = useCallback((entry, nodeDefByKey) => {
+    const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
+    const fallbackNodeDef = key ? nodeDefByKey.get(key) : null;
+    const intent = String(entry?.intent || '').trim();
+    const payload = String(entry?.payload || entry?.view || '').trim();
+    const ref = normalizeDefinitionRef(entry?.ref || entry?.path || entry?.file || fallbackNodeDef?.ref || '');
+    const source = String(entry?.source || '').trim() || fallbackNodeDef?.source || inferSourceFromRef(ref);
+    const version = String(entry?.version || '').trim() || String(fallbackNodeDef?.version || '').trim();
+    return {
+      ...entry,
+      key,
+      intent: intent || (payload === 'editor.web' ? 'editor' : 'node'),
+      payload: payload || (intent === 'editor' ? 'editor.web' : 'node.web'),
+      ref,
+      source,
+      version
+    };
+  }, [inferSourceFromRef, normalizeDefinitionRef]);
+
+  const normalizeResolvedDictionaryData = useCallback((data = {}) => {
+    const normalizedNodeDefs = (Array.isArray(data?.nodeDefs) ? data.nodeDefs : [])
+      .map((entry) => normalizeDictionaryNodeDef(entry))
+      .filter((entry) => entry.key);
+    const nodeDefByKey = new Map();
+    normalizedNodeDefs.forEach((entry) => {
+      if (!nodeDefByKey.has(entry.key)) nodeDefByKey.set(entry.key, entry);
+    });
+    const normalizedViews = (Array.isArray(data?.views) ? data.views : [])
+      .map((entry) => normalizeDictionaryView(entry, nodeDefByKey))
+      .filter((entry) => entry.key);
+    return {
+      ...data,
+      nodeDefs: normalizedNodeDefs,
+      views: normalizedViews
+    };
+  }, [normalizeDictionaryNodeDef, normalizeDictionaryView]);
+
   const implicitManifestRef = useRef(null);
   const implicitLegendRef = useRef(null);
   const implicitDictionaryRef = useRef(null);
@@ -564,6 +770,25 @@ const GraphEditorContent = () => {
   }, [nodes, groups, resolvedDictionary]);
 
   useEffect(() => {
+    const handleRefreshDefinitions = () => {
+      definitionDictionaryCacheRef.current = {};
+      setViewDefinitions({});
+      setDefinitionsRefreshToken((value) => value + 1);
+      try {
+        setSnackbar({
+          open: true,
+          message: 'Definition cache cleared. Reloading dictionary/view refs...',
+          severity: 'info'
+        });
+      } catch {}
+    };
+    eventBus.on('refreshDefinitions', handleRefreshDefinitions);
+    return () => {
+      eventBus.off('refreshDefinitions', handleRefreshDefinitions);
+    };
+  }, [setSnackbar]);
+
+  useEffect(() => {
     let active = true;
     const hostDictionary = (() => {
       if (!Array.isArray(nodes)) return null;
@@ -586,16 +811,25 @@ const GraphEditorContent = () => {
 
     if (!hostDictionary) {
       setResolvedDictionary(null);
+      setDictionaryContractIssues([]);
       return undefined;
     }
 
     const hostData = hostDictionary.data || {};
-    const hostNodeDefs = Array.isArray(hostData.nodeDefs) ? hostData.nodeDefs : [];
-    const hostViews = Array.isArray(hostData.views) ? hostData.views : [];
+    const hostNodeDefs = (Array.isArray(hostData.nodeDefs) ? hostData.nodeDefs : [])
+      .map((entry) => normalizeDictionaryNodeDef(entry))
+      .filter((entry) => entry.key);
+    const nodeDefByKey = new Map();
+    hostNodeDefs.forEach((entry) => {
+      if (!nodeDefByKey.has(entry.key)) nodeDefByKey.set(entry.key, entry);
+    });
+    const hostViews = (Array.isArray(hostData.views) ? hostData.views : [])
+      .map((entry) => normalizeDictionaryView(entry, nodeDefByKey))
+      .filter((entry) => entry.key);
     const hostSkills = Array.isArray(hostData.skills) ? hostData.skills : [];
 
     const refs = hostNodeDefs
-      .map((entry) => entry?.ref || entry?.path || entry?.file)
+      .map((entry) => entry?.ref)
       .filter(Boolean);
 
     const loadDefinitions = async () => {
@@ -605,37 +839,36 @@ const GraphEditorContent = () => {
       const warnings = [];
       for (const ref of refs) {
         if (!ref) continue;
-        if (!definitionDictionaryCacheRef.current[ref]) {
+        const cached = definitionDictionaryCacheRef.current[ref];
+        const isFresh =
+          cached &&
+          typeof cached.loadedAt === 'number' &&
+          Date.now() - cached.loadedAt < DEFINITION_CACHE_TTL_MS;
+        if (!isFresh) {
           try {
-            let text = null;
-            const publicPath = resolvePublicPath(ref);
-            if (publicPath) {
-              const hostResult = await readFileViaHost(publicPath);
-              if (hostResult && !hostResult.error) {
-                text = hostResult.text || '';
-              }
-            }
-            if (text === null) {
-              const response = await fetch(ref);
-              if (!response.ok) throw new Error(`HTTP ${response.status}`);
-              text = await response.text();
-            }
+            const text = await fetchRefText(ref);
             const parsed = JSON.parse(text);
             const parsedNodes = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
             const dictNode = parsedNodes.find((candidate) => candidate?.type === 'dictionary') || null;
             const requiresDictionary = parsedNodes
               .filter((candidate) => candidate?.type === 'manifest')
               .some((manifest) => manifest?.data?.requiresDictionary === true);
-            definitionDictionaryCacheRef.current[ref] = dictNode?.data || null;
+            definitionDictionaryCacheRef.current[ref] = {
+              loadedAt: Date.now(),
+              data: dictNode?.data || null
+            };
             if (!dictNode && requiresDictionary) {
               warnings.push(`Definition graph declares dictionary requirement but has none in ${ref}`);
             }
           } catch (err) {
-            definitionDictionaryCacheRef.current[ref] = null;
+            definitionDictionaryCacheRef.current[ref] = {
+              loadedAt: Date.now(),
+              data: null
+            };
             warnings.push(`Failed to load ${ref}`);
           }
         }
-        const dictData = definitionDictionaryCacheRef.current[ref];
+        const dictData = definitionDictionaryCacheRef.current[ref]?.data || null;
         if (!dictData) continue;
         if (Array.isArray(dictData.nodeDefs)) importedNodeDefs.push(...dictData.nodeDefs);
         if (Array.isArray(dictData.views)) importedViews.push(...dictData.views);
@@ -646,22 +879,35 @@ const GraphEditorContent = () => {
       const mergedNodeDefs = mergeDictionaryEntries(hostNodeDefs, importedNodeDefs);
       const mergedViews = mergeDictionaryEntries(hostViews, importedViews);
       const mergedSkills = mergeDictionaryEntries(hostSkills, importedSkills);
+      const normalizedData = normalizeResolvedDictionaryData({
+        ...hostData,
+        nodeDefs: mergedNodeDefs,
+        views: mergedViews,
+        skills: mergedSkills
+      });
+      const contractIssues = validateDictionaryAgainstNodeClassContract(
+        normalizedData.nodeDefs,
+        normalizedData.views
+      );
+      setDictionaryContractIssues(contractIssues);
       setResolvedDictionary({
         ...hostDictionary,
-        data: {
-          ...hostData,
-          nodeDefs: mergedNodeDefs,
-          views: mergedViews,
-          skills: mergedSkills
-        }
+        data: normalizedData
       });
 
-      if (warnings.length > 0) {
+      const combinedWarnings = [
+        ...warnings,
+        ...(contractIssues.length ? [
+          `NodeClass contract: ${contractIssues[0]}${contractIssues.length > 1 ? ` (+${contractIssues.length - 1} more)` : ''}`
+        ] : [])
+      ];
+
+      if (combinedWarnings.length > 0) {
         try {
           setSnackbar((prev) => ({
             ...prev,
             open: true,
-            message: `Dictionary load: ${warnings[0]}${warnings.length > 1 ? ` (+${warnings.length - 1} more)` : ''}`,
+            message: `Dictionary load: ${combinedWarnings[0]}${combinedWarnings.length > 1 ? ` (+${combinedWarnings.length - 1} more)` : ''}`,
             severity: 'warning'
           }));
         } catch (err) {
@@ -674,7 +920,7 @@ const GraphEditorContent = () => {
     return () => {
       active = false;
     };
-  }, [nodes, groups, mergeDictionaryEntries]);
+  }, [nodes, groups, mergeDictionaryEntries, fetchRefText, definitionsRefreshToken, normalizeResolvedDictionaryData, normalizeDictionaryNodeDef, normalizeDictionaryView]);
 
   useEffect(() => {
     try {
@@ -698,40 +944,273 @@ const GraphEditorContent = () => {
     };
   }, [resolvedDictionary]);
 
-  const resolveViewEntry = useCallback((node) => {
+  const resolveNodeClassContract = useCallback((node) => {
     if (!node) return null;
     const dictionary = resolveDictionaryForNode(node);
-    const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
-    const lookupKey = node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
-    const matches = views.filter((entry) => {
-      if (!entry) return false;
-      return entry.key === lookupKey || entry.nodeType === lookupKey || entry.type === lookupKey;
+    const dictionaryData = normalizeResolvedDictionaryData(dictionary?.data || {});
+    const nodeDefs = Array.isArray(dictionaryData.nodeDefs) ? dictionaryData.nodeDefs : [];
+    const views = Array.isArray(dictionaryData.views) ? dictionaryData.views : [];
+    const lookupKey = String(node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type || '').trim();
+    if (!lookupKey) return null;
+
+    const nodeDef = nodeDefs.find((entry) => {
+      const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
+      return key === lookupKey;
+    }) || null;
+
+    const matchingViews = views.filter((entry) => {
+      const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
+      return key === lookupKey;
     });
-    if (matches.length === 0) return null;
-    const nodeView = matches.find((entry) => {
-      const payload = entry.payload || entry.view || '';
-      return entry.intent === 'node' || payload === 'node.web';
+
+    const nodeView = matchingViews.find((entry) => {
+      const intent = String(entry?.intent || '').trim();
+      const payload = String(entry?.payload || entry?.view || '').trim();
+      return intent === 'node' || payload === 'node.web';
+    }) || (nodeDef?.ref ? {
+      key: lookupKey,
+      intent: 'node',
+      payload: 'node.web',
+      ref: String(nodeDef.ref || '').trim(),
+      source: String(nodeDef.source || inferSourceFromRef(nodeDef.ref)).trim(),
+      version: String(nodeDef.version || '').trim()
+    } : null);
+
+    const editorView = matchingViews.find((entry) => {
+      const intent = String(entry?.intent || '').trim();
+      const payload = String(entry?.payload || entry?.view || '').trim();
+      return intent === 'editor' || payload === 'editor.web';
+    }) || null;
+
+    return {
+      key: lookupKey,
+      nodeDef,
+      views: matchingViews,
+      nodeView,
+      editorView
+    };
+  }, [resolveDictionaryForNode, normalizeResolvedDictionaryData, inferSourceFromRef]);
+
+  const lifecycleRunningRef = useRef(new Set());
+  const lifecycleLastRunRef = useRef(new Map());
+  const lifecycleLoadedRef = useRef(new Set());
+
+  const resolveLifecycleHookSpec = useCallback((nodeDef, hookName) => {
+    if (!nodeDef || !hookName) return null;
+    const lifecycle = nodeDef?.lifecycle && typeof nodeDef.lifecycle === 'object' ? nodeDef.lifecycle : {};
+    const hooks = lifecycle?.hooks && typeof lifecycle.hooks === 'object'
+      ? lifecycle.hooks
+      : (nodeDef?.hooks && typeof nodeDef.hooks === 'object' ? nodeDef.hooks : {});
+    const raw = hooks?.[hookName] ?? lifecycle?.[hookName] ?? null;
+    if (!raw) return null;
+    if (typeof raw === 'string') {
+      return {
+        kind: 'script',
+        ref: raw.trim(),
+        timeoutMs: 2000
+      };
+    }
+    if (typeof raw === 'object') {
+      const kind = String(raw.kind || 'script').trim().toLowerCase();
+      const ref = String(raw.ref || raw.id || '').trim();
+      const timeoutMs = Number(raw.timeoutMs);
+      return {
+        kind: kind || 'script',
+        ref,
+        timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 2000
+      };
+    }
+    return null;
+  }, []);
+
+  const loadScriptLibrary = useCallback(() => {
+    if (typeof window === 'undefined' || !window.localStorage) return [];
+    try {
+      const raw = window.localStorage.getItem('scripts');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const resolveLifecycleScriptSource = useCallback(async (hookSpec) => {
+    if (!hookSpec?.ref) return '';
+    const ref = String(hookSpec.ref || '').trim();
+    if (!ref) return '';
+    if (ref.startsWith('script://')) {
+      const scriptId = ref.slice('script://'.length).trim();
+      if (!scriptId) return '';
+      const scripts = loadScriptLibrary();
+      const match = scripts.find((item) => {
+        const id = String(item?.id || '').trim();
+        const name = String(item?.name || '').trim();
+        return id === scriptId || name === scriptId;
+      }) || null;
+      if (!match) return '';
+      const inlineSource = String(match?.source || '').trim();
+      if (inlineSource) return inlineSource;
+      const nestedRef = String(match?.ref || '').trim();
+      if (nestedRef) return fetchRefText(nestedRef);
+      return '';
+    }
+    if (
+      ref.startsWith('github://') ||
+      ref.startsWith('local://') ||
+      ref.startsWith('tlz://') ||
+      ref.startsWith('/') ||
+      ref.startsWith('http://') ||
+      ref.startsWith('https://')
+    ) {
+      return fetchRefText(ref);
+    }
+    // Allow inline source as fallback for quick prototyping.
+    return ref;
+  }, [fetchRefText, loadScriptLibrary]);
+
+  const runNodeLifecycleHook = useCallback(async (node, hookName, context = {}) => {
+    if (!node?.id || !hookName) return;
+    const contract = resolveNodeClassContract(node);
+    const nodeDef = contract?.nodeDef || null;
+    const hookSpec = resolveLifecycleHookSpec(nodeDef, hookName);
+    if (!hookSpec) return;
+
+    const guardKey = `${node.id}:${hookName}`;
+    if (lifecycleRunningRef.current.has(guardKey)) return;
+    const now = Date.now();
+    const lastRun = lifecycleLastRunRef.current.get(guardKey) || 0;
+    if (now - lastRun < 120) return;
+    lifecycleLastRunRef.current.set(guardKey, now);
+
+    if (hookSpec.kind !== 'script') {
+      try {
+        setSnackbar((prev) => ({
+          ...prev,
+          open: true,
+          message: `Lifecycle hook kind "${hookSpec.kind}" not supported yet (${hookName}).`,
+          severity: 'warning'
+        }));
+      } catch {}
+      return;
+    }
+
+    if (typeof window === 'undefined' || !window.__scriptRunner) return;
+
+    lifecycleRunningRef.current.add(guardKey);
+    try {
+      const source = await resolveLifecycleScriptSource(hookSpec);
+      if (!String(source || '').trim()) return;
+      const result = await window.__scriptRunner.run(source, {
+        dry: false,
+        allowMutations: true,
+        timeoutMs: hookSpec.timeoutMs,
+        lifecycle: true,
+        hook: hookName,
+        nodeId: node.id,
+        nodeType: node.type,
+        context
+      });
+      try {
+        eventBus.emit('nodeLifecycleHookResult', {
+          nodeId: node.id,
+          nodeType: node.type,
+          hook: hookName,
+          success: Boolean(result?.success),
+          result
+        });
+      } catch {}
+    } catch (err) {
+      try {
+        eventBus.emit('nodeLifecycleHookResult', {
+          nodeId: node.id,
+          nodeType: node.type,
+          hook: hookName,
+          success: false,
+          error: String(err)
+        });
+      } catch {}
+      try {
+        setSnackbar((prev) => ({
+          ...prev,
+          open: true,
+          message: `Lifecycle ${hookName} failed for "${node.label || node.id}": ${String(err)}`,
+          severity: 'warning'
+        }));
+      } catch {}
+    } finally {
+      lifecycleRunningRef.current.delete(guardKey);
+    }
+  }, [resolveNodeClassContract, resolveLifecycleHookSpec, resolveLifecycleScriptSource, setSnackbar]);
+
+  useEffect(() => {
+    const handleNodeAdded = ({ node, id } = {}) => {
+      const resolvedNode = node || nodesRef.current?.find((candidate) => candidate.id === id) || null;
+      if (!resolvedNode) return;
+      runNodeLifecycleHook(resolvedNode, 'onCreate', { trigger: 'nodeAdded' });
+    };
+    const handleNodeBeforeUpdate = ({ node, id, patch } = {}) => {
+      const resolvedNode = node || nodesRef.current?.find((candidate) => candidate.id === id) || null;
+      if (!resolvedNode) return;
+      runNodeLifecycleHook(resolvedNode, 'onBeforeUpdate', { trigger: 'nodeBeforeUpdate', patch });
+    };
+    const handleNodeUpdated = ({ id, node, patch } = {}) => {
+      const resolvedNode = node || nodesRef.current?.find((candidate) => candidate.id === id) || null;
+      if (!resolvedNode) return;
+      runNodeLifecycleHook(resolvedNode, 'onAfterUpdate', { trigger: 'nodeUpdated', patch });
+    };
+    const handleNodeBeforeDelete = ({ node, id } = {}) => {
+      const resolvedNode = node || nodesRef.current?.find((candidate) => candidate.id === id) || null;
+      if (!resolvedNode) return;
+      runNodeLifecycleHook(resolvedNode, 'onDelete', { trigger: 'nodeBeforeDelete' });
+    };
+    eventBus.on('nodeAdded', handleNodeAdded);
+    eventBus.on('nodeBeforeUpdate', handleNodeBeforeUpdate);
+    eventBus.on('nodeUpdated', handleNodeUpdated);
+    eventBus.on('nodeBeforeDelete', handleNodeBeforeDelete);
+    return () => {
+      eventBus.off('nodeAdded', handleNodeAdded);
+      eventBus.off('nodeBeforeUpdate', handleNodeBeforeUpdate);
+      eventBus.off('nodeUpdated', handleNodeUpdated);
+      eventBus.off('nodeBeforeDelete', handleNodeBeforeDelete);
+    };
+  }, [nodesRef, runNodeLifecycleHook]);
+
+  useEffect(() => {
+    const activeNodeIds = new Set((Array.isArray(nodes) ? nodes : []).map((node) => node?.id).filter(Boolean));
+    Array.from(lifecycleLoadedRef.current).forEach((key) => {
+      const nodeId = String(key).split('::')[0];
+      if (!activeNodeIds.has(nodeId)) {
+        lifecycleLoadedRef.current.delete(key);
+      }
     });
-    return nodeView || matches[0] || null;
-  }, [resolveDictionaryForNode]);
+    (Array.isArray(nodes) ? nodes : []).forEach((node) => {
+      if (!node?.id) return;
+      const contract = resolveNodeClassContract(node);
+      if (!contract?.nodeDef) return;
+      const signature = `${node.id}::${node.type}::${contract?.nodeDef?.ref || ''}::${contract?.nodeDef?.version || ''}`;
+      if (lifecycleLoadedRef.current.has(signature)) return;
+      lifecycleLoadedRef.current.add(signature);
+      runNodeLifecycleHook(node, 'onLoad', { trigger: 'dictionaryResolved' });
+    });
+  }, [nodes, resolvedDictionary, resolveNodeClassContract, runNodeLifecycleHook]);
+
+  const resolveViewEntry = useCallback((node) => {
+    if (!node) return null;
+    const contract = resolveNodeClassContract(node);
+    if (!contract) return null;
+    return contract.nodeView || contract.views?.[0] || null;
+  }, [resolveNodeClassContract]);
 
   const resolveEditorViewEntry = useCallback((node) => {
     if (!node) return null;
-    const dictionary = resolveDictionaryForNode(node);
-    const views = Array.isArray(dictionary?.data?.views) ? dictionary.data.views : [];
-    const lookupKey = node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
-    const matched = views.find((entry) => {
-      if (!entry) return false;
-      const keyMatches = entry.key === lookupKey || entry.nodeType === lookupKey || entry.type === lookupKey;
-      if (!keyMatches) return false;
-      const payload = entry.payload || entry.view || '';
-      return entry.intent === 'editor' || payload === 'editor.web';
-    }) || null;
+    const contract = resolveNodeClassContract(node);
+    const lookupKey = contract?.key || node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type;
+    const matched = contract?.editorView || null;
     if (matched) return matched;
 
     const nodeEntry = resolveViewEntry(node);
     if (!nodeEntry?.ref) return null;
-    const def = viewDefinitionsRef.current[nodeEntry.ref] || null;
+    const def = viewDefinitions[nodeEntry.ref] || null;
     const viewNodes = Array.isArray(def?.viewNodes) ? def.viewNodes : [];
     const editorViewNode = viewNodes.find((candidate) => {
       const viewData = candidate?.data?.view || {};
@@ -747,7 +1226,7 @@ const GraphEditorContent = () => {
       ref: nodeEntry.ref,
       source: 'definition'
     };
-  }, [resolveDictionaryForNode, resolveViewEntry]);
+  }, [resolveNodeClassContract, resolveViewEntry, viewDefinitions]);
 
   const manifestNode = useMemo(
     () => (Array.isArray(nodes) ? nodes.find((candidate) => candidate?.type === 'manifest') || null : null),
@@ -874,22 +1353,16 @@ const GraphEditorContent = () => {
   const requestViewDefinition = useCallback((ref) => {
     if (!ref) return;
     const current = viewDefinitionsRef.current[ref];
-    if (current && (current.status === 'loading' || current.status === 'ready')) return;
+    const isFresh =
+      current &&
+      current.status === 'ready' &&
+      typeof current.loadedAt === 'number' &&
+      Date.now() - current.loadedAt < DEFINITION_CACHE_TTL_MS;
+    if (current?.status === 'loading' || isFresh) return;
     setViewDefinitions((prev) => ({ ...prev, [ref]: { status: 'loading' } }));
     Promise.resolve()
       .then(async () => {
-        const publicPath = resolvePublicPath(ref);
-        if (publicPath) {
-          const hostResult = await readFileViaHost(publicPath);
-          if (hostResult && !hostResult.error) {
-            return hostResult.text || '';
-          }
-        }
-        const response = await fetch(ref);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        return response.text();
+        return fetchRefText(ref);
       })
       .then((text) => {
         const parsed = JSON.parse(text);
@@ -901,7 +1374,7 @@ const GraphEditorContent = () => {
         const schemaWarnings = validateViewSchema(viewNodes, ref);
         setViewDefinitions((prev) => ({
           ...prev,
-          [ref]: { status: 'ready', viewNodes }
+          [ref]: { status: 'ready', viewNodes, loadedAt: Date.now() }
         }));
         if (schemaWarnings.length > 0) {
           try {
@@ -922,7 +1395,7 @@ const GraphEditorContent = () => {
           [ref]: { status: 'error', error: err?.message || 'Failed to load view' }
         }));
       });
-  }, [readFileViaHost, resolvePublicPath, validateViewSchema]);
+  }, [fetchRefText, validateViewSchema]);
 
   useEffect(() => {
     if (!Array.isArray(nodes)) return;
@@ -930,11 +1403,14 @@ const GraphEditorContent = () => {
     nodes.forEach((node) => {
       if (!node || nodeTypes?.[node.type]) return;
       if (typeof node?.type === 'string' && node.type.includes(':')) return;
-      const entry = resolveViewEntry(node);
-      if (entry?.ref) refs.add(entry.ref);
+      const contract = resolveNodeClassContract(node);
+      const nodeRef = contract?.nodeView?.ref;
+      const editorRef = contract?.editorView?.ref;
+      if (nodeRef) refs.add(nodeRef);
+      if (editorRef) refs.add(editorRef);
     });
     refs.forEach((ref) => requestViewDefinition(ref));
-  }, [nodes, nodeTypes, resolveViewEntry, requestViewDefinition]);
+  }, [nodes, nodeTypes, resolveNodeClassContract, requestViewDefinition]);
 
   useEffect(() => {
     const handleTogglePanel = ({ nodeId, source } = {}) => {
@@ -1049,9 +1525,9 @@ const GraphEditorContent = () => {
     }
   }, [nodeEditorPanel.open, editorPanelEntry?.ref, requestViewDefinition]);
 
-  const editorPanelDefinition = (() => {
+  const editorPanelDefinition = useMemo(() => {
     if (!editorPanelEntry?.ref) return null;
-    const def = viewDefinitionsRef.current[editorPanelEntry.ref] || null;
+    const def = viewDefinitions[editorPanelEntry.ref] || null;
     const viewNodes = Array.isArray(def?.viewNodes) ? def.viewNodes : [];
     const entryIntent = editorPanelEntry.intent || '';
     const entryPayload = editorPanelEntry.payload || editorPanelEntry.view || '';
@@ -1064,7 +1540,7 @@ const GraphEditorContent = () => {
     return selectedViewNode
       ? { status: def?.status || 'ready', viewNode: selectedViewNode }
       : def;
-  })();
+  }, [editorPanelEntry, viewDefinitions]);
 
   const editorPanelDirty = Boolean(editorPanelNode?.id && nodeEditorDirty.nodeId === editorPanelNode.id && nodeEditorDirty.dirty);
 
@@ -1225,12 +1701,58 @@ const GraphEditorContent = () => {
       changeCount: Object.keys(updates || {}).length,
       selectionCount: selectedNodeIds.length
     });
+    let outboundPatch = updates || {};
     setNodes(prev => {
       const enforceSingleRoot =
         updates?.isRoot === true ||
         updates?.data?.isRoot === true ||
         updates?.data?.root === true;
-      const { data: nextDataPatch, replaceData, ...restUpdates } = updates || {};
+      const targetNode = prev.find((candidate) => candidate.id === id) || null;
+      const contract = targetNode ? resolveNodeClassContract(targetNode) : null;
+      const overrides = contract?.nodeDef?.overrides && typeof contract.nodeDef.overrides === 'object'
+        ? contract.nodeDef.overrides
+        : null;
+      const policy = {
+        allowLabel: overrides?.allowLabel !== false,
+        allowSize: overrides?.allowSize !== false,
+        allowColor: overrides?.allowColor !== false,
+        allowPorts: overrides?.allowPorts !== false,
+        allowData: overrides?.allowData !== false,
+        dataMode: ['replace', 'merge-shallow', 'merge-deep'].includes(String(overrides?.dataMode || ''))
+          ? String(overrides.dataMode)
+          : 'merge-deep'
+      };
+      const filteredUpdates = { ...(updates || {}) };
+      if (!policy.allowLabel) delete filteredUpdates.label;
+      if (!policy.allowSize) {
+        delete filteredUpdates.width;
+        delete filteredUpdates.height;
+      }
+      if (!policy.allowColor) delete filteredUpdates.color;
+      if (!policy.allowPorts) {
+        delete filteredUpdates.ports;
+        delete filteredUpdates.inputs;
+        delete filteredUpdates.outputs;
+        delete filteredUpdates.handles;
+      }
+      if (!policy.allowData) {
+        delete filteredUpdates.data;
+      } else if (filteredUpdates.data && typeof filteredUpdates.data === 'object') {
+        filteredUpdates.__twiliteDataMode = policy.dataMode;
+      }
+      const { data: nextDataPatch, replaceData, __twiliteDataMode, ...restUpdates } = filteredUpdates || {};
+      outboundPatch = filteredUpdates || {};
+      if (targetNode) {
+        try {
+          eventBus.emit('nodeBeforeUpdate', {
+            id,
+            node: { ...targetNode },
+            patch: outboundPatch
+          });
+        } catch (err) {
+          // ignore lifecycle emit failures
+        }
+      }
       const next = prev.map(n => {
         if (n.id !== id) {
           if (!enforceSingleRoot) return n;
@@ -1245,9 +1767,11 @@ const GraphEditorContent = () => {
           };
         }
         const nextData = nextDataPatch
-          ? (replaceData || options?.replaceData)
+          ? (replaceData || options?.replaceData || __twiliteDataMode === 'replace')
             ? nextDataPatch
-            : { ...n.data, ...nextDataPatch }
+            : (__twiliteDataMode === 'merge-deep'
+                ? deepMergeData(n.data || {}, nextDataPatch)
+                : { ...n.data, ...nextDataPatch })
           : n.data;
         return { ...n, ...restUpdates, data: nextData };
       });
@@ -1261,16 +1785,16 @@ const GraphEditorContent = () => {
     if (!options || options !== true) {
       try {
         if (hasHandler) {
-          handlers.handleUpdateNodeData(id, updates, options);
+          handlers.handleUpdateNodeData(id, outboundPatch, options);
         }
       } catch (err) {}
     }
     if (options === true || !hasHandler) {
       try {
-        eventBus.emit('nodeUpdated', { id, patch: updates || {} });
+        eventBus.emit('nodeUpdated', { id, patch: outboundPatch || {} });
       } catch (err) {}
     }
-  }, [emitEdgeIntent, selectedNodeIds.length, setNodes, nodesRef, historyHook, edgesRef, handlers]);
+  }, [emitEdgeIntent, selectedNodeIds.length, setNodes, nodesRef, historyHook, edgesRef, handlers, resolveNodeClassContract]);
 
   const handleUpdateEdgeFromPanels = useCallback((id, updates) => {
     emitEdgeIntent('updateEdge', { edgeId: id, changeCount: Object.keys(updates || {}).length });
@@ -1705,9 +2229,8 @@ const GraphEditorContent = () => {
 
   const handleCreateBlankGraph = useCallback(() => {
     const manifestNode = createDefaultManifestNode({ kind: 'graph' });
-    const legendNode = createDefaultLegendNode();
     const dictionaryNode = createDefaultDictionaryNode();
-    const nextNodes = [manifestNode, legendNode, dictionaryNode];
+    const nextNodes = [manifestNode, dictionaryNode];
     if (typeof loadGraph === 'function') {
       loadGraph(nextNodes, [], []);
     } else {

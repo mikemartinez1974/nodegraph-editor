@@ -17,13 +17,20 @@ import {
   Tab,
   List,
   ListItemButton,
-  ListItemText
+  ListItemText,
+  Tooltip,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import EditIcon from "@mui/icons-material/Edit";
+import * as Icons from "@mui/icons-material";
 import eventBus from "../../NodeGraph/eventBus";
+import useAvailableNodeTypes from "../hooks/useAvailableNodeTypes";
+import { validateDictionaryAgainstNodeClassContract } from "../utils/nodeClassContract";
 
 export default function SystemNodesPanel({
   open = false,
@@ -61,10 +68,28 @@ export default function SystemNodesPanel({
   const [scriptSource, setScriptSource] = useState("");
   const [runningScript, setRunningScript] = useState(false);
   const [scriptResult, setScriptResult] = useState(null);
+  const [legendExpanded, setLegendExpanded] = useState({});
+  const [quickTypeKey, setQuickTypeKey] = useState("");
+  const [quickTypeRef, setQuickTypeRef] = useState("");
+  const [quickTypeSource, setQuickTypeSource] = useState("github");
+  const [quickTypeVersion, setQuickTypeVersion] = useState(">=0.1.0");
+  const [quickIncludeNodeView, setQuickIncludeNodeView] = useState(true);
+  const [quickIncludeEditorView, setQuickIncludeEditorView] = useState(true);
   const resizeStateRef = useRef(null);
   const validationErrors = Array.isArray(validationReport?.errors) ? validationReport.errors : [];
   const validationWarnings = Array.isArray(validationReport?.warnings) ? validationReport.warnings : [];
   const totalIssues = validationErrors.length + validationWarnings.length;
+  const { nodeTypeList } = useAvailableNodeTypes();
+
+  const nodeTypeMetaByType = useMemo(() => {
+    const map = new Map();
+    (nodeTypeList || []).forEach((meta) => {
+      const type = String(meta?.type || "").trim();
+      if (!type) return;
+      map.set(type, meta);
+    });
+    return map;
+  }, [nodeTypeList]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -129,6 +154,34 @@ export default function SystemNodesPanel({
     return `/${trimmed.replace(/^\/+/, "")}`;
   };
 
+  const normalizeDefinitionRef = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return { ref: "", sourceHint: "" };
+    if (raw.startsWith("github://")) return { ref: raw, sourceHint: "github" };
+    try {
+      const url = new URL(raw);
+      const host = (url.hostname || "").toLowerCase();
+      const parts = url.pathname.split("/").filter(Boolean);
+      // github.com/{owner}/{repo}/blob/{branch}/{path...}
+      if (host === "github.com" && parts.length >= 5 && parts[2] === "blob") {
+        const owner = parts[0];
+        const repo = parts[1];
+        const path = parts.slice(4).join("/");
+        return { ref: `github://${owner}/${repo}/${path}`, sourceHint: "github" };
+      }
+      // raw.githubusercontent.com/{owner}/{repo}/{branch}/{path...}
+      if (host === "raw.githubusercontent.com" && parts.length >= 4) {
+        const owner = parts[0];
+        const repo = parts[1];
+        const path = parts.slice(3).join("/");
+        return { ref: `github://${owner}/${repo}/${path}`, sourceHint: "github" };
+      }
+    } catch {
+      // non-URL refs are valid as-is (local path / relative path)
+    }
+    return { ref: raw, sourceHint: "" };
+  };
+
   const beginResize = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -170,7 +223,10 @@ export default function SystemNodesPanel({
   }, [manifestNode?.id]);
 
   useEffect(() => {
-    if (!legendNode) return;
+    if (!legendNode) {
+      setLegendEntries([]);
+      return;
+    }
     const entries = Array.isArray(legendNode?.data?.entries) ? legendNode.data.entries : [];
     setLegendEntries(entries.map((entry) => ({
       key: entry?.key || "",
@@ -181,14 +237,19 @@ export default function SystemNodesPanel({
   }, [legendNode?.id]);
 
   useEffect(() => {
-    if (!dictionaryNode) return;
+    if (!dictionaryNode) {
+      setDictionaryNodeDefs([]);
+      setDictionaryViews([]);
+      return;
+    }
     const nodeDefs = Array.isArray(dictionaryNode?.data?.nodeDefs) ? dictionaryNode.data.nodeDefs : [];
     const views = Array.isArray(dictionaryNode?.data?.views) ? dictionaryNode.data.views : [];
     setDictionaryNodeDefs(nodeDefs.map((entry) => ({
       key: entry?.key || "",
       ref: entry?.ref || "",
       source: entry?.source || "",
-      version: entry?.version || ""
+      version: entry?.version || "",
+      legendVisible: entry?.legend?.visible !== false
     })));
     setDictionaryViews(views.map((entry) => ({
       key: entry?.key || "",
@@ -228,7 +289,10 @@ export default function SystemNodesPanel({
   };
 
   const applyLegend = () => {
-    if (!legendNode) return;
+    if (!legendNode) {
+      setError("No explicit Legend node found. Legend is currently derived from Dictionary.");
+      return;
+    }
     const nextEntries = legendEntries
       .map((entry) => ({
         key: String(entry?.key || "").trim(),
@@ -252,7 +316,10 @@ export default function SystemNodesPanel({
         key: String(entry?.key || "").trim(),
         ref: String(entry?.ref || "").trim(),
         source: String(entry?.source || "").trim(),
-        version: String(entry?.version || "").trim()
+        version: String(entry?.version || "").trim(),
+        legend: {
+          visible: entry?.legendVisible !== false
+        }
       }))
       .filter((entry) => entry.key);
     const nextViews = dictionaryViews
@@ -265,6 +332,11 @@ export default function SystemNodesPanel({
         version: String(entry?.version || "").trim()
       }))
       .filter((entry) => entry.key);
+    const contractErrors = validateDictionaryAgainstNodeClassContract(nextNodeDefs, nextViews);
+    if (contractErrors.length) {
+      setError(`Dictionary NodeClass contract validation failed: ${contractErrors[0]}${contractErrors.length > 1 ? ` (+${contractErrors.length - 1} more)` : ""}`);
+      return;
+    }
     const nextData = {
       ...(dictionaryNode.data || {}),
       nodeDefs: nextNodeDefs,
@@ -274,14 +346,35 @@ export default function SystemNodesPanel({
     setError("");
   };
 
-  const updateLegendEntry = (index, patch) => {
-    setLegendEntries((prev) => prev.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)));
-  };
-  const removeLegendEntry = (index) => {
-    setLegendEntries((prev) => prev.filter((_, i) => i !== index));
-  };
   const addLegendEntry = () => {
     setLegendEntries((prev) => [...prev, { key: "", intent: "", implementation: "", dictionaryKey: "" }]);
+  };
+
+  const updateLegendOverrideByLookup = (lookupKey, patch) => {
+    const safeLookup = String(lookupKey || "").trim();
+    if (!safeLookup) return;
+    setLegendEntries((prev) => {
+      const idx = prev.findIndex((entry) => String(entry?.dictionaryKey || entry?.key || "").trim() === safeLookup);
+      if (idx >= 0) {
+        return prev.map((entry, i) => (i === idx ? { ...entry, ...patch } : entry));
+      }
+      return [...prev, { key: safeLookup, dictionaryKey: safeLookup, intent: "", implementation: "node", ...patch }];
+    });
+  };
+
+  const handleSpawnLegendNode = (entry) => {
+    const typeKey = String(entry?.dictionaryKey || entry?.key || "").trim();
+    if (!typeKey) {
+      setError("Legend entry needs a key or dictionaryKey to add a node.");
+      return;
+    }
+    setError("");
+    eventBus.emit("addNode", { type: typeKey });
+  };
+
+  const getIconComponent = (iconName) => {
+    if (!iconName || typeof iconName !== "string") return Icons.Extension;
+    return Icons[iconName] || Icons.Extension;
   };
 
   const updateNodeDefEntry = (index, patch) => {
@@ -291,7 +384,7 @@ export default function SystemNodesPanel({
     setDictionaryNodeDefs((prev) => prev.filter((_, i) => i !== index));
   };
   const addNodeDefEntry = () => {
-    setDictionaryNodeDefs((prev) => [...prev, { key: "", ref: "", source: "", version: "" }]);
+    setDictionaryNodeDefs((prev) => [...prev, { key: "", ref: "", source: "", version: "", legendVisible: true }]);
   };
 
   const updateViewEntry = (index, patch) => {
@@ -306,6 +399,106 @@ export default function SystemNodesPanel({
       { key: "", intent: "", payload: "", ref: "", source: "", version: "" }
     ]);
   };
+
+  const handleQuickAddNodeType = () => {
+    const key = String(quickTypeKey || "").trim();
+    const normalized = normalizeDefinitionRef(quickTypeRef);
+    const ref = normalized.ref;
+    const resolvedSource = normalized.sourceHint || quickTypeSource;
+    if (!key || !ref) {
+      setError("Quick add requires both key and ref.");
+      return;
+    }
+
+    const nodeDefExists = dictionaryNodeDefs.some((entry) => String(entry?.key || "").trim() === key);
+    const nextNodeDefs = nodeDefExists
+      ? dictionaryNodeDefs
+      : [...dictionaryNodeDefs, { key, ref, source: resolvedSource, version: quickTypeVersion, legendVisible: true }];
+
+    const hasView = (intent, payload) => dictionaryViews.some((entry) => (
+      String(entry?.key || "").trim() === key &&
+      String(entry?.intent || "").trim() === intent &&
+      String(entry?.payload || "").trim() === payload
+    ));
+
+    const nextViews = [...dictionaryViews];
+    if (quickIncludeNodeView && !hasView("node", "node.web")) {
+      nextViews.push({ key, intent: "node", payload: "node.web", ref, source: resolvedSource, version: quickTypeVersion });
+    }
+    if (quickIncludeEditorView && !hasView("editor", "editor.web")) {
+      nextViews.push({ key, intent: "editor", payload: "editor.web", ref, source: resolvedSource, version: quickTypeVersion });
+    }
+
+    setDictionaryNodeDefs(nextNodeDefs);
+    setDictionaryViews(nextViews);
+    if (normalized.ref !== String(quickTypeRef || "").trim()) {
+      setQuickTypeRef(normalized.ref);
+    }
+    if (normalized.sourceHint && normalized.sourceHint !== quickTypeSource) {
+      setQuickTypeSource(normalized.sourceHint);
+    }
+
+    if (dictionaryNode?.id) {
+      onUpdateNode(
+        dictionaryNode.id,
+        {
+          data: {
+            ...(dictionaryNode.data || {}),
+            nodeDefs: nextNodeDefs,
+            views: nextViews
+          }
+        },
+        { replaceData: true }
+      );
+    }
+    setError("");
+  };
+
+  const effectiveLegendEntries = useMemo(() => {
+    const explicitEntries = Array.isArray(legendEntries) ? legendEntries : [];
+    const explicitByLookup = new Map();
+    explicitEntries.forEach((entry) => {
+      const lookup = String(entry?.dictionaryKey || entry?.key || "").trim();
+      if (!lookup) return;
+      explicitByLookup.set(lookup, entry);
+    });
+
+    const dictionaryKeys = new Set();
+    const derived = (Array.isArray(dictionaryNodeDefs) ? dictionaryNodeDefs : [])
+      .filter((entry) => entry?.legendVisible !== false)
+      .map((entry) => {
+        const key = String(entry?.key || "").trim();
+        if (!key) return null;
+        dictionaryKeys.add(key);
+        const override = explicitByLookup.get(key);
+        return {
+          key: String(override?.key || key),
+          dictionaryKey: key,
+          intent: String(override?.intent || ""),
+          implementation: String(override?.implementation || "node"),
+          _lookupKey: key,
+          _derived: true
+        };
+      })
+      .filter(Boolean);
+
+    const extras = explicitEntries
+      .map((entry) => {
+        const lookup = String(entry?.dictionaryKey || entry?.key || "").trim();
+        if (!lookup || dictionaryKeys.has(lookup)) return null;
+        return {
+          key: String(entry?.key || ""),
+          dictionaryKey: String(entry?.dictionaryKey || ""),
+          intent: String(entry?.intent || ""),
+          implementation: String(entry?.implementation || ""),
+          _lookupKey: lookup,
+          _derived: false
+        };
+      })
+      .filter(Boolean);
+
+    return [...derived, ...extras];
+  }, [dictionaryNodeDefs, legendEntries]);
 
   const handleCreateScript = () => {
     const id = `script_${Date.now()}`;
@@ -470,31 +663,107 @@ export default function SystemNodesPanel({
             ) : null}
 
             {selectedSection === "legend" ? (
-              <Stack spacing={1.5}>
-                <Typography variant="subtitle1">Legend</Typography>
-                {legendEntries.map((entry, index) => (
-                  <Paper key={`legend-${index}`} variant="outlined" sx={{ p: 1 }}>
-                    <Stack spacing={1}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption">Entry {index + 1}</Typography>
-                        <IconButton size="small" onClick={() => removeLegendEntry(index)}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+              <Stack spacing={1}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography variant="subtitle1">Legend</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {effectiveLegendEntries.length} entries
+                  </Typography>
+                </Stack>
+                {effectiveLegendEntries.map((entry, index) => (
+                  <Paper key={`legend-${index}`} variant="outlined" sx={{ p: 0.75 }}>
+                    <Stack spacing={0.75}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={0.5}>
+                        {(() => {
+                          const key = String(entry?.dictionaryKey || entry?.key || "").trim();
+                          const meta = key ? nodeTypeMetaByType.get(key) : null;
+                          const Icon = getIconComponent(meta?.icon);
+                          return (
+                            <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                              <Icon sx={{ fontSize: 16 }} />
+                              <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>
+                                {String(entry?.key || "").trim() || `Entry ${index + 1}`}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                noWrap
+                                sx={{ ml: 0.5, lineHeight: 1.3, position: "relative", top: "2px" }}
+                              >
+                                {String(entry?.intent || "").trim() || "No intent"}
+                              </Typography>
+                            </Stack>
+                          );
+                        })()}
+                        <Tooltip title="Add node from this legend entry">
+                          <IconButton size="small" onClick={() => handleSpawnLegendNode(entry)}>
+                            <AddIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit entry">
+                          <IconButton
+                            size="small"
+                            onClick={() => setLegendExpanded((prev) => ({ ...prev, [index]: !prev[index] }))}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
-                      <TextField size="small" label="key" value={entry.key} onChange={(e) => updateLegendEntry(index, { key: e.target.value })} />
-                      <TextField size="small" label="intent" value={entry.intent} onChange={(e) => updateLegendEntry(index, { intent: e.target.value })} />
-                      <TextField size="small" label="implementation" value={entry.implementation} onChange={(e) => updateLegendEntry(index, { implementation: e.target.value })} />
-                      <TextField size="small" label="dictionaryKey" value={entry.dictionaryKey} onChange={(e) => updateLegendEntry(index, { dictionaryKey: e.target.value })} />
+                      {legendExpanded[index] ? (
+                        <>
+                          <Stack direction={{ xs: "column", md: "row" }} spacing={0.75}>
+                            <TextField size="small" label="key" value={entry.key} onChange={(e) => updateLegendOverrideByLookup(entry?._lookupKey, { key: e.target.value })} />
+                            <TextField size="small" label="dictionaryKey" value={entry.dictionaryKey} onChange={(e) => updateLegendOverrideByLookup(entry?._lookupKey, { dictionaryKey: e.target.value })} />
+                          </Stack>
+                          <Stack direction={{ xs: "column", md: "row" }} spacing={0.75}>
+                            <TextField size="small" label="intent" value={entry.intent} onChange={(e) => updateLegendOverrideByLookup(entry?._lookupKey, { intent: e.target.value })} />
+                            <TextField size="small" label="implementation" value={entry.implementation} onChange={(e) => updateLegendOverrideByLookup(entry?._lookupKey, { implementation: e.target.value })} />
+                          </Stack>
+                        </>
+                      ) : null}
                     </Stack>
                   </Paper>
                 ))}
-                <Button variant="text" size="small" startIcon={<AddIcon />} onClick={addLegendEntry}>Add Legend Entry</Button>
-                <Button variant="outlined" size="small" onClick={applyLegend}>Apply Legend</Button>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="text" size="small" startIcon={<AddIcon />} onClick={addLegendEntry}>Add Legend Entry</Button>
+                  <Button variant="outlined" size="small" onClick={applyLegend}>Apply Legend</Button>
+                </Stack>
               </Stack>
             ) : null}
 
             {selectedSection === "dictionary" ? (
               <Stack spacing={1.5}>
+                <Paper variant="outlined" sx={{ p: 1 }}>
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle2">Quick Add Node Type</Typography>
+                    <TextField size="small" label="key" value={quickTypeKey} onChange={(e) => setQuickTypeKey(e.target.value)} />
+                    <TextField size="small" label="ref" value={quickTypeRef} onChange={(e) => setQuickTypeRef(e.target.value)} placeholder="github://owner/repo/file.node-class.node" />
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
+                      <TextField size="small" label="source" value={quickTypeSource} onChange={(e) => setQuickTypeSource(e.target.value)} />
+                      <TextField size="small" label="version" value={quickTypeVersion} onChange={(e) => setQuickTypeVersion(e.target.value)} />
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant={quickIncludeNodeView ? "contained" : "outlined"}
+                        size="small"
+                        onClick={() => setQuickIncludeNodeView((prev) => !prev)}
+                      >
+                        node.web
+                      </Button>
+                      <Button
+                        variant={quickIncludeEditorView ? "contained" : "outlined"}
+                        size="small"
+                        onClick={() => setQuickIncludeEditorView((prev) => !prev)}
+                      >
+                        editor.web
+                      </Button>
+                      <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={handleQuickAddNodeType}>
+                        Add Type
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Paper>
+
                 <Typography variant="subtitle1">Dictionary: nodeDefs</Typography>
                 {dictionaryNodeDefs.map((entry, index) => (
                   <Paper key={`nodeDef-${index}`} variant="outlined" sx={{ p: 1 }}>
@@ -509,6 +778,16 @@ export default function SystemNodesPanel({
                       <TextField size="small" label="ref" value={entry.ref} onChange={(e) => updateNodeDefEntry(index, { ref: e.target.value })} />
                       <TextField size="small" label="source" value={entry.source} onChange={(e) => updateNodeDefEntry(index, { source: e.target.value })} />
                       <TextField size="small" label="version" value={entry.version} onChange={(e) => updateNodeDefEntry(index, { version: e.target.value })} />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            size="small"
+                            checked={entry.legendVisible !== false}
+                            onChange={(e) => updateNodeDefEntry(index, { legendVisible: e.target.checked })}
+                          />
+                        }
+                        label="Show in legend"
+                      />
                     </Stack>
                   </Paper>
                 ))}
@@ -534,7 +813,17 @@ export default function SystemNodesPanel({
                   </Paper>
                 ))}
                 <Button variant="text" size="small" startIcon={<AddIcon />} onClick={addViewEntry}>Add view</Button>
-                <Button variant="outlined" size="small" onClick={applyDictionary}>Apply Dictionary</Button>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="outlined" size="small" onClick={applyDictionary}>Apply Dictionary</Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<PlayArrowIcon />}
+                    onClick={() => eventBus.emit("refreshDefinitions")}
+                  >
+                    Refresh Definitions
+                  </Button>
+                </Stack>
               </Stack>
             ) : null}
 
