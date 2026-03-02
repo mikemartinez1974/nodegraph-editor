@@ -7,6 +7,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import FixedNode from "./FixedNode";
 import useNodePortSchema from "../hooks/useNodePortSchema";
 import { endpointToUrl, parsePortEndpoint } from "../utils/portEndpoint";
+import eventBus from "../../NodeGraph/eventBus";
 
 const DEFAULT_INPUTS = [{ key: "in", label: "In", type: "value" }];
 const DEFAULT_OUTPUTS = [{ key: "out", label: "Out", type: "value" }];
@@ -231,25 +232,37 @@ const GraphReferenceNode = (props) => {
                 >
                   <RefreshIcon sx={{ fontSize: 14 }} />
                 </button>
-                <a
-                  href={graphUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  title="Open source graph"
-                  onClick={(event) => event.stopPropagation()}
+                <button
+                  type="button"
+                  title="Open source graph in Twilite"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!graphUrl) return;
+                    try {
+                      eventBus.emit("fetchUrl", { url: graphUrl, source: "graph-reference-node" });
+                    } catch (err) {
+                      console.warn("[GraphReferenceNode] Failed to emit fetchUrl", err);
+                      if (typeof window !== "undefined") {
+                        window.location.assign(graphUrl);
+                      }
+                    }
+                  }}
                   style={{
                     border: `1px solid ${theme.palette.divider}`,
+                    background: "transparent",
                     color: theme.palette.text.secondary,
                     borderRadius: 6,
                     width: 24,
                     height: 24,
                     display: "inline-flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    cursor: "pointer"
                   }}
                 >
                   <OpenInNewIcon sx={{ fontSize: 14 }} />
-                </a>
+                </button>
               </>
             ) : null}
           </div>

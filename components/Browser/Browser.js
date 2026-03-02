@@ -23,6 +23,9 @@ import MenuItem from '@mui/material/MenuItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import LinkIcon from '@mui/icons-material/Link';
 import TemplateGallery from './TemplateGallery';
 
 export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme, isMobile, isSmallScreen, isPortrait, isLandscape }) {
@@ -36,6 +39,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const [isLoading, setIsLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null); // bookmark menu anchor
+  const [addressMenuPos, setAddressMenuPos] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
   const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
@@ -364,6 +368,74 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     emitFetchUrl(template.resolvedUrl);
   };
 
+  const writeClipboardText = async (value) => {
+    const text = typeof value === 'string' ? value : '';
+    if (!text) return;
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const temp = document.createElement('textarea');
+    temp.value = text;
+    temp.setAttribute('readonly', '');
+    temp.style.position = 'absolute';
+    temp.style.left = '-9999px';
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+  };
+
+  const readClipboardText = async () => {
+    if (navigator?.clipboard?.readText) return navigator.clipboard.readText();
+    return '';
+  };
+
+  const handleAddressContextMenu = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setAddressMenuPos({
+      mouseX: event.clientX + 2,
+      mouseY: event.clientY - 6
+    });
+  };
+
+  const handleCloseAddressMenu = () => setAddressMenuPos(null);
+
+  const handleCopyAddress = async () => {
+    try {
+      await writeClipboardText((address || '').trim());
+    } catch (err) {
+      console.warn('Failed to copy address:', err);
+    }
+    handleCloseAddressMenu();
+  };
+
+  const handlePasteAddress = async () => {
+    try {
+      const text = await readClipboardText();
+      if (typeof text === 'string') setAddress(text);
+    } catch (err) {
+      console.warn('Failed to paste address:', err);
+    }
+    handleCloseAddressMenu();
+  };
+
+  const handleCopyWebFriendlyUrl = async () => {
+    const doc = (address || currentUrl || '').trim();
+    if (!doc) {
+      handleCloseAddressMenu();
+      return;
+    }
+    const launchUrl = `https://twilite.zone/?doc=${encodeURIComponent(doc)}`;
+    try {
+      await writeClipboardText(launchUrl);
+    } catch (err) {
+      console.warn('Failed to copy web-friendly URL:', err);
+    }
+    handleCloseAddressMenu();
+  };
+
   useEffect(() => {
     const handleToggleTemplateGallery = ({ open } = {}) => {
       if (typeof open === 'boolean') {
@@ -457,6 +529,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
             placeholder={isMobile && isPortrait ? "URL..." : "Enter URL or search..."}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            onContextMenu={handleAddressContextMenu}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 const fetchUrl = (function(input) {
@@ -568,6 +641,30 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         <MenuItem onClick={() => { handleCloseHomeMenu(); handleOpenGallery(); }}>Browse Template Gallery</MenuItem>
         <MenuItem onClick={handleSetCurrentAsHome}>Set current document as Home</MenuItem>
         <MenuItem onClick={handleClearHome}>Clear Home page</MenuItem>
+      </Menu>
+
+      <Menu
+        open={Boolean(addressMenuPos)}
+        onClose={handleCloseAddressMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          addressMenuPos
+            ? { top: addressMenuPos.mouseY, left: addressMenuPos.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={handleCopyAddress}>
+          <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
+          Copy
+        </MenuItem>
+        <MenuItem onClick={handlePasteAddress}>
+          <ContentPasteIcon fontSize="small" sx={{ mr: 1 }} />
+          Paste
+        </MenuItem>
+        <MenuItem onClick={handleCopyWebFriendlyUrl}>
+          <LinkIcon fontSize="small" sx={{ mr: 1 }} />
+          Copy Web-Friendly URL
+        </MenuItem>
       </Menu>
 
       <TemplateGallery open={galleryOpen} onClose={handleCloseGallery} onSelect={handleTemplateSelect} />
