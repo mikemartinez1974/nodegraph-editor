@@ -1,0 +1,464 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "bride-of-charlie-episode-4",
+          "name": "Bride of Charlie - Episode 4 Summary",
+          "version": "1.0.0",
+          "description": "Summary of Episode 4: War with Iran, Khazarian mafia history, Vince Lombardi connection, Bible timeline contradictions",
+          "createdAt": "2026-02-27T20:30:00.000Z",
+          "updatedAt": "2026-02-27T20:30:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Episode 4 Overview",
+      "position": { "x": 0, "y": -220 },
+      "width": 520,
+      "height": 400,
+      "color": "#b71c1c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Bride of Charlie - Episode 4\n## War With Iran & The Kazerian Empire\n\n### Opening: Charlie's Assassination Theory\n\n\"It is my personal belief that that is the very reason they colluded to have that obstacle eventually removed just months later.\n\nI believe on the basis of evidence that Charlie's murder was likely a **very sophisticated military operation** that was meant to **galvanize American support behind Israel**.\"\n\n### Main Story Arcs\n\n**1. Charlie vs. Neocons on Iran**\n- Charlie stopped Trump from Iran war at White House\n- \"Operation Midnight Hammer\" - limited strike agreement\n- BB and Zionists wanted full-scale war\n- 31-year-old Charlie was obstacle to their plans\n\n**2. Turning Point's Betrayal**\n- McCoy & Blake Neff claim Charlie would support war\n- Using \"ghost of Charlie\" to manipulate opinion\n- Erica scheduled to record with BB & Ben Shapiro\n- \"She loved Charlie like LBJ loved JFK\"\n\n**3. The Vince Lombardi Bombshell**\n- Charlie states on camera: Lorie is \"direct descendant\" of Vince Lombardi\n- Super Bowl trophy named after Lombardi\n- Paraphernalia all over Charlie's house\n- Grandmother: Angelina **Lombardo** Abbis\n\n**4. Bible Study Timeline Collapse**\n- 2008: 8 months locked in room studying Bible\n- 2016: First time reading Bible cover to cover with friend\n- Multiple contradictory accounts\n- \"Pathological liar\" or \"programming\"?"
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Charlie's Iran Position vs TPUSA",
+      "position": { "x": 600, "y": -220 },
+      "width": 500,
+      "height": 600,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Charlie's Explicit Iran Views\n\n### The Charlie Kirk Show Clip\n\n**On Lindsey Graham/Neocons:**\n\n\"This is just lunacy. 'We want to go all in and take out the regime. It's time for us to close the chapter on the Iranian Ayatollah.'\n\nThat sounds good, doesn't it? But what have we learned when it comes to wars and especially wars in the Middle East? **What you draw up on a whiteboard rarely happens.**\n\nEspecially when you're talking about a country **two and a half times the size of Texas. 90 million people.** An ancient and great power with over a dozen ethnic groups.\n\n**Who's going to run the country exactly, Lindsey Graham?**\n\nThis sounds like Hillary Rodham Clinton in Libya.\n\nDonald Trump is doing a phenomenal job of resisting these calls for regime change. Yeah, the Ayatollah is awful, but maybe he's one of the few guys that can keep that country together and not have a 90 million person civil war.\"\n\n**Final Statement:**\n\"Lindsey Graham is so consistently out of his mind, it's hard to even comprehend. The neoconservative extreme needs to be represented philosophically anymore. It's uninteresting to me.\n\nThey've done a mess of Iraq, Afghanistan, Libya, the entire Middle East, Ukraine.\n\nWe know what the neoconservatives believe.\"\n\n### What Happened At White House\n\n**Operation Midnight Hammer:**\n- Trump agreed on limited strike on Iran's nuclear sites\n- BB wanted full-scale war\n- Zionists around Trump wanted full-scale war\n- **Charlie Kirk convinced Trump it was terrible idea**\n- Would crater support and ruin legacy\n\n**Their Reaction:**\n\"Charlie Kirk, 31-year-old, he's the person that's stopping us from getting what we want.\""
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "TPUSA Rewrites Charlie's Legacy",
+      "position": { "x": 0, "y": 240 },
+      "width": 520,
+      "height": 560,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## McCoy & Blake Nef In Charlie's Studio\n\n### The \"Ghost of Charlie\" Manipulation\n\n**Rob McCoy:**\n\"He also always did have trust with the president and he would look for the bright side of things. He was an American patriot. So he would **pray for our success once that began**.\n\nI just want to say that to offer perspective on how I think he would have felt about this.\"\n\n**Blake Nef:**\n\"As soon as all of this broke out, you saw that social media immediately went to go find Charlie clips because **he still is even in death the leading voice** on a matter like this.\"\n\n**McCoy Continues:**\n\"For these people that didn't actually know Charlie... he would **not** be happy with the situation and he would express his thoughts.\n\nBut then as soon as this would happen, he would have trust in the president. He would try to calm people down.\n\nSo it's really irritating for me to see so many people on social media have the opposite reaction, to **use his voice to actually cause chaos**, to actually cause fear, to actually cause hatred of President Trump.\"\n\n### Candace's Response\n\n\"It's shameless. They don't even care.\n\nThey're going to get there. They've got the ghost of Charlie. 'Aha, we can direct the ghost of Charlie.'\n\n'Why are you sharing these old clips of him as if he would have stood against the president, even though **he literally stood against the president and told him not to go to war with Iran**?'\n\n'Trust me, if he would have been here, he would have been supportive of what the president is doing, which was **explicitly against what Charlie shared in his own words**.'\"  \n\n### Erica's Role\n\n**The BB/Shapiro Recording:**\n- Slated to record something with BB Netanyahu and Ben Shapiro\n- Ahead of Super Bowl at Mar-a-Lago\n- **Cancelled at eleventh hour**\n- \"Maybe somebody was like, 'Hey, this isn't a good idea'\"\n\n**Quote:** \"She loved Charlie like Lyndon Baines Johnson loved JFK. No time to grieve. She needed to be sworn in as the new leader before his body was even cold.\""
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Character Recap: Dr. Jerry France",
+      "position": { "x": 600, "y": 440 },
+      "width": 500,
+      "height": 520,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Dr. Jerry France (Kent's First Wife)\n\n### Background Summary\n\n**Early Life:**\n- Raised in \"strict Mormon household\" (her words)\n- Knocked up at age 14\n- Married by age 14\n- Bookie turned psychologist\n\n**Where They Married:**\n- **Baháʼí Temple in Chicago**\n- (New info this episode)\n\n### Career\n\n**Creator of Tesseract Model:**\n- Designed psychological methods for elite school\n- Erica attended this school\n\n**Radford University:**\n- Given entire research center\n- **Gender research center**\n- **University seal/yearbook: The Beehive**\n- \"I can't make it up. I cannot make it up.\"\n\n**Corporate Work:**\n- DuPont Chemicals psychologist\n- Bush family connections\n- Organizational psychology\n\n**Eastern Europe Research:**\n- Conducted gender research in Eastern Europe\n- Specifically Bosnia\n- \"So many ties to Eastern Europe\"\n- \"We're going to get into that\"\n\n### The Pattern\n\n**All roads lead to:**\n- Military/intelligence operations\n- Elite families\n- Gender/psychology programs\n- Eastern Europe connections"
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "Uncle Rick Urbenbeck Confirmed",
+      "position": { "x": 0, "y": 860 },
+      "width": 520,
+      "height": 540,
+      "color": "#d84315",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Erica Still Close To Rick Today\n\n### The Universal Studios Visit\n\n**December 1st, 2018:**\n- Erica documented trip to Universal Studios\n- With her mother Lorie (\"always with Lorie\")\n- Instagram stories saved\n- Shows **\"Uncle Rick\"**\n\n**Rick's Position:**\n- High up at Universal Studios\n- \"Makes me wonder if that could have been a potential pathway for her to win Miss Arizona in 2012\"\n\n### The NBC Universal Connection\n\n**2012 Timing:**\n- NBC Universal and Trump split ownership of Miss Universe pageant\n- Rick working at Universal Studios\n- Erica wins Miss Arizona 2012\n\n**Quote:** \"I have no proof of that. I'm just saying that's an interesting tie that Rick is working over at Universal Studios.\"\n\n### The Gangster Observation\n\n**Candace's Take:**\n\n\"That's one of my favorite things about gangsters.\n\nMost people if they have a traffic ticket, they got to show it. They got a record. 'Oh gosh, this is going to hurt my chances of getting a job.'\n\nUrban Beck kind of a big deal. **$34 million went missing and he's at the top of Universal Studios.**\n\nJust incredible.\n\nI don't know. Feel like if my brother was the Zodiac Killer or something, I probably wouldn't be able to go down and work for Disney or Universal Studios.\"\n\n### The Family Proximity Issue\n\n**Candace's Standard:**\n\"For some people, proximity to criminals, non-starter. That's how I would say I live my life.\n\nBeing close with your brother who tried to kill your sister probably wouldn't be my thing.\n\n**Both Lori and Erica. It's fine.**\""
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "More Document 'Clerical Errors'",
+      "position": { "x": 600, "y": 1020 },
+      "width": 500,
+      "height": 680,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Remaining Divorce Documents\n\n### \"Simply a Clerical Error\"\n\n**The Debunker Narrative:**\nInitial filing was just clerical error listing Erica's birthday as November 22nd instead of 20th.\n\n**Candace's Response:**\n\"To be clear, there was no cleric involved. It's a document filed by Lori, sitting down with her lawyer, reviewing it with her lawyer.\n\nWhen you go into a courtroom, you have to swear the statements are true.\"\n\n### The Complete Document Trail\n\n**1995 & 1996:** Two separation agreements\n- Birthday: November 22nd, 1988\n\n**January 8, 1998:** Joint shared parenting plan\n- Filled in by hand\n- \"Someone tried to edit it by hand\"\n- Birthday: November 22nd, 1988\n\n**September 10, 1998:** Amendment to child support\n- \"Most egregious of all filings\"\n- **No notary**\n- **No judge signing off**\n- \"Lori was just like going off of vibes there\"\n- \"Her attorney was like, 'This is a bridge too far even for me'\"\n- Signatures between Lori and Kent \"very similar\"\n- \"Kent waived off his rights without a notary\"\n- Birthday: November 22nd, 1988\n\n**November 10, 1998:** Final decree\n- Erica's name typed in\n- Birthday: November 22nd, 1988\n\n**January 1999:** Medical child support document\n- Requires consent of health insurance (Aetna)\n- \"Actually, the only date that really matters here is Erica's birthday. You want to make sure you have the right kid.\"\n- Birthday: November 22nd, 1988\n\n**July 2004:** Kent defaults on child support\n- Enforcement agency records default plus Erica's birthday\n- Birthday: November 22nd, 1988\n\n**2007:** Child support emancipation (Erica turns 18)\n- \"Nobody got anything wrong in 2007. Fantastic year.\"\n- Birthday: November 22nd, 1988\n\n### The Point\n\n\"Apparently, there isn't a clerk across **10 years** that can type in 20 as opposed to 22.\""
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "Psychopaths Are Created, Not Born",
+      "position": { "x": 0, "y": 1460 },
+      "width": 520,
+      "height": 600,
+      "color": "#880e4f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Elizabeth Lane's Thesis Revisited\n\n### The Psychopath Theory\n\n**Elizabeth Lane argued:**\nErica Kirk might be a psychopath, not a sociopath.\n\n**What Disturbs Us:**\n- Words coming out of her mouth\n- But expressions are not right\n- Actions are not right\n- Body has natural defense system\n- We pull back before we can register why\n\n**Even Supporters:**\n- \"I can't watch her\"\n- \"I can't listen to her\"\n- \"I hope she does well, but I don't want to watch this\"\n- They can't watch her either\n\n### Candace Builds Upon This\n\n**Critical Point:**\n\"Psychopaths are not born. They are **created**. Typically, they are created in their youth.\n\nIf the work of Sigmund Freud, who rather obsessed himself with creating psychopaths, is to be believed...\n\nI would respectfully submit to you all that **Erica's childhood is actually the most important piece of the puzzle**.\"\n\n### The Lorie Instagram Posts\n\n**The Timing:**\n- Erica didn't post her mother for years\n- Suddenly moves to post mother in vulnerable sick position\n- **2-3 days before Charlie's assassinated**\n\n**Why This Matters:**\n\"That registers to me as emotionally manipulative.\n\nI don't know many people who would move to curate an Instagram reel of their mother in that condition.\n\nMost of all, I don't know many people who would want or allow them to.\n\n**That tells us also something's not right with Lori.**\n\nWhy would you want someone curating these moments of you and putting it online as if to say, 'Hey, don't even look here'?\n\nLeaking to people without any clarity. 'I heard her mother has cancer.' They're putting this out here without any clarity.\""
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "The Vince Lombardi Connection",
+      "position": { "x": 1180, "y": -220 },
+      "width": 500,
+      "height": 720,
+      "color": "#1b5e20",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Charlie's Shocking Revelation\n\n### The Charlie Kirk Show Clip\n\n**Someone emailed Candace:**\n\"I listened to Charlie's podcast... regarding his thoughts on past Super Bowls. Charlie was speaking about the Green Bay Packers and mentioned that **Erica's mom is a direct line to the Lombardi family**.\n\nI thought this might be an interesting piece to your puzzle.\"\n\n### Who Is Vince Lombardi?\n\n**Most Famous American Football Coach:**\n- Of all time\n- Green Bay Packers\n- Won first Super Bowl ever\n- **Super Bowl trophy named after him: The Lombardi Trophy**\n\n### Charlie's Exact Words\n\n**On Air:**\n\"The Packers won the first Super Bowl. You know, my wife Erica is from the Lombardi family.\"\n\n**Guest:** \"Really? Is that right? Seriously?\"\n\n**Charlie:** \"Yeah. That's royal. Her mom's a Lombardi. Literally, isn't that insane? That's royal.\"\n\n**Guest:** \"Like direct bloodline? Like lineal descent from Vince?\"\n\n**Charlie:** \"Wow. That's crazy. Yeah. We have all this Packer stuff at our house.\"\n\n**Guest:** \"I didn't know that.\"\n\n**Charlie:** \"And I'm from a huge Bears family, so I don't know.\"\n\n### Candace's Analysis\n\n**First Thought:**\n\"Charlie's not lying because take it from me, **he's not dumb enough to tell a lie that big on camera**.\n\nHe knows they will fact check him real quick.\"\n\n**Second Thought:**\n\"Is Erica lying? I would rank that as a strong possibility.\n\nWere it not for the fact that Charlie said **they had a ton of Vince Lombardi's paraphernalia around the house**.\"\n\n### What \"Direct Descendant\" Means\n\n\"Charlie is not known for hyperbole. He knows words have meaning.\n\nA **direct descendant** therefore would mean that Lori is **Vince Lombardi's offspring**.\n\nThat's really our only option here given the ages.\n\nLori is born in 1950.\""
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Lombardo vs Lombardi",
+      "position": { "x": 1180, "y": 560 },
+      "width": 500,
+      "height": 640,
+      "color": "#558b2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Name Problem\n\n### Erica's Maternal Grandmother\n\n**From 1970 Obituary:**\n\nAngelina **Lombardo** Abbis\n- Wife of Joseph Abbis\n- Cincinnati, Ohio\n- Died 1970\n\n### The Photos\n\n**Candace's Observation:**\n\"Once I heard him say it, Lori and her sister Deborah **do look like Vince**.\n\nI see it.\"\n\n**The Mystery:**\n\"I thought it was interesting that I could never find a photo of her parents.\"\n\n### Lombardo = Lombardi?\n\n**Charlie's Confirmation:**\n\"He says she's a **Lombardi**.\n\nBut actually, according to obituary, she's a **Lombardo**.\n\nIf that's the reality, if those are interchangeable, then we can begin to honestly speculate about Lorie's potential ties to the **Lombardo Genovese crime family**, who had a lot to do with illegal gambling and racketeering.\n\n**It's now all open. It's all on the table and it is all of interest.**\"\n\n### The Unanswered Questions\n\n**Candace's Appeal:**\n\"Is her name really Angelina Lombardo? Is his name Joe Lombardo?\n\nI don't know.\n\nIs Lori actually Vince's kid? Did he have one out of wedlock?\n\nI don't know.\n\nBut a **direct descendant** means a direct descendant.\n\n**That's to me is the only possibility.**\n\nWhy else would you be getting the paraphernalia which is **worth a fortune**?\"\n\n### The Gambling Connection\n\n**If Lombardo/Lombardi are interchangeable:**\n- Opens door to **Lombardo Genovese crime family**\n- Illegal gambling operations\n- Racketeering\n- Fits pattern: \"From her parents to her grandparents... lotteries, casinos, gambling. These are familial themes.\"\n\n### Left for Sleuths\n\n\"Unfortunately, there are no photos of Lori's father and mother that I could find.\n\nBut it's a strong lead, and I'm going to leave it at that for YouTubers and other sleuths to take a look at.\""
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "Khazarian Mafia History Lesson",
+      "position": { "x": 600, "y": 1760 },
+      "width": 500,
+      "height": 800,
+      "color": "#bf360c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"A Little Bit of History\"\n\n### The Khazarian Empire\n\n**8th, 9th, 10th Century:**\n- Existed\n- Then \"magically disappeared, magically\"\n- Turkic tribe\n- Nomadic tribe\n- **Mass converted to Judaism**\n- Not ethnically Jewish\n- \"They mixed in with people who are actually Jews\"\n\n### \"They Call This A Conspiracy\"\n\n**The Claim:**\nPeople in Israel now are the Khazarian mafia\n\n**But:**\n\"If you read books that were printed **in Israel by the Israelis**, they themselves declared that they were Khazari.\n\nAbraham Pollock as an example:\n- Wrote a book\n- Did all the research\n- **Awarded for his research**\n- Said, 'Hey, we're that tribe. We are the Turks that mass converted to Judaism.'\n- Then he was told it was inconvenient after 1948\n- 'Oh no, no, no. We're claiming we're the original Jews from the Bible. So let's just get rid of all this research.'\"\n\n### The Italian Mafia Was Actually Jewish\n\n**Hollywood Founded By Jewish Gangs:**\n- Universal, MGM\n- \"There's no hiding that, okay? There's no denying it.\"\n- Initially carnies running carnivals\n- \"Wow people with illusions - the occultists\"\n- \"Let's do this on larger scale. Let's do movies.\"\n- \"Get people to pour into cathedrals. Put on a show.\"\n\n**The Carnival Connection:**\n\"That's why you go to a carnival with so much magic and illusion.\n\nMovies are another illusory trick. It captures your imagination. It captures your emotions and it's **almost never based in reality**.\"\n\n### The Real Story\n\n**Prevailing Narrative:**\n\"Italian mafia just for no reason partnered with Meyer Lansky and Bugsy Siegel.\n\nThe Italian and then the Jewish mafia got together. No.\"\n\n**Reality:**\n\"Yes. The Italian mafia, they spoke Italian.\n\nBut that's because they **immigrated to Italy after revolutions**.\""
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "The Pale of Settlement & Assassinations",
+      "position": { "x": 1180, "y": 1260 },
+      "width": 500,
+      "height": 820,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 1881: The Russian Czar Assassination\n\n### What Happened\n\n\"The reality is that in **1881, the Russian Czar was assassinated by a Jewish revolutionary gang from the Pale of Settlement**.\n\nYou had a Christian empire and then what was carved out was like if you were Jewish you had to live in the Pale of Settlement because they required that you were Christian if you were going to live within the kingdom.\n\nThe world was dominated by Christian kingdoms.\"\n\n### \"Beyond The Pale\"\n\n**The Expression:**\n\"That expression when you say 'that was beyond the pale' - probably don't even know why you say that.\n\nOh what he did was beyond the pale - **you're actually referring to the Pale of Settlement which is where the Jews had to live**.\n\nThey were allowed to work inside the kingdom but you had to be a Christian to live within the kingdom.\"\n\n**Geography:**\nModern-day Poland, Ukraine, and Lithuania\n- \"This is very important for you to understand this.\"\n\n### After The Assassination\n\n**The Migration:**\n\"Many of the associated people that were involved, little gang that put together, they immigrated to Italy, they immigrated to the United States.\n\nYou learn this in your textbook as **'there were pogroms'** - like no context for no reason. Kicked out of a country.\n\nThere's actually **no evidence they were ever kicked out**, but they left. The revolutionaries left.\"\n\n### The Revolutionary Wave Across Europe\n\n**Failed Revolutions:**\n- German revolution failed\n- Italy failed\n- Austria failed\n- Revolutions of 1848\n\n**What They Were:**\n\"They were commies. The revolutionaries, you could also refer to them as **murderous psychopaths**.\n\nThen they immigrated in mass into the United States as victims and they brought with them their revolutionary ideas.\n\nI like to say they were anarchists obviously but also you should think of them as **gypsies in the truest sense of the word**.\n\nThey will learn any language, become what they have to become, move wherever they need to move and **wherever they go they bring their filth with them**.\""
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "American Assassinations Begin",
+      "position": { "x": 1180, "y": 2140 },
+      "width": 500,
+      "height": 700,
+      "color": "#ad1457",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Pattern Arrives In America\n\n### Haymarket Square Bombing (Chicago)\n\n\"We get these migrants into the company and then suddenly the people that assassinated the Czar - then we get **the first bombing in America at the Haymarket Square in Chicago** that involved quote unquote 'German immigrants.'\"\n\n### President McKinley Assassination\n\n**The Killer:**\nLeon Czolgosz\n- Polish man\n- **Radicalized by Emma Goldman**\n\n**Emma Goldman:**\n- Jewish Russian immigrant\n- **Family from the Pale of Settlement**\n- Not poor - \"wealthy Jews, educated Jews\"\n- \"Tons of books about what they did\"\n- \"I could do 12 episodes on Emma Goldman alone\"\n- \"Amount of assassinations connected to her\"\n\n**Also Behind:**\n- Margaret Sanger\n- Planned Parenthood\n\n### Henry Frick Assassination Attempt\n\n**Emma's Boyfriend:**\n- Also from the Pale of Settlement\n- Tried to assassinate Henry Frick (US Steel)\n- **Literally shot him**\n- Frick survived\n\n**Why:**\n\"They wanted to establish unions.\n\nYou learn in school, 'oh, it was about workers' rights.' Yeah.\n\nThey organized these worker strikes and protests and eventually they were successful in establishing unions because **that allowed them to establish racketeering mafias**.\n\nYou guys know unions are associated with mafia and the mobs.\"\n\n### The Inheritance\n\n\"This is our inheritance.\n\nOur entire history and our present is a **gangsters paradise in America**.\n\nHollywood exists to glamorize the filthiest people that work in the most debased industries.\n\n**It's not entertainment. It's always been disgusting.** It's always been about filth, prostitution, importing people from Vienna and trying to collapse America.\n\nSuccessful all across Europe. What they did. Christian empires got divided.\n\nAnd here we are today, right? This is what we're facing in America. You have to understand this.\""
+      }
+    },
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "type": "markdown",
+      "label": "Erica Timeline Updates",
+      "position": { "x": 0, "y": 2120 },
+      "width": 520,
+      "height": 600,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## New Confirmations & Mysteries\n\n### St. Ursula Villa Confirmed\n\n**Kindergarten 1994-1995:**\n- Photo found\n- **Before** she went to Arizona\n- Name spelled with **C** (\"another clerical error\")\n\n**2000-2002:** Still missing\n- \"No one with a yearbook has been able to confirm her\"\n- \"Those years are still technically missing\"\n- \"Maybe we had it in reverse\"\n\n### Regis Basketball Confirmed\n\n**2007-2008 Season:**\n- Photo from December 2007 with team members\n- But did NOT play\n- Stats still up showing only 2007-2008\n- No newspaper mentions\n- **Team members confirm she did not play 2008 season**\n\n**Despite:**\n- Erica claiming \"multiple times\" she played two years\n- Notre Dame alumni packet says two years\n\n### The Missing 8 Months Mystery\n\n**Comment Theory:**\n\"Many of you guys thought that she went to have a baby.\n\n'In my day when someone went away for eight months, it's cuz they got knocked up and they had to go away.'\n\nI've seen no evidence of that.\"\n\n**Candace's Theory:**\n\"I'm just going to keep following the facts and following Erica's words.\""
+      }
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "type": "markdown",
+      "label": "Bible Study Timeline Collapse",
+      "position": { "x": 0, "y": 2780 },
+      "width": 520,
+      "height": 720,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Three Different Bible Study Stories\n\n### Story #1: 2008 (8 Months)\n\n**From previous episode:**\n\"I locked myself in my room basically turned into a hermit for about a good **eight months**.\n\nThe only person I would see outside of my family was my pastor's wife.\n\nWe would go to the church and she would just pour into me every single day. I just was reading scripture and read the Bible cover to cover **multiple times**.\"\n\n### Story #2: 2008 (6 Months)\n\n**\"Don't Ignore The Nudge\" Podcast:**\n\n\"With Miss Arizona, I was so done with that world. It was very toxic.\n\nI was so sold out and focused on Christ that I didn't want anything from that past.\n\nFor me, it was all about just I literally had **locked myself in my room and read my Bible**.\n\nAnd the only person I saw for **six months** was my pastor's wife. I just had her pour into me.\n\nWe would meet for lunch or coffee and I just I didn't see any of my friends. I didn't do anything. I just was so focused on that.\"\n\n### Story #3: 2016 (First Time Ever)\n\n**Sage Steele Interview:**\n\n\"**The first time I ever read the Bible cover to cover was 2016**, and it changed my life. It absolutely changed my life.\n\nAnd that's when I started. So it was me and another friend and I put together the Bible reading program and I sent it to my friend.\n\nI said, 'Do it with me. Cuz **I don't know what I'm doing** and you've been a Christian your whole life and I just want to have an accountability partner like please read this with me.'\n\n2016, finished the whole thing. It was a wild year.\n\nAfter that everything was in technicolor and I was like, **I get it now. I get it.**\n\nIt made me - it's really interesting because then if ever I do go back to sit in a Catholic mass **I'm like now I get the Catholic side even more now** after having read the Bible.\n\nI wish they would have... Unfortunately, mine weren't as good from the standpoint of 'get your own Bible and let's crack it open.' It was never really like that.\"\n\n### The Contradiction\n\n**Candace's Analysis:**\n\n\"I don't know what's up. I don't know what's down with Erica. You don't know what the story is.\n\nYou could say she didn't read it cover to cover in the first eight months, but **I would imagine she didn't need to turn to a friend eight years later and go, 'What am I doing?' if she had eight months to study the Bible with a pastor**.\n\nI think a pastor would be better suited than a friend.\""
+      }
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "type": "markdown",
+      "label": "The Programming Theory",
+      "position": { "x": 600, "y": 2620 },
+      "width": 500,
+      "height": 600,
+      "color": "#311b92",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"Someone Whose Brain Has Been Rerouted\"\n\n### Candace's Conclusion\n\n\"She gives me the vibe of someone whose brain has been rerouted.\n\nLike the pathways in her brain have been rerouted **from a time that she's a child**.\n\nLike she just had to lie so much that **she doesn't even recognize that what she's doing is lying**.\n\nLike she just says something and it's like **'this is what works in this room'** - exactly as Elizabeth Lane described it.\n\n'This is what works in this room. This is how I have to be.'\n\nOkay, I'm sitting with Sage and I'm trying to now explain what brought me back to the Catholic thing.\n\nLike maybe I need to be Catholic this week or you know maybe I need Protestant next week.\n\nSo I said it at that podcast that I did it because I didn't have an appreciation for Catholicism, but now I'm saying that studying the Bible made me have an appreciation for Catholicism, which I wasn't getting.\n\n**It's so all over the place.**\"\n\n### The Assessment\n\n\"I don't know what to make of it.\n\nI don't know other than **someone who was programmed and has had to tell so many different stories** that she can't really pedal backwards.\n\nShe just kind of just keeps going and just keeps swimming and just keeps swimming.\n\nAnd what she's going to say tomorrow is not going to be what she said yesterday.\n\n**It's too many lies.**\"\n\n### The Disqualification\n\n\"She is obviously **not fit to be the CEO and chairman of Turning Point USA** just on the basis of the amount of dishonesty that we can just show you using her own words.\n\nJust using Erica's own words trying to make sense of anything is a very difficult task.\"\n\n### Tomorrow's Preview\n\n**Candace announces:**\n\"Tomorrow: Tesseract's direct ties to Fort Huachuca.\n\nMan, it's just - I mean, I just had them everywhere right at the very beginning.\n\nI would very much bet that **Erica knows what Fort Huachuca is**.\n\nThat just feels right to me.\""
+      }
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "type": "markdown",
+      "label": "LBJ Cryptojew Note",
+      "position": { "x": 1760, "y": -220 },
+      "width": 420,
+      "height": 360,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"She Loved Charlie Like LBJ Loved JFK\"\n\n### The Comparison\n\n**Quote:**\n\"She loved Charlie like Lyndon Baines Johnson loved JFK.\n\nNo time to grieve. She needed to be sworn in as the new leader before his body was even cold.\"\n\n### LBJ Revelation\n\n\"In case you didn't know this, LBJ was actually a **cryptojew** as they term it.\n\nA Jewish gangster. **Crypto Jew** to be sure.\n\nMore on that later. We'll talk more about that later.\"\n\n### The Pattern\n\n**Immediate Power Grab:**\n- LBJ sworn in on Air Force One\n- Before JFK's body processed\n- Erica assumes chairman/CEO\n- Before Charlie buried\n- Directing PR messaging immediately\n- \"Superman neck\" narrative\n\n**Quote:**\n\"She went straight from her husband being assassinated to assuming the chairman and CEO to Zoom calls and directing the PR messaging.\n\nAndrew's out here catching strays.\n\nI don't know why you do it, Andrew. **I've got an idea, though.**\n\nMaybe Erica is not the only person who was born into something.\""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-005",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-007",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-010",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-011",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-012",
+      "source": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-013",
+      "source": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "sourcePort": "root",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-014",
+      "source": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "sourcePort": "out",
+      "target": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-015",
+      "source": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "sourcePort": "root",
+      "target": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-016",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2026-02-27T20:30:00.000Z",
+  "nodeCount": 17,
+  "edgeCount": 16
+}

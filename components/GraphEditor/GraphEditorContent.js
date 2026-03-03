@@ -1228,6 +1228,46 @@ const deepMergeData = (base, patch) => {
     };
   }, [resolveNodeClassContract, resolveViewEntry, viewDefinitions]);
 
+  const buildBuiltinEditorDefinition = useCallback((node) => {
+    if (!node?.type) return null;
+    const type = String(node.type).trim();
+    if (type !== 'port' && type !== 'graph-reference') return null;
+    const fields = [
+      { key: 'ref', label: 'Reference', type: 'text', path: 'data.ref', placeholder: 'github://owner/repo/path/file.node' },
+      { key: 'endpoint', label: 'Endpoint', type: 'text', path: 'data.endpoint', placeholder: 'root.node:root' },
+      { key: 'url', label: 'URL', type: 'text', path: 'data.url', placeholder: 'https://example.com/file.node' },
+      { key: 'mode', label: 'Mode', type: 'text', path: 'data.mode', placeholder: type === 'graph-reference' ? 'preview|interactive' : 'navigate' },
+      { key: 'graphId', label: 'Target graphId', type: 'text', path: 'data.target.graphId' },
+      { key: 'nodeId', label: 'Target nodeId', type: 'text', path: 'data.target.nodeId' },
+      { key: 'portId', label: 'Target portId', type: 'text', path: 'data.target.portId', placeholder: 'root' },
+      { key: 'label', label: 'Target label', type: 'text', path: 'data.target.label' },
+      { key: 'intent', label: 'Intent', type: 'text', path: 'data.intent' },
+      { key: 'security', label: 'Security', type: 'text', path: 'data.security', placeholder: 'prompt|allow|deny' }
+    ];
+    if (type === 'graph-reference') {
+      fields.push({ key: 'maxDepth', label: 'Max depth', type: 'number', path: 'data.maxDepth' });
+    }
+    return {
+      status: 'ready',
+      viewNode: {
+        id: `builtin-editor-${type}`,
+        type: 'view',
+        data: {
+          view: {
+            intent: 'editor',
+            payload: 'editor.web',
+            showEditButton: true
+          },
+          editor: {
+            web: {
+              fields
+            }
+          }
+        }
+      }
+    };
+  }, []);
+
   const manifestNode = useMemo(
     () => (Array.isArray(nodes) ? nodes.find((candidate) => candidate?.type === 'manifest') || null : null),
     [nodes]
@@ -1514,8 +1554,20 @@ const deepMergeData = (base, patch) => {
   }, [nodeEditorPanel.open, nodeEditorPanel.nodeId]);
 
   const editorPanelEntry = useMemo(
-    () => (editorPanelNode ? resolveEditorViewEntry(editorPanelNode) : null),
-    [editorPanelNode, resolveEditorViewEntry]
+    () => {
+      if (!editorPanelNode) return null;
+      const resolved = resolveEditorViewEntry(editorPanelNode);
+      if (resolved) return resolved;
+      const builtin = buildBuiltinEditorDefinition(editorPanelNode);
+      if (!builtin?.viewNode) return null;
+      return {
+        key: editorPanelNode.type,
+        intent: 'editor',
+        payload: 'editor.web',
+        source: 'builtin'
+      };
+    },
+    [buildBuiltinEditorDefinition, editorPanelNode, resolveEditorViewEntry]
   );
 
   useEffect(() => {
@@ -1526,6 +1578,9 @@ const deepMergeData = (base, patch) => {
   }, [nodeEditorPanel.open, editorPanelEntry?.ref, requestViewDefinition]);
 
   const editorPanelDefinition = useMemo(() => {
+    if (editorPanelEntry?.source === 'builtin' && editorPanelNode) {
+      return buildBuiltinEditorDefinition(editorPanelNode);
+    }
     if (!editorPanelEntry?.ref) return null;
     const def = viewDefinitions[editorPanelEntry.ref] || null;
     const viewNodes = Array.isArray(def?.viewNodes) ? def.viewNodes : [];
@@ -1540,7 +1595,7 @@ const deepMergeData = (base, patch) => {
     return selectedViewNode
       ? { status: def?.status || 'ready', viewNode: selectedViewNode }
       : def;
-  }, [editorPanelEntry, viewDefinitions]);
+  }, [buildBuiltinEditorDefinition, editorPanelEntry, editorPanelNode, viewDefinitions]);
 
   const editorPanelDirty = Boolean(editorPanelNode?.id && nodeEditorDirty.nodeId === editorPanelNode.id && nodeEditorDirty.dirty);
 

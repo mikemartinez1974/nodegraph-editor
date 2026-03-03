@@ -505,6 +505,83 @@ const applyNodeUpdates = (node, updates = {}) => {
   };
 };
 
+const firstNonEmptyString = (...values) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return '';
+};
+
+const normalizeTypeTransitionForNavigationNodes = (currentNode, updates = {}) => {
+  const nextType = String(updates?.type || '').trim();
+  if (!nextType || (nextType !== 'port' && nextType !== 'graph-reference')) {
+    return updates;
+  }
+  if (!currentNode || typeof currentNode !== 'object') return updates;
+
+  const currentData = currentNode.data && typeof currentNode.data === 'object' ? currentNode.data : {};
+  const incomingData = updates.data && typeof updates.data === 'object' ? updates.data : {};
+  const baseData = updates.replaceData === true
+    ? cloneValue(incomingData)
+    : { ...cloneValue(currentData), ...cloneValue(incomingData) };
+  const baseTarget = baseData.target && typeof baseData.target === 'object' ? baseData.target : {};
+
+  const canonicalRef = firstNonEmptyString(
+    baseData.ref,
+    baseData.src,
+    baseData.graphUrl,
+    baseTarget.ref
+  );
+  const canonicalEndpoint = firstNonEmptyString(
+    baseData.endpoint,
+    baseTarget.endpoint
+  );
+  const canonicalUrl = firstNonEmptyString(
+    baseData.url,
+    baseTarget.url
+  );
+
+  const defaultTarget = {
+    endpoint: canonicalEndpoint || 'root.node:root',
+    ref: canonicalRef || '',
+    mode: typeof baseTarget.mode === 'string' && baseTarget.mode.trim() ? baseTarget.mode.trim() : 'navigate',
+    url: canonicalUrl || '',
+    graphId: typeof baseTarget.graphId === 'string' ? baseTarget.graphId : '',
+    nodeId: typeof baseTarget.nodeId === 'string' ? baseTarget.nodeId : '',
+    portId: typeof baseTarget.portId === 'string' && baseTarget.portId.trim()
+      ? baseTarget.portId
+      : (typeof baseTarget.handleId === 'string' && baseTarget.handleId.trim() ? baseTarget.handleId : 'root'),
+    label: typeof baseTarget.label === 'string' ? baseTarget.label : ''
+  };
+
+  const normalizedData = {
+    ...baseData,
+    target: {
+      ...defaultTarget,
+      ...baseTarget,
+      endpoint: firstNonEmptyString(baseTarget.endpoint, defaultTarget.endpoint),
+      ref: firstNonEmptyString(baseTarget.ref, defaultTarget.ref),
+      mode: firstNonEmptyString(baseTarget.mode, defaultTarget.mode) || 'navigate',
+      url: firstNonEmptyString(baseTarget.url, defaultTarget.url),
+      portId: firstNonEmptyString(baseTarget.portId, baseTarget.handleId, defaultTarget.portId),
+      handleId: firstNonEmptyString(baseTarget.handleId, baseTarget.portId, defaultTarget.portId),
+      label: firstNonEmptyString(baseTarget.label, defaultTarget.label),
+      graphId: firstNonEmptyString(baseTarget.graphId, defaultTarget.graphId),
+      nodeId: firstNonEmptyString(baseTarget.nodeId, defaultTarget.nodeId)
+    },
+    intent: firstNonEmptyString(baseData.intent, 'external'),
+    src: firstNonEmptyString(baseData.src, canonicalRef),
+    ref: firstNonEmptyString(baseData.ref, canonicalRef),
+    endpoint: firstNonEmptyString(baseData.endpoint, canonicalEndpoint),
+    url: firstNonEmptyString(baseData.url, canonicalUrl)
+  };
+
+  return {
+    ...updates,
+    data: normalizedData
+  };
+};
+
 const BUILTIN_NODE_TYPES = new Set([
   'manifest',
   'legend',
@@ -782,18 +859,19 @@ export default class GraphCRUD {
         return { success: false, error: `Node ${id} not found` };
       }
       const currentNode = currentNodes[nodeIndex];
+      const normalizedTypeUpdates = normalizeTypeTransitionForNavigationNodes(currentNode, updates || {});
       try {
         eventBus.emit('nodeBeforeUpdate', {
           id,
           node: cloneValue(currentNode),
-          patch: cloneValue(updates || {})
+          patch: cloneValue(normalizedTypeUpdates || {})
         });
       } catch (err) {
         // ignore lifecycle emit failures
       }
       const nodeClassEntry = resolveNodeClassEntry(currentNodes, currentNode?.type);
       const policy = resolveNodeClassPolicy(nodeClassEntry);
-      const filteredUpdates = { ...(updates || {}) };
+      const filteredUpdates = { ...normalizedTypeUpdates };
       if (!policy.allowLabel) {
         delete filteredUpdates.label;
       }
@@ -866,18 +944,19 @@ export default class GraphCRUD {
       ids.forEach((targetId) => {
         const node = currentNodes.find((candidate) => candidate.id === targetId);
         if (!node) return;
+        const normalizedTypeUpdates = normalizeTypeTransitionForNavigationNodes(node, updates || {});
         try {
           eventBus.emit('nodeBeforeUpdate', {
             id: targetId,
             node: cloneValue(node),
-            patch: cloneValue(updates || {})
+            patch: cloneValue(normalizedTypeUpdates || {})
           });
         } catch (err) {
           // ignore lifecycle emit failures
         }
         const nodeClassEntry = resolveNodeClassEntry(currentNodes, node?.type);
         const policy = resolveNodeClassPolicy(nodeClassEntry);
-        const filtered = { ...(updates || {}) };
+        const filtered = { ...normalizedTypeUpdates };
         if (!policy.allowLabel) {
           delete filtered.label;
         }

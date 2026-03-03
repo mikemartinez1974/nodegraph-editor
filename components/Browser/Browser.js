@@ -411,12 +411,18 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     handleCloseAddressMenu();
   };
 
-  const handlePasteAddress = async () => {
+  const handlePasteAndGoAddress = async () => {
     try {
       const text = await readClipboardText();
-      if (typeof text === 'string') setAddress(text);
+      if (typeof text === 'string') {
+        const next = text.trim();
+        if (next) {
+          setAddress(next);
+          emitFetchUrl(next);
+        }
+      }
     } catch (err) {
-      console.warn('Failed to paste address:', err);
+      console.warn('Failed to paste & go address:', err);
     }
     handleCloseAddressMenu();
   };
@@ -657,9 +663,9 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
           <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
           Copy
         </MenuItem>
-        <MenuItem onClick={handlePasteAddress}>
+        <MenuItem onClick={handlePasteAndGoAddress}>
           <ContentPasteIcon fontSize="small" sx={{ mr: 1 }} />
-          Paste
+          Paste & Go
         </MenuItem>
         <MenuItem onClick={handleCopyWebFriendlyUrl}>
           <LinkIcon fontSize="small" sx={{ mr: 1 }} />

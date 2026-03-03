@@ -36,6 +36,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MarkdownRenderer from "./MarkdownRenderer";
 import edgeTypes from "../edgeTypes";
 import useAvailableNodeTypes from "../hooks/useAvailableNodeTypes";
+import eventBus from "../../NodeGraph/eventBus";
 
 const STYLE_PRESETS = [
   {
@@ -186,6 +187,25 @@ const MIN_PANEL_WIDTH = 260;
 const MAX_PANEL_WIDTH = 720;
 const NODE_STYLE_PRESETS_STORAGE_KEY = "twilite.nodeStylePresets";
 const EDGE_STYLE_PRESETS_STORAGE_KEY = "twilite.edgeStylePresets";
+const LEGACY_PAYLOAD_KEYS = new Set(["memo", "link", "html", "svg", "isRoot", "root"]);
+const RELEVANT_DATA_KEYS_BY_TYPE = {
+  markdown: ["markdown"],
+  script: ["name", "script", "scriptId", "scriptRef", "source", "dryRun", "allowMutations", "autoRun", "lastResult", "lastRunAt"],
+  port: ["intent", "security", "src", "ref", "endpoint", "url", "target"],
+  "graph-reference": ["src", "ref", "endpoint", "url", "mode", "target", "maxDepth"],
+  view: ["view", "node", "editor"],
+  dictionary: ["nodeDefs", "skills", "views"],
+  legend: ["entries"],
+  manifest: ["identity", "intent", "dependencies", "authority", "document", "settings"]
+};
+
+const isEmptyPayloadValue = (value) => {
+  if (value == null) return true;
+  if (typeof value === "string") return value.trim() === "";
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === "object") return Object.keys(value).length === 0;
+  return false;
+};
 
 export default function PropertiesPanel({
   open = false,
@@ -209,7 +229,10 @@ export default function PropertiesPanel({
   const VALID_ANCHORS = useMemo(() => new Set(["left", "right", "top", "bottom"]), []);
   const normalizedAnchor = typeof anchor === "string" ? anchor.toLowerCase() : "";
   const anchorValue = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : "right";
-  const [payloadView, setPayloadView] = useState("friendly");
+  const [payloadView, setPayloadView] = useState("relevant");
+  const [payloadSearch, setPayloadSearch] = useState("");
+  const [showEmptyPayloadFields, setShowEmptyPayloadFields] = useState(false);
+  const [hideLegacyPayloadFields, setHideLegacyPayloadFields] = useState(true);
   const [preset, setPreset] = useState("default");
   const [presetNameDraft, setPresetNameDraft] = useState("");
   const [customNodePresets, setCustomNodePresets] = useState([]);
@@ -326,6 +349,52 @@ export default function PropertiesPanel({
   const selectionLabel = selectedNode?.label || selectedEdge?.label || selectedGroup?.label || "Properties";
   const selectionType = isNodeSelected ? "Node" : isEdgeSelected ? "Edge" : isGroupSelected ? "Cluster" : "Item";
   const activeView = isNodeSelected ? "node" : isEdgeSelected ? "edge" : isGroupSelected ? "group" : null;
+  const relevantSchemaKeys = useMemo(() => {
+    if (!isNodeSelected || !selectedNode?.type) return [];
+    const dictionaries = (nodes || []).filter((node) => node?.type === "dictionary");
+    for (const dict of dictionaries) {
+      const defs = Array.isArray(dict?.data?.nodeDefs) ? dict.data.nodeDefs : [];
+      const match = defs.find((entry) => String(entry?.key || "").trim() === String(selectedNode.type).trim());
+      if (!match) continue;
+      const schemaProps = match?.dataSchema?.properties && typeof match.dataSchema.properties === "object"
+        ? Object.keys(match.dataSchema.properties)
+        : [];
+      const requiredKeys = Array.isArray(match?.validation?.requiredDataKeys)
+        ? match.validation.requiredDataKeys.map((key) => String(key || "").trim()).filter(Boolean)
+        : [];
+      return Array.from(new Set([...schemaProps, ...requiredKeys]));
+    }
+    return [];
+  }, [isNodeSelected, nodes, selectedNode?.type]);
+  const relevantKeySet = useMemo(() => {
+    if (!isNodeSelected) return new Set();
+    const builtIn = RELEVANT_DATA_KEYS_BY_TYPE[String(selectedNode?.type || "").trim()] || [];
+    return new Set([...builtIn, ...relevantSchemaKeys]);
+  }, [isNodeSelected, relevantSchemaKeys, selectedNode?.type]);
+  const filteredDataEntries = useMemo(() => {
+    let list = Array.isArray(dataEntries) ? dataEntries.map((entry, index) => ({ ...entry, _index: index })) : [];
+    if (!showEmptyPayloadFields) {
+      list = list.filter((entry) => !isEmptyPayloadValue(entry?.value));
+    }
+    if (hideLegacyPayloadFields) {
+      list = list.filter((entry) => !LEGACY_PAYLOAD_KEYS.has(String(entry?.key || "").trim()));
+    }
+    const term = String(payloadSearch || "").trim().toLowerCase();
+    if (term) {
+      list = list.filter((entry) => String(entry?.key || "").toLowerCase().includes(term));
+    }
+    if (payloadView === "relevant") {
+      list = list.filter((entry) => relevantKeySet.has(String(entry?.key || "").trim()));
+    }
+    return list;
+  }, [
+    dataEntries,
+    hideLegacyPayloadFields,
+    payloadSearch,
+    payloadView,
+    relevantKeySet,
+    showEmptyPayloadFields
+  ]);
   const [styleJsonText, setStyleJsonText] = useState(() => JSON.stringify(selectionStyle, null, 2));
   const payloadJson = useMemo(() => {
     const data = {};
@@ -540,6 +609,13 @@ export default function PropertiesPanel({
 
   useEffect(() => {
     friendlyDraftRef.current = {};
+  }, [activeSelectionId]);
+
+  useEffect(() => {
+    setPayloadSearch("");
+    setShowEmptyPayloadFields(false);
+    setHideLegacyPayloadFields(true);
+    setPayloadView("relevant");
   }, [activeSelectionId]);
 
   useEffect(() => {
@@ -910,33 +986,6 @@ export default function PropertiesPanel({
 
   const isPortNode = Boolean(isNodeSelected && selectedNode?.type === "port");
   const isGraphReferenceNode = Boolean(isNodeSelected && selectedNode?.type === "graph-reference");
-  const portData = selectedNode?.data || {};
-  const portTarget = portData?.target || {};
-
-  const updatePortTarget = useCallback(
-    (patch) => {
-      if (!selectedNode) return;
-      const nextTarget = { ...(portTarget || {}), ...patch };
-      onUpdateNode(selectedNode.id, { data: { target: nextTarget } });
-    },
-    [onUpdateNode, portTarget, selectedNode]
-  );
-
-  const updatePortDataField = useCallback(
-    (patch) => {
-      if (!selectedNode) return;
-      onUpdateNode(selectedNode.id, { data: patch });
-    },
-    [onUpdateNode, selectedNode]
-  );
-
-  const updateGraphReferenceField = useCallback(
-    (patch) => {
-      if (!selectedNode) return;
-      onUpdateNode(selectedNode.id, { data: { ...(selectedNode.data || {}), ...patch } });
-    },
-    [onUpdateNode, selectedNode]
-  );
 
   const applyGroupStylePatch = useCallback(
     (patch) => {
@@ -1710,11 +1759,14 @@ export default function PropertiesPanel({
       {!isManifestNode && !isLegendNode && !isDictionaryNode && (
         <>
           <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-            <Button size="small" variant={payloadView === "friendly" ? "contained" : "outlined"} onClick={() => setPayloadView("friendly")}>
-              Friendly view
+            <Button size="small" variant={payloadView === "relevant" ? "contained" : "outlined"} onClick={() => setPayloadView("relevant")}>
+              Relevant
             </Button>
-            <Button size="small" variant={payloadView === "json" ? "contained" : "outlined"} onClick={() => setPayloadView("json")}>
-              JSON
+            <Button size="small" variant={payloadView === "advanced" ? "contained" : "outlined"} onClick={() => setPayloadView("advanced")}>
+              Advanced
+            </Button>
+            <Button size="small" variant={payloadView === "raw" ? "contained" : "outlined"} onClick={() => setPayloadView("raw")}>
+              Raw JSON
             </Button>
             <Tooltip title="Copy payload JSON">
               <IconButton size="small" onClick={() => copyToClipboard(payloadJson)}>
@@ -1722,17 +1774,35 @@ export default function PropertiesPanel({
               </IconButton>
             </Tooltip>
           </Stack>
-          {payloadView === "friendly" ? (
-            dataEntries.length ? (
+          {payloadView !== "raw" ? (
+            filteredDataEntries.length || dataEntries.length ? (
               <Stack spacing={1}>
-                {dataEntries.map((entry, index) => {
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                  <TextField
+                    size="small"
+                    label="Filter fields"
+                    value={payloadSearch}
+                    onChange={(event) => setPayloadSearch(event.target.value)}
+                    fullWidth
+                  />
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Typography variant="caption">Empty</Typography>
+                    <Switch size="small" checked={showEmptyPayloadFields} onChange={(event) => setShowEmptyPayloadFields(event.target.checked)} />
+                  </Stack>
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Typography variant="caption">Hide legacy</Typography>
+                    <Switch size="small" checked={hideLegacyPayloadFields} onChange={(event) => setHideLegacyPayloadFields(event.target.checked)} />
+                  </Stack>
+                </Stack>
+                {filteredDataEntries.length ? filteredDataEntries.map((entry, index) => {
+                const entryIndex = typeof entry?._index === "number" ? entry._index : index;
                 const isMarkdownField =
                   entry.type === "string" &&
                   ((entry.key && entry.key.toLowerCase().includes("markdown")) ||
                     entry.rawValue?.includes("\n"));
-                const previewMode = markdownPreviewMode[index] ?? false;
+                const previewMode = markdownPreviewMode[entryIndex] ?? false;
                 return (
-                  <Paper key={entry.key || index} variant="outlined" sx={{ p: 1 }}>
+                  <Paper key={`${entry.key || index}-${entryIndex}`} variant="outlined" sx={{ p: 1 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={0.5}>
                       <Typography variant="subtitle2">{entry.key || "(unnamed)"}</Typography>
                       {isMarkdownField && (
@@ -1744,7 +1814,7 @@ export default function PropertiesPanel({
                             size="small"
                             checked={previewMode}
                             onChange={(event) =>
-                              setMarkdownPreviewMode((prev) => ({ ...prev, [index]: event.target.checked }))
+                              setMarkdownPreviewMode((prev) => ({ ...prev, [entryIndex]: event.target.checked }))
                             }
                           />
                         </Stack>
@@ -1770,20 +1840,24 @@ export default function PropertiesPanel({
                     )}
                     {(!isMarkdownField || !previewMode) && (
                       <TextField
-                        key={`friendly-edit-${activeSelectionId || "none"}-${dataEntriesRevision}-${index}`}
+                        key={`friendly-edit-${activeSelectionId || "none"}-${dataEntriesRevision}-${entryIndex}`}
                         label="Value"
                         size="small"
                         fullWidth
                         multiline={isMarkdownField}
                         minRows={isMarkdownField ? 4 : 1}
                         defaultValue={entry.rawValue}
-                        onChange={(event) => handleFriendlyDraftChange(index, event.target.value)}
-                        onBlur={() => handleFriendlyDraftBlur(index)}
+                        onChange={(event) => handleFriendlyDraftChange(entryIndex, event.target.value)}
+                        onBlur={() => handleFriendlyDraftBlur(entryIndex)}
                       />
                     )}
                   </Paper>
                 );
-              })}
+              }) : (
+                <Typography variant="body2" color="text.secondary">
+                  No matching fields in this view.
+                </Typography>
+              )}
               </Stack>
             ) : (
               <Typography variant="body2" color="text.secondary">
@@ -2093,86 +2167,28 @@ export default function PropertiesPanel({
     </Section>
   );
 
-  const renderPortSection = () => (
+  const renderNavigationSection = () => (
     <Section
-      title="Port target"
-      value="port"
-      expanded={expandedSections.node === "port"}
-      onToggle={handleAccordionChange("node", "port")}
-      disabled={!isPortNode}
+      title="Navigation Editor"
+      value="navigation"
+      expanded={expandedSections.node === "navigation"}
+      onToggle={handleAccordionChange("node", "navigation")}
+      disabled={!isPortNode && !isGraphReferenceNode}
     >
       <Stack spacing={1}>
-        <TextField
-          label="Reference (ref)"
+        <Typography variant="body2" color="text.secondary">
+          Endpoint and navigation fields are edited in the node editor panel.
+        </Typography>
+        <Button
           size="small"
-          fullWidth
-          value={portTarget.ref || ""}
-          onChange={(event) => updatePortTarget({ ref: event.target.value })}
-          helperText="Canonical target. Supports github://, local://, tlz://, /path, https://"
-        />
-        <TextField
-          label="Endpoint (file.node:port)"
-          size="small"
-          fullWidth
-          value={portTarget.endpoint || ""}
-          onChange={(event) => updatePortTarget({ endpoint: event.target.value })}
-        />
-        <TextField
-          label="Target URL"
-          size="small"
-          fullWidth
-          value={portTarget.url || ""}
-          onChange={(event) => updatePortTarget({ url: event.target.value })}
-        />
-        <TextField
-          label="Target graphId"
-          size="small"
-          fullWidth
-          value={portTarget.graphId || ""}
-          onChange={(event) => updatePortTarget({ graphId: event.target.value })}
-        />
-        <TextField
-          label="Target nodeId"
-          size="small"
-          fullWidth
-          value={portTarget.nodeId || ""}
-          onChange={(event) => updatePortTarget({ nodeId: event.target.value })}
-        />
-        <TextField
-          label="Target portId"
-          size="small"
-          fullWidth
-          value={portTarget.portId || portTarget.handleId || ""}
-          onChange={(event) => updatePortTarget({ portId: event.target.value, handleId: event.target.value })}
-        />
-        <TextField
-          label="Target label"
-          size="small"
-          fullWidth
-          value={portTarget.label || ""}
-          onChange={(event) => updatePortTarget({ label: event.target.value })}
-        />
-        <TextField
-          label="Intent"
-          size="small"
-          fullWidth
-          value={portData.intent || ""}
-          onChange={(event) => updatePortDataField({ intent: event.target.value })}
-        />
-        <FormControl fullWidth size="small">
-          <InputLabel>Security</InputLabel>
-          <Select
-            value={portData.security || "prompt"}
-            label="Security"
-            onChange={(event) => updatePortDataField({ security: event.target.value })}
-          >
-            {["prompt", "allow", "deny"].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          variant="outlined"
+          onClick={() => {
+            if (!selectedNode?.id) return;
+            eventBus.emit("toggleNodeEditorPanel", { nodeId: selectedNode.id, source: "properties-navigation" });
+          }}
+        >
+          Open Editor Panel
+        </Button>
       </Stack>
     </Section>
   );
@@ -2232,57 +2248,6 @@ export default function PropertiesPanel({
             Apply
           </Button>
         </Box>
-      </Stack>
-    </Section>
-  );
-
-  const renderGraphReferenceSection = () => (
-    <Section
-      title="Graph reference"
-      value="graph-reference"
-      expanded={expandedSections.node === "graph-reference"}
-      onToggle={handleAccordionChange("node", "graph-reference")}
-      disabled={!isGraphReferenceNode}
-    >
-      <Stack spacing={1}>
-        <TextField
-          label="Reference (ref)"
-          size="small"
-          fullWidth
-          placeholder="github://owner/repo/path/file.node"
-          value={selectedNode?.data?.ref || selectedNode?.data?.src || ""}
-          onChange={(event) => updateGraphReferenceField({ ref: event.target.value, src: event.target.value })}
-          helperText="Canonical source. Supports github://, local://, tlz://, /path, https://"
-        />
-        <TextField
-          label="Endpoint (file.node:port)"
-          size="small"
-          fullWidth
-          placeholder="/root.node:root"
-          value={selectedNode?.data?.endpoint || ""}
-          onChange={(event) => updateGraphReferenceField({ endpoint: event.target.value })}
-          helperText="Optional endpoint form. Parsed to file path for load."
-        />
-        <FormControl fullWidth size="small">
-          <InputLabel>Mode</InputLabel>
-          <Select
-            value={selectedNode?.data?.mode || "preview"}
-            label="Mode"
-            onChange={(event) => updateGraphReferenceField({ mode: event.target.value })}
-          >
-            <MenuItem value="preview">preview</MenuItem>
-            <MenuItem value="interactive">interactive</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          label="Notes"
-          size="small"
-          fullWidth
-          multiline
-          minRows={2}
-          value={selectedNode?.data?.notes || ""}
-          onChange={(event) => updateGraphReferenceField({ notes: event.target.value })}
-        />
       </Stack>
     </Section>
   );
@@ -2842,10 +2807,9 @@ export default function PropertiesPanel({
           </FormControl>
         </Box>
       )}
-      {!isMarkdownNode && renderPayloadSection()}
+      {!isMarkdownNode && !isPortNode && !isGraphReferenceNode && renderPayloadSection()}
       {isMarkdownNode && renderMarkdownSection()}
-      {isPortNode && renderPortSection()}
-      {isGraphReferenceNode && renderGraphReferenceSection()}
+      {(isPortNode || isGraphReferenceNode) && renderNavigationSection()}
       {renderHandlesSection()}
       {renderNodeEdgesSection()}
       {renderFormattingSection()}

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import EditIcon from "@mui/icons-material/Edit";
 import FixedNode from "./FixedNode";
 import useNodePortSchema from "../hooks/useNodePortSchema";
 import { endpointToUrl, parsePortEndpoint } from "../utils/portEndpoint";
@@ -12,14 +13,31 @@ import eventBus from "../../NodeGraph/eventBus";
 const DEFAULT_INPUTS = [{ key: "in", label: "In", type: "value" }];
 const DEFAULT_OUTPUTS = [{ key: "out", label: "Out", type: "value" }];
 const DEFAULT_MAX_EMBED_DEPTH = 4;
+const NON_PASSIVE_LISTENER = { passive: false };
+const HANDLE_SIZE = 10;
+const HANDLE_OFFSET = -4;
+const RESIZE_HANDLES = [
+  { key: "nw", cursor: "nwse-resize", x: HANDLE_OFFSET, y: HANDLE_OFFSET },
+  { key: "ne", cursor: "nesw-resize", x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`, y: HANDLE_OFFSET },
+  {
+    key: "se",
+    cursor: "nwse-resize",
+    x: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`,
+    y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)`
+  },
+  { key: "sw", cursor: "nesw-resize", x: HANDLE_OFFSET, y: `calc(100% - ${HANDLE_SIZE + HANDLE_OFFSET}px)` }
+];
 
 const resolveGraphUrl = (node) => {
   const data = node?.data || {};
+  const target = data?.target && typeof data.target === "object" ? data.target : {};
   const explicit =
     (typeof data.ref === "string" && data.ref.trim()) ||
     (typeof data.src === "string" && data.src.trim()) ||
     (typeof data.url === "string" && data.url.trim()) ||
     (typeof data.graphUrl === "string" && data.graphUrl.trim()) ||
+    (typeof target.ref === "string" && target.ref.trim()) ||
+    (typeof target.url === "string" && target.url.trim()) ||
     "";
   if (explicit) {
     const parsedExplicit = parsePortEndpoint(explicit);
@@ -76,6 +94,22 @@ const GraphReferenceNode = (props) => {
   const interactive = mode === "interactive";
   const iframeRef = useRef(null);
   const [frameState, setFrameState] = useState("idle");
+  const [isResizing, setIsResizing] = useState(false);
+  const isResizingRef = useRef(false);
+  const resizeStateRef = useRef({
+    handle: "se",
+    startX: 0,
+    startY: 0,
+    startWidth: 0,
+    startHeight: 0,
+    startPosX: 0,
+    startPosY: 0
+  });
+  const rafRef = useRef(null);
+  const pendingSizeRef = useRef(null);
+  const pendingPosRef = useRef(null);
+  const MIN_WIDTH = 260;
+  const MIN_HEIGHT = 180;
   const maxDepthOverride = Number(node?.data?.maxDepth);
   const maxDepth =
     Number.isFinite(maxDepthOverride) && maxDepthOverride > 0
@@ -137,6 +171,123 @@ const GraphReferenceNode = (props) => {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [embedToken, parentOrigin]);
+
+  const getPointerPosition = (event) => {
+    if (!event) return null;
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    if (touch) return { x: touch.clientX, y: touch.clientY };
+    if (typeof event.clientX === "number" && typeof event.clientY === "number") {
+      return { x: event.clientX, y: event.clientY };
+    }
+    return null;
+  };
+
+  const flushResize = () => {
+    rafRef.current = null;
+    if (!pendingSizeRef.current || !node?.id) return;
+    const { width, height } = pendingSizeRef.current;
+    eventBus.emit("nodeResize", { id: node.id, width, height });
+    if (pendingPosRef.current) {
+      eventBus.emit("nodeMove", { id: node.id, position: pendingPosRef.current });
+    }
+  };
+
+  const handleResizeStart = (event, handle) => {
+    const point = getPointerPosition(event);
+    if (!point) return;
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.cancelable && event.preventDefault) event.preventDefault();
+    isResizingRef.current = true;
+    setIsResizing(true);
+    resizeStateRef.current = {
+      handle,
+      startX: point.x,
+      startY: point.y,
+      startWidth: node.width || 420,
+      startHeight: node.height || 300,
+      startPosX: node.position?.x ?? node.x ?? 0,
+      startPosY: node.position?.y ?? node.y ?? 0
+    };
+    if (event.currentTarget?.setPointerCapture && event.pointerId !== undefined) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (err) {
+        // ignore pointer capture errors
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleResizeMove = (event) => {
+      if (!isResizingRef.current) return;
+      const point = getPointerPosition(event);
+      if (!point) return;
+      if (event.cancelable && event.preventDefault) event.preventDefault();
+
+      const zoom = props.zoom || 1;
+      const state = resizeStateRef.current;
+      const dx = (point.x - state.startX) / zoom;
+      const dy = (point.y - state.startY) / zoom;
+      let newWidth = state.startWidth;
+      let newHeight = state.startHeight;
+      let newX = state.startPosX;
+      let newY = state.startPosY;
+
+      if (state.handle.includes("e")) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth + dx);
+      }
+      if (state.handle.includes("s")) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight + dy);
+      }
+      if (state.handle.includes("w")) {
+        newWidth = Math.max(MIN_WIDTH, state.startWidth - dx);
+        newX = state.startPosX + (state.startWidth - newWidth);
+      }
+      if (state.handle.includes("n")) {
+        newHeight = Math.max(MIN_HEIGHT, state.startHeight - dy);
+        newY = state.startPosY + (state.startHeight - newHeight);
+      }
+
+      pendingSizeRef.current = { width: newWidth, height: newHeight };
+      pendingPosRef.current = { x: newX, y: newY };
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(flushResize);
+      }
+    };
+
+    const handleResizeEnd = () => {
+      if (!isResizingRef.current) return;
+      isResizingRef.current = false;
+      setIsResizing(false);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      flushResize();
+      eventBus.emit("nodeResizeEnd", { id: node.id });
+    };
+
+    document.addEventListener("pointermove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("pointerup", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("pointercancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("mousemove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("mouseup", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchmove", handleResizeMove, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchend", handleResizeEnd, NON_PASSIVE_LISTENER);
+    document.addEventListener("touchcancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+
+    return () => {
+      document.removeEventListener("pointermove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("pointerup", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("pointercancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("mousemove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("mouseup", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchmove", handleResizeMove, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchend", handleResizeEnd, NON_PASSIVE_LISTENER);
+      document.removeEventListener("touchcancel", handleResizeEnd, NON_PASSIVE_LISTENER);
+    };
+  }, [isResizing, node?.id, node.height, node.position?.x, node.position?.y, node.width, props.zoom]);
 
   return (
     <FixedNode {...props} node={node} hideDefaultContent>
@@ -234,6 +385,30 @@ const GraphReferenceNode = (props) => {
                 </button>
                 <button
                   type="button"
+                  title="Edit node"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!node?.id) return;
+                    eventBus.emit("toggleNodeEditorPanel", { nodeId: node.id, source: "graph-reference-edit" });
+                  }}
+                  style={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    background: "transparent",
+                    color: theme.palette.text.secondary,
+                    borderRadius: 6,
+                    width: 24,
+                    height: 24,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer"
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 14 }} />
+                </button>
+                <button
+                  type="button"
                   title="Open source graph in Twilite"
                   onClick={(event) => {
                     event.preventDefault();
@@ -324,6 +499,34 @@ const GraphReferenceNode = (props) => {
               {frameState === "error" ? `Embed failed: ${embedSrc}` : `Loading: ${embedSrc}`}
             </div>
           ) : null}
+        </div>
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {RESIZE_HANDLES.map((handle) => (
+            <div
+              key={handle.key}
+              onPointerDown={(event) => handleResizeStart(event, handle.key)}
+              onMouseDown={(event) => handleResizeStart(event, handle.key)}
+              onTouchStart={(event) => handleResizeStart(event.nativeEvent || event, handle.key)}
+              style={{
+                position: "absolute",
+                width: HANDLE_SIZE,
+                height: HANDLE_SIZE,
+                borderRadius: 3,
+                border: `1px solid ${theme.palette.divider}`,
+                background: theme.palette.background.paper,
+                boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+                cursor: handle.cursor,
+                opacity: isResizing ? 1 : 0,
+                transition: "opacity 0.2s ease",
+                zIndex: 3,
+                pointerEvents: "auto",
+                touchAction: "none",
+                userSelect: "none",
+                left: handle.x,
+                top: handle.y
+              }}
+            />
+          ))}
         </div>
       </div>
     </FixedNode>

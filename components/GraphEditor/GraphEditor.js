@@ -1800,11 +1800,77 @@ useEffect(() => {
       }
     };
 
+    const handleGithubDelete = async ({ token, settings = {}, message } = {}) => {
+      if (!token) {
+        showMessage('GitHub PAT is required.', 'error');
+        return;
+      }
+      const repoInfo = parseRepoString(settings.repo || '');
+      if (!repoInfo) {
+        showMessage('GitHub repo must be in the form owner/name.', 'error');
+        return;
+      }
+      const path = (settings.path || '').trim().replace(/^\/+/, '');
+      if (!path) {
+        showMessage('GitHub file path is required.', 'error');
+        return;
+      }
+      const branch = (settings.branch || 'main').trim();
+      const { owner, repo } = repoInfo;
+      const headers = buildGitHubHeaders(token);
+
+      try {
+        showMessage(`Deleting ${path} from GitHub...`, 'info');
+        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
+        const deleteUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: false });
+
+        const readResp = await fetch(readUrl, { headers });
+        if (!readResp.ok) {
+          const { message: readMessage } = await parseGithubError(readResp);
+          throw new Error(`GitHub read failed (${path}): ${readMessage}`);
+        }
+
+        const existing = await readResp.json();
+        const sha = existing?.sha;
+        if (!sha || existing?.type !== 'file') {
+          throw new Error(`Path "${path}" is not a file or is missing sha.`);
+        }
+
+        const deleteResp = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: (message || '').trim() || `Delete ${path}`,
+            sha,
+            branch
+          })
+        });
+
+        if (!deleteResp.ok) {
+          const { message: deleteMessage } = await parseGithubError(deleteResp);
+          throw new Error(`GitHub delete failed (${path}): ${deleteMessage}`);
+        }
+
+        showMessage('GitHub delete successful.', 'success');
+      } catch (err) {
+        const detail = err?.message || String(err);
+        const hint = detail.includes('not found')
+          ? ' Check repo owner/name, path, branch, and token access (repo scope).'
+          : '';
+        showMessage(`GitHub delete error: ${detail}${hint}`, 'error');
+      }
+    };
+
     eventBus.on('githubCommit', handleGithubCommit);
     eventBus.on('githubLoad', handleGithubLoad);
+    eventBus.on('githubDelete', handleGithubDelete);
     return () => {
       eventBus.off('githubCommit', handleGithubCommit);
       eventBus.off('githubLoad', handleGithubLoad);
+      eventBus.off('githubDelete', handleGithubDelete);
     };
   }, [buildGraphSaveData, handleLoadGraph, setSnackbar]);
 

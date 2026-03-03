@@ -20,13 +20,14 @@ import {
   ListItemText,
   Tooltip,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  Menu,
+  MenuItem
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import EditIcon from "@mui/icons-material/Edit";
 import * as Icons from "@mui/icons-material";
 import eventBus from "../../NodeGraph/eventBus";
 import useAvailableNodeTypes from "../hooks/useAvailableNodeTypes";
@@ -75,6 +76,7 @@ export default function SystemNodesPanel({
   const [quickTypeVersion, setQuickTypeVersion] = useState(">=0.1.0");
   const [quickIncludeNodeView, setQuickIncludeNodeView] = useState(true);
   const [quickIncludeEditorView, setQuickIncludeEditorView] = useState(true);
+  const [legendContextMenu, setLegendContextMenu] = useState(null);
   const resizeStateRef = useRef(null);
   const validationErrors = Array.isArray(validationReport?.errors) ? validationReport.errors : [];
   const validationWarnings = Array.isArray(validationReport?.warnings) ? validationReport.warnings : [];
@@ -370,6 +372,20 @@ export default function SystemNodesPanel({
     }
     setError("");
     eventBus.emit("addNode", { type: typeKey });
+  };
+
+  const handleOpenLegendContextMenu = (event, index) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setLegendContextMenu({
+      mouseX: event.clientX + 2,
+      mouseY: event.clientY - 6,
+      index
+    });
+  };
+
+  const handleCloseLegendContextMenu = () => {
+    setLegendContextMenu(null);
   };
 
   const getIconComponent = (iconName) => {
@@ -671,7 +687,12 @@ export default function SystemNodesPanel({
                   </Typography>
                 </Stack>
                 {effectiveLegendEntries.map((entry, index) => (
-                  <Paper key={`legend-${index}`} variant="outlined" sx={{ p: 0.75 }}>
+                  <Paper
+                    key={`legend-${index}`}
+                    variant="outlined"
+                    sx={{ p: 0.75 }}
+                    onContextMenu={(event) => handleOpenLegendContextMenu(event, index)}
+                  >
                     <Stack spacing={0.75}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={0.5}>
                         {(() => {
@@ -698,14 +719,6 @@ export default function SystemNodesPanel({
                         <Tooltip title="Add node from this legend entry">
                           <IconButton size="small" onClick={() => handleSpawnLegendNode(entry)}>
                             <AddIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Edit entry">
-                          <IconButton
-                            size="small"
-                            onClick={() => setLegendExpanded((prev) => ({ ...prev, [index]: !prev[index] }))}
-                          >
-                            <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Stack>
@@ -895,6 +908,38 @@ export default function SystemNodesPanel({
           </Box>
         </Box>
       </Box>
+      <Menu
+        open={Boolean(legendContextMenu)}
+        onClose={handleCloseLegendContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          legendContextMenu
+            ? { top: legendContextMenu.mouseY, left: legendContextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem
+          onClick={() => {
+            const index = legendContextMenu?.index;
+            if (typeof index === "number") {
+              setLegendExpanded((prev) => ({ ...prev, [index]: !prev[index] }));
+            }
+            handleCloseLegendContextMenu();
+          }}
+        >
+          Edit entry
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            const index = legendContextMenu?.index;
+            const entry = typeof index === "number" ? effectiveLegendEntries[index] : null;
+            if (entry) handleSpawnLegendNode(entry);
+            handleCloseLegendContextMenu();
+          }}
+        >
+          Add node from this entry
+        </MenuItem>
+      </Menu>
     </Drawer>
   );
 }

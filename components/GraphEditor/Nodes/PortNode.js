@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
+import EditIcon from "@mui/icons-material/Edit";
 import FixedNode from "./FixedNode";
 import useNodePortSchema from "../hooks/useNodePortSchema";
 import eventBus from "../../NodeGraph/eventBus";
@@ -71,7 +72,15 @@ const PortNode = (props) => {
   const MIN_WIDTH = 140;
   const MIN_HEIGHT = 90;
   const target = node?.data?.target || {};
-  const targetLabel = buildTargetLabel(target);
+  const fallbackTarget = {
+    label: node?.data?.label || node?.data?.name || "",
+    endpoint: node?.data?.endpoint || "",
+    ref: node?.data?.ref || node?.data?.src || node?.data?.graphUrl || "",
+    url: node?.data?.url || ""
+  };
+  const targetLabel = buildTargetLabel(target) !== "No target"
+    ? buildTargetLabel(target)
+    : buildTargetLabel(fallbackTarget);
   const displayLabel = node?.label || "Port";
 
   const endpointResult = useMemo(
@@ -81,8 +90,21 @@ const PortNode = (props) => {
   const endpointData = endpointResult.ok ? endpointResult.value : null;
   const targetUrl = useMemo(() => {
     if (typeof target.ref === "string" && target.ref.trim()) return endpointToUrl(target.ref.trim());
+    if (typeof node?.data?.src === "string" && node.data.src.trim()) return endpointToUrl(node.data.src.trim());
+    if (typeof node?.data?.graphUrl === "string" && node.data.graphUrl.trim()) return endpointToUrl(node.data.graphUrl.trim());
     if (typeof node?.data?.ref === "string" && node.data.ref.trim()) return endpointToUrl(node.data.ref.trim());
+    if (typeof node?.data?.url === "string" && node.data.url.trim()) return node.data.url.trim();
     if (typeof target.url === "string" && target.url.trim()) return target.url.trim();
+    if (typeof node?.data?.endpoint === "string" && node.data.endpoint.trim()) {
+      const parsedNodeEndpoint = parsePortEndpoint(node.data.endpoint.trim());
+      if (parsedNodeEndpoint.ok && parsedNodeEndpoint.value?.filePath) {
+        return endpointToUrl(parsedNodeEndpoint.value.filePath);
+      }
+      if (/^https?:\/\//i.test(node.data.endpoint.trim())) {
+        return node.data.endpoint.trim();
+      }
+      return endpointToUrl(node.data.endpoint.trim());
+    }
     const endpointRaw = typeof target?.endpoint === "string" ? target.endpoint.trim() : "";
     if (endpointData?.filePath) {
       return endpointToUrl(endpointData.filePath);
@@ -92,7 +114,17 @@ const PortNode = (props) => {
       return endpointRaw;
     }
     return endpointToUrl(endpointRaw);
-  }, [target.ref, target.url, target?.endpoint, node?.data?.ref, endpointData?.filePath]);
+  }, [
+    target.ref,
+    target.url,
+    target?.endpoint,
+    node?.data?.src,
+    node?.data?.graphUrl,
+    node?.data?.ref,
+    node?.data?.url,
+    node?.data?.endpoint,
+    endpointData?.filePath
+  ]);
 
   const handleNavigate = useCallback(
     (event) => {
@@ -109,6 +141,16 @@ const PortNode = (props) => {
       }
     },
     [targetUrl]
+  );
+
+  const handleOpenEditor = useCallback(
+    (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      if (!node?.id) return;
+      eventBus.emit("toggleNodeEditorPanel", { nodeId: node.id, source: "port-node-edit" });
+    },
+    [node?.id]
   );
 
   const getPointerPosition = (event) => {
@@ -261,25 +303,45 @@ const PortNode = (props) => {
             {targetLabel}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleNavigate}
-          disabled={!targetUrl}
-          style={{
-            alignSelf: "flex-start",
-            borderRadius: 6,
-            border: `1px solid ${theme.palette.divider}`,
-            background: "transparent",
-            color: theme.palette.text.primary,
-            padding: "4px 8px",
-            fontSize: 11,
-            cursor: targetUrl ? "pointer" : "default",
-            opacity: targetUrl ? 1 : 0.55
-          }}
-          title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
-        >
-          Navigate
-        </button>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <button
+            type="button"
+            onClick={handleNavigate}
+            disabled={!targetUrl}
+            style={{
+              borderRadius: 6,
+              border: `1px solid ${theme.palette.divider}`,
+              background: "transparent",
+              color: theme.palette.text.primary,
+              padding: "4px 8px",
+              fontSize: 11,
+              cursor: targetUrl ? "pointer" : "default",
+              opacity: targetUrl ? 1 : 0.55
+            }}
+            title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
+          >
+            Navigate
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenEditor}
+            style={{
+              borderRadius: 6,
+              border: `1px solid ${theme.palette.divider}`,
+              background: "transparent",
+              color: theme.palette.text.primary,
+              width: 26,
+              height: 24,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer"
+            }}
+            title="Edit node"
+          >
+            <EditIcon sx={{ fontSize: 14 }} />
+          </button>
+        </div>
       </div>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
         {RESIZE_HANDLES.map((handle) => (

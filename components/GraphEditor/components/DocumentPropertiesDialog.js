@@ -2055,6 +2055,35 @@ export default function DocumentPropertiesDialog({
                   >
                     Load from GitHub
                   </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => {
+                      const settings = docSettings.github || {};
+                      const repo = (settings.repo || '').trim();
+                      const branch = (settings.branch || 'main').trim();
+                      const path = (settings.path || '').trim();
+                      if (!repo || !path) {
+                        if (typeof window !== 'undefined') {
+                          window.alert('Set GitHub repo and path before deleting.');
+                        }
+                        return;
+                      }
+                      const confirmed = typeof window !== 'undefined'
+                        ? window.confirm(
+                            `Delete "${path}" from ${repo} (${branch})?\n\nThis creates a delete commit on GitHub and cannot be undone from Twilite.`
+                          )
+                        : false;
+                      if (!confirmed) return;
+                      eventBus.emit('githubDelete', {
+                        token: githubPat,
+                        settings,
+                        message: (githubCommitMessage || '').trim() || `Delete ${path}`
+                      });
+                    }}
+                  >
+                    Delete from GitHub
+                  </Button>
                 </Stack>
               </Stack>
             </Paper>

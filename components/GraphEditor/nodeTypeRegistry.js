@@ -114,9 +114,13 @@ const baseNodeTypeRegistry = {
     defaultWidth: 220,
     defaultHeight: 140,
     defaultData: {
+      src: '/root.node',
+      ref: '/root.node',
+      endpoint: 'root.node:root',
       intent: 'external',
       target: {
         endpoint: 'root.node:root',
+        ref: '/root.node',
         mode: 'navigate',
         url: '',
         graphId: '',
@@ -360,9 +364,13 @@ export const nodeTypeMetadata = [
     defaultWidth: 220,
     defaultHeight: 140,
     defaultData: {
+      src: '/root.node',
+      ref: '/root.node',
+      endpoint: 'root.node:root',
       intent: 'external',
       target: {
         endpoint: 'root.node:root',
+        ref: '/root.node',
         mode: 'navigate',
         url: '',
         graphId: '',
@@ -710,7 +718,20 @@ const buildRegistry = () => ({
     defaultWidth: 420,
     defaultHeight: 300,
     defaultData: {
+      ref: '/root.node',
       src: '/root.node',
+      endpoint: 'root.node:root',
+      intent: 'external',
+      target: {
+        endpoint: 'root.node:root',
+        ref: '/root.node',
+        mode: 'navigate',
+        url: '',
+        graphId: '',
+        nodeId: '',
+        portId: 'root',
+        label: ''
+      },
       mode: 'preview'
     }
   },
