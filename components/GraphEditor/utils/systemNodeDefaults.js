@@ -63,6 +63,7 @@ export const createDefaultManifestNode = ({ kind = 'graph' } = {}) => {
       settings: {
         theme: null,
         backgroundImage: null,
+        uiDensity: 'comfortable',
         defaultNodeColor: '#1976d2',
         defaultEdgeColor: '#666666',
         snapToGrid: false,

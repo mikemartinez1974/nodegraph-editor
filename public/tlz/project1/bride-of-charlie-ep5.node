@@ -1,0 +1,512 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "bride-of-charlie-episode-5",
+          "name": "Bride of Charlie - Episode 5 Summary",
+          "version": "1.0.0",
+          "description": "Summary of Episode 5: Complete timeline, Eastern Europe connections, Tyler Boyer in Romania, Epstein links, Rick's fraud exposed",
+          "createdAt": "2026-03-03T21:30:00.000Z",
+          "updatedAt": "2026-03-03T21:30:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Episode 5 Overview",
+      "position": { "x": 0, "y": -220 },
+      "width": 520,
+      "height": 420,
+      "color": "#b71c1c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Bride of Charlie - Episode 5\n## The Complete Timeline & Romania Connection\n\n### \"The Players Are Now In Place\"\n\n**Big Questions:**\n- Erica's missing years - where is she?\n- Is she in Eastern Europe? Why?\n- Was Lorie in Afghanistan?\n- Is Lorie actually Vince Lombardi's descendant? (\"I actually think she is\")\n- Tyler Boyer out in Romania - what was he doing?\n\n### Main Revelations\n\n**1. Complete Erica Timeline 1988-2010**\n- Missing years: 2000-2002 (still unknown)\n- Lorie's E3 Tech: Operation Enduring Freedom (Afghanistan)\n- $2.4M from Army National Guard in 2008\n\n**2. Tyler Boyer in Romania 2010**\n- Same time as Black Sea Rotational Force\n- Modeling agency, parliament member\n- \"Romanian sloshed\" with girls\n- Married & LDS at the time\n\n**3. Jeffrey Epstein Romania Connection**\n- 2009: US military base established\n- Epstein immediately procuring Romanian models\n- Arizona State University connection\n\n**4. Rick Urbenbeck's License Loss**\n- Multiple mortgage fraud (led to financial crisis)\n- Deed fraud\n- \"Professional negligence\" not \"criminality\""
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Dr. Jerry France in Eastern Europe",
+      "position": { "x": 600, "y": -220 },
+      "width": 500,
+      "height": 640,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 1990: Dr. Jerry France Goes to Eastern Europe\n\n### The Official Story\n\n**Radford University Project:**\n\"The final big project of the semester will be taking a group of students to Eastern Europe.\n\nWe will research the **expectations of men and women** as work life and day-to-day life change **after the wall came down**.\"\n\n### The Timing Problem\n\n**Fall of Berlin Wall → Immediate Chaos:**\n- Wall fell: 1989\n- Dr. France goes: **August 1990**\n- Yugoslav Wars begin: **Same year, August 1990**\n- \"Chaos and carnage\"\n\n**Candace's Question:**\n\"Imagine your kid's teacher says: 'We're going to go in 1990 to Eastern Europe after the wall came down.'\n\nDo you understand what happened after that? **Chaos. That's what happened.**\n\nAgain, why would you take students there to research **gender issues**?\n\nDo we think gender issues are ranking high in the minds of those Eastern Europeans?\"\n\n### Children in War\n\n**The Dark Reality:**\n\"Are you guys aware of how many children go missing during times of war?\n\nDuring all that chaos, how many kids are trafficked **during the fog of war**?\n\nI know this because one of my best friends in college was Romanian. She grew up with **real gypsies grabbing children off the street**.\n\nShe was almost trafficked as a child.\n\nWhere exactly are they taking these children? How could that go unnoticed?\"\n\n### Candace's Conclusion\n\n**Unequivocal Statement:**\n\n\"I don't think Dr. Jerry France, who is a **verifiable fraud**, was there in Eastern Europe researching gender issues.\n\nMay she rest in peace.\n\nBut that's my opinion and I'm sticking to it.\""
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "Tesseract's Military Principal",
+      "position": { "x": 0, "y": 260 },
+      "width": 520,
+      "height": 600,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Nancy Gerard Hall - Tesseract Principal\n\n### While Erica Was A Student\n\nNancy had **very strong military ties**\n\n### Her Father: Colonel Paul Tracy Gerard\n\n**Military Background:**\n- Member of Scottish Rite\n- Freemason at Fort Leavenworth, Kansas\n- Blue Masonic Lodge, Galesburg, Illinois\n- **Chief Military Law Enforcement Officer**\n- Seventh Army in Europe (Germany, Stuttgart, 1950s)\n\n**Candace's Note:**\n\"Maybe he knows where Jean-Michelle Trogno went. Maybe they cross paths.\"\n\n### Her Brother: Paul Tracy Gerard Jr.\n\n- Followed father's footsteps\n- **Major in the military** (1977)\n- Continued climbing ranks\n- Member of **Scabbard and Blade** (military honor society)\n\n### Her First Husband: Steven Edward Sample\n\n- Long line of military men\n- **Second Lieutenant in Air Force** when they married\n\n### Nancy's Role at Tesseract\n\n\"She's in charge of the curriculum and much more.\"\n\n**Candace's Speculation:**\n\"I think it's fair to wonder whether or not she approached that job with **military precision**.\"\n\n### The Pattern\n\n- Tesseract backed by Bush family & Waltons\n- Model designed by psychologists with Dr. Jerry France\n- Principal with deep military intelligence ties\n- Erica attended this school"
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Complete Erica Timeline Part 1",
+      "position": { "x": 600, "y": 480 },
+      "width": 500,
+      "height": 760,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 1988-1999: Early Years\n\n### 1988\n\nErica born November 20th or 22nd (\"depending on who's telling the story\")\n\n### 1990\n\n**Dr. Jerry France** starts conducting research in Eastern Europe\n\n**Note:** \"I don't know if she is still married to Kent. We can't find marriage records between Lori and Kent, but we also could not locate divorce records between Dr. Jerry France and Kent.\"\n\n### 1991\n\nErica attends private daycare:\n- Walnut Corner, Cincinnati, Ohio\n- Corporate business building\n- Owned by Child Care Visions\n- Photo: Halloween 1991 (brink of 3rd birthday)\n\n### 1994-1995\n\nSt. Ursula Villa for kindergarten\n\n### 1995-1996\n\n**Tesseract School** (Paradise Valley)\n- First year at Tesseract\n- Parents Kent & Lori allegedly married (Marblehead, MA)\n- \"Cannot find a single shred of documentation\"\n\n### 1996-1998\n\nContinues at Tesseract\n\n### 1998-1999\n\n**Third Grade at Tesseract**\n\n**Lori & Kent file for divorce** (Cincinnati)\n- Kent already living in Arizona\n- Lori listed as living in Cincinnati\n\n### 1999\n\n**Lorie's LLC Explosion:**\n\n**December 1:** Virtual Registration International Inc.\n- With help of Rick & Donna Urbenbeck\n- \"Indicating she's going to be doing work overseas\"\n\n**September 24:** Intellment Incorporated\n\n**December 2:** Intellment International Inc. of Delaware\n\n\"She's getting ready to do business.\""
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "The Missing Years: 2000-2002",
+      "position": { "x": 0, "y": 920 },
+      "width": 520,
+      "height": 520,
+      "color": "#d32f2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Where Is Erica?\n\n### 2000\n\n**Tesseract school goes bankrupt**\n- \"Millions are apparently missing\"\n- \"For-profit corporate drive to run public schools... full-blown meltdown\"\n\n**Erica:** Location unknown\n\n### 2001\n\n**9/11 & Operation Enduring Freedom**\n\n**The Question:**\n\"If Saudis allegedly drove planes into the World Trade Center, why are we immediately a couple of weeks later on **October 7th, 2001**, sending people to Afghanistan?\n\nIt's very confusing. None of it makes any sense. Don't try to understand corruption.\"\n\n**Lorie's E3 Tech Company:**\n- Used for Operation Enduring Freedom\n- According to its current website\n- Eventually wins award for contributions\n\n**The Question:**\n\"Did Erica go overseas with her mother during those years? Maybe in 2001.\n\nI don't even know if Lori went overseas.\n\nI'm just telling you that according to their own website E3, they received an award for whatever they were doing for that operation.\"\n\n### 2002\n\n**Erica:** Still no idea which school\n\n### The APB\n\n**Candace's Call:**\n\"If you went to school with Erica France anywhere in the United States from the years **2000 to 2002**, we would like to hear from you.\"\n\n**Note:** Initially thought St. Ursula Villa, but people with yearbooks confirmed she's NOT there during these years."
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "Timeline Part 2: 2003-2007",
+      "position": { "x": 600, "y": 1300 },
+      "width": 500,
+      "height": 680,
+      "color": "#558b2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 2003-2007\n\n### 2003\n\n**Lorie forms:** Intellment of Arizona LLC (January 9)\n\n### 2005\n\n**Erica documented at Notre Dame Prep:**\n- Playing basketball\n- Pageant world\n- First runner up: National American Miss Arizona\n\n**MOST CRUCIAL: Lorie's Government Money**\n\n**IMAT Laboratories:**\n- Listed in House bill budget\n- Receiving money from **Department of Homeland Security**\n- \"Could not find formation docs\"\n- \"Maybe related to Intellment - could be shortened from Intellment Laboratories\"\n\n**Question:** \"What is she doing for them?\"\n\n### 2006\n\n**Erica:**\n- Wins National American Miss Teen Pageant\n- Travels to DC\n- Meets Senator John Kyl\n- Presents plans to Rep. JD Hayworth\n- Gets involved in Andrea's Closet charity (Winslow hospital)\n\n**The Winslow Story Problem:**\n\nErica claims: \"We love stopping here. Come through many times on way to basketball games.\"\n\n**Expert Email:**\n- 80% of Arizona population in Maricopa County\n- Winslow 3 hours from Scottsdale\n- Structure of teams: would only go to Winslow **2 times max** in 4 years\n\n**Red Flag:** \"Mother is involved in this immediately flagging this as weird. How did she get involved with this hospital?\"\n\n**Also:** \"She says she loves to do charity work **abroad**. That would imply Erica has already been abroad.\"\n\n### 2007\n\n- Graduates Notre Dame Prep\n- Miss America Teen\n- Begins basketball at Regis University\n- **Major:** Business Administration\n- Lorie's A-Tech International cancelled (tax filing), will reinstate later"
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "2008: The Crucial Missing Year",
+      "position": { "x": 0, "y": 1500 },
+      "width": 520,
+      "height": 600,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Erica Missing, Lorie Gets Millions\n\n### Erica's Status\n\n**2007-2008 School Year at Regis:**\n- \"Locked away like Cinderella\"\n- \"Reading her Bible\"\n- \"Only seeing her pastor\"\n- **Majoring:** Business Administration\n- Regis player bio still available\n\n**2008-2009:**\n- Assumed continuing studies online (\"kind assumption\")\n- Future she'll claim: majored in political science \"from the beginning\"\n- \"That's not true\"\n- Takes **5 years total** to graduate college\n\n### LORIE RECEIVES $2.4 MILLION\n\n**Army National Guard → IMAT Laboratories**\n\nAmount: **$2,400,000**\n\n**Purpose:** J3, J6\n- Cyber security\n- Cyber operations\n\n### The Evolution\n\n**Candace's Summary:**\n\n\"Erica already, via her mother, who she claims raised her as a single mom. She didn't, unless maybe her mindset it was the single mom cuz **Erica was over on a base with her mother**.\n\nBut we now know that during this year, this crucial year where Erica is missing, her mother is going to wind up having received $2.4 million.\n\nI mean, this woman:\n- From a model\n- To a secretary  \n- To now she's getting all of this money for tech\n\nIt's interesting.\""
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "2009: Everyday Heroes & Romania Base",
+      "position": { "x": 1180, "y": -220 },
+      "width": 500,
+      "height": 820,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Pieces Come Together\n\n### April 2009: Lorie Establishes Charity\n\n**Everyday Heroes Like You**\n\nFiling claims:\n- Faith-based organization\n- Raising funds\n- **Developing programs for vulnerable children**\n\nPublished: July 2nd, 2009\n\n### Candace's Discomfort\n\n\"Lori seems a bit busy.\n\nShe's already working with the government. She's maybe in Afghanistan or at least creating tech for Afghanistan.\n\nAnd now, wow, this hero is jumping in: **'I'm going to help vulnerable children.'**\n\nWhy does that make me uncomfortable?\n\nDo I have a right to feel uncomfortable about that?\n\n**Military bases and doing stuff for the military and now 'I'm gonna help kids a little bit.'**\n\nMaybe I'm wrong. With everything I know about Lori, **I don't love it.**\"\n\n### October 2009: ROMANIA BASE ESTABLISHED\n\n**Romanian government agrees:**\nAllow America to set up military base along **Black Sea**\n\n### Erica's Claim: China Sex Trafficking Work\n\n**From \"Freethinkers Only\" Podcast:**\n\n\"Shortly after they established this charity, Everyday Heroes Like You, she's going to go to **China to help women who were sex trafficked**.\"\n\n**Timeline she gives:**\n1. Everyday Heroes comes first\n2. Goes to China (sex trafficking victims)\n3. Gets partnership with **Marines**\n4. Goes out and establishes **Romanian Angels project**\n\n**Candace:** \"Don't hold Erica to being consistent. You'll drive yourself crazy.\"\n\n### Also 2009: Erica Competes Miss Colorado\n\n**Problem:**\nBy her own standards, shouldn't be in Colorado anymore (\"first two years of school\")\n\nYet competes November 2009 for Miss Colorado 2010\n- Places: Fourth runner up\n\n**Question:** \"How did she qualify to compete?\""
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "2009: Jeffrey Epstein Enters Romania",
+      "position": { "x": 1180, "y": 660 },
+      "width": 500,
+      "height": 640,
+      "color": "#ad1457",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Romania Military Base = Epstein Procurement\n\n### The Timing\n\n**2009:** Romanian government agrees to US military base\n\n**Same year:** Jeffrey Epstein begins procuring women from Romania\n\n### The Evidence\n\n**Email Quote:**\n\"Here is information for the girl from Romania who will receive **$10,000**.\"\n\n**Headlines:**\n\"Several Romanian women named in newly released Epstein case files.\"\n\n**Pattern:**\n\"There have been headlines about how often he refers to Romania throughout his emails.\n\nThere is no question.\"\n\n### The Arizona State Connection\n\n**Important Note:**\n\"The number one university that he seems to be involved with is **Arizona State University**.\n\nWhich Erica will eventually graduate from.\"\n\n### Candace's Summary\n\n\"For the purposes of right now, just know that Jeffrey Epstein:\n\nWe have emails going back to **2009**.\n\n**Right when this base gets established.**\n\nAnd suddenly he is interested in procuring **models from Romania**.\n\nOkay, lock that into your mind.\"\n\n### The Questions\n\n- Why Romania specifically?\n- Why immediately after base established?\n- Connection to modeling agencies?\n- Arizona State University role?\n- Erica's eventual graduation from ASU?"
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "2010: November Renaissance & Charter Schools",
+      "position": { "x": 600, "y": 2040 },
+      "width": 500,
+      "height": 720,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## 2010: Multiple Suspicious Activities\n\n### Loyola Marymount (Allegedly)\n\n**Erica claims:** Junior year (Fall 2009 - Spring 2010)\n- Can't find her in yearbook/graduation list\n- No one remembers her in class\n- Could have attended online\n- \"Given amount of travel, probably did take a lot of classes online\"\n\n### January 6, 2010: Dr. Jerry Creates LLC\n\n**Luminarius LLC**\n- With daughter Deborah Himsil (the one she had at 14)\n- Deborah \"following mommy's footsteps\" into psychology\n- **Another charter school company**\n\n### The Charter School Question\n\n**Candace's Theory:**\n\n\"What are they doing with these charter schools?\n\nWhat would be the benefit?\n\n**You being in charge of schools, you could create records for anybody actually.**\n\nYou would literally be able if you wanted to and you had some people who were maybe illegal and you needed to get them into school pretty quickly in elementary school, **it would be good to control a fleet of charter schools**.\n\nI'm not saying that's the case with Luminarius Group, but I'm finding this theme to be interesting.\"\n\n**Pattern:** Corruption of charter schools in Arizona\n- Begins with Tesseract\n- Continues to move\n\n### November 2010: November Renaissance Film\n\n**What It Was:**\n- Eventually put trailer on Kickstarter\n- **Never came out**\n- About: **Corporate espionage, spies working on behalf of global government**\n\n**Red Flags:**\n- Actors/directors affiliated with **Fort Huachuca & Sierra Vista**\n- \"That is an intel base\"\n- \"How did Erica get this role?\"\n- \"How is she doing this in addition to her studies?\"\n- \"A little too on the nose for me\"\n\n### Also 2010: LLC with Boyfriend\n\n**Table Four LLC**\n- With Tyler Sanford\n- He's catcher for LA Angels\n- Later featured in her \"My Kind of Crazy\" music video (2013)\n- \"Erica always dating people that have some level of fame\""
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "2010: Black Sea Rotational Force Established",
+      "position": { "x": 0, "y": 2160 },
+      "width": 520,
+      "height": 680,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Lorie Reinstates, Marines Deploy\n\n### 2010: Lorie Reinstates A-Tech International\n\n**Remember:**\n- First got in trouble (not filing tax returns)\n- Then Lorie moves to reinstate in 2010\n- **AZ Tech International back on the table**\n\n### May 17, 2010: Marines to Romania\n\n**Black Sea Rotational Force 10:**\n\nOfficial ceremony at Romania's **Mihail Kogălniceanu Airfield**\n\n**Official Statement:**\n\"Marines, sailors, and sailors of the Black Sea Rotational Force 2010 officially kicked off their **three-month engagement** in the Black Sea region.\"\n\n**Timing:** May through end of summer\n\n### Interesting Detail: Reno, Nevada\n\n\"What's incredibly interesting is in particular, a lot of those people are coming from **Reno, Nevada** of all places.\"\n\n### The Official Banner\n\n**They claim:**\n\"Allegedly there because they're going to promote **regional stability**.\"\n\n**Candace's Take:**\n\"We have a way with words, I will say, in the West:\n- Regional stability\n- Spreading democracy\"\n\n### The Reality: Colonel Otto Busher\n\n**Accusations:**\nRunning a **brothel and human trafficking ring**\n\n**Timeline:** 2010-2015\n- From the very year base established\n- Through 2015\n\n**Important Note:**\n\"Yes, Erica will come into contact with Colonel Otto Busher.\n\nWe're not going to focus on that today.\""
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "Tyler Boyer in Romania 2010",
+      "position": { "x": 1180, "y": 1360 },
+      "width": 500,
+      "height": 840,
+      "color": "#bf360c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"I'm Sorry, WHAT?\"\n\n### Tyler's Timeline\n\n**May through end of summer 2010:**\nTyler Boyer makes appearance in Romania\n\n**Purpose:** \"To work with the Romanian Parliament\"\n\n**Exact same timeframe:** Black Sea Rotational Force 10 deployment\n\n### The Conversation (Receipts)\n\n**Tyler's Message:**\n\n\"I went to Romania to do some work with a **senator in the parliament** there.\n\nAnd he was friends, meaning the senator in Romania was friends with **this guy that owned a modeling agency** and took me to the beach [Constanța] for 4 days and legit slept collectively like 10 hours.\"\n\n**Friend responds:** \"Oh, I was at a lake...\"\n\n**Tyler continues:**\n\n\"But yeah, **these girls were crazy** and I got completely **Romanian sloshed**.\n\nAnd it got very interesting. Haha.\"\n\n**Candace:** \"This is the Tyler I know. Everybody knows who Tyler is.\"\n\n### The Problems\n\n**1. He Was Married:**\n\"Pretty sure Tyler was married in 2010. Check the records. I think he was married to his first wife in 2010.\"\n\n**2. He's LDS:**\n\"Also, isn't he LDS? Doesn't that mean he's not supposed to be drinking?\n\nOh, who cares? It's all for appearances anyways. **Super Christian company.** Who cares what they're actually doing?\"\n\n### More From Tyler\n\n**About the whiskey:**\n\"They had this homemade whiskey that was like, I can't explain it, but yeah, **the girls were wow, both of them**.\"\n\n**Candace:** \"I told you he's a sexual deviant. There's just so much out there. It's crazy.\"\n\n**Tyler's final comment:**\n\"I can drink a lot so I don't pass out or get weird or anything. Ha.\""
+      }
+    },
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "type": "markdown",
+      "label": "The Questions Tyler Won't Answer",
+      "position": { "x": 1180, "y": 2260 },
+      "width": 500,
+      "height": 680,
+      "color": "#311b92",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## What Was He Doing?\n\n### The Unanswered Questions\n\n**1. Who was the person in Romanian Parliament?**\n\n\"Who was the person in Romanian Parliament that he was there to see?\"\n\n**2. What was the modeling agency?**\n\n\"What was the name of the modeling agency?\n\nI am dying to know because it's gonna get real interesting now, right?\"\n\n### Erica \"Can't Remember\"\n\n**How She Knows Tyler:**\n\n\"Erica just can't remember. She can't remember how she knows him. She can't remember how she met him.\"\n\n**What She Told Candace:**\n\n\"She said to me, 'Maybe it was through a senator.'\n\nSpecifically, that's what she said to me in person.\n\nShe said it might have been through a senator.\n\nI think it could have been through a senator.\n\n**I think it definitely could have been through a senator.**\"\n\n### The Connection\n\n**Candace's Theory:**\n\n\"Honestly, the vibes are vibing here.\n\nI find that **you both have a little something to do with what's going on in Romania**.\n\nAs soon as America gets there and establishes a base, which is going to become pretty much **synonymous, if you speak to Romanians, with trafficking models in Romania**.\n\nDo you know Jeffrey Epstein, Tyler? Did you guys come across each other? Because **he was dealing with models from Romania, too**.\"\n\n### The Request\n\n\"I know this is — I know they're just carrying on Charlie's legacy and everybody grieves differently and it might not be the time to ask.\n\nI'd really like to know **what model agency that Romanian Parliament member was working with** that Tyler had a fun night out with.\""
+      }
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "type": "markdown",
+      "label": "Rick Urbenbeck License Loss EXPOSED",
+      "position": { "x": 600, "y": 2820 },
+      "width": 500,
+      "height": 820,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Uncle Rick Is A Fraud\n\n### Lost License 2009\n\n**First Reason:** Didn't pay his dues\n\n**Candace's Theory:**\n\"My best guess is the reason he stopped paying his dues in Kentucky was that he was hoping they would stop their investigation into him.\n\nBut they didn't.\"\n\n### 2007: Investigation Opened\n\n**Reason #1: Multiple Mortgage Fraud**\n\nWhile employed by Bank of Corbin to perform title searches:\n- Rick didn't inform bank that **other mortgages already existed** on properties\n- They were issuing **loans to multiple people for the same property**\n- Resulted in Bank of Corbin issuing loans on **four properties already encumbered**\n\n**Candace's Note:**\n\"Just so you guys are clear, **this is exactly what led to the financial crisis**.\n\nYou ever seen the movie The Big Short? This is what happened.\"\n\n**Reason #2: Brother Bill's Stock Transfer**\n\nBill transferred 50% of stock in B&G Holdings LLC to:\n- \"Bill Urban Beck Children LLC\"\n- **Rick managed that LLC**\n\nWhile Rick was indebted to lending institutions:\n- Bill's stolen money went to LLC controlled by Rick\n- During bankruptcy court: \"Where's the money?\"\n- Answer: **In an LLC controlled by Rick**\n\n\"Rick ended up not only with Tony's money, but he also ended up with a good portion of Bill's money as well.\"\n\n**Reason #3: Deed Fraud**\n\nRick prepared deed transferring property to Anita Andrews:\n- Did NOT record deed with county\n- **Deed wasn't actually signed by Anita Andrews**\n- Then quickly transferred same property to his mother and father\n\n\"This kind of feels like deed fraud.\""
+      }
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "type": "markdown",
+      "label": "Two-Tiered Justice System",
+      "position": { "x": 0, "y": 2900 },
+      "width": 520,
+      "height": 640,
+      "color": "#880e4f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"Professional Negligence\" Not \"Criminality\"\n\n### The Verdict\n\n**August 2009:** Rick's license suspended (Kentucky only)\n\n**BUT:**\n\n\"They found that his actions did **not rise to the level of criminality**.\n\nJust **professional negligence**.\"\n\n### The Outrage\n\n**Candace's Response:**\n\n\"It's amazing. It is amazing what wealthy people, what wealthy criminals get away with, right?\n\nCould you just imagine the people whose entire lives got ruined because they believed in this company, they gave their money, they're doing mortgage, whatever it is, and then **banks are going under, their entire life savings have been depleted**.\n\nAnd we just look at the characters involved and he's working at Universal doing more LLCs with Lori.\n\nLori's working with the government.\n\n**There's no bar to entry when you're with the gang.**\n\nThe people that are running things doesn't matter. They write the laws. They'll read the laws if they want to read the laws.\n\nThis was professionally not okay. **He committed no crimes here. He just was negligent professionally.**\"\n\n### The Comparison\n\n**For Regular People:**\n- Too many parking tickets → jail\n- Speeding on freeway → jail, \"never get your life back,\" \"you've got a record\"\n- Smoking a joint → \"you got a record\"\n\n**For Hunter Biden:**\n- Smoking crack down freeway\n- Recording yourself\n- Hand in your own laptop\n- \"He's good. He's never going to see a day in prison.\"\n\n### The Reality\n\n\"Just wanted to let you know these are the people that rule over us.\n\nAnyways, enjoy your time at Universal Studios.\""
+      }
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "type": "markdown",
+      "label": "Blake Neff's Shabbat Shalom Defense",
+      "position": { "x": 1760, "y": -220 },
+      "width": 480,
+      "height": 720,
+      "color": "#ff6f00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Blake Breaks His Silence\n\n### What He Ignored\n\n**Everything Presented:**\n- Possible gang ties\n- Vince Lombardi connection\n- Tesseract school\n- Fraud following Lori\n- Money disappearing everywhere\n\n### What He COULDN'T Bear\n\n\"There was only one thing that Blake Nef could not bear.\n\nHe put his foot down last night and issued a **full-throated statement**.\n\n**No one comes for Shabbat Shalom.**\n\nNo one comes for Erica Shalom.\"\n\n### Blake's Statement\n\n\"I have avoided commenting on most of what Candace Owens claims... However, her last episode contains such a **blatant untruth about Charlie's daily life** that I feel compelled to correct it.\n\nCandace Owens aggressively ridicules Erica for using the phrase Shabbat Shalom and suggests that Charlie's last book, *Stop in the Name of God*, about the value of observing the Sabbath, is a fabrication to make Charlie appear more pro-Jewish and pro-Israel than he really was.\n\nIt is very revealing that Candace would fixate on this as it immediately reveals **unfamiliarity with Charlie's behavior** for the entire period that I knew him.\n\nCharlie was observing his evangelical Christian version of Shabbat.\"\n\n### Candace's Response\n\n\"Blake, I could show you text messages that **turning your phone off on Saturday I was doing first** and telling Charlie he should do before anybody.\n\nAs soon as I met George, that became a thing.\n\nI'm aware he turned his phone off on Saturdays. **I did it first.**\n\nWhat we're making fun of is that being the first thing that you hit on tour, the idea that he finished this book.\n\nIt's pretty obvious you guys were trying to make us remind us of how much Charlie loves Israel.\n\nBB Netanyahu came out within 48 hours to remind us of how much Charlie loved Israel.\n\nWe're aware of the psyop and **it failed**.\""
+      }
+    },
+    {
+      "id": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "type": "markdown",
+      "label": "The Dreidel Mockery",
+      "position": { "x": 1760, "y": 560 },
+      "width": 480,
+      "height": 520,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Candace's Sarcastic Apology\n\n### The Mockery\n\n\"Everything Candace is saying... how dare she discount the fact that Charlie—\n\nI just want to be clear.\n\n**Charlie loved Dreidel. Dreidel. Dreidel. Dreidel.**\n\nHe made it out of clay.\n\nHe'd spin it. He'd play.\n\nHe loved **latkes**. Enough is enough.\n\nThey're delicious. They're crunchy. And they're salty.\n\n**And we will not stand for Candace to say this.**\"\n\n### The Apology\n\n\"I'm sorry, Blake.\n\nI'd like to apologize.\n\n**Shabbat shalom. Daddy's home.**\n\nHe threw in his phone.\n\nGlad we cleared that up.\n\nCharlie's phone was off on Saturdays.\n\nBro was like a rapper sliding in like Usher.\n\n**Daddy's home. Shalom.**\n\nI'm sorry. I'm sorry, Erica. And I'm sorry, Blake.\n\nI will never do this again.\"\n\n### The Clarification\n\n**Later:**\n\n\"Just to be clear, I do love latkes.\n\nThey are delicious. They are very, very good and they are salty.\n\nSo there's that. We can meet in the middle.\n\n**Blake, you better be Jewish.**\n\nIf I find out you're not Jewish, you're in so much trouble.\""
+      }
+    },
+    {
+      "id": "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+      "type": "markdown",
+      "label": "The Web They Weave",
+      "position": { "x": 1760, "y": 1140 },
+      "width": 480,
+      "height": 640,
+      "color": "#1b5e20",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## \"They All Knew Each Other Before\"\n\n### Candace's Theory\n\n**The Connections:**\n\n\"I feel like you and Lori and Tyler **go back way back**.\n\nI feel like you guys have known each other for like since at least **2010** if I'm being honest.\n\nI think you knew the Farnsworths and I think you knew the Boyers.\n\nI'd actually go back further.\n\nI think you guys maybe even knew each other since **Afghanistan**.\n\nBut I'm going to wait until tomorrow to introduce that and how you guys maybe even could have known each other.\n\nJust dancing around each other there in Arizona, all getting involved in the same stuff, **charter schools**, and then you and Tyler are going to graduate in the same year.\n\nIt's all so crazy.\"\n\n### The Airport Story\n\n\"Tell me what happened. What happened with Turning Point USA?\n\nYou just knew, got lucky. We're on a pilgrimage, I guess, and there Charlie was at the airport in Israel.\n\nYou saw him. Your mom said go up to him. **She's a pusher, right? Lori's a pusher.**\n\nI always thought it was so strange how you never mentioned that I was at the airport with Charlie.\n\nJust thought that was so weird. You never said that.\n\n**I saw Charlie with Candace because we were actually together for that trip.**\n\nSo interesting.\"\n\n### The Conclusion\n\n\"It's a tangled web that we weave, Erica.\"\n\n**Final Theory:**\n\n\"I think tomorrow you will see even more how plausible that is.\n\nHow plausible it is that **they all kind of knew each other before** and then **surrounded Charlie like a November Renaissance**.\""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-005",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-007",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-010",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-011",
+      "source": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "out",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-012",
+      "source": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "sourcePort": "out",
+      "target": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-013",
+      "source": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-014",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-015",
+      "source": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "sourcePort": "root",
+      "target": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-016",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-017",
+      "source": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "sourcePort": "root",
+      "target": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-018",
+      "source": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "sourcePort": "root",
+      "target": "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+      "targetPort": "in",
+      "type": "sequence"
+    }
+  ],
+  "timestamp": "2026-03-03T21:30:00.000Z",
+  "nodeCount": 18,
+  "edgeCount": 18
+}

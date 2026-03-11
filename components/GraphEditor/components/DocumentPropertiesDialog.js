@@ -95,6 +95,8 @@ const mapProjectMeta = (meta = {}, fallbackLink = '') => {
 };
 
 const uniqueCollaboratorId = () => `collab-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
+const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
 
 function StringListEditor({ label, items = [], onChange, helperText }) {
   const [input, setInput] = useState('');
@@ -411,6 +413,17 @@ export default function DocumentPropertiesDialog({
     if (key === 'edgeRouting') {
       emitEdgeIntent('edgeRoutingChange', { value });
     }
+    if (key === 'uiDensity') {
+      const normalized = normalizeUiDensity(value);
+      setDocSettings((prev) => ({ ...prev, [key]: normalized }));
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('twilite.uiDensity', normalized);
+        }
+      } catch {}
+      eventBus.emit('uiDensityChanged', { uiDensity: normalized });
+      return;
+    }
     setDocSettings((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -559,6 +572,7 @@ export default function DocumentPropertiesDialog({
     setDocSettings((prev) => ({
       ...prev,
       edgeRouting: 'auto',
+      uiDensity: 'comfortable',
       layout
     }));
     setSettings((prev) => ({
@@ -1821,6 +1835,25 @@ export default function DocumentPropertiesDialog({
 
         {activeTab === 'appearance' && (
           <Stack spacing={sectionSpacing} sx={contentPadding}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Interface Density
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                Reduce horizontal footprint across browser bar, toolbar, and side panels.
+              </Typography>
+              <Select
+                fullWidth
+                size="small"
+                value={normalizeUiDensity(docSettings?.uiDensity)}
+                onChange={(event) => handleDocSettingsChange('uiDensity', event.target.value)}
+              >
+                <MenuItem value="comfortable">Comfortable</MenuItem>
+                <MenuItem value="compact">Compact</MenuItem>
+                <MenuItem value="dense">Dense</MenuItem>
+              </Select>
+            </Paper>
+
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" gutterBottom>
                 Browser Theme

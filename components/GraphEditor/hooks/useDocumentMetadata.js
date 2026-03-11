@@ -4,6 +4,7 @@ import { DEFAULT_GRID_SIZE, DEFAULT_ELK_ROUTING_SETTINGS, DEFAULT_LAYOUT_SETTING
 const createInitialDocumentSettings = () => ({
   url: '',
   backgroundImage: '',
+  uiDensity: 'comfortable',
   gridSize: DEFAULT_GRID_SIZE,
   theme: null,
   edgeRouting: 'auto',

@@ -37,8 +37,15 @@ export default function EntitiesPanel({
   onSelectGroup,
   onEntityViewChange,
   onClose = () => {},
-  anchor = "left"
+  anchor = "left",
+  width = 320,
+  uiDensity = "comfortable"
 }) {
+  const density = uiDensity === "dense" ? "dense" : uiDensity === "compact" ? "compact" : "comfortable";
+  const listDense = density !== "comfortable";
+  const panelPadding = density === "dense" ? 1.25 : density === "compact" ? 1.5 : 2;
+  const tabMinHeight = density === "dense" ? 30 : density === "compact" ? 34 : 36;
+  const headingVariant = density === "dense" ? "subtitle1" : "h6";
   const normalizedAnchor = typeof anchor === "string" ? anchor.toLowerCase() : "";
   const safeAnchor = VALID_ANCHORS.has(normalizedAnchor) ? normalizedAnchor : "left";
 
@@ -55,7 +62,7 @@ export default function EntitiesPanel({
       return aLabel.localeCompare(bLabel);
     });
     return (
-      <List dense sx={{ p: 0 }}>
+      <List dense={listDense} sx={{ p: 0 }}>
         {sorted.map((node) => (
           <ListItem key={node.id} disablePadding>
             <ListItemButton
@@ -79,7 +86,7 @@ export default function EntitiesPanel({
       return <Typography variant="body2" color="text.secondary">No edges defined yet.</Typography>;
     }
     return (
-      <List dense sx={{ p: 0 }}>
+      <List dense={listDense} sx={{ p: 0 }}>
         {edges.map((edge) => (
           <ListItem key={edge.id} disablePadding>
             <ListItemButton
@@ -103,7 +110,7 @@ export default function EntitiesPanel({
       return <Typography variant="body2" color="text.secondary">No clusters created.</Typography>;
     }
     return (
-      <List dense sx={{ p: 0 }}>
+      <List dense={listDense} sx={{ p: 0 }}>
         {groups.map((group) => (
           <ListItem key={group.id} disablePadding>
             <ListItemButton
@@ -139,19 +146,19 @@ export default function EntitiesPanel({
       ModalProps={{ keepMounted: true }}
       BackdropProps={{ invisible: true }}
     >
-      <Box sx={{ width: 320, p: 2, height: "100%", bgcolor: "background.paper", display: "flex", flexDirection: "column" }}>
-        <Typography variant="h6" gutterBottom>
+      <Box sx={{ width, p: panelPadding, height: "100%", bgcolor: "background.paper", display: "flex", flexDirection: "column" }}>
+        <Typography variant={headingVariant} gutterBottom>
           Elements
         </Typography>
         <Tabs
           value={normalizedView === "clusters" ? "clusters" : normalizedView}
           onChange={(_, value) => onEntityViewChange?.(value)}
           variant="fullWidth"
-          sx={{ minHeight: 36 }}
+          sx={{ minHeight: tabMinHeight }}
         >
-          <Tab label="Nodes" value="nodes" sx={{ minHeight: 36 }} />
-          <Tab label="Edges" value="edges" sx={{ minHeight: 36 }} />
-          <Tab label="Clusters" value="clusters" sx={{ minHeight: 36 }} />
+          <Tab label="Nodes" value="nodes" sx={{ minHeight: tabMinHeight }} />
+          <Tab label="Edges" value="edges" sx={{ minHeight: tabMinHeight }} />
+          <Tab label="Clusters" value="clusters" sx={{ minHeight: tabMinHeight }} />
         </Tabs>
         <Divider />
         <Box sx={{ mt: 2, flex: 1, overflowY: "auto" }}>{content}</Box>

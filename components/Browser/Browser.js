@@ -28,6 +28,9 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import LinkIcon from '@mui/icons-material/Link';
 import TemplateGallery from './TemplateGallery';
 
+const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
+const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
+
 export default function Browser({ themeName, setThemeName, setTempTheme, theme, applyBrowserTheme, isMobile, isSmallScreen, isPortrait, isLandscape }) {
   const [address, setAddress] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -41,6 +44,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const [anchorEl, setAnchorEl] = useState(null); // bookmark menu anchor
   const [addressMenuPos, setAddressMenuPos] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [uiDensity, setUiDensity] = useState('comfortable');
   const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
   const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
   
@@ -58,6 +62,60 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const LEGACY_DEFAULT_HOME = 'https://cpwith.me/data/IntroGraph.node';
   const [homeUrl, setHomeUrl] = useState(DEFAULT_HOME);
   const [homeMenuAnchor, setHomeMenuAnchor] = useState(null);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('twilite.uiDensity');
+        if (stored) setUiDensity(normalizeUiDensity(stored));
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const handleDensity = (payload = {}) => {
+      const incoming = normalizeUiDensity(payload?.uiDensity);
+      setUiDensity(incoming);
+    };
+    const handleSettings = ({ settings } = {}) => {
+      const incoming = normalizeUiDensity(settings?.uiDensity);
+      setUiDensity(incoming);
+    };
+    eventBus.on('uiDensityChanged', handleDensity);
+    eventBus.on('documentSettingsUpdated', handleSettings);
+    return () => {
+      eventBus.off('uiDensityChanged', handleDensity);
+      eventBus.off('documentSettingsUpdated', handleSettings);
+    };
+  }, []);
+
+  const densityConfig = (() => {
+    if (uiDensity === 'dense') {
+      return {
+        toolbarMinHeight: isMobile ? 38 : 42,
+        toolbarPaddingX: isMobile ? 0.25 : 0.5,
+        toolbarGap: 0.25,
+        iconButtonPadding: 0.35,
+        addressWidthDelta: -120
+      };
+    }
+    if (uiDensity === 'compact') {
+      return {
+        toolbarMinHeight: isMobile ? 40 : 46,
+        toolbarPaddingX: isMobile ? 0.5 : 0.75,
+        toolbarGap: 0.35,
+        iconButtonPadding: 0.45,
+        addressWidthDelta: -72
+      };
+    }
+    return {
+      toolbarMinHeight: isMobile ? 42 : 50,
+      toolbarPaddingX: isMobile ? 0.5 : 1,
+      toolbarGap: 0.5,
+      iconButtonPadding: 0.6,
+      addressWidthDelta: 0
+    };
+  })();
 
 
   useEffect(() => {
@@ -464,9 +522,9 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         <Toolbar
           variant={isMobile ? "dense" : "regular"}
           sx={{
-            minHeight: isMobile ? 42 : 50,
-            px: isMobile ? 0.5 : 1,
-            gap: 0.5
+            minHeight: densityConfig.toolbarMinHeight,
+            px: densityConfig.toolbarPaddingX,
+            gap: densityConfig.toolbarGap
           }}
         >
 
@@ -478,7 +536,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                 size="small"
                 sx={{
                   borderColor: muiTheme.palette.divider,
-                  '& .MuiIconButton-root': { p: 0.6 }
+                  '& .MuiIconButton-root': { p: densityConfig.iconButtonPadding }
                 }}
               >
                 <IconButton
@@ -578,8 +636,8 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
             }}
             sx={{
               width: isMobile && isPortrait ? '100%' : 
-                     isMobile && isLandscape ? 280 :
-                     isSmallScreen ? 320 : 480,
+                     isMobile && isLandscape ? Math.max(220, 280 + densityConfig.addressWidthDelta) :
+                     isSmallScreen ? Math.max(240, 320 + densityConfig.addressWidthDelta) : Math.max(300, 480 + densityConfig.addressWidthDelta),
               flexGrow: (isMobile && isPortrait) ? 1 : 0,
               '& .MuiOutlinedInput-root': {
                 backgroundColor: muiTheme.palette.background.paper,

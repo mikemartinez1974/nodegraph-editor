@@ -1,0 +1,299 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "permission-to-create",
+          "name": "Permission to Create Before You're Ready",
+          "version": "1.0.0",
+          "description": "A motivational guide about overcoming perfectionism and productive procrastination to just start creating",
+          "createdAt": "2026-03-03T21:00:00.000Z",
+          "updatedAt": "2026-03-03T21:00:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "The Post-It Note Avatar",
+      "position": { "x": 0, "y": -220 },
+      "width": 460,
+      "height": 320,
+      "color": "#ff6f00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "right", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## This Is Your Permission\n\n### \"Is that seriously just a post-it note with a face on it?\"\n\n**Yes. Yes, it is.**\n\n### We Are Starting Now\n\n- Not ready\n- Certainly not perfect\n- But you know what?\n- **That's it**\n\n### The Truth\n\n**Something is better than nothing.**\n\n**Just start.**\n\nRight?\n\nInstead of waiting another month to figure out professional avatar creation...\n\nI grabbed a post-it and drew a face and slapped it on my desk."
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Your Amazing Idea",
+      "position": { "x": 540, "y": -220 },
+      "width": 440,
+      "height": 380,
+      "color": "#1976d2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## You Have This Amazing Idea\n\n### In Your Head\n\nMaybe it's:\n- A YouTube channel\n- A painting\n- A novel\n- A comic you've been planning for **years or decades**\n\n### In Your Head, It's...\n\n✨ **Incredible**\n\n✨ Going to **change everything**\n\n✨ Going to be **perfect**\n\n### The Problem\n\nIt stays in your head.\n\nPerfect and safe.\n\nBut unrealized."
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "The Perfect Plan That Never Happened",
+      "position": { "x": 540, "y": 220 },
+      "width": 440,
+      "height": 440,
+      "color": "#d32f2f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## My Goal for 2025\n\n### The Perfect Plan\n\nHave a plan for this channel for the whole year:\n- An avatar ✓\n- A schedule ✓\n- Everything perfectly planned for 2026 ✓\n\n### Right Now: Third Week of January 2026\n\n**What I was doing for the last two months instead of planning and making this video:**\n\n### Procrastinating.\n\n### The Worst Kind:\n\n# Productive Procrastinating\n\n**I spent hours:**\n- Watching videos to motivate me making videos\n- Tutorials about VTuber software\n- Animation tutorials\n- Scripting guides\n- **Watching others be creative instead of creating something myself**\n\n### Sound Familiar?"
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "The Worst Part",
+      "position": { "x": 0, "y": 160 },
+      "width": 460,
+      "height": 360,
+      "color": "#880e4f",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## You Know What's the Worst Part?\n\n### The Truth We All Know\n\n**I could have a few videos out now if I would have started right away.**\n\nWe all know that secretly.\n\n### But We All Love To\n\n## Consume Instead of Create\n\n**Why?**\n\n✓ It's easy\n\n✓ You can't go wrong\n\n✓ The false sense of safety\n\n### But That Has To Stop\n\n# RIGHT NOW\n\nAs you are watching this talking post-it on your screen."
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "The Thing Nobody Wants to Admit",
+      "position": { "x": 0, "y": 580 },
+      "width": 460,
+      "height": 400,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Here's the Thing About Creative Work\n\n### That Nobody Wants to Admit\n\n## We Don't Start Because\n\n# We're Terrified It Won't Be Perfect\n\n### But I Realized While Procrastinating:\n\n# It Will Never Be Perfect\n\n# EVER\n\n### And That's Actually...\n\n## The Best News You'll Hear Today\n\n**Why?**\n\nBecause you can stop waiting.\n\nYou can stop preparing.\n\nYou can stop learning \"one more thing.\"\n\nYou can just... **start**."
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "The Solution",
+      "position": { "x": 540, "y": 720 },
+      "width": 440,
+      "height": 360,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Start to Create Something\n\n# Anything\n\n### The Process\n\n**1. Create it**\n\n**2. You can make it pretty later**\n\n### I Will Prove That to You\n\n**Grab:**\n- A piece of paper\n- Open a page in Word\n- Or your drawing software of choice\n\n### And Make Something\n\n# Anything\n\nRight now.\n\nAbout this.\n\nAbout anything.\n\nJust... **create**."
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "The Cycle of Productive Procrastination",
+      "position": { "x": 1060, "y": -220 },
+      "width": 420,
+      "height": 480,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Productive Procrastination Trap\n\n### The Cycle\n\n**1. Have amazing idea** 💡\n\n↓\n\n**2. Want it to be perfect** ✨\n\n↓\n\n**3. Research how to make it perfect** 📚\n- Watch tutorials\n- Read articles\n- Study other creators\n- Learn \"one more skill\"\n\n↓\n\n**4. Feel productive** ✓\n- \"I'm learning!\"\n- \"I'm preparing!\"\n- \"This counts as progress!\"\n\n↓\n\n**5. Don't actually create anything** ❌\n\n↓\n\n**6. Repeat** 🔄\n\n### The Reality\n\nYou're consuming content **about** creativity.\n\nNot **being** creative.\n\nIt feels safe.\n\nIt feels productive.\n\nBut it's not."
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "Permission Granted",
+      "position": { "x": 0, "y": 1040 },
+      "width": 460,
+      "height": 380,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## You Have Permission\n\n### Permission To:\n\n✓ Start before you're ready\n\n✓ Create something imperfect\n\n✓ Use a post-it note as an avatar\n\n✓ Make something that's \"not good enough\"\n\n✓ Skip the planning phase\n\n✓ Ignore the tutorials (for now)\n\n✓ **Just create**\n\n### The Promise\n\nVersion 1 doesn't have to be perfect.\n\nIt just has to **exist**.\n\nYou can improve it later.\n\nYou can make it pretty later.\n\nYou can perfect it later.\n\n### But First\n\n# It Has To Exist\n\n### So Make It Exist\n\n**Now.**"
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "The Action Steps",
+      "position": { "x": 540, "y": 1140 },
+      "width": 440,
+      "height": 400,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## What To Do Right Now\n\n### Stop This Video\n\n### Then:\n\n**Option 1: Physical**\n- Grab paper\n- Grab pen/pencil\n- Draw/write something\n- Anything\n\n**Option 2: Digital**\n- Open Word/Google Docs\n- Open drawing software\n- Open video editor\n- Open code editor\n\n**Option 3: Audio**\n- Open voice recorder\n- Start talking\n- Record your idea\n- Just... speak it\n\n### The Only Rule\n\n# CREATE SOMETHING\n\n### Don't:\n- ❌ Research more\n- ❌ Watch another tutorial\n- ❌ Plan it perfectly\n- ❌ Wait until tomorrow\n\n### Do:\n- ✓ **Make something**\n- ✓ **Right now**\n- ✓ **Imperfectly**"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-004",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-005",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-007",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-009",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2026-03-03T21:00:00.000Z",
+  "nodeCount": 12,
+  "edgeCount": 9
+}

@@ -43,8 +43,14 @@ export default function SystemNodesPanel({
   minWidth = 520,
   maxWidth = 1200,
   onWidthChange = () => {},
-  onUpdateNode = () => {}
+  onUpdateNode = () => {},
+  uiDensity = "comfortable"
 }) {
+  const density = uiDensity === "dense" ? "dense" : uiDensity === "compact" ? "compact" : "comfortable";
+  const densityScale = density === "dense" ? 0.86 : density === "compact" ? 0.93 : 1;
+  const headingVariant = density === "dense" ? "subtitle1" : "h6";
+  const panelPadding = density === "dense" ? 1.4 : density === "compact" ? 1.7 : 2;
+  const tabMinHeight = density === "dense" ? 30 : density === "compact" ? 34 : 36;
   const manifestNode = useMemo(() => nodes.find((n) => n?.type === "manifest") || null, [nodes]);
   const legendNode = useMemo(() => nodes.find((n) => n?.type === "legend") || null, [nodes]);
   const dictionaryNode = useMemo(() => nodes.find((n) => n?.type === "dictionary") || null, [nodes]);
@@ -597,9 +603,9 @@ export default function SystemNodesPanel({
         }}
         aria-label="Resize Legend panel"
       />
-      <Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <Box sx={{ p: panelPadding, height: "100%", display: "flex", flexDirection: "column", minHeight: 0, fontSize: `${densityScale}rem` }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">Legend</Typography>
+          <Typography variant={headingVariant}>Legend</Typography>
           <IconButton onClick={onClose}>
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -615,16 +621,17 @@ export default function SystemNodesPanel({
             value={selectedSection}
             onChange={(event, value) => setSelectedSection(value)}
             sx={{
+              minHeight: tabMinHeight,
               borderBottom: 1,
               borderColor: "divider",
               mb: 2
             }}
           >
-            <Tab value="legend" label="Legend" />
-            <Tab value="manifest" label="Manifest" />
-            <Tab value="dictionary" label="Dictionary" />
-            <Tab value="scripts" label="Scripts" />
-            <Tab value="validation" label={`Validation (${totalIssues})`} />
+            <Tab value="legend" label="Legend" sx={{ minHeight: tabMinHeight }} />
+            <Tab value="manifest" label="Manifest" sx={{ minHeight: tabMinHeight }} />
+            <Tab value="dictionary" label="Dictionary" sx={{ minHeight: tabMinHeight }} />
+            <Tab value="scripts" label="Scripts" sx={{ minHeight: tabMinHeight }} />
+            <Tab value="validation" label={`Validation (${totalIssues})`} sx={{ minHeight: tabMinHeight }} />
           </Tabs>
 
           <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>

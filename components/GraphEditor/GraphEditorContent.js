@@ -40,9 +40,12 @@ import { validateGraphInvariants } from './validators/validateGraphInvariants';
 import { shouldShowInTypeSelectors } from './constants/nodeTypeSelectorConfig';
 import { validateDictionaryAgainstNodeClassContract } from './utils/nodeClassContract';
 
-const PANEL_WIDTHS = {
-  entities: 320,
-  layout: 380
+const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
+const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
+const PANEL_WIDTHS_BY_DENSITY = {
+  comfortable: { entities: 320, layout: 380, properties: 420, system: 760 },
+  compact: { entities: 290, layout: 350, properties: 380, system: 680 },
+  dense: { entities: 260, layout: 320, properties: 340, system: 620 }
 };
 
 const postHostMessage = (payload) => {
@@ -67,8 +70,8 @@ const GraphEditorContent = () => {
   const host = typeof window !== 'undefined'
     ? (window.__Twilite_HOST__ || new URLSearchParams(window.location.search).get('host') || 'browser')
     : 'browser';
-  const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(420);
-  const [systemNodesPanelWidth, setSystemNodesPanelWidth] = useState(760);
+  const [propertiesPanelWidth, setPropertiesPanelWidth] = useState(PANEL_WIDTHS_BY_DENSITY.comfortable.properties);
+  const [systemNodesPanelWidth, setSystemNodesPanelWidth] = useState(PANEL_WIDTHS_BY_DENSITY.comfortable.system);
   const [nodeContextMenu, setNodeContextMenu] = useState(null);
   const [nodeEditorPanel, setNodeEditorPanel] = useState({ open: false, nodeId: null });
   const [nodeEditorDirty, setNodeEditorDirty] = useState({ nodeId: null, dirty: false });
@@ -182,6 +185,8 @@ const GraphEditorContent = () => {
 
   const panelAnchor = nodePanelAnchor || "left";
   const entitiesAnchor = "right";
+  const normalizedUiDensity = normalizeUiDensity(documentSettings?.uiDensity);
+  const panelWidths = PANEL_WIDTHS_BY_DENSITY[normalizedUiDensity] || PANEL_WIDTHS_BY_DENSITY.comfortable;
 
   const {
     handlers,
@@ -219,6 +224,17 @@ const GraphEditorContent = () => {
     target: host === 'vscode' ? 'Active VS Code document' : 'Current session'
   }));
   const readOnlyNoticeShownRef = useRef(false);
+
+  useEffect(() => {
+    setPropertiesPanelWidth(panelWidths.properties);
+    setSystemNodesPanelWidth(panelWidths.system);
+    eventBus.emit('uiDensityChanged', { uiDensity: normalizedUiDensity });
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('twilite.uiDensity', normalizedUiDensity);
+      }
+    } catch {}
+  }, [normalizedUiDensity, panelWidths.properties, panelWidths.system]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -1674,16 +1690,16 @@ const deepMergeData = (base, patch) => {
     }
     if (showEntitiesPanel) {
       if (entitiesAnchor === 'left') {
-        offsets.left = Math.max(offsets.left, PANEL_WIDTHS.entities);
+        offsets.left = Math.max(offsets.left, panelWidths.entities);
       } else if (entitiesAnchor === 'right') {
-        offsets.right = Math.max(offsets.right, PANEL_WIDTHS.entities);
+        offsets.right = Math.max(offsets.right, panelWidths.entities);
       }
     }
     if (showEdgePanel) {
-      offsets.right = Math.max(offsets.right, PANEL_WIDTHS.layout);
+      offsets.right = Math.max(offsets.right, panelWidths.layout);
     }
     return offsets;
-  }, [entitiesAnchor, panelAnchor, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
+  }, [entitiesAnchor, panelAnchor, panelWidths.entities, panelWidths.layout, propertiesPanelWidth, showEdgePanel, showEntitiesPanel, showPropertiesPanel]);
   const resolveDefinitionUrl = useCallback((nodeId) => {
     if (!nodeId) return null;
     const node = nodes?.find((candidate) => candidate.id === nodeId);
@@ -2643,6 +2659,7 @@ const skipPropertiesCloseRef = useRef(false);
           showSystemNodesPanel={showSystemNodesPanel}
           showEdgeList={showEdgeList}
           dockInBrowserBar={host !== 'vscode'}
+          uiDensity={normalizedUiDensity}
         />
       )}
 
@@ -2696,7 +2713,7 @@ const skipPropertiesCloseRef = useRef(false);
           }}
           sx={{
             position: 'fixed',
-            right: showEntitiesPanel ? Math.max(0, PANEL_WIDTHS.entities - 1) : 0,
+            right: showEntitiesPanel ? Math.max(0, panelWidths.entities - 1) : 0,
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -2801,11 +2818,14 @@ const skipPropertiesCloseRef = useRef(false);
         onWidthChange={setSystemNodesPanelWidth}
         onUpdateNode={handleUpdateNodeFromPanels}
         onClose={() => setShowSystemNodesPanel?.(false)}
+        uiDensity={normalizedUiDensity}
       />
 
           <EntitiesPanel
             open={showEntitiesPanel}
             anchor={entitiesAnchor}
+            width={panelWidths.entities}
+            uiDensity={normalizedUiDensity}
             entityView={entityView}
             nodes={nodes}
             edges={edges}

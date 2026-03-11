@@ -68,6 +68,9 @@ import HistoryActions from './Toolbar/HistoryActions';
 import NodeActions from './Toolbar/NodeActions';
 import ViewActions from './Toolbar/ViewActions';
 
+const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
+const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
+
 const Toolbar = ({ 
   host = 'browser',
   nodes = [], 
@@ -130,7 +133,8 @@ const Toolbar = ({
   showSystemNodesPanel = false,
   uiTheme = null,
   documentAccess = null,
-  dockInBrowserBar = false
+  dockInBrowserBar = false,
+  uiDensity = 'comfortable'
 }) => {
   const theme = useTheme();  // Browser theme for UI
   const [pos, setPos] = useState({ x: 0, y: 88 });
@@ -837,6 +841,12 @@ const Toolbar = ({
   };
 
   const isBookmarked = currentUrl && bookmarks.some(b => b.url === currentUrl);
+  const density = normalizeUiDensity(uiDensity);
+  const densityConfig = density === 'dense'
+    ? { toolbarGap: 0.5, toolbarPadding: 0.35, chipPx: 1, chipPy: 0.35, chipFontSize: 11, viewportFont: 9.5 }
+    : density === 'compact'
+      ? { toolbarGap: 0.75, toolbarPadding: 0.6, chipPx: 1.25, chipPy: 0.45, chipFontSize: 11.5, viewportFont: 10 }
+      : { toolbarGap: 1, toolbarPadding: 1, chipPx: 1.5, chipPy: 0.5, chipFontSize: 12, viewportFont: 10 };
 
   const toolbarContent = (
     <>
@@ -898,8 +908,8 @@ const Toolbar = ({
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: dockInBrowserBar ? 0.5 : 1,
-          p: dockInBrowserBar ? 0.5 : 1,
+          gap: dockInBrowserBar ? Math.max(0.25, densityConfig.toolbarGap - 0.35) : densityConfig.toolbarGap,
+          p: dockInBrowserBar ? Math.max(0.25, densityConfig.toolbarPadding - 0.25) : densityConfig.toolbarPadding,
           flexWrap: dockInBrowserBar ? 'nowrap' : 'wrap',
           justifyContent: 'center',
           overflowX: dockInBrowserBar ? 'auto' : 'visible'
@@ -908,10 +918,10 @@ const Toolbar = ({
           <>
             <Box
               sx={{
-                px: 1.5,
-                py: 0.5,
+                px: densityConfig.chipPx,
+                py: densityConfig.chipPy,
                 borderRadius: 999,
-                fontSize: 12,
+                fontSize: densityConfig.chipFontSize,
                 fontWeight: 600,
                 backgroundColor: alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.22 : 0.14),
                 color: theme.palette.info.main
@@ -921,10 +931,10 @@ const Toolbar = ({
             </Box>
             <Box
               sx={{
-                px: 1.5,
-                py: 0.5,
+                px: densityConfig.chipPx,
+                py: densityConfig.chipPy,
                 borderRadius: 999,
-                fontSize: 12,
+                fontSize: densityConfig.chipFontSize,
                 fontWeight: 600,
                 backgroundColor: documentAccess?.writable
                   ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.22 : 0.14)
@@ -938,9 +948,9 @@ const Toolbar = ({
               {documentAccess?.writable ? 'Writable target' : 'Read-only view'}
             </Box>
             {!documentAccess?.writable && (
-              <Button
-                size="small"
-                variant="outlined"
+            <Button
+              size="small"
+              variant="outlined"
                 onClick={() => eventBus.emit('documentAccessPromoteWritable')}
               >
                 Bind Save Target
@@ -1056,7 +1066,7 @@ const Toolbar = ({
             borderRadius: 1,
             bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
             color: theme.palette.text.secondary,
-            fontSize: 10,
+            fontSize: densityConfig.viewportFont,
             minWidth: 0,
             textAlign: 'center',
             border: `1px solid ${theme.palette.divider}`,

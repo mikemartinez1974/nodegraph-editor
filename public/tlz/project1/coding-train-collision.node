@@ -1,0 +1,371 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": { "x": -520, "y": -220 },
+      "width": 420,
+      "height": 280,
+      "data": {
+        "identity": {
+          "graphId": "coding-train-elastic-collisions",
+          "name": "Coding Train: Elastic Collisions Physics Engine",
+          "version": "1.0.0",
+          "description": "Building a 2D elastic collision physics engine in p5.js - from Nature of Code book",
+          "createdAt": "2024-09-03T00:00:00.000Z",
+          "updatedAt": "2024-09-03T00:00:00.000Z"
+        },
+        "intent": { "kind": "graph", "scope": "foundation" },
+        "dependencies": {
+          "nodeTypes": ["manifest", "legend", "dictionary", "markdown"],
+          "portContracts": ["core"],
+          "skills": [],
+          "schemaVersions": { "nodes": ">=1.0.0", "ports": ">=1.0.0" },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": { "humans": true, "agents": true, "tools": true },
+          "styleAuthority": "descriptive",
+          "history": { "rewriteAllowed": false, "squashAllowed": false }
+        },
+        "document": { "url": "" },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": { "repo": "", "path": "", "branch": "main" },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "legend",
+      "label": "Legend",
+      "position": { "x": -520, "y": 90 },
+      "width": 360,
+      "height": 220,
+      "data": {
+        "entries": [
+          {
+            "key": "markdown",
+            "intent": "documentation",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": { "x": -520, "y": 360 },
+      "width": 360,
+      "height": 220,
+      "data": { "nodeDefs": [], "skills": [], "views": [] }
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "markdown",
+      "label": "Tutorial Overview",
+      "position": { "x": 0, "y": -220 },
+      "width": 480,
+      "height": 400,
+      "color": "#1976d2",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "any", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "# Elastic Collisions Coding Challenge\n## The Nature of Code - Physics Engine\n\n### Context\n\n**From the book** (September 3, 2024 release):\n- First half: Step-by-step physics engine building\n- Chapter 6: When to use third-party libraries\n\n**Key Decision Point:**\n\n\"A key reason to use another physics library is if what you need in your p5.js sketch is **rigid body collisions**.\"\n\n### The Challenge\n\n**Two particles colliding:**\n- Particle A moving →\n- Particle B moving ←\n- They meet and collide\n\n**Two Problems to Solve:**\n1. **Collision Detection** - How do I know when they collide? (Easy)\n2. **Collision Resolution** - How do I solve for their new velocities? (Hard)\n\n### The Choice\n\n**Option 1:** Use Matter.js library (does everything)\n- Handles all collision math\n- Works with squares, polygons, irregular shapes\n- Production-ready\n\n**Option 2:** Learn the vector math yourself\n- Understand the physics\n- Build it into your own p5 sketch\n- Limited to circles (in this tutorial)\n- Educational and fun!"
+      }
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "type": "markdown",
+      "label": "Physics Foundation Review",
+      "position": { "x": 540, "y": -220 },
+      "width": 460,
+      "height": 580,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Nature of Code Chapters 1-5 Summary\n\n### The Particle\n\n**Has:**\n- **Position** (vector)\n- **Velocity** (vector) - arrow providing instructions for next position\n- **Acceleration** (vector) - changes velocity\n- **Mass** (scalar) - not a vector!\n\n### The Math\n\n**After time Δt:**\n\nposition' = position + velocity × Δt\n\n**Simplification:**\n\n\"Life is short. We don't need to overcomplicate things.\"\n\nOne frame = one draw() cycle = Δt\n\nSo Δt = 1\n\nTherefore:\n```\nposition' = position + velocity\n```\n\n### Forces\n\n**Newton's Second Law:**\n```\nF = ma\n```\n\nForce = mass × acceleration\n\nForces are external/internal factors that cause objects with mass to accelerate.\n\n### Update Method\n\n```javascript\nvelocity += acceleration\nposition += velocity\n```\n\n### Wall Collisions (Already Working)\n\n**Collision detection:** Does position reach edge?\n\n**Collision resolution:** Invert velocity component\n- Horizontal edges: flip x velocity\n- Vertical edges: flip y velocity\n\nThis is a \"perfectly elastic collision between a circle and a wall.\""
+      }
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "type": "markdown",
+      "label": "Collision Detection (The Easy Part)",
+      "position": { "x": 0, "y": 240 },
+      "width": 480,
+      "height": 460,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Detecting Circle Collisions\n\n### The Concept\n\n**Compare:**\n1. Distance between circle centers\n2. Sum of the two radii\n\n### The Math\n\n```\nif (distance < radius1 + radius2) {\n  // COLLISION!\n}\n```\n\n**Why it works:**\n- Overlapping circles: distance < r1 + r2\n- Separated circles: distance > r1 + r2\n- Just touching: distance = r1 + r2\n\n### The Code\n\n```javascript\n// In main sketch\nparticleA.collide(particleB);\n\n// In Particle class\ncollide(other) {\n  let distance = this.position.dist(other.position);\n  \n  if (distance < this.r + other.r) {\n    console.log(\"choo-choo!\"); // It works!\n  }\n}\n```\n\n### Result\n\n\"Whenever those two circles are colliding, the choo-choo number goes up and up and up.\"\n\n✅ **Collision detection complete!**\n\nNow for the really hard part..."
+      }
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "type": "markdown",
+      "label": "Momentum & Kinetic Energy",
+      "position": { "x": 540, "y": 420 },
+      "width": 460,
+      "height": 600,
+      "color": "#4a148c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## New Concepts for Collision Resolution\n\n### Momentum (Vector)\n\n```\np = m × v\n```\n\nmomentum = mass × velocity\n\n**Key Insight:**\n\n\"A massive object with a small velocity has just as much momentum as a small object with a lot of velocity.\"\n\n### Kinetic Energy (Scalar)\n\n```\nKE = ½ m v²\n```\n\nKinetic energy = ½ × mass × speed²\n\n(speed = magnitude of velocity)\n\n## Elastic vs Inelastic Collisions\n\n### Elastic Collision\n\n**Both are conserved:**\n1. Total momentum\n2. Total kinetic energy\n\n**Before collision:**\n- Particle A: mass_A, velocity_A\n- Particle B: mass_B, velocity_B\n\n**After collision:**\n- Particle A: mass_A, velocity_A'\n- Particle B: mass_B, velocity_B'\n\n**Conservation equations:**\n```\nmomentum_before = momentum_after\nKE_before = KE_after\n```\n\n### Inelastic Collision\n\n**Some kinetic energy is lost:**\n- Manifests as heat or sound\n- Not covered in this tutorial\n- Possible future video\n\n### The Goal\n\nUse these two conservation equations to solve for the new velocities (v_A' and v_B')"
+      }
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "type": "markdown",
+      "label": "Line of Impact (The Key Concept)",
+      "position": { "x": 0, "y": 760 },
+      "width": 480,
+      "height": 580,
+      "color": "#d84315",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Understanding the Line of Impact\n\n### Definition\n\n**Line of Impact:**\nA vector or line that connects the centers of both particles.\n\nIt becomes an axis - the horizontal axis of a new coordinate system.\n\n### Why It Matters\n\n**Normal vector components:**\n- Velocity split into x and y components\n- Along horizontal and vertical axes\n\n**Line of impact components:**\n- Velocity split along the line of impact\n- This is what's needed for calculating new velocities!\n\n### Related to Chapter 5\n\n**Concepts needed:**\n- Dot product\n- Scalar projection\n\n\"This is very much related to the section in chapter 5 of The Nature of Code book.\"\n\n### Resources Used\n\n**1. Wikipedia - Elastic Collision**\n- Animated demonstrations\n- Conservation equations\n- 1D and 2D examples\n\n**2. \"2-Dimensional Elastic Collisions without Trigonometry\"**\n- From Bouncescope (2009)\n- vobarian.com\n- Detailed explanations\n\n**3. \"Elastic Collisions\" PDF by Dipam**\n- Coding Train viewer/contributor\n- 1D collision derivation\n- 2D collision resolution\n- Tangent vector explanation\n\n### The Formulas\n\n\"I'm not actually going to derive them in this video. I'm just going to tell you what the solution is.\"\n\nFinal formulas for v1' and v2' are implemented from these resources."
+      }
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "type": "markdown",
+      "label": "Implementing the Formulas",
+      "position": { "x": 540, "y": 1080 },
+      "width": 460,
+      "height": 640,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Breaking Down the Formula Components\n\n### Step 1: Calculate Required Values\n\n```javascript\n// Sum of masses\nlet mSum = this.mass + other.mass;\n\n// Line of impact vector\nlet impactVector = p5.Vector.sub(\n  other.position,  // B (x2)\n  this.position    // A (x1)\n);\n\n// Distance between centers\nlet d = impactVector.mag();\n\n// Velocity difference\nlet vDiff = p5.Vector.sub(\n  other.velocity,  // vB\n  this.velocity    // vA\n);\n```\n\n### Step 2: Calculate Numerator\n\n```javascript\n// Dot product of velocity difference and impact vector\nlet numerator = vDiff.dot(impactVector);\n```\n\n### Step 3: Calculate Denominator\n\n```javascript\nlet denominator = mSum * d * d;\n```\n\n### Step 4: Calculate Velocity Changes\n\n**For Particle A (this):**\n```javascript\nlet deltaVA = impactVector.copy()\n  .mult(2 * other.mass * numerator / denominator);\n  \nthis.velocity.add(deltaVA);\n```\n\n**For Particle B (other):**\n```javascript\nlet deltaVB = impactVector.copy()\n  .mult(-2 * this.mass * numerator / denominator);\n  \nother.velocity.add(deltaVB);\n```\n\n### Key Points\n\n- Particle A: +2 × mass_B × numerator\n- Particle B: -2 × mass_A × numerator\n- The negative sign handles the reversed direction\n- Both use the same denominator"
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "type": "markdown",
+      "label": "Debugging & The Overlap Problem",
+      "position": { "x": 0, "y": 1400 },
+      "width": 480,
+      "height": 680,
+      "color": "#c62828",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Two Major Issues Encountered\n\n### Problem 1: Manufacturing Energy\n\n\"For some reason, sometimes I seem to be manufacturing kinetic energy out of thin air. The balls keep going faster and faster as they collide.\"\n\n### Problem 2: Particles Getting Stuck\n\n**The issue:**\n\nWith a time step of 1 (one frame), particles can move significantly in one frame.\n\nWhen collision is detected, they might look like this:\n```\n  A  B\n  oo\n```\n\nThey've moved **quite a bit into the same space**.\n\n### The Solution: Overlap Correction\n\n```javascript\n// Calculate how much they're overlapping\nlet overlap = d - (this.r + other.r);\n\n// Create correction vector\nlet correction = impactVector.copy()\n  .setMag(overlap / 2);\n\n// Move particles apart\nthis.position.add(correction);      // Move A\nother.position.sub(correction);     // Move B (opposite)\n```\n\n### Consistency Issue\n\n**First attempt:** Moved particles apart but didn't update impactVector length\n\n**Problem:** Using uncorrected distance in calculations\n\n**Fix:** After moving particles, adjust the impact vector:\n```javascript\n// Use corrected distance\nlet correctedDistance = this.r + other.r;\nimpactVector.setMag(correctedDistance);\n```\n\n### Testing Conservation\n\n\"I just need to be consistent. If I'm going to correct that distance, I should consider that impact vector to be slightly elongated if need be.\""
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "type": "markdown",
+      "label": "Verifying Kinetic Energy Conservation",
+      "position": { "x": 540, "y": 1780 },
+      "width": 460,
+      "height": 520,
+      "color": "#6a1b9a",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Testing the Physics\n\n### Calculate Total Kinetic Energy\n\n```javascript\nlet speedA = particleA.velocity.mag();\nlet speedB = particleB.velocity.mag();\n\nlet keA = 0.5 * particleA.mass * speedA * speedA;\nlet keB = 0.5 * particleB.mass * speedB * speedB;\n\nlet totalKE = keA + keB;\nconsole.log(totalKE);\n```\n\n### Expected Behavior\n\n\"I don't expect this to be perfect. Large time steps of Euler integration, JavaScript rounding, there's all sorts of reasons why this could go wrong.\n\nBut let's at least see how close it is to being accurate.\"\n\n### Initial Results (Broken)\n\n```\nTotal KE: 150  (before collision)\nTotal KE: 300  (doubled!)\nTotal KE: 150  (halved)\nTotal KE: 300  (doubled again)\n```\n\n\"That's way off. Something must be wrong.\"\n\n### The Bug\n\nWhen simplifying to one numerator, forgot to use correct mass:\n- Particle A needs: mass_B\n- Particle B needs: mass_A\n\n### After Fix\n\n```\nTotal KE: 150.0000\nTotal KE: 150.0001  (tiny rounding)\nTotal KE: 149.9999\nTotal KE: 150.0000\n```\n\n\"Look at how beautifully this kinetic energy is being maintained now. Now it's just rounding errors.\"\n\n✅ **Conservation verified!**"
+      }
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "type": "markdown",
+      "label": "Scaling to Multiple Particles",
+      "position": { "x": 0, "y": 2140 },
+      "width": 480,
+      "height": 560,
+      "color": "#00695c",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } },
+        { "id": "out", "label": "Out", "direction": "output", "dataType": "content", "position": { "side": "bottom", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## From 2 Particles to Many\n\n### Create Array of Particles\n\n```javascript\nlet particles = [];\n\n// Start with 5\nfor (let i = 0; i < 5; i++) {\n  particles.push(new Particle(\n    random(width),\n    random(height)\n  ));\n}\n```\n\n### Update and Draw\n\n```javascript\nfunction draw() {\n  // Update all particles\n  for (let particle of particles) {\n    particle.update();\n    particle.edges();\n    particle.show();\n  }\n}\n```\n\n### The Collision Loop\n\n**Efficient checking:** Every particle checks every other particle, but:\n- Don't check against self\n- Don't recheck pairs\n\n```javascript\n// Check collisions\nfor (let i = 0; i < particles.length; i++) {\n  let particleA = particles[i];\n  \n  // Start from i+1 (not i)\n  for (let j = i + 1; j < particles.length; j++) {\n    let particleB = particles[j];\n    particleA.collide(particleB);\n  }\n}\n```\n\n**Logic:**\n- Particle 0 checks: 1, 2, 3, 4, 5...\n- Particle 1 checks: 2, 3, 4, 5...\n- Particle 2 checks: 3, 4, 5...\n- And so on\n\n### Scaling Up\n\n✅ 5 particles → works\n✅ 10 particles → works\n✅ 50 particles → \"I love it already\"\n✅ 400 particles → \"Amazingly still working\"\n✅ 1000 particles → \"Running much faster than I would expect\""
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "type": "markdown",
+      "label": "Optimization: Quadtree",
+      "position": { "x": 540, "y": 2360 },
+      "width": 460,
+      "height": 520,
+      "color": "#f57c00",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## The Performance Challenge\n\n### Current Algorithm: O(n²)\n\n\"Technically, it is still an n squared algorithm.\"\n\n**For 1000 particles:**\n- Particle 0: checks 999 others\n- Particle 1: checks 998 others\n- Total checks: ~500,000\n\n**For 3000 particles:**\n- Total checks: ~4,500,000\n- \"It's going to get quite slow\"\n\n### The Solution: Spatial Partitioning\n\n**Quadtree optimization:**\n\n\"I believe this can run quite fast with 3,000 particles with a particular kind of optimization.\"\n\n**From the book:**\n- Chapter 5: Optimization section\n- Coding Challenge: Quadtree video series\n\n### How Quadtree Helps\n\n**Concept:**\n1. Divide space into quadrants\n2. Only check particles in same/adjacent quadrants\n3. Dramatically reduces collision checks\n\n**Result:**\n- From O(n²) to approximately O(n log n)\n- Makes 3000+ particles feasible\n\n### Implementation\n\n\"After I finished recording this, I'm going to make a version of what you're seeing right here that uses a quad tree to optimize those collision checks.\n\nI will release that as part of this video.\"\n\n### Future Content\n\n\"I could come back and unpack that further in a live stream or make another video about it.\"\n\nPossible topics:\n- Inelastic collisions\n- Quadtree deep dive\n- Other optimizations"
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "type": "markdown",
+      "label": "Code Structure Summary",
+      "position": { "x": 1060, "y": -220 },
+      "width": 440,
+      "height": 700,
+      "color": "#1565c0",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "left", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## Complete Particle Class\n\n### Properties\n\n```javascript\nclass Particle {\n  constructor(x, y) {\n    this.position = createVector(x, y);\n    this.velocity = p5.Vector.random2D();\n    this.acceleration = createVector(0, 0);\n    this.mass = random(1, 6);\n    this.r = sqrt(this.mass) * 10;\n  }\n}\n```\n\n### Update Method\n\n```javascript\nupdate() {\n  this.velocity.add(this.acceleration);\n  this.position.add(this.velocity);\n}\n```\n\n### Wall Collisions\n\n```javascript\nedges() {\n  // Horizontal edges\n  if (this.position.x <= this.r || \n      this.position.x >= width - this.r) {\n    this.velocity.x *= -1;\n  }\n  \n  // Vertical edges\n  if (this.position.y <= this.r || \n      this.position.y >= height - this.r) {\n    this.velocity.y *= -1;\n  }\n}\n```\n\n### Collision Detection & Resolution\n\n```javascript\ncollide(other) {\n  // Impact vector\n  let impact = p5.Vector.sub(\n    other.position, \n    this.position\n  );\n  let d = impact.mag();\n  \n  // Detection\n  if (d < this.r + other.r) {\n    // Overlap correction\n    let overlap = d - (this.r + other.r);\n    let correction = impact.copy()\n      .setMag(overlap / 2);\n    this.position.add(correction);\n    other.position.sub(correction);\n    \n    // Resolution\n    let vDiff = p5.Vector.sub(\n      other.velocity,\n      this.velocity\n    );\n    let num = vDiff.dot(impact);\n    let denom = (this.mass + other.mass) * d * d;\n    \n    // Update velocities\n    this.velocity.add(\n      impact.copy().mult(\n        2 * other.mass * num / denom\n      )\n    );\n    other.velocity.add(\n      impact.copy().mult(\n        -2 * this.mass * num / denom\n      )\n    );\n  }\n}\n```"
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "type": "markdown",
+      "label": "Key Takeaways & Resources",
+      "position": { "x": 1060, "y": 540 },
+      "width": 440,
+      "height": 640,
+      "color": "#2e7d32",
+      "ports": [
+        { "id": "in", "label": "In", "direction": "input", "dataType": "content", "position": { "side": "top", "offset": 0.5 } }
+      ],
+      "data": {
+        "markdown": "## What You Learned\n\n### Physics Concepts\n\n✅ **Momentum** (vector) = mass × velocity\n✅ **Kinetic Energy** (scalar) = ½ × mass × speed²\n✅ **Elastic collisions** conserve both\n✅ **Line of impact** - key to 2D resolution\n✅ **Scalar projection** via dot product\n\n### Coding Techniques\n\n✅ Collision detection (distance check)\n✅ Collision resolution (velocity math)\n✅ Overlap correction (particle separation)\n✅ Conservation verification (testing)\n✅ Efficient pair checking (i+1 loop)\n\n### Limitations\n\n⚠️ Only works for circles\n⚠️ O(n²) algorithm without optimization\n⚠️ Euler integration approximations\n⚠️ JavaScript floating-point rounding\n\n### When to Use a Library\n\n**Use Matter.js when you need:**\n- Non-circular shapes\n- Production quality\n- Complex constraints\n- Optimized performance\n\n**Build your own when you want:**\n- To understand the physics\n- Educational purposes\n- Simple circle simulations\n- Creative coding experiments\n\n## Resources\n\n📚 **The Nature of Code** (Sept 3, 2024)\n- Chapters 1-5: Physics engine building\n- Chapter 6: Third-party libraries\n\n🌐 **Wikipedia: Elastic Collision**\n- Conservation equations\n- Animated demonstrations\n\n📄 **Bouncescope Article** (2009)\n- \"2D Elastic Collisions without Trig\"\n- vobarian.com\n\n📄 **Dipam's PDF: Elastic Collisions**\n- Full derivations\n- 1D and 2D explanations\n\n🎥 **Coding Challenge: Quadtree**\n- Spatial optimization\n- Making 3000+ particles feasible"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "11111111-1111-4111-8111-111111111111",
+      "sourcePort": "root",
+      "target": "44444444-4444-4444-8444-444444444444",
+      "targetPort": "in",
+      "type": "relates"
+    },
+    {
+      "id": "edge-002",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "66666666-6666-4666-8666-666666666666",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-003",
+      "source": "44444444-4444-4444-8444-444444444444",
+      "sourcePort": "out",
+      "target": "55555555-5555-4555-8555-555555555555",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-004",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "77777777-7777-4777-8777-777777777777",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-005",
+      "source": "66666666-6666-4666-8666-666666666666",
+      "sourcePort": "out",
+      "target": "88888888-8888-4888-8888-888888888888",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-006",
+      "source": "77777777-7777-4777-8777-777777777777",
+      "sourcePort": "out",
+      "target": "99999999-9999-4999-8999-999999999999",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-007",
+      "source": "88888888-8888-4888-8888-888888888888",
+      "sourcePort": "out",
+      "target": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-008",
+      "source": "99999999-9999-4999-8999-999999999999",
+      "sourcePort": "out",
+      "target": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-009",
+      "source": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourcePort": "out",
+      "target": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "targetPort": "in",
+      "type": "sequence"
+    },
+    {
+      "id": "edge-010",
+      "source": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "sourcePort": "out",
+      "target": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-011",
+      "source": "55555555-5555-4555-8555-555555555555",
+      "sourcePort": "out",
+      "target": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "targetPort": "in",
+      "type": "reference"
+    },
+    {
+      "id": "edge-012",
+      "source": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sourcePort": "out",
+      "target": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      "targetPort": "in",
+      "type": "reference"
+    }
+  ],
+  "timestamp": "2024-09-03T00:00:00.000Z",
+  "nodeCount": 13,
+  "edgeCount": 12
+}

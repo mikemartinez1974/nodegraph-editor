@@ -81,6 +81,33 @@ const detectContentType = (payload) => {
   return 'json';
 };
 
+const isFieldMultiline = (field) => {
+  if (!field || typeof field !== 'object') return false;
+  if (field.multiline === true) return true;
+  const type = String(field.type || '').toLowerCase();
+  return (
+    type === 'markdown' ||
+    type === 'textarea' ||
+    type === 'multiline' ||
+    type === 'json' ||
+    type === 'html' ||
+    type === 'xml'
+  );
+};
+
+const normalizeFieldValueForCommit = (field, value) => {
+  const type = String(field?.type || '').toLowerCase();
+  if (type === 'number') {
+    if (value === '' || value === null || value === undefined) return '';
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value;
+  }
+  if (type === 'boolean' || type === 'checkbox' || type === 'toggle') {
+    return Boolean(value);
+  }
+  return value;
+};
+
 const drawCanvasSpec = (ctx, spec = {}, width, height) => {
   ctx.clearRect(0, 0, width, height);
   if (spec.background) {
@@ -383,6 +410,7 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   });
   const [dirtyFields, setDirtyFields] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
+  const [uiDensity, setUiDensity] = useState('comfortable');
   const isEditingRef = useRef(false);
   const editorFieldSnapshot = useMemo(() => {
     if (!effectiveEditorFields.length) return {};
@@ -418,6 +446,22 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
       return editorFieldSnapshot;
     });
   }, [effectiveEditorFields.length, editorFieldSnapshot]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const normalize = (value) => (
+      value === 'dense' || value === 'compact' ? value : 'comfortable'
+    );
+    try {
+      const stored = window.localStorage.getItem('twilite.uiDensity');
+      if (stored) setUiDensity(normalize(stored));
+    } catch {}
+    const handleDensity = (payload = {}) => {
+      setUiDensity(normalize(payload?.uiDensity));
+    };
+    eventBus.on('uiDensityChanged', handleDensity);
+    return () => eventBus.off('uiDensityChanged', handleDensity);
+  }, []);
 
   useEffect(() => {
     if (!effectiveEditorFields.length) {
@@ -904,35 +948,58 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
       return <div style={{ color: theme.palette.error.main }}>Failed to load view.</div>;
     }
     if (useEditorUI) {
+      const densityConfig = uiDensity === 'dense'
+        ? { fieldGap: 6, labelSize: 11, inputSize: 12, inputPadding: 6, helperSize: 10, defaultRows: 3, panelPadding: 8 }
+        : uiDensity === 'compact'
+          ? { fieldGap: 8, labelSize: 11.5, inputSize: 13, inputPadding: 7, helperSize: 10.5, defaultRows: 4, panelPadding: 10 }
+          : { fieldGap: 12, labelSize: 12, inputSize: 14, inputPadding: 8, helperSize: 11, defaultRows: 4, panelPadding: 16 };
       if (effectiveEditorFields.length) {
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div
+            style={{
+              display: 'grid',
+              gap: densityConfig.fieldGap,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              alignItems: 'start'
+            }}
+          >
             {effectiveEditorFields.map((field, index) => {
               const key = field.key || field.path || `field-${index}`;
               const path = field.path || field.key || '';
               const value = editorFieldValues[key] ?? '';
               const label = field.label || key;
-              const isMultiline = field.multiline || field.type === 'markdown' || field.type === 'text';
+              const fieldType = String(field.type || '').toLowerCase();
+              const isMultiline = isFieldMultiline(field);
+              const isBooleanField = fieldType === 'boolean' || fieldType === 'checkbox' || fieldType === 'toggle';
+              const optionEntries = Array.isArray(field.options) ? field.options : [];
+              const isSelectField = fieldType === 'select' || optionEntries.length > 0;
               const fieldReadOnly = editLocked || field.readOnly === true;
               const error = fieldErrors[key];
               const commonStyle = {
                 width: '100%',
                 border: `1px solid ${error ? theme.palette.error.main : theme.palette.divider}`,
                 borderRadius: 6,
-                padding: 8,
+                padding: densityConfig.inputPadding,
                 fontFamily: 'inherit',
-                fontSize: 14,
-                lineHeight: 1.5,
+                fontSize: densityConfig.inputSize,
+                lineHeight: 1.35,
                 color: theme.palette.text.primary,
                 background: 'transparent',
                 boxSizing: 'border-box'
+              };
+              const onFieldChange = (nextValue) => {
+                setEditorFieldValues((prev) => ({ ...prev, [key]: nextValue }));
+                if (path) {
+                  const currentValue = getByPath(node, path);
+                  setDirtyFields((prev) => ({ ...prev, [key]: nextValue !== currentValue }));
+                }
               };
               const handleCommit = () => {
                 isEditingRef.current = false;
                 if (fieldReadOnly) return;
                 if (!node?.id || !path) return;
                 if (fieldErrors[key]) return;
-                const nextValue = editorFieldValues[key];
+                const nextValue = normalizeFieldValueForCommit(field, editorFieldValues[key]);
                 const currentValue = getByPath(node, path);
                 if (nextValue === currentValue) return;
                 const nextNode = setByPath(node, path, nextValue);
@@ -957,19 +1024,27 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
                 setDirtyFields((prev) => ({ ...prev, [key]: false }));
               };
               return (
-                <label key={key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>{label}</span>
+                <label
+                  key={key}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMultiline ? '1fr' : (isBooleanField ? '1fr' : '120px minmax(0, 1fr)'),
+                    alignItems: isMultiline ? 'stretch' : 'center',
+                    columnGap: 10,
+                    rowGap: Math.max(4, densityConfig.fieldGap - 2),
+                    padding: `${Math.max(4, densityConfig.inputPadding - 2)}px ${Math.max(6, densityConfig.inputPadding)}px`,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                    borderRadius: 8,
+                    gridColumn: isMultiline ? '1 / -1' : 'auto'
+                  }}
+                >
+                  <span style={{ fontSize: densityConfig.labelSize, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                    {label}
+                  </span>
                   {isMultiline ? (
                     <textarea
                       value={value}
-                      onChange={(event) => {
-                        const nextValue = event.target.value;
-                        setEditorFieldValues((prev) => ({ ...prev, [key]: nextValue }));
-                        if (path) {
-                          const currentValue = getByPath(node, path);
-                          setDirtyFields((prev) => ({ ...prev, [key]: nextValue !== currentValue }));
-                        }
-                      }}
+                      onChange={(event) => onFieldChange(event.target.value)}
                       onFocus={() => {
                         isEditingRef.current = true;
                       }}
@@ -977,21 +1052,52 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
                       placeholder={field.placeholder || ''}
                       spellCheck={field.spellCheck ?? true}
                       readOnly={fieldReadOnly}
-                      rows={field.rows || 6}
+                      rows={field.rows || densityConfig.defaultRows}
                       style={{ ...commonStyle, resize: 'vertical' }}
                     />
+                  ) : isBooleanField ? (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(value)}
+                      onChange={(event) => onFieldChange(Boolean(event.target.checked))}
+                      onBlur={handleCommit}
+                      disabled={fieldReadOnly}
+                      style={{ width: 16, height: 16 }}
+                    />
+                  ) : isSelectField ? (
+                    <select
+                      value={value}
+                      onChange={(event) => onFieldChange(event.target.value)}
+                      onFocus={() => {
+                        isEditingRef.current = true;
+                      }}
+                      onBlur={handleCommit}
+                      disabled={fieldReadOnly}
+                      style={commonStyle}
+                    >
+                      {!field.required && <option value="">Select…</option>}
+                      {optionEntries.map((option, optionIndex) => {
+                        if (typeof option === 'object') {
+                          const optionValue = option?.value ?? '';
+                          const optionLabel = option?.label ?? String(optionValue);
+                          return (
+                            <option key={`${key}-opt-${optionIndex}`} value={optionValue}>
+                              {optionLabel}
+                            </option>
+                          );
+                        }
+                        return (
+                          <option key={`${key}-opt-${optionIndex}`} value={option}>
+                            {String(option)}
+                          </option>
+                        );
+                      })}
+                    </select>
                   ) : (
                     <input
-                      type={field.inputType || 'text'}
+                      type={field.inputType || (fieldType === 'number' ? 'number' : 'text')}
                       value={value}
-                      onChange={(event) => {
-                        const nextValue = event.target.value;
-                        setEditorFieldValues((prev) => ({ ...prev, [key]: nextValue }));
-                        if (path) {
-                          const currentValue = getByPath(node, path);
-                          setDirtyFields((prev) => ({ ...prev, [key]: nextValue !== currentValue }));
-                        }
-                      }}
+                      onChange={(event) => onFieldChange(event.target.value)}
                       onFocus={() => {
                         isEditingRef.current = true;
                       }}
@@ -1001,7 +1107,14 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
                       style={commonStyle}
                     />
                   )}
-                  <span style={{ minHeight: 16, fontSize: 11, color: error ? theme.palette.error.main : theme.palette.text.secondary }}>
+                  <span
+                    style={{
+                      minHeight: 14,
+                      fontSize: densityConfig.helperSize,
+                      color: error ? theme.palette.error.main : theme.palette.text.secondary,
+                      gridColumn: (isMultiline || isBooleanField) ? '1 / -1' : '2 / 3'
+                    }}
+                  >
                     {error || field.helperText || ' '}
                   </span>
                 </label>
@@ -1053,10 +1166,10 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
             resize: 'none',
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: 6,
-            padding: 8,
+            padding: uiDensity === 'dense' ? 6 : uiDensity === 'compact' ? 7 : 8,
             fontFamily: 'inherit',
-            fontSize: 14,
-            lineHeight: 1.5,
+            fontSize: uiDensity === 'dense' ? 12 : uiDensity === 'compact' ? 13 : 14,
+            lineHeight: 1.35,
             color: theme.palette.text.primary,
             background: 'transparent',
             boxSizing: 'border-box'
@@ -1199,8 +1312,9 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
   );
 
   if (renderInPanel) {
+    const panelPadding = uiDensity === 'dense' ? 8 : uiDensity === 'compact' ? 12 : 16;
     return (
-      <div style={{ height: '100%', padding: 16 }}>
+      <div style={{ height: '100%', padding: panelPadding }}>
         {content}
       </div>
     );
