@@ -161,6 +161,15 @@ const Toolbar = ({
       return [];
     }
   });
+  const [exportBoundaryPortsEnabled, setExportBoundaryPortsEnabled] = useState(() => {
+    try {
+      const raw = localStorage.getItem('twilite.exportFragment.includeBoundaryPorts');
+      if (raw == null) return false;
+      return raw === 'true';
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     if (host !== 'vscode') return;
@@ -189,6 +198,14 @@ const Toolbar = ({
       eventBus.off('groupDeleted', markDirty);
     };
   }, [host]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('twilite.exportFragment.includeBoundaryPorts', exportBoundaryPortsEnabled ? 'true' : 'false');
+    } catch {
+      // ignore storage errors
+    }
+  }, [exportBoundaryPortsEnabled]);
   const [bookmarkMenuAnchor, setBookmarkMenuAnchor] = useState(null);
   const currentUrl = browserHistory[historyIndex] || '';
   const [gridMenuAnchor, setGridMenuAnchor] = useState(null);
@@ -449,7 +466,33 @@ const Toolbar = ({
     e.target.value = '';
   };
 
-  const handleSaveToFile = async () => {
+  const isExpansionInjectedNode = useCallback((node) => Boolean(node?.data?._expansion?.expansionId), []);
+  const isExpansionInjectedEdge = useCallback((edge) => Boolean(edge?.data?._expansion?.expansionId), []);
+
+  const resolveGraphForSave = useCallback(({ excludeExpanded = false } = {}) => {
+    if (!excludeExpanded) {
+      return {
+        nodesToSave: nodes,
+        edgesToSave: edges,
+        groupsToSave: groups || []
+      };
+    }
+    const nodesToSave = nodes.filter((node) => !isExpansionInjectedNode(node));
+    const nodeIdSet = new Set(nodesToSave.map((node) => node.id));
+    const edgesToSave = edges.filter((edge) => {
+      if (isExpansionInjectedEdge(edge)) return false;
+      return nodeIdSet.has(edge.source) && nodeIdSet.has(edge.target);
+    });
+    const groupsToSave = (groups || [])
+      .map((group) => ({
+        ...group,
+        nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => nodeIdSet.has(id)) : []
+      }))
+      .filter((group) => group.nodeIds.length > 0);
+    return { nodesToSave, edgesToSave, groupsToSave };
+  }, [edges, groups, isExpansionInjectedEdge, isExpansionInjectedNode, nodes]);
+
+  const handleSaveToFile = async ({ excludeExpanded = false } = {}) => {
     const now = new Date().toISOString();
     const notifySaved = () => {
       try {
@@ -459,7 +502,8 @@ const Toolbar = ({
       }
     };
 
-    const edgesMissingType = edges.filter((edge) => !edge?.type);
+    const { nodesToSave, edgesToSave, groupsToSave } = resolveGraphForSave({ excludeExpanded });
+    const edgesMissingType = edgesToSave.filter((edge) => !edge?.type);
     if (edgesMissingType.length > 0) {
       setSnackbar({
         open: true,
@@ -469,7 +513,7 @@ const Toolbar = ({
       return;
     }
 
-    const nodesMissingSize = nodes.filter(
+    const nodesMissingSize = nodesToSave.filter(
       (node) => typeof node?.width !== 'number' || typeof node?.height !== 'number'
     );
     if (nodesMissingSize.length > 0) {
@@ -494,7 +538,7 @@ const Toolbar = ({
       github: githubSettings || null,
       autoSave: false
     };
-    const nodesWithManifestSettings = setManifestSettings(nodes, manifestSettings);
+    const nodesWithManifestSettings = setManifestSettings(nodesToSave, manifestSettings);
     const rawManifestDocumentUrl = getManifestDocumentUrl(nodesWithManifestSettings);
     const manifestHasDocumentUrl = typeof rawManifestDocumentUrl === 'string';
     const manifestDocumentUrl = manifestHasDocumentUrl ? rawManifestDocumentUrl.trim() : '';
@@ -506,6 +550,15 @@ const Toolbar = ({
       nodesWithManifestSettings,
       resolvedDocumentUrl
     );
+
+    const nodeIdsForSave = new Set(nodesWithManifestData.map((node) => node.id));
+    const saveEdges = edgesToSave.filter((edge) => nodeIdsForSave.has(edge.source) && nodeIdsForSave.has(edge.target));
+    const saveGroups = (groupsToSave || [])
+      .map((group) => ({
+        ...group,
+        nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => nodeIdsForSave.has(id)) : []
+      }))
+      .filter((group) => group.nodeIds.length > 0);
 
     const saveData = {
       fileVersion: "1.0",
@@ -536,7 +589,7 @@ const Toolbar = ({
         showLabel: node.showLabel !== false,
         data: node.data || {}
       })),
-      edges: edges.map(edge => {
+      edges: saveEdges.map(edge => {
         const sourceNodeId = typeof edge.source === 'object' && edge.source
           ? (edge.source.nodeId ?? edge.source.id ?? '')
           : edge.source;
@@ -558,7 +611,7 @@ const Toolbar = ({
           data: edge.data || {}
         };
       }),
-      clusters: groups.map(group => ({
+      clusters: saveGroups.map(group => ({
         id: group.id,
         label: group.label || "",
         nodeIds: group.nodeIds || [],
@@ -638,7 +691,7 @@ const Toolbar = ({
 
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
-        if (onShowMessage) onShowMessage(`Saved as ${actualFilename}`, 'success');
+        if (onShowMessage) onShowMessage(`Saved as ${actualFilename}${excludeExpanded ? ' (without expanded injections)' : ''}`, 'success');
         notifySaved();
         return;
       } catch (err) {
@@ -675,8 +728,166 @@ const Toolbar = ({
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    if (onShowMessage) onShowMessage(`Saved as ${filename}. If you renamed it, reload to sync.`, 'info');
+    if (onShowMessage) onShowMessage(`Saved as ${filename}${excludeExpanded ? ' (without expanded injections)' : ''}. If you renamed it, reload to sync.`, 'info');
     notifySaved();
+  };
+
+  const handleExportFragmentToFile = async () => {
+    if (!Array.isArray(selectedNodeIds) || selectedNodeIds.length === 0) {
+      if (onShowMessage) onShowMessage('Select nodes before exporting a fragment.', 'warning');
+      return;
+    }
+
+    const includeBoundaryPorts = exportBoundaryPortsEnabled;
+
+    const selectedSet = new Set(selectedNodeIds);
+    const selectedNodes = nodes.filter((node) => selectedSet.has(node.id));
+    const selectedNodeMap = new Map(selectedNodes.map((node) => [node.id, node]));
+    const fragmentEdges = edges.filter((edge) => selectedSet.has(edge.source) && selectedSet.has(edge.target));
+    const generatedNodes = [];
+    const generatedEdges = [];
+
+    if (includeBoundaryPorts) {
+      const crossingEdges = edges.filter((edge) => {
+        const sourceIn = selectedSet.has(edge.source);
+        const targetIn = selectedSet.has(edge.target);
+        return sourceIn !== targetIn;
+      });
+      crossingEdges.forEach((edge, index) => {
+        const sourceIn = selectedSet.has(edge.source);
+        const anchorId = sourceIn ? edge.source : edge.target;
+        const anchorNode = selectedNodeMap.get(anchorId);
+        const baseX = Number(anchorNode?.position?.x) || 0;
+        const baseY = Number(anchorNode?.position?.y) || 0;
+        const boundaryId = `boundary_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`;
+        const boundaryDirection = sourceIn ? 'out' : 'in';
+        const externalNodeId = sourceIn ? edge.target : edge.source;
+        const externalPort = sourceIn ? (edge.targetPort || 'root') : (edge.sourcePort || 'root');
+
+        generatedNodes.push({
+          id: boundaryId,
+          type: 'port',
+          label: boundaryDirection === 'in' ? 'Boundary In' : 'Boundary Out',
+          position: { x: baseX + (sourceIn ? 220 : -220), y: baseY + ((index % 6) * 36) },
+          width: 220,
+          height: 110,
+          visible: true,
+          showLabel: true,
+          data: {
+            memo: `Boundary ${boundaryDirection} connection to ${externalNodeId}`,
+            intent: 'boundary',
+            target: {
+              endpoint: `host.node#${externalNodeId}:${externalPort}`,
+              mode: 'navigate',
+              label: externalNodeId
+            }
+          }
+        });
+
+        generatedEdges.push({
+          id: `boundary_edge_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`,
+          type: edge.type || 'relates',
+          source: sourceIn ? edge.source : boundaryId,
+          target: sourceIn ? boundaryId : edge.target,
+          sourcePort: sourceIn ? (edge.sourcePort || 'root') : 'root',
+          targetPort: sourceIn ? 'root' : (edge.targetPort || 'root'),
+          label: edge.label || '',
+          style: edge.style || {},
+          data: { ...(edge.data || {}), _boundary: true }
+        });
+      });
+    }
+
+    const exportNodes = [...selectedNodes, ...generatedNodes];
+    const exportEdges = [...fragmentEdges, ...generatedEdges];
+    const exportNodeIds = new Set(exportNodes.map((node) => node.id));
+    const exportGroups = (groups || [])
+      .map((group) => ({
+        ...group,
+        nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => exportNodeIds.has(id)) : []
+      }))
+      .filter((group) => group.nodeIds.length > 0);
+
+    const saveData = {
+      fileVersion: "1.0",
+      metadata: {
+        title: "Fragment Export",
+        description: "Selected subgraph export",
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        author: "",
+        tags: ["fragment"],
+        preferredViewer: "https://twilite.zone"
+      },
+      nodes: exportNodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        color: node.color,
+        ports: Array.isArray(node.ports) ? node.ports : undefined,
+        inputs: Array.isArray(node.inputs) ? node.inputs : undefined,
+        outputs: Array.isArray(node.outputs) ? node.outputs : undefined,
+        state: node.state && typeof node.state === 'object' ? node.state : undefined,
+        style: node.style && typeof node.style === 'object' ? node.style : undefined,
+        extensions: node.extensions && typeof node.extensions === 'object' ? node.extensions : undefined,
+        visible: node.visible !== false,
+        showLabel: node.showLabel !== false,
+        data: node.data || {}
+      })),
+      edges: exportEdges.map(edge => ({
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target,
+        sourcePort: edge.sourcePort,
+        targetPort: edge.targetPort,
+        portMeta: edge.portMeta || undefined,
+        label: edge.label || "",
+        style: edge.style || {},
+        data: edge.data || {}
+      })),
+      clusters: exportGroups.map(group => ({
+        id: group.id,
+        label: group.label || "",
+        nodeIds: group.nodeIds || [],
+        bounds: group.bounds || { x: 0, y: 0, width: 0, height: 0 },
+        visible: group.visible !== false,
+        style: group.style || {}
+      }))
+    };
+
+    const jsonString = JSON.stringify(saveData, null, 2);
+    const filename = `fragment_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.node`;
+
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+      try {
+        const fileHandle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'Node Graph Files', accept: { 'application/node': ['.node'] } }]
+        });
+        const writable = await fileHandle.createWritable();
+        await writable.write(jsonString);
+        await writable.close();
+        if (onShowMessage) onShowMessage(`Exported fragment as ${fileHandle.name}`, 'success');
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    const blob = new Blob([jsonString], { type: 'application/node' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    if (link.parentNode) link.parentNode.removeChild(link);
+    URL.revokeObjectURL(url);
+    if (onShowMessage) onShowMessage(`Exported fragment as ${filename}`, 'success');
   };
 
   const handleCopyOnboard = async () => {
@@ -835,6 +1046,16 @@ const Toolbar = ({
     localStorage.setItem('graphBrowserBookmarks', JSON.stringify(newBookmarks));
   };
 
+  const handleToggleExportBoundaryPorts = () => {
+    setExportBoundaryPortsEnabled((prev) => !prev);
+    if (onShowMessage) {
+      onShowMessage(
+        `Fragment boundary ports ${!exportBoundaryPortsEnabled ? 'enabled' : 'disabled'}.`,
+        'info'
+      );
+    }
+  };
+
   const handleBookmarkClick = (url) => {
     eventBus.emit('fetchUrl', { url });
     setBookmarkMenuAnchor(null);
@@ -965,7 +1186,11 @@ const Toolbar = ({
             {/* File Actions Section */}
             <ButtonGroup variant="contained" size="small">
               <FileActions 
-                onSave={handleSaveToFile}
+                onSave={() => handleSaveToFile({ excludeExpanded: false })}
+                onSaveWithoutExpanded={() => handleSaveToFile({ excludeExpanded: true })}
+                onExportFragment={handleExportFragmentToFile}
+                exportBoundaryPortsEnabled={exportBoundaryPortsEnabled}
+                onToggleExportBoundaryPorts={handleToggleExportBoundaryPorts}
                 onLoad={handleLoadFile}
                 onNewFile={handleNewFile}
                 isMobile={false}

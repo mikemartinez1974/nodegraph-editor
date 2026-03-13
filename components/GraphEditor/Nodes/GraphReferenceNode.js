@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -9,6 +9,7 @@ import FixedNode from "./FixedNode";
 import useNodePortSchema from "../hooks/useNodePortSchema";
 import { endpointToUrl, parsePortEndpoint } from "../utils/portEndpoint";
 import eventBus from "../../NodeGraph/eventBus";
+import { readExpansionState, resolveExpansionTarget } from "./expansionUtils";
 
 const DEFAULT_INPUTS = [{ key: "in", label: "In", type: "value" }];
 const DEFAULT_OUTPUTS = [{ key: "out", label: "Out", type: "value" }];
@@ -90,8 +91,13 @@ const GraphReferenceNode = (props) => {
     () => `twilite_embed_${node?.id || "graph"}_${Math.random().toString(36).slice(2, 10)}`,
     [node?.id]
   );
-  const mode = String(node?.data?.mode || "preview").toLowerCase();
-  const interactive = mode === "interactive";
+  const viewMode = String(node?.data?.mode || "preview").toLowerCase();
+  const interactive = viewMode === "interactive";
+  const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
+  const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
+  const [expansionBusy, setExpansionBusy] = useState(false);
+  const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
+  const [expansionError, setExpansionError] = useState("");
   const iframeRef = useRef(null);
   const [frameState, setFrameState] = useState("idle");
   const [isResizing, setIsResizing] = useState(false);
@@ -122,6 +128,67 @@ const GraphReferenceNode = (props) => {
     : isDepthBlocked
     ? `Blocked: max embed depth (${maxDepth}) reached.`
     : "";
+
+  const readGraphApi = useCallback(() => {
+    if (typeof window === "undefined") return null;
+    return window.graphAPI?._raw || window.graphAPIRaw || window.graphAPI || null;
+  }, []);
+
+  const refreshExpansionState = useCallback(() => {
+    if (!node?.id || !canExpand) {
+      setExpansionState({ expanded: false, expansionId: null, expansionKey: "" });
+      return;
+    }
+    const api = readGraphApi();
+    setExpansionState(readExpansionState(api, node.id, expansionTarget));
+  }, [canExpand, expansionTarget, node?.id, readGraphApi]);
+
+  useEffect(() => {
+    refreshExpansionState();
+  }, [refreshExpansionState]);
+
+  useEffect(() => {
+    const handleExpansionStateChanged = (payload = {}) => {
+      if (!node?.id) return;
+      if (payload?.sourceNodeId && payload.sourceNodeId !== node.id) return;
+      refreshExpansionState();
+    };
+    eventBus.on("expansionStateChanged", handleExpansionStateChanged);
+    return () => eventBus.off("expansionStateChanged", handleExpansionStateChanged);
+  }, [node?.id, refreshExpansionState]);
+
+  const handleToggleExpansion = useCallback(
+    async (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      if (!node?.id || !canExpand || expansionBusy) return;
+      const api = readGraphApi();
+      if (!api) return;
+      setExpansionBusy(true);
+      try {
+        setExpansionError("");
+        if (expansionState.expanded && expansionState.expansionId && typeof api.collapseExpansion === "function") {
+          const result = await api.collapseExpansion({ expansionId: expansionState.expansionId, sourceNodeId: node.id });
+          if (result && result.success === false) {
+            setExpansionError(result.error || result.data?.message || "Collapse failed");
+          }
+        } else if (typeof api.expandReference === "function") {
+          const result = await api.expandReference({
+            sourceNodeId: node.id,
+            target: expansionTarget,
+            options: { layout: "attach-right", dedupe: true }
+          });
+          if (result && result.success === false) {
+            setExpansionError(result.error || result.data?.message || "Expansion failed");
+          }
+        }
+      } finally {
+        setExpansionBusy(false);
+        refreshExpansionState();
+      }
+    },
+    [canExpand, expansionBusy, expansionState.expanded, expansionState.expansionId, expansionTarget, node?.id, readGraphApi, refreshExpansionState]
+  );
 
   const embedSrc = useMemo(() => {
     if (!graphUrl) return "";
@@ -329,17 +396,59 @@ const GraphReferenceNode = (props) => {
                 letterSpacing: 0.2,
                 textTransform: "uppercase",
                 background:
-                  mode === "interactive"
+                  viewMode === "interactive"
                     ? theme.palette.secondary.main
                     : theme.palette.primary.main,
                 color:
-                  mode === "interactive"
+                  viewMode === "interactive"
                     ? theme.palette.secondary.contrastText
                     : theme.palette.primary.contrastText
               }}
             >
-              {mode}
+              {viewMode}
             </span>
+            {canExpand && expansionState.expanded ? (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  height: 18,
+                  padding: "0 6px",
+                  borderRadius: 999,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: 0.2,
+                  textTransform: "uppercase",
+                  background: theme.palette.success.main,
+                  color: theme.palette.success.contrastText
+                }}
+              >
+                expanded
+              </span>
+            ) : null}
+            {canExpand && expansionError ? (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  height: 18,
+                  padding: "0 6px",
+                  borderRadius: 999,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: 0.2,
+                  background: theme.palette.error.main,
+                  color: theme.palette.error.contrastText,
+                  maxWidth: 180,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
+                }}
+                title={expansionError}
+              >
+                {expansionError}
+              </span>
+            ) : null}
             <div
               style={{
                 fontSize: 11,
@@ -383,6 +492,31 @@ const GraphReferenceNode = (props) => {
                 >
                   <RefreshIcon sx={{ fontSize: 14 }} />
                 </button>
+                {canExpand ? (
+                  <button
+                    type="button"
+                    title={expansionState.expanded ? "Collapse expanded branch" : "Expand referenced fragment"}
+                    onClick={handleToggleExpansion}
+                    disabled={expansionBusy}
+                    style={{
+                      border: `1px solid ${theme.palette.divider}`,
+                      background: "transparent",
+                      color: theme.palette.text.secondary,
+                      borderRadius: 6,
+                      minWidth: 62,
+                      height: 24,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 8px",
+                      cursor: expansionBusy ? "default" : "pointer",
+                      opacity: expansionBusy ? 0.65 : 1,
+                      fontSize: 11
+                    }}
+                  >
+                    {expansionBusy ? "..." : expansionState.expanded ? "Collapse" : "Expand"}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   title="Edit node"

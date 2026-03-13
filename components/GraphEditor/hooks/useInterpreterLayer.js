@@ -210,6 +210,14 @@ export default function useInterpreterLayer({
             const delta = proposal.delta || proposal.data || {};
             return [{ op: 'translateGroups', ids: Array.isArray(ids) ? ids : [ids], delta }];
           }
+          case 'expandReference': {
+            const payload = proposal.payload || proposal.data || proposal;
+            return [{ op: 'expandReference', payload }];
+          }
+          case 'collapseExpansion': {
+            const payload = proposal.payload || proposal.data || proposal;
+            return [{ op: 'collapseExpansion', payload }];
+          }
           default:
             return [];
         }
@@ -302,14 +310,26 @@ export default function useInterpreterLayer({
           if (routeDeltas.length && typeof setEdgeRoutes === 'function') {
             routeDeltas.forEach(d => setEdgeRoutes(d.routes));
           }
-          const graphDeltas = deltas.filter(d => d && d.op !== 'setEdgeRoutes');
+          const expansionDeltas = deltas.filter(
+            d => d && (d.op === 'expandReference' || d.op === 'collapseExpansion')
+          );
+          for (const delta of expansionDeltas) {
+            if (delta.op === 'expandReference' && typeof api.expandReference === 'function') {
+              await api.expandReference(delta.payload || delta.data || delta);
+            } else if (delta.op === 'collapseExpansion' && typeof api.collapseExpansion === 'function') {
+              await api.collapseExpansion(delta.payload || delta.data || delta);
+            }
+          }
+          const graphDeltas = deltas.filter(
+            d => d && d.op !== 'setEdgeRoutes' && d.op !== 'expandReference' && d.op !== 'collapseExpansion'
+          );
           if (graphDeltas.length) {
             api.applyDeltas(graphDeltas, { batchHistory: true });
           }
           return;
         }
-        deltas.forEach((delta) => {
-          if (!delta || !delta.op) return;
+        for (const delta of deltas) {
+          if (!delta || !delta.op) continue;
           switch (delta.op) {
             case 'createNode':
               api.createNode?.(delta.data || {});
@@ -371,6 +391,16 @@ export default function useInterpreterLayer({
             case 'setGroupNodes':
               api.setGroupNodes?.(delta.id, delta.nodeIds || []);
               break;
+            case 'expandReference':
+              if (typeof api.expandReference === 'function') {
+                await api.expandReference(delta.payload || delta.data || delta);
+              }
+              break;
+            case 'collapseExpansion':
+              if (typeof api.collapseExpansion === 'function') {
+                await api.collapseExpansion(delta.payload || delta.data || delta);
+              }
+              break;
             case 'setEdgeRoutes':
               if (delta.routes && typeof setEdgeRoutes === 'function') {
                 setEdgeRoutes(delta.routes);
@@ -379,7 +409,7 @@ export default function useInterpreterLayer({
             default:
               break;
           }
-        });
+        }
       },
       onCommit: ({ intent, context }) => {
         const contractSummary = summarizeContracts({

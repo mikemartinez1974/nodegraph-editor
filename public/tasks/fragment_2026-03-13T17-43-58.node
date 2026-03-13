@@ -1,0 +1,173 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Fragment Export",
+    "description": "Selected subgraph export",
+    "created": "2026-03-13T17:43:58.355Z",
+    "modified": "2026-03-13T17:43:58.355Z",
+    "author": "",
+    "tags": [
+      "fragment"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "p5-port-expand",
+      "type": "port",
+      "label": "Expand via Port",
+      "position": {
+        "x": 40,
+        "y": 190
+      },
+      "width": 320,
+      "height": 190,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "intent": "external",
+        "target": {
+          "kind": "fragment",
+          "mode": "expand",
+          "ref": "/tasks/expansion-fragment-target.node",
+          "entryPort": "root",
+          "label": "Fragment Target"
+        },
+        "endpoint": "/tasks/expansion-fragment-target.node:root"
+      }
+    },
+    {
+      "id": "p5-export-anchor",
+      "type": "markdown",
+      "label": "Export Anchor",
+      "position": {
+        "x": -234.64053697435605,
+        "y": 471.06179801489327
+      },
+      "width": 360,
+      "height": 180,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Export Anchor\n\nSelect me plus one other node to test Export Fragment."
+      }
+    },
+    {
+      "id": "exp_vryz9a:frag-root",
+      "type": "markdown",
+      "label": "Fragment Root",
+      "position": {
+        "x": 380.3651488830038,
+        "y": 498.32590769353385
+      },
+      "width": 380,
+      "height": 220,
+      "ports": [
+        {
+          "id": "root",
+          "label": "Root",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expansion Fragment\n\nThis fragment is imported by expandReference.\n\nIf you see this branch materialized in host graph, expansion worked.",
+        "_origin": {
+          "canonicalId": "frag-root",
+          "ref": "/tasks/expansion-fragment-target.node",
+          "instanceId": "exp_vryz9a"
+        },
+        "_expansion": {
+          "expansionId": "exp_vryz9a",
+          "expandKey": "p5-port-expand::/tasks/expansion-fragment-target.node::root::expand",
+          "sourceNodeId": "p5-port-expand",
+          "sourceRef": "/tasks/expansion-fragment-target.node",
+          "entryPort": "root",
+          "trustMode": "untrusted",
+          "injectedBy": "expandReference",
+          "createdAt": "2026-03-13T17:42:37.195Z",
+          "sourceOrigin": "local://",
+          "sourceHash": "492355f279e008ff5a40095554bad0e7988bca84616eac7ad47553e517f391ab",
+          "sourceBytes": 1941
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "p5-edge-2",
+      "type": "relates",
+      "source": "p5-port-expand",
+      "target": "p5-export-anchor",
+      "sourcePort": "root",
+      "targetPort": "in",
+      "label": "",
+      "style": {
+        "curved": true,
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "6986e13d-cccb-4793-91a1-8a9776158c5b",
+      "type": "expands-to",
+      "source": "p5-port-expand",
+      "target": "exp_vryz9a:frag-root",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [
+          6,
+          4
+        ],
+        "curved": true
+      },
+      "data": {
+        "_expansion": {
+          "expansionId": "exp_vryz9a",
+          "expandKey": "p5-port-expand::/tasks/expansion-fragment-target.node::root::expand",
+          "sourceNodeId": "p5-port-expand",
+          "sourceRef": "/tasks/expansion-fragment-target.node",
+          "entryPort": "root",
+          "trustMode": "untrusted",
+          "injectedBy": "expandReference",
+          "createdAt": "2026-03-13T17:42:37.195Z",
+          "sourceOrigin": "local://",
+          "sourceHash": "492355f279e008ff5a40095554bad0e7988bca84616eac7ad47553e517f391ab",
+          "sourceBytes": 1941
+        }
+      }
+    }
+  ],
+  "clusters": []
+}

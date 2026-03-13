@@ -1,0 +1,1675 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-03-13T01:00:12.221Z",
+    "modified": "2026-03-13T01:00:12.221Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "task-manifest-branch-expand",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": 1873.8333333333333,
+        "y": -2537.2463113334816
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "task-branch-expansion-resolution",
+          "name": "Task: Branch Expansion From Port/Reference",
+          "version": "0.1.0",
+          "description": "Defines implementation plan for expanding branches from reference nodes with graph vs fragment semantics.",
+          "createdAt": "2026-03-11T00:00:00.000Z",
+          "updatedAt": "2026-03-11T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "architecture"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port",
+            "graph-reference"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "task-legend-branch-expand",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": 1473.8333333333333,
+        "y": -2537.2463113334816
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "decision",
+            "intent": "Decision or policy",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "risk",
+            "intent": "Failure mode or tradeoff",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "phase",
+            "intent": "Implementation phase",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "task-dictionary-branch-expand",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 1073.8333333333333,
+        "y": -2537.2463113334816
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "task-overview",
+      "type": "markdown",
+      "label": "Problem Statement",
+      "position": {
+        "x": 2410.5,
+        "y": -2537.2463113334816
+      },
+      "width": 520,
+      "height": 240,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Branch Expansion From Port/Reference\n\nStart from a `port` or `graph-reference` node and resolve target behavior by content kind:\n\n- If target kind is `graph`: navigate to new graph context.\n- If target kind is `fragment`: expand into host graph as an attached branch.\n\nGoal: explicit semantics, reversible expansion, deterministic behavior."
+      }
+    },
+    {
+      "id": "task-semantics",
+      "type": "markdown",
+      "label": "Semantic Contract",
+      "position": {
+        "x": 2313.833333333333,
+        "y": -2137.2463113334816
+      },
+      "width": 540,
+      "height": 300,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Required Target Contract\n\nReference-capable nodes should normalize to:\n\n- `data.target.kind`: `graph` | `fragment`\n- `data.target.ref`: canonical ref (`github://`, `tlz://`, local path)\n- `data.target.entryPort`: default `root`\n- `data.target.mode`: `navigate` | `expand`\n\nRules:\n\n- `mode=navigate` opens new graph context.\n- `mode=expand` only valid for `kind=fragment` in v1.\n- `mode=expand` + `kind=graph` should fail fast with clear reason."
+      }
+    },
+    {
+      "id": "task-tradeoffs",
+      "type": "markdown",
+      "label": "Tradeoffs & Risks",
+      "position": {
+        "x": 2313.833333333333,
+        "y": -1117.2463113334816
+      },
+      "width": 540,
+      "height": 360,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Key Tradeoffs\n\n1. ID collisions during fragment merge\n- Need deterministic remap/namespace strategy.\n\n2. Duplicate expansion\n- Same ref must not duplicate branch on repeated expand.\n\n3. Collapse reversibility\n- Need provenance tags (`expansionId`, `sourceRef`, `injectedBy`).\n\n4. Contract conflicts\n- Fragment manifest/dictionary can conflict with host rules.\n\n5. Performance\n- Expansion should be transaction-based and incremental, not full rerender."
+      }
+    },
+    {
+      "id": "task-plan",
+      "type": "markdown",
+      "label": "Implementation Phases",
+      "position": {
+        "x": 2998.833333333333,
+        "y": 2272.7536886665184
+      },
+      "width": 520,
+      "height": 360,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Phase Plan\n\n### Phase 1: Contract + Normalizer\n- Normalize target fields on `port` and `graph-reference`.\n- Enforce `kind/mode` combinations.\n\n### Phase 2: Expansion Transaction\n- Resolve fragment, validate, remap IDs, attach root edge.\n- Tag all injected entities with `expansionId`.\n\n### Phase 3: Collapse\n- Remove injected entities by `expansionId`.\n- Preserve host-authored nodes/edges.\n\n### Phase 4: UX\n- Add Expand/Collapse controls and status badges.\n- Show explicit errors for invalid target contracts."
+      }
+    },
+    {
+      "id": "task-acceptance",
+      "type": "markdown",
+      "label": "Acceptance Criteria",
+      "position": {
+        "x": 2822.833333333333,
+        "y": 3362.7536886665184
+      },
+      "width": 520,
+      "height": 280,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Done Means\n\n- Expanding a fragment adds a branch exactly once per expansion key.\n- Collapse removes only the injected branch.\n- Graph targets navigate, fragment targets expand.\n- Errors are explicit and non-destructive.\n- Behavior is deterministic across refresh/reload.\n- Existing graphs without `target.kind` still work via normalizer defaults."
+      }
+    },
+    {
+      "id": "task-open-questions",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 3499.833333333333,
+        "y": -2137.2463113334816
+      },
+      "width": 520,
+      "height": 300,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Questions\n\n1. Should expansion persist as materialized nodes in saved files by default?\n2. Should host dictionary auto-register expanded fragment node types?\n3. Do we allow recursive expansion in v1 or gate to one level?\n4. How should security policy treat remote refs on expand?\n5. Should `mode=expand` be exposed on both `port` and `graph-reference` UI equally?"
+      }
+    },
+    {
+      "id": "task-semantic-zoom",
+      "type": "markdown",
+      "label": "Semantic Zoom Plan",
+      "position": {
+        "x": 3183.166666666667,
+        "y": 2792.7536886665184
+      },
+      "width": 560,
+      "height": 340,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Semantic Zoom (Fragment Distance)\n\nUse focus-distance semantics with no edge-specific controls in v1.\n\n- Distance 0 (active fragment): detail card\n- Distance 1 (adjacent fragments): summary card\n- Distance >=2 (older/far fragments): dot node\n\nImplementation notes:\n\n1. Compute distance from active fragment/root.\n2. Derive semantic level from distance first, camera zoom second.\n3. Render nodes by level (`detail` | `summary` | `dot`).\n4. Keep edge rendering simple for now: no semantic edge controls.\n\nAcceptance:\n\n- Switching active fragment updates levels deterministically.\n- Dot/summarized nodes remain selectable.\n- Existing graphs remain backward compatible."
+      }
+    },
+    {
+      "id": "task-save-policy",
+      "type": "markdown",
+      "label": "Save Policy (Graph vs Fragment)",
+      "position": {
+        "x": 2874.833333333333,
+        "y": -1667.2463113334816
+      },
+      "width": 560,
+      "height": 360,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Save Policy: Expanded Branches\n\nDo not overload normal save behavior.\n\n## Operations\n\n1. **Save Graph** (default)\n- Persists full current graph state.\n- Includes expanded materialized nodes unless user filters them.\n\n2. **Export Fragment** (explicit)\n- Persists selected subgraph only (selected nodes + internal edges).\n- Includes optional boundary ports and required dictionary entries.\n\n## Provenance\n\nExpanded injections should be tagged:\n\n- `data._expansion.expansionId`\n- `data._expansion.sourceRef`\n- `data._expansion.injectedBy`\n\n## Optional Save Filter\n\nAdd save option: **Save without expanded injections**\n- Filters entities with matching `_expansion` metadata before write.\n\n## Decision\n\n- Keep `Save` deterministic and unsurprising.\n- Make selection-based persistence an explicit `Export Fragment` command."
+      }
+    },
+    {
+      "id": "task-dictionary-security",
+      "type": "markdown",
+      "label": "Host Dictionary Security Policy",
+      "position": {
+        "x": 3359.833333333333,
+        "y": -1147.2463113334816
+      },
+      "width": 600,
+      "height": 420,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Host Dictionary Security Policy\n\nFor fragment expansion: merge metadata, not executable trust.\n\n## Default Import Mode\n\n- Imported dictionary entries are `untrusted` by default.\n- Merge type metadata and references, but do **not** auto-enable execution features.\n\n## Entry Security Flags\n\nEach imported entry should include:\n\n- `originRef`\n- `originHash` (if available)\n- `trust`: `untrusted | trusted`\n- `capabilities` object (render/edit/script/lifecycle)\n\n## Capability Defaults (Untrusted)\n\n- `render: true` (safe subset)\n- `edit: false`\n- `script: false`\n- `lifecycle: false`\n\n## Promotion Flow\n\n- User can explicitly promote an entry (or source) to `trusted`.\n- Promotion should be explicit in UI and persisted intentionally.\n- Trust should be pinned to `originRef + originHash` when possible.\n\n## Host Protection\n\n- Manifest policy should default to `allowImportedExecution: false`.\n- Fragment expansion must not silently change host runtime behavior.\n\n## Acceptance\n\n- Expanding untrusted fragments cannot run script/lifecycle code.\n- Host graph remains deterministic unless user explicitly trusts imports."
+      }
+    },
+    {
+      "id": "task-expansion-scope",
+      "type": "markdown",
+      "label": "Expansion Scope (One Hop)",
+      "position": {
+        "x": 3473.166666666667,
+        "y": -557.2463113334816
+      },
+      "width": 560,
+      "height": 330,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expansion Scope: One-Hop Only\n\nDecision for Q3:\n\n- Traversing a composition link expands **exactly one** referenced fragment.\n- Expansion is one-hop only in v1 (no recursive chain expansion).\n\nClarification:\n\n- One expansion can materialize multiple nodes/edges (the fragment content).\n- But only one external fragment is resolved per traverse action.\n\nSafety limits:\n\n- Enforce per-expansion caps (max nodes, max edges).\n- Reject expansion with explicit error if caps are exceeded.\n\nAcceptance:\n\n- A single traverse action cannot pull nested downstream fragments automatically.\n- User must explicitly trigger the next hop from newly materialized references."
+      }
+    },
+    {
+      "id": "task-ui-parity-execution",
+      "type": "markdown",
+      "label": "Q5 Decision: UI Parity + Execution Boundary",
+      "position": {
+        "x": 3856.166666666667,
+        "y": -67.24631133348157
+      },
+      "width": 620,
+      "height": 360,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Q5 Decision: Port + Graph-Reference Parity\n\nDecision:\n\n- `port` and `graph-reference` should expose the same target semantics in UI.\n- Shared fields: `target.kind`, `target.mode`, `target.ref`, limits/policy flags.\n- Node rendering can differ, but composition semantics stay consistent.\n\nExecution boundary:\n\n- `mode=navigate`: open target graph in its own context; target policy applies there.\n- `mode=expand`: import into host as untrusted by default.\n- Untrusted imports may render, but script/lifecycle/plugin execution is blocked.\n- Explicit trust promotion is required before enabling execution in host context.\n\nAcceptance:\n\n- Type-switch `port <-> graph-reference` preserves target behavior.\n- Expansion does not silently execute imported code in host graph."
+      }
+    },
+    {
+      "id": "task-gaps-contract-tests",
+      "type": "markdown",
+      "label": "Implementation Gaps: Contract + Tests",
+      "position": {
+        "x": 3816.166666666667,
+        "y": 452.7536886665184
+      },
+      "width": 700,
+      "height": 470,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implementation Gaps To Close\n\n1. Expansion transaction contract\n- Define explicit command schema (`expandRef`, `collapseExpansion`) and error codes.\n\n2. Dedupe key + idempotency\n- Specify exact expansion key (e.g. `hostNodeId + target.ref + target.entryPort + mode`).\n\n3. Attach/layout policy\n- Define deterministic placement of injected fragment and collision handling.\n\n4. Remote ref trust gating details\n- Protocol/host allowlists, size/time limits, and content validation rules.\n\n5. Rollback semantics\n- Expansion should be transactional with full rollback on partial failure.\n\n6. Trust metadata persistence model\n- Decide local vs persisted trust; define hash-pinning behavior on ref changes.\n\n7. Test matrix\n- One-hop enforcement\n- Untrusted execution blocking\n- Collapse removes only injected entities\n- ID collision/remap stability\n- Repeated expand idempotency"
+      }
+    },
+    {
+      "id": "task-expansion-contract",
+      "type": "markdown",
+      "label": "Expansion Contract (UI + AI)",
+      "position": {
+        "x": 3786.166666666667,
+        "y": 1082.7536886665184
+      },
+      "width": 760,
+      "height": 540,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expansion Contract (UI + AI)\n\nUse one host capability with two entry points:\n\n1. UI control (primary)\n2. AI command wrapper (optional)\n\n## Host API\n\n`graph.expandReference(payload)`\n\n```json\n{\n  \"sourceNodeId\": \"node-123\",\n  \"target\": {\n    \"kind\": \"fragment\",\n    \"ref\": \"github://owner/repo/path/thing.node\",\n    \"entryPort\": \"root\",\n    \"mode\": \"expand\"\n  },\n  \"options\": {\n    \"maxNodes\": 200,\n    \"maxEdges\": 400,\n    \"dedupe\": true,\n    \"layout\": \"attach-right\",\n    \"trustMode\": \"untrusted\"\n  }\n}\n```\n\n## Return shape\n\n```json\n{\n  \"ok\": true,\n  \"expansionId\": \"exp_abc123\",\n  \"added\": { \"nodes\": 23, \"edges\": 31 },\n  \"skipped\": false,\n  \"reason\": null\n}\n```\n\n## Error codes\n\n- `INVALID_TARGET`\n- `UNSUPPORTED_MODE`\n- `EXPANSION_LIMIT_EXCEEDED`\n- `REF_FETCH_FAILED`\n- `TRUST_POLICY_BLOCKED`\n- `ID_COLLISION_UNRESOLVED`\n- `TRANSACTION_ROLLBACK`\n\n## Collapse API\n\n`graph.collapseExpansion({ \"expansionId\": \"exp_abc123\" })`\n\n## AI wrapper\n\nAllow `action: \"expandReference\"`, but route to same host API.\nNo separate behavior path for AI vs UI."
+      }
+    },
+    {
+      "id": "task-safe-merge-idempotency",
+      "type": "markdown",
+      "label": "Safe Merge + Idempotency Policy",
+      "position": {
+        "x": 5960,
+        "y": 500
+      },
+      "width": 700,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Safe Merge + Idempotency (No Canonical ID Rewrite)\n\nGoal: prevent collisions without breaking source identity.\n\n## Rules\n\n1. Preserve source canonical IDs\n- Keep fragment `node.id` as canonical identity metadata.\n\n2. Materialize with runtime instance keys\n- Host materialized key: `instanceId:canonicalId` (runtime/internal).\n- Store provenance:\n  - `data._origin.canonicalId`\n  - `data._origin.ref`\n  - `data._origin.instanceId`\n\n3. Idempotency key\n- `expandKey = sourceNodeId + ref + entryPort + mode`\n- If `expandKey` exists: reuse/focus existing expansion, do not duplicate.\n\n4. Collision handling\n- Same `canonicalId` in same `instanceId`: reuse (idempotent).\n- Same `canonicalId` in different instances: allowed via distinct runtime keys.\n- Legacy flat-ID collision with no provenance: safe-fail with explicit error.\n\n5. Collapse semantics\n- Collapse by `instanceId`/provenance, never by raw canonical IDs."
+      }
+    },
+    {
+      "id": "task-attach-layout-policy",
+      "type": "markdown",
+      "label": "Attach/Layout Policy (Hybrid)",
+      "position": {
+        "x": 6720,
+        "y": 500
+      },
+      "width": 740,
+      "height": 440,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Attach/Layout Policy (Hybrid)\n\nAdopt a simple default with optional polish:\n\n## Default (v1): Lane Attach + Deterministic Nudge\n\n- Attach fragment root near source node using source port side.\n- Reserve lanes per `sourceNodeId + side`.\n- New expansions use next lane index (stable ordering).\n- Preserve fragment internal relative coordinates.\n- Apply bounded collision nudge only when overlap exceeds threshold.\n- Do not auto-move host-authored existing nodes.\n\n## Optional (user-invoked): Reflow Branch\n\n- Provide explicit action to reflow injected branch for cleaner layout.\n- Reflow only the injected branch (not entire host graph).\n\n## Suggested parameters\n\n- `laneGapPx`: 220\n- `attachMarginPx`: 80\n- `maxNudgePx`: 240\n- `collisionPaddingPx`: 24\n- `fallbackSide`: opposite of preferred side if blocked\n\n## Acceptance\n\n- Repeated expansions from same source are spatially stable.\n- Branches do not overlap by default in common cases.\n- Reflow action improves crowded branches without disturbing host layout."
+      }
+    },
+    {
+      "id": "task-remote-trust-gating-v1",
+      "type": "markdown",
+      "label": "Remote Ref Trust Gating (V1 Final)",
+      "position": {
+        "x": 7480,
+        "y": 500
+      },
+      "width": 760,
+      "height": 520,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Remote Ref Trust Gating (V1 Final)\n\n## 1) Protocol allowlist\n\n- Allow: `github://`, `https://`\n- Block: `file://`, `javascript:`, `data:`\n- `http://` blocked except localhost/dev mode (optional host setting).\n\n## 2) Integrity pinning\n\n- Compute `originHash = sha256(rawFetchedContent)` on import.\n- Store on imported metadata with `originRef`.\n- If same ref later resolves to different hash: treat as new untrusted version.\n\n## 3) Resource limits (modest defaults)\n\n- Fetch timeout: `8s`\n- Max payload bytes: `1.5 MB`\n- Max nodes per expansion: `250`\n- Max edges per expansion: `500`\n- Max external loads per action: `1` (one-hop rule)\n\n## 4) Validation gates\n\n- Require valid `nodegraph-data` shape before merge.\n- Reject malformed ports/edges/required fields.\n- Imported executable sections disabled unless trusted.\n\n## 5) Trust scope\n\n- Trust is graph-scoped in v1 (current graph only).\n\n## 6) User prompt behavior\n\n- First import of source: default to **Import passive only**.\n- Optional action: **Trust this version** (hash-pinned).\n- If hash changes later: revert to passive and warn.\n\n## Acceptance\n\n- Web refs remain usable (`https://`) with explicit safety rails.\n- No silent execution from imported remote content in host context."
+      }
+    },
+    {
+      "id": "task-rollback-semantics-v1",
+      "type": "markdown",
+      "label": "Rollback Semantics (V1 Decision)",
+      "position": {
+        "x": 8240,
+        "y": 500
+      },
+      "width": 760,
+      "height": 460,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Rollback Semantics (V1 Decision)\n\nAccepted decisions:\n\n1. Expansion is all-or-nothing transaction.\n2. Every injected node/edge carries `expansionId` provenance.\n3. On expansion failure, rollback all entities from current `expansionId`.\n4. Collapse removes only entities tied to target `expansionId`.\n5. If user edits injected node, it must be explicitly promoted before excluding from collapse.\n6. Failures return specific error code + message (no silent partial state).\n\nOperational distinction:\n\n- **Transactional rollback**: automatic on failed expand.\n- **Collapse detach**: user-initiated removal by provenance.\n\nAcceptance:\n\n- No partial branch artifacts remain after failed expansion.\n- Host-authored content is never removed by collapse.\n- Promoted nodes survive collapse by design."
+      }
+    },
+    {
+      "id": "task-trust-persistence-v1",
+      "type": "markdown",
+      "label": "Trust Metadata Persistence (V1)",
+      "position": {
+        "x": 9000,
+        "y": 500
+      },
+      "width": 760,
+      "height": 460,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Trust Metadata Persistence (V1)\n\nDecision: persist trust metadata in the graph file, graph-scoped only.\n\n## Trust binding\n\n- Trust is pinned to `originRef + originHash` (not ref alone).\n- If content hash changes, trust does not carry automatically.\n\n## Storage model\n\n- Prefer centralized registry:\n- `manifest.data.settings.trustRegistry`\n- (instead of duplicating trust flags on every dictionary entry)\n\n## Suggested trust record shape\n\n```json\n{\n  \"originRef\": \"github://owner/repo/path/file.node\",\n  \"originHash\": \"sha256:...\",\n  \"trust\": \"trusted\",\n  \"trustedAt\": \"2026-03-13T00:00:00.000Z\",\n  \"trustedBy\": \"user\",\n  \"capabilities\": {\n    \"render\": true,\n    \"edit\": false,\n    \"script\": false,\n    \"lifecycle\": false\n  }\n}\n```\n\n## Behavior\n\n1. Import creates untrusted record by default.\n2. User promotion marks exact `ref+hash` trusted.\n3. Re-import with changed hash creates new untrusted version.\n\n## Acceptance\n\n- Trust is explicit, auditable, and portable with graph file.\n- No silent trust inheritance on content changes."
+      }
+    },
+    {
+      "id": "task-port-phase5-export-smoke",
+      "type": "port",
+      "label": "Phase 5 Export Smoke",
+      "position": {
+        "x": 1640,
+        "y": 360
+      },
+      "width": 280,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Save-filter and fragment-export smoke graph.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/phase5-export-smoke.node:root",
+          "mode": "navigate",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "task-port-phase4-trust-smoke",
+      "type": "port",
+      "label": "Phase 4 Trust Smoke",
+      "position": {
+        "x": 1640,
+        "y": 560
+      },
+      "width": 280,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Expansion trust-gating smoke graph.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/phase4-trust-smoke.node:root",
+          "mode": "navigate",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "task-port-expansion-fragment-target",
+      "type": "port",
+      "label": "Expansion Fragment Target",
+      "position": {
+        "x": 1640,
+        "y": 760
+      },
+      "width": 280,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Target fragment loaded by expansion smoke tests.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/expansion-fragment-target.node:root",
+          "mode": "navigate",
+          "label": "Open"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-task-1",
+      "type": "relates",
+      "source": "task-overview",
+      "target": "task-semantics",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "define contract",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-2",
+      "type": "relates",
+      "source": "task-overview",
+      "target": "task-open-questions",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "clarify",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-3",
+      "type": "relates",
+      "source": "task-semantics",
+      "target": "task-tradeoffs",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "analyze risks",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-4",
+      "type": "flows-to",
+      "source": "task-tradeoffs",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-5",
+      "type": "flows-to",
+      "source": "task-plan",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "verify",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-6",
+      "type": "relates",
+      "source": "task-open-questions",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "refine",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-7",
+      "type": "flows-to",
+      "source": "task-plan",
+      "target": "task-semantic-zoom",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "next",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-8",
+      "type": "flows-to",
+      "source": "task-semantic-zoom",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "extends criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-9",
+      "type": "relates",
+      "source": "task-open-questions",
+      "target": "task-save-policy",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "answer Q1",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-10",
+      "type": "flows-to",
+      "source": "task-save-policy",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "adds scope",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-11",
+      "type": "flows-to",
+      "source": "task-save-policy",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "criteria update",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-12",
+      "type": "relates",
+      "source": "task-open-questions",
+      "target": "task-dictionary-security",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "answer Q2/security",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-13",
+      "type": "flows-to",
+      "source": "task-save-policy",
+      "target": "task-dictionary-security",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "trust boundary",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-14",
+      "type": "flows-to",
+      "source": "task-dictionary-security",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "policy to implementation",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-15",
+      "type": "flows-to",
+      "source": "task-dictionary-security",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "security criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-16",
+      "type": "flows-to",
+      "source": "task-open-questions",
+      "target": "task-expansion-scope",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "answer Q3",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-17",
+      "type": "flows-to",
+      "source": "task-dictionary-security",
+      "target": "task-expansion-scope",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "scope boundary",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-18",
+      "type": "flows-to",
+      "source": "task-expansion-scope",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation rule",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-19",
+      "type": "flows-to",
+      "source": "task-expansion-scope",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "test criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-20",
+      "type": "flows-to",
+      "source": "task-open-questions",
+      "target": "task-ui-parity-execution",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "answer Q5",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-21",
+      "type": "flows-to",
+      "source": "task-expansion-scope",
+      "target": "task-ui-parity-execution",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "consistency",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-22",
+      "type": "flows-to",
+      "source": "task-ui-parity-execution",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "UI + policy tasks",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-23",
+      "type": "flows-to",
+      "source": "task-ui-parity-execution",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-24",
+      "type": "flows-to",
+      "source": "task-ui-parity-execution",
+      "target": "task-gaps-contract-tests",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "remaining gaps",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-25",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "add work items",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-26",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "add verification",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-27",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-expansion-contract",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "define contract",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-28",
+      "type": "flows-to",
+      "source": "task-expansion-contract",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation input",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-29",
+      "type": "flows-to",
+      "source": "task-expansion-contract",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "API criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-30",
+      "type": "flows-to",
+      "source": "task-expansion-contract",
+      "target": "task-safe-merge-idempotency",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "safe merge policy",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-31",
+      "type": "flows-to",
+      "source": "task-safe-merge-idempotency",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation details",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-32",
+      "type": "flows-to",
+      "source": "task-safe-merge-idempotency",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "idempotency criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-33",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-attach-layout-policy",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "close layout gap",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-34",
+      "type": "flows-to",
+      "source": "task-safe-merge-idempotency",
+      "target": "task-attach-layout-policy",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "placement strategy",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-35",
+      "type": "flows-to",
+      "source": "task-attach-layout-policy",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "layout implementation",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-36",
+      "type": "flows-to",
+      "source": "task-attach-layout-policy",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "layout criteria",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-37",
+      "type": "flows-to",
+      "source": "task-dictionary-security",
+      "target": "task-remote-trust-gating-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "enforcement details",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-38",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-remote-trust-gating-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "close trust gap",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-39",
+      "type": "flows-to",
+      "source": "task-remote-trust-gating-v1",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation tasks",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-40",
+      "type": "flows-to",
+      "source": "task-remote-trust-gating-v1",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "security acceptance",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-41",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-rollback-semantics-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "close rollback gap",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-42",
+      "type": "flows-to",
+      "source": "task-expansion-contract",
+      "target": "task-rollback-semantics-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "transaction behavior",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-43",
+      "type": "flows-to",
+      "source": "task-rollback-semantics-v1",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-44",
+      "type": "flows-to",
+      "source": "task-rollback-semantics-v1",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "verification",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-45",
+      "type": "flows-to",
+      "source": "task-remote-trust-gating-v1",
+      "target": "task-trust-persistence-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "persistence model",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-46",
+      "type": "flows-to",
+      "source": "task-gaps-contract-tests",
+      "target": "task-trust-persistence-v1",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "close persistence gap",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-47",
+      "type": "flows-to",
+      "source": "task-trust-persistence-v1",
+      "target": "task-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implementation",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-48",
+      "type": "flows-to",
+      "source": "task-trust-persistence-v1",
+      "target": "task-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "verification",
+      "style": {
+        "curved": true,
+        "route": "curved",
+        "width": 2
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-smoke-1",
+      "type": "reference",
+      "source": "task-plan",
+      "target": "task-port-phase5-export-smoke",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "smoke",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-smoke-2",
+      "type": "reference",
+      "source": "task-plan",
+      "target": "task-port-phase4-trust-smoke",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "trust",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-task-smoke-3",
+      "type": "reference",
+      "source": "task-plan",
+      "target": "task-port-expansion-fragment-target",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "fragment",
+      "style": {
+        "width": 2,
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ],
+  "timestamp": "2026-03-13T06:46:40.823Z",
+  "nodeCount": 24,
+  "edgeCount": 51
+}

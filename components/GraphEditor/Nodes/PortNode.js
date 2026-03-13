@@ -6,6 +6,7 @@ import FixedNode from "./FixedNode";
 import useNodePortSchema from "../hooks/useNodePortSchema";
 import eventBus from "../../NodeGraph/eventBus";
 import { parsePortEndpoint, endpointToUrl } from "../utils/portEndpoint";
+import { readExpansionState, resolveExpansionTarget } from "./expansionUtils";
 
 const DEFAULT_INPUTS = [{ key: "in", label: "In", type: "value" }];
 const DEFAULT_OUTPUTS = [{ key: "out", label: "Out", type: "value" }];
@@ -82,6 +83,72 @@ const PortNode = (props) => {
     ? buildTargetLabel(target)
     : buildTargetLabel(fallbackTarget);
   const displayLabel = node?.label || "Port";
+  const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
+  const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
+  const [expansionBusy, setExpansionBusy] = useState(false);
+  const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
+  const [expansionError, setExpansionError] = useState("");
+
+  const readGraphApi = useCallback(() => {
+    if (typeof window === "undefined") return null;
+    return window.graphAPI?._raw || window.graphAPIRaw || window.graphAPI || null;
+  }, []);
+
+  const refreshExpansionState = useCallback(() => {
+    if (!node?.id || !canExpand) {
+      setExpansionState({ expanded: false, expansionId: null, expansionKey: "" });
+      return;
+    }
+    const api = readGraphApi();
+    setExpansionState(readExpansionState(api, node.id, expansionTarget));
+  }, [canExpand, expansionTarget, node?.id, readGraphApi]);
+
+  useEffect(() => {
+    refreshExpansionState();
+  }, [refreshExpansionState]);
+
+  useEffect(() => {
+    const handleExpansionStateChanged = (payload = {}) => {
+      if (!node?.id) return;
+      if (payload?.sourceNodeId && payload.sourceNodeId !== node.id) return;
+      refreshExpansionState();
+    };
+    eventBus.on("expansionStateChanged", handleExpansionStateChanged);
+    return () => eventBus.off("expansionStateChanged", handleExpansionStateChanged);
+  }, [node?.id, refreshExpansionState]);
+
+  const handleToggleExpansion = useCallback(
+    async (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      if (!node?.id || !canExpand || expansionBusy) return;
+      const api = readGraphApi();
+      if (!api) return;
+      setExpansionBusy(true);
+      try {
+        setExpansionError("");
+        if (expansionState.expanded && expansionState.expansionId && typeof api.collapseExpansion === "function") {
+          const result = await api.collapseExpansion({ expansionId: expansionState.expansionId, sourceNodeId: node.id });
+          if (result && result.success === false) {
+            setExpansionError(result.error || result.data?.message || "Collapse failed");
+          }
+        } else if (typeof api.expandReference === "function") {
+          const result = await api.expandReference({
+            sourceNodeId: node.id,
+            target: expansionTarget,
+            options: { layout: "attach-right", dedupe: true }
+          });
+          if (result && result.success === false) {
+            setExpansionError(result.error || result.data?.message || "Expansion failed");
+          }
+        }
+      } finally {
+        setExpansionBusy(false);
+        refreshExpansionState();
+      }
+    },
+    [canExpand, expansionBusy, expansionState.expanded, expansionState.expansionId, expansionTarget, node?.id, readGraphApi, refreshExpansionState]
+  );
 
   const endpointResult = useMemo(
     () => parsePortEndpoint((target?.endpoint || "").trim()),
@@ -302,8 +369,53 @@ const PortNode = (props) => {
           >
             {targetLabel}
           </div>
+          {canExpand && expansionState.expanded ? (
+            <div
+              style={{
+                fontSize: 10,
+                lineHeight: 1.2,
+                color: theme.palette.success.main,
+                fontWeight: 600
+              }}
+            >
+              Expanded branch
+            </div>
+          ) : null}
+          {canExpand && expansionError ? (
+            <div
+              style={{
+                fontSize: 10,
+                lineHeight: 1.2,
+                color: theme.palette.error.main,
+                fontWeight: 600
+              }}
+              title={expansionError}
+            >
+              {expansionError}
+            </div>
+          ) : null}
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          {canExpand ? (
+            <button
+              type="button"
+              onClick={handleToggleExpansion}
+              disabled={expansionBusy}
+              style={{
+                borderRadius: 6,
+                border: `1px solid ${theme.palette.divider}`,
+                background: "transparent",
+                color: theme.palette.text.primary,
+                padding: "4px 8px",
+                fontSize: 11,
+                cursor: expansionBusy ? "default" : "pointer",
+                opacity: expansionBusy ? 0.6 : 1
+              }}
+              title={expansionState.expanded ? "Collapse expanded branch" : "Expand referenced fragment"}
+            >
+              {expansionBusy ? "..." : expansionState.expanded ? "Collapse" : "Expand"}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={handleNavigate}

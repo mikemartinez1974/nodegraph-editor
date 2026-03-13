@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils.js';
 import eventBus from '../NodeGraph/eventBus.js';
+import { parsePortEndpoint, endpointToUrl } from './utils/portEndpoint.js';
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -691,6 +692,96 @@ const applyEdgeUpdates = (edge, updates = {}) => {
   }
   return mergedEdge;
 };
+
+const EXPANSION_ERROR = Object.freeze({
+  INVALID_TARGET: 'INVALID_TARGET',
+  UNSUPPORTED_MODE: 'UNSUPPORTED_MODE',
+  EXPANSION_LIMIT_EXCEEDED: 'EXPANSION_LIMIT_EXCEEDED',
+  REF_FETCH_FAILED: 'REF_FETCH_FAILED',
+  TRUST_POLICY_BLOCKED: 'TRUST_POLICY_BLOCKED',
+  ID_COLLISION_UNRESOLVED: 'ID_COLLISION_UNRESOLVED',
+  TRANSACTION_ROLLBACK: 'TRANSACTION_ROLLBACK'
+});
+
+const normalizeExpansionTarget = (target = {}) => {
+  if (!target || typeof target !== 'object') return null;
+  const kind = typeof target.kind === 'string' ? target.kind.trim().toLowerCase() : '';
+  const mode = typeof target.mode === 'string' ? target.mode.trim().toLowerCase() : 'expand';
+  const endpointRaw = typeof target.endpoint === 'string' ? target.endpoint.trim() : '';
+  const targetRef = typeof target.ref === 'string' ? target.ref.trim() : '';
+  let ref = targetRef;
+  let entryPort =
+    typeof target.entryPort === 'string' && target.entryPort.trim() ? target.entryPort.trim() : 'root';
+  if (!ref && endpointRaw) {
+    const parsed = parsePortEndpoint(endpointRaw);
+    if (parsed.ok && parsed.value?.filePath) {
+      ref = endpointToUrl(parsed.value.filePath);
+      if (parsed.value.portId) entryPort = parsed.value.portId;
+    } else {
+      ref = endpointToUrl(endpointRaw);
+    }
+  }
+  const trustMode =
+    typeof target.trustMode === 'string' && target.trustMode.trim()
+      ? target.trustMode.trim().toLowerCase()
+      : 'untrusted';
+  const expectedHash = typeof target.expectedHash === 'string' ? target.expectedHash.trim() : '';
+  return {
+    kind: kind || 'fragment',
+    mode,
+    ref,
+    entryPort,
+    trustMode,
+    expectedHash
+  };
+};
+
+const hashExpansionKey = (value = '') => {
+  let hash = 0;
+  const input = String(value);
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash).toString(36);
+};
+
+const createExpansionId = (expansionKey) => `exp_${hashExpansionKey(expansionKey)}`;
+
+const resolveSourceTargetFromNode = (sourceNode) => {
+  const data = sourceNode?.data && typeof sourceNode.data === 'object' ? sourceNode.data : {};
+  const nestedTarget = data?.target && typeof data.target === 'object' ? data.target : {};
+  const ref = firstNonEmptyString(
+    nestedTarget.ref,
+    nestedTarget.url,
+    data.ref,
+    data.src,
+    data.graphUrl,
+    data.url
+  );
+  const endpoint = firstNonEmptyString(nestedTarget.endpoint, data.endpoint);
+  const mode = firstNonEmptyString(nestedTarget.mode, data.mode, 'expand');
+  const kind = firstNonEmptyString(nestedTarget.kind, data.kind, 'fragment');
+  const trustMode = firstNonEmptyString(nestedTarget.trustMode, data.trustMode, 'untrusted');
+  const expectedHash = firstNonEmptyString(nestedTarget.expectedHash, data.expectedHash);
+  return {
+    ref,
+    endpoint,
+    mode,
+    kind,
+    entryPort: firstNonEmptyString(nestedTarget.portId, nestedTarget.handleId, nestedTarget.entryPort, 'root'),
+    trustMode,
+    expectedHash
+  };
+};
+
+const DEFAULT_EXPANSION_TRUST_POLICY = Object.freeze({
+  strict: false,
+  allowProtocols: ['github', 'https', 'local', 'tlz', 'relative'],
+  allowHosts: [],
+  allowGithubRepos: [],
+  blockHttp: true,
+  maxFetchBytes: 2_000_000
+});
 
 /**
  * CRUD API for Node Graph Editor
@@ -2324,6 +2415,660 @@ export default class GraphCRUD {
   }
 
   // ==================== HELPER METHODS ====================
+
+  async expandReference(payload = {}) {
+    try {
+      const sourceNodeId =
+        typeof payload?.sourceNodeId === 'string' && payload.sourceNodeId.trim()
+          ? payload.sourceNodeId.trim()
+          : '';
+      const options = isPlainObject(payload?.options) ? payload.options : {};
+      const maxNodes = options.maxNodes === undefined ? 200 : toNumber(options.maxNodes);
+      const maxEdges = options.maxEdges === undefined ? 400 : toNumber(options.maxEdges);
+      const sourceNode = this.getNodes().find((node) => node.id === sourceNodeId);
+      if (!sourceNode) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.INVALID_TARGET,
+          `Source node "${sourceNodeId}" was not found`,
+          { sourceNodeId }
+        );
+      }
+
+      const sourceTarget = resolveSourceTargetFromNode(sourceNode);
+      const directTarget = isPlainObject(payload?.target) ? payload.target : {};
+      const target = normalizeExpansionTarget({ ...sourceTarget, ...directTarget });
+      if (!sourceNodeId || !target || !target.ref) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.INVALID_TARGET,
+          'expandReference requires sourceNodeId and target.ref',
+          { sourceNodeId, target }
+        );
+      }
+
+      if (target.mode !== 'expand') {
+        return this._expansionFailure(
+          EXPANSION_ERROR.UNSUPPORTED_MODE,
+          `expandReference does not support target.mode="${target.mode}"`,
+          { target }
+        );
+      }
+
+      if (target.kind !== 'fragment') {
+        return this._expansionFailure(
+          EXPANSION_ERROR.UNSUPPORTED_MODE,
+          `expandReference only supports target.kind="fragment" in v1 (received "${target.kind || 'unknown'}")`,
+          { target }
+        );
+      }
+
+      if (!this._isExpansionRefAllowed(target.ref)) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.TRUST_POLICY_BLOCKED,
+          `Reference "${target.ref}" is blocked by trust policy`,
+          { target }
+        );
+      }
+
+      if (maxNodes === null || maxNodes <= 0 || maxEdges === null || maxEdges <= 0) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.EXPANSION_LIMIT_EXCEEDED,
+          'options.maxNodes and options.maxEdges must be positive numbers',
+          { maxNodes: options.maxNodes, maxEdges: options.maxEdges }
+        );
+      }
+
+      const expansionKey = [sourceNodeId, target.ref, target.entryPort, target.mode].join('::');
+      const existingExpansionNode = this.getNodes().find((node) => node?.data?._expansion?.expandKey === expansionKey);
+      if (existingExpansionNode) {
+        return this._expansionSuccess({
+          expansionId: existingExpansionNode?.data?._expansion?.expansionId || null,
+          added: { nodes: 0, edges: 0 },
+          skipped: true,
+          reason: 'already-expanded',
+          expandKey: expansionKey
+        });
+      }
+
+      const {
+        nodes: fragmentNodes,
+        edges: fragmentEdges,
+        fetchMeta
+      } = await this._resolveExpansionGraph(payload, target);
+      if (typeof target.expectedHash === 'string' && target.expectedHash.trim()) {
+        const expected = target.expectedHash.trim().toLowerCase();
+        const actual = String(fetchMeta?.hash || '').toLowerCase();
+        if (expected && actual && expected !== actual) {
+          return this._expansionFailure(
+            EXPANSION_ERROR.TRUST_POLICY_BLOCKED,
+            `Integrity hash mismatch for "${target.ref}"`,
+            { expectedHash: expected, actualHash: actual }
+          );
+        }
+      }
+      if (fragmentNodes.length > maxNodes || fragmentEdges.length > maxEdges) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.EXPANSION_LIMIT_EXCEEDED,
+          `Expansion exceeds limits (nodes=${fragmentNodes.length}/${maxNodes}, edges=${fragmentEdges.length}/${maxEdges})`,
+          {
+            maxNodes,
+            maxEdges,
+            received: { nodes: fragmentNodes.length, edges: fragmentEdges.length }
+          }
+        );
+      }
+
+      const expansionId = createExpansionId(expansionKey);
+      const existingNodes = this.getNodes();
+      const existingEdges = this.getEdges();
+      const existingNodeIds = new Set(existingNodes.map((node) => node.id));
+      const existingEdgeIds = new Set(existingEdges.map((edge) => edge.id));
+      const runtimeNodeIdMap = new Map();
+      const materializedNodes = [];
+      const nowIso = new Date().toISOString();
+      const expansionMeta = {
+        expansionId,
+        expandKey: expansionKey,
+        sourceNodeId,
+        sourceRef: target.ref,
+        entryPort: target.entryPort || 'root',
+        trustMode: target.trustMode || 'untrusted',
+        injectedBy: 'expandReference',
+        createdAt: nowIso,
+        sourceOrigin: fetchMeta?.origin || '',
+        sourceHash: fetchMeta?.hash || '',
+        sourceBytes: fetchMeta?.bytes || 0
+      };
+
+      for (let index = 0; index < fragmentNodes.length; index += 1) {
+        const node = fragmentNodes[index];
+        const canonicalId = String(node?.id || `node-${index}`);
+        const runtimeId = `${expansionId}:${canonicalId}`;
+        if (existingNodeIds.has(runtimeId) || runtimeNodeIdMap.has(canonicalId)) {
+          return this._expansionFailure(
+            EXPANSION_ERROR.ID_COLLISION_UNRESOLVED,
+            `Runtime node id collision for canonicalId "${canonicalId}"`,
+            { canonicalId, runtimeId }
+          );
+        }
+        runtimeNodeIdMap.set(canonicalId, runtimeId);
+        existingNodeIds.add(runtimeId);
+        const nodeData = isPlainObject(node?.data) ? cloneValue(node.data) : {};
+        const position = node?.position && Number.isFinite(node.position.x) && Number.isFinite(node.position.y)
+          ? { x: node.position.x, y: node.position.y }
+          : { x: index * 40, y: index * 40 };
+        materializedNodes.push({
+          ...cloneValue(node),
+          id: runtimeId,
+          position,
+          data: {
+            ...nodeData,
+            _origin: {
+              canonicalId,
+              ref: target.ref,
+              instanceId: expansionId
+            },
+            _expansion: cloneValue(expansionMeta)
+          }
+        });
+      }
+
+      const layoutMode = typeof options.layout === 'string' && options.layout.trim()
+        ? options.layout.trim().toLowerCase()
+        : 'attach-right';
+      const offset = this._computeExpansionOffset(sourceNode, materializedNodes, layoutMode);
+      const shiftedNodes = materializedNodes.map((node) => ({
+        ...node,
+        position: {
+          x: (node.position?.x || 0) + offset.x,
+          y: (node.position?.y || 0) + offset.y
+        }
+      }));
+
+      const materializedEdges = [];
+      for (let index = 0; index < fragmentEdges.length; index += 1) {
+        const edge = fragmentEdges[index];
+        const canonicalSource = String(edge?.source || '');
+        const canonicalTarget = String(edge?.target || '');
+        const source = runtimeNodeIdMap.get(canonicalSource);
+        const targetNodeId = runtimeNodeIdMap.get(canonicalTarget);
+        if (!source || !targetNodeId) continue;
+
+        const canonicalEdgeId = String(edge?.id || `edge-${index}`);
+        let runtimeEdgeId = `${expansionId}:edge:${canonicalEdgeId}`;
+        let suffix = 1;
+        while (existingEdgeIds.has(runtimeEdgeId)) {
+          runtimeEdgeId = `${expansionId}:edge:${canonicalEdgeId}:${suffix}`;
+          suffix += 1;
+        }
+        existingEdgeIds.add(runtimeEdgeId);
+
+        const edgeData = isPlainObject(edge?.data) ? cloneValue(edge.data) : {};
+        materializedEdges.push({
+          ...cloneValue(edge),
+          id: runtimeEdgeId,
+          source,
+          target: targetNodeId,
+          sourcePort: edge?.sourcePort || 'root',
+          targetPort: edge?.targetPort || 'root',
+          data: {
+            ...edgeData,
+            _origin: {
+              canonicalId: canonicalEdgeId,
+              ref: target.ref,
+              instanceId: expansionId
+            },
+            _expansion: cloneValue(expansionMeta)
+          }
+        });
+      }
+
+      const entryNode = this._resolveExpansionEntryNode(shiftedNodes);
+      if (!entryNode?.id) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.INVALID_TARGET,
+          'Expanded fragment did not include a valid entry node',
+          { expansionId }
+        );
+      }
+      const attachEdgeId = this._generateUniqueEdgeId(existingEdgeIds);
+      materializedEdges.push({
+        id: attachEdgeId,
+        source: sourceNodeId,
+        target: entryNode.id,
+        sourcePort: 'root',
+        targetPort: target.entryPort || 'root',
+        type: 'expands-to',
+        label: '',
+        data: {
+          _expansion: cloneValue(expansionMeta)
+        },
+        style: {
+          width: 2,
+          dash: [6, 4],
+          curved: true
+        }
+      });
+
+      const nextNodes = deduplicateNodes([...existingNodes, ...shiftedNodes]);
+      const nextEdges = [...existingEdges, ...materializedEdges];
+      this.setNodes(() => {
+        if (this.nodesRef) this.nodesRef.current = nextNodes;
+        return nextNodes;
+      });
+      this.setEdges(() => {
+        if (this.edgesRef) this.edgesRef.current = nextEdges;
+        return nextEdges;
+      });
+      this.saveToHistory(nextNodes, nextEdges);
+      try {
+        eventBus.emit('expansionStateChanged', {
+          action: 'expanded',
+          sourceNodeId,
+          expansionId,
+          expandKey: expansionKey
+        });
+      } catch {}
+
+      return this._expansionSuccess({
+        expansionId,
+        added: { nodes: shiftedNodes.length, edges: materializedEdges.length },
+        skipped: false,
+        reason: null,
+        expandKey: expansionKey,
+        entryNodeId: entryNode.id,
+        trust: {
+          origin: fetchMeta?.origin || '',
+          hash: fetchMeta?.hash || '',
+          bytes: fetchMeta?.bytes || 0
+        }
+      });
+    } catch (error) {
+      if (error?.code === EXPANSION_ERROR.REF_FETCH_FAILED) {
+        return this._expansionFailure(EXPANSION_ERROR.REF_FETCH_FAILED, error.message);
+      }
+      return this._expansionFailure(EXPANSION_ERROR.TRANSACTION_ROLLBACK, error.message);
+    }
+  }
+
+  async _resolveExpansionGraph(payload = {}, target = {}) {
+    const inlineGraph = isPlainObject(payload?.fragment)
+      ? payload.fragment
+      : isPlainObject(payload?.graph)
+      ? payload.graph
+      : null;
+    if (inlineGraph) {
+      return this._parseExpansionGraphPayload(inlineGraph);
+    }
+    if (typeof payload?.fragmentText === 'string' && payload.fragmentText.trim()) {
+      return this._parseExpansionGraphPayload(payload.fragmentText);
+    }
+    const fetched = await this._fetchExpansionRefText(target.ref, payload?.branch);
+    return {
+      ...this._parseExpansionGraphPayload(fetched.text),
+      fetchMeta: fetched
+    };
+  }
+
+  async _fetchExpansionRefText(ref, preferredBranch) {
+    const raw = String(ref || '').trim();
+    if (!raw) {
+      const error = new Error('Expansion ref is empty');
+      error.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+      throw error;
+    }
+
+    const trustPolicy = this._getExpansionTrustPolicy();
+    const maxFetchBytes = toNumber(trustPolicy.maxFetchBytes) || DEFAULT_EXPANSION_TRUST_POLICY.maxFetchBytes;
+
+    if (raw.startsWith('github://')) {
+      const parsed = this._parseGithubRef(raw);
+      if (!parsed) {
+        const error = new Error(`Invalid github ref "${raw}"`);
+        error.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+        throw error;
+      }
+      const branchCandidates = [];
+      if (typeof preferredBranch === 'string' && preferredBranch.trim()) {
+        branchCandidates.push(preferredBranch.trim());
+      }
+      branchCandidates.push('main', 'master');
+      const tried = new Set();
+      for (const branch of branchCandidates) {
+        if (!branch || tried.has(branch)) continue;
+        tried.add(branch);
+        const safePath = parsed.path
+          .split('/')
+          .map((segment) => encodeURIComponent(segment))
+          .join('/');
+        const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(parsed.owner)}/${encodeURIComponent(parsed.repo)}/${encodeURIComponent(branch)}/${safePath}`;
+        const response = await fetch(rawUrl);
+        if (response.ok) {
+          const text = await response.text();
+          const bytes = new TextEncoder().encode(text).length;
+          if (bytes > maxFetchBytes) {
+            const error = new Error(`Fetched content exceeds maxFetchBytes (${bytes}/${maxFetchBytes})`);
+            error.code = EXPANSION_ERROR.TRUST_POLICY_BLOCKED;
+            throw error;
+          }
+          return {
+            text,
+            origin: `github://${parsed.owner}/${parsed.repo}`,
+            resolvedRef: `github://${parsed.owner}/${parsed.repo}/${parsed.path}`,
+            bytes,
+            hash: await this._computeExpansionHash(text)
+          };
+        }
+      }
+      const error = new Error(`Unable to fetch github ref "${raw}"`);
+      error.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+      throw error;
+    }
+
+    const fetchUrl = this._toFetchableRef(raw);
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+      const error = new Error(`Failed to fetch "${raw}" (HTTP ${response.status})`);
+      error.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+      throw error;
+    }
+    const text = await response.text();
+    const bytes = new TextEncoder().encode(text).length;
+    if (bytes > maxFetchBytes) {
+      const error = new Error(`Fetched content exceeds maxFetchBytes (${bytes}/${maxFetchBytes})`);
+      error.code = EXPANSION_ERROR.TRUST_POLICY_BLOCKED;
+      throw error;
+    }
+    const origin = this._resolveExpansionOrigin(fetchUrl);
+    return {
+      text,
+      origin,
+      resolvedRef: fetchUrl,
+      bytes,
+      hash: await this._computeExpansionHash(text)
+    };
+  }
+
+  _parseExpansionGraphPayload(payload) {
+    let graph = payload;
+    if (typeof payload === 'string') {
+      try {
+        graph = JSON.parse(payload);
+      } catch (error) {
+        const err = new Error(`Expansion payload is not valid JSON: ${error.message}`);
+        err.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+        throw err;
+      }
+    }
+    if (!isPlainObject(graph)) {
+      const err = new Error('Expansion payload must be an object');
+      err.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+      throw err;
+    }
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes.map((node) => cloneValue(node)) : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges.map((edge) => cloneValue(edge)) : [];
+    if (nodes.length === 0) {
+      const err = new Error('Expansion graph has no nodes');
+      err.code = EXPANSION_ERROR.REF_FETCH_FAILED;
+      throw err;
+    }
+    return { nodes, edges };
+  }
+
+  _isExpansionRefAllowed(ref) {
+    const raw = String(ref || '').trim();
+    if (!raw) return false;
+    const policy = this._getExpansionTrustPolicy();
+    const kind = this._classifyExpansionRef(raw);
+    if (kind === 'http' && policy.blockHttp) return false;
+
+    const allowedProtocols = new Set((Array.isArray(policy.allowProtocols) ? policy.allowProtocols : []).map((item) => String(item || '').toLowerCase()));
+    if (allowedProtocols.size > 0 && !allowedProtocols.has(kind)) {
+      return false;
+    }
+
+    if (kind === 'github') {
+      const parsed = this._parseGithubRef(raw);
+      if (!parsed) return false;
+      const repoKey = `${parsed.owner}/${parsed.repo}`.toLowerCase();
+      const allowRepos = Array.isArray(policy.allowGithubRepos) ? policy.allowGithubRepos : [];
+      if (policy.strict && allowRepos.length > 0 && !allowRepos.some((entry) => String(entry || '').toLowerCase() === repoKey)) {
+        return false;
+      }
+      return true;
+    }
+
+    if ((kind === 'https' || kind === 'http') && policy.strict) {
+      const host = this._extractRefHost(raw);
+      const allowHosts = Array.isArray(policy.allowHosts) ? policy.allowHosts : [];
+      if (allowHosts.length > 0 && !allowHosts.some((entry) => String(entry || '').toLowerCase() === host)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  _toFetchableRef(ref) {
+    const raw = String(ref || '').trim();
+    if (raw.startsWith('local://')) {
+      const localPath = raw.slice('local://'.length).replace(/^\/+/, '');
+      return `/${localPath}`;
+    }
+    if (raw.startsWith('tlz://')) {
+      const rest = raw.slice('tlz://'.length);
+      if (rest.startsWith('/')) return rest;
+      if (rest.includes('/')) return `https://${rest}`;
+      return `/${rest}`;
+    }
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw) || raw.startsWith('/')) return raw;
+    return `/${raw.replace(/^\/+/, '')}`;
+  }
+
+  _parseGithubRef(ref) {
+    if (typeof ref !== 'string' || !ref.startsWith('github://')) return null;
+    const raw = ref.slice('github://'.length);
+    const [owner = '', repo = '', ...pathParts] = raw.split('/');
+    if (!owner || !repo) return null;
+    let path = pathParts.join('/').replace(/^\/+/, '');
+    if (!path || path.endsWith('/')) path = `${path}root.node`;
+    return { owner, repo, path };
+  }
+
+  _classifyExpansionRef(ref) {
+    const raw = String(ref || '').trim();
+    if (raw.startsWith('github://')) return 'github';
+    if (raw.startsWith('local://')) return 'local';
+    if (raw.startsWith('tlz://')) return 'tlz';
+    if (raw.startsWith('https://')) return 'https';
+    if (raw.startsWith('http://')) return 'http';
+    if (raw.startsWith('/') || raw.startsWith('./') || raw.startsWith('../')) return 'relative';
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw)) return 'relative';
+    return 'unknown';
+  }
+
+  _extractRefHost(ref) {
+    try {
+      return new URL(ref).hostname.toLowerCase();
+    } catch {
+      return '';
+    }
+  }
+
+  _resolveExpansionOrigin(fetchRef) {
+    const raw = String(fetchRef || '').trim();
+    if (!raw) return '';
+    if (raw.startsWith('/')) return 'local://';
+    try {
+      const parsed = new URL(raw, typeof window !== 'undefined' ? window.location.origin : undefined);
+      return `${parsed.protocol}//${parsed.host}`;
+    } catch {
+      return raw;
+    }
+  }
+
+  _getExpansionTrustPolicy() {
+    const nodes = this.getNodes();
+    const manifest = Array.isArray(nodes) ? nodes.find((node) => node?.type === 'manifest') : null;
+    const rawPolicy = manifest?.data?.settings?.expansionTrust;
+    if (!rawPolicy || typeof rawPolicy !== 'object') {
+      return { ...DEFAULT_EXPANSION_TRUST_POLICY };
+    }
+    return {
+      ...DEFAULT_EXPANSION_TRUST_POLICY,
+      ...rawPolicy
+    };
+  }
+
+  async _computeExpansionHash(text = '') {
+    const value = String(text ?? '');
+    if (typeof crypto !== 'undefined' && crypto?.subtle && typeof TextEncoder !== 'undefined') {
+      const encoded = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', encoded);
+      const bytes = Array.from(new Uint8Array(digest));
+      return bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    }
+    return hashExpansionKey(value);
+  }
+
+  _resolveExpansionEntryNode(nodes = []) {
+    if (!Array.isArray(nodes) || nodes.length === 0) return null;
+    const explicit = nodes.find((node) => node?.isRoot || node?.data?.isRoot || node?.data?.root);
+    if (explicit) return explicit;
+    const manifest = nodes.find((node) => node?.type === 'manifest');
+    if (manifest) return manifest;
+    return nodes[0];
+  }
+
+  _computeExpansionOffset(sourceNode, nodes = [], layoutMode = 'attach-right') {
+    if (!Array.isArray(nodes) || nodes.length === 0) return { x: 0, y: 0 };
+    if (layoutMode === 'none' || layoutMode === 'preserve') return { x: 0, y: 0 };
+    const points = nodes
+      .map((node) => node?.position)
+      .filter((position) => position && Number.isFinite(position.x) && Number.isFinite(position.y));
+    if (points.length === 0) return { x: 0, y: 0 };
+    const minX = Math.min(...points.map((position) => position.x));
+    const minY = Math.min(...points.map((position) => position.y));
+    const maxY = Math.max(...points.map((position) => position.y));
+
+    const sourceX = Number.isFinite(sourceNode?.position?.x) ? sourceNode.position.x : 0;
+    const sourceY = Number.isFinite(sourceNode?.position?.y) ? sourceNode.position.y : 0;
+    const sourceWidth = Number.isFinite(sourceNode?.width) ? sourceNode.width : 220;
+    const sourceHeight = Number.isFinite(sourceNode?.height) ? sourceNode.height : 140;
+    const gap = 100;
+    const targetX = sourceX + sourceWidth + gap;
+    const sourceCenterY = sourceY + sourceHeight / 2;
+    const fragmentCenterY = (minY + maxY) / 2;
+    return {
+      x: targetX - minX,
+      y: sourceCenterY - fragmentCenterY
+    };
+  }
+
+  _generateUniqueEdgeId(existingIds) {
+    let id = this._generateId();
+    while (existingIds.has(id)) {
+      id = this._generateId();
+    }
+    existingIds.add(id);
+    return id;
+  }
+
+  collapseExpansion(payload = {}) {
+    try {
+      const expansionId =
+        typeof payload?.expansionId === 'string' && payload.expansionId.trim()
+          ? payload.expansionId.trim()
+          : '';
+      if (!expansionId) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.INVALID_TARGET,
+          'collapseExpansion requires expansionId'
+        );
+      }
+
+      const currentNodes = this.getNodes();
+      const currentEdges = this.getEdges();
+      const nodeIdsToRemove = new Set(
+        currentNodes
+          .filter((node) => node?.data?._expansion?.expansionId === expansionId)
+          .map((node) => node.id)
+      );
+      const edgeIdsToRemove = new Set(
+        currentEdges
+          .filter((edge) => edge?.data?._expansion?.expansionId === expansionId)
+          .map((edge) => edge.id)
+      );
+
+      if (nodeIdsToRemove.size === 0 && edgeIdsToRemove.size === 0) {
+        return this._expansionSuccess({
+          expansionId,
+          removed: { nodes: 0, edges: 0 },
+          skipped: true,
+          reason: 'not-found'
+        });
+      }
+
+      const nextNodes = currentNodes.filter((node) => !nodeIdsToRemove.has(node.id));
+      const nextEdges = currentEdges.filter((edge) => {
+        if (edgeIdsToRemove.has(edge.id)) return false;
+        if (nodeIdsToRemove.has(edge.source)) return false;
+        if (nodeIdsToRemove.has(edge.target)) return false;
+        return true;
+      });
+
+      this.setNodes(() => {
+        if (this.nodesRef) this.nodesRef.current = nextNodes;
+        return nextNodes;
+      });
+      this.setEdges(() => {
+        if (this.edgesRef) this.edgesRef.current = nextEdges;
+        return nextEdges;
+      });
+      this.saveToHistory(nextNodes, nextEdges);
+      try {
+        eventBus.emit('expansionStateChanged', {
+          action: 'collapsed',
+          sourceNodeId: payload?.sourceNodeId || null,
+          expansionId
+        });
+      } catch {}
+
+      return this._expansionSuccess({
+        expansionId,
+        removed: {
+          nodes: currentNodes.length - nextNodes.length,
+          edges: currentEdges.length - nextEdges.length
+        },
+        skipped: false,
+        reason: null
+      });
+    } catch (error) {
+      return this._expansionFailure(EXPANSION_ERROR.TRANSACTION_ROLLBACK, error.message);
+    }
+  }
+
+  _expansionFailure(code, message, details) {
+    return {
+      success: false,
+      error: message,
+      code,
+      data: {
+        ok: false,
+        code,
+        message,
+        details: details || null
+      }
+    };
+  }
+
+  _expansionSuccess(data = {}) {
+    return {
+      success: true,
+      data: {
+        ok: true,
+        ...data
+      }
+    };
+  }
 
   executeNode(nodeId, meta = {}) {
     try {

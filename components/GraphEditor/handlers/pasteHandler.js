@@ -40,6 +40,8 @@ const estimateCrudImpact = (command = {}) => {
       return { nodes: count, edges: 0, clusters: 0 };
     }
     case 'skill':
+    case 'expandReference':
+    case 'collapseExpansion':
       return { nodes: 0, edges: 0, clusters: 0 };
     case 'batch':
     case 'transaction': {
@@ -627,6 +629,22 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         result = await graphCRUD.getStats();
         break;
 
+      case 'expandReference':
+        if (typeof graphCRUD.expandReference === 'function') {
+          result = await graphCRUD.expandReference(command.payload || command.data || command);
+        } else {
+          result = { success: false, error: 'expandReference is not supported' };
+        }
+        break;
+
+      case 'collapseExpansion':
+        if (typeof graphCRUD.collapseExpansion === 'function') {
+          result = await graphCRUD.collapseExpansion(command.payload || command.data || command);
+        } else {
+          result = { success: false, error: 'collapseExpansion is not supported' };
+        }
+        break;
+
       default:
         result = { success: false, error: `Unknown action: ${action}` };
     }
@@ -656,6 +674,12 @@ async function executeCRUDCommand(command, graphCRUD, onShowMessage) {
         const createdNodes = result.data?.createdNodes || [];
         const createdEdges = result.data?.createdEdges || [];
         return { nodes: createdNodes.length, edges: createdEdges.length, clusters: 0 };
+      } else if (action === 'expandReference') {
+        const added = result.data?.added || {};
+        return { nodes: added.nodes || 0, edges: added.edges || 0, clusters: 0 };
+      } else if (action === 'collapseExpansion') {
+        const removed = result.data?.removed || {};
+        return { nodes: removed.nodes || 0, edges: removed.edges || 0, clusters: 0 };
       }
 
       return { nodes: 0, edges: 0, clusters: 0 };

@@ -249,6 +249,14 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         const list = Array.isArray(ids) ? ids : [];
         emitExecutionIntent({ action: 'translateGroups', ids: list, delta });
         return { success: true, queued: true, data: { ids: list } };
+      },
+      expandReference: (payload = {}) => {
+        emitExecutionIntent({ action: 'expandReference', payload });
+        return { success: true, queued: true, data: { ok: true, queued: true } };
+      },
+      collapseExpansion: (payload = {}) => {
+        emitExecutionIntent({ action: 'collapseExpansion', payload });
+        return { success: true, queued: true, data: { ok: true, queued: true } };
       }
     };
 
