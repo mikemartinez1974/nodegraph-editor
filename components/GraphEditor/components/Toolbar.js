@@ -100,6 +100,8 @@ const Toolbar = ({
   showEdgePanel = false,
   mode,
   onModeChange,
+  interactionMode = 'browse',
+  onInteractionModeChange = () => {},
   onAlignSelection = () => false,
   onDistributeSelection = () => false,
   onShowMessage,
@@ -1256,6 +1258,31 @@ const Toolbar = ({
             isMobile={false}
             isFreeUser={isFreeUser}
           />
+        </ButtonGroup>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+        <ButtonGroup variant="contained" size="small">
+          <Button
+            size="small"
+            variant={interactionMode === 'browse' ? 'contained' : 'outlined'}
+            onClick={() => onInteractionModeChange('browse')}
+            startIcon={<DrawIcon fontSize="small" />}
+            title="Browse mode: clicks move focus and semantic context"
+            aria-label="Switch to browse mode"
+          >
+            Browse
+          </Button>
+          <Button
+            size="small"
+            variant={interactionMode === 'edit' ? 'contained' : 'outlined'}
+            onClick={() => onInteractionModeChange('edit')}
+            startIcon={<CreateIcon fontSize="small" />}
+            title="Edit mode: clicks select without moving semantic focus"
+            aria-label="Switch to edit mode"
+          >
+            Edit
+          </Button>
         </ButtonGroup>
 
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />

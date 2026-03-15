@@ -1,0 +1,377 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "structural-expansion-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -560,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "structural-expansion-context-task",
+          "name": "Structural Expansion Context Contract",
+          "version": "0.1.0",
+          "description": "Implementation plan for branch-safe, structural-only graph expansion.",
+          "createdAt": "2026-03-14T00:00:00.000Z",
+          "updatedAt": "2026-03-14T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "implementation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "structural-expansion-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -560,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "contract",
+            "intent": "runtime rule to enforce",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "phase",
+            "intent": "implementation step",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "accept",
+            "intent": "testable done condition",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "structural-expansion-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -560,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "structural-expansion-overview",
+      "type": "markdown",
+      "label": "Problem Statement",
+      "position": {
+        "x": 0,
+        "y": -180
+      },
+      "width": 440,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Structural Expansion Context Contract\n\n`expand` must project branch-safe structure into the host graph without importing remote graph authority, execution, or document-scoped system nodes."
+      },
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "structural-expansion-contract",
+      "type": "markdown",
+      "label": "Runtime Contract",
+      "position": {
+        "x": -60,
+        "y": 120
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Runtime Contract\n\nWhen `mode=expand`:\n- resolve target graph and requested entry surface\n- project only branch-safe nodes and edges\n- strip document-scoped system nodes\n- do not merge remote authority into host context\n- mark imported entities with projection metadata"
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "structural-expansion-phases",
+      "type": "markdown",
+      "label": "Implementation Phases",
+      "position": {
+        "x": 340,
+        "y": 120
+      },
+      "width": 380,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implementation Phases\n\n### Phase 1: Projection Normalizer\n- classify system nodes and execution-bearing nodes\n- strip or suppress them during expansion\n- preserve structural nodes and edges\n\n### Phase 2: Entry Surface Resolver\n- support graph-level `open` / `expand` handles\n- resolve handle -> node id with fallback chain\n\n### Phase 3: Execution Boundary\n- disable remote scripts/views/plugins by default in projected nodes\n- preserve provenance and trust metadata\n\n### Phase 4: UX + Validation\n- show clear warning when expanding a document-scoped graph\n- expose `Open at` / `Expand from` in document properties"
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "structural-expansion-open-questions",
+      "type": "markdown",
+      "label": "Implementation Questions",
+      "position": {
+        "x": 760,
+        "y": 120
+      },
+      "width": 340,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Remaining Questions\n\n- Which node types are stripped versus downgraded?\n- Should remote editor/node views be fully blocked or selectively allowed?\n- How should entry surfaces be stored in manifest/settings?\n- What warning text best explains document vs branch behavior?"
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "structural-expansion-acceptance",
+      "type": "markdown",
+      "label": "Acceptance Criteria",
+      "position": {
+        "x": 220,
+        "y": 520
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Acceptance Criteria\n\n- Expanding a full task/document graph does not import a second manifest, legend, or dictionary\n- Host graph execution context remains unchanged after expansion\n- Imported branch is visibly attached and collapsible\n- Port `navigate` still opens the full document graph\n- Entry handles select the intended expansion start without raw internal node ids\n- Validation warnings explain downgraded/stripped content clearly"
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "structural-expansion-edge-001",
+      "type": "relates",
+      "source": "structural-expansion-manifest",
+      "target": "structural-expansion-overview",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares"
+    },
+    {
+      "id": "structural-expansion-edge-002",
+      "type": "reference",
+      "source": "structural-expansion-overview",
+      "target": "structural-expansion-contract",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "contract"
+    },
+    {
+      "id": "structural-expansion-edge-003",
+      "type": "reference",
+      "source": "structural-expansion-overview",
+      "target": "structural-expansion-phases",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "plan"
+    },
+    {
+      "id": "structural-expansion-edge-004",
+      "type": "reference",
+      "source": "structural-expansion-contract",
+      "target": "structural-expansion-phases",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implement"
+    },
+    {
+      "id": "structural-expansion-edge-005",
+      "type": "reference",
+      "source": "structural-expansion-phases",
+      "target": "structural-expansion-open-questions",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "questions"
+    },
+    {
+      "id": "structural-expansion-edge-006",
+      "type": "reference",
+      "source": "structural-expansion-phases",
+      "target": "structural-expansion-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "done"
+    },
+    {
+      "id": "structural-expansion-edge-007",
+      "type": "reference",
+      "source": "structural-expansion-open-questions",
+      "target": "structural-expansion-acceptance",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "resolve"
+    }
+  ],
+  "timestamp": "2026-03-14T00:00:00.000Z",
+  "nodeCount": 8,
+  "edgeCount": 7
+}

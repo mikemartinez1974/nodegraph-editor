@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateUUID, ensureUniqueNodeIds, deduplicateNodes } from './utils/idUtils.js';
 import eventBus from '../NodeGraph/eventBus.js';
 import { parsePortEndpoint, endpointToUrl } from './utils/portEndpoint.js';
+import { validateGraphInvariants } from './validators/validateGraphInvariants.js';
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -699,9 +700,28 @@ const EXPANSION_ERROR = Object.freeze({
   EXPANSION_LIMIT_EXCEEDED: 'EXPANSION_LIMIT_EXCEEDED',
   REF_FETCH_FAILED: 'REF_FETCH_FAILED',
   TRUST_POLICY_BLOCKED: 'TRUST_POLICY_BLOCKED',
+  CONTEXT_INCOMPATIBLE: 'CONTEXT_INCOMPATIBLE',
   ID_COLLISION_UNRESOLVED: 'ID_COLLISION_UNRESOLVED',
   TRANSACTION_ROLLBACK: 'TRANSACTION_ROLLBACK'
 });
+
+const EXPANSION_BLOCKING_WARNING_CODES = new Set([
+  'HANDLE_NOT_FOUND',
+  'UNKNOWN_NODE',
+  'CLUSTER_UNKNOWN_NODE'
+]);
+
+const EXECUTION_BEARING_NODE_TYPES = new Set([
+  'script',
+  'api',
+  'background-rpc'
+]);
+
+const SYSTEM_NODE_TYPES = new Set([
+  'manifest',
+  'legend',
+  'dictionary'
+]);
 
 const normalizeExpansionTarget = (target = {}) => {
   if (!target || typeof target !== 'object') return null;
@@ -2416,6 +2436,44 @@ export default class GraphCRUD {
 
   // ==================== HELPER METHODS ====================
 
+  async assessContextCompatibility(payload = {}) {
+    try {
+      const sourceNodeId =
+        typeof payload?.sourceNodeId === 'string' && payload.sourceNodeId.trim()
+          ? payload.sourceNodeId.trim()
+          : '';
+      const sourceNode = sourceNodeId ? this.getNodes().find((node) => node.id === sourceNodeId) : null;
+      const sourceTarget = sourceNode ? resolveSourceTargetFromNode(sourceNode) : {};
+      const directTarget = isPlainObject(payload?.target) ? payload.target : {};
+      const target = normalizeExpansionTarget({ ...sourceTarget, ...directTarget });
+      if (!target || !target.ref) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.INVALID_TARGET,
+          'Context compatibility check requires target.ref',
+          { sourceNodeId, target }
+        );
+      }
+      if (!this._isExpansionRefAllowed(target.ref)) {
+        return this._expansionFailure(
+          EXPANSION_ERROR.TRUST_POLICY_BLOCKED,
+          `Reference "${target.ref}" is blocked by trust policy`,
+          { target }
+        );
+      }
+      const resolved = await this._resolveExpansionGraph(payload, target);
+      const report = this._assessExpansionGraphCompatibility({
+        target,
+        fetchMeta: resolved.fetchMeta,
+        nodes: resolved.nodes,
+        edges: resolved.edges
+      });
+      return this._expansionSuccess(report);
+    } catch (error) {
+      const code = error?.code || EXPANSION_ERROR.REF_FETCH_FAILED;
+      return this._expansionFailure(code, error.message || 'Compatibility check failed');
+    }
+  }
+
   async expandReference(payload = {}) {
     try {
       const sourceNodeId =
@@ -2494,6 +2552,24 @@ export default class GraphCRUD {
         edges: fragmentEdges,
         fetchMeta
       } = await this._resolveExpansionGraph(payload, target);
+      const compatibility = this._assessExpansionGraphCompatibility({
+        target,
+        fetchMeta,
+        nodes: fragmentNodes,
+        edges: fragmentEdges
+      });
+      if (compatibility.status === 'incompatible') {
+        return this._expansionFailure(
+          EXPANSION_ERROR.CONTEXT_INCOMPATIBLE,
+          compatibility.summary,
+          compatibility
+        );
+      }
+      const projectedGraph = compatibility.status === 'compatible-with-downgrades'
+        ? this._projectExpansionGraph({ nodes: fragmentNodes, edges: fragmentEdges, compatibility })
+        : { nodes: fragmentNodes, edges: fragmentEdges };
+      const projectedNodes = projectedGraph.nodes;
+      const projectedEdges = projectedGraph.edges;
       if (typeof target.expectedHash === 'string' && target.expectedHash.trim()) {
         const expected = target.expectedHash.trim().toLowerCase();
         const actual = String(fetchMeta?.hash || '').toLowerCase();
@@ -2505,14 +2581,14 @@ export default class GraphCRUD {
           );
         }
       }
-      if (fragmentNodes.length > maxNodes || fragmentEdges.length > maxEdges) {
+      if (projectedNodes.length > maxNodes || projectedEdges.length > maxEdges) {
         return this._expansionFailure(
           EXPANSION_ERROR.EXPANSION_LIMIT_EXCEEDED,
-          `Expansion exceeds limits (nodes=${fragmentNodes.length}/${maxNodes}, edges=${fragmentEdges.length}/${maxEdges})`,
+          `Expansion exceeds limits (nodes=${projectedNodes.length}/${maxNodes}, edges=${projectedEdges.length}/${maxEdges})`,
           {
             maxNodes,
             maxEdges,
-            received: { nodes: fragmentNodes.length, edges: fragmentEdges.length }
+            received: { nodes: projectedNodes.length, edges: projectedEdges.length }
           }
         );
       }
@@ -2539,8 +2615,8 @@ export default class GraphCRUD {
         sourceBytes: fetchMeta?.bytes || 0
       };
 
-      for (let index = 0; index < fragmentNodes.length; index += 1) {
-        const node = fragmentNodes[index];
+      for (let index = 0; index < projectedNodes.length; index += 1) {
+        const node = projectedNodes[index];
         const canonicalId = String(node?.id || `node-${index}`);
         const runtimeId = `${expansionId}:${canonicalId}`;
         if (existingNodeIds.has(runtimeId) || runtimeNodeIdMap.has(canonicalId)) {
@@ -2585,8 +2661,8 @@ export default class GraphCRUD {
       }));
 
       const materializedEdges = [];
-      for (let index = 0; index < fragmentEdges.length; index += 1) {
-        const edge = fragmentEdges[index];
+      for (let index = 0; index < projectedEdges.length; index += 1) {
+        const edge = projectedEdges[index];
         const canonicalSource = String(edge?.source || '');
         const canonicalTarget = String(edge?.target || '');
         const source = runtimeNodeIdMap.get(canonicalSource);
@@ -2676,6 +2752,7 @@ export default class GraphCRUD {
         reason: null,
         expandKey: expansionKey,
         entryNodeId: entryNode.id,
+        compatibility,
         trust: {
           origin: fetchMeta?.origin || '',
           hash: fetchMeta?.hash || '',
@@ -2707,6 +2784,177 @@ export default class GraphCRUD {
       ...this._parseExpansionGraphPayload(fetched.text),
       fetchMeta: fetched
     };
+  }
+
+  _assessExpansionGraphCompatibility({ target = {}, fetchMeta = null, nodes = [], edges = [] } = {}) {
+    const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
+    const dictionaryNodes = nodes.filter((node) => node?.type === 'dictionary');
+    const legendNodes = nodes.filter((node) => node?.type === 'legend');
+    const executionNodes = nodes.filter((node) => EXECUTION_BEARING_NODE_TYPES.has(String(node?.type || '').trim().toLowerCase()));
+    const explicitRoot = nodes.find((node) => node?.isRoot || node?.data?.isRoot || node?.data?.root) || null;
+    const primaryManifest = manifestNodes[0] || null;
+    const allowGraphEntry = primaryManifest?.data?.settings?.expansion?.allowGraphEntry === true;
+    const validation = validateGraphInvariants({ nodes, edges, mode: 'load' });
+    const rawWarnings = Array.isArray(validation?.warnings) ? validation.warnings : [];
+    const blockingWarnings = rawWarnings.filter((issue) => EXPANSION_BLOCKING_WARNING_CODES.has(String(issue?.code || '').trim()));
+    const issues = [];
+    const downgradeActions = [];
+
+    if (manifestNodes.length > 0) {
+      downgradeActions.push('remote manifest remains informational only');
+      issues.push(
+        manifestNodes.length > 1
+          ? `Target declares ${manifestNodes.length} manifest nodes; host authority cannot transfer.`
+          : 'Target declares a manifest; host authority must remain primary.'
+      );
+    }
+    if (manifestNodes.length > 0 && !allowGraphEntry) {
+      issues.push('Target graph does not allow branch entry expansion.');
+    }
+    if (dictionaryNodes.length > 0) {
+      downgradeActions.push('remote dictionary available only as scoped view fallback');
+      issues.push(
+        dictionaryNodes.length > 1
+          ? `Target declares ${dictionaryNodes.length} dictionaries; imported dictionaries must stay scoped.`
+          : 'Target dictionary can be used for scoped rendering only.'
+      );
+    }
+    if (legendNodes.length > 0) {
+      downgradeActions.push('remote legend remains informational content only');
+    }
+    if (executionNodes.length > 0) {
+      downgradeActions.push('remote execution-bearing nodes disabled by default');
+      const uniqueTypes = [...new Set(executionNodes.map((node) => String(node?.type || '').trim()).filter(Boolean))];
+      issues.push(`Target includes execution-bearing nodes (${uniqueTypes.join(', ')}); remote code cannot run in host context.`);
+    }
+    if (manifestNodes.length > 0 && !explicitRoot) {
+      issues.push('Target has document-scoped manifest content but no explicit branch entry.');
+    }
+    blockingWarnings.forEach((issue) => {
+      if (issue?.message) issues.push(issue.message);
+    });
+
+    let status = 'compatible';
+    if ((manifestNodes.length > 0 && (!allowGraphEntry || !explicitRoot)) || blockingWarnings.length > 0) {
+      status = 'incompatible';
+    } else if (downgradeActions.length > 0) {
+      status = 'compatible-with-downgrades';
+    }
+
+    const selectedEntry =
+      explicitRoot?.id ||
+      manifestNodes[0]?.id ||
+      nodes[0]?.id ||
+      null;
+
+    return {
+      status,
+      summary:
+        status === 'compatible'
+          ? 'Compatible for direct expansion.'
+          : status === 'compatible-with-downgrades'
+          ? `Compatible with downgrades: ${downgradeActions.join('; ')}.`
+          : issues[0] || 'Target is not compatible with direct expansion.',
+      ref: target.ref || '',
+      mode: target.mode || 'expand',
+      kind: target.kind || 'fragment',
+      entry: {
+        explicitRootNodeId: explicitRoot?.id || null,
+        selectedNodeId: selectedEntry,
+        fallbackUsed: explicitRoot ? 'explicit-root' : manifestNodes[0] ? 'manifest' : nodes[0] ? 'first-node' : 'none',
+        graphEntryEnabled: allowGraphEntry
+      },
+      structure: {
+        nodeCount: nodes.length,
+        edgeCount: edges.length,
+        warningCount: rawWarnings.length,
+        blockingIssueCount: blockingWarnings.length,
+        blockingCodes: [...new Set(blockingWarnings.map((issue) => String(issue?.code || '').trim()).filter(Boolean))]
+      },
+      authority: {
+        remoteManifestCount: manifestNodes.length,
+        hostAuthorityOnly: true,
+        remoteManifestDowngraded: manifestNodes.length > 0
+      },
+      dictionary: {
+        remoteDictionaryCount: dictionaryNodes.length,
+        remoteDictionaryPresent: dictionaryNodes.length > 0,
+        scopedFallbackOnly: dictionaryNodes.length > 0
+      },
+      execution: {
+        remoteCodePresent: executionNodes.length > 0,
+        blockedByDefault: executionNodes.length > 0,
+        nodeTypes: [...new Set(executionNodes.map((node) => String(node?.type || '').trim()).filter(Boolean))]
+      },
+      systemNodes: {
+        manifestCount: manifestNodes.length,
+        dictionaryCount: dictionaryNodes.length,
+        legendCount: legendNodes.length,
+        typesPresent: [...new Set(nodes.map((node) => String(node?.type || '').trim()).filter((type) => SYSTEM_NODE_TYPES.has(type)))]
+      },
+      downgradeActions,
+      issues,
+      trust: {
+        origin: fetchMeta?.origin || '',
+        hash: fetchMeta?.hash || '',
+        bytes: fetchMeta?.bytes || 0
+      }
+    };
+  }
+
+  _projectExpansionGraph({ nodes = [], edges = [], compatibility = null } = {}) {
+    if (!Array.isArray(nodes) || nodes.length === 0) {
+      return { nodes: [], edges: [] };
+    }
+
+    const allowedNodeIds = new Set();
+    const projectedNodes = nodes.map((node) => {
+      const safeNode = cloneValue(node);
+      if (!safeNode?.id) return safeNode;
+      allowedNodeIds.add(safeNode.id);
+      const type = String(safeNode.type || '').trim().toLowerCase();
+      const data = isPlainObject(safeNode.data) ? cloneValue(safeNode.data) : {};
+      const scope = {
+        mode: 'expanded-projection',
+        compatibilityStatus: compatibility?.status || 'compatible-with-downgrades',
+        authority: type === 'manifest' ? 'informational' : 'host',
+        dictionaryScope: type === 'dictionary' ? 'scoped-fallback' : 'host',
+        execution: EXECUTION_BEARING_NODE_TYPES.has(type) ? 'blocked' : 'host'
+      };
+
+      if (type === 'manifest') {
+        safeNode.isRoot = false;
+        data.isRoot = false;
+        data.root = false;
+      }
+
+      if (EXECUTION_BEARING_NODE_TYPES.has(type)) {
+        const originalType = safeNode.type;
+        safeNode.type = 'markdown';
+        safeNode.label = safeNode.label || `${originalType} (blocked)`;
+        data.markdown = [
+          `## ${safeNode.label}`,
+          '',
+          `Imported \`${originalType}\` nodes are blocked in expanded context.`,
+          '',
+          'Navigate to the source graph to use its active runtime.'
+        ].join('\n');
+        data._blockedExecution = {
+          originalType,
+          reason: 'execution-disabled-in-expanded-context'
+        };
+      }
+
+      data._contextScope = scope;
+      safeNode.data = data;
+      return safeNode;
+    });
+
+    const projectedEdges = (Array.isArray(edges) ? edges : [])
+      .map((edge) => cloneValue(edge))
+      .filter((edge) => allowedNodeIds.has(edge?.source) && allowedNodeIds.has(edge?.target));
+
+    return { nodes: projectedNodes, edges: projectedEdges };
   }
 
   async _fetchExpansionRefText(ref, preferredBranch) {
@@ -2933,6 +3181,8 @@ export default class GraphCRUD {
     if (!Array.isArray(nodes) || nodes.length === 0) return null;
     const explicit = nodes.find((node) => node?.isRoot || node?.data?.isRoot || node?.data?.root);
     if (explicit) return explicit;
+    const firstNonSystem = nodes.find((node) => !SYSTEM_NODE_TYPES.has(String(node?.type || '').trim().toLowerCase()));
+    if (firstNonSystem) return firstNonSystem;
     const manifest = nodes.find((node) => node?.type === 'manifest');
     if (manifest) return manifest;
     return nodes[0];

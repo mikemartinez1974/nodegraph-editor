@@ -475,6 +475,7 @@ export function createGraphEditorHandlers({
         x: window.innerWidth / 2 - nodeCenterX * zoom,
         y: window.innerHeight / 2 - nodeCenterY * zoom
       });
+      state.setFocusedNodeId?.(nodeId);
       setSelectedNodeIds([nodeId]);
       setSelectedEdgeIds([]);
     }

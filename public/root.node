@@ -3,10 +3,11 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-02-26T18:58:19.315Z",
-    "modified": "2026-02-26T18:58:19.315Z",
+    "created": "2026-03-14T23:08:17.708Z",
+    "modified": "2026-03-14T23:08:17.708Z",
     "author": "",
-    "tags": []
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
@@ -83,7 +84,11 @@
           "github": {
             "repo": "",
             "path": "",
-            "branch": "main"
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
           },
           "autoSave": false
         },
@@ -132,7 +137,7 @@
       "data": {
         "nodeDefs": [
           {
-            "key": "youtube",
+            "key": "youtube-embedded",
             "ref": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
             "source": "My private stash.",
             "version": "1.0"
@@ -141,10 +146,10 @@
         "skills": [],
         "views": [
           {
-            "key": "youtube",
+            "key": "youtube-embedded",
             "intent": "node",
             "payload": "node.web",
-            "ref": "",
+            "ref": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
             "source": "https://twilite.zone/library/classes/nodes/youtube-embedded.node",
             "version": "1.0"
           }
@@ -898,6 +903,39 @@
         "svg": "",
         "isRoot": true
       }
+    },
+    {
+      "id": "port-tasks-root",
+      "type": "port",
+      "label": "Task Graphs",
+      "position": {
+        "x": 1335,
+        "y": 1085
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
     }
   ],
   "edges": [
@@ -1162,8 +1200,36 @@
         "curved": true
       },
       "data": {}
+    },
+    {
+      "id": "edge-root-to-tasks",
+      "type": "reference",
+      "source": "resources",
+      "target": "port-tasks-root",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "tasks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
     }
   ],
   "clusters": [],
-  "scripts": []
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
 }

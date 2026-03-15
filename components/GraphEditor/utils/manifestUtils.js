@@ -16,16 +16,39 @@ export const setManifestSettings = (nodes = [], settings) => {
   if (!Array.isArray(nodes) || !settings || typeof settings !== 'object') {
     return nodes;
   }
+  const mergeSettings = (base, patch) => {
+    const current = base && typeof base === 'object' && !Array.isArray(base) ? base : {};
+    const next = patch && typeof patch === 'object' && !Array.isArray(patch) ? patch : {};
+    const merged = { ...current };
+    Object.keys(next).forEach((key) => {
+      const prevValue = merged[key];
+      const nextValue = next[key];
+      if (
+        prevValue &&
+        typeof prevValue === 'object' &&
+        !Array.isArray(prevValue) &&
+        nextValue &&
+        typeof nextValue === 'object' &&
+        !Array.isArray(nextValue)
+      ) {
+        merged[key] = { ...prevValue, ...nextValue };
+        return;
+      }
+      merged[key] = nextValue;
+    });
+    return merged;
+  };
   let found = false;
   const next = nodes.map((node) => {
     if (node?.type !== 'manifest') return node;
     found = true;
     const data = node.data && typeof node.data === 'object' ? node.data : {};
+    const existingSettings = data.settings && typeof data.settings === 'object' ? data.settings : {};
     return {
       ...node,
       data: {
         ...data,
-        settings
+        settings: mergeSettings(existingSettings, settings)
       }
     };
   });

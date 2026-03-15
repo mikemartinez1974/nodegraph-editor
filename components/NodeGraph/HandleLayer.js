@@ -188,6 +188,7 @@ const HandleLayer = forwardRef(({
   edgeTypes = {}, 
   children,
   draggingInfoRef,
+  showPorts = true,
 }, ref) => {
   const [hoveredHandleId, setHoveredHandleId] = useState(null);
   const [draggingHandle, setDraggingHandle] = useState(null);
@@ -412,42 +413,48 @@ const HandleLayer = forwardRef(({
     
     const handles = getCurrentHandles();
 
-    handles.forEach(handle => {
-      const screenX = handle.position.x * zoom + pan.x;
-      const screenY = handle.position.y * zoom + pan.y;
-      
-      if (screenX < -handleRadius || screenX > canvas.width + handleRadius || 
-          screenY < -handleRadius || screenY > canvas.height + handleRadius) {
-        return;
-      }
-      
-      const isHovered = hoveredHandleId === handle.id;
-      const isDragging = draggingHandle?.id === handle.id;
-      const radius = (isHovered || isDragging) ? handleRadius * 1.3 : handleRadius;
-      
-      if (isHovered || isDragging) {
-        ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.4)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 2;
-      }
-      
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = handle.color;
-      ctx.fill();
-      
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = isHovered || isDragging ? 3 : 2;
-      ctx.stroke();
-      
-      if (isHovered || isDragging) {
-        ctx.restore();
-      }
-    });
+    if (!showPorts && !(previewLine && draggingHandle)) {
+      return;
+    }
+
+    if (showPorts) {
+      handles.forEach(handle => {
+        const screenX = handle.position.x * zoom + pan.x;
+        const screenY = handle.position.y * zoom + pan.y;
+        
+        if (screenX < -handleRadius || screenX > canvas.width + handleRadius || 
+            screenY < -handleRadius || screenY > canvas.height + handleRadius) {
+          return;
+        }
+        
+        const isHovered = hoveredHandleId === handle.id;
+        const isDragging = draggingHandle?.id === handle.id;
+        const radius = (isHovered || isDragging) ? handleRadius * 1.3 : handleRadius;
+        
+        if (isHovered || isDragging) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.4)';
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 2;
+        }
+        
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = handle.color;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = isHovered || isDragging ? 3 : 2;
+        ctx.stroke();
+        
+        if (isHovered || isDragging) {
+          ctx.restore();
+        }
+      });
+    }
     
     if (previewLine && draggingHandle) {
       const startX = draggingHandle.position.x * zoom + pan.x;
@@ -471,7 +478,7 @@ const HandleLayer = forwardRef(({
       
       ctx.restore();
     }
-  }, [getCurrentHandles, pan, zoom, hoveredHandleId, draggingHandle, previewLine]);
+  }, [getCurrentHandles, pan, zoom, hoveredHandleId, draggingHandle, previewLine, showPorts]);
 
   const scheduleRender = useCallback(() => {
     if (animationFrameRef.current) return;

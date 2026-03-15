@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -38,6 +38,8 @@ const MarkdownNode = (props) => {
   };
 
   const nodeLabel = node?.label || 'Markdown';
+  const semanticLevel = String(node?.data?._semanticLevel || 'detail').trim().toLowerCase();
+  const isCompactSemantic = semanticLevel === 'summary' || semanticLevel === 'icon';
   const markdownContent = (() => {
     const primary = typeof node?.data?.markdown === 'string' ? node.data.markdown : '';
     if (primary.trim().length > 0) {
@@ -135,6 +137,50 @@ const MarkdownNode = (props) => {
   }, [node.id, node.data]);
   
   // Render FixedNode with markdown content and resize handle
+  if (isCompactSemantic) {
+    return (
+      <FixedNode {...props} node={node} hideDefaultContent={true} disableChrome={true} hideChromeOverlays={true}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: semanticLevel === 'icon' ? '8px 10px' : '12px 14px',
+            boxSizing: 'border-box',
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '100%',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: semanticLevel === 'icon' ? '6px 10px' : '8px 12px',
+              borderRadius: 999,
+              background: isSelected ? alpha(theme.palette.primary.main, 0.18) : alpha(theme.palette.common.white, 0.10),
+              border: `1px solid ${alpha(isSelected ? theme.palette.primary.main : theme.palette.common.white, isSelected ? 0.45 : 0.22)}`,
+              color: '#fff',
+              fontSize: semanticLevel === 'icon' ? 11 : 12,
+              fontWeight: 700,
+              letterSpacing: 0.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <span style={{ opacity: 0.75, fontSize: semanticLevel === 'icon' ? 10 : 11 }}>markdown</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {nodeLabel}
+            </span>
+          </div>
+        </div>
+      </FixedNode>
+    );
+  }
+
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
       <div

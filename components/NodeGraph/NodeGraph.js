@@ -68,6 +68,7 @@ export default function NodeGraph({
   setSnackbar,
   showMinimap = true,
   minimapOffset = {},
+  showPorts = true,
   snapToGrid = false,
   showGrid = false,
   gridSize = 20,
@@ -1246,9 +1247,10 @@ export default function NodeGraph({
           edges={edges}
           pan={pan}
           zoom={zoom}
-          edgeTypes={edgeTypes} 
+          edgeTypes={edgeTypes}
           selectedEdgeIds={selectedEdgeIds}
           hoveredEdgeId={hoveredEdgeId}
+          showPorts={showPorts}
         />
       
       <NodeLayer

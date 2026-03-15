@@ -1,0 +1,974 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-03-14T16:16:22.370Z",
+    "modified": "2026-03-14T16:16:22.370Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "4f4e8562-0665-433f-8707-7f41c2c3d1cf",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -980,
+        "y": -240
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "planning-node-types-task",
+          "name": "Planning Node Types Task",
+          "version": "0.1.0",
+          "description": "Task graph for planning the first implementation-oriented node types for Twilite prompting and execution workflows.",
+          "createdAt": "2026-03-14T00:00:00.000Z",
+          "updatedAt": "2026-03-14T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "node-type-planning"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "e9adde73-fe99-430c-aaf6-320ebc4ece77",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -980,
+        "y": 380
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "type": "markdown",
+      "label": "Task Graph Overview",
+      "position": {
+        "x": -360,
+        "y": -260
+      },
+      "width": 420,
+      "height": 260,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Planning Node Types\n\nThis task graph breaks out the first implementation-oriented node types into separate planning nodes.\n\nGoal: define what each node type is for, what data it should hold, and how it should behave inside a Twilite planning graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "f4a6d2c9-1b7e-4d8a-9c6f-3e2d1b7a4d44",
+      "type": "markdown",
+      "label": "Goal",
+      "position": {
+        "x": 220,
+        "y": -520
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Goal\n\nDefine the **Goal** node type for planning graphs.\n\nQuestions to answer:\n- What makes a goal different from a task?\n- Is it strategic, local, or both?\n- What fields should it carry beyond label and markdown?\n- Should goals support priority or completion state?\n\nOutput:\n- clear purpose\n- canonical data shape\n- relationship rules",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "9e3b7a1d-4c6f-4e8b-8d2c-5a7f3c1b5e55",
+      "type": "markdown",
+      "label": "Constraint",
+      "position": {
+        "x": 620,
+        "y": -520
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Constraint\n\nDefine the **Constraint** node type.\n\nQuestions to answer:\n- What counts as a hard constraint versus guidance?\n- Should constraints be typed (schema, UX, performance, policy)?\n- Can a constraint apply globally or only to a subgraph?\n- How should Codex treat constraints during implementation?\n\nOutput:\n- constraint categories\n- canonical fields\n- usage rules",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "3c5d7e9f-2a1b-4c8d-9e6f-7b2a4d1c6f66",
+      "type": "markdown",
+      "label": "Decision",
+      "position": {
+        "x": 1020,
+        "y": -520
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Decision\n\nDefine the **Decision** node type.\n\nQuestions to answer:\n- How is a decision represented distinctly from discussion?\n- Should decisions carry rationale, status, and date?\n- Can a decision supersede an older decision?\n- How should decisions connect to tasks and constraints?\n\nOutput:\n- decision semantics\n- canonical data shape\n- precedence/update rules",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "7a1c5e3d-9f2b-4d6a-8c7e-1b3d5f7a8b77",
+      "type": "markdown",
+      "label": "Open Question",
+      "position": {
+        "x": 1420,
+        "y": -520
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Open Question\n\nDefine the **Open Question** node type.\n\nQuestions to answer:\n- What distinguishes an open question from a risk or investigation?\n- Should it track owner, status, and resolution path?\n- Does resolution convert it into a decision, task, or note?\n- How prominently should unresolved questions appear in prompts?\n\nOutput:\n- lifecycle rules\n- canonical fields\n- resolution behavior",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
+      "type": "markdown",
+      "label": "Task",
+      "position": {
+        "x": 220,
+        "y": -160
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Task\n\nDefine the **Task** node type.\n\nQuestions to answer:\n- What makes a task atomic enough for implementation use?\n- Should tasks carry status, owner, priority, or estimate?\n- How should tasks connect to goals, dependencies, and acceptance criteria?\n- Do tasks map directly to execution prompts?\n\nOutput:\n- task scope rules\n- canonical data shape\n- execution linkage",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
+      "type": "markdown",
+      "label": "Dependency",
+      "position": {
+        "x": 620,
+        "y": -160
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dependency\n\nDefine the **Dependency** node type.\n\nQuestions to answer:\n- Should dependency be a node type, an edge type, or both?\n- What extra meaning does a dependency node add?\n- Can dependencies represent external systems, prerequisites, or ordering?\n- How should blockers be modeled?\n\nOutput:\n- representation choice\n- canonical fields\n- connection rules",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "8c1e7d5a-4b2f-4c9d-8a6e-3d1b7f5c2daa",
+      "type": "markdown",
+      "label": "Acceptance Criteria",
+      "position": {
+        "x": 1020,
+        "y": -160
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Acceptance Criteria\n\nDefine the **Acceptance Criteria** node type.\n\nQuestions to answer:\n- Should criteria be checklists, prose, or structured tests?\n- Are they attached to tasks, goals, or decisions?\n- How specific should they be for Codex execution?\n- Can they drive validation or auto-review later?\n\nOutput:\n- canonical format\n- attachment rules\n- verification intent",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "1d7c5b3a-9e4f-4d6c-8b2a-7f1e3d5c4ebb",
+      "type": "markdown",
+      "label": "Risk / Edge Case",
+      "position": {
+        "x": 1420,
+        "y": -160
+      },
+      "width": 340,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Risk / Edge Case\n\nDefine the **Risk / Edge Case** node type.\n\nQuestions to answer:\n- Should risk and edge case stay combined or split later?\n- Does this node track severity, likelihood, or mitigation?\n- How should edge cases connect to acceptance criteria and tasks?\n- When does a risk become a task or decision?\n\nOutput:\n- scope definition\n- canonical fields\n- escalation behavior",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "c1a9d7e5-4b3f-4d6a-8c2e-1f7b5d3a9c01",
+      "type": "relates",
+      "source": "4f4e8562-0665-433f-8707-7f41c2c3d1cf",
+      "target": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "sourcePort": "root",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "root",
+          "label": "root",
+          "type": "value",
+          "direction": "output"
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "d2b8e6f4-5c1a-4d7b-9e3f-2a6c8d1b4e02",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "f4a6d2c9-1b7e-4d8a-9c6f-3e2d1b7a4d44",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e3c7f5a2-6d1b-4c8e-8f2a-3b7d9c1e5f03",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "9e3b7a1d-4c6f-4e8b-8d2c-5a7f3c1b5e55",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f4d6a8b1-7e2c-4d9f-8a3b-4c1e7d5f6a04",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "3c5d7e9f-2a1b-4c8d-9e6f-7b2a4d1c6f66",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "a5e7b9c3-8d1f-4c6a-9b2e-5d3f7a1c8b05",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "7a1c5e3d-9f2b-4d6a-8c7e-1b3d5f7a8b77",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "b6f8c1d4-9a2e-4d7c-8b3f-6e1a5d7c9f06",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "c7a9d2e5-1b3f-4d8c-9e4a-7f2c5d1b8e07",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "d8b1e3f6-2c4a-4d9b-8f5e-8a3d1c7b9f08",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "8c1e7d5a-4b2f-4c9d-8a6e-3d1b7f5c2daa",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e9c2f4a7-3d5b-4c6e-9a1f-9b4e2d8c1a09",
+      "type": "relates",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "1d7c5b3a-9e4f-4d6c-8b2a-7f1e3d5c4ebb",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
+}

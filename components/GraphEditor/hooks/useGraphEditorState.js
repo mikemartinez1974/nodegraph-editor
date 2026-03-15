@@ -34,7 +34,11 @@ const isDraftMode = () => {
 
 const validateManifestNodes = (nodes = []) => {
   const manifestNodes = Array.isArray(nodes)
-    ? nodes.filter((node) => node?.type === 'manifest')
+    ? nodes.filter((node) => {
+        if (node?.type !== 'manifest') return false;
+        const authority = node?.data?._contextScope?.authority;
+        return authority !== 'informational';
+      })
     : [];
 
   if (manifestNodes.length !== 1) {
@@ -204,6 +208,9 @@ export function useGraphEditorState() {
   const [selectedNodeIds, setSelectedNodeIds] = useState([]);
   const [selectedEdgeIds, setSelectedEdgeIds] = useState([]);
   const [selectedGroupIds, setSelectedGroupIds] = useState([]);
+  const [focusedNodeId, setFocusedNodeId] = useState(null);
+  const [focusedFragmentId, setFocusedFragmentId] = useState('');
+  const [interactionMode, setInteractionMode] = useState('browse');
   
   // Hover state
   const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
@@ -239,6 +246,44 @@ export function useGraphEditorState() {
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
+
+  useEffect(() => {
+    const handleSetInteractionMode = ({ mode } = {}) => {
+      const normalized = String(mode || '').trim().toLowerCase();
+      if (normalized === 'browse' || normalized === 'edit') {
+        setInteractionMode(normalized);
+      }
+    };
+    eventBus.on('setInteractionMode', handleSetInteractionMode);
+    return () => eventBus.off('setInteractionMode', handleSetInteractionMode);
+  }, []);
+
+  useEffect(() => {
+    if (!focusedNodeId) {
+      setFocusedFragmentId('');
+      return;
+    }
+    const focusedNode = nodes.find((node) => node?.id === focusedNodeId) || null;
+    if (!focusedNode) {
+      setFocusedNodeId(null);
+      setFocusedFragmentId('');
+      return;
+    }
+    const fragmentId = String(
+      focusedNode?.data?._expansion?.expansionId ||
+      focusedNode?.data?._origin?.instanceId ||
+      ''
+    ).trim();
+    setFocusedFragmentId(fragmentId);
+  }, [focusedNodeId, nodes]);
+
+  useEffect(() => {
+    if (interactionMode !== 'browse') return;
+    const selectedNodeId = Array.isArray(selectedNodeIds) ? selectedNodeIds[0] || null : null;
+    if (!selectedNodeId) return;
+    if (selectedNodeId === focusedNodeId) return;
+    setFocusedNodeId(selectedNodeId);
+  }, [interactionMode, selectedNodeIds, focusedNodeId]);
   
   useEffect(() => {
     edgesRef.current = edges;
@@ -446,6 +491,9 @@ export function useGraphEditorState() {
     selectedNodeIds, setSelectedNodeIds,
     selectedEdgeIds, setSelectedEdgeIds,
     selectedGroupIds, setSelectedGroupIds,
+    focusedNodeId, setFocusedNodeId,
+    focusedFragmentId, setFocusedFragmentId,
+    interactionMode, setInteractionMode,
     
     // Hover
     hoveredEdgeId, setHoveredEdgeId,

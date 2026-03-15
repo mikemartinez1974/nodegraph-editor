@@ -167,6 +167,38 @@
           {
             "key": "youtube-embedded",
             "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "youtube-embedded",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "youtube-embedded",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "youtube-embedded",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "youtube-embedded",
+            "intent": "node",
             "payload": "render.html",
             "ref": "/library/classes/nodes/youtube-embedded.node-class.node",
             "source": "local",
@@ -228,12 +260,139 @@
       }
     },
     {
-      "id": "youtube-class-node-view",
+      "id": "youtube-class-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": 20,
+        "y": 220
+      },
+      "width": 880,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## YouTube Embedded Node\n\nUse this node type by adding a dictionary entry in your host graph:\n\n- `key`: `youtube-embedded`\n- `ref`: `/library/classes/nodes/youtube-embedded.node`\n\nThen create nodes of type `youtube-embedded` with data:\n\n```json\n{\n  \"videoId\": \"dQw4w9WgXcQ\",\n  \"title\": \"YouTube video player\",\n  \"startSeconds\": 0,\n  \"autoplay\": false\n}\n```"
+      }
+    },
+    {
+      "id": "youtube-class-node-view-detail",
+      "type": "view",
+      "label": "Node View (node.web.detail)",
+      "position": {
+        "x": 470,
+        "y": -80
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.detail",
+          "controls": [
+            {
+              "id": "youtube-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "detail": {
+              "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;background:transparent;'>\n  <div style='font:600 12px system-ui, sans-serif;opacity:.8;margin:0 0 6px 0;'>{{label}}</div>\n  <div style='flex:1;min-height:0;'>\n    <iframe\n      title='{{data.title}}'\n      src='https://www.youtube.com/embed/{{data.videoId}}?start={{data.startSeconds}}&autoplay={{data.autoplay}}&rel=0'\n      width='100%'\n      height='100%'\n      frameborder='0'\n      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'\n      referrerpolicy='strict-origin-when-cross-origin'\n      allowfullscreen\n      style='border:0;border-radius:8px;display:block;background:transparent;'></iframe>\n  </div>\n</div>"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "youtube-class-node-view-summary",
+      "type": "view",
+      "label": "Node View (node.web.summary)",
+      "position": {
+        "x": 470,
+        "y": 220
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.summary",
+          "controls": [
+            {
+              "id": "youtube-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "summary": {
+              "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.08));color:#fff;'>\n  <div style='display:flex;align-items:center;justify-content:space-between;gap:8px;'>\n    <div style='font:700 12px system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;'>YouTube</div>\n    <div style='font:600 11px system-ui,sans-serif;opacity:.75;'>{{data.videoId}}</div>\n  </div>\n  <div style='font:600 15px system-ui,sans-serif;line-height:1.25;overflow:hidden;text-overflow:ellipsis;'>{{label}}</div>\n  <div style='font:500 11px system-ui,sans-serif;opacity:.82;'>{{data.title}}</div>\n</div>"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "youtube-class-node-view-icon",
+      "type": "view",
+      "label": "Node View (node.web.icon)",
+      "position": {
+        "x": 470,
+        "y": 520
+      },
+      "width": 430,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.icon",
+          "controls": [
+            {
+              "id": "youtube-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "icon": {
+              "html": "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:10px;'>\n  <div style='display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font:700 12px system-ui,sans-serif;'>\n    <span style='display:inline-flex;align-items:center;justify-content:center;width:22px;height:16px;border-radius:5px;background:#ff0033;color:#fff;'>\u25b6</span>\n    <span>{{label}}</span>\n  </div>\n</div>"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "youtube-class-node-view-legacy",
       "type": "view",
       "label": "Node View (render.html)",
       "position": {
         "x": 470,
-        "y": -80
+        "y": 820
       },
       "width": 430,
       "height": 260,
@@ -260,22 +419,6 @@
             "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;background:transparent;'>\n  <div style='font:600 12px system-ui, sans-serif;opacity:.8;margin:0 0 6px 0;'>{{label}}</div>\n  <div style='flex:1;min-height:0;'>\n    <iframe\n      title='{{data.title}}'\n      src='https://www.youtube.com/embed/{{data.videoId}}?start={{data.startSeconds}}&autoplay={{data.autoplay}}&rel=0'\n      width='100%'\n      height='100%'\n      frameborder='0'\n      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'\n      referrerpolicy='strict-origin-when-cross-origin'\n      allowfullscreen\n      style='border:0;border-radius:8px;display:block;background:transparent;'></iframe>\n  </div>\n</div>"
           }
         }
-      }
-    },
-    {
-      "id": "youtube-class-notes",
-      "type": "markdown",
-      "label": "Definition Notes",
-      "position": {
-        "x": 20,
-        "y": 220
-      },
-      "width": 880,
-      "height": 260,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## YouTube Embedded Node\n\nUse this node type by adding a dictionary entry in your host graph:\n\n- `key`: `youtube-embedded`\n- `ref`: `/library/classes/nodes/youtube-embedded.node`\n\nThen create nodes of type `youtube-embedded` with data:\n\n```json\n{\n  \"videoId\": \"dQw4w9WgXcQ\",\n  \"title\": \"YouTube video player\",\n  \"startSeconds\": 0,\n  \"autoplay\": false\n}\n```"
       }
     }
   ],

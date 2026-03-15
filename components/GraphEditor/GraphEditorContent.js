@@ -59,6 +59,34 @@ const postHostMessage = (payload) => {
   } catch {}
 };
 
+const isPlainObject = (value) => (
+  value !== null &&
+  typeof value === 'object' &&
+  !Array.isArray(value)
+);
+
+const deepMergeData = (base, patch) => {
+  if (!isPlainObject(base)) {
+    if (!isPlainObject(patch)) return patch;
+    return Object.keys(patch).reduce((acc, key) => {
+      acc[key] = deepMergeData(undefined, patch[key]);
+      return acc;
+    }, {});
+  }
+  if (!isPlainObject(patch)) return patch;
+  const out = { ...base };
+  Object.keys(patch).forEach((key) => {
+    const prev = out[key];
+    const next = patch[key];
+    if (isPlainObject(prev) && isPlainObject(next)) {
+      out[key] = deepMergeData(prev, next);
+      return;
+    }
+    out[key] = next;
+  });
+  return out;
+};
+
 const GraphEditorContent = () => {
   const theme = useTheme();
   const state = useGraphEditorStateContext();
@@ -80,6 +108,7 @@ const GraphEditorContent = () => {
   const [viewDefinitions, setViewDefinitions] = useState({});
   const viewDefinitionsRef = useRef({});
   const isDraggingRef = useRef(false);
+  const nodeEditorCommitTargetRef = useRef(null);
 
   const {
     nodes,
@@ -97,6 +126,11 @@ const GraphEditorContent = () => {
     setZoom,
     selectedNodeIds,
     setSelectedNodeIds,
+    focusedNodeId,
+    setFocusedNodeId,
+    focusedFragmentId,
+    interactionMode,
+    setInteractionMode,
     selectedEdgeIds,
     setSelectedEdgeIds,
     selectedGroupIds,
@@ -283,36 +317,8 @@ const GraphEditorContent = () => {
       }));
       if (payload.writable !== false) {
         readOnlyNoticeShownRef.current = false;
-  }
-};
-
-const isPlainObject = (value) => (
-  value !== null &&
-  typeof value === 'object' &&
-  !Array.isArray(value)
-);
-
-const deepMergeData = (base, patch) => {
-  if (!isPlainObject(base)) {
-    if (!isPlainObject(patch)) return patch;
-    return Object.keys(patch).reduce((acc, key) => {
-      acc[key] = deepMergeData(undefined, patch[key]);
-      return acc;
-    }, {});
-  }
-  if (!isPlainObject(patch)) return patch;
-  const out = { ...base };
-  Object.keys(patch).forEach((key) => {
-    const prev = out[key];
-    const next = patch[key];
-    if (isPlainObject(prev) && isPlainObject(next)) {
-      out[key] = deepMergeData(prev, next);
-      return;
-    }
-    out[key] = next;
-  });
-  return out;
-};
+      }
+    };
     const handleAccessPromoteWritable = () => {
       setDocumentAccess((prev) => ({
         ...prev,
@@ -415,6 +421,17 @@ const deepMergeData = (base, patch) => {
     emitEdgeIntent('applyLayout', { layoutType: resolvedLayoutType });
     modesHook.applyAutoLayout(resolvedLayoutType);
   }, [emitEdgeIntent, modesHook.applyAutoLayout, modesHook.autoLayoutType]);
+
+  const handleInteractionModeChange = useCallback((nextMode) => {
+    const normalized = String(nextMode || '').trim().toLowerCase();
+    if (normalized !== 'browse' && normalized !== 'edit') return;
+    setInteractionMode?.(normalized);
+    try {
+      eventBus.emit('setInteractionMode', { mode: normalized, source: 'toolbar' });
+    } catch {
+      // ignore event bus errors
+    }
+  }, [setInteractionMode]);
 
   const effectiveThemeConfig = useMemo(() => {
     return mergeThemeConfigs(editorThemeConfig, documentTheme || null);
@@ -755,6 +772,123 @@ const deepMergeData = (base, patch) => {
     };
   }, [normalizeDictionaryNodeDef, normalizeDictionaryView]);
 
+  const getExpansionScopeKey = useCallback((node) => {
+    if (!node || typeof node !== 'object') return '';
+    return String(
+      node?.data?._expansion?.expansionId ||
+      node?.data?._origin?.instanceId ||
+      ''
+    ).trim();
+  }, []);
+
+  const semanticScopeState = useMemo(() => {
+    const nodesList = Array.isArray(nodes) ? nodes : [];
+    const edgesList = Array.isArray(edges) ? edges : [];
+    const nodeById = new Map(nodesList.map((node) => [node?.id, node]));
+    const adjacency = new Map();
+    const ensureScope = (scope) => {
+      const key = String(scope || '').trim();
+      if (!adjacency.has(key)) adjacency.set(key, new Set());
+      return key;
+    };
+    ensureScope('');
+    edgesList.forEach((edge) => {
+      if (edge?.type !== 'expands-to') return;
+      const sourceNode = nodeById.get(edge?.source);
+      const targetNode = nodeById.get(edge?.target);
+      const sourceScope = ensureScope(getExpansionScopeKey(sourceNode));
+      const targetScope = ensureScope(getExpansionScopeKey(targetNode));
+      if (sourceScope === targetScope) return;
+      adjacency.get(sourceScope).add(targetScope);
+      adjacency.get(targetScope).add(sourceScope);
+    });
+
+    const activeFocusedNodeId = focusedNodeId || null;
+    const focusedNode = activeFocusedNodeId ? nodeById.get(activeFocusedNodeId) || null : null;
+    const focusedScope = getExpansionScopeKey(focusedNode);
+    const scopeDepth = new Map([[focusedScope, 0]]);
+    const queue = [focusedScope];
+    while (queue.length > 0) {
+      const current = queue.shift();
+      const currentDepth = scopeDepth.get(current) || 0;
+      if (currentDepth >= 2) continue;
+      const neighbors = adjacency.get(current);
+      if (!neighbors) continue;
+      neighbors.forEach((neighbor) => {
+        if (scopeDepth.has(neighbor)) return;
+        scopeDepth.set(neighbor, currentDepth + 1);
+        queue.push(neighbor);
+      });
+    }
+
+    return {
+      focusedNodeId: activeFocusedNodeId,
+      focusedScope,
+      scopeDepth
+    };
+  }, [nodes, edges, focusedNodeId, getExpansionScopeKey]);
+
+  const getNodeSemanticLevel = useCallback((node) => {
+    const scopeKey = getExpansionScopeKey(node);
+    const depth = semanticScopeState.scopeDepth.get(scopeKey);
+    if (depth === 1) return 'summary';
+    if (depth >= 2) return 'icon';
+    return 'detail';
+  }, [getExpansionScopeKey, semanticScopeState.scopeDepth]);
+
+  const isScopedDictionaryNode = useCallback((node) => {
+    if (!node || node.type !== 'dictionary') return false;
+    return node?.data?._contextScope?.dictionaryScope === 'scoped-fallback';
+  }, []);
+
+  const buildScopedDictionaryForNode = useCallback((node, hostDictionary) => {
+    const scopeKey = getExpansionScopeKey(node);
+    if (!scopeKey || !Array.isArray(nodes)) return hostDictionary || null;
+    const scopeDepth = semanticScopeState.scopeDepth.get(scopeKey);
+    if (scopeDepth !== 0 && scopeDepth !== 1 && scopeDepth !== 2) {
+      return hostDictionary || null;
+    }
+    const scopedDictionaryNode = nodes.find((candidate) => {
+      if (candidate?.type !== 'dictionary') return false;
+      if (!isScopedDictionaryNode(candidate)) return false;
+      return getExpansionScopeKey(candidate) === scopeKey;
+    }) || null;
+    if (!scopedDictionaryNode) return hostDictionary || null;
+
+    const hostData = normalizeResolvedDictionaryData(hostDictionary?.data || {});
+    const scopedData = normalizeResolvedDictionaryData(scopedDictionaryNode?.data || {});
+    const mergedNodeDefs = mergeDictionaryEntries(
+      Array.isArray(hostData.nodeDefs) ? hostData.nodeDefs : [],
+      Array.isArray(scopedData.nodeDefs) ? scopedData.nodeDefs : []
+    );
+    const mergedViews = mergeDictionaryEntries(
+      Array.isArray(hostData.views) ? hostData.views : [],
+      Array.isArray(scopedData.views) ? scopedData.views : []
+    );
+    const mergedSkills = mergeDictionaryEntries(
+      Array.isArray(hostData.skills) ? hostData.skills : [],
+      Array.isArray(scopedData.skills) ? scopedData.skills : []
+    );
+
+    return {
+      ...scopedDictionaryNode,
+      data: {
+        ...hostData,
+        ...scopedData,
+        nodeDefs: mergedNodeDefs,
+        views: mergedViews,
+        skills: mergedSkills,
+        _contextScope: {
+          ...(hostData._contextScope || {}),
+          ...(scopedData._contextScope || {}),
+          dictionaryScope: 'scoped-fallback',
+          scopeKey,
+          ringDepth: scopeDepth ?? null
+        }
+      }
+    };
+  }, [getExpansionScopeKey, isScopedDictionaryNode, mergeDictionaryEntries, nodes, normalizeResolvedDictionaryData, semanticScopeState.scopeDepth]);
+
   const implicitManifestRef = useRef(null);
   const implicitLegendRef = useRef(null);
   const implicitDictionaryRef = useRef(null);
@@ -773,17 +907,18 @@ const deepMergeData = (base, patch) => {
     const clusterList = Array.isArray(groups) ? groups : [];
     const nodeClusterId = clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(node.id))?.id || null;
     const dictionaryInCluster = nodeClusterId
-      ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+      ? nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
       : null;
-    const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-    return (
+    const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+    const hostDictionary = (
       resolvedDictionary ||
       dictionaryInCluster ||
       rootDictionary ||
-      nodes.find((candidate) => candidate.type === 'dictionary') ||
+      nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate)) ||
       implicitDictionaryRef.current
     );
-  }, [nodes, groups, resolvedDictionary]);
+    return buildScopedDictionaryForNode(node, hostDictionary);
+  }, [nodes, groups, resolvedDictionary, isScopedDictionaryNode, buildScopedDictionaryForNode]);
 
   useEffect(() => {
     const handleRefreshDefinitions = () => {
@@ -814,13 +949,13 @@ const deepMergeData = (base, patch) => {
         ? clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(manifestNode.id))?.id || null
         : null;
       const dictionaryInManifestCluster = manifestClusterId
-        ? nodes.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === manifestClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+        ? nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && clusterList.some((cluster) => cluster.id === manifestClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
         : null;
-      const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+      const rootDictionary = nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
       return (
         dictionaryInManifestCluster ||
         rootDictionary ||
-        nodes.find((candidate) => candidate.type === 'dictionary') ||
+        nodes.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate)) ||
         implicitDictionaryRef.current
       );
     })();
@@ -936,7 +1071,7 @@ const deepMergeData = (base, patch) => {
     return () => {
       active = false;
     };
-  }, [nodes, groups, mergeDictionaryEntries, fetchRefText, definitionsRefreshToken, normalizeResolvedDictionaryData, normalizeDictionaryNodeDef, normalizeDictionaryView]);
+  }, [nodes, groups, mergeDictionaryEntries, fetchRefText, definitionsRefreshToken, normalizeResolvedDictionaryData, normalizeDictionaryNodeDef, normalizeDictionaryView, isScopedDictionaryNode]);
 
   useEffect(() => {
     try {
@@ -968,6 +1103,7 @@ const deepMergeData = (base, patch) => {
     const views = Array.isArray(dictionaryData.views) ? dictionaryData.views : [];
     const lookupKey = String(node?.data?.dictionaryKey || node?.data?.definitionKey || node?.type || '').trim();
     if (!lookupKey) return null;
+    const semanticLevel = getNodeSemanticLevel(node);
 
     const nodeDef = nodeDefs.find((entry) => {
       const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
@@ -978,12 +1114,40 @@ const deepMergeData = (base, patch) => {
       const key = String(entry?.key || entry?.nodeType || entry?.type || '').trim();
       return key === lookupKey;
     });
+    const normalizeViewEntryRef = (entry) => {
+      if (!entry || typeof entry !== 'object') return entry;
+      const ref = String(entry?.ref || '').trim();
+      if (ref) return entry;
+      const source = String(entry?.source || '').trim();
+      if (!source) return entry;
+      return { ...entry, ref: source };
+    };
+    const normalizedMatchingViews = matchingViews.map(normalizeViewEntryRef);
 
-    const nodeView = matchingViews.find((entry) => {
-      const intent = String(entry?.intent || '').trim();
-      const payload = String(entry?.payload || entry?.view || '').trim();
-      return intent === 'node' || payload === 'node.web';
-    }) || (nodeDef?.ref ? {
+    const preferredPayloads =
+      semanticLevel === 'icon'
+        ? ['node.web.icon', 'icon.web', 'node.web.summary', 'summary.web', 'node.web.detail', 'node.web']
+        : semanticLevel === 'summary'
+        ? ['node.web.summary', 'summary.web', 'node.web.detail', 'node.web', 'node.web.icon', 'icon.web']
+        : ['node.web.detail', 'node.web', 'node.web.summary', 'summary.web', 'node.web.icon', 'icon.web'];
+
+    let nodeView = null;
+    for (const preferredPayload of preferredPayloads) {
+      nodeView = normalizedMatchingViews.find((entry) => {
+        const intent = String(entry?.intent || '').trim();
+        const payload = String(entry?.payload || entry?.view || '').trim();
+        if (payload === preferredPayload) return true;
+        if (preferredPayload === 'node.web' && intent === 'node' && !payload) return true;
+        return false;
+      }) || null;
+      if (nodeView) break;
+    }
+
+    if (!nodeView) {
+      nodeView = normalizedMatchingViews.find((entry) => String(entry?.intent || '').trim() === 'node') || null;
+    }
+
+    nodeView = nodeView || (nodeDef?.ref ? {
       key: lookupKey,
       intent: 'node',
       payload: 'node.web',
@@ -992,7 +1156,7 @@ const deepMergeData = (base, patch) => {
       version: String(nodeDef.version || '').trim()
     } : null);
 
-    const editorView = matchingViews.find((entry) => {
+    const editorView = normalizedMatchingViews.find((entry) => {
       const intent = String(entry?.intent || '').trim();
       const payload = String(entry?.payload || entry?.view || '').trim();
       return intent === 'editor' || payload === 'editor.web';
@@ -1001,11 +1165,12 @@ const deepMergeData = (base, patch) => {
     return {
       key: lookupKey,
       nodeDef,
-      views: matchingViews,
+      views: normalizedMatchingViews,
       nodeView,
-      editorView
+      editorView,
+      semanticLevel
     };
-  }, [resolveDictionaryForNode, normalizeResolvedDictionaryData, inferSourceFromRef]);
+  }, [resolveDictionaryForNode, normalizeResolvedDictionaryData, inferSourceFromRef, getNodeSemanticLevel]);
 
   const lifecycleRunningRef = useRef(new Set());
   const lifecycleLastRunRef = useRef(new Map());
@@ -1248,17 +1413,42 @@ const deepMergeData = (base, patch) => {
     if (!node?.type) return null;
     const type = String(node.type).trim();
     if (type !== 'port' && type !== 'graph-reference') return null;
+    const portTargetPath = (field) => (type === 'port' ? `data.target.${field}` : `data.${field}`);
+    const modeOptions =
+      type === 'graph-reference'
+        ? [
+            { label: 'Preview', value: 'preview' },
+            { label: 'Interactive', value: 'interactive' },
+            { label: 'Expand Fragment', value: 'expand' }
+          ]
+        : [
+            { label: 'Navigate', value: 'navigate' },
+            { label: 'Expand Fragment', value: 'expand' },
+            { label: 'Bridge', value: 'bridge' },
+            { label: 'Boundary', value: 'boundary' }
+          ];
     const fields = [
-      { key: 'ref', label: 'Reference', type: 'text', path: 'data.ref', placeholder: 'github://owner/repo/path/file.node' },
-      { key: 'endpoint', label: 'Endpoint', type: 'text', path: 'data.endpoint', placeholder: 'root.node:root' },
-      { key: 'url', label: 'URL', type: 'text', path: 'data.url', placeholder: 'https://example.com/file.node' },
-      { key: 'mode', label: 'Mode', type: 'text', path: 'data.mode', placeholder: type === 'graph-reference' ? 'preview|interactive' : 'navigate' },
-      { key: 'graphId', label: 'Target graphId', type: 'text', path: 'data.target.graphId' },
-      { key: 'nodeId', label: 'Target nodeId', type: 'text', path: 'data.target.nodeId' },
-      { key: 'portId', label: 'Target portId', type: 'text', path: 'data.target.portId', placeholder: 'root' },
-      { key: 'label', label: 'Target label', type: 'text', path: 'data.target.label' },
+      { key: 'ref', label: 'Reference', type: 'text', path: portTargetPath('ref'), placeholder: 'github://owner/repo/path/file.node' },
+      { key: 'endpoint', label: 'Endpoint', type: 'text', path: portTargetPath('endpoint'), placeholder: 'root.node:root' },
+      { key: 'url', label: 'URL', type: 'text', path: portTargetPath('url'), placeholder: 'https://example.com/file.node' },
+      { key: 'mode', label: 'Mode', type: 'select', options: modeOptions, path: portTargetPath('mode'), placeholder: type === 'graph-reference' ? 'preview' : 'navigate' },
+      { key: 'graphId', label: 'Target graphId', type: 'text', path: type === 'port' ? 'data.target.graphId' : 'data.graphId' },
+      { key: 'nodeId', label: 'Target nodeId', type: 'text', path: type === 'port' ? 'data.target.nodeId' : 'data.nodeId' },
+      { key: 'portId', label: 'Target portId', type: 'text', path: type === 'port' ? 'data.target.portId' : 'data.portId', placeholder: 'root' },
+      { key: 'label', label: 'Target label', type: 'text', path: type === 'port' ? 'data.target.label' : 'data.label' },
       { key: 'intent', label: 'Intent', type: 'text', path: 'data.intent' },
-      { key: 'security', label: 'Security', type: 'text', path: 'data.security', placeholder: 'prompt|allow|deny' }
+      {
+        key: 'security',
+        label: 'Security',
+        type: 'select',
+        options: [
+          { label: 'Prompt', value: 'prompt' },
+          { label: 'Allow', value: 'allow' },
+          { label: 'Deny', value: 'deny' }
+        ],
+        path: 'data.security',
+        placeholder: 'prompt'
+      }
     ];
     if (type === 'graph-reference') {
       fields.push({ key: 'maxDepth', label: 'Max depth', type: 'number', path: 'data.maxDepth' });
@@ -1502,13 +1692,15 @@ const deepMergeData = (base, patch) => {
       if (!nodeId) return;
       if (success) {
         setNodeEditorCommitError(null);
-        if (nodeEditorCommitPending && nodeEditorPanel.open && nodeEditorPanel.nodeId === nodeId) {
+        if (nodeEditorCommitTargetRef.current === nodeId && nodeEditorPanel.open && nodeEditorPanel.nodeId === nodeId) {
           setNodeEditorPanel({ open: false, nodeId: null });
           setNodeEditorCommitPending(false);
+          nodeEditorCommitTargetRef.current = null;
         }
       } else if (error) {
         setNodeEditorCommitError(String(error));
         setNodeEditorCommitPending(false);
+        nodeEditorCommitTargetRef.current = null;
       }
     };
     eventBus.on('nodeEditorDirtyChange', handleDirtyChange);
@@ -1533,6 +1725,9 @@ const deepMergeData = (base, patch) => {
       if (entryIntent && viewData.intent && entryIntent !== viewData.intent) return false;
       if (entryPayload && viewData.payload && entryPayload !== viewData.payload) return false;
       return true;
+    }) || viewNodes.find((candidate) => {
+      const viewData = candidate?.data?.view || {};
+      return !entryIntent || !viewData.intent || entryIntent === viewData.intent;
     }) || viewNodes[0] || null;
     const resolvedDefinition = selectedViewNode
       ? { status: viewDefinition?.status || 'ready', viewNode: selectedViewNode }
@@ -1628,12 +1823,14 @@ const deepMergeData = (base, patch) => {
     setNodeEditorPanel({ open: false, nodeId: null });
     setNodeEditorCommitPending(false);
     setNodeEditorCommitError(null);
+    nodeEditorCommitTargetRef.current = null;
   }, [editorPanelDirty, editorPanelNode?.id]);
 
   const handleCommitAndClose = useCallback(() => {
     if (!editorPanelNode?.id) return;
     setNodeEditorCommitPending(true);
     setNodeEditorCommitError(null);
+    nodeEditorCommitTargetRef.current = editorPanelNode.id;
     eventBus.emit('nodeEditorCommit', { nodeId: editorPanelNode.id });
   }, [editorPanelNode?.id]);
 
@@ -1708,10 +1905,11 @@ const deepMergeData = (base, patch) => {
     const clusterList = Array.isArray(groups) ? groups : [];
     const nodeClusterId = clusterList.find((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(node.id))?.id || null;
     const dictionaryInCluster = nodeClusterId
-      ? nodes?.find((candidate) => candidate.type === 'dictionary' && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
+      ? nodes?.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && clusterList.some((cluster) => cluster.id === nodeClusterId && Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)))
       : null;
-    const rootDictionary = nodes?.find((candidate) => candidate.type === 'dictionary' && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
-    const dictionary = resolvedDictionary || dictionaryInCluster || rootDictionary || nodes?.find((candidate) => candidate.type === 'dictionary');
+    const rootDictionary = nodes?.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate) && !clusterList.some((cluster) => Array.isArray(cluster.nodeIds) && cluster.nodeIds.includes(candidate.id)));
+    const hostDictionary = resolvedDictionary || dictionaryInCluster || rootDictionary || nodes?.find((candidate) => candidate.type === 'dictionary' && !isScopedDictionaryNode(candidate));
+    const dictionary = buildScopedDictionaryForNode(node, hostDictionary);
 
     const entries = Array.isArray(dictionary?.data?.nodeDefs) ? dictionary.data.nodeDefs : [];
     const match = entries.find((entry) => {
@@ -1719,7 +1917,7 @@ const deepMergeData = (base, patch) => {
       return entry.nodeType === node.type || entry.type === node.type || entry.key === node.type;
     });
     return match?.ref || match?.file || match?.path || null;
-  }, [nodes, groups, resolvedDictionary]);
+  }, [nodes, groups, resolvedDictionary, isScopedDictionaryNode, buildScopedDictionaryForNode]);
 
   const isNodeExecutable = useCallback((node) => {
     if (!node) return false;
@@ -1732,6 +1930,7 @@ const deepMergeData = (base, patch) => {
 
   const handleNodeContextMenu = useCallback((nodeId, event) => {
     if (!nodeId || !event) return;
+    setFocusedNodeId(nodeId);
     setSelectedNodeIds([nodeId]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
@@ -1740,15 +1939,16 @@ const deepMergeData = (base, patch) => {
       mouseY: event.clientY - 4,
       nodeId
     });
-  }, [setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds]);
+  }, [setFocusedNodeId, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds]);
 
   const handleNodeDoubleClickOpenProperties = useCallback((nodeId) => {
     if (!nodeId) return;
+    setFocusedNodeId(nodeId);
     setSelectedNodeIds([nodeId]);
     setSelectedEdgeIds([]);
     setSelectedGroupIds([]);
     setShowPropertiesPanel(true);
-  }, [setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel]);
+  }, [setFocusedNodeId, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel]);
 
   const handleEdgeDoubleClickOpenProperties = useCallback((edgeId) => {
     if (!edgeId) return;
@@ -1905,6 +2105,7 @@ const deepMergeData = (base, patch) => {
     <GraphRendererAdapter
       graphKey={graphRendererKey}
       nodeTypes={nodeTypes}
+      getNodeSemanticLevel={getNodeSemanticLevel}
       resolveNodeComponent={resolveNodeComponent}
       edgeTypes={EdgeTypes}
       edgeRoutes={edgeRoutes}
@@ -1915,6 +2116,7 @@ const deepMergeData = (base, patch) => {
       setSnackbar={setSnackbar}
       showMinimap={showMinimap}
       minimapOffset={minimapOffset}
+      showPorts={interactionMode === 'edit'}
       snapToGrid={snapToGrid}
       showGrid={showGrid}
       gridSize={documentSettings.gridSize}
@@ -1936,6 +2138,13 @@ const deepMergeData = (base, patch) => {
     />
   );
 
+  const focusDebugBottomOffset = showMinimap ? 208 : 16;
+  const focusDebugRightOffset = Math.max(16, (minimapOffset?.right || 0) + 16);
+  const focusDebugFocusedScope = semanticScopeState?.focusedScope || 'root';
+  const focusDebugFocusedLevel = focusedNodeId
+    ? getNodeSemanticLevel(nodes?.find((candidate) => candidate?.id === focusedNodeId) || null)
+    : 'detail';
+
   useEffect(() => {
     const handleNodeDragEndIntent = () => {
       emitEdgeIntent('nodeDragEnd');
@@ -1945,6 +2154,21 @@ const deepMergeData = (base, patch) => {
       eventBus.off('nodeDragEnd', handleNodeDragEndIntent);
     };
   }, [emitEdgeIntent]);
+
+  useEffect(() => {
+    const handleFocusNodeEvent = ({ nodeId } = {}) => {
+      if (!nodeId) return;
+      try {
+        handlers?.handleNodeFocus?.(nodeId);
+      } catch (err) {
+        // ignore focus routing failures
+      }
+    };
+    eventBus.on('focusNode', handleFocusNodeEvent);
+    return () => {
+      eventBus.off('focusNode', handleFocusNodeEvent);
+    };
+  }, [handlers]);
 
   const handleToggleSnapToGrid = useCallback(() => {
     setSnapToGrid(prev => {
@@ -2317,8 +2541,9 @@ const deepMergeData = (base, patch) => {
       setGroups(() => []);
     }
     historyHook.saveToHistory(nextNodes, []);
+    setFocusedNodeId(manifestNode.id);
     setSelectedNodeIds([manifestNode.id]);
-  }, [loadGraph, setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setSelectedNodeIds]);
+  }, [loadGraph, setNodes, nodesRef, setEdges, edgesRef, setGroups, historyHook, setFocusedNodeId, setSelectedNodeIds]);
 
   const handleImportGraph = useCallback((nodesToLoad, edgesToLoad, groupsToLoad) => {
     emitEdgeIntent('loadGraph', {
@@ -2612,6 +2837,8 @@ const skipPropertiesCloseRef = useRef(false);
           mode={modesHook.mode}
           autoLayoutType={modesHook.autoLayoutType}
           onModeChange={modesHook.handleModeChange}
+          interactionMode={interactionMode}
+          onInteractionModeChange={handleInteractionModeChange}
           onAutoLayoutChange={modesHook.setAutoLayoutType}
           onApplyLayout={handleApplyLayout}
           onAlignSelection={handleAlignSelection}
@@ -2636,6 +2863,7 @@ const skipPropertiesCloseRef = useRef(false);
           showMinimap={showMinimap}
           onToggleMinimap={handleToggleMinimap}
           snapToGrid={snapToGrid}
+          showPorts={interactionMode === 'edit'}
           onToggleSnapToGrid={handleToggleSnapToGrid}
           gridSize={documentSettings.gridSize}
           edgeRouting={documentSettings.edgeRouting || 'auto'}
@@ -2664,6 +2892,42 @@ const skipPropertiesCloseRef = useRef(false);
       )}
 
       {isMobile && <MobileFabToolbar />}
+
+      {!isMobile && (
+        <Box
+          sx={{
+            position: 'fixed',
+            right: `${focusDebugRightOffset}px`,
+            bottom: `${focusDebugBottomOffset}px`,
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            px: 1,
+            py: 0.75,
+            borderRadius: 1,
+            bgcolor: 'rgba(18, 18, 18, 0.82)',
+            color: 'common.white',
+            border: '1px solid rgba(255,255,255,0.12)',
+            boxShadow: 3,
+            minWidth: 180,
+            pointerEvents: 'none'
+          }}
+        >
+          <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, letterSpacing: 0.3 }}>
+            Focus
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', opacity: 0.9 }}>
+            mode: {interactionMode || 'browse'}
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', opacity: 0.9 }}>
+            level: {focusDebugFocusedLevel}
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', opacity: 0.9 }}>
+            node: {focusedNodeId || '-'}
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', opacity: 0.9 }}>
+            fragment: {focusedFragmentId || focusDebugFocusedScope}
+          </Typography>
+        </Box>
+      )}
 
       {!isMobile && (
         <Button

@@ -297,6 +297,8 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     groups, setGroups,
     pan, setPan, zoom, setZoom,
     selectedNodeIds, setSelectedNodeIds,
+    focusedNodeId, setFocusedNodeId,
+    interactionMode,
     selectedEdgeIds, setSelectedEdgeIds,
     selectedGroupIds, setSelectedGroupIds,
     hoveredEdgeId, setHoveredEdgeId,
@@ -1390,6 +1392,7 @@ useEffect(() => {
           const rootNode = getGraphRootNode(nodesToLoad);
           const rootNodeId = rootNode?.id || nodesToLoad[0]?.id;
           if (rootNodeId) {
+            setFocusedNodeId(rootNodeId);
             setSelectedNodeIds([rootNodeId]);
             setSelectedEdgeIds([]);
             setSelectedGroupIds([]);
@@ -1398,7 +1401,7 @@ useEffect(() => {
         setMemoAutoExpandToken((token) => token + 1);
       }
     }
-  }, [handlers, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken, setStorySnapshots]);
+  }, [handlers, setFocusedNodeId, setSelectedNodeIds, setSelectedEdgeIds, setSelectedGroupIds, setShowPropertiesPanel, setMemoAutoExpandToken, setStorySnapshots]);
 
   useEffect(() => {
     if (!pendingRerouteOnLoadRef.current) return;
@@ -3750,13 +3753,16 @@ useEffect(() => {
   // Listen for node click events and select the node
   useEffect(() => {
     const handleNodeClick = ({ id }) => {
+      if (interactionMode === 'browse') {
+        setFocusedNodeId(id);
+      }
       setSelectedNodeIds([id]);
       setSelectedEdgeIds([]);
       // Removed any pan/zoom reset logic here
     };
     eventBus.on('nodeClick', handleNodeClick);
     return () => eventBus.off('nodeClick', handleNodeClick);
-  }, [setSelectedNodeIds, setSelectedEdgeIds]);
+  }, [interactionMode, setFocusedNodeId, setSelectedNodeIds, setSelectedEdgeIds]);
 
   // Consolidated background/document repaint & redraw effect
   useEffect(() => {

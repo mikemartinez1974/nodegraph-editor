@@ -51,14 +51,46 @@ const mergeRuntimeData = (entry) => {
   return { ...entry, runtime: { ...runtime } };
 };
 
-const getRegistrySnapshot = () => {
-  if (typeof window === 'undefined') {
-    return BUILTIN_PLUGIN_MANIFESTS.map((manifest) =>
-      mergeRuntimeData(sanitizeRecord(manifest, manifest.bundle?.url || ''))
+const getBuiltinRecord = (pluginId) => {
+  const manifest = BUILTIN_PLUGIN_MANIFESTS.find((entry) => entry?.id === pluginId);
+  if (!manifest) return null;
+  return sanitizeRecord(manifest, manifest.bundle?.url || '');
+};
+
+const getMergedEntries = (entries = []) => {
+  const persisted = Array.isArray(entries) ? entries : [];
+  const byId = new Map();
+
+  BUILTIN_PLUGIN_MANIFESTS.forEach((manifest) => {
+    const record = sanitizeRecord(manifest, manifest.bundle?.url || '');
+    byId.set(record.id, record);
+  });
+
+  persisted.forEach((entry) => {
+    if (!entry?.id) return;
+    const existing = byId.get(entry.id);
+    byId.set(
+      entry.id,
+      existing
+        ? {
+            ...existing,
+            ...entry,
+            manifest: entry.manifest || existing.manifest,
+            bundle: entry.bundle || existing.bundle,
+            nodes: entry.nodes || existing.nodes,
+            panels: entry.panels || existing.panels,
+            metadata: entry.metadata || existing.metadata
+          }
+        : entry
     );
-  }
-  const entries = readRegistry();
-  return entries.map((entry) => mergeRuntimeData(entry));
+  });
+
+  return Array.from(byId.values());
+};
+
+const getRegistrySnapshot = () => {
+  const entries = typeof window === 'undefined' ? [] : readRegistry();
+  return getMergedEntries(entries).map((entry) => mergeRuntimeData(entry));
 };
 
 const notifyListeners = () => {
@@ -126,7 +158,17 @@ export function setPluginEnabled(pluginId, enabled) {
   const entries = readRegistry();
   const idx = entries.findIndex((entry) => entry.id === pluginId);
   if (idx === -1) {
-    return { success: false, error: 'Plugin not found' };
+    const builtin = getBuiltinRecord(pluginId);
+    if (!builtin) {
+      return { success: false, error: 'Plugin not found' };
+    }
+    entries.push({ ...builtin, enabled: Boolean(enabled), updatedAt: nowIso() });
+    writeRegistry(entries);
+    if (enabled === false) {
+      runtimeCache.delete(pluginId);
+    }
+    notifyListeners();
+    return { success: true, data: entries[entries.length - 1] };
   }
   entries[idx] = { ...entries[idx], enabled: Boolean(enabled), updatedAt: nowIso() };
   writeRegistry(entries);
@@ -141,6 +183,12 @@ export function uninstallPlugin(pluginId) {
   const entries = readRegistry();
   const next = entries.filter((entry) => entry.id !== pluginId);
   if (next.length === entries.length) {
+    if (getBuiltinRecord(pluginId)) {
+      writeRegistry(next);
+      runtimeCache.delete(pluginId);
+      notifyListeners();
+      return { success: true };
+    }
     return { success: false, error: 'Plugin not found' };
   }
   writeRegistry(next);
@@ -200,7 +248,20 @@ export function setPluginPinnedVersion(pluginId, version = null) {
   const entries = readRegistry();
   const idx = entries.findIndex((entry) => entry.id === pluginId);
   if (idx === -1) {
-    return { success: false, error: 'Plugin not found' };
+    const builtin = getBuiltinRecord(pluginId);
+    if (!builtin) {
+      return { success: false, error: 'Plugin not found' };
+    }
+    const record = {
+      ...builtin,
+      pinnedVersion: version,
+      pinnedIntegrity: version ? builtin.bundle?.integrity || null : null,
+      updatedAt: nowIso()
+    };
+    entries.push(record);
+    writeRegistry(entries);
+    notifyListeners();
+    return { success: true, data: record };
   }
   entries[idx] = {
     ...entries[idx],

@@ -1177,10 +1177,11 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
         />
       );
     }
-    if (isNodeWebView || (isEditorView && !renderInPanel)) {
+    if ((isNodeWebView || (isEditorView && !renderInPanel)) && (contentType === 'markdown' || contentType === 'text')) {
       const markdown = (() => {
         if (typeof payload === 'string') return payload;
         if (payload && typeof payload === 'object' && typeof payload.markdown === 'string') return payload.markdown;
+        if (payload && typeof payload === 'object' && typeof payload.text === 'string') return payload.text;
         return typeof node?.data?.content === 'string' ? node.data.content : '';
       })();
       return (

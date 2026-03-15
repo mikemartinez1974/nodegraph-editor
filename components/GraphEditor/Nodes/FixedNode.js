@@ -40,7 +40,8 @@ const FixedNode = ({
   draggingHandle,
   nodeRefs,
   hideDefaultContent = false,
-  disableChrome = false // Allow callers to completely opt out of gradients/borders
+  disableChrome = false, // Allow callers to completely opt out of gradients/borders
+  hideChromeOverlays = false
 }) => {
   const node = useNodePortSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
@@ -304,9 +305,9 @@ const FixedNode = ({
         eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
       }}
     >
-      <NodeTypeBadge type={node?.type} />
+      {!hideChromeOverlays && <NodeTypeBadge type={node?.type} />}
       {/* Render node label/markdown if present (unless hideDefaultContent is true) */}
-      {isRootNode && (
+      {!hideChromeOverlays && isRootNode && (
         <div
           style={{
             position: 'absolute',
@@ -372,7 +373,7 @@ const FixedNode = ({
         </div>
       )}
       {/* Data indicators */}
-      {!hideDefaultContent && (hasMemo || hasLink) && (
+      {!hideChromeOverlays && !hideDefaultContent && (hasMemo || hasLink) && (
         <div style={{
           position: 'absolute',
           bottom: 4,

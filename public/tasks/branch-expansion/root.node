@@ -1,0 +1,490 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "branch-expansion-root-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -620,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "branch-expansion-root",
+          "name": "Branch Expansion Tasks",
+          "version": "0.1.0",
+          "description": "Index graph for branch expansion task and smoke-test graphs.",
+          "createdAt": "2026-03-14T00:00:00.000Z",
+          "updatedAt": "2026-03-14T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "index"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-root-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -620,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "task",
+            "intent": "branch expansion implementation plan",
+            "implementation": "task graph",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "smoke",
+            "intent": "verification graph",
+            "implementation": "port node",
+            "dictionaryKey": "port"
+          }
+        ]
+      }
+    },
+    {
+      "id": "branch-expansion-root-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -620,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "branch-expansion-root-overview",
+      "type": "markdown",
+      "label": "Branch Expansion",
+      "position": {
+        "x": -60,
+        "y": -140
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Branch Expansion\n\nIndex graph for the branch expansion task work and smoke tests.\n\nUse the ports below to open the implementation task graph and the supporting test graphs in this folder."
+      },
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "branch-expansion-port-task",
+      "type": "port",
+      "label": "Implementation Task",
+      "position": {
+        "x": -260,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Primary task graph for branch expansion.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/branch-expansion-resolution.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-fragment-target",
+      "type": "port",
+      "label": "Fragment Target",
+      "position": {
+        "x": 80,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Simple fragment used for expansion tests.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/expansion-fragment-target.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-export-fragment",
+      "type": "port",
+      "label": "Exported Fragment",
+      "position": {
+        "x": 420,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Exported fragment artifact from smoke testing.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/fragment_2026-03-13T17-43-58.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-trust-smoke",
+      "type": "port",
+      "label": "Trust Smoke",
+      "position": {
+        "x": -90,
+        "y": 450
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Trust gating smoke test.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/phase4-trust-smoke.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-export-smoke",
+      "type": "port",
+      "label": "Export Smoke",
+      "position": {
+        "x": 250,
+        "y": 450
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Save/export filtering smoke test.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/phase5-export-smoke.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-entry-surfaces",
+      "type": "port",
+      "label": "Named Entry Surfaces",
+      "position": {
+        "x": 590,
+        "y": 450
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Design review graph for graph-level open/expand entry surfaces.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/entry-surfaces.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-structural-expansion",
+      "type": "port",
+      "label": "Structural Expansion Context",
+      "position": {
+        "x": 930,
+        "y": 450
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Implementation task graph for structural-only branch expansion.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/structural-expansion-context.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-bullseye-authority",
+      "type": "port",
+      "label": "Bullseye Authority Model",
+      "position": {
+        "x": 1270,
+        "y": 450
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Review graph for navigation-scoped authority rings.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/bullseye-authority.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "branch-expansion-port-context-compatibility",
+      "type": "port",
+      "label": "Context Compatibility",
+      "position": {
+        "x": 1610,
+        "y": 450
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Review graph for preflight compatibility and block-vs-warn policy.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/branch-expansion/context-compatibility.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "branch-expansion-root-edge-001",
+      "type": "relates",
+      "source": "branch-expansion-root-manifest",
+      "target": "branch-expansion-root-overview",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares"
+    },
+    {
+      "id": "branch-expansion-root-edge-002",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-task",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "branch-expansion-root-edge-003",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-fragment-target",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "target"
+    },
+    {
+      "id": "branch-expansion-root-edge-004",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-export-fragment",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "artifact"
+    },
+    {
+      "id": "branch-expansion-root-edge-005",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-trust-smoke",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "trust"
+    },
+    {
+      "id": "branch-expansion-root-edge-006",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-export-smoke",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "export"
+    },
+    {
+      "id": "branch-expansion-root-edge-007",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-entry-surfaces",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "entries"
+    },
+    {
+      "id": "branch-expansion-root-edge-008",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-structural-expansion",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "context"
+    },
+    {
+      "id": "branch-expansion-root-edge-009",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-bullseye-authority",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "bullseye"
+    },
+    {
+      "id": "branch-expansion-root-edge-010",
+      "type": "reference",
+      "source": "branch-expansion-root-overview",
+      "target": "branch-expansion-port-context-compatibility",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "compat"
+    }
+  ],
+  "timestamp": "2026-03-14T00:00:00.000Z",
+  "nodeCount": 13,
+  "edgeCount": 10
+}

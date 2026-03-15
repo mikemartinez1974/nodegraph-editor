@@ -198,6 +198,23 @@ const RELEVANT_DATA_KEYS_BY_TYPE = {
   legend: ["entries"],
   manifest: ["identity", "intent", "dependencies", "authority", "document", "settings"]
 };
+const DICTIONARY_ENTRY_SOURCE_OPTIONS = [
+  "local",
+  "github",
+  "definition",
+  "plugin",
+  "manual",
+  "codex"
+];
+const DICTIONARY_VIEW_INTENT_OPTIONS = ["node", "editor", "graph"];
+const DICTIONARY_VIEW_PAYLOAD_OPTIONS = [
+  "node.web",
+  "editor.web",
+  "graph.web.detail",
+  "graph.web.summary",
+  "graph.web.icon",
+  "render.html"
+];
 
 const isEmptyPayloadValue = (value) => {
   if (value == null) return true;
@@ -252,6 +269,8 @@ export default function PropertiesPanel({
   const { nodeTypeOptions: sharedNodeTypeOptions } = useAvailableNodeTypes();
 
   const activeSelection = selectedNode || selectedEdge || selectedGroup;
+  const manifestNode = useMemo(() => nodes.find((node) => node?.type === "manifest") || null, [nodes]);
+  const graphEntryEnabled = Boolean(manifestNode?.data?.settings?.expansion?.allowGraphEntry);
   const selectionStyle = selectedNode?.style || selectedEdge?.style || {};
   const connectedEdges = useMemo(() => buildConnectedEdges(selectedNode, edges), [selectedNode, edges]);
   const edgeSourceNode = useMemo(() => {
@@ -409,7 +428,6 @@ export default function PropertiesPanel({
       return "{}";
     }
   }, [dataEntries]);
-  const manifestNode = useMemo(() => nodes.find((node) => node?.type === "manifest") || null, [nodes]);
   const manifestDependencies = useMemo(() => {
     const values = manifestNode?.data?.dependencies?.nodeTypes;
     if (!Array.isArray(values)) return [];
@@ -1706,22 +1724,53 @@ export default function PropertiesPanel({
                     value={entry?.version || ""}
                     onChange={(event) => handleEntryChange({ version: event.target.value })}
                   />
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Source</InputLabel>
+                    <Select
+                      value={entry?.source || ""}
+                      label="Source"
+                      onChange={(event) => handleEntryChange({ source: event.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {DICTIONARY_ENTRY_SOURCE_OPTIONS.map((option) => (
+                        <MenuItem key={`${sectionKey}-source-${option}`} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   {sectionKey === "views" && (
                     <Stack direction="row" spacing={1}>
-                      <TextField
-                        label="Intent"
-                        size="small"
-                        fullWidth
-                        value={entry?.intent || "node"}
-                        onChange={(event) => handleEntryChange({ intent: event.target.value })}
-                      />
-                      <TextField
-                        label="Payload"
-                        size="small"
-                        fullWidth
-                        value={entry?.payload || entry?.view || "twilite.web"}
-                        onChange={(event) => handleEntryChange({ payload: event.target.value })}
-                      />
+                      <FormControl size="small" fullWidth>
+                        <InputLabel>Intent</InputLabel>
+                        <Select
+                          value={entry?.intent || "node"}
+                          label="Intent"
+                          onChange={(event) => handleEntryChange({ intent: event.target.value })}
+                        >
+                          {DICTIONARY_VIEW_INTENT_OPTIONS.map((option) => (
+                            <MenuItem key={`view-intent-${option}`} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <FormControl size="small" fullWidth>
+                        <InputLabel>Payload</InputLabel>
+                        <Select
+                          value={entry?.payload || entry?.view || "node.web"}
+                          label="Payload"
+                          onChange={(event) => handleEntryChange({ payload: event.target.value })}
+                        >
+                          {DICTIONARY_VIEW_PAYLOAD_OPTIONS.map((option) => (
+                            <MenuItem key={`view-payload-${option}`} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Stack>
                   )}
                 </Stack>
@@ -2768,23 +2817,75 @@ export default function PropertiesPanel({
               }
             }}
           />
-          <Box sx={{ mt: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Typography variant="caption" color="text.secondary">
-              Root node
-            </Typography>
-            <Switch
-              size="small"
-              checked={Boolean(selectedNode?.data?.isRoot)}
-              onChange={(event) =>
-                selectedNode &&
-                onUpdateNode(selectedNode.id, {
-                  data: {
-                    ...(selectedNode.data || {}),
-                    isRoot: event.target.checked
+          <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                Root node
+              </Typography>
+              <Switch
+                size="small"
+                checked={Boolean(selectedNode?.data?.isRoot)}
+                onChange={(event) => {
+                  if (!selectedNode) return;
+                  const checked = Boolean(event.target.checked);
+                  onUpdateNode(selectedNode.id, {
+                    data: {
+                      ...(selectedNode.data || {}),
+                      isRoot: checked,
+                      root: checked
+                    }
+                  });
+                  if (!checked && manifestNode && graphEntryEnabled) {
+                    onUpdateNode(manifestNode.id, {
+                      data: {
+                        ...(manifestNode.data || {}),
+                        settings: {
+                          ...((manifestNode.data || {}).settings || {}),
+                          expansion: {
+                            ...(((manifestNode.data || {}).settings || {}).expansion || {}),
+                            allowGraphEntry: false
+                          }
+                        }
+                      }
+                    });
                   }
-                })
-              }
-            />
+                }}
+              />
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                Graph entry
+              </Typography>
+              <Switch
+                size="small"
+                checked={graphEntryEnabled}
+                onChange={(event) => {
+                  if (!selectedNode || !manifestNode) return;
+                  const checked = Boolean(event.target.checked);
+                  if (checked && !selectedNode?.data?.isRoot) {
+                    onUpdateNode(selectedNode.id, {
+                      data: {
+                        ...(selectedNode.data || {}),
+                        isRoot: true,
+                        root: true
+                      }
+                    });
+                  }
+                  onUpdateNode(manifestNode.id, {
+                    data: {
+                      ...(manifestNode.data || {}),
+                      settings: {
+                        ...((manifestNode.data || {}).settings || {}),
+                        expansion: {
+                          ...(((manifestNode.data || {}).settings || {}).expansion || {}),
+                          allowGraphEntry: checked
+                        }
+                      }
+                    }
+                  });
+                }}
+              />
+            </Box>
           </Box>
         </Box>
       )}

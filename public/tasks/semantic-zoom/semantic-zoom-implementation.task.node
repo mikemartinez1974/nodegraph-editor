@@ -1,0 +1,1654 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "task-manifest-semantic-zoom",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -1180,
+        "y": -260
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "semantic-zoom-implementation-task",
+          "name": "Semantic Zoom Implementation",
+          "version": "0.1.0",
+          "description": "Task graph for adding semantic zoom to Twilite.",
+          "createdAt": "2026-03-13T00:00:00.000Z",
+          "updatedAt": "2026-03-13T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "implementation"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "task-legend-semantic-zoom",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -1180,
+        "y": 70
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "problem",
+            "intent": "what semantic zoom must accomplish",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "contract",
+            "intent": "runtime and node-class rules",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "phase",
+            "intent": "implementation sequence",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "task-dictionary-semantic-zoom",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -1180,
+        "y": 360
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "task-overview-semantic-zoom",
+      "type": "markdown",
+      "label": "Problem Statement",
+      "position": {
+        "x": -620,
+        "y": -260
+      },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Semantic Zoom\n\nSemantic zoom in Twilite should operate primarily on graph fragments, not isolated nodes.\n\nThe current focused graph fragment should render in detailed view. Linked fragments should load in summary view. Within those linked fragments, deeper linked graphs should compress further into icon view.\n\nThis is a navigation-driven representation system, not just a scale-driven one."
+      }
+    },
+    {
+      "id": "task-goals-semantic-zoom",
+      "type": "markdown",
+      "label": "Goals",
+      "position": {
+        "x": -80,
+        "y": -260
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Goals\n\n- Make navigation across linked graph fragments legible\n- Introduce a `focused node` separate from selection\n- Render the focused fragment in detail\n- Render linked fragments in summary\n- Render deeper linked graphs in icon form\n- Keep the behavior deterministic and composable\n\nThis should make traversal feel intentional rather than visually noisy."
+      }
+    },
+    {
+      "id": "task-zoom-bands-semantic-zoom",
+      "type": "markdown",
+      "label": "Zoom Bands",
+      "position": {
+        "x": 420,
+        "y": -260
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Zoom Bands\n\nPhysical zoom should still matter, but semantic zoom should be led by navigation focus.\n\nCandidate semantic levels:\n\n- `detail` for the focused fragment\n- `summary` for directly linked fragments\n- `icon` for deeper linked graphs\n\nPhysical zoom can bias how much detail is practical, but navigation determines which fragment deserves attention."
+      }
+    },
+    {
+      "id": "task-node-class-contract-semantic-zoom",
+      "type": "markdown",
+      "label": "Node-Class Contract",
+      "position": {
+        "x": -620,
+        "y": 80
+      },
+      "width": 460,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Representation Contract\n\nTwilite needs two related representation families:\n\n## Node-level (for node instances)\n- `node.web.detail`\n- `node.web.summary`\n- `node.web.icon`\n\n## Graph-level (for graphs rendered as objects)\n- `graph.web.detail`\n- `graph.web.summary`\n- `graph.web.icon`\n\nLegacy `node.web` should imply detail. Normal full-graph rendering remains the fallback for the canvas role.\n\nA class graph may define both families, but a node instance still resolves through `node.*`, not `graph.*`."
+      }
+    },
+    {
+      "id": "task-renderer-contract-semantic-zoom",
+      "type": "markdown",
+      "label": "Renderer Contract",
+      "position": {
+        "x": -80,
+        "y": 80
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Renderer Contract\n\nThe renderer should:\n\n1. Identify the current focused node/fragment\n2. Resolve a semantic base level for the focused fragment\n3. Render linked fragments at relative lower levels\n4. Apply physical zoom as a secondary constraint\n5. Avoid cases where peripheral fragments are more detailed than the focused fragment\n\nThis should be runtime-driven and deterministic."
+      }
+    },
+    {
+      "id": "task-fallbacks-semantic-zoom",
+      "type": "markdown",
+      "label": "Fallback Rules",
+      "position": {
+        "x": 420,
+        "y": 80
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Fallback Rules\n\nFallback should be deterministic, relative to the focused fragment, and automatic by default.\n\nRules:\n\n- focused fragment uses the resolved base representation\n- linked fragments render one level lower if available\n- deeper fragments render two levels lower if available\n- if a requested level is missing, fall back to the nearest lower valid representation for that role\n- if no authored or automatic representation exists, use the minimal generic graph-object badge/card\n\nPeripheral fragments must never become more visually prominent than the focus."
+      }
+    },
+    {
+      "id": "task-fragments-groups-semantic-zoom",
+      "type": "markdown",
+      "label": "Fragments & Groups",
+      "position": {
+        "x": 920,
+        "y": 80
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph Contexts\n\nSemantic zoom applies to linked `.node` graphs as navigation contexts, but the same graph can be rendered in different roles.\n\n- as canvas: active graph workspace\n- as graph-object: represented inside another graph\n\nGroups and clusters can later inherit the same model, but the first-class concern is graph context rendered by role and level."
+      }
+    },
+    {
+      "id": "task-phases-semantic-zoom",
+      "type": "markdown",
+      "label": "Implementation Phases",
+      "position": {
+        "x": -620,
+        "y": 460
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implementation Phases\n\n## Phase 1\nAdd focus state and focused-fragment base level resolution.\n\n## Phase 2\nAdd zoom-band detection, hysteresis, and relative fragment level computation.\n\n## Phase 3\nSupport `detail`, `summary`, and `icon` view payloads with fallback logic.\n\n## Phase 4\nApply semantic zoom behavior to expanded and embedded fragments.\n\n## Phase 5\nAdd polish: transitions, cluster-aware behavior, and override controls."
+      }
+    },
+    {
+      "id": "task-acceptance-semantic-zoom",
+      "type": "markdown",
+      "label": "Acceptance Criteria",
+      "position": {
+        "x": -80,
+        "y": 460
+      },
+      "width": 420,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Acceptance Criteria\n\n- Focused fragment semantic level resolves deterministically\n- Linked fragments render at lower relative levels\n- Zoom-band transitions do not flicker\n- Editing keeps the focused fragment readable\n- Missing semantic views degrade automatically\n- Expanded fragments remain legible when zoomed out\n- Existing graphs keep working without semantic zoom definitions"
+      }
+    },
+    {
+      "id": "task-open-questions-semantic-zoom",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 420,
+        "y": 460
+      },
+      "width": 420,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Open Questions\n\n- Fragment layout policy when multiple expanded fragments are visible\n\nAll other core semantic zoom contract questions in this graph are currently resolved at the design level."
+      }
+    },
+    {
+      "id": "task-focused-node-semantic-zoom",
+      "type": "markdown",
+      "label": "Focused Node",
+      "position": {
+        "x": 920,
+        "y": -260
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focused Node\n\nTwilite needs a `focused node` distinct from the selected node.\n\nSelection is an editing state. Focus is a navigation state.\n\nThe focused node determines which graph fragment is primary, but it does not guarantee absolute detail. The focused fragment can itself be rendered at different semantic levels depending on navigation and zoom pressure. Other fragments should step down relative to that level."
+      }
+    },
+    {
+      "id": "task-fragment-cascade-semantic-zoom",
+      "type": "markdown",
+      "label": "Fragment Cascade",
+      "position": {
+        "x": 920,
+        "y": 460
+      },
+      "width": 420,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Fragment Cascade\n\nSemantic zoom should cascade through linked fragments *relative to the current focus level*.\n\n- focused fragment: `focus level`\n- directly linked fragments: `focus level - 1`\n- deeper linked graphs: `focus level - 2`\n\nThis means if the user zooms the focused fragment down to icon-level representation, peripheral fragments step down with it rather than staying louder than the focus."
+      }
+    },
+    {
+      "id": "task-relative-levels-semantic-zoom",
+      "type": "markdown",
+      "label": "Relative Semantic Levels",
+      "position": {
+        "x": 1360,
+        "y": 80
+      },
+      "width": 420,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Relative Semantic Levels\n\nSemantic zoom levels should be relative, not absolute.\n\nInstead of saying:\n- focused = detail\n- linked = summary\n- deep = icon\n\nThe system should say:\n- focused fragment = current semantic level\n- linked fragment = current level - 1\n- deeper fragment = current level - 2\n\nThis prevents the periphery from becoming visually louder than the user's current focus."
+      }
+    },
+    {
+      "id": "task-focus-state-contract-semantic-zoom",
+      "type": "markdown",
+      "label": "Focus State Contract",
+      "position": {
+        "x": 1820,
+        "y": -260
+      },
+      "width": 440,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus State Contract\n\nFocus should be runtime-only state.\n\nSuggested shape:\n\n- `focusedNodeId`\n- `focusedFragmentId`\n- `origin` (`navigation`, `expand`, `embed`, `manual`, `history`)\n- `updatedAt`\n\n`focusedFragmentId` is the semantic zoom anchor and is derived from the fragment containing `focusedNodeId`."
+      }
+    },
+    {
+      "id": "task-focus-triggers-semantic-zoom",
+      "type": "markdown",
+      "label": "Focus Triggers",
+      "position": {
+        "x": 1820,
+        "y": 100
+      },
+      "width": 440,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus Triggers\n\nFragment focus should change only on explicit navigation events:\n\n- navigate via port\n- expand fragment\n- enter embedded graph\n- explicit focus action\n- history back/forward\n\nIt should **not** change on:\n\n- selection only\n- drag\n- hover\n- property edits\n- marquee selection\n- pan / zoom\n\nThat keeps semantic priority stable."
+      }
+    },
+    {
+      "id": "task-node-vs-fragment-focus-semantic-zoom",
+      "type": "markdown",
+      "label": "Node Focus vs Fragment Focus",
+      "position": {
+        "x": 1820,
+        "y": 500
+      },
+      "width": 440,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Node Focus vs Fragment Focus\n\nTwilite needs both:\n\n- **node focus**: local attention target\n- **fragment focus**: semantic zoom anchor\n\nThey are related but not identical.\n\nA node can be focused inside a fragment without changing which fragment owns semantic priority. This keeps local interaction and navigation context from collapsing into one state variable."
+      }
+    },
+    {
+      "id": "task-focus-reassignment-semantic-zoom",
+      "type": "markdown",
+      "label": "Focus Reassignment Rules",
+      "position": {
+        "x": 1820,
+        "y": 900
+      },
+      "width": 440,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus Reassignment Rules\n\nFocus must never dangle.\n\nRules:\n\n- on graph load: focus the root fragment\n- on expand: move fragment focus to the expanded fragment\n- on enter embed: move fragment focus to the embedded graph context\n- on collapse of a focused fragment: return focus to the parent anchor node/fragment\n- on node deletion: move node focus to the nearest valid anchor or clear it\n\nThis keeps navigation coherent as graph contexts appear and disappear."
+      }
+    },
+    {
+      "id": "task-base-level-resolver-semantic-zoom",
+      "type": "markdown",
+      "label": "Base Level Resolver",
+      "position": {
+        "x": 2320,
+        "y": -260
+      },
+      "width": 460,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Base Level Resolver\n\nThe runtime must resolve the current semantic level for the focused fragment before computing relative fragment levels.\n\nSuggested levels:\n\n- `detail`\n- `summary`\n- `icon`\n\nThe resolver sets the base level for the focused fragment. Linked fragments then step down relative to that level."
+      }
+    },
+    {
+      "id": "task-resolver-inputs-semantic-zoom",
+      "type": "markdown",
+      "label": "Resolver Inputs",
+      "position": {
+        "x": 2320,
+        "y": 140
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Resolver Inputs\n\nRecommended inputs for the focused fragment base level:\n\n- `viewportZoom`\n- `semanticLock`\n- `isEditing`\n- `isInteracting`\n\nPriority order:\n\n1. explicit semantic lock\n2. active editing override\n3. active interaction override\n4. physical zoom bands\n5. default fallback\n\nGraph distance should *not* affect the base level. Distance is applied after the base level is chosen."
+      }
+    },
+    {
+      "id": "task-hysteresis-rules-semantic-zoom",
+      "type": "markdown",
+      "label": "Hysteresis Rules",
+      "position": {
+        "x": 2320,
+        "y": 560
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Hysteresis Rules\n\nPhysical zoom should not cause semantic flicker at threshold boundaries.\n\nSuggested transitions:\n\n- `detail -> summary` below `0.85`\n- `summary -> detail` above `0.95`\n- `summary -> icon` below `0.40`\n- `icon -> summary` above `0.50`\n\nThis keeps semantic level changes stable while the user scrolls near a threshold."
+      }
+    },
+    {
+      "id": "task-interaction-overrides-semantic-zoom",
+      "type": "markdown",
+      "label": "Interaction Overrides",
+      "position": {
+        "x": 2320,
+        "y": 980
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Interaction Overrides\n\nThe focused fragment should resist over-compression while the user is actively working in it.\n\nInitial rules:\n\n- if editing inside the focused fragment: minimum base level = `detail`\n- if actively navigating/interacting: minimum base level = `summary`\n- otherwise defer to zoom-band resolution\n\nThis prevents the focused fragment from collapsing below what the current interaction justifies."
+      }
+    },
+    {
+      "id": "task-graph-canvas-vs-object-semantic-zoom",
+      "type": "markdown",
+      "label": "Graph As Canvas vs Object",
+      "position": {
+        "x": 2840,
+        "y": -260
+      },
+      "width": 460,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph As Canvas vs Object\n\nA `.node` graph is the same artifact in both cases, but it can appear in two different rendering roles:\n\n- **graph-as-canvas**: the active workspace you are inside\n- **graph-as-object**: a representation of that graph inside another graph\n\nSemantic zoom must account for this distinction. The artifact is the same; the rendering role is different."
+      }
+    },
+    {
+      "id": "task-rendering-role-semantic-zoom",
+      "type": "markdown",
+      "label": "Rendering Role",
+      "position": {
+        "x": 2840,
+        "y": 140
+      },
+      "width": 460,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Rendering Role\n\nRepresentation resolution should depend on both:\n\n- semantic level\n- rendering role\n\nSuggested roles:\n\n- `canvas` for the active graph workspace\n- `graph-object` for a graph represented inside another graph\n- `node` for ordinary node views\n\nThis prevents the runtime from confusing `show me this graph` with `show me something about this graph`."
+      }
+    },
+    {
+      "id": "task-role-level-resolution-semantic-zoom",
+      "type": "markdown",
+      "label": "Role + Level Resolution",
+      "position": {
+        "x": 2840,
+        "y": 560
+      },
+      "width": 460,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Role + Level Resolution\n\nRepresentation should be resolved by a combination of role and semantic level.\n\nExamples:\n\n- active graph + canvas role -> normal graph renderer\n- linked graph + graph-object role + summary level -> graph summary representation\n- linked graph + graph-object role + icon level -> graph icon representation\n- ordinary node + node role + detail level -> node detail view\n\nRole chooses the representation family. Semantic level chooses the representation variant."
+      }
+    },
+    {
+      "id": "task-class-graph-vs-node-instance-semantic-zoom",
+      "type": "markdown",
+      "label": "Class Graph vs Node Instance",
+      "position": {
+        "x": 3360,
+        "y": -260
+      },
+      "width": 480,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Class Graph vs Node Instance\n\nA node class and a node instance are not the same thing.\n\n- **class graph**: a `.node` graph that defines a reusable type\n- **node instance**: a host-graph node that uses that type\n\nThe class graph may contain a manifest, dictionary, view definitions, schema, and behavior. The node instance does not become a graph context just because it is backed by a class graph. It remains a node in the host graph unless the class graph itself is referenced or rendered as a graph-object."
+      }
+    },
+    {
+      "id": "task-node-vs-graph-representation-semantic-zoom",
+      "type": "markdown",
+      "label": "Node vs Graph Representation",
+      "position": {
+        "x": 3360,
+        "y": 180
+      },
+      "width": 480,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Node vs Graph Representation\n\nRepresentation family depends on what is being rendered:\n\n- node instance -> `node.*` representations\n- graph represented inside another graph -> `graph.*` representations\n- active graph workspace -> canvas rendering\n\nA class graph can define both families, but they apply in different roles. The instance uses the node family. The referenced graph uses the graph family."
+      }
+    },
+    {
+      "id": "task-automatic-semantic-fallback-semantic-zoom",
+      "type": "markdown",
+      "label": "Automatic Semantic Fallback",
+      "position": {
+        "x": 3880,
+        "y": -260
+      },
+      "width": 480,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Automatic Semantic Fallback\n\nSemantic zoom should work by default, even when extra semantic views are not authored.\n\nRules:\n\n- missing `node.web.summary` falls back automatically\n- missing `node.web.icon` falls back automatically\n- missing `graph.web.summary` derives automatically\n- missing `graph.web.icon` derives automatically\n\nAuthored semantic views should improve the result, not be required for the system to function."
+      }
+    },
+    {
+      "id": "task-explicit-views-as-overrides-semantic-zoom",
+      "type": "markdown",
+      "label": "Explicit Views As Overrides",
+      "position": {
+        "x": 3880,
+        "y": 180
+      },
+      "width": 480,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Explicit Views As Overrides\n\nExplicit semantic views are where graphs and node classes become expressive.\n\nPolicy:\n\n- baseline semantic zoom comes from runtime fallback/derivation\n- authored `detail`, `summary`, and `icon` views override the baseline\n- automatic fallback stays simple and structural\n- authored views may be richer, more domain-specific, and more visually intentional\n- users should never see blank or broken representations just because a semantic view was never authored"
+      }
+    },
+    {
+      "id": "task-structural-automatic-fallback-semantic-zoom",
+      "type": "markdown",
+      "label": "Structural Automatic Fallback",
+      "position": {
+        "x": 4400,
+        "y": -260
+      },
+      "width": 500,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Structural Automatic Fallback\n\nAutomatic graph-object representations should be structural reductions, not content summaries.\n\nThey should use plain graph data only:\n\n- manifest identity\n- manifest description\n- manifest intent\n- graph counts\n- source/ref metadata\n\nThey should not depend on AI, interpretation, or deep content mining."
+      }
+    },
+    {
+      "id": "task-identity-over-meaning-semantic-zoom",
+      "type": "markdown",
+      "label": "Identity Over Meaning",
+      "position": {
+        "x": 4400,
+        "y": 180
+      },
+      "width": 500,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Identity Over Meaning\n\nAutomatic semantic fallback should summarize **identity and scale**, not **meaning**.\n\nGood automatic signals:\n\n- graph title\n- graph description\n- node/edge counts\n- graph kind/scope\n\nMeaningful or domain-rich summaries belong in authored semantic views, not in automatic fallback."
+      }
+    },
+    {
+      "id": "task-automatic-graph-object-drawing-policy-semantic-zoom",
+      "type": "markdown",
+      "label": "Automatic Drawing Policy",
+      "position": {
+        "x": 4400,
+        "y": 580
+      },
+      "width": 500,
+      "height": 400,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Automatic Drawing Policy\n\nSuggested baseline object ladder:\n\n## automatic detail\n- graph icon\n- title\n- short description\n- counts row\n\n## automatic summary\n- graph icon\n- title\n- minimal subtitle or count strip\n\n## automatic icon\n- graph glyph\n- short label or count badge\n\nThis gives predictable reduction without defeating the purpose of summarization."
+      }
+    },
+    {
+      "id": "task-representation-cache-scope-semantic-zoom",
+      "type": "markdown",
+      "label": "Representation Cache Scope",
+      "position": {
+        "x": 4920,
+        "y": -260
+      },
+      "width": 500,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Representation Cache Scope\n\nCache only resolved semantic representation data.\n\nCache candidates:\n\n- derived graph-object detail\n- derived graph-object summary\n- derived graph-object icon\n- resolved explicit-vs-derived representation choice\n\nDo **not** cache active canvas rendering, focus state, viewport state, or mounted UI."
+      }
+    },
+    {
+      "id": "task-cache-keys-semantic-zoom",
+      "type": "markdown",
+      "label": "Cache Keys",
+      "position": {
+        "x": 4920,
+        "y": 160
+      },
+      "width": 500,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Cache Keys\n\nCache keys should be deterministic and small.\n\nSuggested key:\n\n`target + role + level + revision`\n\nWhere:\n\n- `target` = graph/class identity\n- `role` = `node` or `graph-object`\n- `level` = `detail`, `summary`, `icon`\n- `revision` = in-memory version token for the underlying source\n\nIf revision changes, the cache entry is stale by definition."
+      }
+    },
+    {
+      "id": "task-invalidation-rules-semantic-zoom",
+      "type": "markdown",
+      "label": "Invalidation Rules",
+      "position": {
+        "x": 4920,
+        "y": 580
+      },
+      "width": 500,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Invalidation Rules\n\nInvalidate cached semantic representations when:\n\n- graph nodes/edges/groups change\n- manifest identity/description/intent changes\n- authored semantic views change\n- class/view definitions change\n\nDo **not** invalidate just because focus, selection, panning, or physical zoom changed. Those affect which representation is requested, not whether the cached representation is stale."
+      }
+    },
+    {
+      "id": "task-in-memory-only-phase1-semantic-zoom",
+      "type": "markdown",
+      "label": "In-Memory Only (Phase 1)",
+      "position": {
+        "x": 4920,
+        "y": 1020
+      },
+      "width": 500,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# In-Memory Only (Phase 1)\n\nPhase 1 caching should be in-memory only.\n\n- no localStorage\n- no IndexedDB\n- no file persistence\n\nUse a simple runtime `Map` keyed by representation identity. Extend later only if performance data justifies it."
+      }
+    },
+    {
+      "id": "task-explicit-sticky-focus-semantic-zoom",
+      "type": "markdown",
+      "label": "Explicit Sticky Focus",
+      "position": {
+        "x": 5440,
+        "y": -260
+      },
+      "width": 500,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Explicit Sticky Focus\n\nFocused node/fragment should be set primarily by explicit navigation events, not by geometry.\n\nFocus should be **sticky**:\n\n- click / navigate / expand / enter embed sets focus\n- focus persists until explicitly changed or invalidated\n- panning and zooming alone do not change focus\n\nThis keeps semantic zoom stable and intentional."
+      }
+    },
+    {
+      "id": "task-viewport-center-fallback-semantic-zoom",
+      "type": "markdown",
+      "label": "Viewport Center Fallback",
+      "position": {
+        "x": 5440,
+        "y": 180
+      },
+      "width": 500,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Viewport Center Fallback\n\nViewport-center heuristics should be fallback only.\n\nUse them only when:\n\n- no focus currently exists\n- the previous focus became invalid\n- a replacement focus must be chosen\n\nEven then, center-of-viewport should be treated as a recovery heuristic, not the normal driver of semantic focus."
+      }
+    },
+    {
+      "id": "task-no-focus-churn-semantic-zoom",
+      "type": "markdown",
+      "label": "No Focus Churn On Pan/Zoom",
+      "position": {
+        "x": 5440,
+        "y": 580
+      },
+      "width": 500,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# No Focus Churn On Pan/Zoom\n\nSemantic zoom must not reassign focus just because the camera moved.\n\nRules:\n\n- pan does not change focus\n- zoom does not change focus\n- focus is only reassigned on explicit navigation or invalidation\n\nThis prevents accidental radical representation changes when the user is only reframing the viewport."
+      }
+    },
+    {
+      "id": "task-browse-vs-edit-modes-semantic-zoom",
+      "type": "markdown",
+      "label": "Browse vs Edit Modes",
+      "position": {
+        "x": 5960,
+        "y": -260
+      },
+      "width": 520,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Browse vs Edit Modes\n\nTwilite needs to distinguish navigation intent from editing intent.\n\n- **browse mode**: focus, navigate, expand, inspect\n- **edit mode**: select, drag, resize, rewire, mutate\n\nThis keeps focus and selection from competing for the same mouse gesture. Semantic zoom belongs primarily to browse behavior."
+      }
+    },
+    {
+      "id": "task-toolbar-mode-switch-semantic-zoom",
+      "type": "markdown",
+      "label": "Toolbar Mode Switch",
+      "position": {
+        "x": 5960,
+        "y": 180
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Toolbar Mode Switch\n\nWhen the full editor toolbar is present, the user should have an explicit mode switch:\n\n- `Browse`\n- `Edit`\n\nThe switch must change event interpretation, not just appearance. This makes intent explicit and keeps the interaction model understandable."
+      }
+    },
+    {
+      "id": "task-browse-default-without-toolbar-semantic-zoom",
+      "type": "markdown",
+      "label": "Browse Default Without Toolbar",
+      "position": {
+        "x": 5960,
+        "y": 560
+      },
+      "width": 520,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Browse Default Without Toolbar\n\nIf the toolbar/editor chrome is absent, Twilite should default to browse mode.\n\nThat fits the viewer/embedded/runtime posture:\n\n- read\n- navigate\n- traverse linked graphs\n- inspect graph objects\n\nEditing should not be the implicit default in minimal or embedded contexts."
+      }
+    },
+    {
+      "id": "task-mode-specific-mouse-semantics-semantic-zoom",
+      "type": "markdown",
+      "label": "Mode-Specific Mouse Semantics",
+      "position": {
+        "x": 5960,
+        "y": 920
+      },
+      "width": 520,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Mode-Specific Mouse Semantics\n\nSuggested first-pass behavior:\n\n## browse mode\n- click = focus\n- navigation affordance = open / traverse\n- semantic zoom follows navigation\n\n## edit mode\n- click = select\n- drag = move\n- resize/connect/edit enabled\n\nThe same gesture should not mean both \"focus this\" and \"edit this\" at the same time."
+      }
+    },
+    {
+      "id": "task-pointer-primary-navigation-semantic-zoom",
+      "type": "markdown",
+      "label": "Pointer-Primary Navigation",
+      "position": {
+        "x": 6480,
+        "y": -260
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Pointer-Primary Navigation\n\nGraph navigation in Twilite should be pointer-primary.\n\nMouse/pointer input is the main way to:\n\n- focus graph objects\n- traverse references\n- expand branches\n- inspect graph context\n\nThis matches the spatial nature of the medium."
+      }
+    },
+    {
+      "id": "task-keyboard-command-layer-semantic-zoom",
+      "type": "markdown",
+      "label": "Keyboard As Command Layer",
+      "position": {
+        "x": 6480,
+        "y": 140
+      },
+      "width": 520,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Keyboard As Command Layer\n\nKeyboard remains useful, but not as the main graph browsing mechanism.\n\nGood keyboard roles:\n\n- mode switching\n- delete / duplicate / copy / paste\n- search / command palette\n- confirm / cancel\n- open / back / forward commands\n\nKeyboard should support graph work without pretending to be the primary spatial navigation tool."
+      }
+    },
+    {
+      "id": "task-no-arrow-key-graph-browsing-semantic-zoom",
+      "type": "markdown",
+      "label": "No Arrow-Key Graph Browsing",
+      "position": {
+        "x": 6480,
+        "y": 560
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# No Arrow-Key Graph Browsing\n\nArrow keys are not a sufficient model for graph navigation.\n\nThey are too linear and too ambiguous for a spatial, branching workspace.\n\nKeyboard navigation should only update focus when tied to an explicit navigation command, not via generic arrow-key browsing."
+      }
+    },
+    {
+      "id": "task-initial-focus-resolution-semantic-zoom",
+      "type": "markdown",
+      "label": "Initial Focus Resolution",
+      "position": {
+        "x": 7000,
+        "y": -260
+      },
+      "width": 540,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Initial Focus Resolution\n\nOn initial graph load:\n\n1. find the first root node\n2. set it as `focusedNodeId`\n3. set the containing graph context as `focusedFragmentId`\n\nFallback order:\n\n- first explicit root node\n- first visible node\n- `null` only if the graph is empty\n\nThis gives semantic zoom a deterministic startup anchor."
+      }
+    },
+    {
+      "id": "task-focused-fragment-containment-semantic-zoom",
+      "type": "markdown",
+      "label": "Focused Fragment Containment",
+      "position": {
+        "x": 7000,
+        "y": 180
+      },
+      "width": 540,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focused Fragment Containment\n\nThe focused fragment is the fragment that contains the focused node.\n\nThat means:\n\n- node focus is the local anchor\n- fragment focus is derived from node containment\n\nThis keeps the focus model coherent and prevents node focus and fragment focus from drifting apart."
+      }
+    },
+    {
+      "id": "task-nearest-lower-fallback-semantic-zoom",
+      "type": "markdown",
+      "label": "Nearest Lower Fallback",
+      "position": {
+        "x": 7520,
+        "y": -260
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Nearest Lower Fallback\n\nIf the requested semantic representation does not exist, the runtime should fall back to the nearest lower valid representation for that role.\n\nRules:\n\n- never promote peripheral content above the focused fragment's relative prominence\n- prefer automatic representations before generic fallback\n- if `focus-1` is missing, use automatic summary or icon as appropriate\n- if `focus-2` is missing, use automatic icon\n- if nothing richer exists, use the minimal generic graph-object badge/card\n\nThis keeps semantic reduction stable even when authored views are sparse."
+      }
+    },
+    {
+      "id": "task-focus-runtime-only-semantic-zoom",
+      "type": "markdown",
+      "label": "Focus Is Runtime Only",
+      "position": {
+        "x": 8040,
+        "y": -260
+      },
+      "width": 560,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus Is Runtime Only\n\nFocus should remain runtime-only state.\n\nDo not persist:\n\n- `focusedNodeId`\n- `focusedFragmentId`\n- transient focus history\n\nFocus belongs to the live navigation session, not to the saved `.node` artifact."
+      }
+    },
+    {
+      "id": "task-fragment-layout-dependency-semantic-zoom",
+      "type": "markdown",
+      "label": "Fragment Layout Dependency",
+      "position": {
+        "x": 8040,
+        "y": 160
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Fragment Layout Dependency\n\nSemantic zoom depends on fragment layout policy when multiple expanded fragments are visible.\n\nSemantic zoom can decide:\n\n- focus\n- relative representation level\n- visual prominence\n\nBut layout determines:\n\n- where fragments appear\n- how they avoid overlap\n- whether adjacency is legible\n- whether semantic hierarchy reads clearly\n\nThis remaining issue belongs at the boundary between semantic zoom and fragment layout."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-semzoom-001",
+      "type": "relates",
+      "source": "task-manifest-semantic-zoom",
+      "target": "task-overview-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares"
+    },
+    {
+      "id": "edge-semzoom-002",
+      "type": "relates",
+      "source": "task-overview-semantic-zoom",
+      "target": "task-goals-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "frames"
+    },
+    {
+      "id": "edge-semzoom-003",
+      "type": "relates",
+      "source": "task-goals-semantic-zoom",
+      "target": "task-zoom-bands-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires"
+    },
+    {
+      "id": "edge-semzoom-004",
+      "type": "relates",
+      "source": "task-overview-semantic-zoom",
+      "target": "task-node-class-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains"
+    },
+    {
+      "id": "edge-semzoom-005",
+      "type": "relates",
+      "source": "task-node-class-contract-semantic-zoom",
+      "target": "task-renderer-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "edge-semzoom-006",
+      "type": "relates",
+      "source": "task-renderer-contract-semantic-zoom",
+      "target": "task-fallbacks-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "resolves"
+    },
+    {
+      "id": "edge-semzoom-007",
+      "type": "relates",
+      "source": "task-fallbacks-semantic-zoom",
+      "target": "task-fragments-groups-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "extends to"
+    },
+    {
+      "id": "edge-semzoom-008",
+      "type": "relates",
+      "source": "task-renderer-contract-semantic-zoom",
+      "target": "task-phases-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives"
+    },
+    {
+      "id": "edge-semzoom-009",
+      "type": "relates",
+      "source": "task-phases-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "validated by"
+    },
+    {
+      "id": "edge-semzoom-010",
+      "type": "relates",
+      "source": "task-acceptance-semantic-zoom",
+      "target": "task-open-questions-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "clarifies"
+    },
+    {
+      "id": "edge-semzoom-011",
+      "type": "relates",
+      "source": "task-legend-semantic-zoom",
+      "target": "task-overview-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "describes"
+    },
+    {
+      "id": "edge-semzoom-012",
+      "type": "relates",
+      "source": "task-dictionary-semantic-zoom",
+      "target": "task-node-class-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-013",
+      "type": "relates",
+      "source": "task-zoom-bands-semantic-zoom",
+      "target": "task-focused-node-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "is guided by"
+    },
+    {
+      "id": "edge-semzoom-014",
+      "type": "relates",
+      "source": "task-focused-node-semantic-zoom",
+      "target": "task-fragment-cascade-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives"
+    },
+    {
+      "id": "edge-semzoom-015",
+      "type": "relates",
+      "source": "task-fragment-cascade-semantic-zoom",
+      "target": "task-phases-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "shapes"
+    },
+    {
+      "id": "edge-semzoom-016",
+      "type": "relates",
+      "source": "task-focused-node-semantic-zoom",
+      "target": "task-open-questions-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "raises"
+    },
+    {
+      "id": "edge-semzoom-017",
+      "type": "relates",
+      "source": "task-focused-node-semantic-zoom",
+      "target": "task-relative-levels-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "scales through"
+    },
+    {
+      "id": "edge-semzoom-018",
+      "type": "relates",
+      "source": "task-relative-levels-semantic-zoom",
+      "target": "task-fragment-cascade-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "governs"
+    },
+    {
+      "id": "edge-semzoom-019",
+      "type": "relates",
+      "source": "task-relative-levels-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains"
+    },
+    {
+      "id": "edge-semzoom-020",
+      "type": "relates",
+      "source": "task-focused-node-semantic-zoom",
+      "target": "task-focus-state-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires"
+    },
+    {
+      "id": "edge-semzoom-021",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-focus-triggers-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "changes through"
+    },
+    {
+      "id": "edge-semzoom-022",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-node-vs-fragment-focus-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "separates"
+    },
+    {
+      "id": "edge-semzoom-023",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-focus-reassignment-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must define"
+    },
+    {
+      "id": "edge-semzoom-024",
+      "type": "relates",
+      "source": "task-focus-reassignment-semantic-zoom",
+      "target": "task-open-questions-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "raises"
+    },
+    {
+      "id": "edge-semzoom-025",
+      "type": "relates",
+      "source": "task-node-vs-fragment-focus-semantic-zoom",
+      "target": "task-renderer-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "edge-semzoom-026",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-base-level-resolver-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "anchors"
+    },
+    {
+      "id": "edge-semzoom-027",
+      "type": "relates",
+      "source": "task-base-level-resolver-semantic-zoom",
+      "target": "task-resolver-inputs-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "uses"
+    },
+    {
+      "id": "edge-semzoom-028",
+      "type": "relates",
+      "source": "task-resolver-inputs-semantic-zoom",
+      "target": "task-hysteresis-rules-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "stabilized by"
+    },
+    {
+      "id": "edge-semzoom-029",
+      "type": "relates",
+      "source": "task-resolver-inputs-semantic-zoom",
+      "target": "task-interaction-overrides-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "overridden by"
+    },
+    {
+      "id": "edge-semzoom-030",
+      "type": "relates",
+      "source": "task-base-level-resolver-semantic-zoom",
+      "target": "task-relative-levels-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "edge-semzoom-031",
+      "type": "relates",
+      "source": "task-interaction-overrides-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-032",
+      "type": "relates",
+      "source": "task-node-class-contract-semantic-zoom",
+      "target": "task-graph-canvas-vs-object-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "extends to"
+    },
+    {
+      "id": "edge-semzoom-033",
+      "type": "relates",
+      "source": "task-graph-canvas-vs-object-semantic-zoom",
+      "target": "task-rendering-role-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires"
+    },
+    {
+      "id": "edge-semzoom-034",
+      "type": "relates",
+      "source": "task-rendering-role-semantic-zoom",
+      "target": "task-role-level-resolution-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives"
+    },
+    {
+      "id": "edge-semzoom-035",
+      "type": "relates",
+      "source": "task-role-level-resolution-semantic-zoom",
+      "target": "task-renderer-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "refines"
+    },
+    {
+      "id": "edge-semzoom-036",
+      "type": "relates",
+      "source": "task-role-level-resolution-semantic-zoom",
+      "target": "task-base-level-resolver-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "works with"
+    },
+    {
+      "id": "edge-semzoom-037",
+      "type": "relates",
+      "source": "task-graph-canvas-vs-object-semantic-zoom",
+      "target": "task-class-graph-vs-node-instance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must not confuse"
+    },
+    {
+      "id": "edge-semzoom-038",
+      "type": "relates",
+      "source": "task-class-graph-vs-node-instance-semantic-zoom",
+      "target": "task-node-vs-graph-representation-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "maps to"
+    },
+    {
+      "id": "edge-semzoom-039",
+      "type": "relates",
+      "source": "task-node-vs-graph-representation-semantic-zoom",
+      "target": "task-node-class-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "clarifies"
+    },
+    {
+      "id": "edge-semzoom-040",
+      "type": "relates",
+      "source": "task-class-graph-vs-node-instance-semantic-zoom",
+      "target": "task-rendering-role-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains"
+    },
+    {
+      "id": "edge-semzoom-041",
+      "type": "relates",
+      "source": "task-fallbacks-semantic-zoom",
+      "target": "task-automatic-semantic-fallback-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "defaults to"
+    },
+    {
+      "id": "edge-semzoom-042",
+      "type": "relates",
+      "source": "task-automatic-semantic-fallback-semantic-zoom",
+      "target": "task-explicit-views-as-overrides-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "can be refined by"
+    },
+    {
+      "id": "edge-semzoom-043",
+      "type": "relates",
+      "source": "task-explicit-views-as-overrides-semantic-zoom",
+      "target": "task-node-class-contract-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "fits into"
+    },
+    {
+      "id": "edge-semzoom-044",
+      "type": "relates",
+      "source": "task-automatic-semantic-fallback-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-045",
+      "type": "relates",
+      "source": "task-automatic-semantic-fallback-semantic-zoom",
+      "target": "task-structural-automatic-fallback-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "should be"
+    },
+    {
+      "id": "edge-semzoom-046",
+      "type": "relates",
+      "source": "task-structural-automatic-fallback-semantic-zoom",
+      "target": "task-identity-over-meaning-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "favors"
+    },
+    {
+      "id": "edge-semzoom-047",
+      "type": "relates",
+      "source": "task-identity-over-meaning-semantic-zoom",
+      "target": "task-automatic-graph-object-drawing-policy-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "expressed as"
+    },
+    {
+      "id": "edge-semzoom-048",
+      "type": "relates",
+      "source": "task-automatic-graph-object-drawing-policy-semantic-zoom",
+      "target": "task-explicit-views-as-overrides-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "contrasts with"
+    },
+    {
+      "id": "edge-semzoom-049",
+      "type": "relates",
+      "source": "task-automatic-graph-object-drawing-policy-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-050",
+      "type": "relates",
+      "source": "task-automatic-graph-object-drawing-policy-semantic-zoom",
+      "target": "task-representation-cache-scope-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "benefits from"
+    },
+    {
+      "id": "edge-semzoom-051",
+      "type": "relates",
+      "source": "task-representation-cache-scope-semantic-zoom",
+      "target": "task-cache-keys-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "indexed by"
+    },
+    {
+      "id": "edge-semzoom-052",
+      "type": "relates",
+      "source": "task-cache-keys-semantic-zoom",
+      "target": "task-invalidation-rules-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "governed by"
+    },
+    {
+      "id": "edge-semzoom-053",
+      "type": "relates",
+      "source": "task-invalidation-rules-semantic-zoom",
+      "target": "task-in-memory-only-phase1-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implemented as"
+    },
+    {
+      "id": "edge-semzoom-054",
+      "type": "relates",
+      "source": "task-in-memory-only-phase1-semantic-zoom",
+      "target": "task-phases-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "scopes"
+    },
+    {
+      "id": "edge-semzoom-055",
+      "type": "relates",
+      "source": "task-focus-triggers-semantic-zoom",
+      "target": "task-explicit-sticky-focus-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "resolved as"
+    },
+    {
+      "id": "edge-semzoom-056",
+      "type": "relates",
+      "source": "task-explicit-sticky-focus-semantic-zoom",
+      "target": "task-viewport-center-fallback-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "falls back to"
+    },
+    {
+      "id": "edge-semzoom-057",
+      "type": "relates",
+      "source": "task-explicit-sticky-focus-semantic-zoom",
+      "target": "task-no-focus-churn-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "protects with"
+    },
+    {
+      "id": "edge-semzoom-058",
+      "type": "relates",
+      "source": "task-no-focus-churn-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-059",
+      "type": "relates",
+      "source": "task-node-vs-fragment-focus-semantic-zoom",
+      "target": "task-browse-vs-edit-modes-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "pressures"
+    },
+    {
+      "id": "edge-semzoom-060",
+      "type": "relates",
+      "source": "task-browse-vs-edit-modes-semantic-zoom",
+      "target": "task-toolbar-mode-switch-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "exposed by"
+    },
+    {
+      "id": "edge-semzoom-061",
+      "type": "relates",
+      "source": "task-toolbar-mode-switch-semantic-zoom",
+      "target": "task-browse-default-without-toolbar-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "falls back to"
+    },
+    {
+      "id": "edge-semzoom-062",
+      "type": "relates",
+      "source": "task-browse-vs-edit-modes-semantic-zoom",
+      "target": "task-mode-specific-mouse-semantics-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implemented as"
+    },
+    {
+      "id": "edge-semzoom-063",
+      "type": "relates",
+      "source": "task-mode-specific-mouse-semantics-semantic-zoom",
+      "target": "task-focus-triggers-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "clarifies"
+    },
+    {
+      "id": "edge-semzoom-064",
+      "type": "relates",
+      "source": "task-browse-default-without-toolbar-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-065",
+      "type": "relates",
+      "source": "task-browse-vs-edit-modes-semantic-zoom",
+      "target": "task-pointer-primary-navigation-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implies"
+    },
+    {
+      "id": "edge-semzoom-066",
+      "type": "relates",
+      "source": "task-pointer-primary-navigation-semantic-zoom",
+      "target": "task-keyboard-command-layer-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "complements with"
+    },
+    {
+      "id": "edge-semzoom-067",
+      "type": "relates",
+      "source": "task-keyboard-command-layer-semantic-zoom",
+      "target": "task-no-arrow-key-graph-browsing-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "excludes"
+    },
+    {
+      "id": "edge-semzoom-068",
+      "type": "relates",
+      "source": "task-no-arrow-key-graph-browsing-semantic-zoom",
+      "target": "task-focus-triggers-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "clarifies"
+    },
+    {
+      "id": "edge-semzoom-069",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-initial-focus-resolution-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts with"
+    },
+    {
+      "id": "edge-semzoom-070",
+      "type": "relates",
+      "source": "task-initial-focus-resolution-semantic-zoom",
+      "target": "task-focused-fragment-containment-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "establishes"
+    },
+    {
+      "id": "edge-semzoom-071",
+      "type": "relates",
+      "source": "task-focused-fragment-containment-semantic-zoom",
+      "target": "task-base-level-resolver-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "anchors"
+    },
+    {
+      "id": "edge-semzoom-072",
+      "type": "relates",
+      "source": "task-focused-fragment-containment-semantic-zoom",
+      "target": "task-relative-levels-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "edge-semzoom-073",
+      "type": "relates",
+      "source": "task-fallbacks-semantic-zoom",
+      "target": "task-nearest-lower-fallback-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "resolved by"
+    },
+    {
+      "id": "edge-semzoom-074",
+      "type": "relates",
+      "source": "task-nearest-lower-fallback-semantic-zoom",
+      "target": "task-automatic-semantic-fallback-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "uses"
+    },
+    {
+      "id": "edge-semzoom-075",
+      "type": "relates",
+      "source": "task-nearest-lower-fallback-semantic-zoom",
+      "target": "task-acceptance-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports"
+    },
+    {
+      "id": "edge-semzoom-076",
+      "type": "relates",
+      "source": "task-focus-state-contract-semantic-zoom",
+      "target": "task-focus-runtime-only-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "resolved as"
+    },
+    {
+      "id": "edge-semzoom-077",
+      "type": "relates",
+      "source": "task-focus-runtime-only-semantic-zoom",
+      "target": "task-open-questions-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "removes"
+    },
+    {
+      "id": "edge-semzoom-078",
+      "type": "relates",
+      "source": "task-fragments-groups-semantic-zoom",
+      "target": "task-fragment-layout-dependency-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "depends on"
+    },
+    {
+      "id": "edge-semzoom-079",
+      "type": "relates",
+      "source": "task-fragment-layout-dependency-semantic-zoom",
+      "target": "task-open-questions-semantic-zoom",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "reframes"
+    }
+  ],
+  "timestamp": "2026-03-13T00:00:00.000Z",
+  "nodeCount": 53,
+  "edgeCount": 79
+}

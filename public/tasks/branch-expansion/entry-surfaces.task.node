@@ -1,0 +1,480 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "entry-surfaces-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -560,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "branch-expansion-entry-surfaces",
+          "name": "Named Entry Surfaces",
+          "version": "0.1.0",
+          "description": "Review graph for graph-level open/expand entry surfaces.",
+          "createdAt": "2026-03-14T00:00:00.000Z",
+          "updatedAt": "2026-03-14T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "design"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main"
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "entry-surfaces-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -560,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "problem",
+            "intent": "why root fragment semantics came up",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "decision",
+            "intent": "proposed Twilite contract",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          },
+          {
+            "key": "usage",
+            "intent": "port behavior and user workflow",
+            "implementation": "markdown node",
+            "dictionaryKey": "markdown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry-surfaces-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -560,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "entry-surfaces-overview",
+      "type": "markdown",
+      "label": "Problem Statement",
+      "position": {
+        "x": 20,
+        "y": -180
+      },
+      "width": 460,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Named Entry Surfaces\n\nBranch expansion exposed a gap: the same `.node` file may be used as a destination graph or as an inline branch source.\n\nThe port decides the interaction mode, but the target graph needs a declared entry surface so expansion starts from the intended place."
+      },
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-port-contract",
+      "type": "markdown",
+      "label": "Port-Decided Intent",
+      "position": {
+        "x": -20,
+        "y": 140
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Port-Decided Intent\n\nThe target file does not hard-code whether it is a graph or a fragment.\n\nThe `port` declares the intent:\n- `mode=navigate` -> open as document\n- `mode=expand` -> use as branch source\n\nThat keeps one artifact reusable in multiple contexts."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-entries",
+      "type": "markdown",
+      "label": "Named Entry Surfaces",
+      "position": {
+        "x": 380,
+        "y": 140
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Named Entry Surfaces\n\nA graph should be able to declare stable entry handles such as:\n- `open`\n- `expand`\n- `summary`\n\nPorts point to the graph and a handle, not to arbitrary internal node ids."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-ux",
+      "type": "markdown",
+      "label": "User Experience",
+      "position": {
+        "x": -20,
+        "y": 430
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## UX Direction\n\nHide the mechanics. The user should see concrete settings like:\n- `Open at`\n- `Expand from`\n\nNormal users should not have to think about manifests, root fragments, or internal node ids."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-fallbacks",
+      "type": "markdown",
+      "label": "Fallback Resolution",
+      "position": {
+        "x": 380,
+        "y": 440
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Fallback Resolution\n\nIf a graph does not declare an entry surface:\n1. use the requested handle if present\n2. else use the default/root handle\n3. else use the first root node\n4. else use the first visible node\n\nThis keeps existing graphs working while allowing explicit author control."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-context-boundary",
+      "type": "markdown",
+      "label": "Host Context Boundary",
+      "position": {
+        "x": 800,
+        "y": -40
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Host Context Boundary\n\nThe connector chooses the source, but the host graph keeps execution authority. Expanding a graph must not silently import its runtime authority."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-structural-only",
+      "type": "markdown",
+      "label": "Structural-Only Expansion",
+      "position": {
+        "x": 800,
+        "y": 260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Structural-Only Expansion\n\nDefault `expand` should import structure, not authority:\n- import nodes and edges\n- strip manifest, legend, dictionary\n- block scripts and executable bindings\n- keep imported content marked as projected structure"
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "entry-surfaces-responsibility-split",
+      "type": "markdown",
+      "label": "Responsibility Split",
+      "position": {
+        "x": 800,
+        "y": 560
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Responsibility Split\n\nThe user chooses what to reference. Twilite limits what that reference can do. Source choice is user intent; context protection is runtime policy."
+      },
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "content",
+          "position": {
+            "side": "top",
+            "offset": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "entry-surfaces-edge-001",
+      "type": "relates",
+      "source": "entry-surfaces-manifest",
+      "target": "entry-surfaces-overview",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares"
+    },
+    {
+      "id": "entry-surfaces-edge-002",
+      "type": "reference",
+      "source": "entry-surfaces-overview",
+      "target": "entry-surfaces-port-contract",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "intent"
+    },
+    {
+      "id": "entry-surfaces-edge-003",
+      "type": "reference",
+      "source": "entry-surfaces-overview",
+      "target": "entry-surfaces-entries",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "contract"
+    },
+    {
+      "id": "entry-surfaces-edge-004",
+      "type": "reference",
+      "source": "entry-surfaces-port-contract",
+      "target": "entry-surfaces-ux",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "ui"
+    },
+    {
+      "id": "entry-surfaces-edge-005",
+      "type": "reference",
+      "source": "entry-surfaces-entries",
+      "target": "entry-surfaces-fallbacks",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "fallback"
+    },
+    {
+      "id": "entry-surfaces-edge-006",
+      "type": "reference",
+      "source": "entry-surfaces-entries",
+      "target": "entry-surfaces-context-boundary",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "context"
+    },
+    {
+      "id": "entry-surfaces-edge-007",
+      "type": "reference",
+      "source": "entry-surfaces-context-boundary",
+      "target": "entry-surfaces-structural-only",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "default"
+    },
+    {
+      "id": "entry-surfaces-edge-008",
+      "type": "reference",
+      "source": "entry-surfaces-structural-only",
+      "target": "entry-surfaces-responsibility-split",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "policy"
+    }
+  ],
+  "timestamp": "2026-03-14T00:00:00.000Z",
+  "nodeCount": 11,
+  "edgeCount": 8
+}

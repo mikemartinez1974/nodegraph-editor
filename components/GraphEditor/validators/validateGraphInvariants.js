@@ -180,7 +180,10 @@ export function validateGraphInvariants({
   });
 
   const manifestNodes = nodes.filter((node) => node?.type === 'manifest');
-  if (manifestNodes.length === 0) {
+  const authoritativeManifestNodes = manifestNodes.filter(
+    (node) => node?.data?._contextScope?.authority !== 'informational'
+  );
+  if (authoritativeManifestNodes.length === 0) {
     const entry = {
       code: 'MANIFEST_COUNT_INVALID',
       message: 'Manifest missing: graph mutations are blocked.'
@@ -194,7 +197,7 @@ export function validateGraphInvariants({
 
   const manifestByCluster = new Map();
   const rootManifests = [];
-  manifestNodes.forEach((manifest) => {
+  authoritativeManifestNodes.forEach((manifest) => {
     const clusterId = nodeClusterMap.get(manifest.id) || null;
     if (clusterId) {
       if (manifestByCluster.has(clusterId)) {
@@ -581,7 +584,7 @@ export function validateGraphInvariants({
       return;
     }
 
-    if (target.mode && !["navigate", "bridge", "boundary"].includes(target.mode)) {
+    if (target.mode && !["navigate", "expand", "bridge", "boundary"].includes(target.mode)) {
       pushLoadTolerantIssue({
         code: "PORT_MODE_INVALID",
         message: `Port node \"${node.id}\" has invalid target.mode \"${target.mode}\".`,

@@ -254,6 +254,12 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         emitExecutionIntent({ action: 'expandReference', payload });
         return { success: true, queued: true, data: { ok: true, queued: true } };
       },
+      assessContextCompatibility: async (payload = {}) => {
+        if (typeof rawGraph?.assessContextCompatibility === 'function') {
+          return rawGraph.assessContextCompatibility(payload);
+        }
+        return { success: false, error: 'assessContextCompatibility is unavailable' };
+      },
       collapseExpansion: (payload = {}) => {
         emitExecutionIntent({ action: 'collapseExpansion', payload });
         return { success: true, queued: true, data: { ok: true, queued: true } };

@@ -180,6 +180,12 @@ const GraphReferenceNode = (props) => {
           });
           if (result && result.success === false) {
             setExpansionError(result.error || result.data?.message || "Expansion failed");
+          } else if (result?.entryNodeId) {
+            window.setTimeout(() => {
+              try {
+                eventBus.emit("focusNode", { nodeId: result.entryNodeId, source: "expandReference" });
+              } catch {}
+            }, 0);
           }
         }
       } finally {

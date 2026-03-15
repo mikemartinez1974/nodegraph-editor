@@ -250,9 +250,12 @@ export default function useGraphInteractions({
     const handleNodeClick = ({ id }) => {
       setSelectedNodeIds([id]);
       setSelectedEdgeIds([]);
+      if (state?.interactionMode === 'browse') {
+        state?.setFocusedNodeId?.(id);
+      }
     };
 
     eventBus.on('nodeClick', handleNodeClick);
     return () => eventBus.off('nodeClick', handleNodeClick);
-  }, [setSelectedNodeIds, setSelectedEdgeIds]);
+  }, [setSelectedNodeIds, setSelectedEdgeIds, state]);
 }

@@ -6,9 +6,29 @@ import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
 
 const CANVAS_HIDDEN_NODE_TYPES = new Set(['manifest', 'dictionary', 'legend']);
 
+const getSemanticRenderSize = (node, semanticLevel) => {
+  const type = String(node?.type || '').trim().toLowerCase();
+  if (semanticLevel !== 'summary' && semanticLevel !== 'icon') return null;
+
+  if (type === 'markdown') {
+    return semanticLevel === 'icon'
+      ? { width: 150, height: 40 }
+      : { width: 210, height: 46 };
+  }
+
+  if (type === 'port') {
+    return semanticLevel === 'icon'
+      ? { width: 160, height: 40 }
+      : { width: 220, height: 46 };
+  }
+
+  return null;
+};
+
 export default function GraphRendererAdapter({
   graphKey,
   nodeTypes,
+  getNodeSemanticLevel,
   resolveNodeComponent,
   edgeTypes,
   edgeRoutes,
@@ -19,6 +39,7 @@ export default function GraphRendererAdapter({
   setSnackbar,
   showMinimap,
   minimapOffset,
+  showPorts = true,
   snapToGrid,
   showGrid,
   gridSize,
@@ -59,8 +80,27 @@ export default function GraphRendererAdapter({
     hoveredNodeId
   } = state;
   const renderNodes = React.useMemo(
-    () => (Array.isArray(nodes) ? nodes.filter((node) => !CANVAS_HIDDEN_NODE_TYPES.has(node?.type)) : []),
-    [nodes]
+    () => (
+      Array.isArray(nodes)
+        ? nodes
+            .filter((node) => !CANVAS_HIDDEN_NODE_TYPES.has(node?.type))
+            .map((node) => {
+              const semanticLevel = typeof getNodeSemanticLevel === 'function'
+                ? getNodeSemanticLevel(node)
+                : 'detail';
+              const semanticSize = getSemanticRenderSize(node, semanticLevel);
+              return {
+                ...node,
+                ...(semanticSize ? semanticSize : {}),
+                data: {
+                  ...(node?.data || {}),
+                  _semanticLevel: semanticLevel
+                }
+              };
+            })
+        : []
+    ),
+    [getNodeSemanticLevel, nodes]
   );
   const renderNodeIds = React.useMemo(
     () => new Set(renderNodes.map((node) => node.id)),
@@ -118,6 +158,7 @@ export default function GraphRendererAdapter({
         setSnackbar={setSnackbar}
         showMinimap={showMinimap}
         minimapOffset={minimapOffset}
+        showPorts={showPorts}
         snapToGrid={snapToGrid}
         showGrid={showGrid}
         gridSize={gridSize}

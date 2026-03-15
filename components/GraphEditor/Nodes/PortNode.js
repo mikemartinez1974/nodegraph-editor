@@ -55,6 +55,7 @@ const buildTargetLabel = (target = {}) => {
 
 const PortNode = (props) => {
   const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const { isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
   const isResizingRef = useRef(false);
@@ -83,11 +84,15 @@ const PortNode = (props) => {
     ? buildTargetLabel(target)
     : buildTargetLabel(fallbackTarget);
   const displayLabel = node?.label || "Port";
+  const semanticLevel = String(node?.data?._semanticLevel || "detail").trim().toLowerCase();
+  const isCompactSemantic = semanticLevel === "summary" || semanticLevel === "icon";
   const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
   const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
+  const canNavigate = expansionTarget.mode !== "expand";
   const [expansionBusy, setExpansionBusy] = useState(false);
   const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
   const [expansionError, setExpansionError] = useState("");
+  const [compatibility, setCompatibility] = useState(null);
 
   const readGraphApi = useCallback(() => {
     if (typeof window === "undefined") return null;
@@ -117,6 +122,56 @@ const PortNode = (props) => {
     return () => eventBus.off("expansionStateChanged", handleExpansionStateChanged);
   }, [node?.id, refreshExpansionState]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!node?.id || !canExpand) {
+        setCompatibility(null);
+        return;
+      }
+      const api = readGraphApi();
+      if (!api || typeof api.assessContextCompatibility !== "function") {
+        setCompatibility(null);
+        return;
+      }
+      try {
+        const result = await api.assessContextCompatibility({
+          sourceNodeId: node.id,
+          target: expansionTarget
+        });
+        if (cancelled) return;
+        if (result?.success) {
+          setCompatibility(result.data || null);
+        } else {
+          setCompatibility({
+            status: "incompatible",
+            summary: result?.error || result?.data?.message || "Compatibility check failed"
+          });
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setCompatibility({
+          status: "incompatible",
+          summary: error?.message || "Compatibility check failed"
+        });
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [canExpand, expansionTarget, node?.id, readGraphApi]);
+
+  const compatibilityStatus = compatibility?.status || null;
+  const canExecuteExpand =
+    canExpand &&
+    (
+      expansionState.expanded ||
+      compatibilityStatus === null ||
+      compatibilityStatus === "compatible" ||
+      compatibilityStatus === "compatible-with-downgrades"
+    );
+
   const handleToggleExpansion = useCallback(
     async (event) => {
       event?.preventDefault?.();
@@ -124,6 +179,10 @@ const PortNode = (props) => {
       if (!node?.id || !canExpand || expansionBusy) return;
       const api = readGraphApi();
       if (!api) return;
+      if (!expansionState.expanded && compatibilityStatus === "incompatible") {
+        setExpansionError(compatibility?.summary || "Expansion is blocked by compatibility policy");
+        return;
+      }
       setExpansionBusy(true);
       try {
         setExpansionError("");
@@ -140,6 +199,12 @@ const PortNode = (props) => {
           });
           if (result && result.success === false) {
             setExpansionError(result.error || result.data?.message || "Expansion failed");
+          } else if (result?.entryNodeId) {
+            window.setTimeout(() => {
+              try {
+                eventBus.emit("focusNode", { nodeId: result.entryNodeId, source: "expandReference" });
+              } catch {}
+            }, 0);
           }
         }
       } finally {
@@ -147,7 +212,18 @@ const PortNode = (props) => {
         refreshExpansionState();
       }
     },
-    [canExpand, expansionBusy, expansionState.expanded, expansionState.expansionId, expansionTarget, node?.id, readGraphApi, refreshExpansionState]
+    [
+      canExpand,
+      compatibility?.summary,
+      compatibilityStatus,
+      expansionBusy,
+      expansionState.expanded,
+      expansionState.expansionId,
+      expansionTarget,
+      node?.id,
+      readGraphApi,
+      refreshExpansionState
+    ]
   );
 
   const endpointResult = useMemo(
@@ -337,6 +413,65 @@ const PortNode = (props) => {
     };
   }, [flushResize, isResizing, node.id, props.zoom]);
 
+  if (isCompactSemantic) {
+    const modeLabel = canExpand ? "exp" : "nav";
+    return (
+      <FixedNode {...props} node={node} hideDefaultContent={true} disableChrome={true} hideChromeOverlays={true}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: semanticLevel === "icon" ? "8px 10px" : "12px 14px",
+            boxSizing: "border-box",
+            pointerEvents: "none"
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "100%",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: semanticLevel === "icon" ? "6px 10px" : "8px 12px",
+              borderRadius: 999,
+              background: isSelected ? "rgba(25,118,210,0.18)" : "rgba(255,255,255,0.10)",
+              border: `1px solid ${isSelected ? "rgba(25,118,210,0.45)" : "rgba(255,255,255,0.22)"}`,
+              color: "#fff",
+              fontSize: semanticLevel === "icon" ? 11 : 12,
+              fontWeight: 700,
+              letterSpacing: 0.2,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 28,
+                padding: "2px 6px",
+                borderRadius: 999,
+                background: "rgba(255,255,255,0.16)",
+                fontSize: 10,
+                textTransform: "uppercase"
+              }}
+            >
+              {modeLabel}
+            </span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {displayLabel}
+            </span>
+          </div>
+        </div>
+      </FixedNode>
+    );
+  }
+
   return (
     <FixedNode {...props} node={node} hideDefaultContent={true}>
       <div
@@ -381,6 +516,28 @@ const PortNode = (props) => {
               Expanded branch
             </div>
           ) : null}
+          {canExpand && compatibilityStatus && !expansionState.expanded ? (
+            <div
+              style={{
+                fontSize: 10,
+                lineHeight: 1.2,
+                color:
+                  compatibilityStatus === "compatible"
+                    ? theme.palette.success.main
+                    : compatibilityStatus === "compatible-with-downgrades"
+                    ? theme.palette.warning.main
+                    : theme.palette.error.main,
+                fontWeight: 600
+              }}
+              title={compatibility?.summary || ""}
+            >
+              {compatibilityStatus === "compatible"
+                ? "Compatible"
+                : compatibilityStatus === "compatible-with-downgrades"
+                ? "Downgrade required"
+                : "Incompatible"}
+            </div>
+          ) : null}
           {canExpand && expansionError ? (
             <div
               style={{
@@ -400,7 +557,7 @@ const PortNode = (props) => {
             <button
               type="button"
               onClick={handleToggleExpansion}
-              disabled={expansionBusy}
+              disabled={expansionBusy || !canExecuteExpand}
               style={{
                 borderRadius: 6,
                 border: `1px solid ${theme.palette.divider}`,
@@ -408,32 +565,40 @@ const PortNode = (props) => {
                 color: theme.palette.text.primary,
                 padding: "4px 8px",
                 fontSize: 11,
-                cursor: expansionBusy ? "default" : "pointer",
-                opacity: expansionBusy ? 0.6 : 1
+                cursor: expansionBusy || !canExecuteExpand ? "default" : "pointer",
+                opacity: expansionBusy || !canExecuteExpand ? 0.6 : 1
               }}
-              title={expansionState.expanded ? "Collapse expanded branch" : "Expand referenced fragment"}
+              title={
+                expansionState.expanded
+                  ? "Collapse expanded branch"
+                  : !canExecuteExpand
+                  ? (compatibility?.summary || "Expand is blocked")
+                  : "Expand referenced fragment"
+              }
             >
               {expansionBusy ? "..." : expansionState.expanded ? "Collapse" : "Expand"}
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={handleNavigate}
-            disabled={!targetUrl}
-            style={{
-              borderRadius: 6,
-              border: `1px solid ${theme.palette.divider}`,
-              background: "transparent",
-              color: theme.palette.text.primary,
-              padding: "4px 8px",
-              fontSize: 11,
-              cursor: targetUrl ? "pointer" : "default",
-              opacity: targetUrl ? 1 : 0.55
-            }}
-            title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
-          >
-            Navigate
-          </button>
+          {canNavigate ? (
+            <button
+              type="button"
+              onClick={handleNavigate}
+              disabled={!targetUrl}
+              style={{
+                borderRadius: 6,
+                border: `1px solid ${theme.palette.divider}`,
+                background: "transparent",
+                color: theme.palette.text.primary,
+                padding: "4px 8px",
+                fontSize: 11,
+                cursor: targetUrl ? "pointer" : "default",
+                opacity: targetUrl ? 1 : 0.55
+              }}
+              title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
+            >
+              Navigate
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={handleOpenEditor}
