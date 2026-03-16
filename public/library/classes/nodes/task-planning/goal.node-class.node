@@ -1,0 +1,447 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Goal Class",
+    "description": "Strategic or local outcome node for planning graphs.",
+    "created": "2026-03-15T20:30:00.000Z",
+    "modified": "2026-03-15T20:30:00.000Z",
+    "author": "",
+    "tags": [
+      "library",
+      "node-class",
+      "task-planning"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "goal-class-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -300
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "goal-class",
+          "name": "Goal Class",
+          "version": "0.1.0",
+          "description": "Strategic or local outcome node for planning graphs.",
+          "createdAt": "2026-03-15T20:30:00.000Z",
+          "updatedAt": "2026-03-15T20:30:00.000Z"
+        },
+        "intent": {
+          "kind": "node-class",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -300
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "goal",
+            "intent": "class",
+            "implementation": "node class",
+            "dictionaryKey": "goal"
+          }
+        ],
+        "markdown": "## Legend\n- class views and notes",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "goal-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -300
+      },
+      "width": 340,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "goal-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "label",
+                "label": "Label",
+                "type": "text",
+                "path": "label",
+                "placeholder": "Goal"
+              },
+              {
+                "key": "body",
+                "label": "Description",
+                "type": "markdown",
+                "path": "data.body",
+                "placeholder": "Define success...",
+                "multiline": true,
+                "rows": 8
+              },
+              {
+                "key": "priority",
+                "label": "Priority",
+                "type": "select",
+                "path": "data.priority",
+                "options": [
+                  {
+                    "label": "High",
+                    "value": "high"
+                  },
+                  {
+                    "label": "Medium",
+                    "value": "medium"
+                  },
+                  {
+                    "label": "Low",
+                    "value": "low"
+                  },
+                  {
+                    "label": "Critical",
+                    "value": "critical"
+                  }
+                ]
+              },
+              {
+                "key": "status",
+                "label": "Status",
+                "type": "select",
+                "path": "data.status",
+                "options": [
+                  {
+                    "label": "Open",
+                    "value": "open"
+                  },
+                  {
+                    "label": "In Progress",
+                    "value": "in-progress"
+                  },
+                  {
+                    "label": "Achieved",
+                    "value": "achieved"
+                  },
+                  {
+                    "label": "Blocked",
+                    "value": "blocked"
+                  }
+                ]
+              },
+              {
+                "key": "owner",
+                "label": "Owner",
+                "type": "text",
+                "path": "data.owner",
+                "placeholder": "owner"
+              },
+              {
+                "key": "targetDate",
+                "label": "Target Date",
+                "type": "text",
+                "path": "data.targetDate",
+                "placeholder": "YYYY-MM-DD"
+              },
+              {
+                "key": "successMetrics",
+                "label": "Success Metrics",
+                "type": "json",
+                "path": "data.successMetrics",
+                "placeholder": "[\"metric\"]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "goal-detail-view",
+      "type": "view",
+      "label": "Node View (node.web.detail)",
+      "position": {
+        "x": -340,
+        "y": 20
+      },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.detail",
+          "controls": [
+            {
+              "id": "goal-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "detail": {
+              "markdown": "## Goal: {{label}}\n\n**Status:** `{{data.status}}`  \n**Priority:** `{{data.priority}}`\n\n{{data.body}}\n\n**Success Metrics**\n```json\n{{data.successMetrics}}\n```"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "goal-summary-view",
+      "type": "view",
+      "label": "Summary View (node.web.summary)",
+      "position": {
+        "x": 80,
+        "y": 20
+      },
+      "width": 340,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.summary"
+        },
+        "node": {
+          "web": {
+            "summary": {
+              "markdown": "**Goal** {{label}}  \n`{{data.status}}` \u00b7 `{{data.priority}}`"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "goal-icon-view",
+      "type": "view",
+      "label": "Icon View (node.web.icon)",
+      "position": {
+        "x": 460,
+        "y": 20
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.icon"
+        },
+        "node": {
+          "web": {
+            "icon": {
+              "markdown": "**G** {{label}}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "goal-legacy-view",
+      "type": "view",
+      "label": "Legacy Node View (node.web)",
+      "position": {
+        "x": 800,
+        "y": 20
+      },
+      "width": 340,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web"
+        },
+        "node": {
+          "web": {
+            "markdown": "## Goal: {{label}}\n\n**Status:** `{{data.status}}`  \n**Priority:** `{{data.priority}}`\n\n{{data.body}}\n\n**Success Metrics**\n```json\n{{data.successMetrics}}\n```"
+          }
+        }
+      }
+    },
+    {
+      "id": "goal-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": -760,
+        "y": 300
+      },
+      "width": 760,
+      "height": 220,
+      "color": "#455a64",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Goal is a strategic or local outcome. It is static-first, fragment-safe, and intended to parent tasks, decisions, and constraints.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

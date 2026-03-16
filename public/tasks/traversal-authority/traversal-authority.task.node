@@ -1,0 +1,690 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Traversal And Authority",
+    "description": "Task graph for traversal, authority, and capability boundaries.",
+    "created": "2026-03-15T12:00:00.000Z",
+    "modified": "2026-03-15T12:00:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "traversal",
+      "authority"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "traversal-auth-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -320
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "traversal-authority-task",
+          "name": "Traversal And Authority",
+          "version": "0.1.0",
+          "description": "Design constraints for bounded traversal, authority, and capability.",
+          "createdAt": "2026-03-15T12:00:00.000Z",
+          "updatedAt": "2026-03-15T12:00:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "traversal-auth-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "constraint",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- constraint: design rule or future boundary",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "traversal-auth-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-overview",
+      "type": "markdown",
+      "label": "Traversal And Authority",
+      "position": {
+        "x": -620,
+        "y": 0
+      },
+      "width": 430,
+      "height": 230,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Traversal And Authority\n\nTraversal, authority, and capability must be modeled together. The current system works, but future work must preserve the ability to cut scope cleanly later.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "trav-traversal",
+      "type": "markdown",
+      "label": "Traversal Policy",
+      "position": {
+        "x": -120,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#5e35b1",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Traversal Policy\n\n- Fragment targets should feel like continuous traversal.\n- Non-fragment targets remain document boundaries.\n- Ring-based loading bounds growth.\n- Automatic expansion should follow graph type, not ad hoc guesses.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-authority",
+      "type": "markdown",
+      "label": "Authority Policy",
+      "position": {
+        "x": 320,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#8e24aa",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Authority Policy\n\n- Host authority remains primary inside fragment continuity.\n- Non-fragment navigation is where authority may transition.\n- The abstraction must match reality: if power is cut, it must actually be cut.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-capability",
+      "type": "markdown",
+      "label": "Capability Policy",
+      "position": {
+        "x": 760,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#3949ab",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Capability Policy\n\n- Showing a node is not the same as running a node.\n- Static rendering can stay broad.\n- Live behavior, hooks, and side effects must eventually be scope-aware.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-safe",
+      "type": "markdown",
+      "label": "Safe To Build Now",
+      "position": {
+        "x": -120,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#00897b",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Safe To Build Now\n\n- Graph type: `fragment` vs `graph`\n- Entry surfaces\n- Focus and fragment identity\n- Provenance metadata\n- Ring-based loading and semantic views\n\nThese preserve future scope cuts without breaking current behavior.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-avoid",
+      "type": "markdown",
+      "label": "Avoid Baking In",
+      "position": {
+        "x": 320,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#ef6c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Avoid Baking In\n\n- Ambient global execution assumptions\n- Silent authority merging across visible graphs\n- Hooks firing everywhere because something is on screen\n- Node classes that cannot separate static render from live behavior",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-boundary",
+      "type": "markdown",
+      "label": "Future Boundary",
+      "position": {
+        "x": 760,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#6d4c41",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Future Boundary\n\nDo not harden authority cutoffs prematurely. Keep the current theory working, but avoid deepening ambient power. Tight scope enforcement comes later when render and execution can be split cleanly.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "trav-edge-1",
+      "type": "reference",
+      "source": "trav-overview",
+      "target": "trav-traversal",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-2",
+      "type": "reference",
+      "source": "trav-overview",
+      "target": "trav-authority",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-3",
+      "type": "reference",
+      "source": "trav-overview",
+      "target": "trav-capability",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-4",
+      "type": "reference",
+      "source": "trav-traversal",
+      "target": "trav-safe",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-5",
+      "type": "reference",
+      "source": "trav-authority",
+      "target": "trav-avoid",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-6",
+      "type": "reference",
+      "source": "trav-capability",
+      "target": "trav-boundary",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "forces",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-7",
+      "type": "reference",
+      "source": "trav-safe",
+      "target": "trav-boundary",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "preserves",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-8",
+      "type": "reference",
+      "source": "trav-avoid",
+      "target": "trav-boundary",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "protects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

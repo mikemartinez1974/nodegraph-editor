@@ -1,0 +1,1018 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-03-15T23:28:10.850Z",
+    "modified": "2026-03-15T23:28:10.850Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "d9e239ef-1faf-40b0-9dac-592dccac749c",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -260,
+        "y": -160
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "26df6f76-4617-40d1-828c-4a646d9e2389",
+          "name": "Untitled Graph",
+          "version": "0.1.0",
+          "description": "",
+          "createdAt": "2026-03-15T23:27:40.570Z",
+          "updatedAt": "2026-03-15T23:27:40.570Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "dictionary",
+            "default",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "uiDensity": "comfortable",
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "layout": null,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "2a6ed901-c297-41d5-9402-704f6045bc45",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -260,
+        "y": 100
+      },
+      "width": 320,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "8f3d2a1c-4b6e-4d9a-8c1f-2e7a5b3c9d10",
+      "type": "markdown",
+      "label": "Planning Node Types Proposal",
+      "position": {
+        "x": 1820,
+        "y": -260
+      },
+      "width": 460,
+      "height": 260,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Proposal\n\nRecommended first-class planning nodes:\n- Goal\n- Task\n- Decision\n- Open Question\n- Constraint\n- Risk\n\nRecommended relational-first concept:\n- Dependency\n\nRecommended structured attachment concept:\n- Acceptance Criteria\n\nThis proposal favors node types where lifecycle, provenance, and prompt relevance matter most.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "1a7c5e3d-9b2f-4d6a-8c7e-3f1a5d7c9e11",
+      "type": "markdown",
+      "label": "Recommended First Wave",
+      "position": {
+        "x": 2420,
+        "y": -600
+      },
+      "width": 420,
+      "height": 300,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Recommended First Wave\n\nImplement these as first-class planning node types first:\n\n1. Goal\n2. Task\n3. Decision\n4. Open Question\n5. Constraint\n6. Risk\n\nWhy:\n- each has distinct semantics\n- each benefits from explicit lifecycle or status\n- each adds value beyond plain markdown\n- each is likely to matter in prompting and review",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "2b8d6f4a-1c3e-4d9b-8a7f-4e2b6c1d8f12",
+      "type": "markdown",
+      "label": "Dependency as Edge-First",
+      "position": {
+        "x": 2420,
+        "y": -200
+      },
+      "width": 420,
+      "height": 280,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Dependency as Edge-First\n\nProposal:\n- model ordinary dependency as an edge semantic first\n- allow dependency nodes only when the dependency itself needs content, provenance, or attached discussion\n\nExamples for node escalation:\n- external system prerequisite\n- human/team blocker\n- package or service requirement\n- complex blocker with rationale",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "3c9e7a5b-2d4f-4c8a-9b1e-5f3c7d2a9e13",
+      "type": "markdown",
+      "label": "Acceptance Criteria as Structured Attachment",
+      "position": {
+        "x": 2420,
+        "y": 180
+      },
+      "width": 420,
+      "height": 300,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Acceptance Criteria as Structured Attachment\n\nProposal:\n- keep acceptance criteria close to tasks and goals\n- represent them as structured items rather than pure prose\n- allow later promotion to stronger validation semantics\n\nSuggested shape:\n- summary\n- criteria[]\n- verification hints\n- optional test linkage\n\nThis keeps them execution-useful without overformalizing too early.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "4d1f8b6c-3e5a-4d9c-8a2f-6a4d8e3b1f14",
+      "type": "markdown",
+      "label": "Constraint Needs Typed Fields",
+      "position": {
+        "x": 3020,
+        "y": -600
+      },
+      "width": 420,
+      "height": 320,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Constraint Needs Typed Fields\n\nProposal:\nAvoid turning Constraint into a junk drawer.\n\nSuggested fields:\n- kind: technical | product | ux | policy | performance | scope | temporal\n- strength: hard | soft\n- scope: global | subgraph | local\n- enforcement: advisory | blocking | validation-target\n\nThis makes constraints queryable and prompt-safe.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "5e2a9c7d-4f6b-4d8a-9c3e-7b5e9f4c2a15",
+      "type": "markdown",
+      "label": "Decision and Question Are High Value",
+      "position": {
+        "x": 3020,
+        "y": -180
+      },
+      "width": 420,
+      "height": 300,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Decision and Question Are High Value\n\nProposal:\nDecision and Open Question should be early first-class types because they carry project memory.\n\nWhy:\n- they shape downstream implementation\n- they inform prompting\n- they explain graph history\n- they preserve unresolved reasoning state\n\nThese are more than notes. They are thinking artifacts.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "6f3b1d8e-5a7c-4d9f-8b4a-8c6f1a5d3b16",
+      "type": "markdown",
+      "label": "Risk Should Likely Split Later",
+      "position": {
+        "x": 3020,
+        "y": 220
+      },
+      "width": 420,
+      "height": 280,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Risk Should Likely Split Later\n\nProposal:\nKeep `Risk / Edge Case` combined only as an early convenience.\n\nLikely future split:\n- Risk = probability, impact, mitigation\n- Edge Case = unusual scenario, coverage condition, corner behavior\n\nThey overlap, but they are not the same semantic object.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "type": "markdown",
+      "label": "Canonical Semantics Summary",
+      "position": {
+        "x": 3620,
+        "y": -220
+      },
+      "width": 460,
+      "height": 360,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Canonical Semantics Summary\n\n- Goal = desired outcome\n- Task = actionable work\n- Decision = committed choice\n- Open Question = unresolved issue needing answer\n- Constraint = rule or limit\n- Risk = potential failure mode\n- Acceptance Criteria = condition for success\n- Dependency = prerequisite or blocking relationship\n\nThis semantic split gives planning graphs better prompting, tracing, and execution structure.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "8b5d3f1a-7c9e-4d6b-8a1f-1e8b3c7d5f18",
+      "type": "markdown",
+      "label": "Suggested Next Step",
+      "position": {
+        "x": 2420,
+        "y": 560
+      },
+      "width": 420,
+      "height": 260,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "any",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "any",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "any"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "any"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Suggested Next Step\n\nTurn the first-wave proposal into concrete node schemas:\n- required fields\n- optional fields\n- lifecycle/status fields\n- relationship rules\n- prompt/export behavior\n\nThat gives Grok, Claude, and me one clean target to compare instead of arguing at pure concept level.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "ad7f5b3c-9e2a-4d8f-8b3c-3a1d5e7f2c20",
+      "type": "reference",
+      "source": "8f3d2a1c-4b6e-4d9a-8c1f-2e7a5b3c9d10",
+      "target": "1a7c5e3d-9b2f-4d6a-8c7e-3f1a5d7c9e11",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "recommends",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "be8a6c4d-1f3b-4d9a-8c4d-4b2e6f8a3d21",
+      "type": "reference",
+      "source": "8f3d2a1c-4b6e-4d9a-8c1f-2e7a5b3c9d10",
+      "target": "2b8d6f4a-1c3e-4d9b-8a7f-4e2b6c1d8f12",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "recommends",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "cf9b7d5e-2a4c-4d8b-8d5e-5c3f7a9b4e22",
+      "type": "reference",
+      "source": "8f3d2a1c-4b6e-4d9a-8c1f-2e7a5b3c9d10",
+      "target": "3c9e7a5b-2d4f-4c8a-9b1e-5f3c7d2a9e13",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "recommends",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "d7a5e3c1-9f2d-4d8a-8e3f-3d1a5c7e9f29",
+      "type": "reference",
+      "source": "1a7c5e3d-9b2f-4d6a-8c7e-3f1a5d7c9e11",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "e8b6f4d2-1a3c-4d9b-8f4a-4e2b6d8f1a30",
+      "type": "reference",
+      "source": "2b8d6f4a-1c3e-4d9b-8a7f-4e2b6c1d8f12",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f9c7a5e3-2b4d-4d8c-8a5b-5f3c7e9a2b31",
+      "type": "reference",
+      "source": "3c9e7a5b-2d4f-4c8a-9b1e-5f3c7d2a9e13",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "a1d8b6f4-3c5e-4d9a-8b6c-6a4d8f1c3e32",
+      "type": "reference",
+      "source": "4d1f8b6c-3e5a-4d9c-8a2f-6a4d8e3b1f14",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "b2e9c7a5-4d6f-4d8b-8c7d-7b5e9a2d4f33",
+      "type": "reference",
+      "source": "5e2a9c7d-4f6b-4d8a-9c3e-7b5e9f4c2a15",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "c3f1d8b6-5a7e-4d9f-8d8e-8c6f1b3a5d34",
+      "type": "reference",
+      "source": "6f3b1d8e-5a7c-4d9f-8b4a-8c6f1a5d3b16",
+      "target": "7a4c2e9f-6b8d-4d1a-9c5f-9d7a2b6c4e17",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "summarized by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "d4a2e9c7-6b8f-4d1a-8e9f-9d7a2c4b6e35",
+      "type": "reference",
+      "source": "8f3d2a1c-4b6e-4d9a-8c1f-2e7a5b3c9d10",
+      "target": "8b5d3f1a-7c9e-4d6b-8a1f-1e8b3c7d5f18",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "any",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "next",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
+}

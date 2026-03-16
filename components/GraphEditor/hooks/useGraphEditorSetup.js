@@ -254,6 +254,12 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         emitExecutionIntent({ action: 'expandReference', payload });
         return { success: true, queued: true, data: { ok: true, queued: true } };
       },
+      bridgeReference: async (payload = {}) => {
+        if (typeof rawGraph?.bridgeReference === 'function') {
+          return rawGraph.bridgeReference(payload);
+        }
+        return { success: false, error: 'bridgeReference is unavailable' };
+      },
       assessContextCompatibility: async (payload = {}) => {
         if (typeof rawGraph?.assessContextCompatibility === 'function') {
           return rawGraph.assessContextCompatibility(payload);

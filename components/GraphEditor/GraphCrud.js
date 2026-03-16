@@ -756,6 +756,51 @@ const normalizeExpansionTarget = (target = {}) => {
   };
 };
 
+const normalizeBridgeTarget = (target = {}) => {
+  if (!target || typeof target !== 'object') return null;
+  const endpointRaw = typeof target.endpoint === 'string' ? target.endpoint.trim() : '';
+  const targetRef = typeof target.ref === 'string' ? target.ref.trim() : '';
+  let ref = targetRef;
+  let entryPort =
+    typeof target.entryPort === 'string' && target.entryPort.trim() ? target.entryPort.trim() : 'root';
+  if (!ref && endpointRaw) {
+    const parsed = parsePortEndpoint(endpointRaw);
+    if (parsed.ok && parsed.value?.filePath) {
+      ref = endpointToUrl(parsed.value.filePath);
+      if (parsed.value.portId) entryPort = parsed.value.portId;
+    } else {
+      ref = endpointToUrl(endpointRaw);
+    }
+  }
+  return {
+    kind: typeof target.kind === 'string' && target.kind.trim() ? target.kind.trim().toLowerCase() : 'node-class',
+    mode: 'bridge',
+    ref,
+    entryPort
+  };
+};
+
+const mergeDictionaryEntriesByIdentity = (existing = [], incoming = [], identityFn) => {
+  const result = Array.isArray(existing) ? existing.map((entry) => cloneValue(entry)) : [];
+  const indexByKey = new Map();
+  result.forEach((entry, index) => {
+    const key = identityFn(entry);
+    if (key) indexByKey.set(key, index);
+  });
+  (Array.isArray(incoming) ? incoming : []).forEach((entry) => {
+    const key = identityFn(entry);
+    if (!key) return;
+    const cloned = cloneValue(entry);
+    if (indexByKey.has(key)) {
+      result[indexByKey.get(key)] = cloned;
+      return;
+    }
+    indexByKey.set(key, result.length);
+    result.push(cloned);
+  });
+  return result;
+};
+
 const hashExpansionKey = (value = '') => {
   let hash = 0;
   const input = String(value);
@@ -2764,6 +2809,131 @@ export default class GraphCRUD {
         return this._expansionFailure(EXPANSION_ERROR.REF_FETCH_FAILED, error.message);
       }
       return this._expansionFailure(EXPANSION_ERROR.TRANSACTION_ROLLBACK, error.message);
+    }
+  }
+
+  async bridgeReference(payload = {}) {
+    try {
+      const sourceNodeId =
+        typeof payload?.sourceNodeId === 'string' && payload.sourceNodeId.trim()
+          ? payload.sourceNodeId.trim()
+          : '';
+      const sourceNode = sourceNodeId ? this.getNodes().find((node) => node.id === sourceNodeId) : null;
+      if (!sourceNode) {
+        return { success: false, error: `Source node "${sourceNodeId}" was not found` };
+      }
+
+      const sourceTarget = resolveSourceTargetFromNode(sourceNode);
+      const directTarget = isPlainObject(payload?.target) ? payload.target : {};
+      const target = normalizeBridgeTarget({ ...sourceTarget, ...directTarget });
+      if (!target?.ref) {
+        return { success: false, error: 'bridgeReference requires target.ref' };
+      }
+
+      const { nodes: classNodes } = await this._resolveExpansionGraph(payload, target);
+      const manifestNode = classNodes.find((node) => node?.type === 'manifest') || null;
+      const dictionaryNode = classNodes.find((node) => node?.type === 'dictionary') || null;
+      const classIntent = String(manifestNode?.data?.intent?.kind || '').trim().toLowerCase();
+      if (classIntent && classIntent !== 'node-class') {
+        return { success: false, error: `Bridge target must be a node-class graph (received "${classIntent}")` };
+      }
+
+      const nodeDefs = Array.isArray(dictionaryNode?.data?.nodeDefs) ? dictionaryNode.data.nodeDefs : [];
+      const views = Array.isArray(dictionaryNode?.data?.views) ? dictionaryNode.data.views : [];
+      const nodeDef = nodeDefs[0] || null;
+      const nodeType = String(nodeDef?.key || nodeDef?.nodeType || nodeDef?.type || '').trim();
+      if (!nodeType) {
+        return { success: false, error: 'Bridge target does not declare a node class entry' };
+      }
+
+      const currentNodes = this.getNodes();
+      const currentEdges = this.getEdges();
+      const hostDictionaryIndex = currentNodes.findIndex(
+        (node) => node?.type === 'dictionary' && node?.data?._contextScope?.authority !== 'informational'
+      );
+      if (hostDictionaryIndex === -1) {
+        return { success: false, error: 'Host graph does not have an authoritative dictionary to register the class' };
+      }
+
+      const nextNodes = currentNodes.map((node) => cloneValue(node));
+      const hostDictionary = cloneValue(nextNodes[hostDictionaryIndex]);
+      const hostDictData = isPlainObject(hostDictionary?.data) ? hostDictionary.data : {};
+      hostDictionary.data = {
+        ...hostDictData,
+        nodeDefs: mergeDictionaryEntriesByIdentity(
+          hostDictData.nodeDefs,
+          nodeDefs,
+          (entry) => toNodeClassKey(entry)
+        ),
+        views: mergeDictionaryEntriesByIdentity(
+          hostDictData.views,
+          views,
+          (entry) => {
+            const key = toNodeClassKey(entry);
+            const intent = String(entry?.intent || '').trim();
+            const payloadKey = String(entry?.payload || '').trim();
+            return key && intent && payloadKey ? `${key}::${intent}::${payloadKey}` : '';
+          }
+        )
+      };
+      nextNodes[hostDictionaryIndex] = hostDictionary;
+
+      const nodeClassEntry = resolveNodeClassEntry(nextNodes, nodeType) || nodeDef;
+      const policy = resolveNodeClassPolicy(nodeClassEntry);
+      const defaults = resolveNodeClassDefaults(nodeClassEntry);
+      const defaultHandles = defaults.ports.length
+        ? normalizeHandleDefinitions({ ports: defaults.ports })
+        : normalizeHandleDefinitions({});
+      const resolvedData = mergeNodeClassDataForCreate({}, defaults.data, policy, false);
+      const sourcePos = sourceNode?.position && Number.isFinite(sourceNode.position.x) && Number.isFinite(sourceNode.position.y)
+        ? sourceNode.position
+        : { x: 0, y: 0 };
+      const instanceId = this._generateId();
+      const manifestName = String(manifestNode?.data?.identity?.name || '').trim().replace(/\s+Class$/i, '');
+      const label = defaults.label || manifestName || nodeType;
+      const width = defaults.size?.width !== undefined ? defaults.size.width : 260;
+      const height = defaults.size?.height !== undefined ? defaults.size.height : 180;
+      const createdNode = {
+        id: instanceId,
+        type: nodeType,
+        label,
+        position: { x: sourcePos.x + 260, y: sourcePos.y + 20 },
+        width,
+        height,
+        color: defaults.color,
+        data: resolvedData,
+        inputs: defaultHandles.inputs,
+        outputs: defaultHandles.outputs,
+        ports: defaultHandles.ports,
+        visible: defaults.visible !== undefined ? defaults.visible : true,
+        state: undefined,
+        style: undefined,
+        extensions: undefined,
+        resizable: true,
+        portPosition: 'center',
+        showLabel: defaults.showLabel !== undefined ? defaults.showLabel : true
+      };
+
+      const finalNodes = deduplicateNodes([...nextNodes, createdNode]);
+      this.setNodes(() => {
+        if (this.nodesRef) this.nodesRef.current = finalNodes;
+        return finalNodes;
+      });
+      this.saveToHistory(finalNodes, currentEdges);
+      try {
+        eventBus.emit('focusNode', { nodeId: createdNode.id, source: 'bridgeReference' });
+      } catch {}
+      return {
+        success: true,
+        data: {
+          node: createdNode,
+          nodeType,
+          registered: true,
+          sourceRef: target.ref
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error?.message || 'Bridge failed' };
     }
   }
 

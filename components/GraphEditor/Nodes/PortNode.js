@@ -88,7 +88,8 @@ const PortNode = (props) => {
   const isCompactSemantic = semanticLevel === "summary" || semanticLevel === "icon";
   const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
   const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
-  const canNavigate = expansionTarget.mode !== "expand";
+  const canBridge = expansionTarget.mode === "bridge" && Boolean(expansionTarget.ref);
+  const canNavigate = !canExpand && !canBridge;
   const [expansionBusy, setExpansionBusy] = useState(false);
   const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
   const [expansionError, setExpansionError] = useState("");
@@ -286,6 +287,24 @@ const PortNode = (props) => {
     [targetUrl]
   );
 
+  const handleBridge = useCallback(
+    async (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      if (!node?.id) return;
+      const api = readGraphApi();
+      if (!api || typeof api.bridgeReference !== "function") return;
+      const result = await api.bridgeReference({
+        sourceNodeId: node.id,
+        target: expansionTarget
+      });
+      if (result?.success === false) {
+        setExpansionError(result.error || "Bridge failed");
+      }
+    },
+    [expansionTarget, node?.id, readGraphApi]
+  );
+
   const handleOpenEditor = useCallback(
     (event) => {
       event?.preventDefault?.();
@@ -414,7 +433,7 @@ const PortNode = (props) => {
   }, [flushResize, isResizing, node.id, props.zoom]);
 
   if (isCompactSemantic) {
-    const modeLabel = canExpand ? "exp" : "nav";
+    const modeLabel = canExpand ? "exp" : canBridge ? "brg" : "nav";
     return (
       <FixedNode {...props} node={node} hideDefaultContent={true} disableChrome={true} hideChromeOverlays={true}>
         <div
@@ -577,6 +596,24 @@ const PortNode = (props) => {
               }
             >
               {expansionBusy ? "..." : expansionState.expanded ? "Collapse" : "Expand"}
+            </button>
+          ) : null}
+          {canBridge ? (
+            <button
+              type="button"
+              onClick={handleBridge}
+              style={{
+                borderRadius: 6,
+                border: `1px solid ${theme.palette.divider}`,
+                background: "transparent",
+                color: theme.palette.text.primary,
+                padding: "4px 8px",
+                fontSize: 11,
+                cursor: "pointer"
+              }}
+              title="Create a local instance from this node class"
+            >
+              Create
             </button>
           ) : null}
           {canNavigate ? (

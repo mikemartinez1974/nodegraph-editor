@@ -208,7 +208,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Welcome to Twilite ✨\n\n**A persistent graph workspace where ideas connect and evolve.**\n\nTwilight is a visual thinking environment built on graphs. Every node is a thought, every edge is a relationship, and the whole canvas is your workspace.\n\n## What makes Twilite different?\n\n- **Persistent state** - Your graph is the source of truth\n- **Semantic connections** - Edges carry meaning and type\n- **Contract-driven** - Manifests define intent and authority\n- **Incremental updates** - Small, targeted changes preserve history\n\nExplore the nodes below to get started! 👇",
+        "markdown": "# Welcome to Twilite \u2728\n\n**A persistent graph workspace where ideas connect and evolve.**\n\nTwilight is a visual thinking environment built on graphs. Every node is a thought, every edge is a relationship, and the whole canvas is your workspace.\n\n## What makes Twilite different?\n\n- **Persistent state** - Your graph is the source of truth\n- **Semantic connections** - Edges carry meaning and type\n- **Contract-driven** - Manifests define intent and authority\n- **Incremental updates** - Small, targeted changes preserve history\n\nExplore the nodes below to get started! \ud83d\udc47",
         "memo": "",
         "link": "",
         "html": "",
@@ -710,7 +710,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Welcome, Human! 👋\n\n**Twilite is your visual thinking space.**\n\nForget about JSON and schemas for a moment. This is a place where you can:\n\n- **Map your thoughts** visually on an infinite canvas\n- **Connect ideas** with meaningful relationships\n- **Build systems** that grow with your understanding\n- **Think spatially** instead of linearly\n\nThink of it like:\n- A whiteboard that remembers\n- A mind map that can execute\n- A notebook where pages can talk to each other\n\n**Start exploring →**",
+        "markdown": "# Welcome, Human! \ud83d\udc4b\n\n**Twilite is your visual thinking space.**\n\nForget about JSON and schemas for a moment. This is a place where you can:\n\n- **Map your thoughts** visually on an infinite canvas\n- **Connect ideas** with meaningful relationships\n- **Build systems** that grow with your understanding\n- **Think spatially** instead of linearly\n\nThink of it like:\n- A whiteboard that remembers\n- A mind map that can execute\n- A notebook where pages can talk to each other\n\n**Start exploring \u2192**",
         "memo": "",
         "link": "",
         "html": "",
@@ -769,7 +769,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## What Can You Build?\n\n### 📚 Personal Knowledge Base\nCapture notes, link concepts, build your second brain\n\n### 🎯 Project Planning\nBreak down goals, track dependencies, visualize progress\n\n### 🧠 Brainstorming\nFree-form idea generation with emergent structure\n\n### 📖 Story Development\nCharacters, plots, world-building with relationships\n\n### 🗺️ Learning Maps\nSubjects connect, prerequisites emerge naturally\n\n### 🔄 Workflows\nProcess steps with decision points and feedback loops\n\n### 💡 Idea Gardens\nCapture seeds, watch them grow into systems",
+        "markdown": "## What Can You Build?\n\n### \ud83d\udcda Personal Knowledge Base\nCapture notes, link concepts, build your second brain\n\n### \ud83c\udfaf Project Planning\nBreak down goals, track dependencies, visualize progress\n\n### \ud83e\udde0 Brainstorming\nFree-form idea generation with emergent structure\n\n### \ud83d\udcd6 Story Development\nCharacters, plots, world-building with relationships\n\n### \ud83d\uddfa\ufe0f Learning Maps\nSubjects connect, prerequisites emerge naturally\n\n### \ud83d\udd04 Workflows\nProcess steps with decision points and feedback loops\n\n### \ud83d\udca1 Idea Gardens\nCapture seeds, watch them grow into systems",
         "memo": "",
         "link": "",
         "html": "",
@@ -922,6 +922,39 @@
       "data": {
         "target": {
           "endpoint": "/tasks/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "port-library-root",
+      "type": "port",
+      "label": "Library",
+      "position": {
+        "x": 1330,
+        "y": 1315
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -1209,6 +1242,21 @@
       "sourcePort": "root",
       "targetPort": "root",
       "label": "tasks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "edge-library-root",
+      "type": "reference",
+      "source": "resources",
+      "target": "port-library-root",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "library",
       "style": {
         "width": 2,
         "dash": [],

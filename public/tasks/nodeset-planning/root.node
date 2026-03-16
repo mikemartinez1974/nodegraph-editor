@@ -237,6 +237,138 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "nodeset-planning-root-port-2",
+      "type": "port",
+      "label": "Proposal By Claude",
+      "position": {
+        "x": 360,
+        "y": 40
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/proposal-by-claude.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-planning-root-port-3",
+      "type": "port",
+      "label": "Proposal By Gemini",
+      "position": {
+        "x": 680,
+        "y": 40
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/proposal-by-gemini.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-planning-root-port-4",
+      "type": "port",
+      "label": "Proposal By Gpt",
+      "position": {
+        "x": 40,
+        "y": 190
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/proposal-by-gpt.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-planning-root-port-5",
+      "type": "port",
+      "label": "Proposal By Grok",
+      "position": {
+        "x": 360,
+        "y": 190
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/proposal-by-grok.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
     }
   ],
   "edges": [
@@ -245,6 +377,66 @@
       "type": "reference",
       "source": "nodeset-planning-root-overview",
       "target": "nodeset-planning-root-port-1",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "nodeset-planning-root-edge-2",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-2",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "nodeset-planning-root-edge-3",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-3",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "nodeset-planning-root-edge-4",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-4",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "nodeset-planning-root-edge-5",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-5",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",

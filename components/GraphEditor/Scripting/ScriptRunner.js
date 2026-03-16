@@ -113,6 +113,7 @@ const createBootstrapSrcDoc = (token) => `<!doctype html><html><head><meta chars
             getNodes: (...a)=>hostCall('getNodes', a),
             getNode: (...a)=>hostCall('getNode', a),
             getEdges: (...a)=>hostCall('getEdges', a),
+            getGroups: (...a)=>hostCall('getGroups', a),
             createNode: (...a)=>hostCall('createNode', a),
             updateNode: (...a)=>hostCall('updateNode', a),
             deleteNode: (...a)=>hostCall('deleteNode', a),

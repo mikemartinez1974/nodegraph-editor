@@ -27,9 +27,9 @@
           "graphId": "planning-node-types-task",
           "name": "Planning Node Types Task",
           "version": "0.1.0",
-          "description": "Task graph for planning the first implementation-oriented node types for Twilite prompting and execution workflows.",
+          "description": "Task graph for planning the first implementation-oriented node types for Twilite prompting and execution workflows. **Proposal complete** - all definitions, canonical shapes, architecture decisions, and rules locked in.",
           "createdAt": "2026-03-14T00:00:00.000Z",
-          "updatedAt": "2026-03-14T00:00:00.000Z"
+          "updatedAt": "2026-03-15T23:19:00.000Z"
         },
         "intent": {
           "kind": "task",
@@ -161,7 +161,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Planning Node Types\n\nThis task graph breaks out the first implementation-oriented node types into separate planning nodes.\n\nGoal: define what each node type is for, what data it should hold, and how it should behave inside a Twilite planning graph.",
+        "markdown": "# Planning Node Types - Complete Proposal\n\nThis task graph now contains the **approved, ready-to-implement** definitions for the first wave of planning node types.\n\n**Goal achieved**: Every node type has a clear purpose, canonical data shape, relationship rules, and architecture constraints.\n\nAll planning nodes are static-first, fragment-safe, graph-authoritative (dictionary demoted), and ready for Codex execution prompts.\n\n**Next**: schema files, prompt templates, and dictionary registration (when you say go).",
         "memo": "",
         "link": "",
         "html": "",
@@ -218,7 +218,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\n\nDefine the **Goal** node type for planning graphs.\n\nQuestions to answer:\n- What makes a goal different from a task?\n- Is it strategic, local, or both?\n- What fields should it carry beyond label and markdown?\n- Should goals support priority or completion state?\n\nOutput:\n- clear purpose\n- canonical data shape\n- relationship rules",
+        "markdown": "## Goal\n\n**Purpose**: Strategic or local outcome that orients the entire plan. Answers \"what success looks like.\"\n\n**Different from Task**: Goal = why + measurable outcome; Task = atomic executable action for Codex.\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"priority\": \"critical|high|medium|low\",\n  \"status\": \"open|in-progress|achieved|blocked\",\n  \"successMetrics\": [\"string\", \"...\"] or nodeRef[],\n  \"owner\": \"string?\",\n  \"targetDate\": \"YYYY-MM-DD?\",\n  \"children\": [nodeRef]\n}\n```\n\n**Relationship rules**: Goals parent Tasks/Decisions/Constraints. Multiple Tasks roll up to one Goal. Full hierarchy support.",
         "memo": "",
         "link": "",
         "html": "",
@@ -275,7 +275,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Constraint\n\nDefine the **Constraint** node type.\n\nQuestions to answer:\n- What counts as a hard constraint versus guidance?\n- Should constraints be typed (schema, UX, performance, policy)?\n- Can a constraint apply globally or only to a subgraph?\n- How should Codex treat constraints during implementation?\n\nOutput:\n- constraint categories\n- canonical fields\n- usage rules",
+        "markdown": "## Constraint\n\n**Purpose**: Immutable boundary or requirement that Codex must respect.\n\n**Hard vs guidance**: Hard = must-fail validation; guidance = should-flag.\n\n**Typed categories**: schema, ux, performance, policy, resource, security.\n\n**Scope**: global (root-level) or subgraph (attached to Goal/Task).\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"type\": \"schema|ux|performance|policy|...\",\n  \"severity\": \"hard|guidance\",\n  \"scope\": \"global|subgraph\",\n  \"affectedNodes\": [nodeRef]?\n}\n```\n\n**Codex treatment**: Hard constraints become validation rules in every execution prompt; guidance becomes advisory text.",
         "memo": "",
         "link": "",
         "html": "",
@@ -332,7 +332,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Decision\n\nDefine the **Decision** node type.\n\nQuestions to answer:\n- How is a decision represented distinctly from discussion?\n- Should decisions carry rationale, status, and date?\n- Can a decision supersede an older decision?\n- How should decisions connect to tasks and constraints?\n\nOutput:\n- decision semantics\n- canonical data shape\n- precedence/update rules",
+        "markdown": "## Decision\n\n**Purpose**: Recorded, timestamped choice that closes discussion or questions.\n\n**Distinct from discussion**: Discussion lives in markdown or Open Question nodes; Decision is the resolved state.\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"rationale\": \"string\",\n  \"status\": \"pending|decided|superseded\",\n  \"decidedAt\": \"YYYY-MM-DD\",\n  \"supersededBy\": nodeRef?,\n  \"owner\": \"string?\"\n}\n```\n\n**Rules**: Can supersede older decisions (chain via supersededBy). Connects to Tasks (triggers), Constraints (sets), Open Questions (resolves).",
         "memo": "",
         "link": "",
         "html": "",
@@ -389,7 +389,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Question\n\nDefine the **Open Question** node type.\n\nQuestions to answer:\n- What distinguishes an open question from a risk or investigation?\n- Should it track owner, status, and resolution path?\n- Does resolution convert it into a decision, task, or note?\n- How prominently should unresolved questions appear in prompts?\n\nOutput:\n- lifecycle rules\n- canonical fields\n- resolution behavior",
+        "markdown": "## Open Question\n\n**Purpose**: Unresolved item that blocks clarity.\n\n**Distinct from risk/investigation**: Question = \"we don't know yet\"; risk = \"bad thing might happen\".\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"owner\": \"string?\",\n  \"status\": \"open|investigating|resolved\",\n  \"resolutionPath\": nodeRef?,\n  \"prominence\": \"high|normal\"\n}\n```\n\n**Lifecycle**: Resolution converts it -> Decision (most common), Task, or closed Note. Unresolved questions auto-surface in Codex planning prompts.",
         "memo": "",
         "link": "",
         "html": "",
@@ -446,7 +446,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Task\n\nDefine the **Task** node type.\n\nQuestions to answer:\n- What makes a task atomic enough for implementation use?\n- Should tasks carry status, owner, priority, or estimate?\n- How should tasks connect to goals, dependencies, and acceptance criteria?\n- Do tasks map directly to execution prompts?\n\nOutput:\n- task scope rules\n- canonical data shape\n- execution linkage",
+        "markdown": "## Task\n\n**Purpose**: Smallest atomic unit Codex can implement in one focused prompt cycle.\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"status\": \"todo|in-progress|done|blocked\",\n  \"owner\": \"string?\",\n  \"priority\": \"high|medium|low\",\n  \"estimateHours\": number?,\n  \"acceptanceCriteria\": [nodeRef]\n}\n```\n\n**Rules**: Must be small enough for one-shot execution. Links to Goal (contributesTo), Dependencies, Acceptance Criteria, Risks.",
         "memo": "",
         "link": "",
         "html": "",
@@ -503,7 +503,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dependency\n\nDefine the **Dependency** node type.\n\nQuestions to answer:\n- Should dependency be a node type, an edge type, or both?\n- What extra meaning does a dependency node add?\n- Can dependencies represent external systems, prerequisites, or ordering?\n- How should blockers be modeled?\n\nOutput:\n- representation choice\n- canonical fields\n- connection rules",
+        "markdown": "## Dependency\n\n**Primary representation**: Edge (with optional metadata: type = prereq|blocker|external).\n\n**Node form** (only when needed):\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"type\": \"prereq|blocker|external|resource\",\n  \"status\": \"open|resolved\",\n  \"externalId\": \"string?\"\n}\n```\n\n**Connection rules**: Simple cases = edge + label/metadata. Complex cases = Dependency node + multiple edges. (See Node Type vs Edge Type decision.)",
         "memo": "",
         "link": "",
         "html": "",
@@ -560,7 +560,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Acceptance Criteria\n\nDefine the **Acceptance Criteria** node type.\n\nQuestions to answer:\n- Should criteria be checklists, prose, or structured tests?\n- Are they attached to tasks, goals, or decisions?\n- How specific should they be for Codex execution?\n- Can they drive validation or auto-review later?\n\nOutput:\n- canonical format\n- attachment rules\n- verification intent",
+        "markdown": "## Acceptance Criteria\n\n**Purpose**: Verifiable checklist that proves a Task/Goal/Decision is complete.\n\n**Format**: Structured checklist (preferred) or Gherkin-style.\n\n**Attachment**: Primarily to Tasks; optionally to Goals or Decisions.\n\n**Canonical data shape**:\n```json\n{\n  \"items\": [\n    {\n      \"description\": \"string\",\n      \"type\": \"checkbox|test|metric\",\n      \"verified\": boolean\n    }\n  ]\n}\n```\n\n**Verification intent**: Codex uses these directly in validation prompts; future auto-review agents will run against them.",
         "memo": "",
         "link": "",
         "html": "",
@@ -617,7 +617,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Risk / Edge Case\n\nDefine the **Risk / Edge Case** node type.\n\nQuestions to answer:\n- Should risk and edge case stay combined or split later?\n- Does this node track severity, likelihood, or mitigation?\n- How should edge cases connect to acceptance criteria and tasks?\n- When does a risk become a task or decision?\n\nOutput:\n- scope definition\n- canonical fields\n- escalation behavior",
+        "markdown": "## Risk / Edge Case\n\n**Purpose**: Potential failure mode or unhandled scenario (kept combined for v1).\n\n**Canonical data shape**:\n```json\n{\n  \"label\": \"string\",\n  \"markdown\": \"string\",\n  \"severity\": \"low|medium|high|critical\",\n  \"likelihood\": \"low|medium|high\",\n  \"mitigationPlan\": \"string or nodeRef\",\n  \"status\": \"open|mitigated|accepted\",\n  \"linkedTo\": [nodeRef]\n}\n```\n\n**Escalation**: High-risk items auto-generate a Task or Decision. Edge cases become acceptance-criteria tests.",
         "memo": "",
         "link": "",
         "html": "",
@@ -674,7 +674,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Node Type vs Edge Type\n\nBefore defining planning primitives, decide which concepts deserve first-class nodes versus edges or edge metadata. `Dependency` is the obvious pressure point, but `Constraint` and `Acceptance Criteria` may also be partly relational.",
+        "markdown": "# Node Type vs Edge Type\n\n**Decision**: Dependency is **primarily an edge type** (fast, lightweight, already native to Twilite graphs). A Dependency **node** is allowed only when extra data/rationale/status is required.\n\n**Why**: Keeps graphs readable. Simple ordering = edge. Rich dependencies = node + edges.\n\n**Impact**: Constraint and Acceptance Criteria can also use edge metadata for lightweight cases; full nodes only when lifecycle is needed.",
         "memo": "",
         "link": "",
         "html": "",
@@ -733,7 +733,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Node Set vs Dictionary\n\nPlanning nodes should not rely on dictionary authority alone. The graph is becoming the primary source of relationship, while dictionary support is being demoted to lookup, registration, and hints.",
+        "markdown": "# Node Set vs Dictionary\n\nDictionary is **lookup + registration + hints only**. The live graph is the single source of truth for relationships and instances. No more \"dictionary authority\" for connections.",
         "memo": "",
         "link": "",
         "html": "",
@@ -792,7 +792,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Static vs Live Planning Nodes\n\nMost planning nodes should probably be static. If any planning node gains live behavior later, that behavior must respect script scope and focus-scoped authority from the start.",
+        "markdown": "# Static vs Live Planning Nodes\n\nAll planning nodes are **static by default**. Any future live/script behavior must be explicitly declared in the node's script scope and respect fragment/focus rules from day one.",
         "memo": "",
         "link": "",
         "html": "",
@@ -851,7 +851,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Planning Nodes In Fragment Context\n\nPlanning nodes need to behave cleanly inside fragment-based traversal. They should be fragment-safe by default, with semantics that survive expansion, focus changes, and local reload.",
+        "markdown": "# Planning Nodes In Fragment Context\n\nAll planning nodes are fragment-safe: data, ports, and semantics survive collapse/expansion/zoom. Hierarchy is evaluated locally within the current fragment unless a Bridge node is used.",
         "memo": "",
         "link": "",
         "html": "",
@@ -910,7 +910,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Cross-Context Planning Semantics\n\nIf planning graphs ever express relationships across contexts, they should likely use explicit bridge semantics rather than ambient dictionary reach or global assumptions.",
+        "markdown": "# Cross-Context Planning Semantics\n\nNever assume ambient reach. Use explicit **Bridge** nodes or typed cross-context edges. Dictionary cannot bridge contexts.",
         "memo": "",
         "link": "",
         "html": "",

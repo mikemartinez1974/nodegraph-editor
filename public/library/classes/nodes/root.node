@@ -1,17 +1,19 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
-    "created": "2026-03-15T00:05:41.061Z",
-    "modified": "2026-03-15T00:05:41.061Z",
+    "title": "Node Class Library",
+    "description": "Index for node classes in the library.",
+    "created": "2026-03-15T21:05:00.000Z",
+    "modified": "2026-03-15T21:05:00.000Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "library"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "tasks-root-manifest",
+      "id": "library-node-classes-root-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -24,12 +26,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "tasks-root-root",
-          "name": "Task Graphs Root",
+          "graphId": "library-node-classes-root",
+          "name": "Node Class Library",
           "version": "0.1.0",
-          "description": "Top-level index for task graph folders.",
-          "createdAt": "2026-03-14T23:04:35.664Z",
-          "updatedAt": "2026-03-14T23:04:35.664Z"
+          "description": "Index for node classes in the library.",
+          "createdAt": "2026-03-15T21:05:00.000Z",
+          "updatedAt": "2026-03-15T21:05:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -101,7 +103,7 @@
       }
     },
     {
-      "id": "tasks-root-legend",
+      "id": "library-node-classes-root-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -115,19 +117,19 @@
       "data": {
         "entries": [
           {
-            "key": "task",
+            "key": "entry",
             "intent": "reference",
             "implementation": "port node",
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- task: open a task graph",
+        "markdown": "## Legend\n- entry: open a library graph",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "tasks-root-dictionary",
+      "id": "library-node-classes-root-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -147,12 +149,12 @@
       }
     },
     {
-      "id": "tasks-root-overview",
+      "id": "library-node-classes-root-overview",
       "type": "markdown",
-      "label": "Task Graphs",
+      "label": "Node Class Library",
       "position": {
         "x": -520,
-        "y": 39
+        "y": 40
       },
       "width": 460,
       "height": 220,
@@ -196,7 +198,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Task Graphs\n\nIndex for task graphs in `/tasks`.",
+        "markdown": "# Node Class Library\n\nBrowse node classes and related graphs in `/library/classes/nodes`.",
         "memo": "",
         "link": "",
         "html": "",
@@ -206,9 +208,9 @@
       }
     },
     {
-      "id": "tasks-root-port-1",
+      "id": "library-node-classes-root-port-1",
       "type": "port",
-      "label": "Branch Expansion",
+      "label": "Api Node",
       "position": {
         "x": 40,
         "y": 40
@@ -222,7 +224,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/branch-expansion/root.node:root",
+          "endpoint": "/library/classes/nodes/api-node.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -239,9 +241,9 @@
       }
     },
     {
-      "id": "tasks-root-port-2",
+      "id": "library-node-classes-root-port-2",
       "type": "port",
-      "label": "Nodeset Planning",
+      "label": "Code Execution",
       "position": {
         "x": 360,
         "y": 40
@@ -255,7 +257,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/nodeset-planning/root.node:root",
+          "endpoint": "/library/classes/nodes/code-execution.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -272,9 +274,42 @@
       }
     },
     {
-      "id": "tasks-root-port-3",
+      "id": "library-node-classes-root-port-3",
       "type": "port",
-      "label": "Semantic Zoom",
+      "label": "Dynamic Render Modes",
+      "position": {
+        "x": 680,
+        "y": 40
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/dynamic-render-modes.node-class.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "library-node-classes-root-port-4",
+      "type": "port",
+      "label": "Dynamic Render Modes",
       "position": {
         "x": 40,
         "y": 190
@@ -288,7 +323,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/semantic-zoom/root.node:root",
+          "endpoint": "/library/classes/nodes/dynamic-render-modes.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -305,9 +340,9 @@
       }
     },
     {
-      "id": "tasks-root-port-4",
+      "id": "library-node-classes-root-port-5",
       "type": "port",
-      "label": "Traversal And Authority",
+      "label": "Graph Reference",
       "position": {
         "x": 360,
         "y": 190
@@ -321,7 +356,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/traversal-authority/root.node:root",
+          "endpoint": "/library/classes/nodes/graph-reference.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -338,42 +373,9 @@
       }
     },
     {
-      "id": "tasks-root-port-5",
+      "id": "library-node-classes-root-port-6",
       "type": "port",
-      "label": "Focus Scoped Authority",
-      "position": {
-        "x": 680,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/focus-scoped-authority/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "tasks-root-port-6",
-      "type": "port",
-      "label": "Script Scope",
+      "label": "Image Node",
       "position": {
         "x": 680,
         "y": 190
@@ -387,7 +389,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope/root.node:root",
+          "endpoint": "/library/classes/nodes/image-node.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -404,12 +406,12 @@
       }
     },
     {
-      "id": "tasks-root-port-7",
+      "id": "library-node-classes-root-port-7",
       "type": "port",
-      "label": "Context Grammar",
+      "label": "Markdown",
       "position": {
-        "x": 1000,
-        "y": 40
+        "x": 40,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -420,7 +422,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/context-grammar/root.node:root",
+          "endpoint": "/library/classes/nodes/markdown.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -437,12 +439,12 @@
       }
     },
     {
-      "id": "tasks-root-port-8",
+      "id": "library-node-classes-root-port-8",
       "type": "port",
-      "label": "Dictionary Demotion",
+      "label": "Node",
       "position": {
-        "x": 1000,
-        "y": 190
+        "x": 360,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -453,7 +455,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/dictionary-demotion/root.node:root",
+          "endpoint": "/library/classes/nodes/node.node-class.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -470,12 +472,12 @@
       }
     },
     {
-      "id": "tasks-root-port-9",
+      "id": "library-node-classes-root-port-9",
       "type": "port",
-      "label": "Script Scope Test",
+      "label": "Terminal Node",
       "position": {
-        "x": 420,
-        "y": 720
+        "x": 680,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -486,7 +488,103 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope-test.node:root",
+          "endpoint": "/library/classes/nodes/terminal-node.node-class.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "library-node-classes-root-port-10",
+      "type": "port",
+      "label": "Youtube Embedded",
+      "position": {
+        "x": 40,
+        "y": 490
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/youtube-embedded.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "library-node-classes-root-port-11",
+      "type": "port",
+      "label": "Youtube Embedded",
+      "position": {
+        "x": 360,
+        "y": 490
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/youtube-embedded.node-class.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "library-node-classes-root-port-task-planning",
+      "type": "port",
+      "label": "Task Planning",
+      "position": {
+        "x": 640,
+        "y": 640
+      },
+      "width": 260,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -505,10 +603,10 @@
   ],
   "edges": [
     {
-      "id": "tasks-root-edge-1",
+      "id": "library-node-classes-root-edge-1",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-1",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-1",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -520,10 +618,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-2",
+      "id": "library-node-classes-root-edge-2",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-2",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-2",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -535,10 +633,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-3",
+      "id": "library-node-classes-root-edge-3",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-3",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-3",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -550,10 +648,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-4",
+      "id": "library-node-classes-root-edge-4",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-4",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-4",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -565,10 +663,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-5",
+      "id": "library-node-classes-root-edge-5",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-5",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-5",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -580,10 +678,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-6",
+      "id": "library-node-classes-root-edge-6",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-6",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-6",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -595,10 +693,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-7",
+      "id": "library-node-classes-root-edge-7",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-7",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-7",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -610,10 +708,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-8",
+      "id": "library-node-classes-root-edge-8",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-8",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-8",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -625,10 +723,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-9",
+      "id": "library-node-classes-root-edge-9",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-9",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-9",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -638,21 +736,46 @@
         "curved": true
       },
       "data": {}
+    },
+    {
+      "id": "library-node-classes-root-edge-10",
+      "type": "reference",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-10",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "library-node-classes-root-edge-11",
+      "type": "reference",
+      "source": "library-node-classes-root-overview",
+      "target": "library-node-classes-root-port-11",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "library-node-classes-root-edge-task-planning",
+      "source": "library-node-classes-root-overview",
+      "sourcePort": "out",
+      "target": "library-node-classes-root-port-task-planning",
+      "targetPort": "root",
+      "type": "references"
     }
   ],
   "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ]
+  "scripts": []
 }

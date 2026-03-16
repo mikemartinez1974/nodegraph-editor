@@ -1,39 +1,43 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
-    "created": "2026-03-15T18:58:55.321Z",
-    "modified": "2026-03-15T18:58:55.321Z",
+    "title": "Script Scope Test",
+    "description": "Scratch graph for testing fragment-scoped scripting behavior.",
+    "created": "2026-03-15T23:50:00.000Z",
+    "modified": "2026-03-15T23:50:00.000Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "testing",
+      "script-scope"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "semantic-zoom-root-manifest",
+      "id": "script-scope-test-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -640,
-        "y": -260
+        "x": -760,
+        "y": -280
       },
       "width": 360,
-      "height": 220,
+      "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "semantic-zoom-root-root",
-          "name": "Semantic Zoom Root",
+          "graphId": "script-scope-test",
+          "name": "Script Scope Test",
           "version": "0.1.0",
-          "description": "Index for semantic zoom task graphs.",
-          "createdAt": "2026-03-14T23:04:35.657Z",
-          "updatedAt": "2026-03-14T23:04:35.657Z"
+          "description": "Scratch graph for testing fragment-scoped scripting behavior.",
+          "createdAt": "2026-03-15T23:50:00.000Z",
+          "updatedAt": "2026-03-15T23:50:00.000Z"
         },
         "intent": {
-          "kind": "graph",
-          "scope": "mixed"
+          "kind": "task",
+          "scope": "local"
         },
         "dependencies": {
           "nodeTypes": [
@@ -41,7 +45,8 @@
             "legend",
             "dictionary",
             "markdown",
-            "port"
+            "port",
+            "script"
           ],
           "portContracts": [
             "core"
@@ -82,81 +87,57 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "github": {
-            "repo": "",
-            "path": "",
-            "branch": "main",
-            "autoCreateRepo": true,
-            "repoVisibility": "private",
-            "seedOnCommit": false,
-            "enableGithubPages": false
-          },
-          "autoSave": false,
-          "expansion": {
-            "allowGraphEntry": true
-          }
+          "autoSave": false
         },
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "semantic-zoom-root-legend",
+      "id": "script-scope-test-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -240,
-        "y": -260
+        "x": -760,
+        "y": 20
       },
       "width": 320,
       "height": 180,
       "visible": true,
       "showLabel": true,
-      "data": {
-        "entries": [
-          {
-            "key": "task",
-            "intent": "reference",
-            "implementation": "port node",
-            "dictionaryKey": "default"
-          }
-        ],
-        "markdown": "## Legend\n- task: open a task graph",
-        "isRoot": false,
-        "root": false
-      }
+      "data": {}
     },
     {
-      "id": "semantic-zoom-root-dictionary",
+      "id": "script-scope-test-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": 120,
-        "y": -260
+        "x": -760,
+        "y": 240
       },
-      "width": 320,
-      "height": 180,
+      "width": 360,
+      "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
         "nodeDefs": [],
-        "skills": [],
         "views": [],
-        "isRoot": false,
-        "root": false
+        "skills": []
       }
     },
     {
-      "id": "semantic-zoom-root-overview",
+      "id": "script-scope-test-overview",
       "type": "markdown",
-      "label": "Semantic Zoom",
+      "label": "Script Scope Test",
       "position": {
-        "x": -520,
+        "x": -300,
         "y": 40
       },
       "width": 460,
-      "height": 220,
+      "height": 240,
       "color": "#1976d2",
+      "visible": true,
+      "showLabel": true,
       "ports": [
         {
           "id": "in",
@@ -193,10 +174,8 @@
           "type": "content"
         }
       ],
-      "visible": true,
-      "showLabel": true,
       "data": {
-        "markdown": "# Semantic Zoom\n\nIndex for task graphs in `/tasks/semantic-zoom`.",
+        "markdown": "# Script Scope Test\n\nUse this graph to test that scripts only see and mutate the active fragment.\n\nSuggested checks:\n- run a script in the root fragment\n- expand into another fragment\n- verify out-of-scope reads and mutations fail in diagnostics",
         "memo": "",
         "link": "",
         "html": "",
@@ -206,23 +185,45 @@
       }
     },
     {
-      "id": "semantic-zoom-root-port-1",
-      "type": "port",
-      "label": "Semantic Zoom Implementation",
+      "id": "script-scope-test-note",
+      "type": "markdown",
+      "label": "Expected Behavior",
       "position": {
-        "x": 40,
+        "x": 260,
         "y": 40
       },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
+      "width": 380,
+      "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
+        "markdown": "## Expected Behavior\n\n- `getNodes()` returns only active-fragment nodes\n- foreign `getNode(id)` fails with scope error\n- foreign mutations are rejected\n- script failures appear in diagnostics",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-port",
+      "type": "port",
+      "label": "Script Scope Task",
+      "position": {
+        "x": 260,
+        "y": 320
+      },
+      "width": 280,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "data": {
         "target": {
-          "endpoint": "/tasks/semantic-zoom/semantic-zoom-implementation.task.node:root",
+          "endpoint": "/tasks/script-scope/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -241,10 +242,25 @@
   ],
   "edges": [
     {
-      "id": "semantic-zoom-root-edge-1",
+      "id": "script-scope-test-edge-1",
       "type": "reference",
-      "source": "semantic-zoom-root-overview",
-      "target": "semantic-zoom-root-port-1",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-note",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "expects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-2",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-port",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -254,21 +270,6 @@
         "curved": true
       },
       "data": {}
-    }
-  ],
-  "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
     }
   ]
 }

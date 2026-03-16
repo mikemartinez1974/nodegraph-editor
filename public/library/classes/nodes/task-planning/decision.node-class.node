@@ -1,0 +1,419 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Decision Class",
+    "description": "Recorded, timestamped choice for planning graphs.",
+    "created": "2026-03-15T20:30:00.000Z",
+    "modified": "2026-03-15T20:30:00.000Z",
+    "author": "",
+    "tags": [
+      "library",
+      "node-class",
+      "task-planning"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "decision-class-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -300
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "decision-class",
+          "name": "Decision Class",
+          "version": "0.1.0",
+          "description": "Recorded, timestamped choice for planning graphs.",
+          "createdAt": "2026-03-15T20:30:00.000Z",
+          "updatedAt": "2026-03-15T20:30:00.000Z"
+        },
+        "intent": {
+          "kind": "node-class",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "view",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -300
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "decision",
+            "intent": "class",
+            "implementation": "node class",
+            "dictionaryKey": "decision"
+          }
+        ],
+        "markdown": "## Legend\n- class views and notes",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "decision-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -300
+      },
+      "width": 340,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "decision-editor-view",
+      "type": "view",
+      "label": "Editor View (editor.web)",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "editor",
+          "payload": "editor.web"
+        },
+        "editor": {
+          "web": {
+            "fields": [
+              {
+                "key": "label",
+                "label": "Label",
+                "type": "text",
+                "path": "label",
+                "placeholder": "Decision"
+              },
+              {
+                "key": "rationale",
+                "label": "Rationale",
+                "type": "markdown",
+                "path": "data.rationale",
+                "placeholder": "Why this decision was made...",
+                "multiline": true,
+                "rows": 8
+              },
+              {
+                "key": "status",
+                "label": "Status",
+                "type": "select",
+                "path": "data.status",
+                "options": [
+                  {
+                    "label": "Pending",
+                    "value": "pending"
+                  },
+                  {
+                    "label": "Decided",
+                    "value": "decided"
+                  },
+                  {
+                    "label": "Superseded",
+                    "value": "superseded"
+                  }
+                ]
+              },
+              {
+                "key": "decidedAt",
+                "label": "Decided At",
+                "type": "text",
+                "path": "data.decidedAt",
+                "placeholder": "YYYY-MM-DD"
+              },
+              {
+                "key": "owner",
+                "label": "Owner",
+                "type": "text",
+                "path": "data.owner",
+                "placeholder": "owner"
+              },
+              {
+                "key": "supersededBy",
+                "label": "Superseded By",
+                "type": "text",
+                "path": "data.supersededBy",
+                "placeholder": "nodeRef"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "decision-detail-view",
+      "type": "view",
+      "label": "Node View (node.web.detail)",
+      "position": {
+        "x": -340,
+        "y": 20
+      },
+      "width": 380,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.detail",
+          "controls": [
+            {
+              "id": "decision-edit",
+              "type": "button",
+              "label": "Edit",
+              "icon": "edit",
+              "variant": "outlined",
+              "priority": "high",
+              "action": "openEditor"
+            }
+          ]
+        },
+        "node": {
+          "web": {
+            "detail": {
+              "markdown": "## Decision: {{label}}\n\n**Status:** `{{data.status}}`  \n**Decided:** `{{data.decidedAt}}`\n\n{{data.rationale}}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "decision-summary-view",
+      "type": "view",
+      "label": "Summary View (node.web.summary)",
+      "position": {
+        "x": 80,
+        "y": 20
+      },
+      "width": 340,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.summary"
+        },
+        "node": {
+          "web": {
+            "summary": {
+              "markdown": "**Decision** {{label}}  \n`{{data.status}}`"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "decision-icon-view",
+      "type": "view",
+      "label": "Icon View (node.web.icon)",
+      "position": {
+        "x": 460,
+        "y": 20
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web.icon"
+        },
+        "node": {
+          "web": {
+            "icon": {
+              "markdown": "**D** {{label}}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "decision-legacy-view",
+      "type": "view",
+      "label": "Legacy Node View (node.web)",
+      "position": {
+        "x": 800,
+        "y": 20
+      },
+      "width": 340,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "view": {
+          "intent": "node",
+          "payload": "node.web"
+        },
+        "node": {
+          "web": {
+            "markdown": "## Decision: {{label}}\n\n**Status:** `{{data.status}}`  \n**Decided:** `{{data.decidedAt}}`\n\n{{data.rationale}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "decision-notes",
+      "type": "markdown",
+      "label": "Definition Notes",
+      "position": {
+        "x": -760,
+        "y": 300
+      },
+      "width": 760,
+      "height": 220,
+      "color": "#455a64",
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Decision records a resolved choice and may supersede older decisions.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": []
+}

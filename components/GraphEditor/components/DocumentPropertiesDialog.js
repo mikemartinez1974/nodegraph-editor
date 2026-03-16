@@ -1959,6 +1959,23 @@ export default function DocumentPropertiesDialog({
                     valueLabelDisplay="auto"
                   />
                 </Box>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={settings.showFocusIndicator === true}
+                      onChange={(event) => {
+                        const nextEnabled = event.target.checked;
+                        setSettings((prev) => {
+                          const next = { ...prev, showFocusIndicator: nextEnabled };
+                          saveSettings(next);
+                          return next;
+                        });
+                        eventBus.emit('updateEditorFocusIndicator', { enabled: nextEnabled });
+                      }}
+                    />
+                  }
+                  label="Show focus indicator"
+                />
               </Stack>
             </Paper>
           </Stack>

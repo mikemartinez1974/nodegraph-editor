@@ -859,9 +859,9 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
       <div
         style={{
           position: 'absolute',
-          top: 8,
+          top: 4,
           right: 8,
-          zIndex: 2,
+          zIndex: 6,
           display: 'flex',
           gap: 6,
           alignItems: 'center',
@@ -984,8 +984,12 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
                 fontSize: densityConfig.inputSize,
                 lineHeight: 1.35,
                 color: theme.palette.text.primary,
-                background: 'transparent',
+                background: alpha(theme.palette.background.paper, 0.92),
                 boxSizing: 'border-box'
+              };
+              const optionStyle = {
+                background: theme.palette.background.paper,
+                color: theme.palette.text.primary
               };
               const onFieldChange = (nextValue) => {
                 setEditorFieldValues((prev) => ({ ...prev, [key]: nextValue }));
@@ -1075,19 +1079,19 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
                       disabled={fieldReadOnly}
                       style={commonStyle}
                     >
-                      {!field.required && <option value="">Select…</option>}
+                      {!field.required && <option value="" style={optionStyle}>Select…</option>}
                       {optionEntries.map((option, optionIndex) => {
                         if (typeof option === 'object') {
                           const optionValue = option?.value ?? '';
                           const optionLabel = option?.label ?? String(optionValue);
                           return (
-                            <option key={`${key}-opt-${optionIndex}`} value={optionValue}>
+                            <option key={`${key}-opt-${optionIndex}`} value={optionValue} style={optionStyle}>
                               {optionLabel}
                             </option>
                           );
                         }
                         return (
-                          <option key={`${key}-opt-${optionIndex}`} value={option}>
+                          <option key={`${key}-opt-${optionIndex}`} value={option} style={optionStyle}>
                             {String(option)}
                           </option>
                         );
@@ -1277,17 +1281,22 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
     );
   };
 
+  const canvasTitleBarHeight = renderInPanel ? 0 : 30;
+
   const content = (
     <div
       style={{
         position: renderInPanel ? 'relative' : 'absolute',
-        inset: renderInPanel ? 'auto' : (isHtmlCanvasMode ? 0 : 8),
+        top: renderInPanel ? 'auto' : canvasTitleBarHeight,
+        right: renderInPanel ? 'auto' : (isHtmlCanvasMode ? 0 : 8),
+        bottom: renderInPanel ? 'auto' : (isHtmlCanvasMode ? 0 : 8),
+        left: renderInPanel ? 'auto' : (isHtmlCanvasMode ? 0 : 8),
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         gap: isHtmlCanvasMode ? 0 : 8,
         pointerEvents: 'auto',
-        height: renderInPanel ? '100%' : (isHtmlCanvasMode ? '100%' : 'auto'),
+        height: renderInPanel ? '100%' : 'auto',
         borderRadius: isHtmlCanvasMode && showHtmlChrome ? 8 : 0,
         border: isHtmlCanvasMode && showHtmlChrome
           ? `2px solid ${alpha(theme.palette.primary.main, 0.9)}`
@@ -1331,7 +1340,7 @@ const DynamicViewNode = ({ viewDefinition, viewEntry, renderInPanel = false, sho
             top: 0,
             left: 0,
             right: 0,
-            height: 18,
+            height: canvasTitleBarHeight,
             zIndex: 4,
             cursor: 'grab',
             pointerEvents: 'auto',

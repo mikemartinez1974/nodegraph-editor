@@ -39,6 +39,7 @@ const defaultSettings = {
   backgroundImage: null,
   watermarkEnabled: true,
   watermarkStrength: 100,
+  showFocusIndicator: false,
   defaultNodeColor: '#1976d2',
   defaultEdgeColor: '#666666',
   pan: { x: 0, y: 0 },

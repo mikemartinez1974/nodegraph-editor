@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useCallback, useEffect } from 'react';
+import { useMemo, useRef, useCallback, useEffect, useState } from 'react';
 import eventBus from '../../NodeGraph/eventBus';
 import GraphCRUD from '../GraphCrud';
 import { useBackgroundRpc } from './useBackgroundRpc';
@@ -7,6 +7,7 @@ import usePluginRuntimeManager from './usePluginRuntimeManager';
 
 const MAX_SCRIPT_RPC_CALLS = 200;
 const MAX_SCRIPT_MUTATIONS = 100;
+const MAX_SCRIPT_DIAGNOSTICS = 100;
 const MUTATION_METHODS = new Set(['createNode', 'updateNode', 'deleteNode', 'createEdge', 'deleteEdge']);
 
 const safeClone = (value) => {
@@ -42,6 +43,96 @@ export default function usePluginRuntime({
 
   const scriptRunStatsRef = useRef(new Map());
   const scriptEventSubscriptionsRef = useRef(new Map());
+  const [scriptDiagnostics, setScriptDiagnostics] = useState([]);
+
+  const getFragmentIdForNode = useCallback((node) => {
+    return String(
+      node?.data?._expansion?.expansionId ||
+      node?.data?._origin?.instanceId ||
+      ''
+    ).trim();
+  }, []);
+
+  const getActiveFragmentId = useCallback((meta = {}) => {
+    const explicitFragmentId = typeof meta?.fragmentId === 'string' ? meta.fragmentId.trim() : '';
+    if (explicitFragmentId) return explicitFragmentId;
+
+    const metaNodeId = typeof meta?.nodeId === 'string' ? meta.nodeId.trim() : '';
+    if (metaNodeId) {
+      const match = (nodesRef?.current || nodes || []).find((node) => node?.id === metaNodeId) || null;
+      if (match) return getFragmentIdForNode(match);
+    }
+
+    return typeof state?.focusedFragmentId === 'string' ? state.focusedFragmentId.trim() : '';
+  }, [getFragmentIdForNode, nodes, nodesRef, state?.focusedFragmentId]);
+
+  const isNodeInFragment = useCallback((node, fragmentId = '') => {
+    return getFragmentIdForNode(node) === String(fragmentId || '').trim();
+  }, [getFragmentIdForNode]);
+
+  const getScopedNodes = useCallback((fragmentId = '') => {
+    const safeFragmentId = String(fragmentId || '').trim();
+    return (nodesRef?.current || nodes || []).filter((node) => isNodeInFragment(node, safeFragmentId));
+  }, [isNodeInFragment, nodes, nodesRef]);
+
+  const getScopedEdges = useCallback((fragmentId = '') => {
+    const safeFragmentId = String(fragmentId || '').trim();
+    const latestNodes = nodesRef?.current || nodes || [];
+    const nodeById = new Map(latestNodes.map((node) => [node?.id, node]));
+    return (edgesRef?.current || []).filter((edge) => {
+      const sourceNode = nodeById.get(edge?.source);
+      const targetNode = nodeById.get(edge?.target);
+      return Boolean(sourceNode && targetNode && isNodeInFragment(sourceNode, safeFragmentId) && isNodeInFragment(targetNode, safeFragmentId));
+    });
+  }, [edgesRef, isNodeInFragment, nodes, nodesRef]);
+
+  const getScopedGroups = useCallback((fragmentId = '') => {
+    const safeFragmentId = String(fragmentId || '').trim();
+    return (groupsRef?.current || groups || []).filter((group) => {
+      const nodeIds = Array.isArray(group?.nodeIds) ? group.nodeIds : [];
+      if (!nodeIds.length) return false;
+      return nodeIds.every((nodeId) => {
+        const node = (nodesRef?.current || nodes || []).find((entry) => entry?.id === nodeId) || null;
+        return node ? isNodeInFragment(node, safeFragmentId) : false;
+      });
+    });
+  }, [groups, groupsRef, isNodeInFragment, nodes, nodesRef]);
+
+  const pushScriptDiagnostic = useCallback((issue = {}) => {
+    if (!issue || typeof issue !== 'object') return;
+    const nextIssue = {
+      code: String(issue.code || 'SCRIPT_ERROR').trim() || 'SCRIPT_ERROR',
+      message: String(issue.message || 'Script error').trim() || 'Script error',
+      severity: issue.severity === 'warning' ? 'warning' : 'error',
+      nodeId: issue.nodeId || null,
+      edgeId: issue.edgeId || null,
+      groupId: issue.groupId || issue.clusterId || null,
+      fragmentId: typeof issue.fragmentId === 'string' ? issue.fragmentId : '',
+      runId: typeof issue.runId === 'string' ? issue.runId : '',
+      method: typeof issue.method === 'string' ? issue.method : '',
+      timestamp: Number.isFinite(issue.timestamp) ? issue.timestamp : Date.now()
+    };
+    setScriptDiagnostics((prev) => {
+      const deduped = prev.filter((entry) => !(
+        entry.code === nextIssue.code &&
+        entry.message === nextIssue.message &&
+        entry.nodeId === nextIssue.nodeId &&
+        entry.edgeId === nextIssue.edgeId &&
+        entry.groupId === nextIssue.groupId &&
+        entry.fragmentId === nextIssue.fragmentId
+      ));
+      return [nextIssue, ...deduped].slice(0, MAX_SCRIPT_DIAGNOSTICS);
+    });
+  }, []);
+
+  const assertNodeInActiveFragment = useCallback((node, fragmentId, action) => {
+    if (!node) {
+      throw new Error(`${action} target was not found`);
+    }
+    if (!isNodeInFragment(node, fragmentId)) {
+      throw new Error(`${action} is out of scope for the active fragment`);
+    }
+  }, [isNodeInFragment]);
 
   const emitScriptEventPayload = useCallback((eventName, payload) => {
     if (!eventName || typeof window === 'undefined') return;
@@ -156,6 +247,12 @@ export default function usePluginRuntime({
       const isDry = meta && meta.dry === true;
       const allowMutations = meta && meta.allowMutations === true;
       const runId = ensureScriptId(meta?.runId);
+      const activeFragmentId = getActiveFragmentId(meta);
+      const scopedNodes = getScopedNodes(activeFragmentId);
+      const scopedEdges = getScopedEdges(activeFragmentId);
+      const scopedGroups = getScopedGroups(activeFragmentId);
+      const scopedNodeById = new Map(scopedNodes.map((node) => [node?.id, node]));
+      const scopedEdgeById = new Map(scopedEdges.map((edge) => [edge?.id, edge]));
 
       if (runId) {
         const current = scriptRunStatsRef.current.get(runId) || { calls: 0, mutations: 0 };
@@ -176,14 +273,19 @@ export default function usePluginRuntime({
 
       switch (method) {
         case 'getNodes':
-          return safeClone(nodesRef.current || []);
+          return safeClone(scopedNodes);
         case 'getNode': {
           const [id] = args;
-          const node = (nodesRef.current || []).find((n) => n.id === id) || null;
+          const node = scopedNodeById.get(id) || null;
+          if (!node && id) {
+            throw new Error('getNode is out of scope for the active fragment');
+          }
           return node ? safeClone(node) : null;
         }
         case 'getEdges':
-          return safeClone(edgesRef.current || []);
+          return safeClone(scopedEdges);
+        case 'getGroups':
+          return safeClone(scopedGroups);
         case 'createNode': {
           if (isDry && !allowMutations) {
             return { simulated: true };
@@ -208,6 +310,19 @@ export default function usePluginRuntime({
             data: nodeData.data && typeof nodeData.data === 'object' ? safeClone(nodeData.data) : {},
             color: nodeData.color || defaultNodeColor || '#1976d2'
           };
+          if (activeFragmentId) {
+            newNode.data = {
+              ...(newNode.data || {}),
+              _origin: {
+                ...((newNode.data && newNode.data._origin) || {}),
+                instanceId: activeFragmentId
+              },
+              _contextScope: {
+                ...((newNode.data && newNode.data._contextScope) || {}),
+                fragmentId: activeFragmentId
+              }
+            };
+          }
           emitExecutionIntent({ action: 'createNode', node: newNode });
           return safeClone(newNode);
         }
@@ -219,6 +334,10 @@ export default function usePluginRuntime({
           if (!edgeData || typeof edgeData !== 'object') {
             throw new Error('createEdge expects an edge object');
           }
+          const sourceNode = scopedNodeById.get(edgeData.source) || null;
+          const targetNode = scopedNodeById.get(edgeData.target) || null;
+          assertNodeInActiveFragment(sourceNode, activeFragmentId, 'createEdge source');
+          assertNodeInActiveFragment(targetNode, activeFragmentId, 'createEdge target');
           const newEdge = {
             id:
               typeof edgeData.id === 'string' && edgeData.id.trim()
@@ -232,6 +351,15 @@ export default function usePluginRuntime({
             data: edgeData.data && typeof edgeData.data === 'object' ? safeClone(edgeData.data) : {},
             color: edgeData.color || defaultEdgeColor || '#666666'
           };
+          if (activeFragmentId) {
+            newEdge.data = {
+              ...(newEdge.data || {}),
+              _contextScope: {
+                ...((newEdge.data && newEdge.data._contextScope) || {}),
+                fragmentId: activeFragmentId
+              }
+            };
+          }
           emitExecutionIntent({ action: 'createEdge', edge: newEdge });
           return safeClone(newEdge);
         }
@@ -243,6 +371,7 @@ export default function usePluginRuntime({
           if (!id) {
             throw new Error('deleteNode requires an id');
           }
+          assertNodeInActiveFragment(scopedNodeById.get(id) || null, activeFragmentId, 'deleteNode');
           emitExecutionIntent({ action: 'deleteNode', id });
           return { id };
         }
@@ -257,6 +386,7 @@ export default function usePluginRuntime({
           if (!updates || typeof updates !== 'object') {
             throw new Error('updateNode requires an updates object');
           }
+          assertNodeInActiveFragment(scopedNodeById.get(id) || null, activeFragmentId, 'updateNode');
           emitExecutionIntent({ action: 'updateNode', id, patch: safeClone(updates) });
           return { id, ...safeClone(updates) };
         }
@@ -268,6 +398,9 @@ export default function usePluginRuntime({
           if (!id) {
             throw new Error('deleteEdge requires an id');
           }
+          if (!scopedEdgeById.has(id)) {
+            throw new Error('deleteEdge is out of scope for the active fragment');
+          }
           emitExecutionIntent({ action: 'deleteEdge', id });
           return { id };
         }
@@ -277,6 +410,7 @@ export default function usePluginRuntime({
           if (!nodeId || !patch) {
             throw new Error('applyScriptPatch requires nodeId and patch');
           }
+          assertNodeInActiveFragment(scopedNodeById.get(nodeId) || null, activeFragmentId, 'applyScriptPatch');
           emitExecutionIntent({ action: 'updateNode', id: nodeId, patch: safeClone(patch) });
           return { nodeId };
         }
@@ -347,17 +481,30 @@ export default function usePluginRuntime({
           throw new Error('Unknown method: ' + method);
       }
     } catch (err) {
+      pushScriptDiagnostic({
+        code: String(err?.message || '').includes('scope') ? 'SCRIPT_SCOPE' : 'SCRIPT_RPC',
+        message: err?.message || `Script request failed for ${method}`,
+        severity: 'error',
+        nodeId: typeof meta?.nodeId === 'string' ? meta.nodeId : null,
+        fragmentId: getActiveFragmentId(meta),
+        runId,
+        method
+      });
       console.error('Script RPC error', method, err);
       throw err;
     }
   }, [
-    nodesRef,
-    edgesRef,
-    setNodes,
-    setEdges,
-    historyHook,
+    getActiveFragmentId,
+    getScopedEdges,
+    getScopedGroups,
+    getScopedNodes,
+    assertNodeInActiveFragment,
+    defaultEdgeColor,
     defaultNodeColor,
-    defaultEdgeColor
+    emitExecutionIntent,
+    emitScriptEventPayload,
+    buildScriptEventPayload,
+    pushScriptDiagnostic
   ]);
 
   useEffect(() => {
@@ -374,13 +521,20 @@ export default function usePluginRuntime({
       if (detail.success) {
         setSnackbar({ open: true, message: 'Script executed successfully', severity: 'success' });
       } else if (detail.success === false) {
+        pushScriptDiagnostic({
+          code: 'SCRIPT_RUNTIME',
+          message: detail.error || 'Script execution failed',
+          severity: 'error',
+          runId: detail.runId || '',
+          timestamp: Date.now()
+        });
         setSnackbar({ open: true, message: detail.error || 'Script execution failed', severity: 'error' });
       }
     };
 
     window.addEventListener('scriptRunnerResult', handleScriptResult);
     return () => window.removeEventListener('scriptRunnerResult', handleScriptResult);
-  }, [setSnackbar]);
+  }, [pushScriptDiagnostic, setSnackbar]);
 
   useEffect(() => {
     const handleApplyProposals = ({ proposals = [], sourceId } = {}) => {
@@ -415,10 +569,16 @@ export default function usePluginRuntime({
     [pluginRuntime]
   );
 
+  const clearScriptDiagnostics = useCallback(() => {
+    setScriptDiagnostics([]);
+  }, []);
+
   return useMemo(
     () => ({
       graphCRUD,
       handleScriptRequest,
+      scriptDiagnostics,
+      clearScriptDiagnostics,
       backgroundRpc: rpc,
       backgroundRpcReady: isReady,
       backgroundPostEvent: postEvent,
@@ -430,6 +590,8 @@ export default function usePluginRuntime({
     [
       graphCRUD,
       handleScriptRequest,
+      scriptDiagnostics,
+      clearScriptDiagnostics,
       rpc,
       isReady,
       postEvent,

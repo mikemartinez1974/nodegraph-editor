@@ -1,17 +1,20 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
-    "created": "2026-03-15T00:05:41.061Z",
-    "modified": "2026-03-15T00:05:41.061Z",
+    "title": "Task Planning Root",
+    "description": "Index for task-planning node classes.",
+    "created": "2026-03-15T20:30:00.000Z",
+    "modified": "2026-03-15T20:30:00.000Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "library",
+      "task-planning"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "tasks-root-manifest",
+      "id": "task-planning-root-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -19,29 +22,29 @@
         "y": -260
       },
       "width": 360,
-      "height": 220,
+      "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "tasks-root-root",
-          "name": "Task Graphs Root",
+          "graphId": "task-planning-root",
+          "name": "Task Planning Root",
           "version": "0.1.0",
-          "description": "Top-level index for task graph folders.",
-          "createdAt": "2026-03-14T23:04:35.664Z",
-          "updatedAt": "2026-03-14T23:04:35.664Z"
+          "description": "Index for task-planning node classes.",
+          "createdAt": "2026-03-15T20:30:00.000Z",
+          "updatedAt": "2026-03-15T20:30:00.000Z"
         },
         "intent": {
-          "kind": "graph",
-          "scope": "mixed"
+          "kind": "node-class",
+          "scope": "local"
         },
         "dependencies": {
           "nodeTypes": [
             "manifest",
             "legend",
             "dictionary",
-            "markdown",
-            "port"
+            "view",
+            "markdown"
           ],
           "portContracts": [
             "core"
@@ -91,17 +94,14 @@
             "seedOnCommit": false,
             "enableGithubPages": false
           },
-          "autoSave": false,
-          "expansion": {
-            "allowGraphEntry": true
-          }
+          "autoSave": false
         },
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "tasks-root-legend",
+      "id": "legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -115,19 +115,19 @@
       "data": {
         "entries": [
           {
-            "key": "task",
+            "key": "class",
             "intent": "reference",
             "implementation": "port node",
-            "dictionaryKey": "default"
+            "dictionaryKey": "task-planning"
           }
         ],
-        "markdown": "## Legend\n- task: open a task graph",
+        "markdown": "## Legend\n- class views and notes",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "tasks-root-dictionary",
+      "id": "task-planning-root-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -147,56 +147,20 @@
       }
     },
     {
-      "id": "tasks-root-overview",
+      "id": "task-planning-root-overview",
       "type": "markdown",
-      "label": "Task Graphs",
+      "label": "Task Planning Classes",
       "position": {
         "x": -520,
-        "y": 39
+        "y": 40
       },
       "width": 460,
       "height": 220,
       "color": "#1976d2",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Task Graphs\n\nIndex for task graphs in `/tasks`.",
+        "markdown": "# Task Planning Classes\n\nIndex for the planning node-set classes and package dictionary.",
         "memo": "",
         "link": "",
         "html": "",
@@ -206,9 +170,9 @@
       }
     },
     {
-      "id": "tasks-root-port-1",
+      "id": "task-planning-root-port-1",
       "type": "port",
-      "label": "Branch Expansion",
+      "label": "Task Planning Node Set",
       "position": {
         "x": 40,
         "y": 40
@@ -222,7 +186,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/branch-expansion/root.node:root",
+          "endpoint": "/library/classes/nodes/task-planning/task-planning.dictionary.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -239,9 +203,9 @@
       }
     },
     {
-      "id": "tasks-root-port-2",
+      "id": "task-planning-root-port-2",
       "type": "port",
-      "label": "Nodeset Planning",
+      "label": "Goal",
       "position": {
         "x": 360,
         "y": 40
@@ -255,13 +219,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/nodeset-planning/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/goal.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -272,9 +236,42 @@
       }
     },
     {
-      "id": "tasks-root-port-3",
+      "id": "task-planning-root-port-3",
       "type": "port",
-      "label": "Semantic Zoom",
+      "label": "Task",
+      "position": {
+        "x": 680,
+        "y": 40
+      },
+      "width": 280,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/task.node-class.node:root",
+          "mode": "bridge",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Create"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "task-planning-root-port-4",
+      "type": "port",
+      "label": "Decision",
       "position": {
         "x": 40,
         "y": 190
@@ -288,13 +285,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/semantic-zoom/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/decision.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -305,9 +302,9 @@
       }
     },
     {
-      "id": "tasks-root-port-4",
+      "id": "task-planning-root-port-5",
       "type": "port",
-      "label": "Traversal And Authority",
+      "label": "Constraint",
       "position": {
         "x": 360,
         "y": 190
@@ -321,13 +318,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/traversal-authority/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/constraint.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -338,42 +335,9 @@
       }
     },
     {
-      "id": "tasks-root-port-5",
+      "id": "task-planning-root-port-6",
       "type": "port",
-      "label": "Focus Scoped Authority",
-      "position": {
-        "x": 680,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/focus-scoped-authority/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "tasks-root-port-6",
-      "type": "port",
-      "label": "Script Scope",
+      "label": "Open Question",
       "position": {
         "x": 680,
         "y": 190
@@ -387,13 +351,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/open-question.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -404,12 +368,12 @@
       }
     },
     {
-      "id": "tasks-root-port-7",
+      "id": "task-planning-root-port-7",
       "type": "port",
-      "label": "Context Grammar",
+      "label": "Acceptance Criteria",
       "position": {
-        "x": 1000,
-        "y": 40
+        "x": 40,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -420,13 +384,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/context-grammar/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/acceptance-criteria.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -437,12 +401,12 @@
       }
     },
     {
-      "id": "tasks-root-port-8",
+      "id": "task-planning-root-port-8",
       "type": "port",
-      "label": "Dictionary Demotion",
+      "label": "Risk",
       "position": {
-        "x": 1000,
-        "y": 190
+        "x": 360,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -453,13 +417,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/dictionary-demotion/root.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/risk.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -470,12 +434,12 @@
       }
     },
     {
-      "id": "tasks-root-port-9",
+      "id": "task-planning-root-port-9",
       "type": "port",
-      "label": "Script Scope Test",
+      "label": "Dependency",
       "position": {
-        "x": 420,
-        "y": 720
+        "x": 680,
+        "y": 340
       },
       "width": 280,
       "height": 110,
@@ -486,13 +450,13 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope-test.node:root",
-          "mode": "navigate",
+          "endpoint": "/library/classes/nodes/task-planning/dependency.node-class.node:root",
+          "mode": "bridge",
           "url": "",
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Open"
+          "label": "Create"
         },
         "memo": "",
         "link": "",
@@ -505,11 +469,11 @@
   ],
   "edges": [
     {
-      "id": "tasks-root-edge-1",
+      "id": "task-planning-root-edge-1",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-1",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-1",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -520,11 +484,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-2",
+      "id": "task-planning-root-edge-2",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-2",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-2",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -535,11 +499,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-3",
+      "id": "task-planning-root-edge-3",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-3",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-3",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -550,11 +514,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-4",
+      "id": "task-planning-root-edge-4",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-4",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-4",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -565,11 +529,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-5",
+      "id": "task-planning-root-edge-5",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-5",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-5",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -580,11 +544,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-6",
+      "id": "task-planning-root-edge-6",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-6",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-6",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -595,11 +559,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-7",
+      "id": "task-planning-root-edge-7",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-7",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-7",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -610,11 +574,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-8",
+      "id": "task-planning-root-edge-8",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-8",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-8",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -625,11 +589,11 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-9",
+      "id": "task-planning-root-edge-9",
       "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-9",
-      "sourcePort": "out",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-9",
+      "sourcePort": "root",
       "targetPort": "root",
       "label": "opens",
       "style": {
@@ -640,19 +604,5 @@
       "data": {}
     }
   ],
-  "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ]
+  "clusters": []
 }

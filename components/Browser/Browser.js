@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { useState, useEffect, useRef } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import themeMap from './themes';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -45,8 +45,10 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const [addressMenuPos, setAddressMenuPos] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [uiDensity, setUiDensity] = useState('comfortable');
+  const [viewportInfo, setViewportInfo] = useState({ x: 0, y: 0, z: 1 });
   const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
   const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
+  const previewAddressRef = useRef('');
   
   let muiTheme = useTheme();
   if (!muiTheme || !('palette' in muiTheme)) {
@@ -87,6 +89,18 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       eventBus.off('uiDensityChanged', handleDensity);
       eventBus.off('documentSettingsUpdated', handleSettings);
     };
+  }, []);
+
+  useEffect(() => {
+    const handleViewportInfoChanged = (payload = {}) => {
+      setViewportInfo({
+        x: Number.isFinite(payload?.pan?.x) ? payload.pan.x : 0,
+        y: Number.isFinite(payload?.pan?.y) ? payload.pan.y : 0,
+        z: Number.isFinite(payload?.zoom) ? payload.zoom : 1
+      });
+    };
+    eventBus.on('viewportInfoChanged', handleViewportInfoChanged);
+    return () => eventBus.off('viewportInfoChanged', handleViewportInfoChanged);
   }, []);
 
   const densityConfig = (() => {
@@ -262,6 +276,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     const handleSetAddress = (data) => {
       const url = typeof data === 'string' ? data : data?.url;
       if (!url) return;
+      previewAddressRef.current = '';
 
       // Skip history updates if this is the URL we're navigating to via back/forward
       if (navigatingToUrlRef.current === url) {
@@ -284,6 +299,28 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     };
     eventBus.on('setAddress', handleSetAddress);
     return () => eventBus.off('setAddress', handleSetAddress);
+  }, []);
+
+  useEffect(() => {
+    const handleSetAddressPreview = (data) => {
+      const url = typeof data === 'string' ? data : data?.url;
+      if (!url) return;
+      previewAddressRef.current = url;
+      setAddress(url);
+    };
+
+    const handleClearAddressPreview = () => {
+      if (!previewAddressRef.current) return;
+      previewAddressRef.current = '';
+      setAddress(browserHistoryRef.current[historyIndexRef.current] || '');
+    };
+
+    eventBus.on('setAddressPreview', handleSetAddressPreview);
+    eventBus.on('clearAddressPreview', handleClearAddressPreview);
+    return () => {
+      eventBus.off('setAddressPreview', handleSetAddressPreview);
+      eventBus.off('clearAddressPreview', handleClearAddressPreview);
+    };
   }, []);
 
   const handleBrowserBack = () => {
@@ -584,6 +621,26 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
                   <DashboardCustomizeIcon fontSize="small" />
                 </IconButton>
               </ButtonGroup>
+            </Box>
+          )}
+
+          {(!isMobile || isLandscape) && (
+            <Box
+              sx={{
+                px: 0.75,
+                py: 0.25,
+                borderRadius: 1,
+                bgcolor: alpha(muiTheme.palette.common.black, muiTheme.palette.mode === 'dark' ? 0.2 : 0.08),
+                border: `1px solid ${alpha(muiTheme.palette.common.white, muiTheme.palette.mode === 'dark' ? 0.12 : 0.35)}`,
+                color: muiTheme.palette.getContrastText(muiTheme.palette.primary.dark),
+                fontSize: densityConfig.iconSize * 0.7,
+                lineHeight: 1.1,
+                whiteSpace: 'nowrap',
+                userSelect: 'text'
+              }}
+              title={`Viewport: x=${viewportInfo.x}, y=${viewportInfo.y}, zoom=${viewportInfo.z.toFixed(2)}`}
+            >
+              x:{viewportInfo.x} y:{viewportInfo.y} z:{viewportInfo.z.toFixed(2)}
             </Box>
           )}
           

@@ -39,6 +39,7 @@ import { summarizeContracts } from './contracts/contractManager';
 import { validateGraphInvariants } from './validators/validateGraphInvariants';
 import { shouldShowInTypeSelectors } from './constants/nodeTypeSelectorConfig';
 import { validateDictionaryAgainstNodeClassContract } from './utils/nodeClassContract';
+import { endpointToUrl } from './utils/portEndpoint';
 
 const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
 const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
@@ -233,7 +234,8 @@ const GraphEditorContent = () => {
     modesHook,
     nodeTypes,
     nodeTypeMetadata,
-    handleScriptRequest
+    handleScriptRequest,
+    scriptDiagnostics
   } = services || {};
 
   const { emitEdgeIntent } = useIntentEmitter();
@@ -246,6 +248,7 @@ const GraphEditorContent = () => {
   const [editorThemeConfig, setEditorThemeConfig] = useState(null);
   const [editorWatermarkEnabled, setEditorWatermarkEnabled] = useState(true);
   const [editorWatermarkStrength, setEditorWatermarkStrength] = useState(100);
+  const [editorFocusIndicatorEnabled, setEditorFocusIndicatorEnabled] = useState(false);
   const [hostLoadReady, setHostLoadReady] = useState(() => {
     if (typeof window === 'undefined') return true;
     if (window.__Twilite_HOST__ !== 'vscode' || !window.__Twilite_EMBED__) return true;
@@ -279,6 +282,7 @@ const GraphEditorContent = () => {
         ? Math.max(0, Math.min(100, settings.watermarkStrength))
         : 100
     );
+    setEditorFocusIndicatorEnabled(settings?.showFocusIndicator === true);
     if (host !== 'vscode') return;
     if (settings?.theme) {
       setEditorThemeConfig(settings.theme);
@@ -489,11 +493,25 @@ const GraphEditorContent = () => {
         message
       });
     });
+    const runtimeErrors = [];
+    const runtimeWarnings = [];
+    (Array.isArray(scriptDiagnostics) ? scriptDiagnostics : []).forEach((issue) => {
+      const entry = {
+        code: issue?.code || 'SCRIPT_RUNTIME',
+        message: issue?.message || 'Script error',
+        nodeId: issue?.nodeId || undefined,
+        edgeId: issue?.edgeId || undefined,
+        groupId: issue?.groupId || undefined
+      };
+      if (issue?.severity === 'warning') runtimeWarnings.push(entry);
+      else runtimeErrors.push(entry);
+    });
     return {
       ...base,
-      warnings
+      errors: [...(Array.isArray(base?.errors) ? base.errors : []), ...runtimeErrors],
+      warnings: [...warnings, ...runtimeWarnings]
     };
-  }, [nodes, edges, edgeRoutes, groups, resolvedDictionary, dictionaryContractIssues]);
+  }, [nodes, edges, edgeRoutes, groups, resolvedDictionary, dictionaryContractIssues, scriptDiagnostics]);
 
   const resolvePublicPath = useCallback((ref) => {
     if (!ref || typeof ref !== 'string') return null;
@@ -1424,8 +1442,7 @@ const GraphEditorContent = () => {
         : [
             { label: 'Navigate', value: 'navigate' },
             { label: 'Expand Fragment', value: 'expand' },
-            { label: 'Bridge', value: 'bridge' },
-            { label: 'Boundary', value: 'boundary' }
+            { label: 'Bridge', value: 'bridge' }
           ];
     const fields = [
       { key: 'ref', label: 'Reference', type: 'text', path: portTargetPath('ref'), placeholder: 'github://owner/repo/path/file.node' },
@@ -2144,6 +2161,33 @@ const GraphEditorContent = () => {
   const focusDebugFocusedLevel = focusedNodeId
     ? getNodeSemanticLevel(nodes?.find((candidate) => candidate?.id === focusedNodeId) || null)
     : 'detail';
+  const focusedFragmentUrl = useMemo(() => {
+    const focusedNode = Array.isArray(nodes)
+      ? nodes.find((candidate) => candidate?.id === focusedNodeId) || null
+      : null;
+    const rawRef = typeof focusedNode?.data?._origin?.ref === 'string' && focusedNode.data._origin.ref.trim()
+      ? focusedNode.data._origin.ref.trim()
+      : (typeof focusedNode?.data?._expansion?.sourceRef === 'string' ? focusedNode.data._expansion.sourceRef.trim() : '');
+    return rawRef ? endpointToUrl(rawRef) : '';
+  }, [focusedNodeId, nodes]);
+
+  useEffect(() => {
+    if (focusedFragmentUrl) {
+      eventBus.emit('setAddressPreview', { url: focusedFragmentUrl });
+      return;
+    }
+    eventBus.emit('clearAddressPreview');
+  }, [focusedFragmentUrl]);
+
+  useEffect(() => {
+    eventBus.emit('viewportInfoChanged', {
+      pan: {
+        x: Math.round(pan?.x || 0),
+        y: Math.round(pan?.y || 0)
+      },
+      zoom: Number(zoom || 1)
+    });
+  }, [pan?.x, pan?.y, zoom]);
 
   useEffect(() => {
     const handleNodeDragEndIntent = () => {
@@ -2263,6 +2307,7 @@ const GraphEditorContent = () => {
             ? Math.max(0, Math.min(100, settings.watermarkStrength))
             : 100
         );
+        setEditorFocusIndicatorEnabled(settings?.showFocusIndicator === true);
         return;
       }
 
@@ -2278,6 +2323,7 @@ const GraphEditorContent = () => {
             ? Math.max(0, Math.min(100, settings.watermarkStrength))
             : 100
         );
+        setEditorFocusIndicatorEnabled(settings?.showFocusIndicator === true);
         if (nodesRef) nodesRef.current = nodesToLoad;
         if (edgesRef) edgesRef.current = edgesToLoad;
         return;
@@ -2339,6 +2385,17 @@ const GraphEditorContent = () => {
     };
     eventBus.on('updateEditorWatermark', handler);
     return () => eventBus.off('updateEditorWatermark', handler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = ({ enabled } = {}) => {
+      if (typeof enabled === 'boolean') {
+        setEditorFocusIndicatorEnabled(enabled);
+      }
+    };
+    eventBus.on('updateEditorFocusIndicator', handler);
+    return () => eventBus.off('updateEditorFocusIndicator', handler);
   }, []);
 
   useEffect(() => {
@@ -2886,14 +2943,14 @@ const skipPropertiesCloseRef = useRef(false);
           showPropertiesPanel={showPropertiesPanel}
           showSystemNodesPanel={showSystemNodesPanel}
           showEdgeList={showEdgeList}
-          dockInBrowserBar={host !== 'vscode'}
+          dockInBrowserBar={false}
           uiDensity={normalizedUiDensity}
         />
       )}
 
       {isMobile && <MobileFabToolbar />}
 
-      {!isMobile && (
+      {!isMobile && editorFocusIndicatorEnabled && (
         <Box
           sx={{
             position: 'fixed',
@@ -3078,6 +3135,30 @@ const skipPropertiesCloseRef = useRef(false);
         anchor="left"
         nodes={nodes}
         validationReport={invariantReport}
+        onValidationItemFocus={({ type, id } = {}) => {
+          if (!id) return;
+          if (type === 'edge') {
+            handleSelectEdgeFromList(id, false);
+            return;
+          }
+          if (type === 'group') {
+            handleEntitiesPanelSelectGroup(id, false);
+            return;
+          }
+          handleEntitiesPanelSelectNode(id, false);
+        }}
+        onValidationItemOpen={({ type, id } = {}) => {
+          if (!id) return;
+          if (type === 'edge') {
+            handleSelectEdgeFromList(id, true);
+            return;
+          }
+          if (type === 'group') {
+            handleEntitiesPanelSelectGroup(id, true);
+            return;
+          }
+          handleEntitiesPanelSelectNode(id, true);
+        }}
         width={systemNodesPanelWidth}
         onWidthChange={setSystemNodesPanelWidth}
         onUpdateNode={handleUpdateNodeFromPanels}

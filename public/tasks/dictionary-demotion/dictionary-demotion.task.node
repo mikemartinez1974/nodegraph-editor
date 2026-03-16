@@ -1,0 +1,675 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Dictionary Demotion",
+    "description": "Task graph for shifting power from dictionary to graph structure.",
+    "created": "2026-03-15T19:55:00.000Z",
+    "modified": "2026-03-15T19:55:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "dictionary",
+      "architecture"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "dict-demotion-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -320
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "dictionary-demotion-task",
+          "name": "Dictionary Demotion",
+          "version": "0.1.0",
+          "description": "Shift from dictionary authority to graph-native connection semantics.",
+          "createdAt": "2026-03-15T19:55:00.000Z",
+          "updatedAt": "2026-03-15T19:55:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "shift",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- shift: change in architectural responsibility",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-overview",
+      "type": "markdown",
+      "label": "Dictionary Demotion",
+      "position": {
+        "x": -620,
+        "y": 0
+      },
+      "width": 430,
+      "height": 230,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Dictionary Demotion\n\nThe dictionary is no longer the primary source of relationship. The graph itself is taking over through explicit connections, bridges, entry surfaces, and context boundaries.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "dict-demotion-what",
+      "type": "markdown",
+      "label": "What Changed",
+      "position": {
+        "x": -160,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#8e24aa",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# What Changed\n\nInstead of a dictionary defining what exists globally, the graph increasingly connects you to what exists. The dictionary starts to feel more like an index, cache, or registration layer.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-role",
+      "type": "markdown",
+      "label": "New Dictionary Role",
+      "position": {
+        "x": 260,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# New Dictionary Role\n\nKeep the dictionary for:\n- lookup\n- defaults\n- class registration\n- static resolution hints\n\nBut do not make it the sovereign source of relationship or authority.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-graph",
+      "type": "markdown",
+      "label": "Graph-Native Relationship",
+      "position": {
+        "x": 680,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#1565c0",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph-Native Relationship\n\nThe graph itself now carries the important semantics:\n- entry surfaces\n- bridges\n- expansion links\n- context boundaries\n- focus and provenance\n\nThat is where the power moved.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-plan",
+      "type": "markdown",
+      "label": "Work Ahead",
+      "position": {
+        "x": -160,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#ef6c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Work Ahead\n\n1. Audit where dictionary authority is still assumed.\n2. Separate lookup/registration from authority.\n3. Move cross-context semantics into graph structure.\n4. Keep dictionary resolution as support, not sovereignty.\n5. Preserve node class robustness while reducing ambient power.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-risks",
+      "type": "markdown",
+      "label": "Risks",
+      "position": {
+        "x": 260,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#6d4c41",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Risks\n\n- Breaking node class resolution while removing too much dictionary authority\n- Losing easy authoring workflows\n- Replacing one ambient system with another hidden one\n- Not having enough explicit graph structure to carry the new semantics",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "dict-demotion-open",
+      "type": "markdown",
+      "label": "Appraisal Questions",
+      "position": {
+        "x": 680,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#00897b",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Appraisal Questions\n\n- What still truly depends on dictionary authority?\n- Which flows break if dictionary scope becomes purely local/supportive?\n- What new graph primitives or metadata are still missing?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "dict-demotion-edge-1",
+      "type": "reference",
+      "source": "dict-demotion-overview",
+      "target": "dict-demotion-what",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "observes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-2",
+      "type": "reference",
+      "source": "dict-demotion-overview",
+      "target": "dict-demotion-role",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "reframes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-3",
+      "type": "reference",
+      "source": "dict-demotion-overview",
+      "target": "dict-demotion-graph",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "explains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-4",
+      "type": "reference",
+      "source": "dict-demotion-role",
+      "target": "dict-demotion-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-5",
+      "type": "reference",
+      "source": "dict-demotion-graph",
+      "target": "dict-demotion-plan",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-6",
+      "type": "reference",
+      "source": "dict-demotion-plan",
+      "target": "dict-demotion-risks",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "creates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "dict-demotion-edge-7",
+      "type": "reference",
+      "source": "dict-demotion-risks",
+      "target": "dict-demotion-open",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "leads to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

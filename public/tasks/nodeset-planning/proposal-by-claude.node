@@ -3,42 +3,43 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-03-14T16:16:22.370Z",
-    "modified": "2026-03-14T16:16:22.370Z",
+    "created": "2026-03-15T23:22:45.258Z",
+    "modified": "2026-03-15T23:22:45.258Z",
     "author": "",
     "tags": [],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "4f4e8562-0665-433f-8707-7f41c2c3d1cf",
+      "id": "24ed5443-5611-48cc-a149-af30d868438e",
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -980,
-        "y": -240
+        "x": -260,
+        "y": -160
       },
-      "width": 420,
-      "height": 280,
+      "width": 360,
+      "height": 220,
       "visible": true,
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "planning-node-types-task",
-          "name": "Planning Node Types Task",
+          "graphId": "91e906bc-b023-45a2-b2bf-5d0e23a3c495",
+          "name": "Untitled Graph",
           "version": "0.1.0",
-          "description": "Task graph for planning the first implementation-oriented node types for Twilite prompting and execution workflows.",
-          "createdAt": "2026-03-14T00:00:00.000Z",
-          "updatedAt": "2026-03-14T00:00:00.000Z"
+          "description": "",
+          "createdAt": "2026-03-15T23:21:38.449Z",
+          "updatedAt": "2026-03-15T23:21:38.449Z"
         },
         "intent": {
-          "kind": "task",
-          "scope": "node-type-planning"
+          "kind": "graph",
+          "scope": "mixed"
         },
         "dependencies": {
           "nodeTypes": [
             "manifest",
             "dictionary",
+            "default",
             "markdown"
           ],
           "portContracts": [
@@ -75,11 +76,13 @@
         "settings": {
           "theme": null,
           "backgroundImage": null,
+          "uiDensity": "comfortable",
           "defaultNodeColor": "#1976d2",
           "defaultEdgeColor": "#666666",
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
+          "layout": null,
           "github": {
             "repo": "",
             "path": "",
@@ -94,14 +97,14 @@
       }
     },
     {
-      "id": "e9adde73-fe99-430c-aaf6-320ebc4ece77",
+      "id": "f060594f-f27b-44d3-969b-13f61002a76d",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": -980,
-        "y": 380
+        "x": -260,
+        "y": 100
       },
-      "width": 360,
+      "width": 320,
       "height": 220,
       "visible": true,
       "showLabel": true,
@@ -112,73 +115,16 @@
       }
     },
     {
-      "id": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "id": "a1b2c3d4-0001-4001-8001-aabbcc000001",
       "type": "markdown",
-      "label": "Task Graph Overview",
-      "position": {
-        "x": -360,
-        "y": -260
-      },
-      "width": 420,
-      "height": 260,
-      "color": "#1976d2",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "any",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "any",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "any"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "any"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Planning Node Types\n\nThis task graph breaks out the first implementation-oriented node types into separate planning nodes.\n\nGoal: define what each node type is for, what data it should hold, and how it should behave inside a Twilite planning graph.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": ""
-      }
-    },
-    {
-      "id": "f4a6d2c9-1b7e-4d8a-9c6f-3e2d1b7a4d44",
-      "type": "markdown",
-      "label": "Goal",
+      "label": "Goal — proposal",
       "position": {
         "x": 220,
         "y": -520
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 300,
+      "color": "#2e7d32",
       "ports": [
         {
           "id": "in",
@@ -218,7 +164,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Goal\n\nDefine the **Goal** node type for planning graphs.\n\nQuestions to answer:\n- What makes a goal different from a task?\n- Is it strategic, local, or both?\n- What fields should it carry beyond label and markdown?\n- Should goals support priority or completion state?\n\nOutput:\n- clear purpose\n- canonical data shape\n- relationship rules",
+        "markdown": "## Goal — proposal\n\n**Purpose**: Represents a desired outcome. Strategic or local.\n\n**Canonical fields**:\n- `label` (string)\n- `description` (markdown)\n- `priority` (low | medium | high | critical)\n- `status` (open | active | achieved | abandoned)\n- `scope` (strategic | local)\n\n**Rules**:\n- Goals do not carry tasks; tasks carry goals via edges.\n- A goal may have child goals (decomposition).\n- Completion state lives on the goal, not inferred from tasks.",
         "memo": "",
         "link": "",
         "html": "",
@@ -226,16 +172,16 @@
       }
     },
     {
-      "id": "9e3b7a1d-4c6f-4e8b-8d2c-5a7f3c1b5e55",
+      "id": "a1b2c3d4-0002-4002-8002-aabbcc000002",
       "type": "markdown",
-      "label": "Constraint",
+      "label": "Constraint — proposal",
       "position": {
         "x": 620,
         "y": -520
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 320,
+      "color": "#e65100",
       "ports": [
         {
           "id": "in",
@@ -275,7 +221,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Constraint\n\nDefine the **Constraint** node type.\n\nQuestions to answer:\n- What counts as a hard constraint versus guidance?\n- Should constraints be typed (schema, UX, performance, policy)?\n- Can a constraint apply globally or only to a subgraph?\n- How should Codex treat constraints during implementation?\n\nOutput:\n- constraint categories\n- canonical fields\n- usage rules",
+        "markdown": "## Constraint — proposal\n\n**Purpose**: A boundary that implementation must respect.\n\n**Canonical fields**:\n- `label` (string)\n- `body` (markdown)\n- `category` (schema | ux | performance | policy | security)\n- `hardness` (hard | soft)\n- `scope` (global | subgraph | node-local)\n\n**Rules**:\n- Hard constraints are never negotiable without a Decision node.\n- Soft constraints are guidance; Codex may deviate with explanation.\n- Constraint is a **node**, not an edge. It connects via `constrains` edges to what it governs.\n- Open question: does a global constraint need special handling in fragment traversal?",
         "memo": "",
         "link": "",
         "html": "",
@@ -283,16 +229,16 @@
       }
     },
     {
-      "id": "3c5d7e9f-2a1b-4c8d-9e6f-7b2a4d1c6f66",
+      "id": "a1b2c3d4-0003-4003-8003-aabbcc000003",
       "type": "markdown",
-      "label": "Decision",
+      "label": "Decision — proposal",
       "position": {
         "x": 1020,
         "y": -520
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 320,
+      "color": "#1565c0",
       "ports": [
         {
           "id": "in",
@@ -332,7 +278,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Decision\n\nDefine the **Decision** node type.\n\nQuestions to answer:\n- How is a decision represented distinctly from discussion?\n- Should decisions carry rationale, status, and date?\n- Can a decision supersede an older decision?\n- How should decisions connect to tasks and constraints?\n\nOutput:\n- decision semantics\n- canonical data shape\n- precedence/update rules",
+        "markdown": "## Decision — proposal\n\n**Purpose**: Records a resolved choice, its rationale, and status.\n\n**Canonical fields**:\n- `label` (string)\n- `body` (markdown — rationale)\n- `status` (proposed | accepted | superseded | reversed)\n- `date` (ISO 8601)\n- `supersedes` (node ID, optional)\n\n**Rules**:\n- Decisions are append-only in intent. Use `supersedes` to chain.\n- A Decision can resolve an Open Question (edge: `resolves`).\n- A Decision can authorize relaxing a Constraint (edge: `overrides`).\n- Codex should treat accepted decisions as authoritative.",
         "memo": "",
         "link": "",
         "html": "",
@@ -340,16 +286,16 @@
       }
     },
     {
-      "id": "7a1c5e3d-9f2b-4d6a-8c7e-1b3d5f7a8b77",
+      "id": "a1b2c3d4-0004-4004-8004-aabbcc000004",
       "type": "markdown",
-      "label": "Open Question",
+      "label": "Open Question — proposal",
       "position": {
         "x": 1420,
         "y": -520
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 320,
+      "color": "#6a1599",
       "ports": [
         {
           "id": "in",
@@ -389,7 +335,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Question\n\nDefine the **Open Question** node type.\n\nQuestions to answer:\n- What distinguishes an open question from a risk or investigation?\n- Should it track owner, status, and resolution path?\n- Does resolution convert it into a decision, task, or note?\n- How prominently should unresolved questions appear in prompts?\n\nOutput:\n- lifecycle rules\n- canonical fields\n- resolution behavior",
+        "markdown": "## Open Question — proposal\n\n**Purpose**: Captures an unresolved question that blocks or informs decisions.\n\n**Canonical fields**:\n- `label` (string)\n- `body` (markdown)\n- `status` (open | investigating | resolved | deferred)\n- `owner` (string, optional)\n- `resolution` (markdown, optional — filled on close)\n\n**Rules**:\n- Resolution converts status to `resolved`, does not delete the node.\n- Resolution should produce a Decision or Task (edge: `resolved-by`).\n- Unresolved open questions should be surfaced prominently in prompts.\n- Distinct from Risk: a question is epistemic, a risk is probabilistic.",
         "memo": "",
         "link": "",
         "html": "",
@@ -397,16 +343,16 @@
       }
     },
     {
-      "id": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
+      "id": "a1b2c3d4-0005-4005-8005-aabbcc000005",
       "type": "markdown",
-      "label": "Task",
+      "label": "Task — proposal",
       "position": {
         "x": 220,
-        "y": -160
+        "y": -120
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 320,
+      "color": "#2e7d32",
       "ports": [
         {
           "id": "in",
@@ -446,7 +392,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Task\n\nDefine the **Task** node type.\n\nQuestions to answer:\n- What makes a task atomic enough for implementation use?\n- Should tasks carry status, owner, priority, or estimate?\n- How should tasks connect to goals, dependencies, and acceptance criteria?\n- Do tasks map directly to execution prompts?\n\nOutput:\n- task scope rules\n- canonical data shape\n- execution linkage",
+        "markdown": "## Task — proposal\n\n**Purpose**: A discrete, implementable unit of work.\n\n**Canonical fields**:\n- `label` (string)\n- `body` (markdown — description + context)\n- `status` (todo | in-progress | done | blocked | cancelled)\n- `priority` (low | medium | high | critical)\n- `owner` (string, optional)\n- `estimate` (string, optional — e.g. \"2h\", \"S/M/L\")\n\n**Rules**:\n- Tasks should be scoped to one implementation unit.\n- A task may have one or more Acceptance Criteria nodes.\n- Tasks connect to Goals via `implements` edges.\n- Static by default. No live behavior unless explicitly promoted.\n- Maps directly to an execution prompt when status is `todo`.",
         "memo": "",
         "link": "",
         "html": "",
@@ -454,16 +400,16 @@
       }
     },
     {
-      "id": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
+      "id": "a1b2c3d4-0006-4006-8006-aabbcc000006",
       "type": "markdown",
-      "label": "Dependency",
+      "label": "Dependency — proposal",
       "position": {
-        "x": 620,
-        "y": -160
+        "x": 680,
+        "y": -120
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 400,
+      "height": 340,
+      "color": "#4a148c",
       "ports": [
         {
           "id": "in",
@@ -503,7 +449,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Dependency\n\nDefine the **Dependency** node type.\n\nQuestions to answer:\n- Should dependency be a node type, an edge type, or both?\n- What extra meaning does a dependency node add?\n- Can dependencies represent external systems, prerequisites, or ordering?\n- How should blockers be modeled?\n\nOutput:\n- representation choice\n- canonical fields\n- connection rules",
+        "markdown": "## Dependency — proposal\n\n**Resolution**: Both node and edge, with distinct roles.\n\n- **Edge-only** (`depends-on` edge type): sufficient for simple ordering — A must complete before B.\n- **Node** (this type): use when the dependency is a first-class entity — an external system, a prerequisite artifact, a third-party service, or a blocker with its own status.\n\n**Canonical fields** (node form):\n- `label` (string)\n- `body` (markdown)\n- `kind` (external-system | prerequisite | blocker | ordering)\n- `status` (pending | available | blocked | resolved)\n- `source` (string — what provides this dependency)\n\n**Rules**:\n- Prefer edge for pure ordering. Use node when status, source, or kind matter.\n- A blocker dependency with `status: blocked` should surface in prompt context.",
         "memo": "",
         "link": "",
         "html": "",
@@ -511,16 +457,16 @@
       }
     },
     {
-      "id": "8c1e7d5a-4b2f-4c9d-8a6e-3d1b7f5c2daa",
+      "id": "a1b2c3d4-0007-4007-8007-aabbcc000007",
       "type": "markdown",
-      "label": "Acceptance Criteria",
+      "label": "Acceptance Criteria — proposal",
       "position": {
-        "x": 1020,
-        "y": -160
+        "x": 1140,
+        "y": -120
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 400,
+      "height": 320,
+      "color": "#1565c0",
       "ports": [
         {
           "id": "in",
@@ -560,7 +506,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Acceptance Criteria\n\nDefine the **Acceptance Criteria** node type.\n\nQuestions to answer:\n- Should criteria be checklists, prose, or structured tests?\n- Are they attached to tasks, goals, or decisions?\n- How specific should they be for Codex execution?\n- Can they drive validation or auto-review later?\n\nOutput:\n- canonical format\n- attachment rules\n- verification intent",
+        "markdown": "## Acceptance Criteria — proposal\n\n**Purpose**: Defines when a Task or Goal is considered complete.\n\n**Canonical fields**:\n- `label` (string)\n- `items` (array of strings — checklist format)\n- `body` (markdown — optional prose supplement)\n- `format` (checklist | prose | test-spec)\n- `verified` (boolean, default false)\n\n**Rules**:\n- Attach to Tasks via `verifies` edges; may also attach to Goals.\n- Checklist format is preferred — it is unambiguous for Codex.\n- Prose format is allowed but should be used only when criteria are non-enumerable.\n- `verified: true` does not automatically mark the Task as done — it is a signal, not a trigger.\n- May eventually drive auto-review; `test-spec` format reserved for that path.",
         "memo": "",
         "link": "",
         "html": "",
@@ -568,16 +514,16 @@
       }
     },
     {
-      "id": "1d7c5b3a-9e4f-4d6c-8b2a-7f1e3d5c4ebb",
+      "id": "a1b2c3d4-0008-4008-8008-aabbcc000008",
       "type": "markdown",
-      "label": "Risk / Edge Case",
+      "label": "Risk / Edge Case — proposal",
       "position": {
-        "x": 1420,
-        "y": -160
+        "x": 1600,
+        "y": -120
       },
-      "width": 340,
-      "height": 240,
-      "color": "#1976d2",
+      "width": 380,
+      "height": 320,
+      "color": "#b71c1c",
       "ports": [
         {
           "id": "in",
@@ -617,7 +563,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Risk / Edge Case\n\nDefine the **Risk / Edge Case** node type.\n\nQuestions to answer:\n- Should risk and edge case stay combined or split later?\n- Does this node track severity, likelihood, or mitigation?\n- How should edge cases connect to acceptance criteria and tasks?\n- When does a risk become a task or decision?\n\nOutput:\n- scope definition\n- canonical fields\n- escalation behavior",
+        "markdown": "## Risk / Edge Case — proposal\n\n**Purpose**: Names a probabilistic or boundary condition that could affect outcomes.\n\n**Canonical fields**:\n- `label` (string)\n- `body` (markdown)\n- `kind` (risk | edge-case) — keep combined for now, split later if needed\n- `severity` (low | medium | high | critical)\n- `likelihood` (low | medium | high)\n- `mitigation` (markdown, optional)\n- `status` (open | mitigated | accepted | escalated)\n\n**Rules**:\n- Escalation path: `status: escalated` converts to a Task or Decision (edge: `escalates-to`).\n- Edge cases connect to Acceptance Criteria via `covered-by` edges.\n- Distinct from Open Question: a risk is known, probabilistic. A question is unknown.",
         "memo": "",
         "link": "",
         "html": "",
@@ -625,14 +571,14 @@
       }
     },
     {
-      "id": "nodeset-arch-node-vs-edge",
+      "id": "a1b2c3d4-0009-4009-8009-aabbcc000009",
       "type": "markdown",
-      "label": "Node Type vs Edge Type",
+      "label": "Arch: Dependency resolution",
       "position": {
-        "x": 860,
-        "y": -40
+        "x": 78,
+        "y": 330
       },
-      "width": 360,
+      "width": 380,
       "height": 220,
       "color": "#8e24aa",
       "ports": [
@@ -674,24 +620,79 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Node Type vs Edge Type\n\nBefore defining planning primitives, decide which concepts deserve first-class nodes versus edges or edge metadata. `Dependency` is the obvious pressure point, but `Constraint` and `Acceptance Criteria` may also be partly relational.",
+        "markdown": "## Arch: Dependency resolution\n\n**Decision**: Dependency is both node and edge, with distinct use-cases.\n\nEdge (`depends-on`) = ordering only.\nNode = first-class entity with status, kind, and source.\n\nThis resolves the node-vs-edge tension. The Dependency node proposal above encodes the full rule.",
         "memo": "",
         "link": "",
         "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
+        "svg": ""
       }
     },
     {
-      "id": "nodeset-arch-dictionary",
+      "id": "a1b2c3d4-0010-4010-8010-aabbcc000010",
       "type": "markdown",
-      "label": "Node Set vs Dictionary",
+      "label": "Arch: Constraint as node",
       "position": {
-        "x": 1260,
-        "y": -40
+        "x": 540,
+        "y": 330
       },
-      "width": 360,
+      "width": 380,
+      "height": 220,
+      "color": "#e65100",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Arch: Constraint as node\n\n**Decision**: Constraint is a first-class node, not edge metadata.\n\nRationale: constraints need independent identity, category, hardness, and scope. They connect to what they govern via typed `constrains` edges. Edge-only representation loses too much.\n\nOpen: global-scope constraint behavior in fragment traversal is deferred.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "a1b2c3d4-0011-4011-8011-aabbcc000011",
+      "type": "markdown",
+      "label": "Arch: Execution linkage",
+      "position": {
+        "x": 1000,
+        "y": 330
+      },
+      "width": 380,
       "height": 220,
       "color": "#1565c0",
       "ports": [
@@ -733,232 +734,20 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Node Set vs Dictionary\n\nPlanning nodes should not rely on dictionary authority alone. The graph is becoming the primary source of relationship, while dictionary support is being demoted to lookup, registration, and hints.",
+        "markdown": "## Arch: Execution linkage\n\nA Task with `status: todo` + its connected Acceptance Criteria + its connected Constraints + its parent Goal = the natural prompt bundle for Codex.\n\nNo separate 'execution context' node type is needed yet. The traversal from a Task node provides the context. If prompt shaping becomes complex, promote to a node type later.",
         "memo": "",
         "link": "",
         "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-arch-static-live",
-      "type": "markdown",
-      "label": "Static vs Live Planning Nodes",
-      "position": {
-        "x": 860,
-        "y": 260
-      },
-      "width": 360,
-      "height": 220,
-      "color": "#2e7d32",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Static vs Live Planning Nodes\n\nMost planning nodes should probably be static. If any planning node gains live behavior later, that behavior must respect script scope and focus-scoped authority from the start.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-arch-fragment",
-      "type": "markdown",
-      "label": "Planning Nodes In Fragment Context",
-      "position": {
-        "x": 1260,
-        "y": 260
-      },
-      "width": 360,
-      "height": 220,
-      "color": "#ef6c00",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Planning Nodes In Fragment Context\n\nPlanning nodes need to behave cleanly inside fragment-based traversal. They should be fragment-safe by default, with semantics that survive expansion, focus changes, and local reload.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-arch-cross",
-      "type": "markdown",
-      "label": "Cross-Context Planning Semantics",
-      "position": {
-        "x": 1660,
-        "y": 110
-      },
-      "width": 360,
-      "height": 220,
-      "color": "#6d4c41",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Cross-Context Planning Semantics\n\nIf planning graphs ever express relationships across contexts, they should likely use explicit bridge semantics rather than ambient dictionary reach or global assumptions.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
+        "svg": ""
       }
     }
   ],
   "edges": [
     {
-      "id": "c1a9d7e5-4b3f-4d6a-8c2e-1f7b5d3a9c01",
+      "id": "edge-prop-0001-4001-8001-aabbcc110001",
       "type": "relates",
-      "source": "4f4e8562-0665-433f-8707-7f41c2c3d1cf",
-      "target": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "sourcePort": "root",
-      "targetPort": "in",
-      "portMeta": {
-        "source": {
-          "key": "root",
-          "label": "root",
-          "type": "value",
-          "direction": "output"
-        },
-        "target": {
-          "key": "in",
-          "label": "In",
-          "type": "any",
-          "direction": "input",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        }
-      },
-      "label": "",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "d2b8e6f4-5c1a-4d7b-9e3f-2a6c8d1b4e02",
-      "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "f4a6d2c9-1b7e-4d8a-9c6f-3e2d1b7a4d44",
+      "source": "a1b2c3d4-0005-4005-8005-aabbcc000005",
+      "target": "a1b2c3d4-0001-4001-8001-aabbcc000001",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -983,19 +772,19 @@
           }
         }
       },
-      "label": "",
+      "label": "implements",
       "style": {
-        "width": 2,
+        "width": 1.5,
         "dash": [],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "e3c7f5a2-6d1b-4c8e-8f2a-3b7d9c1e5f03",
+      "id": "edge-prop-0002-4002-8002-aabbcc110002",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "9e3b7a1d-4c6f-4e8b-8d2c-5a7f3c1b5e55",
+      "source": "a1b2c3d4-0005-4005-8005-aabbcc000005",
+      "target": "a1b2c3d4-0007-4007-8007-aabbcc000007",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1020,19 +809,19 @@
           }
         }
       },
-      "label": "",
+      "label": "verified-by",
       "style": {
-        "width": 2,
+        "width": 1.5,
         "dash": [],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "f4d6a8b1-7e2c-4d9f-8a3b-4c1e7d5f6a04",
+      "id": "edge-prop-0003-4003-8003-aabbcc110003",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "3c5d7e9f-2a1b-4c8d-9e6f-7b2a4d1c6f66",
+      "source": "a1b2c3d4-0006-4006-8006-aabbcc000006",
+      "target": "a1b2c3d4-0005-4005-8005-aabbcc000005",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1057,19 +846,22 @@
           }
         }
       },
-      "label": "",
+      "label": "blocks",
       "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "a5e7b9c3-8d1f-4c6a-9b2e-5d3f7a1c8b05",
+      "id": "edge-prop-0004-4004-8004-aabbcc110004",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "7a1c5e3d-9f2b-4d6a-8c7e-1b3d5f7a8b77",
+      "source": "a1b2c3d4-0004-4004-8004-aabbcc000004",
+      "target": "a1b2c3d4-0003-4003-8003-aabbcc000003",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1094,19 +886,19 @@
           }
         }
       },
-      "label": "",
+      "label": "resolved-by",
       "style": {
-        "width": 2,
+        "width": 1.5,
         "dash": [],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "b6f8c1d4-9a2e-4d7c-8b3f-6e1a5d7c9f06",
+      "id": "edge-prop-0005-4005-8005-aabbcc110005",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
+      "source": "a1b2c3d4-0003-4003-8003-aabbcc000003",
+      "target": "a1b2c3d4-0002-4002-8002-aabbcc000002",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1131,19 +923,22 @@
           }
         }
       },
-      "label": "",
+      "label": "overrides",
       "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "c7a9d2e5-1b3f-4d8c-9e4a-7f2c5d1b8e07",
+      "id": "edge-prop-0006-4006-8006-aabbcc110006",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
+      "source": "a1b2c3d4-0008-4008-8008-aabbcc000008",
+      "target": "a1b2c3d4-0007-4007-8007-aabbcc000007",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1168,19 +963,19 @@
           }
         }
       },
-      "label": "",
+      "label": "covered-by",
       "style": {
-        "width": 2,
+        "width": 1.5,
         "dash": [],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "d8b1e3f6-2c4a-4d9b-8f5e-8a3d1c7b9f08",
+      "id": "edge-prop-0007-4007-8007-aabbcc110007",
       "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "8c1e7d5a-4b2f-4c9d-8a6e-3d1b7f5c2daa",
+      "source": "a1b2c3d4-0008-4008-8008-aabbcc000008",
+      "target": "a1b2c3d4-0005-4005-8005-aabbcc000005",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
@@ -1205,26 +1000,29 @@
           }
         }
       },
-      "label": "",
+      "label": "escalates-to",
       "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "e9c2f4a7-3d5b-4c6e-9a1f-9b4e2d8c1a09",
-      "type": "relates",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "1d7c5b3a-9e4f-4d6c-8b2a-7f1e3d5c4ebb",
+      "id": "edge-prop-0008-4008-8008-aabbcc110008",
+      "type": "reference",
+      "source": "a1b2c3d4-0009-4009-8009-aabbcc000009",
+      "target": "a1b2c3d4-0006-4006-8006-aabbcc000006",
       "sourcePort": "out",
       "targetPort": "in",
       "portMeta": {
         "source": {
           "key": "out",
           "label": "Out",
-          "type": "any",
+          "type": "content",
           "direction": "output",
           "position": {
             "side": "right",
@@ -1242,175 +1040,93 @@
           }
         }
       },
-      "label": "",
+      "label": "resolves",
       "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "nodeset-edge-10",
+      "id": "edge-prop-0009-4009-8009-aabbcc110009",
       "type": "reference",
-      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
-      "target": "nodeset-arch-node-vs-edge",
+      "source": "a1b2c3d4-0010-4010-8010-aabbcc000010",
+      "target": "a1b2c3d4-0002-4002-8002-aabbcc000002",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "needs",
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
+      },
+      "label": "resolves",
       "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}
     },
     {
-      "id": "nodeset-edge-11",
+      "id": "edge-prop-0010-4010-8010-aabbcc110010",
       "type": "reference",
-      "source": "nodeset-arch-node-vs-edge",
-      "target": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
+      "source": "a1b2c3d4-0011-4011-8011-aabbcc000011",
+      "target": "a1b2c3d4-0005-4005-8005-aabbcc000005",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "reframes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
+      "portMeta": {
+        "source": {
+          "key": "out",
+          "label": "Out",
+          "type": "content",
+          "direction": "output",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        },
+        "target": {
+          "key": "in",
+          "label": "In",
+          "type": "any",
+          "direction": "input",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        }
       },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-12",
-      "type": "reference",
-      "source": "nodeset-arch-node-vs-edge",
-      "target": "9e3b7a1d-4c6f-4e8b-8d2c-5a7f3c1b5e55",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "questions",
+      "label": "shapes",
       "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-13",
-      "type": "reference",
-      "source": "nodeset-arch-node-vs-edge",
-      "target": "8c1e7d5a-4b2f-4c9d-8a6e-3d1b7f5c2daa",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "questions",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-14",
-      "type": "reference",
-      "source": "nodeset-arch-dictionary",
-      "target": "e9adde73-fe99-430c-aaf6-320ebc4ece77",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "demotes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-15",
-      "type": "reference",
-      "source": "nodeset-arch-dictionary",
-      "target": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "constrains",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-16",
-      "type": "reference",
-      "source": "nodeset-arch-static-live",
-      "target": "5d8a2c1f-7b4e-4f9c-8d2a-6c1e7b3d9a88",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "guards",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-17",
-      "type": "reference",
-      "source": "nodeset-arch-fragment",
-      "target": "f4a6d2c9-1b7e-4d8a-9c6f-3e2d1b7a4d44",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "scopes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-18",
-      "type": "reference",
-      "source": "nodeset-arch-fragment",
-      "target": "3c5d7e9f-2a1b-4c8d-9e6f-7b2a4d1c6f66",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "scopes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-19",
-      "type": "reference",
-      "source": "nodeset-arch-fragment",
-      "target": "7a1c5e3d-9f2b-4d6a-8c7e-1b3d5f7a8b77",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "scopes",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-edge-20",
-      "type": "reference",
-      "source": "nodeset-arch-cross",
-      "target": "2f6d9a4c-1b3e-4d8f-9c7a-5e2b1d6f3c99",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "impacts",
-      "style": {
-        "width": 2,
-        "dash": [],
+        "width": 1.5,
+        "dash": [
+          4,
+          3
+        ],
         "curved": true
       },
       "data": {}

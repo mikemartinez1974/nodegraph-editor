@@ -1267,21 +1267,21 @@ const Toolbar = ({
             size="small"
             variant={interactionMode === 'browse' ? 'contained' : 'outlined'}
             onClick={() => onInteractionModeChange('browse')}
-            startIcon={<DrawIcon fontSize="small" />}
             title="Browse mode: clicks move focus and semantic context"
             aria-label="Switch to browse mode"
+            sx={{ minWidth: 34, px: 1 }}
           >
-            Browse
+            <DrawIcon fontSize="small" />
           </Button>
           <Button
             size="small"
             variant={interactionMode === 'edit' ? 'contained' : 'outlined'}
             onClick={() => onInteractionModeChange('edit')}
-            startIcon={<CreateIcon fontSize="small" />}
             title="Edit mode: clicks select without moving semantic focus"
             aria-label="Switch to edit mode"
+            sx={{ minWidth: 34, px: 1 }}
           >
-            Edit
+            <CreateIcon fontSize="small" />
           </Button>
         </ButtonGroup>
 
@@ -1309,33 +1309,6 @@ const Toolbar = ({
           </IconButton>
         </ButtonGroup>
 
-        {/* Viewport Indicator */}
-        <Box
-          sx={{
-            ml: 1,
-            px: 0.5,
-            py: 0.25,
-            borderRadius: 1,
-            bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
-            color: theme.palette.text.secondary,
-            fontSize: densityConfig.viewportFont,
-            minWidth: 0,
-            textAlign: 'center',
-            border: `1px solid ${theme.palette.divider}`,
-            display: 'inline-block',
-            lineHeight: 1.1,
-            userSelect: 'text',
-           
-            whiteSpace: 'nowrap'
-          }}
-          title={`Viewport: x=${Math.round(pan?.x || 0)}, y=${Math.round(pan?.y || 0)}, zoom=${zoom?.toFixed(2) || 1}`}
-        >
-          <span>
-            x:{Math.round(pan?.x || 0)}<br />
-            y:{Math.round(pan?.y || 0)}<br />
-            z:{zoom?.toFixed(2) || 1}
-          </span>
-        </Box>
       </Box>
 
       {/* Menus and Dialogs */}

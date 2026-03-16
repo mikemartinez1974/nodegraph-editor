@@ -1,0 +1,838 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Focus Scoped Authority",
+    "description": "Task graph for navigation-local authority and fragment-local reload.",
+    "created": "2026-03-15T18:30:00.000Z",
+    "modified": "2026-03-15T18:30:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "authority",
+      "reload"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "focus-auth-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -320
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "focus-scoped-authority-task",
+          "name": "Focus Scoped Authority",
+          "version": "0.1.0",
+          "description": "Navigation-local authority and fragment-local reload.",
+          "createdAt": "2026-03-15T18:30:00.000Z",
+          "updatedAt": "2026-03-15T18:30:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "constraint",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- constraint: runtime rule or implementation target",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-overview",
+      "type": "markdown",
+      "label": "Focus Scoped Authority",
+      "position": {
+        "x": -620,
+        "y": 0
+      },
+      "width": 430,
+      "height": 230,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus Scoped Authority\n\nKeep one shared node collection, but move execution authority with navigation focus. Reload should act on the focused fragment only, in place.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "focus-auth-structure",
+      "type": "markdown",
+      "label": "Shared Structure",
+      "position": {
+        "x": -140,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#00897b",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Shared Structure\n\n- All loaded nodes coexist in one runtime collection.\n- Graph sections stay where they were authored.\n- Navigation does not move graph features around.\n- Every materialized node carries fragment provenance.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-exec",
+      "type": "markdown",
+      "label": "Focus-Scoped Execution",
+      "position": {
+        "x": 320,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#8e24aa",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Focus-Scoped Execution\n\n- Only the focused fragment runs scripts, hooks, and live behavior.\n- Nearby fragments may render, but stay dormant.\n- Authority moves with navigation, not with visibility alone.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-reload",
+      "type": "markdown",
+      "label": "Local Fragment Reload",
+      "position": {
+        "x": 780,
+        "y": -40
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#3949ab",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Local Fragment Reload\n\n- Refresh should target the focused fragment source.\n- Rematerialize only nodes from that fragment.\n- Leave the rest of the visible graph intact.\n- Preserve layout anchors and attachment edges.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-prov",
+      "type": "markdown",
+      "label": "Fragment Provenance Contract",
+      "position": {
+        "x": -140,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#ef6c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Fragment Provenance Contract\n\nEach loaded node needs:\n- fragment id\n- source ref\n- canonical local id\n- authority domain marker\n\nWithout provenance, focus-scoped authority cannot be enforced.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-remat",
+      "type": "markdown",
+      "label": "In-Place Rematerialization",
+      "position": {
+        "x": 320,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#6d4c41",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# In-Place Rematerialization\n\nReloading a fragment means:\n- remove nodes for fragment F\n- fetch F\n- rematerialize F\n- reconnect attach edges\n- keep surrounding graph untouched",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 780,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#5e35b1",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Open Questions\n\n- What lifecycle events fire when focus enters or leaves a fragment?\n- Do scripts suspend, restart, or resume?\n- How should fragment-local history interact with document history?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-lifecycle",
+      "type": "markdown",
+      "label": "Lifecycle Defaults",
+      "position": {
+        "x": 1120,
+        "y": 120
+      },
+      "width": 380,
+      "height": 230,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Lifecycle Defaults\n\nStart with a small fragment lifecycle:\n- `fragmentMaterialize` on first load\n- `fragmentFocusEnter` when focus enters\n- `fragmentFocusLeave` when focus leaves\n- `fragmentReload` on local reload\n\nDefault behavior:\n- reload restarts scripts\n- if the focused node still exists after reload, restore focus to it\n- otherwise focus the fragment entry/root",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-history",
+      "type": "markdown",
+      "label": "History Default",
+      "position": {
+        "x": 1120,
+        "y": 400
+      },
+      "width": 380,
+      "height": 220,
+      "color": "#1565c0",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# History Default\n\nUse one shared document/session history for now.\n\n- Fragment reload is a normal history event in the shared node collection.\n- Story snapshots remain document-level milestones.\n- GitHub is the durable history system.\n- Do not add fragment-local history until there is a concrete need.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "focus-auth-edge-1",
+      "type": "reference",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-structure",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-2",
+      "type": "reference",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-exec",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-3",
+      "type": "reference",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-reload",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-4",
+      "type": "reference",
+      "source": "focus-auth-structure",
+      "target": "focus-auth-prov",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "depends on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-5",
+      "type": "reference",
+      "source": "focus-auth-exec",
+      "target": "focus-auth-prov",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "depends on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-6",
+      "type": "reference",
+      "source": "focus-auth-reload",
+      "target": "focus-auth-remat",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implemented by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-7",
+      "type": "reference",
+      "source": "focus-auth-prov",
+      "target": "focus-auth-remat",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-8",
+      "type": "reference",
+      "source": "focus-auth-remat",
+      "target": "focus-auth-open",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "leads to",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-9",
+      "type": "reference",
+      "source": "focus-auth-open",
+      "target": "focus-auth-lifecycle",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "default answer",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-10",
+      "type": "reference",
+      "source": "focus-auth-open",
+      "target": "focus-auth-history",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "default answer",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

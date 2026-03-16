@@ -1164,6 +1164,8 @@ useEffect(() => {
   const {
     graphCRUD,
     handleScriptRequest,
+    scriptDiagnostics,
+    clearScriptDiagnostics,
     backgroundRpc,
     backgroundRpcReady,
     backgroundPostEvent,
@@ -4004,6 +4006,8 @@ useEffect(() => {
     nodeTypes,
     nodeTypeMetadata: nodeTypeMetadataList,
     handleScriptRequest,
+    scriptDiagnostics,
+    clearScriptDiagnostics,
     pluginRuntime: pluginRuntimeInfo
   }), [
     handlers,
@@ -4019,6 +4023,8 @@ useEffect(() => {
     nodeTypes,
     nodeTypeMetadataList,
     handleScriptRequest,
+    scriptDiagnostics,
+    clearScriptDiagnostics,
     pluginRuntimeInfo
   ]);
 

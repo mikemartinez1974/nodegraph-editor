@@ -1,0 +1,764 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Context Grammar",
+    "description": "Task graph for connection semantics.",
+    "created": "2026-03-15T19:35:00.000Z",
+    "modified": "2026-03-15T19:35:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "context",
+      "ports"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "context-grammar-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -320
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "context-grammar-task",
+          "name": "Context Grammar",
+          "version": "0.1.0",
+          "description": "Semantic roles for navigate, expand, bridge, and boundary.",
+          "createdAt": "2026-03-15T19:35:00.000Z",
+          "updatedAt": "2026-03-15T19:35:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -360,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "mode",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- mode: semantic role for a connection",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": 0,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-overview",
+      "type": "markdown",
+      "label": "Context Grammar",
+      "position": {
+        "x": -620,
+        "y": 0
+      },
+      "width": 430,
+      "height": 230,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Context Grammar\n\nPort modes can become a real graph grammar if their meanings stay sharp. The important roles are navigate, expand, bridge, and boundary.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "context-grammar-navigate",
+      "type": "markdown",
+      "label": "Navigate",
+      "position": {
+        "x": -160,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#1565c0",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Navigate\n\n- move into another graph/document context\n- host session changes intentionally\n- authority transition is allowed here\n- use when the target is a destination world",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-expand",
+      "type": "markdown",
+      "label": "Expand",
+      "position": {
+        "x": 260,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expand\n\n- inline a fragment into the current world\n- preserve shared structure\n- same navigational world\n- authority stays local to the host unless explicitly changed",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-bridge",
+      "type": "markdown",
+      "label": "Bridge",
+      "position": {
+        "x": 680,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#8e24aa",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Bridge\n\n- explicit cross-context reference or capability link\n- use this to reach across without merging worlds\n- likely future surface for safe cross-fragment power\n- example: reference `youtube-embedded` from another context",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-boundary",
+      "type": "markdown",
+      "label": "Boundary (Context Property)",
+      "position": {
+        "x": 1100,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#ef6c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Boundary (Context Property)\n\nBoundary is probably not an edge behavior. It is more naturally a region or fragment property:\n- it marks where one context stops and another begins\n- it lives at the perimeter of a fragment/domain\n- ports and bridges may cross it\n- but the boundary itself is not the crossing",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-implications",
+      "type": "markdown",
+      "label": "Implications",
+      "position": {
+        "x": 260,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#00897b",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implications\n\nIf these semantics hold:\n- `expand` means same world\n- `navigate` means enter another world\n- `bridge` means controlled reach across worlds\n- `boundary` means define or expose a world perimeter\n\nThen graph composition becomes inspectable instead of inferred.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-ui",
+      "type": "markdown",
+      "label": "UI Consequence",
+      "position": {
+        "x": 760,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#6d4c41",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# UI Consequence\n\nThe current select overpromises because only `navigate` and `expand` are truly implemented. If `bridge` stays in the select and `boundary` moves out of it, the UI should split:\n- connection semantics: navigate, expand, bridge\n- context semantics: boundary",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-split",
+      "type": "markdown",
+      "label": "Connection vs Context",
+      "position": {
+        "x": 1100,
+        "y": 260
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#5e35b1",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Connection vs Context\n\nA cleaner grammar is:\n- connection semantics: `navigate`, `expand`, `bridge`\n- context semantics: `boundary`\n\nBoundary should likely move to fragment/domain metadata instead of staying in the port-mode select.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "context-grammar-edge-1",
+      "type": "reference",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-navigate",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-2",
+      "type": "reference",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-expand",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-3",
+      "type": "reference",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-bridge",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-4",
+      "type": "reference",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-boundary",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-5",
+      "type": "reference",
+      "source": "context-grammar-bridge",
+      "target": "context-grammar-implications",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-6",
+      "type": "reference",
+      "source": "context-grammar-boundary",
+      "target": "context-grammar-implications",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-7",
+      "type": "reference",
+      "source": "context-grammar-implications",
+      "target": "context-grammar-ui",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "forces",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-8",
+      "type": "reference",
+      "source": "context-grammar-boundary",
+      "target": "context-grammar-split",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "reframes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-9",
+      "type": "reference",
+      "source": "context-grammar-split",
+      "target": "context-grammar-ui",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "clarifies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

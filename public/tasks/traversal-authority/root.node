@@ -1,37 +1,37 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "The Library",
-    "description": "Top-level index for library documentation and classes.",
-    "created": "2026-03-15T21:05:00.000Z",
-    "modified": "2026-03-15T21:05:00.000Z",
+    "title": "Traversal And Authority Root",
+    "description": "Index for traversal and authority task graphs.",
+    "created": "2026-03-15T12:00:00.000Z",
+    "modified": "2026-03-15T12:00:00.000Z",
     "author": "",
     "tags": [
-      "library"
+      "tasks"
     ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "library-root-manifest",
+      "id": "traversal-auth-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -640,
-        "y": -260
+        "x": -760,
+        "y": -320
       },
       "width": 360,
-      "height": 220,
+      "height": 240,
       "visible": true,
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "library-root",
-          "name": "The Library",
+          "graphId": "traversal-authority-task",
+          "name": "Traversal And Authority",
           "version": "0.1.0",
-          "description": "Top-level index for library documentation and classes.",
-          "createdAt": "2026-03-15T21:05:00.000Z",
-          "updatedAt": "2026-03-15T21:05:00.000Z"
+          "description": "Design constraints for bounded traversal, authority, and capability.",
+          "createdAt": "2026-03-15T12:00:00.000Z",
+          "updatedAt": "2026-03-15T12:00:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -42,8 +42,7 @@
             "manifest",
             "legend",
             "dictionary",
-            "markdown",
-            "port"
+            "markdown"
           ],
           "portContracts": [
             "core"
@@ -103,12 +102,12 @@
       }
     },
     {
-      "id": "library-root-legend",
+      "id": "traversal-auth-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -240,
-        "y": -260
+        "x": -360,
+        "y": -320
       },
       "width": 320,
       "height": 180,
@@ -117,24 +116,24 @@
       "data": {
         "entries": [
           {
-            "key": "entry",
-            "intent": "reference",
-            "implementation": "port node",
+            "key": "constraint",
+            "intent": "discussion",
+            "implementation": "markdown node",
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- entry: open a library graph",
+        "markdown": "## Legend\n- constraint: design rule or future boundary",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "library-root-dictionary",
+      "id": "traversal-auth-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": 120,
-        "y": -260
+        "x": 0,
+        "y": -320
       },
       "width": 320,
       "height": 180,
@@ -149,9 +148,9 @@
       }
     },
     {
-      "id": "library-root-overview",
+      "id": "trav-root-overview",
       "type": "markdown",
-      "label": "The Library",
+      "label": "Traversal And Authority",
       "position": {
         "x": -520,
         "y": 40
@@ -198,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# The Library\n\nBrowse documentation, class libraries, and task-planning node classes from here.",
+        "markdown": "# Traversal And Authority\n\nTask graph for bounded traversal, authority, capability, and future execution scoping.",
         "memo": "",
         "link": "",
         "html": "",
@@ -208,14 +207,14 @@
       }
     },
     {
-      "id": "library-root-port-1",
+      "id": "trav-root-port-1",
       "type": "port",
-      "label": "Documentation",
+      "label": "Traversal And Authority Task",
       "position": {
-        "x": 40,
-        "y": 40
+        "x": 60,
+        "y": 60
       },
-      "width": 280,
+      "width": 300,
       "height": 110,
       "ports": [],
       "inputs": [],
@@ -224,106 +223,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/library/documentation/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "library-root-port-2",
-      "type": "port",
-      "label": "Classes",
-      "position": {
-        "x": 360,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/library/classes/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "library-root-port-3",
-      "type": "port",
-      "label": "Node Classes",
-      "position": {
-        "x": 680,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/library/classes/nodes/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "library-root-port-4",
-      "type": "port",
-      "label": "Task Planning Classes",
-      "position": {
-        "x": 40,
-        "y": 190
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "endpoint": "/tasks/traversal-authority/traversal-authority.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -342,55 +242,10 @@
   ],
   "edges": [
     {
-      "id": "library-root-edge-1",
+      "id": "trav-root-edge-1",
       "type": "reference",
-      "source": "library-root-overview",
-      "target": "library-root-port-1",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "library-root-edge-2",
-      "type": "reference",
-      "source": "library-root-overview",
-      "target": "library-root-port-2",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "library-root-edge-3",
-      "type": "reference",
-      "source": "library-root-overview",
-      "target": "library-root-port-3",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "library-root-edge-4",
-      "type": "reference",
-      "source": "library-root-overview",
-      "target": "library-root-port-4",
+      "source": "trav-root-overview",
+      "target": "trav-root-port-1",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",

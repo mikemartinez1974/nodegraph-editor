@@ -39,7 +39,14 @@
           "nodeTypes": [
             "manifest",
             "dictionary",
-            "markdown"
+            "markdown",
+            "goal",
+            "task",
+            "decision",
+            "constraint",
+            "open-question",
+            "risk",
+            "acceptance-criteria"
           ],
           "portContracts": [
             "core"
@@ -106,7 +113,28 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "nodeDefs": [],
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "twilite/planning/goal",
+            "version": "1.0.0"
+          },
+          {
+            "key": "task",
+            "ref": "twilite/planning/task",
+            "version": "1.0.0"
+          },
+          {
+            "key": "decision",
+            "ref": "twilite/planning/decision",
+            "version": "1.0.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "twilite/planning/constraint",
+            "version": "1.0.0"
+          }
+        ],
         "skills": [],
         "views": []
       }
@@ -918,6 +946,64 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0123456789ab",
+      "type": "markdown",
+      "label": "Implementation Proposal",
+      "position": {
+        "x": -360,
+        "y": 620
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "data": {
+        "markdown": "## Implementation Phase 1\n\nThis proposal updates the `manifest` and `dictionary` to officially support the planning primitives defined in the previous task.\n\n### Changes:\n- **Manifest**: Adds `goal`, `task`, `decision`, `constraint` to `nodeTypes`.\n- **Dictionary**: Injects `nodeDefs` for these types to provide schema enforcement.\n- **Linkage**: Connects planning nodes to execution ports.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
     }
   ],
   "edges": [
@@ -1408,6 +1494,21 @@
       "sourcePort": "out",
       "targetPort": "in",
       "label": "impacts",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "f5e4d3c2-b1a0-4987-bcde-f01234567890",
+      "source": "4f4e8562-0665-433f-8707-7f41c2c3d1cf",
+      "sourcePort": "root",
+      "target": "a1b2c3d4-e5f6-4a5b-8c9d-0123456789ab",
+      "targetPort": "root",
+      "type": "proposes",
+      "label": "proposes",
       "style": {
         "width": 2,
         "dash": [],

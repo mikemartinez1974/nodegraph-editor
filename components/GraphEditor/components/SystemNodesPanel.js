@@ -44,6 +44,8 @@ export default function SystemNodesPanel({
   maxWidth = 1200,
   onWidthChange = () => {},
   onUpdateNode = () => {},
+  onValidationItemFocus = () => {},
+  onValidationItemOpen = () => {},
   uiDensity = "comfortable"
 }) {
   const density = uiDensity === "dense" ? "dense" : uiDensity === "compact" ? "compact" : "comfortable";
@@ -87,6 +89,13 @@ export default function SystemNodesPanel({
   const validationErrors = Array.isArray(validationReport?.errors) ? validationReport.errors : [];
   const validationWarnings = Array.isArray(validationReport?.warnings) ? validationReport.warnings : [];
   const totalIssues = validationErrors.length + validationWarnings.length;
+  const resolveValidationTarget = (issue) => {
+    if (issue?.nodeId) return { type: 'node', id: issue.nodeId };
+    if (issue?.edgeId) return { type: 'edge', id: issue.edgeId };
+    if (issue?.groupId) return { type: 'group', id: issue.groupId };
+    if (issue?.clusterId) return { type: 'group', id: issue.clusterId };
+    return null;
+  };
   const { nodeTypeList } = useAvailableNodeTypes();
 
   const nodeTypeMetaByType = useMemo(() => {
@@ -650,8 +659,17 @@ export default function SystemNodesPanel({
                   <Chip size="small" label={`${validationErrors.length} errors`} color="error" variant="outlined" />
                   <Chip size="small" label={`${validationWarnings.length} warnings`} color="warning" variant="outlined" />
                 </Stack>
-                {validationErrors.map((issue, index) => (
-                  <Alert key={`validation-error-${index}`} severity="error" variant="outlined">
+                {validationErrors.map((issue, index) => {
+                  const target = resolveValidationTarget(issue);
+                  return (
+                  <Alert
+                    key={`validation-error-${index}`}
+                    severity="error"
+                    variant="outlined"
+                    onClick={target ? () => onValidationItemFocus(target) : undefined}
+                    onDoubleClick={target ? () => onValidationItemOpen(target) : undefined}
+                    sx={target ? { cursor: 'pointer' } : undefined}
+                  >
                     <Typography variant="body2">{issue?.message || "Unknown error"}</Typography>
                     {issue?.code ? (
                       <Typography variant="caption" color="text.secondary">
@@ -659,9 +677,18 @@ export default function SystemNodesPanel({
                       </Typography>
                     ) : null}
                   </Alert>
-                ))}
-                {validationWarnings.map((issue, index) => (
-                  <Alert key={`validation-warning-${index}`} severity="warning" variant="outlined">
+                )})}
+                {validationWarnings.map((issue, index) => {
+                  const target = resolveValidationTarget(issue);
+                  return (
+                  <Alert
+                    key={`validation-warning-${index}`}
+                    severity="warning"
+                    variant="outlined"
+                    onClick={target ? () => onValidationItemFocus(target) : undefined}
+                    onDoubleClick={target ? () => onValidationItemOpen(target) : undefined}
+                    sx={target ? { cursor: 'pointer' } : undefined}
+                  >
                     <Typography variant="body2">{issue?.message || "Unknown warning"}</Typography>
                     {issue?.code ? (
                       <Typography variant="caption" color="text.secondary">
@@ -669,7 +696,7 @@ export default function SystemNodesPanel({
                       </Typography>
                     ) : null}
                   </Alert>
-                ))}
+                )})}
               </Stack>
             ) : null}
 
