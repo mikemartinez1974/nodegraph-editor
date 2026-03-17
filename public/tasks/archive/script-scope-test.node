@@ -1,0 +1,838 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Script Scope Test",
+    "description": "Scratch graph for testing fragment-scoped scripting behavior.",
+    "created": "2026-03-15T23:50:00.000Z",
+    "modified": "2026-03-15T23:50:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "testing",
+      "script-scope"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "script-scope-test-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -280
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "script-scope-test",
+          "name": "Script Scope Test",
+          "version": "0.1.0",
+          "description": "Scratch graph for testing fragment-scoped scripting behavior.",
+          "createdAt": "2026-03-15T23:50:00.000Z",
+          "updatedAt": "2026-03-15T23:50:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port",
+            "script"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -760,
+        "y": 240
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "views": [],
+        "skills": []
+      }
+    },
+    {
+      "id": "script-scope-test-overview",
+      "type": "markdown",
+      "label": "Script Scope Test",
+      "position": {
+        "x": -300,
+        "y": 40
+      },
+      "width": 460,
+      "height": 240,
+      "color": "#1976d2",
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "data": {
+        "markdown": "# Script Scope Test\n\nUse this graph to test that scripts only see and mutate the active fragment.\n\nSuggested checks:\n- run a script in the root fragment\n- expand into another fragment\n- verify out-of-scope reads and mutations fail in diagnostics",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "script-scope-test-note",
+      "type": "markdown",
+      "label": "Expected Behavior",
+      "position": {
+        "x": 260,
+        "y": 40
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Expected Behavior\n\n- `getNodes()` returns only active-fragment nodes\n- foreign `getNode(id)` fails with scope error\n- foreign mutations are rejected\n- script failures appear in diagnostics",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-port",
+      "type": "port",
+      "label": "Script Scope Task",
+      "position": {
+        "x": 260,
+        "y": 320
+      },
+      "width": 280,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/script-scope/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-expand-port",
+      "type": "port",
+      "label": "Expand Script Scope Root",
+      "position": {
+        "x": 620,
+        "y": 320
+      },
+      "width": 300,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/script-scope/root.node:root",
+          "mode": "expand",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Expand"
+        },
+        "memo": "Use this to materialize a second fragment and then test script scope against it.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-bridge-port",
+      "type": "port",
+      "label": "Open Focus Scoped Authority",
+      "position": {
+        "x": 960,
+        "y": 320
+      },
+      "width": 320,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/focus-scoped-authority/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Reference task for focus-scoped authority rules while testing script scope.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-script",
+      "type": "script",
+      "label": "Scope Probe Script",
+      "position": {
+        "x": 260,
+        "y": 620
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Script Scope Probe",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": true,
+        "autoRun": false,
+        "scriptId": "script-scope-probe-v1",
+        "lastResult": null,
+        "lastRunAt": null,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-scope-test-target",
+      "type": "markdown",
+      "label": "Mutation Target",
+      "position": {
+        "x": 700,
+        "y": 620
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Mutation Target\n\nThis node lives in the host fragment.\n\nUse the script node to verify that local mutations succeed here but foreign-fragment mutations fail after expansion.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-steps",
+      "type": "markdown",
+      "label": "Test Steps",
+      "position": {
+        "x": 1080,
+        "y": 620
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Test Steps\n\n1. Bind a local script to `Scope Probe Script`.\n2. Run `api.getNodes()` before expansion and note the count.\n3. Expand `Expand Script Scope Root`.\n4. Focus the root fragment and rerun the script: expanded-fragment nodes should stay out of scope.\n5. Focus a node in the expanded fragment and rerun: scope should switch to that fragment.\n6. Try `api.getNode()` or `api.updateNode()` against a foreign-fragment node id and confirm the diagnostics surface reports a scope error.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-read-script",
+      "type": "script",
+      "label": "Foreign Read Test",
+      "position": {
+        "x": 260,
+        "y": 940
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Foreign Read Rejection Test",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": true,
+        "autoRun": false,
+        "scriptId": "script-scope-foreign-read-v1",
+        "lastResult": null,
+        "lastRunAt": null,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-scope-test-mutation-script",
+      "type": "script",
+      "label": "Foreign Mutation Test",
+      "position": {
+        "x": 700,
+        "y": 940
+      },
+      "width": 380,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Foreign Mutation Rejection Test",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": true,
+        "autoRun": false,
+        "scriptId": "script-scope-foreign-mutation-v1",
+        "lastResult": null,
+        "lastRunAt": null,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-scope-test-read-result",
+      "type": "markdown",
+      "label": "Foreign Read Result",
+      "position": {
+        "x": 1140,
+        "y": 940
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Foreign Read Result\n\nFocus a node inside the expanded fragment, then run `Foreign Read Test`.\n\nExpected: scope error surfaced in diagnostics and returned by the script.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-mutation-result",
+      "type": "markdown",
+      "label": "Foreign Mutation Result",
+      "position": {
+        "x": 1540,
+        "y": 940
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Foreign Mutation Result\n\nFocus a node inside the expanded fragment, then run `Foreign Mutation Test`.\n\nExpected: scope error surfaced in diagnostics and mutation denied.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-focus-instruction",
+      "type": "markdown",
+      "label": "Expanded Fragment Focus Required",
+      "position": {
+        "x": 1140,
+        "y": 660
+      },
+      "width": 760,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expanded Fragment Focus Required\n\nThese foreign-access tests only make sense after expanding `Expand Script Scope Root` and then focusing a node inside the expanded fragment. The host node id `script-scope-test-target` is only foreign from that focused expanded context.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-create-script",
+      "type": "script",
+      "label": "Create Local Node Test",
+      "position": {
+        "x": 260,
+        "y": 1260
+      },
+      "width": 380,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Create Local Fragment Node Test",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": true,
+        "autoRun": false,
+        "scriptId": "script-scope-create-local-v1",
+        "lastResult": null,
+        "lastRunAt": null,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-scope-test-create-result",
+      "type": "markdown",
+      "label": "Create Local Node Result",
+      "position": {
+        "x": 700,
+        "y": 1260
+      },
+      "width": 400,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "Run this while focused inside the expanded fragment. It should create `script-scope-created-probe` in that fragment.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-created-read-script",
+      "type": "script",
+      "label": "Read Created Node From Host Test",
+      "position": {
+        "x": 1160,
+        "y": 1260
+      },
+      "width": 400,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "name": "Read Created Node Rejection Test",
+        "script": "",
+        "dryRun": false,
+        "allowMutations": false,
+        "autoRun": false,
+        "scriptId": "script-scope-created-read-v1",
+        "lastResult": null,
+        "lastRunAt": null,
+        "source": ""
+      }
+    },
+    {
+      "id": "script-scope-test-created-read-result",
+      "type": "markdown",
+      "label": "Read Created Node Result",
+      "position": {
+        "x": 1620,
+        "y": 1260
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "After creating the node in the expanded fragment, move focus back to the host and run this. It should fail with a scope error. Then focus the expanded fragment again and use Scope Probe or direct inspection to confirm the node still exists there.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "script-scope-test-create-instruction",
+      "type": "markdown",
+      "label": "Create / Refocus Test Steps",
+      "position": {
+        "x": 1160,
+        "y": 1540
+      },
+      "width": 520,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Create / Refocus Test Steps\n\n1. Expand `Expand Script Scope Root`.\n2. Click a node inside the expanded fragment so it becomes focused.\n3. Run `Create Local Node Test`.\n4. Confirm a new node appears in the expanded fragment.\n5. Click back into the host fragment.\n6. Run `Read Created Node From Host Test`.\n7. Expect a scope error.\n8. Focus the expanded fragment again and confirm the created node is still there.\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "script-scope-test-edge-1",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-note",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "expects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-2",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-3",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-expand-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "expands",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-4",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-bridge-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "reads",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-5",
+      "type": "reference",
+      "source": "script-scope-test-overview",
+      "target": "script-scope-test-script",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "runs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-6",
+      "type": "reference",
+      "source": "script-scope-test-script",
+      "target": "script-scope-test-target",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "mutates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-7",
+      "type": "reference",
+      "source": "script-scope-test-script",
+      "target": "script-scope-test-steps",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "follows",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-8",
+      "type": "reference",
+      "source": "script-scope-test-focus-instruction",
+      "target": "script-scope-test-read-script",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "gates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-9",
+      "type": "reference",
+      "source": "script-scope-test-focus-instruction",
+      "target": "script-scope-test-mutation-script",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "gates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-10",
+      "type": "reference",
+      "source": "script-scope-test-read-script",
+      "target": "script-scope-test-read-result",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "reports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-11",
+      "type": "reference",
+      "source": "script-scope-test-mutation-script",
+      "target": "script-scope-test-mutation-result",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "reports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "script-scope-test-edge-12",
+      "type": "reference",
+      "source": "script-scope-test-created-read-script",
+      "target": "script-scope-test-created-read-result",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "reports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "scripts": [
+    {
+      "id": "script-scope-probe-v1",
+      "name": "Script Scope Probe",
+      "tags": [
+        "tasks",
+        "test",
+        "script-scope"
+      ],
+      "source": "const nodes = await api.getNodes();\nconst edges = await api.getEdges();\nconst groups = typeof api.getGroups === \"function\" ? await api.getGroups() : [];\n\nconst summary = {\n  success: true,\n  nodeCount: nodes.length,\n  edgeCount: edges.length,\n  groupCount: groups.length,\n  labels: nodes.map((node) => node.label || node.id)\n};\n\napi.log(\"info\", `Scope probe saw ${summary.nodeCount} node(s) and ${summary.edgeCount} edge(s).`);\n\nreturn summary;\n",
+      "ref": "",
+      "createdAt": "2026-03-16T13:05:00.000Z",
+      "updatedAt": "2026-03-16T13:05:00.000Z"
+    },
+    {
+      "id": "script-scope-foreign-read-v1",
+      "name": "Foreign Read Rejection Test",
+      "tags": [
+        "tasks",
+        "test",
+        "script-scope"
+      ],
+      "source": "const foreignId = \"script-scope-test-target\";\ntry {\n  const node = await api.getNode(foreignId);\n  return { success: false, expected: \"scope-error\", got: node };\n} catch (error) {\n  return { success: true, expected: \"scope-error\", error: String(error) };\n}\n",
+      "ref": "",
+      "createdAt": "2026-03-16T15:20:00.000Z",
+      "updatedAt": "2026-03-16T15:20:00.000Z"
+    },
+    {
+      "id": "script-scope-foreign-mutation-v1",
+      "name": "Foreign Mutation Rejection Test",
+      "tags": [
+        "tasks",
+        "test",
+        "script-scope"
+      ],
+      "source": "const foreignId = \"script-scope-test-target\";\ntry {\n  const result = await api.updateNode(foreignId, { data: { probe: \"should-fail\" } });\n  return { success: false, expected: \"scope-error\", got: result };\n} catch (error) {\n  return { success: true, expected: \"scope-error\", error: String(error) };\n}\n",
+      "ref": "",
+      "createdAt": "2026-03-16T15:20:00.000Z",
+      "updatedAt": "2026-03-16T15:20:00.000Z"
+    },
+    {
+      "id": "script-scope-create-local-v1",
+      "name": "Create Local Fragment Node Test",
+      "source": "const createdId = \"script-scope-created-probe\";\ntry {\n  const existing = await api.getNode(createdId).catch(() => null);\n  if (existing) {\n    return { success: true, reused: true, id: createdId, label: existing.label || createdId };\n  }\n  const created = await api.createNode({\n    id: createdId,\n    type: \"markdown\",\n    label: \"Created In Expanded Fragment\",\n    position: { x: 1880, y: 1240 },\n    width: 320,\n    height: 160,\n    data: {\n      markdown: \"# Created In Expanded Fragment\\n\\nThis node was created by the script-scope create test.\",\n      memo: \"\",\n      link: \"\",\n      html: \"\",\n      svg: \"\"\n    }\n  });\n  return { success: true, created: true, id: created.id, type: created.type };\n} catch (error) {\n  return { success: false, expected: \"create-in-focused-fragment\", error: String(error) };\n}\n"
+    },
+    {
+      "id": "script-scope-created-read-v1",
+      "name": "Read Created Node Rejection Test",
+      "source": "const foreignId = \"script-scope-created-probe\";\ntry {\n  const node = await api.getNode(foreignId);\n  return { success: false, expected: \"scope-error\", got: node };\n} catch (error) {\n  return { success: true, expected: \"scope-error\", error: String(error) };\n}\n"
+    }
+  ]
+}

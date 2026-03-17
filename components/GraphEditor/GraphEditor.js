@@ -40,6 +40,13 @@ import { validateGraphInvariants } from './validators/validateGraphInvariants';
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 120;
 const DEFAULT_PREFERRED_VIEWER = 'https://twilite.zone';
+const getNodeFragmentIdForPersistence = (node) =>
+  String(
+    node?.data?._contextScope?.fragmentId ||
+    node?.data?._expansion?.expansionId ||
+    node?.data?._origin?.instanceId ||
+    ''
+  ).trim();
 const encodeBase64 = (value) => {
   if (typeof window === 'undefined') return '';
   return window.btoa(unescape(encodeURIComponent(value)));
@@ -298,6 +305,7 @@ export default function GraphEditor({ backgroundImage, isMobile, isSmallScreen, 
     pan, setPan, zoom, setZoom,
     selectedNodeIds, setSelectedNodeIds,
     focusedNodeId, setFocusedNodeId,
+    focusedFragmentId,
     interactionMode,
     selectedEdgeIds, setSelectedEdgeIds,
     selectedGroupIds, setSelectedGroupIds,
@@ -761,9 +769,19 @@ useEffect(() => {
 
   const buildGraphSaveData = useCallback(() => {
     const now = new Date().toISOString();
-    const nodeList = nodesRef.current || nodes;
-    const edgeList = edgesRef.current || edges;
-    const groupsList = groups || [];
+    const activeFragmentId = String(focusedFragmentId || '').trim();
+    const allNodes = nodesRef.current || nodes;
+    const allEdges = edgesRef.current || edges;
+    const allGroups = groups || [];
+    const nodeList = allNodes.filter((node) => getNodeFragmentIdForPersistence(node) === activeFragmentId);
+    const nodeIds = new Set(nodeList.map((node) => node.id));
+    const edgeList = allEdges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+    const groupsList = allGroups
+      .map((group) => ({
+        ...group,
+        nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => nodeIds.has(id)) : []
+      }))
+      .filter((group) => group.nodeIds.length > 0);
     const manifestSettings = {
       theme: documentTheme || documentSettings?.theme || null,
       backgroundImage: documentBackgroundImage || null,
@@ -882,6 +900,7 @@ useEffect(() => {
     pan,
     zoom,
     backgroundUrl,
+    focusedFragmentId,
   ]);
 
   useEffect(() => {
@@ -1047,6 +1066,7 @@ useEffect(() => {
   useInterpreterLayer({
     nodes,
     edges,
+    focusedFragmentId,
     edgeRoutes,
     groups,
     lockedNodes,
@@ -1385,21 +1405,27 @@ useEffect(() => {
     try {
       handlers.handleLoadGraph?.(nodesToLoad, edgesToLoad, groupsToLoad, options);
     } finally {
+      const shouldResetSessionFocus = options?.replace === true || !firstGraphLoadHandledRef.current;
       pendingRerouteOnLoadRef.current = Array.isArray(edgesToLoad) && edgesToLoad.length > 0;
       setGraphRenderKey(prev => prev + 1);
       setStorySnapshots([]);
-      if (!firstGraphLoadHandledRef.current) {
-        firstGraphLoadHandledRef.current = true;
+      if (shouldResetSessionFocus) {
         if (Array.isArray(nodesToLoad) && nodesToLoad.length > 0) {
           const rootNode = getGraphRootNode(nodesToLoad);
-          const rootNodeId = rootNode?.id || nodesToLoad[0]?.id;
-          if (rootNodeId) {
-            setFocusedNodeId(rootNodeId);
-            setSelectedNodeIds([rootNodeId]);
-            setSelectedEdgeIds([]);
-            setSelectedGroupIds([]);
-          }
+          const rootNodeId = rootNode?.id || nodesToLoad[0]?.id || null;
+          setFocusedNodeId(rootNodeId);
+          setSelectedNodeIds(rootNodeId ? [rootNodeId] : []);
+          setSelectedEdgeIds([]);
+          setSelectedGroupIds([]);
+        } else if (options?.replace === true) {
+          setFocusedNodeId(null);
+          setSelectedNodeIds([]);
+          setSelectedEdgeIds([]);
+          setSelectedGroupIds([]);
         }
+      }
+      if (!firstGraphLoadHandledRef.current) {
+        firstGraphLoadHandledRef.current = true;
         setMemoAutoExpandToken((token) => token + 1);
       }
     }
@@ -2212,6 +2238,167 @@ useEffect(() => {
       window.graphAPI = graphAPI.current;
     }
   }, [graphAPI]);
+
+  useEffect(() => {
+    const handleRefreshCurrentGraphContext = async ({ hostUrl, displayedUrl } = {}) => {
+      const rawGraph = graphAPI?.current?._raw || null;
+      const fallbackUrl = hostUrl || displayedUrl || '';
+      const activeFragmentId = String(focusedFragmentId || '').trim();
+      console.log('[FocusScope] refreshCurrentGraphContext', {
+        hostUrl,
+        displayedUrl,
+        fallbackUrl,
+        activeFragmentId,
+        focusedNodeId
+      });
+
+      if (!rawGraph) {
+        if (fallbackUrl) {
+          eventBus.emit('fetchUrl', { url: fallbackUrl, source: 'refreshCurrentGraphContext' });
+        }
+        return;
+      }
+
+      if (!activeFragmentId) {
+        try {
+          eventBus.emit('fragmentReload', {
+            fragmentId: 'root',
+            phase: 'start',
+            hostUrl: fallbackUrl
+          });
+        } catch {}
+        if (fallbackUrl) {
+          eventBus.emit('fetchUrl', { url: fallbackUrl, source: 'refreshCurrentGraphContext' });
+        }
+        return;
+      }
+
+      const currentNodes = nodesRef.current || [];
+      const focusedNode = currentNodes.find((node) => node?.id === focusedNodeId) || null;
+      const fragmentNodes = currentNodes.filter((node) => node?.data?._expansion?.expansionId === activeFragmentId);
+      const anchorNode = focusedNode?.data?._expansion?.expansionId === activeFragmentId
+        ? focusedNode
+        : fragmentNodes[0] || null;
+      const expansionMeta = anchorNode?.data?._expansion || null;
+      const sourceNodeId = String(expansionMeta?.sourceNodeId || '').trim();
+      const sourceRef = String(expansionMeta?.sourceRef || anchorNode?.data?._origin?.ref || '').trim();
+      const entryPort = String(expansionMeta?.entryPort || 'root').trim() || 'root';
+      const trustMode = String(expansionMeta?.trustMode || 'untrusted').trim() || 'untrusted';
+      const canonicalFocusedId = String(focusedNode?.data?._origin?.canonicalId || '').trim();
+      console.log('[FocusScope] refresh fragment provenance', {
+        activeFragmentId,
+        anchorNodeId: anchorNode?.id || null,
+        sourceNodeId,
+        sourceRef,
+        entryPort,
+        trustMode,
+        canonicalFocusedId
+      });
+
+      if (!sourceNodeId || !sourceRef) {
+        setSnackbar({
+          open: true,
+          message: 'Focused fragment cannot be reloaded because its expansion provenance is incomplete.',
+          severity: 'error'
+        });
+        return;
+      }
+
+      try {
+        eventBus.emit('fragmentReload', {
+          fragmentId: activeFragmentId,
+          phase: 'start',
+          sourceNodeId,
+          sourceRef,
+          focusedNodeId: focusedNodeId || null
+        });
+      } catch {}
+
+      const collapseResult = await rawGraph.collapseExpansion({
+        expansionId: activeFragmentId,
+        sourceNodeId
+      });
+      console.log('[FocusScope] collapseExpansion result', collapseResult);
+
+      if (!collapseResult?.success) {
+        setSnackbar({
+          open: true,
+          message: collapseResult?.error || 'Failed to collapse fragment during reload.',
+          severity: 'error'
+        });
+        try {
+          eventBus.emit('fragmentReload', {
+            fragmentId: activeFragmentId,
+            phase: 'error',
+            error: collapseResult?.error || 'collapse-failed'
+          });
+        } catch {}
+        return;
+      }
+
+      const expandResult = await rawGraph.expandReference({
+        sourceNodeId,
+        target: {
+          ref: sourceRef,
+          entryPort,
+          mode: 'expand',
+          trustMode
+        },
+        options: {
+          layout: 'attach-right'
+        }
+      });
+      console.log('[FocusScope] expandReference result', expandResult);
+
+      if (!expandResult?.success) {
+        setSnackbar({
+          open: true,
+          message: expandResult?.error || 'Failed to reload focused fragment.',
+          severity: 'error'
+        });
+        try {
+          eventBus.emit('fragmentReload', {
+            fragmentId: activeFragmentId,
+            phase: 'error',
+            error: expandResult?.error || 'expand-failed'
+          });
+        } catch {}
+        return;
+      }
+
+      const restoredNodeId = canonicalFocusedId
+        ? `${activeFragmentId}:${canonicalFocusedId}`
+        : '';
+
+      window.setTimeout(() => {
+        const latestNodes = nodesRef.current || [];
+        const focusTargetId = latestNodes.some((node) => node?.id === restoredNodeId)
+          ? restoredNodeId
+          : (expandResult?.data?.entryNodeId || '');
+        console.log('[FocusScope] refresh restore focus', {
+          activeFragmentId,
+          restoredNodeId,
+          focusTargetId,
+          latestNodeCount: latestNodes.length
+        });
+        if (focusTargetId) {
+          eventBus.emit('focusNode', { nodeId: focusTargetId, source: 'fragmentReload' });
+        }
+        try {
+          eventBus.emit('fragmentReload', {
+            fragmentId: activeFragmentId,
+            phase: 'complete',
+            sourceNodeId,
+            sourceRef,
+            restoredNodeId: focusTargetId || null
+          });
+        } catch {}
+      }, 0);
+    };
+
+    eventBus.on('refreshCurrentGraphContext', handleRefreshCurrentGraphContext);
+    return () => eventBus.off('refreshCurrentGraphContext', handleRefreshCurrentGraphContext);
+  }, [graphAPI, focusedFragmentId, focusedNodeId, nodesRef, setSnackbar]);
   
   // Expose eventBus and RPC helpers to window for console testing
   useEffect(() => {
@@ -2309,11 +2496,24 @@ useEffect(() => {
     const handleFetchUrl = async ({ url, source = 'unknown' }) => {
       try {
         if (!url) return;
+        const setAddressPreview = (nextUrl) => {
+          try {
+            if (!nextUrl) return;
+            eventBus.emit('setAddressPreview', { url: nextUrl });
+          } catch {}
+        };
+        const clearAddressPreview = () => {
+          try {
+            eventBus.emit('clearAddressPreview');
+          } catch {}
+        };
         if (typeof url === 'string' && url.startsWith('github://')) {
+          setAddressPreview(url);
           const raw = url.slice('github://'.length);
           const [owner = '', repo = '', ...pathParts] = raw.split('/');
           let path = pathParts.join('/').replace(/^\/+/, '');
           if (!owner || !repo) {
+            clearAddressPreview();
             setSnackbar({
               open: true,
               message: 'Invalid GitHub URL. Expected github://owner/repo/path/to/file.node',
@@ -2340,6 +2540,7 @@ useEffect(() => {
           const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
           const readResp = await fetch(readUrl, { headers });
           if (!readResp.ok) {
+            clearAddressPreview();
             const errorJson = await readResp.json().catch(() => ({}));
             setSnackbar({
               open: true,
@@ -2351,6 +2552,7 @@ useEffect(() => {
 
           const payload = await readResp.json();
           if (!payload || payload.type !== 'file' || !payload.content) {
+            clearAddressPreview();
             setSnackbar({
               open: true,
               message: 'GitHub response did not include file content.',
@@ -2428,6 +2630,7 @@ useEffect(() => {
             isAllowedTlz(url) ||
             isLocalhostUrl(url);
           if (!isAllowedPluginNavigation) {
+            clearAddressPreview();
             setSnackbar({
               open: true,
               message: 'Plugin navigation only allows local/workspace paths. Use browser mode for remote URLs.',
@@ -2447,6 +2650,7 @@ useEffect(() => {
         if (typeof fullUrl === 'string' && fullUrl.startsWith('local://')) {
           const localPath = fullUrl.slice('local://'.length).trim();
           if (!localPath) {
+            clearAddressPreview();
             setSnackbar({
               open: true,
               message: 'Local URL is empty.',
@@ -2458,6 +2662,7 @@ useEffect(() => {
           if (typeof window !== 'undefined' && window.__Twilite_HOST__ === 'vscode') {
             fullUrl = normalizedPath;
           } else {
+            clearAddressPreview();
             setSnackbar({
               open: true,
               message: `Cannot fetch ${fullUrl} in browser mode. Open a path under /public or use tlz://.`,
@@ -2550,8 +2755,8 @@ useEffect(() => {
         // Log the final URL and fetch options
         const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store' };
 
-        // Update address/history immediately so header/back works
-        try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+        // Show the candidate document without committing browser history until load succeeds.
+        setAddressPreview(fullUrl);
 
         const triedUrls = [];
 
@@ -2660,7 +2865,7 @@ useEffect(() => {
           try {
             response = await tryFetch(candidate);
             fullUrl = candidate;
-            try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+            setAddressPreview(fullUrl);
             break;
           } catch (err) {
             // continue to next candidate
@@ -2728,7 +2933,7 @@ useEffect(() => {
             try {
               response = await tryFetch(alt);
               fullUrl = alt; // switch canonical to the working one
-              try { eventBus.emit('setAddress', fullUrl); } catch (err) { /* ignore */ }
+              setAddressPreview(fullUrl);
               break;
             } catch (e) {
               // continue to next
@@ -2737,6 +2942,7 @@ useEffect(() => {
         }
 
         if (!response) {
+          clearAddressPreview();
           const errorMsg = 'Failed to fetch from any URL';
           console.error('[GraphEditor] Error fetching URL:', errorMsg, triedUrls);
           setSnackbar({ open: true, message: `Failed to fetch URL: ${errorMsg}`, severity: 'error' });
@@ -2891,6 +3097,7 @@ useEffect(() => {
               mode: 'load'
             });
             if (errors.length > 0) {
+              clearAddressPreview();
               const message = errors[0]?.message || 'Manifest validation failed.';
               setSnackbar({
                 open: true,
@@ -2915,6 +3122,30 @@ useEffect(() => {
               setSnackbar({ open: true, message: 'Graph loaded from URL', severity: 'success' });
             }
             eventBus.emit('setAddress', fullUrl); // ensure address reflects final URL
+            try {
+              const manifestSettings = getManifestSettings(filteredNodes);
+              const rawDocumentUrl = getManifestDocumentUrl(filteredNodes);
+              const documentUrl =
+                typeof rawDocumentUrl === 'string'
+                  ? rawDocumentUrl
+                  : jsonData.document?.url || null;
+              eventBus.emit('loadSaveFile', {
+                settings: manifestSettings || jsonData.settings || {},
+                viewport: jsonData.viewport || {},
+                scripts: Array.isArray(jsonData.scripts) ? jsonData.scripts : null,
+                filename: (() => {
+                  try {
+                    const parsed = new URL(fullUrl, typeof window !== 'undefined' ? window.location.origin : undefined);
+                    return parsed.pathname.split('/').pop() || fullUrl;
+                  } catch {
+                    return fullUrl;
+                  }
+                })(),
+                documentUrl
+              });
+            } catch (err) {
+              console.warn('Failed to emit loadSaveFile after URL load:', err);
+            }
             try {
               const parsedUrl = new URL(fullUrl, typeof window !== 'undefined' ? window.location.origin : undefined);
               const params = parsedUrl.searchParams;
@@ -2965,46 +3196,25 @@ useEffect(() => {
           // Not JSON or missing nodes
         }
 
-        // If it's HTML, we should probably NOT create a node if it was intended to be a graph
+        // Navigate is graph-only. Do not silently import arbitrary remote text/HTML into the current host graph.
         if (contentType.includes('text/html') || text.trim().startsWith('<!DOCTYPE html>') || text.trim().startsWith('<html')) {
-           if (fullUrl.endsWith('.node') || fullUrl.endsWith('.json')) {
-             setSnackbar({ open: true, message: `Failed to load graph: Received HTML instead of graph data. (Check if the file exists at ${fullUrl})`, severity: 'error' });
-             return;
-           }
+          clearAddressPreview();
+          setSnackbar({
+            open: true,
+            message: `Navigate expects a graph document. Received HTML from ${fullUrl}.`,
+            severity: 'error'
+          });
+          return;
         }
 
-        // Create text node (fallback for actual text files)
-        const lines = text.trim().split('\n');
-        const label = lines[0] ? lines[0].substring(0, 50) : 'Fetched Text';
-        const memo = text.trim();
-
-        const width = Math.max(200, Math.min(600, (label.length || 10) * 8 + 100));
-        const height = Math.max(100, Math.min(400, lines.length * 20 + 50));
-
-        const centerX = (window.innerWidth / 2 - pan.x) / zoom;
-        const centerY = (window.innerHeight / 2 - pan.y) / zoom;
-
-        const newNode = {
-          id: `node_${Date.now()}`,
-          label: label,
-          type: 'default',
-          position: { x: centerX, y: centerY },
-          width: width,
-          height: height,
-          resizable: true,
-          data: { memo: memo }
-        };
-
-        setNodes(prev => {
-          const next = [...prev, newNode];
-          nodesRef.current = next;
-          return next;
+        clearAddressPreview();
+        setSnackbar({
+          open: true,
+          message: `Navigate expects a .node/.json graph document. ${fullUrl} did not contain graph data.`,
+          severity: 'error'
         });
-
-        historyHook.saveToHistory(nodesRef.current, edgesRef.current);
-        setSnackbar({ open: true, message: 'Fetched and created node from URL', severity: 'success' });
-        eventBus.emit('setAddress', fullUrl);
       } catch (error) {
+        try { eventBus.emit('clearAddressPreview'); } catch {}
         console.error('[GraphEditor] Error fetching URL:', error);
         // Provide clearer snackbar with attempted info
         const msg = error && error.message ? error.message : 'Unknown error';
@@ -3014,7 +3224,7 @@ useEffect(() => {
 
     eventBus.on('fetchUrl', handleFetchUrl);
     return () => eventBus.off('fetchUrl', handleFetchUrl);
-  }, [pan, zoom, setNodes, nodesRef, historyHook, setSnackbar, handlers]);
+  }, [documentSettings?.github?.branch, handleLoadGraph, setSnackbar]);
 
   // If initial fetch events were missed during mount ordering, recover once.
   useEffect(() => {

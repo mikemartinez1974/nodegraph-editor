@@ -723,6 +723,8 @@ const SYSTEM_NODE_TYPES = new Set([
   'dictionary'
 ]);
 
+const EXPANDABLE_TARGET_KINDS = new Set(['fragment', 'graph', 'document']);
+
 const normalizeExpansionTarget = (target = {}) => {
   if (!target || typeof target !== 'object') return null;
   const kind = typeof target.kind === 'string' ? target.kind.trim().toLowerCase() : '';
@@ -854,7 +856,7 @@ const DEFAULT_EXPANSION_TRUST_POLICY = Object.freeze({
  */
 
 export default class GraphCRUD {
-  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef, getGroups, setGroups, groupsRef, groupManagerRef) {
+  constructor(getNodes, setNodes, getEdges, setEdges, saveToHistory, nodesRef, edgesRef, getGroups, setGroups, groupsRef, groupManagerRef, options = {}) {
     this.getNodes = getNodes;
     this.setNodes = setNodes;
     this.getEdges = getEdges;
@@ -868,6 +870,35 @@ export default class GraphCRUD {
     this.setGroups = typeof setGroups === 'function' ? setGroups : (() => {});
     this.groupsRef = groupsRef;
     this.groupManagerRef = groupManagerRef;
+    this.getActiveFragmentId =
+      typeof options?.getActiveFragmentId === 'function'
+        ? options.getActiveFragmentId
+        : (() => '');
+  }
+
+  _getNodeFragmentId(node) {
+    return String(
+      node?.data?._expansion?.expansionId ||
+      node?.data?._origin?.instanceId ||
+      ''
+    ).trim();
+  }
+
+  _resolveExecutionFragmentId(meta = {}) {
+    const explicit = typeof meta?.fragmentId === 'string' ? meta.fragmentId.trim() : '';
+    if (explicit) return explicit;
+    try {
+      return String(this.getActiveFragmentId?.() || '').trim();
+    } catch {
+      return '';
+    }
+  }
+
+  _isNodeExecutableInFragment(nodeId, fragmentId = '') {
+    const node = (this.getNodes?.() || []).find((entry) => entry?.id === nodeId) || null;
+    if (!node) return false;
+    if (!fragmentId) return true;
+    return this._getNodeFragmentId(node) === fragmentId;
   }
 
   // ==================== NODE CRUD ====================
@@ -2556,10 +2587,10 @@ export default class GraphCRUD {
         );
       }
 
-      if (target.kind !== 'fragment') {
+      if (!EXPANDABLE_TARGET_KINDS.has(target.kind)) {
         return this._expansionFailure(
           EXPANSION_ERROR.UNSUPPORTED_MODE,
-          `expandReference only supports target.kind="fragment" in v1 (received "${target.kind || 'unknown'}")`,
+          `expandReference does not support target.kind="${target.kind || 'unknown'}"`,
           { target }
         );
       }
@@ -2789,6 +2820,16 @@ export default class GraphCRUD {
           expandKey: expansionKey
         });
       } catch {}
+      try {
+        eventBus.emit('fragmentMaterialize', {
+          fragmentId: expansionId,
+          sourceNodeId,
+          sourceRef: target.ref,
+          entryNodeId: entryNode.id,
+          entryPort: target.entryPort || 'root',
+          expandKey: expansionKey
+        });
+      } catch {}
 
       return this._expansionSuccess({
         expansionId,
@@ -2822,12 +2863,23 @@ export default class GraphCRUD {
       if (!sourceNode) {
         return { success: false, error: `Source node "${sourceNodeId}" was not found` };
       }
+      const sourceFragmentId = this._getNodeFragmentId(sourceNode);
+      const activeFragmentId = this._resolveExecutionFragmentId();
+      if (activeFragmentId && sourceFragmentId !== activeFragmentId) {
+        return {
+          success: false,
+          error: `Source node "${sourceNodeId}" is out of scope for the active fragment`
+        };
+      }
 
       const sourceTarget = resolveSourceTargetFromNode(sourceNode);
       const directTarget = isPlainObject(payload?.target) ? payload.target : {};
       const target = normalizeBridgeTarget({ ...sourceTarget, ...directTarget });
       if (!target?.ref) {
         return { success: false, error: 'bridgeReference requires target.ref' };
+      }
+      if (target.kind !== 'node-class') {
+        return { success: false, error: `Bridge target kind "${target.kind}" is not supported` };
       }
 
       const { nodes: classNodes } = await this._resolveExpansionGraph(payload, target);
@@ -2885,6 +2937,25 @@ export default class GraphCRUD {
         ? normalizeHandleDefinitions({ ports: defaults.ports })
         : normalizeHandleDefinitions({});
       const resolvedData = mergeNodeClassDataForCreate({}, defaults.data, policy, false);
+      const bridgedData = {
+        ...resolvedData,
+        _bridge: {
+          sourceNodeId,
+          sourceRef: target.ref,
+          entryPort: target.entryPort || 'root',
+          kind: target.kind
+        }
+      };
+      if (sourceFragmentId) {
+        bridgedData._origin = {
+          ...(isPlainObject(bridgedData._origin) ? bridgedData._origin : {}),
+          instanceId: sourceFragmentId
+        };
+        bridgedData._contextScope = {
+          ...(isPlainObject(bridgedData._contextScope) ? bridgedData._contextScope : {}),
+          fragmentId: sourceFragmentId
+        };
+      }
       const sourcePos = sourceNode?.position && Number.isFinite(sourceNode.position.x) && Number.isFinite(sourceNode.position.y)
         ? sourceNode.position
         : { x: 0, y: 0 };
@@ -2901,7 +2972,7 @@ export default class GraphCRUD {
         width,
         height,
         color: defaults.color,
-        data: resolvedData,
+        data: bridgedData,
         inputs: defaultHandles.inputs,
         outputs: defaultHandles.outputs,
         ports: defaultHandles.ports,
@@ -2929,7 +3000,8 @@ export default class GraphCRUD {
           node: createdNode,
           nodeType,
           registered: true,
-          sourceRef: target.ref
+          sourceRef: target.ref,
+          fragmentId: sourceFragmentId || ''
         }
       };
     } catch (error) {
@@ -3407,16 +3479,41 @@ export default class GraphCRUD {
 
       const currentNodes = this.getNodes();
       const currentEdges = this.getEdges();
+      const ownsNode = (node) => {
+        if (!node || typeof node !== 'object') return false;
+        const data = isPlainObject(node.data) ? node.data : {};
+        const fromExpansion = String(data?._expansion?.expansionId || '').trim();
+        const fromOrigin = String(data?._origin?.instanceId || '').trim();
+        const fromScope = String(data?._contextScope?.fragmentId || '').trim();
+        return fromExpansion === expansionId || fromOrigin === expansionId || fromScope === expansionId;
+      };
       const nodeIdsToRemove = new Set(
         currentNodes
-          .filter((node) => node?.data?._expansion?.expansionId === expansionId)
+          .filter((node) => ownsNode(node))
           .map((node) => node.id)
       );
+      console.log('[FocusScope] collapseExpansion ownership', {
+        expansionId,
+        sourceNodeId: payload?.sourceNodeId || null,
+        currentNodeCount: currentNodes.length,
+        ownedNodeIds: Array.from(nodeIdsToRemove)
+      });
       const edgeIdsToRemove = new Set(
         currentEdges
-          .filter((edge) => edge?.data?._expansion?.expansionId === expansionId)
+          .filter((edge) => {
+            const edgeExpansionId = String(edge?.data?._expansion?.expansionId || '').trim();
+            if (edgeExpansionId === expansionId) return true;
+            if (nodeIdsToRemove.has(edge?.source)) return true;
+            if (nodeIdsToRemove.has(edge?.target)) return true;
+            return false;
+          })
           .map((edge) => edge.id)
       );
+      console.log('[FocusScope] collapseExpansion edges', {
+        expansionId,
+        currentEdgeCount: currentEdges.length,
+        ownedEdgeIds: Array.from(edgeIdsToRemove)
+      });
 
       if (nodeIdsToRemove.size === 0 && edgeIdsToRemove.size === 0) {
         return this._expansionSuccess({
@@ -3493,15 +3590,19 @@ export default class GraphCRUD {
   executeNode(nodeId, meta = {}) {
     try {
       if (!nodeId) return { success: false, error: 'nodeId required' };
+      const fragmentId = this._resolveExecutionFragmentId(meta);
+      if (!this._isNodeExecutableInFragment(nodeId, fragmentId)) {
+        return { success: false, error: 'node is out of scope for the active fragment' };
+      }
       eventBus.emit('nodeInput', {
         targetNodeId: nodeId,
         handleId: 'root',
         inputName: 'root',
         value: meta || {},
         source: 'user',
-        meta: { requestedBy: 'executeNode' }
+        meta: { requestedBy: 'executeNode', fragmentId }
       });
-      eventBus.emit('executeNode', { nodeId, meta });
+      eventBus.emit('executeNode', { nodeId, meta: { ...meta, fragmentId } });
       return { success: true, data: { nodeId } };
     } catch (error) {
       return { success: false, error: error.message };
@@ -3513,7 +3614,9 @@ export default class GraphCRUD {
       if (!Array.isArray(nodeIds)) {
         return { success: false, error: 'nodeIds must be an array' };
       }
-      nodeIds.forEach(nodeId => {
+      const fragmentId = this._resolveExecutionFragmentId(meta);
+      const scopedNodeIds = nodeIds.filter((nodeId) => nodeId && this._isNodeExecutableInFragment(nodeId, fragmentId));
+      scopedNodeIds.forEach(nodeId => {
         if (nodeId) {
           eventBus.emit('nodeInput', {
             targetNodeId: nodeId,
@@ -3521,12 +3624,12 @@ export default class GraphCRUD {
             inputName: 'root',
             value: meta || {},
             source: 'user',
-            meta: { requestedBy: 'executeNodes' }
+            meta: { requestedBy: 'executeNodes', fragmentId }
           });
-          eventBus.emit('executeNode', { nodeId, meta });
+          eventBus.emit('executeNode', { nodeId, meta: { ...meta, fragmentId } });
         }
       });
-      return { success: true, data: { count: nodeIds.length } };
+      return { success: true, data: { count: scopedNodeIds.length } };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -3535,13 +3638,17 @@ export default class GraphCRUD {
   sendInput(nodeId, handleId = 'root', value = {}, meta = {}) {
     try {
       if (!nodeId) return { success: false, error: 'nodeId required' };
+      const fragmentId = this._resolveExecutionFragmentId(meta);
+      if (!this._isNodeExecutableInFragment(nodeId, fragmentId)) {
+        return { success: false, error: 'node is out of scope for the active fragment' };
+      }
       eventBus.emit('nodeInput', {
         targetNodeId: nodeId,
         handleId: handleId || 'root',
         inputName: handleId || 'root',
         value,
         source: meta?.source || 'api',
-        meta
+        meta: { ...meta, fragmentId }
       });
       return { success: true, data: { nodeId, handleId } };
     } catch (error) {

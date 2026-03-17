@@ -5,21 +5,21 @@ import NodeGraph from '../../NodeGraph';
 import { useGraphEditorStateContext } from '../providers/GraphEditorContext';
 
 const CANVAS_HIDDEN_NODE_TYPES = new Set(['manifest', 'dictionary', 'legend']);
+const ICON_NODE_SIZE = 14;
 
 const getSemanticRenderSize = (node, semanticLevel) => {
   const type = String(node?.type || '').trim().toLowerCase();
-  if (semanticLevel !== 'summary' && semanticLevel !== 'icon') return null;
+  if (semanticLevel === 'icon') {
+    return { width: ICON_NODE_SIZE, height: ICON_NODE_SIZE };
+  }
+  if (semanticLevel !== 'summary') return null;
 
   if (type === 'markdown') {
-    return semanticLevel === 'icon'
-      ? { width: 150, height: 40 }
-      : { width: 210, height: 46 };
+    return { width: 210, height: 46 };
   }
 
   if (type === 'port') {
-    return semanticLevel === 'icon'
-      ? { width: 160, height: 40 }
-      : { width: 220, height: 46 };
+    return { width: 220, height: 46 };
   }
 
   return null;
@@ -29,6 +29,7 @@ export default function GraphRendererAdapter({
   graphKey,
   nodeTypes,
   getNodeSemanticLevel,
+  isEdgeInSemanticBullseye,
   resolveNodeComponent,
   edgeTypes,
   edgeRoutes,
@@ -109,9 +110,15 @@ export default function GraphRendererAdapter({
   const renderEdges = React.useMemo(
     () =>
       Array.isArray(edges)
-        ? edges.filter((edge) => renderNodeIds.has(edge?.source) && renderNodeIds.has(edge?.target))
+        ? edges.filter((edge) => {
+            if (!renderNodeIds.has(edge?.source) || !renderNodeIds.has(edge?.target)) return false;
+            if (typeof isEdgeInSemanticBullseye === 'function') {
+              return isEdgeInSemanticBullseye(edge);
+            }
+            return true;
+          })
         : [],
-    [edges, renderNodeIds]
+    [edges, isEdgeInSemanticBullseye, renderNodeIds]
   );
   const renderSelectedNodeIds = React.useMemo(
     () => (Array.isArray(selectedNodeIds) ? selectedNodeIds.filter((id) => renderNodeIds.has(id)) : []),

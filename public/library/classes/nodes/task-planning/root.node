@@ -225,7 +225,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -258,7 +259,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -291,7 +293,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -324,7 +327,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -357,7 +361,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -390,7 +395,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -423,7 +429,8 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
         "link": "",
@@ -456,9 +463,43 @@
           "graphId": "",
           "nodeId": "",
           "portId": "root",
-          "label": "Create"
+          "label": "Create",
+          "kind": "node-class"
         },
         "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "task-planning-root-port-first-wave-contract",
+      "type": "port",
+      "label": "First Wave Contract",
+      "position": {
+        "x": 1480,
+        "y": 40
+      },
+      "width": 300,
+      "height": 120,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/first-wave/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Approved first-wave planning-node contract in the task graph.",
         "link": "",
         "html": "",
         "svg": "",
@@ -602,6 +643,15 @@
         "curved": true
       },
       "data": {}
+    },
+    {
+      "id": "task-planning-root-edge-first-wave-contract",
+      "type": "reference",
+      "source": "task-planning-root-overview",
+      "target": "task-planning-root-port-first-wave-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "contract"
     }
   ],
   "clusters": []

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 const CARD_WIDTH = 300;
@@ -25,6 +26,7 @@ export default function BackgroundRpcNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const node = useNodePortSchema(origNode, RPC_INPUTS, RPC_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
 
   const width = (node?.width || CARD_WIDTH) * zoom;
   const height = (node?.height || CARD_HEIGHT) * zoom;
@@ -127,6 +129,7 @@ export default function BackgroundRpcNode({
   useEffect(() => {
     const handleInput = ({ targetNodeId, value } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
 
       let method = selectedMethod;
       let args = {};
@@ -149,16 +152,17 @@ export default function BackgroundRpcNode({
 
     eventBus.on('nodeInput', handleInput);
     return () => eventBus.off('nodeInput', handleInput);
-  }, [selectedMethod]);
+  }, [selectedMethod, isExecutionActive, node.id]);
 
   useEffect(() => {
     const handleExecute = ({ nodeId } = {}) => {
       if (nodeId !== node.id) return;
+      if (!isExecutionActive) return;
       invokeRpc();
     };
     eventBus.on('executeNode', handleExecute);
     return () => eventBus.off('executeNode', handleExecute);
-  }, [node.id, selectedMethod, isReady, argsText]);
+  }, [node.id, selectedMethod, isReady, argsText, isExecutionActive]);
 
   const parseArgs = () => {
     try {

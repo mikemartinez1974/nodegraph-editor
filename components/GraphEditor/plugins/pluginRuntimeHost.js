@@ -51,9 +51,19 @@ const ensureGraphApi = (getGraphApi) => {
   return api;
 };
 
+const getNodeFragmentId = (node) =>
+  String(
+    node?.data?._expansion?.expansionId ||
+    node?.data?._origin?.instanceId ||
+    ''
+  ).trim();
+
+const normalizeFragmentId = (value) => String(value || '').trim();
+
 const buildDefaultHostMethods = (plugin, options = {}) => {
   const permissions = normalizePermissions(plugin);
   const getGraphApi = options.getGraphApi || (() => null);
+  const getActiveFragmentId = options.getActiveFragmentId || (() => '');
   const getSelectionState =
     options.getSelectionState ||
     (() => ({ nodeIds: [], edgeIds: [], groupIds: [] }));
@@ -65,64 +75,141 @@ const buildDefaultHostMethods = (plugin, options = {}) => {
     }
   };
 
+  const getScopedNodeList = () => {
+    const api = ensureGraphApi(getGraphApi);
+    const result = api.readNode?.();
+    if (!result?.success) {
+      throw new Error(
+        result?.error ||
+          `Failed to read nodes in plugin "${plugin.id || plugin.name || 'unknown'}" (method: graph:getNodes)`
+      );
+    }
+    const nodes = Array.isArray(result.data) ? result.data : [];
+    const activeFragmentId = normalizeFragmentId(getActiveFragmentId());
+    if (!activeFragmentId) return nodes;
+    return nodes.filter((node) => getNodeFragmentId(node) === activeFragmentId);
+  };
+
+  const getScopedNodeById = (id) => {
+    if (!id) {
+      throw new Error('Node id is required');
+    }
+    const api = ensureGraphApi(getGraphApi);
+    const result = api.readNode?.(id);
+    if (!result?.success) {
+      throw new Error(result?.error || `Failed to read node ${id}`);
+    }
+    const node = result.data || null;
+    const activeFragmentId = normalizeFragmentId(getActiveFragmentId());
+    if (node && activeFragmentId && getNodeFragmentId(node) !== activeFragmentId) {
+      throw new Error(`Node ${id} is out of scope for the active fragment`);
+    }
+    return node;
+  };
+
+  const getScopedEdgeList = () => {
+    const api = ensureGraphApi(getGraphApi);
+    const result = api.readEdge?.();
+    if (!result?.success) {
+      throw new Error(result?.error || 'Failed to read edges');
+    }
+    const edges = Array.isArray(result.data) ? result.data : [];
+    const scopedNodeIds = new Set(
+      getScopedNodeList().map((node) => node?.id).filter(Boolean)
+    );
+    return edges.filter(
+      (edge) => scopedNodeIds.has(edge?.source) && scopedNodeIds.has(edge?.target)
+    );
+  };
+
+  const getScopedEdgeById = (id) => {
+    if (!id) {
+      throw new Error('Edge id is required');
+    }
+    const edge = getScopedEdgeList().find((entry) => entry?.id === id) || null;
+    if (!edge) {
+      throw new Error(`Edge ${id} is out of scope for the active fragment`);
+    }
+    return edge;
+  };
+
+  const assertPayloadNodeScope = (payload) => {
+    if (!payload || typeof payload !== 'object') return;
+    const ids = new Set();
+    ['nodeId', 'targetNodeId', 'sourceNodeId', 'id'].forEach((key) => {
+      if (typeof payload[key] === 'string' && payload[key].trim()) {
+        ids.add(payload[key].trim());
+      }
+    });
+    if (Array.isArray(payload.nodeIds)) {
+      payload.nodeIds.forEach((id) => {
+        if (typeof id === 'string' && id.trim()) ids.add(id.trim());
+      });
+    }
+    ids.forEach((id) => {
+      getScopedNodeById(id);
+    });
+  };
+
   const methods = {
     'graph:getNodes': () => {
       requirePermission('graph.read');
-      const api = ensureGraphApi(getGraphApi);
-      const result = api.readNode?.();
-      if (!result?.success) {
-        throw new Error(
-          result?.error ||
-            `Failed to read nodes in plugin "${plugin.id || plugin.name || 'unknown'}" (method: graph:getNodes)`
-        );
-      }
-      return cloneForRpc(result.data || []);
+      return cloneForRpc(getScopedNodeList());
     },
     'graph:getNode': ({ id }) => {
       requirePermission('graph.read');
       if (!id) {
         throw new Error('graph:getNode requires id');
       }
-      const api = ensureGraphApi(getGraphApi);
-      const result = api.readNode?.(id);
-      if (!result?.success) {
-        throw new Error(result?.error || `Failed to read node ${id}`);
-      }
-      return cloneForRpc(result.data);
+      return cloneForRpc(getScopedNodeById(id));
     },
     'graph:getEdges': () => {
       requirePermission('graph.read');
-      const api = ensureGraphApi(getGraphApi);
-      const result = api.readEdge?.();
-      if (!result?.success) {
-        throw new Error(result?.error || 'Failed to read edges');
-      }
-      return cloneForRpc(result.data || []);
+      return cloneForRpc(getScopedEdgeList());
     },
     'graph:getEdge': ({ id }) => {
       requirePermission('graph.read');
       if (!id) {
         throw new Error('graph:getEdge requires id');
       }
-      const api = ensureGraphApi(getGraphApi);
-      const result = api.readEdge?.(id);
-      if (!result?.success) {
-        throw new Error(result?.error || `Failed to read edge ${id}`);
-      }
-      return cloneForRpc(result.data);
+      return cloneForRpc(getScopedEdgeById(id));
     },
     'selection:get': () => {
       requirePermission('selection.read');
-      return cloneForRpc(
-        getSelectionState?.() || { nodeIds: [], edgeIds: [], groupIds: [] }
+      const selection =
+        getSelectionState?.() || { nodeIds: [], edgeIds: [], groupIds: [] };
+      const scopedNodeIds = new Set(
+        getScopedNodeList().map((node) => node?.id).filter(Boolean)
       );
+      const scopedEdgeIds = new Set(
+        getScopedEdgeList().map((edge) => edge?.id).filter(Boolean)
+      );
+      return cloneForRpc({
+        nodeIds: Array.isArray(selection.nodeIds)
+          ? selection.nodeIds.filter((id) => scopedNodeIds.has(id))
+          : [],
+        edgeIds: Array.isArray(selection.edgeIds)
+          ? selection.edgeIds.filter((id) => scopedEdgeIds.has(id))
+          : [],
+        groupIds: []
+      });
     },
     'events:emit': ({ event, payload }) => {
       requirePermission('events.emit');
       if (!event || typeof event !== 'string') {
         throw new Error('events:emit requires an event name');
       }
-      emitEvent(event, payload);
+      assertPayloadNodeScope(payload);
+      const fragmentId = normalizeFragmentId(getActiveFragmentId());
+      emitEvent(event, {
+        ...(payload && typeof payload === 'object' ? payload : { value: payload }),
+        meta: {
+          ...(payload?.meta && typeof payload.meta === 'object' ? payload.meta : {}),
+          fragmentId,
+          pluginId: plugin?.id || null,
+          source: 'pluginRuntime'
+        }
+      });
       return true;
     }
   };
@@ -130,6 +217,7 @@ const buildDefaultHostMethods = (plugin, options = {}) => {
   if (permissions.has('graph.write')) {
     methods['graph:updateNode'] = ({ id, updates }) => {
       if (!id) throw new Error('graph:updateNode requires id');
+      getScopedNodeById(id);
       const api = ensureGraphApi(getGraphApi);
       const result = api.updateNode?.(id, updates || {});
       if (!result?.success) {
@@ -139,6 +227,7 @@ const buildDefaultHostMethods = (plugin, options = {}) => {
     };
     methods['graph:updateEdge'] = ({ id, updates }) => {
       if (!id) throw new Error('graph:updateEdge requires id');
+      getScopedEdgeById(id);
       const api = ensureGraphApi(getGraphApi);
       const result = api.updateEdge?.(id, updates || {});
       if (!result?.success) {

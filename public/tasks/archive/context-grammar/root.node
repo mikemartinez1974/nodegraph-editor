@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Script Scope Root",
-    "description": "Index for script scope task graphs.",
-    "created": "2026-03-15T19:10:00.000Z",
-    "modified": "2026-03-15T19:10:00.000Z",
+    "title": "Context Grammar Root",
+    "description": "Index for context grammar task graphs.",
+    "created": "2026-03-15T19:35:00.000Z",
+    "modified": "2026-03-15T19:35:00.000Z",
     "author": "",
     "tags": [
       "tasks"
@@ -13,7 +13,7 @@
   },
   "nodes": [
     {
-      "id": "script-scope-manifest",
+      "id": "context-grammar-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -26,12 +26,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "script-scope-task",
-          "name": "Script Scope",
+          "graphId": "context-grammar-task",
+          "name": "Context Grammar",
           "version": "0.1.0",
-          "description": "Fragment-scoped scripting boundary for traversal-safe expansion.",
-          "createdAt": "2026-03-15T19:10:00.000Z",
-          "updatedAt": "2026-03-15T19:10:00.000Z"
+          "description": "Semantic roles for navigate, expand, and bridge, with boundary treated as context metadata.",
+          "createdAt": "2026-03-15T19:35:00.000Z",
+          "updatedAt": "2026-03-15T19:35:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -102,7 +102,7 @@
       }
     },
     {
-      "id": "script-scope-legend",
+      "id": "context-grammar-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -116,19 +116,19 @@
       "data": {
         "entries": [
           {
-            "key": "constraint",
+            "key": "mode",
             "intent": "discussion",
             "implementation": "markdown node",
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- constraint: script-scope rule or implementation task",
+        "markdown": "## Legend\n- mode: semantic role for a connection",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "script-scope-dictionary",
+      "id": "context-grammar-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -148,9 +148,9 @@
       }
     },
     {
-      "id": "script-scope-root-overview",
+      "id": "context-grammar-root-overview",
       "type": "markdown",
-      "label": "Script Scope",
+      "label": "Context Grammar",
       "position": {
         "x": -520,
         "y": 40
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Script Scope\n\nTask graph for fragment-scoped scripting and neighbor-safe expansion.",
+        "markdown": "# Context Grammar\n\nTask graph for `navigate`, `expand`, and `bridge`, with `boundary` treated as context metadata.",
         "memo": "",
         "link": "",
         "html": "",
@@ -207,9 +207,9 @@
       }
     },
     {
-      "id": "script-scope-root-port-1",
+      "id": "context-grammar-root-port-1",
       "type": "port",
-      "label": "Script Scope Task",
+      "label": "Context Grammar Task",
       "position": {
         "x": 60,
         "y": 60
@@ -223,7 +223,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope/script-scope.task.node:root",
+          "endpoint": "/tasks/archive/context-grammar/context-grammar.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -238,17 +238,65 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "context-grammar-root-port-2",
+      "type": "port",
+      "label": "Bridge / Expand Smoke",
+      "position": {
+        "x": 1840,
+        "y": 700
+      },
+      "width": 320,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/context-grammar/bridge-expansion-smoke.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Smoke test for graph expansion parity and bridge semantics.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
     }
   ],
   "edges": [
     {
-      "id": "script-scope-root-edge-1",
+      "id": "context-grammar-root-edge-1",
       "type": "reference",
-      "source": "script-scope-root-overview",
-      "target": "script-scope-root-port-1",
+      "source": "context-grammar-root-overview",
+      "target": "context-grammar-root-port-1",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-root-edge-2",
+      "type": "reference",
+      "source": "context-grammar-root-overview",
+      "target": "context-grammar-root-port-2",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "tests",
       "style": {
         "width": 2,
         "dash": [],

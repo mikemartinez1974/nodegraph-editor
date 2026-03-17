@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
@@ -29,6 +30,7 @@ export default function DelayNode({
   const queueRef = useRef([]);
   const [, setTick] = useState(0); // force update for UI
   const node = useNodePortSchema(origNode, DELAY_INPUTS, DELAY_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
 
   const width = (node?.width || 400) * zoom;
   const height = (node?.height || 200) * zoom;
@@ -102,6 +104,13 @@ export default function DelayNode({
 
   // External trigger handler via eventBus
   useEffect(() => {
+    if (!isExecutionActive) {
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current = [];
+      queueRef.current = [];
+      setStatus('idle');
+      return undefined;
+    }
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
       // any input triggers the delay; support optional inputName
@@ -115,7 +124,7 @@ export default function DelayNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [node.id, delayMs, status]);
+  }, [node.id, delayMs, status, isExecutionActive]);
 
   const handleManualTrigger = (e) => {
     e.stopPropagation();

@@ -148,7 +148,7 @@ export default function BrowserExperience({
 
     const fetchUrl = resolveDocUrl(doc);
     window.__Twilite_PENDING_FETCH_URL__ = fetchUrl;
-    eventBus.emit('setAddress', fetchUrl);
+    eventBus.emit('setAddressPreview', { url: fetchUrl });
     const emitFetch = () => {
       eventBus.emit('fetchUrl', { url: fetchUrl, source: 'query-doc' });
     };

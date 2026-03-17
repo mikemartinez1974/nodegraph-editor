@@ -849,10 +849,23 @@ const GraphEditorContent = () => {
   const getNodeSemanticLevel = useCallback((node) => {
     const scopeKey = getExpansionScopeKey(node);
     const depth = semanticScopeState.scopeDepth.get(scopeKey);
+    if (depth === 0) return 'detail';
     if (depth === 1) return 'summary';
     if (depth >= 2) return 'icon';
-    return 'detail';
+    return 'icon';
   }, [getExpansionScopeKey, semanticScopeState.scopeDepth]);
+
+  const isEdgeInSemanticBullseye = useCallback((edge) => {
+    if (!edge || !Array.isArray(nodes)) return false;
+    const sourceNode = nodes.find((node) => node?.id === edge?.source) || null;
+    const targetNode = nodes.find((node) => node?.id === edge?.target) || null;
+    if (!sourceNode || !targetNode) return false;
+    const sourceScope = getExpansionScopeKey(sourceNode);
+    const targetScope = getExpansionScopeKey(targetNode);
+    const sourceDepth = semanticScopeState.scopeDepth.get(sourceScope);
+    const targetDepth = semanticScopeState.scopeDepth.get(targetScope);
+    return sourceDepth === 0 && targetDepth === 0;
+  }, [getExpansionScopeKey, nodes, semanticScopeState.scopeDepth]);
 
   const isScopedDictionaryNode = useCallback((node) => {
     if (!node || node.type !== 'dictionary') return false;
@@ -2123,6 +2136,7 @@ const GraphEditorContent = () => {
       graphKey={graphRendererKey}
       nodeTypes={nodeTypes}
       getNodeSemanticLevel={getNodeSemanticLevel}
+      isEdgeInSemanticBullseye={isEdgeInSemanticBullseye}
       resolveNodeComponent={resolveNodeComponent}
       edgeTypes={EdgeTypes}
       edgeRoutes={edgeRoutes}
@@ -2914,6 +2928,7 @@ const skipPropertiesCloseRef = useRef(false);
           backgroundImage={backgroundImage}
           backgroundUrl={backgroundUrl}
           setBackgroundUrl={setBackgroundUrl}
+          focusedFragmentId={focusedFragmentId}
           defaultNodeColor={defaultNodeColor}
           defaultEdgeColor={defaultEdgeColor}
           isFreeUser={isFreeUser}

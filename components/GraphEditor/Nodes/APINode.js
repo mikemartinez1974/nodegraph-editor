@@ -4,6 +4,7 @@ import eventBus from '../../NodeGraph/eventBus';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CancelIcon from '@mui/icons-material/Cancel';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- Unified handle schema ---
@@ -29,6 +30,7 @@ export default function APINode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const controllerRef = useRef(null);
+  const { isExecutionActive } = useNodeExecutionGate(node);
 
   const width = (node?.width || 400) * zoom;
   const height = (node?.height || 400) * zoom;
@@ -156,6 +158,7 @@ export default function APINode({
   useEffect(() => {
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       // optional: if value contains override for url or other fields
       if (value && typeof value === 'object') {
         if (value.url) setUrl(value.url);
@@ -168,16 +171,17 @@ export default function APINode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [url, method, headersText, bodyText]);
+  }, [url, method, headersText, bodyText, node.id, isExecutionActive]);
 
   useEffect(() => {
     const handleExecute = ({ nodeId } = {}) => {
       if (nodeId !== node.id) return;
+      if (!isExecutionActive) return;
       doFetch({ source: 'executeNode' });
     };
     eventBus.on('executeNode', handleExecute);
     return () => eventBus.off('executeNode', handleExecute);
-  }, [node.id, url, method, headersText, bodyText]);
+  }, [node.id, url, method, headersText, bodyText, isExecutionActive]);
 
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;

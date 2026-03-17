@@ -1,26 +1,24 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Script Scope Test",
-    "description": "Scratch graph for testing fragment-scoped scripting behavior.",
-    "created": "2026-03-15T23:50:00.000Z",
-    "modified": "2026-03-15T23:50:00.000Z",
+    "title": "Script Scope Root",
+    "description": "Index for script scope task graphs.",
+    "created": "2026-03-15T19:10:00.000Z",
+    "modified": "2026-03-15T19:10:00.000Z",
     "author": "",
     "tags": [
-      "tasks",
-      "testing",
-      "script-scope"
+      "tasks"
     ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "script-scope-test-manifest",
+      "id": "script-scope-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
         "x": -760,
-        "y": -280
+        "y": -320
       },
       "width": 360,
       "height": 240,
@@ -28,25 +26,23 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "script-scope-test",
-          "name": "Script Scope Test",
+          "graphId": "script-scope-task",
+          "name": "Script Scope",
           "version": "0.1.0",
-          "description": "Scratch graph for testing fragment-scoped scripting behavior.",
-          "createdAt": "2026-03-15T23:50:00.000Z",
-          "updatedAt": "2026-03-15T23:50:00.000Z"
+          "description": "Fragment-scoped scripting boundary for traversal-safe expansion.",
+          "createdAt": "2026-03-15T19:10:00.000Z",
+          "updatedAt": "2026-03-15T19:10:00.000Z"
         },
         "intent": {
-          "kind": "task",
-          "scope": "local"
+          "kind": "graph",
+          "scope": "mixed"
         },
         "dependencies": {
           "nodeTypes": [
             "manifest",
             "legend",
             "dictionary",
-            "markdown",
-            "port",
-            "script"
+            "markdown"
           ],
           "portContracts": [
             "core"
@@ -87,57 +83,81 @@
           "snapToGrid": false,
           "gridSize": 20,
           "edgeRouting": "auto",
-          "autoSave": false
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          },
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
         },
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "script-scope-test-legend",
+      "id": "script-scope-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -760,
-        "y": 20
+        "x": -360,
+        "y": -320
       },
       "width": 320,
       "height": 180,
       "visible": true,
       "showLabel": true,
-      "data": {}
+      "data": {
+        "entries": [
+          {
+            "key": "constraint",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- constraint: script-scope rule or implementation task",
+        "isRoot": false,
+        "root": false
+      }
     },
     {
-      "id": "script-scope-test-dictionary",
+      "id": "script-scope-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": -760,
-        "y": 240
+        "x": 0,
+        "y": -320
       },
-      "width": 360,
-      "height": 220,
+      "width": 320,
+      "height": 180,
       "visible": true,
       "showLabel": true,
       "data": {
         "nodeDefs": [],
+        "skills": [],
         "views": [],
-        "skills": []
+        "isRoot": false,
+        "root": false
       }
     },
     {
-      "id": "script-scope-test-overview",
+      "id": "script-scope-root-overview",
       "type": "markdown",
-      "label": "Script Scope Test",
+      "label": "Script Scope",
       "position": {
-        "x": -300,
+        "x": -520,
         "y": 40
       },
       "width": 460,
-      "height": 240,
+      "height": 220,
       "color": "#1976d2",
-      "visible": true,
-      "showLabel": true,
       "ports": [
         {
           "id": "in",
@@ -174,8 +194,10 @@
           "type": "content"
         }
       ],
+      "visible": true,
+      "showLabel": true,
       "data": {
-        "markdown": "# Script Scope Test\n\nUse this graph to test that scripts only see and mutate the active fragment.\n\nSuggested checks:\n- run a script in the root fragment\n- expand into another fragment\n- verify out-of-scope reads and mutations fail in diagnostics",
+        "markdown": "# Script Scope\n\nTask graph for fragment-scoped scripting and neighbor-safe expansion.",
         "memo": "",
         "link": "",
         "html": "",
@@ -185,45 +207,23 @@
       }
     },
     {
-      "id": "script-scope-test-note",
-      "type": "markdown",
-      "label": "Expected Behavior",
-      "position": {
-        "x": 260,
-        "y": 40
-      },
-      "width": 380,
-      "height": 220,
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "## Expected Behavior\n\n- `getNodes()` returns only active-fragment nodes\n- foreign `getNode(id)` fails with scope error\n- foreign mutations are rejected\n- script failures appear in diagnostics",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "script-scope-test-port",
+      "id": "script-scope-root-port-1",
       "type": "port",
       "label": "Script Scope Task",
       "position": {
-        "x": 260,
-        "y": 320
+        "x": 60,
+        "y": 60
       },
-      "width": 280,
+      "width": 300,
       "height": 110,
-      "visible": true,
-      "showLabel": true,
       "ports": [],
       "inputs": [],
       "outputs": [],
+      "visible": true,
+      "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope/root.node:root",
+          "endpoint": "/tasks/archive/script-scope/script-scope.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -242,25 +242,10 @@
   ],
   "edges": [
     {
-      "id": "script-scope-test-edge-1",
+      "id": "script-scope-root-edge-1",
       "type": "reference",
-      "source": "script-scope-test-overview",
-      "target": "script-scope-test-note",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "expects",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "script-scope-test-edge-2",
-      "type": "reference",
-      "source": "script-scope-test-overview",
-      "target": "script-scope-test-port",
+      "source": "script-scope-root-overview",
+      "target": "script-scope-root-port-1",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -271,5 +256,7 @@
       },
       "data": {}
     }
-  ]
+  ],
+  "clusters": [],
+  "scripts": []
 }

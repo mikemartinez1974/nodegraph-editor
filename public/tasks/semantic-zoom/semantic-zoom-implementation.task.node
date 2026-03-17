@@ -147,7 +147,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Semantic Zoom\n\nSemantic zoom in Twilite should operate primarily on graph fragments, not isolated nodes.\n\nThe current focused graph fragment should render in detailed view. Linked fragments should load in summary view. Within those linked fragments, deeper linked graphs should compress further into icon view.\n\nThis is a navigation-driven representation system, not just a scale-driven one."
+        "markdown": "# Semantic Zoom\n\nStatus: partially implemented for this phase.\n\nFocus state, fragment-relative semantic levels, and bullseye-safe authority are now real. The next layer is to make nearby graph structure come alive more automatically without letting authority roam."
       }
     },
     {
@@ -259,7 +259,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Implementation Phases\n\n## Phase 1\nAdd focus state and focused-fragment base level resolution.\n\n## Phase 2\nAdd zoom-band detection, hysteresis, and relative fragment level computation.\n\n## Phase 3\nSupport `detail`, `summary`, and `icon` view payloads with fallback logic.\n\n## Phase 4\nApply semantic zoom behavior to expanded and embedded fragments.\n\n## Phase 5\nAdd polish: transitions, cluster-aware behavior, and override controls."
+        "markdown": "# Implementation Phases\n\n## Phase 1\nAdd focus state and focused-fragment base level resolution.\n\n## Phase 2\nAdd fragment-relative semantic levels (`detail` / `summary` / `icon`).\n\n## Phase 3\nUse the bullseye to auto-expand direct linked graph/document targets in browse mode while keeping authority fragment-scoped.\n\n## Phase 4\nSupport richer authored semantic representations and fallback logic.\n\n## Phase 5\nAdd polish: transitions, layout-aware behavior, and override controls."
       }
     },
     {
@@ -291,7 +291,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Open Questions\n\n- Fragment layout policy when multiple expanded fragments are visible\n\nAll other core semantic zoom contract questions in this graph are currently resolved at the design level."
+        "markdown": "# Remaining Questions\n\n- Fragment layout policy when multiple expanded fragments are visible\n- Whether bullseye auto-expansion needs per-node or per-document opt-outs\n\nAll other core semantic zoom contract questions in this graph are either implemented or narrowed to follow-up UX work."
       }
     },
     {

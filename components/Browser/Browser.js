@@ -47,7 +47,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   const [uiDensity, setUiDensity] = useState('comfortable');
   const [viewportInfo, setViewportInfo] = useState({ x: 0, y: 0, z: 1 });
   const navigatingToUrlRef = useRef(null);  // Track URL we're navigating to via back/forward
-  const setAddressCountRef = useRef(0);  // Count how many setAddress events we've received
+  const setAddressCountRef = useRef(0);  // Reset helper for back/forward navigation bookkeeping
   const previewAddressRef = useRef('');
   
   let muiTheme = useTheme();
@@ -109,8 +109,7 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         toolbarMinHeight: isMobile ? 38 : 42,
         toolbarPaddingX: isMobile ? 0.25 : 0.5,
         toolbarGap: 0.25,
-        iconButtonPadding: 0.35,
-        addressWidthDelta: -120
+        iconButtonPadding: 0.35
       };
     }
     if (uiDensity === 'compact') {
@@ -118,16 +117,14 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
         toolbarMinHeight: isMobile ? 40 : 46,
         toolbarPaddingX: isMobile ? 0.5 : 0.75,
         toolbarGap: 0.35,
-        iconButtonPadding: 0.45,
-        addressWidthDelta: -72
+        iconButtonPadding: 0.45
       };
     }
     return {
       toolbarMinHeight: isMobile ? 42 : 50,
       toolbarPaddingX: isMobile ? 0.5 : 1,
       toolbarGap: 0.5,
-      iconButtonPadding: 0.6,
-      addressWidthDelta: 0
+      iconButtonPadding: 0.6
     };
   })();
 
@@ -282,13 +279,8 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
       if (navigatingToUrlRef.current === url) {
         // Update address bar but do not push history
         setAddress(url);
-        // Increment counter for duplicate navigation signals
-        setAddressCountRef.current++;
-        // Clear the flag after we've seen it twice (GraphEditor emits start/end)
-        if (setAddressCountRef.current >= 2) {
-          navigatingToUrlRef.current = null;
-          setAddressCountRef.current = 0;
-        }
+        navigatingToUrlRef.current = null;
+        setAddressCountRef.current = 0;
         return;
       }
 
@@ -363,9 +355,16 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
   };
 
   const handleRefresh = () => {
-    const url = currentUrl || address;
-    if (url) {
-      emitFetchUrl(url);
+    const hostUrl = currentUrl || address;
+    try {
+      eventBus.emit('refreshCurrentGraphContext', {
+        hostUrl,
+        displayedUrl: address || hostUrl || ''
+      });
+    } catch (err) {
+      if (hostUrl) {
+        emitFetchUrl(hostUrl);
+      }
     }
   };
 
@@ -644,64 +643,70 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
             </Box>
           )}
           
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={isMobile && isPortrait ? "URL..." : "Enter URL or search..."}
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            onContextMenu={handleAddressContextMenu}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                const fetchUrl = (function(input) {
-                  const trimmed = (input || '').trim();
-                  if (!trimmed) return '';
-                  
-                  // Already handled protocol?
-                  if (trimmed.startsWith('tlz://')) return toFetchableUrl(trimmed);
-                  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return toFetchableUrl(trimmed);
-                  if (trimmed.includes('://')) return trimmed;
-                  
-                  // Local paths (explicit)
-                  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return toFetchableUrl(trimmed);
-                  
-                  // If it's a bare .node filename, assume local first
-                  if (trimmed.endsWith('.node')) return '/' + trimmed;
-                  
-                  // If it looks like a domain (e.g. google.com), prepend https://
-                  // But exclude common filenames or single words without dots
-                  const firstPart = trimmed.split('/')[0];
-                  if (firstPart.includes('.') && 
-                      !firstPart.endsWith('.node') && 
-                      !firstPart.endsWith('.json')) {
-                    return toFetchableUrl('https://' + trimmed);
-                  }
-                  
-                  // Default to local path if it doesn't look like anything else
-                  return toFetchableUrl('/' + trimmed);
-                })(address);
-                if (fetchUrl) emitFetchUrl(fetchUrl);
-                else emitFetchUrl(address);
-              }
-            }}
-            InputProps={{
-              startAdornment: (!isMobile || isLandscape) && (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              )
-            }}
+          <Box
             sx={{
-              width: isMobile && isPortrait ? '100%' : 
-                     isMobile && isLandscape ? Math.max(220, 280 + densityConfig.addressWidthDelta) :
-                     isSmallScreen ? Math.max(240, 320 + densityConfig.addressWidthDelta) : Math.max(300, 480 + densityConfig.addressWidthDelta),
-              flexGrow: (isMobile && isPortrait) ? 1 : 0,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: muiTheme.palette.background.paper,
-                borderRadius: 1,
-              },
+              flex: 1,
+              minWidth: isMobile && isPortrait ? 0 :
+                isMobile && isLandscape ? 220 :
+                isSmallScreen ? 240 : 300
             }}
-          />
+          >
+            <TextField
+              variant="outlined"
+              size="small"
+              fullWidth
+              placeholder={isMobile && isPortrait ? "URL..." : "Enter URL or search..."}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              onContextMenu={handleAddressContextMenu}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  const fetchUrl = (function(input) {
+                    const trimmed = (input || '').trim();
+                    if (!trimmed) return '';
+                    
+                    // Already handled protocol?
+                    if (trimmed.startsWith('tlz://')) return toFetchableUrl(trimmed);
+                    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return toFetchableUrl(trimmed);
+                    if (trimmed.includes('://')) return trimmed;
+                    
+                    // Local paths (explicit)
+                    if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) return toFetchableUrl(trimmed);
+                    
+                    // If it's a bare .node filename, assume local first
+                    if (trimmed.endsWith('.node')) return '/' + trimmed;
+                    
+                    // If it looks like a domain (e.g. google.com), prepend https://
+                    // But exclude common filenames or single words without dots
+                    const firstPart = trimmed.split('/')[0];
+                    if (firstPart.includes('.') && 
+                        !firstPart.endsWith('.node') && 
+                        !firstPart.endsWith('.json')) {
+                      return toFetchableUrl('https://' + trimmed);
+                    }
+                    
+                    // Default to local path if it doesn't look like anything else
+                    return toFetchableUrl('/' + trimmed);
+                  })(address);
+                  if (fetchUrl) emitFetchUrl(fetchUrl);
+                  else emitFetchUrl(address);
+                }
+              }}
+              InputProps={{
+                startAdornment: (!isMobile || isLandscape) && (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: muiTheme.palette.background.paper,
+                  borderRadius: 1,
+                },
+              }}
+            />
+          </Box>
           
           {/* Bookmark buttons - show in landscape, hide in portrait on mobile */}
           {(!isMobile || (isMobile && isLandscape)) && (
@@ -732,9 +737,6 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
               </IconButton>
             </Box>
           )}
-
-          {/* Spacer to push drawer button to far right */}
-          <Box sx={{ flexGrow: (isMobile && isPortrait) ? 0 : 1 }} />
 
         </Toolbar>
       </AppBar>

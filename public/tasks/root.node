@@ -3,8 +3,8 @@
   "metadata": {
     "title": "Untitled Graph",
     "description": "",
-    "created": "2026-03-15T00:05:41.061Z",
-    "modified": "2026-03-15T00:05:41.061Z",
+    "created": "2026-03-16T22:07:13.558Z",
+    "modified": "2026-03-16T22:07:13.558Z",
     "author": "",
     "tags": [],
     "preferredViewer": "https://twilite.zone"
@@ -15,8 +15,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -640,
-        "y": -260
+        "x": -225,
+        "y": -130
       },
       "width": 360,
       "height": 220,
@@ -105,8 +105,8 @@
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": -240,
-        "y": -260
+        "x": 255,
+        "y": -130
       },
       "width": 320,
       "height": 180,
@@ -131,8 +131,8 @@
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": 120,
-        "y": -260
+        "x": 695,
+        "y": -130
       },
       "width": 320,
       "height": 180,
@@ -151,8 +151,8 @@
       "type": "markdown",
       "label": "Task Graphs",
       "position": {
-        "x": -520,
-        "y": 39
+        "x": -225,
+        "y": 210
       },
       "width": 460,
       "height": 220,
@@ -206,45 +206,12 @@
       }
     },
     {
-      "id": "tasks-root-port-1",
-      "type": "port",
-      "label": "Branch Expansion",
-      "position": {
-        "x": 40,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/branch-expansion/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
       "id": "tasks-root-port-2",
       "type": "port",
       "label": "Nodeset Planning",
       "position": {
-        "x": 360,
-        "y": 40
+        "x": 355,
+        "y": 210
       },
       "width": 280,
       "height": 110,
@@ -276,8 +243,8 @@
       "type": "port",
       "label": "Semantic Zoom",
       "position": {
-        "x": 40,
-        "y": 190
+        "x": 755,
+        "y": 210
       },
       "width": 280,
       "height": 110,
@@ -305,144 +272,12 @@
       }
     },
     {
-      "id": "tasks-root-port-4",
-      "type": "port",
-      "label": "Traversal And Authority",
-      "position": {
-        "x": 360,
-        "y": 190
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/traversal-authority/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "tasks-root-port-5",
-      "type": "port",
-      "label": "Focus Scoped Authority",
-      "position": {
-        "x": 680,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/focus-scoped-authority/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "tasks-root-port-6",
-      "type": "port",
-      "label": "Script Scope",
-      "position": {
-        "x": 680,
-        "y": 190
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/script-scope/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "tasks-root-port-7",
-      "type": "port",
-      "label": "Context Grammar",
-      "position": {
-        "x": 1000,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/context-grammar/root.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
       "id": "tasks-root-port-8",
       "type": "port",
       "label": "Dictionary Demotion",
       "position": {
-        "x": 1000,
-        "y": 190
+        "x": -225,
+        "y": 550
       },
       "width": 280,
       "height": 110,
@@ -470,14 +305,14 @@
       }
     },
     {
-      "id": "tasks-root-port-9",
+      "id": "tasks-root-port-10",
       "type": "port",
-      "label": "Script Scope Test",
+      "label": "Landing Page Seriousness",
       "position": {
-        "x": 420,
-        "y": 720
+        "x": 175,
+        "y": 550
       },
-      "width": 280,
+      "width": 300,
       "height": 110,
       "ports": [],
       "inputs": [],
@@ -486,7 +321,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/script-scope-test.node:root",
+          "endpoint": "/tasks/landing-page-seriousness.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -501,24 +336,68 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "tasks-root-port-11",
+      "type": "port",
+      "label": "Modularization Boundaries",
+      "position": {
+        "x": 595,
+        "y": 550
+      },
+      "width": 320,
+      "height": 110,
+      "ports": [],
+      "inputs": [],
+      "outputs": [],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/modularization-boundaries.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "tasks-root-port-archive",
+      "type": "port",
+      "label": "Archive",
+      "position": {
+        "x": 1035,
+        "y": 550
+      },
+      "width": 280,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed task graphs archived for reference.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
     }
   ],
   "edges": [
-    {
-      "id": "tasks-root-edge-1",
-      "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-1",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
     {
       "id": "tasks-root-edge-2",
       "type": "reference",
@@ -550,66 +429,6 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-4",
-      "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-4",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "tasks-root-edge-5",
-      "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-5",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "tasks-root-edge-6",
-      "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-6",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "tasks-root-edge-7",
-      "type": "reference",
-      "source": "tasks-root-overview",
-      "target": "tasks-root-port-7",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
       "id": "tasks-root-edge-8",
       "type": "reference",
       "source": "tasks-root-overview",
@@ -625,10 +444,10 @@
       "data": {}
     },
     {
-      "id": "tasks-root-edge-9",
+      "id": "tasks-root-edge-10",
       "type": "reference",
       "source": "tasks-root-overview",
-      "target": "tasks-root-port-9",
+      "target": "tasks-root-port-10",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",
@@ -637,6 +456,32 @@
         "dash": [],
         "curved": true
       },
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-11",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-11",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "opens",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-archive",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-archive",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "archive",
+      "style": {},
       "data": {}
     }
   ],

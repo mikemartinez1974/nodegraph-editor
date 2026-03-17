@@ -1,0 +1,557 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Untitled Graph",
+    "description": "",
+    "created": "2026-03-16T23:05:07.106Z",
+    "modified": "2026-03-16T23:05:07.106Z",
+    "author": "",
+    "tags": [],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "nodeset-first-wave-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -700,
+        "y": -240
+      },
+      "width": 380,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "nodeset-planning-first-wave",
+          "name": "Planning Node Set First Wave",
+          "version": "0.1.0",
+          "description": "Concrete first-wave implementation plan for planning node types.",
+          "createdAt": "2026-03-16T21:10:00.000Z",
+          "updatedAt": "2026-03-16T21:10:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          },
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -700,
+        "y": 70
+      },
+      "width": 340,
+      "height": 190,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -700,
+        "y": 300
+      },
+      "width": 340,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-overview",
+      "type": "markdown",
+      "label": "First Wave",
+      "position": {
+        "x": -220,
+        "y": -80
+      },
+      "width": 500,
+      "height": 250,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Planning Node Set First Wave\n\nShip a concrete v1 planning schema instead of continuing abstract node-set debate.\n\nFirst wave node types:\n- `goal`\n- `task`\n- `decision`\n- `open-question`\n- `constraint`\n\nModeling rule:\n- `dependency` is edge-first in v1\n- planning nodes stay static and fragment-safe\n- prompt extraction should treat these as the canonical planning surface",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "nodeset-first-wave-ship",
+      "type": "markdown",
+      "label": "Ship In V1",
+      "position": {
+        "x": 380,
+        "y": -120
+      },
+      "width": 390,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Ship In V1\n\nImplement these node types now:\n\n- `goal`\n- `task`\n- `decision`\n- `open-question`\n- `constraint`\n\nWhy these first:\n- highest planning value\n- low semantic overlap\n- useful in prompts and summaries\n- can be rendered as mostly static nodes\n- survive fragment traversal cleanly",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-defer",
+      "type": "markdown",
+      "label": "Defer In V1",
+      "position": {
+        "x": 820,
+        "y": -120
+      },
+      "width": 390,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Defer In V1\n\nDo not make these first-class planning nodes yet:\n\n- `dependency`\n- `acceptance-criteria`\n- `risk-edge-case`\n\nReason:\n- more structurally ambiguous\n- likely partly relational rather than purely node-shaped\n- better informed after first-wave authoring feedback",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-dependency",
+      "type": "markdown",
+      "label": "Dependency Rule",
+      "position": {
+        "x": 380,
+        "y": 250
+      },
+      "width": 390,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Dependency Rule\n\n`dependency` is edge-first in v1.\n\nUse dependency edges with metadata like:\n- `kind`\n- `hard`\n- `external`\n- `status`\n\nIf a prerequisite must be modeled as an object, represent that object as a normal node and connect it with dependency edges.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-schema",
+      "type": "markdown",
+      "label": "Canonical Fields",
+      "position": {
+        "x": 820,
+        "y": 240
+      },
+      "width": 470,
+      "height": 430,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Canonical Fields\n\n`goal`\n- `summary`\n- `horizon`\n- `priority`\n- `status`\n\n`task`\n- `summary`\n- `status`\n- `owner`\n- `priority`\n- `estimate`\n\n`decision`\n- `summary`\n- `status`\n- `rationale`\n- `supersedes`\n\n`open-question`\n- `summary`\n- `status`\n- `owner`\n- `resolutionTarget`\n\n`constraint`\n- `summary`\n- `kind`\n- `scope`\n- `hardness`",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-runtime",
+      "type": "markdown",
+      "label": "Runtime Rules",
+      "position": {
+        "x": 380,
+        "y": 560
+      },
+      "width": 390,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Runtime Rules\n\nPlanning nodes should be:\n- static by default\n- fragment-safe by default\n- non-executable by default\n- valid across expansion and reload\n\nThey should gain value from structure and prompt extraction, not from live runtime behaviors.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-implementation",
+      "type": "markdown",
+      "label": "Implementation Punch List",
+      "position": {
+        "x": 820,
+        "y": 740
+      },
+      "width": 470,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Implementation Punch List\n\n1. Define schema for the five first-wave node types.\n2. Register them in the node-type/dictionary system.\n3. Give each a simple authored view with distinct compact styling.\n4. Keep `dependency` edge-first.\n5. Update prompt/context extraction to pull:\n   - active goals\n   - open tasks\n   - settled decisions\n   - unresolved questions\n   - binding constraints\n6. Reassess deferred node types after real planning-graph usage.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-followup",
+      "type": "markdown",
+      "label": "Follow-Up Questions",
+      "position": {
+        "x": 1340,
+        "y": 240
+      },
+      "width": 390,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Follow-Up Questions\n\n- Should planning nodes eventually get dedicated edge types beyond `dependency`?\n- Should acceptance criteria remain attachments or become typed nodes later?\n- When should risk split from edge case?\n- How much structured validation should planning nodes carry in the editor?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-main-task-port",
+      "type": "port",
+      "label": "Open Main Nodeset Task",
+      "position": {
+        "x": 1340,
+        "y": 620
+      },
+      "width": 300,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Back to the broader nodeset-planning task graph.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/nodeset-planning.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-library-status",
+      "type": "markdown",
+      "label": "Current Library State",
+      "position": {
+        "x": 1340,
+        "y": -120
+      },
+      "width": 430,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Current Library State\n\nThe planning-node library already contains class artifacts for:\n- `goal`\n- `task`\n- `decision`\n- `constraint`\n- `open-question`\n- `acceptance-criteria`\n- `risk`\n- `dependency`\n\nSo the first-wave task is not greenfield. The real work is to reconcile that broader library with the narrower approved first-wave contract.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "nodeset-first-wave-library-port",
+      "type": "port",
+      "label": "Open Planning Class Library",
+      "position": {
+        "x": 1340,
+        "y": 840
+      },
+      "width": 320,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Existing library package for task-planning node classes.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "nodeset-first-wave-edge-001",
+      "type": "relates",
+      "source": "nodeset-first-wave-manifest",
+      "target": "nodeset-first-wave-overview",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-002",
+      "type": "reference",
+      "source": "nodeset-first-wave-overview",
+      "target": "nodeset-first-wave-ship",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "ships",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-003",
+      "type": "reference",
+      "source": "nodeset-first-wave-overview",
+      "target": "nodeset-first-wave-defer",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defers",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-004",
+      "type": "reference",
+      "source": "nodeset-first-wave-overview",
+      "target": "nodeset-first-wave-dependency",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decides",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-005",
+      "type": "reference",
+      "source": "nodeset-first-wave-ship",
+      "target": "nodeset-first-wave-schema",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "fields",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-006",
+      "type": "reference",
+      "source": "nodeset-first-wave-ship",
+      "target": "nodeset-first-wave-runtime",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "runtime",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-007",
+      "type": "reference",
+      "source": "nodeset-first-wave-dependency",
+      "target": "nodeset-first-wave-implementation",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-008",
+      "type": "reference",
+      "source": "nodeset-first-wave-schema",
+      "target": "nodeset-first-wave-implementation",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implements",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-009",
+      "type": "reference",
+      "source": "nodeset-first-wave-defer",
+      "target": "nodeset-first-wave-followup",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "revisit",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-010",
+      "type": "reference",
+      "source": "nodeset-first-wave-overview",
+      "target": "nodeset-first-wave-main-task-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "context",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-011",
+      "type": "reference",
+      "source": "nodeset-first-wave-overview",
+      "target": "nodeset-first-wave-library-status",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "compares",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-012",
+      "type": "reference",
+      "source": "nodeset-first-wave-library-status",
+      "target": "nodeset-first-wave-library-port",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "library",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
+}

@@ -184,7 +184,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Branch Expansion From Port/Reference\n\nStart from a `port` or `graph-reference` node and resolve target behavior by content kind:\n\n- If target kind is `graph`: navigate to new graph context.\n- If target kind is `fragment`: expand into host graph as an attached branch.\n\nGoal: explicit semantics, reversible expansion, deterministic behavior."
+        "markdown": "# Branch Expansion From Port/Reference\n\nStatus: complete for this phase.\n\nBranch expansion now supports in-place projection from `port` and `graph-reference` nodes without transferring host authority. Fragments and full graph documents can expand into the current host session, and persistence is fragment-scoped."
       }
     },
     {
@@ -222,7 +222,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Required Target Contract\n\nReference-capable nodes should normalize to:\n\n- `data.target.kind`: `graph` | `fragment`\n- `data.target.ref`: canonical ref (`github://`, `tlz://`, local path)\n- `data.target.entryPort`: default `root`\n- `data.target.mode`: `navigate` | `expand`\n\nRules:\n\n- `mode=navigate` opens new graph context.\n- `mode=expand` only valid for `kind=fragment` in v1.\n- `mode=expand` + `kind=graph` should fail fast with clear reason."
+        "markdown": "## Required Target Contract\n\nReference-capable nodes normalize to:\n\n- `data.target.kind`: `graph` | `fragment` | `document`\n- `data.target.ref`: canonical ref (`github://`, `tlz://`, local path)\n- `data.target.entryPort`: default `root`\n- `data.target.mode`: `navigate` | `expand` | `bridge`\n\nCurrent rules:\n\n- `mode=navigate` replaces the host graph/session.\n- `mode=expand` projects the target into the current host session.\n- `mode=expand` is valid for fragments and full graph documents.\n- `mode=bridge` is explicit capability import inside the current session.\n- authority does not transfer just because content became visible."
       }
     },
     {
@@ -326,7 +326,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Done Means\n\n- Expanding a fragment adds a branch exactly once per expansion key.\n- Collapse removes only the injected branch.\n- Graph targets navigate, fragment targets expand.\n- Errors are explicit and non-destructive.\n- Behavior is deterministic across refresh/reload.\n- Existing graphs without `target.kind` still work via normalizer defaults."
+        "markdown": "## Done Means\n\n- Expanding a target adds a branch exactly once per expansion key.\n- Collapse removes only the injected branch.\n- `navigate` replaces the host session.\n- `expand` preserves the host session for fragments and full graph documents.\n- imported execution remains blocked or downgraded unless authority later moves there.\n- behavior is deterministic across refresh/reload."
       }
     },
     {
@@ -364,7 +364,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "## Open Questions\n\n1. Should expansion persist as materialized nodes in saved files by default?\n2. Should host dictionary auto-register expanded fragment node types?\n3. Do we allow recursive expansion in v1 or gate to one level?\n4. How should security policy treat remote refs on expand?\n5. Should `mode=expand` be exposed on both `port` and `graph-reference` UI equally?"
+        "markdown": "## Follow-Up Questions\n\n1. Do we still want named entry surfaces such as `open`, `expand`, and `summary` as authored metadata?\n2. Do we need explicit trust promotion UX in the near term, or is untrusted-by-default enough?\n3. Which older branch-expansion design graphs should be archived versus kept as reference?"
       }
     },
     {
@@ -440,7 +440,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Save Policy: Expanded Branches\n\nDo not overload normal save behavior.\n\n## Operations\n\n1. **Save Graph** (default)\n- Persists full current graph state.\n- Includes expanded materialized nodes unless user filters them.\n\n2. **Export Fragment** (explicit)\n- Persists selected subgraph only (selected nodes + internal edges).\n- Includes optional boundary ports and required dictionary entries.\n\n## Provenance\n\nExpanded injections should be tagged:\n\n- `data._expansion.expansionId`\n- `data._expansion.sourceRef`\n- `data._expansion.injectedBy`\n\n## Optional Save Filter\n\nAdd save option: **Save without expanded injections**\n- Filters entities with matching `_expansion` metadata before write.\n\n## Decision\n\n- Keep `Save` deterministic and unsurprising.\n- Make selection-based persistence an explicit `Export Fragment` command."
+        "markdown": "# Save Policy: Fragment-Scoped Persistence\n\nDecision for this phase:\n\n## Save\n- Save writes the current fragment only.\n- A `.node` file is a fragment artifact, not the whole visible session.\n- Expanded neighboring fragments are not part of the save scope.\n\n## Export\n- Export can be selection-based, but only within the current fragment.\n- Cross-fragment selection is not a valid persistence scope.\n- If selection includes foreign-fragment nodes, export should reject with a clear message.\n\n## Implication\n- Visibility does not widen persistence scope.\n- If a node belongs in the current fragment, author it into the fragment explicitly."
       }
     },
     {
@@ -554,7 +554,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Q5 Decision: Port + Graph-Reference Parity\n\nDecision:\n\n- `port` and `graph-reference` should expose the same target semantics in UI.\n- Shared fields: `target.kind`, `target.mode`, `target.ref`, limits/policy flags.\n- Node rendering can differ, but composition semantics stay consistent.\n\nExecution boundary:\n\n- `mode=navigate`: open target graph in its own context; target policy applies there.\n- `mode=expand`: import into host as untrusted by default.\n- Untrusted imports may render, but script/lifecycle/plugin execution is blocked.\n- Explicit trust promotion is required before enabling execution in host context.\n\nAcceptance:\n\n- Type-switch `port <-> graph-reference` preserves target behavior.\n- Expansion does not silently execute imported code in host graph."
+        "markdown": "# Q5 Decision: UI Parity + Execution Boundary\n\nDecision status: implemented enough for this phase.\n\n- `port` and `graph-reference` expose the same target semantics in UI.\n- Shared fields: `target.kind`, `target.mode`, `target.ref`, `entryPort`, trust/policy flags.\n- Node rendering differs, but composition semantics stay consistent.\n\nExecution boundary:\n\n- `mode=navigate`: open target graph in its own host session.\n- `mode=expand`: import into host as projected structure with downgraded authority.\n- `mode=bridge`: create an explicit local capability without ambient authority transfer.\n- visible content does not gain execution authority unless focus later moves there."
       }
     },
     {
@@ -592,7 +592,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Implementation Gaps To Close\n\n1. Expansion transaction contract\n- Define explicit command schema (`expandRef`, `collapseExpansion`) and error codes.\n\n2. Dedupe key + idempotency\n- Specify exact expansion key (e.g. `hostNodeId + target.ref + target.entryPort + mode`).\n\n3. Attach/layout policy\n- Define deterministic placement of injected fragment and collision handling.\n\n4. Remote ref trust gating details\n- Protocol/host allowlists, size/time limits, and content validation rules.\n\n5. Rollback semantics\n- Expansion should be transactional with full rollback on partial failure.\n\n6. Trust metadata persistence model\n- Decide local vs persisted trust; define hash-pinning behavior on ref changes.\n\n7. Test matrix\n- One-hop enforcement\n- Untrusted execution blocking\n- Collapse removes only injected entities\n- ID collision/remap stability\n- Repeated expand idempotency"
+        "markdown": "# Follow-Up Work\n\nRemaining follow-up work is optional for this phase:\n\n1. Entry surfaces\n- add explicit authored entry handles only if fallback resolution stops being enough.\n\n2. Trust promotion UX\n- runtime trust gating exists, but promotion/persistence UX is still thin.\n\n3. Task cleanup\n- merge or archive older branch-expansion subgraphs that were answered by later authority work."
       }
     },
     {
@@ -630,7 +630,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Expansion Contract (UI + AI)\n\nUse one host capability with two entry points:\n\n1. UI control (primary)\n2. AI command wrapper (optional)\n\n## Host API\n\n`graph.expandReference(payload)`\n\n```json\n{\n  \"sourceNodeId\": \"node-123\",\n  \"target\": {\n    \"kind\": \"fragment\",\n    \"ref\": \"github://owner/repo/path/thing.node\",\n    \"entryPort\": \"root\",\n    \"mode\": \"expand\"\n  },\n  \"options\": {\n    \"maxNodes\": 200,\n    \"maxEdges\": 400,\n    \"dedupe\": true,\n    \"layout\": \"attach-right\",\n    \"trustMode\": \"untrusted\"\n  }\n}\n```\n\n## Return shape\n\n```json\n{\n  \"ok\": true,\n  \"expansionId\": \"exp_abc123\",\n  \"added\": { \"nodes\": 23, \"edges\": 31 },\n  \"skipped\": false,\n  \"reason\": null\n}\n```\n\n## Error codes\n\n- `INVALID_TARGET`\n- `UNSUPPORTED_MODE`\n- `EXPANSION_LIMIT_EXCEEDED`\n- `REF_FETCH_FAILED`\n- `TRUST_POLICY_BLOCKED`\n- `ID_COLLISION_UNRESOLVED`\n- `TRANSACTION_ROLLBACK`\n\n## Collapse API\n\n`graph.collapseExpansion({ \"expansionId\": \"exp_abc123\" })`\n\n## AI wrapper\n\nAllow `action: \"expandReference\"`, but route to same host API.\nNo separate behavior path for AI vs UI."
+        "markdown": "# Expansion Contract (Current Runtime)\n\nHost capability:\n\n`graph.expandReference(payload)`\n\n```json\n{\n  \"sourceNodeId\": \"node-123\",\n  \"target\": {\n    \"kind\": \"graph\",\n    \"ref\": \"/tasks/archive/script-scope/root.node\",\n    \"entryPort\": \"root\",\n    \"mode\": \"expand\"\n  }\n}\n```\n\nCurrent behavior:\n- resolves the target graph or fragment\n- runs compatibility assessment\n- projects the target into the current host session\n- downgrades manifest/dictionary/execution surfaces instead of transferring authority\n- tags injected entities with expansion provenance\n- supports collapse and focused-fragment refresh"
       }
     },
     {

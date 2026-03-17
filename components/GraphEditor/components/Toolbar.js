@@ -70,6 +70,13 @@ import ViewActions from './Toolbar/ViewActions';
 
 const DENSITY_OPTIONS = ['comfortable', 'compact', 'dense'];
 const normalizeUiDensity = (value) => (DENSITY_OPTIONS.includes(value) ? value : 'comfortable');
+const getNodeFragmentIdForPersistence = (node) =>
+  String(
+    node?.data?._contextScope?.fragmentId ||
+    node?.data?._expansion?.expansionId ||
+    node?.data?._origin?.instanceId ||
+    ''
+  ).trim();
 
 const Toolbar = ({ 
   host = 'browser',
@@ -118,6 +125,7 @@ const Toolbar = ({
   backgroundImage = null,
   backgroundUrl = '',  // Document URL
   setBackgroundUrl,  // Function to set document URL
+  focusedFragmentId = '',
   defaultNodeColor = '#1976d2',
   defaultEdgeColor = '#666666',
   isFreeUser = false,
@@ -215,6 +223,7 @@ const Toolbar = ({
   const selectionCount = Array.isArray(selectedNodeIds) ? selectedNodeIds.length : 0;
   const canAlign = selectionCount > 1;
   const canDistribute = selectionCount > 2;
+  const activeFragmentId = String(focusedFragmentId || '').trim();
 
   // Retractable drawer state
   const [isExpanded, setIsExpanded] = useState(true);
@@ -472,27 +481,37 @@ const Toolbar = ({
   const isExpansionInjectedEdge = useCallback((edge) => Boolean(edge?.data?._expansion?.expansionId), []);
 
   const resolveGraphForSave = useCallback(({ excludeExpanded = false } = {}) => {
+    const fragmentNodes = nodes.filter((node) => getNodeFragmentIdForPersistence(node) === activeFragmentId);
+    const fragmentNodeIdSet = new Set(fragmentNodes.map((node) => node.id));
+    const fragmentEdges = edges.filter((edge) => fragmentNodeIdSet.has(edge.source) && fragmentNodeIdSet.has(edge.target));
+    const fragmentGroups = (groups || [])
+      .map((group) => ({
+        ...group,
+        nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => fragmentNodeIdSet.has(id)) : []
+      }))
+      .filter((group) => group.nodeIds.length > 0);
+
     if (!excludeExpanded) {
       return {
-        nodesToSave: nodes,
-        edgesToSave: edges,
-        groupsToSave: groups || []
+        nodesToSave: fragmentNodes,
+        edgesToSave: fragmentEdges,
+        groupsToSave: fragmentGroups
       };
     }
-    const nodesToSave = nodes.filter((node) => !isExpansionInjectedNode(node));
+    const nodesToSave = fragmentNodes.filter((node) => !isExpansionInjectedNode(node));
     const nodeIdSet = new Set(nodesToSave.map((node) => node.id));
-    const edgesToSave = edges.filter((edge) => {
+    const edgesToSave = fragmentEdges.filter((edge) => {
       if (isExpansionInjectedEdge(edge)) return false;
       return nodeIdSet.has(edge.source) && nodeIdSet.has(edge.target);
     });
-    const groupsToSave = (groups || [])
+    const groupsToSave = fragmentGroups
       .map((group) => ({
         ...group,
         nodeIds: Array.isArray(group.nodeIds) ? group.nodeIds.filter((id) => nodeIdSet.has(id)) : []
       }))
       .filter((group) => group.nodeIds.length > 0);
     return { nodesToSave, edgesToSave, groupsToSave };
-  }, [edges, groups, isExpansionInjectedEdge, isExpansionInjectedNode, nodes]);
+  }, [activeFragmentId, edges, groups, isExpansionInjectedEdge, isExpansionInjectedNode, nodes]);
 
   const handleSaveToFile = async ({ excludeExpanded = false } = {}) => {
     const now = new Date().toISOString();
@@ -737,6 +756,15 @@ const Toolbar = ({
   const handleExportFragmentToFile = async () => {
     if (!Array.isArray(selectedNodeIds) || selectedNodeIds.length === 0) {
       if (onShowMessage) onShowMessage('Select nodes before exporting a fragment.', 'warning');
+      return;
+    }
+
+    const foreignSelectedNodeIds = selectedNodeIds.filter((nodeId) => {
+      const node = nodes.find((entry) => entry.id === nodeId);
+      return getNodeFragmentIdForPersistence(node) !== activeFragmentId;
+    });
+    if (foreignSelectedNodeIds.length > 0) {
+      if (onShowMessage) onShowMessage('Export only supports nodes in the current fragment.', 'warning');
       return;
     }
 

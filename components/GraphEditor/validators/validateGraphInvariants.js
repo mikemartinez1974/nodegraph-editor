@@ -584,7 +584,7 @@ export function validateGraphInvariants({
       return;
     }
 
-    if (target.mode && !["navigate", "expand", "bridge", "boundary"].includes(target.mode)) {
+    if (target.mode && !["navigate", "expand", "bridge"].includes(target.mode)) {
       pushLoadTolerantIssue({
         code: "PORT_MODE_INVALID",
         message: `Port node \"${node.id}\" has invalid target.mode \"${target.mode}\".`,

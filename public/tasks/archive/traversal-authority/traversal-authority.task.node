@@ -1,21 +1,21 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Context Grammar",
-    "description": "Task graph for connection semantics.",
-    "created": "2026-03-15T19:35:00.000Z",
-    "modified": "2026-03-15T19:35:00.000Z",
+    "title": "Traversal And Authority",
+    "description": "Task graph for traversal, authority, and capability boundaries.",
+    "created": "2026-03-15T12:00:00.000Z",
+    "modified": "2026-03-15T12:00:00.000Z",
     "author": "",
     "tags": [
       "tasks",
-      "context",
-      "ports"
+      "traversal",
+      "authority"
     ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "context-grammar-manifest",
+      "id": "traversal-auth-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -28,12 +28,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "context-grammar-task",
-          "name": "Context Grammar",
+          "graphId": "traversal-authority-task",
+          "name": "Traversal And Authority",
           "version": "0.1.0",
-          "description": "Semantic roles for navigate, expand, bridge, and boundary.",
-          "createdAt": "2026-03-15T19:35:00.000Z",
-          "updatedAt": "2026-03-15T19:35:00.000Z"
+          "description": "Design constraints for bounded traversal, authority, and capability.",
+          "createdAt": "2026-03-15T12:00:00.000Z",
+          "updatedAt": "2026-03-15T12:00:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "id": "context-grammar-legend",
+      "id": "traversal-auth-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -118,19 +118,19 @@
       "data": {
         "entries": [
           {
-            "key": "mode",
+            "key": "constraint",
             "intent": "discussion",
             "implementation": "markdown node",
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- mode: semantic role for a connection",
+        "markdown": "## Legend\n- constraint: design rule or future boundary",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "context-grammar-dictionary",
+      "id": "traversal-auth-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -150,9 +150,9 @@
       }
     },
     {
-      "id": "context-grammar-overview",
+      "id": "trav-overview",
       "type": "markdown",
-      "label": "Context Grammar",
+      "label": "Traversal And Authority",
       "position": {
         "x": -620,
         "y": 0
@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Context Grammar\n\nPort modes can become a real graph grammar if their meanings stay sharp. The important roles are navigate, expand, bridge, and boundary.",
+        "markdown": "# Traversal And Authority\n\nStatus: complete for this phase.\n\nTwilite now has explicit runtime semantics for traversal, authority, and host/session boundaries. `navigate`, `expand`, and `focus` now behave as distinct runtime operations instead of blurred UI conventions.",
         "memo": "",
         "link": "",
         "html": "",
@@ -209,16 +209,16 @@
       }
     },
     {
-      "id": "context-grammar-navigate",
+      "id": "trav-traversal",
       "type": "markdown",
-      "label": "Navigate",
+      "label": "Traversal Policy",
       "position": {
-        "x": -160,
-        "y": -60
+        "x": -120,
+        "y": -40
       },
       "width": 360,
       "height": 210,
-      "color": "#1565c0",
+      "color": "#5e35b1",
       "ports": [
         {
           "id": "in",
@@ -258,7 +258,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Navigate\n\n- move into another graph/document context\n- host session changes intentionally\n- authority transition is allowed here\n- use when the target is a destination world",
+        "markdown": "# Traversal Policy\n\nCurrent rule to implement explicitly:\n- `navigate` changes the document/session host\n- `expand` keeps the same host session and materializes a fragment in place\n- `focus` moves execution authority inside that session\n\nWhat is already true:\n- ring-based loading bounds growth\n- expanded fragments can coexist structurally\n- browser address display can follow focused fragment without replacing the host session",
         "memo": "",
         "link": "",
         "html": "",
@@ -268,71 +268,12 @@
       }
     },
     {
-      "id": "context-grammar-expand",
+      "id": "trav-authority",
       "type": "markdown",
-      "label": "Expand",
+      "label": "Authority Policy",
       "position": {
-        "x": 260,
-        "y": -60
-      },
-      "width": 360,
-      "height": 210,
-      "color": "#2e7d32",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Expand\n\n- inline a fragment into the current world\n- preserve shared structure\n- same navigational world\n- authority stays local to the host unless explicitly changed",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "context-grammar-bridge",
-      "type": "markdown",
-      "label": "Bridge",
-      "position": {
-        "x": 680,
-        "y": -60
+        "x": 320,
+        "y": -40
       },
       "width": 360,
       "height": 210,
@@ -376,7 +317,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Bridge\n\n- explicit cross-context reference or capability link\n- use this to reach across without merging worlds\n- likely future surface for safe cross-fragment power\n- example: reference `youtube-embedded` from another context",
+        "markdown": "# Authority Policy\n\nCurrent runtime stance:\n- host session owns the shared structure\n- focused fragment owns execution/reload authority inside that session\n- imported manifest authority remains informational / host-primary during expansion\n- non-fragment navigation is where document/session authority should reset\n\nThis is now partly real in runtime and should be treated as the authoritative default.",
         "memo": "",
         "link": "",
         "html": "",
@@ -386,16 +327,16 @@
       }
     },
     {
-      "id": "context-grammar-boundary",
+      "id": "trav-capability",
       "type": "markdown",
-      "label": "Boundary (Context Property)",
+      "label": "Capability Policy",
       "position": {
-        "x": 1100,
-        "y": -60
+        "x": 760,
+        "y": -40
       },
       "width": 360,
       "height": 210,
-      "color": "#ef6c00",
+      "color": "#3949ab",
       "ports": [
         {
           "id": "in",
@@ -435,7 +376,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Boundary (Context Property)\n\nBoundary is probably not an edge behavior. It is more naturally a region or fragment property:\n- it marks where one context stops and another begins\n- it lives at the perimeter of a fragment/domain\n- ports and bridges may cross it\n- but the boundary itself is not the crossing",
+        "markdown": "# Capability Policy\n\nCurrent rule:\n- showing a node is not the same as running a node\n- scripts are already scoped to the active fragment\n- focused-fragment reload is scoped locally\n- static rendering can remain broad while live behavior stays local\n\nRemaining capability glue should follow this rule rather than reintroducing ambient power.",
         "memo": "",
         "link": "",
         "html": "",
@@ -445,11 +386,11 @@
       }
     },
     {
-      "id": "context-grammar-implications",
+      "id": "trav-safe",
       "type": "markdown",
-      "label": "Implications",
+      "label": "Safe To Build Now",
       "position": {
-        "x": 260,
+        "x": -120,
         "y": 280
       },
       "width": 360,
@@ -494,7 +435,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Implications\n\nIf these semantics hold:\n- `expand` means same world\n- `navigate` means enter another world\n- `bridge` means controlled reach across worlds\n- `boundary` means define or expose a world perimeter\n\nThen graph composition becomes inspectable instead of inferred.",
+        "markdown": "# Safe To Build Now\n\nAlready safe / already in motion:\n- entry surfaces\n- focus and fragment identity\n- provenance metadata\n- ring-based loading and semantic views\n- fragment-scoped script APIs\n- focused-fragment reload and rematerialization",
         "memo": "",
         "link": "",
         "html": "",
@@ -504,9 +445,68 @@
       }
     },
     {
-      "id": "context-grammar-ui",
+      "id": "trav-avoid",
       "type": "markdown",
-      "label": "UI Consequence",
+      "label": "Avoid Baking In",
+      "position": {
+        "x": 320,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#ef6c00",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Avoid Baking In\n\nStill avoid:\n- ambient global execution assumptions\n- silent authority merging across visible graphs\n- hooks firing everywhere because something is visible\n- letting address-bar display become destructive navigation\n- blurring `navigate`, `expand`, and `focus` back together",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-boundary",
+      "type": "markdown",
+      "label": "Future Boundary",
       "position": {
         "x": 760,
         "y": 280
@@ -553,7 +553,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# UI Consequence\n\nThe current select overpromises because only `navigate` and `expand` are truly implemented. If `bridge` stays in the select and `boundary` moves out of it, the UI should split:\n- connection semantics: navigate, expand, bridge\n- context semantics: boundary",
+        "markdown": "# Future Boundary\n\nDo not over-harden the model yet.\n\nThe current implementation should preserve a later upgrade path to:\n- multi-fragment authority domains\n- tighter lifecycle/hook scoping\n- explicit cross-fragment capability surfaces\n\nBut the immediate job is simpler: make the current traversal/authority rule explicit and consistent.",
         "memo": "",
         "link": "",
         "html": "",
@@ -563,56 +563,41 @@
       }
     },
     {
-      "id": "context-grammar-split",
+      "id": "trav-impl",
       "type": "markdown",
-      "label": "Connection vs Context",
+      "label": "Implementation Glue",
       "position": {
-        "x": 1100,
-        "y": 260
+        "x": 1220,
+        "y": -40
       },
-      "width": 360,
-      "height": 210,
-      "color": "#5e35b1",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
+      "width": 460,
+      "height": 320,
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Connection vs Context\n\nA cleaner grammar is:\n- connection semantics: `navigate`, `expand`, `bridge`\n- context semantics: `boundary`\n\nBoundary should likely move to fragment/domain metadata instead of staying in the port-mode select.",
+        "markdown": "# Implementation Glue\n\nImplemented now:\n- real document/session navigation commits history only on successful host loads\n- focused-fragment preview stays ephemeral in the address bar\n- replacing the host document resets focus/authority to the new root node\n- `navigate` is now graph-only; it no longer mutates the host graph by creating fallback text nodes from arbitrary URLs\n- script runtime is anchored to the script node's fragment instead of falling back to global focus\n- script event subscriptions and script-node auto-run/execute triggers are gated by the active fragment\n- built-in execution surfaces (`executeNode`, `executeNodes`, interpreter graph execution, API/timer/delay/etc.) now default to active-fragment authority\n- plugin graph reads/writes now follow the active fragment by default\n- plugin selection reads are scoped to the active fragment and plugin-emitted events now carry fragment/plugin provenance while rejecting obvious out-of-scope node targets\n\nFollow-up work:\n- add an explicit import surface if raw text/HTML URL ingestion is still desirable\n- decide how these gates should widen if/when multi-fragment authority domains are introduced",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "trav-next",
+      "type": "markdown",
+      "label": "Next Questions",
+      "position": {
+        "x": 1220,
+        "y": 320
+      },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Next Questions\n\nFollow-up questions, not blockers for this phase:\n- what should the explicit import API/UI be for raw text or HTML URLs?\n- when navigating into a non-fragment graph, what runtime state beyond focus should be preserved vs reset?\n- when multi-fragment authority domains arrive later, which of these current fragment gates should widen first?",
         "memo": "",
         "link": "",
         "html": "",
@@ -624,13 +609,13 @@
   ],
   "edges": [
     {
-      "id": "context-grammar-edge-1",
+      "id": "trav-edge-1",
       "type": "reference",
-      "source": "context-grammar-overview",
-      "target": "context-grammar-navigate",
+      "source": "trav-overview",
+      "target": "trav-traversal",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "defines",
+      "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
@@ -639,13 +624,13 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-2",
+      "id": "trav-edge-2",
       "type": "reference",
-      "source": "context-grammar-overview",
-      "target": "context-grammar-expand",
+      "source": "trav-overview",
+      "target": "trav-authority",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "defines",
+      "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
@@ -654,13 +639,13 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-3",
+      "id": "trav-edge-3",
       "type": "reference",
-      "source": "context-grammar-overview",
-      "target": "context-grammar-bridge",
+      "source": "trav-overview",
+      "target": "trav-capability",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "defines",
+      "label": "requires",
       "style": {
         "width": 2,
         "dash": [],
@@ -669,25 +654,10 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-4",
+      "id": "trav-edge-4",
       "type": "reference",
-      "source": "context-grammar-overview",
-      "target": "context-grammar-boundary",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "defines",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "context-grammar-edge-5",
-      "type": "reference",
-      "source": "context-grammar-bridge",
-      "target": "context-grammar-implications",
+      "source": "trav-traversal",
+      "target": "trav-safe",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "enables",
@@ -699,13 +669,13 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-6",
+      "id": "trav-edge-5",
       "type": "reference",
-      "source": "context-grammar-boundary",
-      "target": "context-grammar-implications",
+      "source": "trav-authority",
+      "target": "trav-avoid",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "enables",
+      "label": "constrains",
       "style": {
         "width": 2,
         "dash": [],
@@ -714,10 +684,10 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-7",
+      "id": "trav-edge-6",
       "type": "reference",
-      "source": "context-grammar-implications",
-      "target": "context-grammar-ui",
+      "source": "trav-capability",
+      "target": "trav-boundary",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "forces",
@@ -729,13 +699,13 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-8",
+      "id": "trav-edge-7",
       "type": "reference",
-      "source": "context-grammar-boundary",
-      "target": "context-grammar-split",
+      "source": "trav-safe",
+      "target": "trav-boundary",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "reframes",
+      "label": "preserves",
       "style": {
         "width": 2,
         "dash": [],
@@ -744,13 +714,43 @@
       "data": {}
     },
     {
-      "id": "context-grammar-edge-9",
+      "id": "trav-edge-8",
       "type": "reference",
-      "source": "context-grammar-split",
-      "target": "context-grammar-ui",
+      "source": "trav-avoid",
+      "target": "trav-boundary",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "clarifies",
+      "label": "protects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-9",
+      "type": "reference",
+      "source": "trav-overview",
+      "target": "trav-impl",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "trav-edge-10",
+      "type": "reference",
+      "source": "trav-impl",
+      "target": "trav-next",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "raises",
       "style": {
         "width": 2,
         "dash": [],

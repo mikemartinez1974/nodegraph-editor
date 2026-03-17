@@ -277,9 +277,42 @@ export function useGraphEditorState() {
     setFocusedFragmentId(fragmentId);
   }, [focusedNodeId, nodes]);
 
+  const previousFocusedFragmentRef = useRef(null);
+  useEffect(() => {
+    const previous = previousFocusedFragmentRef.current;
+    const next = String(focusedFragmentId || '').trim() || 'root';
+    if (previous === null) {
+      previousFocusedFragmentRef.current = next;
+      try {
+        eventBus.emit('fragmentFocusEnter', {
+          fragmentId: next,
+          nodeId: focusedNodeId || null
+        });
+      } catch {}
+      return;
+    }
+    if (previous === next) return;
+    try {
+      eventBus.emit('fragmentFocusLeave', {
+        fragmentId: previous,
+        nextFragmentId: next,
+        nodeId: focusedNodeId || null
+      });
+    } catch {}
+    try {
+      eventBus.emit('fragmentFocusEnter', {
+        fragmentId: next,
+        previousFragmentId: previous,
+        nodeId: focusedNodeId || null
+      });
+    } catch {}
+    previousFocusedFragmentRef.current = next;
+  }, [focusedFragmentId, focusedNodeId]);
+
   useEffect(() => {
     if (interactionMode !== 'browse') return;
     const selectedNodeId = Array.isArray(selectedNodeIds) ? selectedNodeIds[0] || null : null;
+    if (!Array.isArray(selectedNodeIds) || selectedNodeIds.length !== 1) return;
     if (!selectedNodeId) return;
     if (selectedNodeId === focusedNodeId) return;
     setFocusedNodeId(selectedNodeId);

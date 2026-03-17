@@ -918,6 +918,78 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "nodeset-first-wave-port",
+      "type": "port",
+      "label": "Open First Wave Plan",
+      "position": {
+        "x": 1260,
+        "y": 940
+      },
+      "width": 300,
+      "height": 130,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Concrete v1 node-set implementation plan for planning graphs.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/first-wave/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "nodeset-library-reconciliation",
+      "type": "markdown",
+      "label": "Library Reconciliation",
+      "position": {
+        "x": 1240,
+        "y": 1120
+      },
+      "width": 420,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "## Library Reconciliation\n\nThe existing `task-planning` library is already broader than the approved first wave.\n\nCurrent practical task:\n- align the existing library with the first-wave contract\n- treat `acceptance-criteria`, `risk`, and `dependency` as deferred/superset classes for now\n- avoid inventing duplicate planning node classes",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "nodeset-task-planning-library-port",
+      "type": "port",
+      "label": "Open Task Planning Library",
+      "position": {
+        "x": 1260,
+        "y": 1400
+      },
+      "width": 320,
+      "height": 130,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Direct link to the existing task-planning class library root.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
     }
   ],
   "edges": [
@@ -1414,6 +1486,33 @@
         "curved": true
       },
       "data": {}
+    },
+    {
+      "id": "nodeset-first-wave-edge-link",
+      "type": "reference",
+      "source": "d1c8a1f3-7e5b-4c5f-9c17-2a9d5e6f0c33",
+      "target": "nodeset-first-wave-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "v1"
+    },
+    {
+      "id": "nodeset-library-reconciliation-edge",
+      "type": "reference",
+      "source": "nodeset-first-wave-port",
+      "target": "nodeset-library-reconciliation",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "aligns"
+    },
+    {
+      "id": "nodeset-task-planning-library-edge",
+      "type": "reference",
+      "source": "nodeset-library-reconciliation",
+      "target": "nodeset-task-planning-library-port",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "opens"
     }
   ],
   "clusters": [],
@@ -1430,5 +1529,7 @@
       "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
       "tags": ""
     }
-  ]
+  ],
+  "nodeCount": 19,
+  "edgeCount": 23
 }

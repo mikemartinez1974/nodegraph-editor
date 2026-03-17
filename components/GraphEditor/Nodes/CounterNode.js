@@ -6,6 +6,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import PinIcon from '@mui/icons-material/Pin';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
@@ -32,6 +33,7 @@ export default function CounterNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const node = useNodePortSchema(origNode, COUNTER_INPUTS, COUNTER_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
   
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 300) * zoom;
@@ -64,13 +66,14 @@ export default function CounterNode({
   useEffect(() => {
     const handler = ({ targetNodeId, inputName } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       if (inputName === 'increment') handleIncrement({ stopPropagation: () => {} });
       else if (inputName === 'decrement') handleDecrement({ stopPropagation: () => {} });
       else if (inputName === 'reset') handleReset({ stopPropagation: () => {} });
     };
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [count, step, min, max, node.id]);
+  }, [count, step, min, max, node.id, isExecutionActive]);
 
   const handleIncrement = (e) => {
     e.stopPropagation();

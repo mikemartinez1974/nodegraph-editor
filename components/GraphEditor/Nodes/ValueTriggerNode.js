@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 const INPUTS = [{ key: 'value', label: 'Value', type: 'value' }];
@@ -55,6 +56,7 @@ export default function ValueTriggerNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const node = useNodePortSchema(origNode, INPUTS, OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
 
   const width = (node?.width || 250) * zoom;
   const height = (node?.height || 300) * zoom;
@@ -153,12 +155,13 @@ export default function ValueTriggerNode({
   useEffect(() => {
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       if (inputName && inputName !== 'value') return;
       evaluateIncoming(value);
     };
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [node.id, evaluateIncoming]);
+  }, [node.id, evaluateIncoming, isExecutionActive]);
 
   const handleManualTrigger = (e) => {
     e.stopPropagation();

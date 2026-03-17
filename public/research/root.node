@@ -1,0 +1,584 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Graph Theory for Twilite",
+    "description": "Research graph for graph-theoretic architecture under a twilite.zone-only evidence constraint.",
+    "created": "2026-03-16T10:30:00.000Z",
+    "modified": "2026-03-16T10:30:00.000Z",
+    "author": "",
+    "tags": [
+      "research",
+      "graph-theory",
+      "architecture"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "research-root-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -940,
+        "y": -320
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "research-root",
+          "name": "Research Root",
+          "version": "0.1.0",
+          "description": "Research graph for graph-theoretic design guidance under a twilite.zone-only evidence constraint.",
+          "createdAt": "2026-03-16T10:30:00.000Z",
+          "updatedAt": "2026-03-16T10:30:00.000Z"
+        },
+        "intent": {
+          "kind": "graph",
+          "scope": "mixed"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false,
+          "expansion": {
+            "allowGraphEntry": true
+          }
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-root-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -540,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "entries": [
+          {
+            "key": "section",
+            "intent": "discussion",
+            "implementation": "markdown node",
+            "dictionaryKey": "default"
+          }
+        ],
+        "markdown": "## Legend\n- section: research section or design frame",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-root-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -180,
+        "y": -320
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": [],
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-overview",
+      "type": "markdown",
+      "label": "Graph Theory for Twilite",
+      "position": {
+        "x": -820,
+        "y": 40
+      },
+      "width": 560,
+      "height": 340,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph Theory for Twilite\n## Under a `twilite.zone`-Only Evidence Constraint\n\nThis graph reframes the report as implementation guidance for Twilite.\n\nCore claim:\n- if the graph is the durable artifact, graph theory becomes a correctness model\n- if the assistant \"understands the graph,\" graph semantics and query surfaces must be explicit\n- emerging Twilite concepts like Core Ontology and Node Class Library imply schema, typing, and reusable abstractions already matter\n\nDeliverables in this graph:\n- model choices and assumptions\n- algorithm family selection guidance\n- storage and integration patterns\n- benchmarking design\n- migration and roadmap framing\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      },
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ]
+    },
+    {
+      "id": "research-executive-summary",
+      "type": "markdown",
+      "label": "Executive Summary",
+      "position": {
+        "x": -160,
+        "y": 20
+      },
+      "width": 540,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Executive Summary\n\nTwilite publicly presents itself as a graph-native persistent workspace where nodes are thoughts, edges are relationships, and AI collaborates against the graph itself.\n\nArchitectural implications:\n- graph theory is not optional math; it becomes part of persistence, merge behavior, querying, and AI grounding\n- graph semantics should be explicit: directedness, multi-edges, typed edges, weights, temporal/versioning, and safe query surfaces\n- Twilite already shows signs of schema and type pressure through public labels like `Core Ontology`, `Node Class Library`, and `Twilite Documentation`\n\nConstraint for this research:\n- only `twilite.zone` may be used as evidence\n- accessible sources establish product intent, but not low-level implementation specifics\n\nSo this graph focuses on:\n- decision frameworks\n- evaluation templates\n- immediate architecture patterns\n- explicit assumptions where internals are not yet published\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-context-assumptions",
+      "type": "markdown",
+      "label": "Twilite Context and Assumptions",
+      "position": {
+        "x": 460,
+        "y": 20
+      },
+      "width": 560,
+      "height": 500,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Twilite Context and Working Assumptions\n\nWhat `twilite.zone` establishes:\n- Twilite is a persistent graph workspace where ideas connect and evolve\n- the canvas is graph-shaped and first-class\n- collaboration with an AI assistant is a core feature\n- the graph is treated as a durable and portable artifact shared between humans and agents\n- public indexing suggests deeper structures around ontology, node classes, and documentation\n\nConservative assumptions for design:\n- the graph has stable node and edge IDs\n- some notion of node and edge typing either exists or is wanted\n- the AI assistant consumes structure plus properties as context\n- least-regret designs should preserve persistence, replay, and collaboration even if storage/runtime changes later\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-graph-models",
+      "type": "markdown",
+      "label": "Graph Models and Fundamentals",
+      "position": {
+        "x": 1080,
+        "y": 20
+      },
+      "width": 620,
+      "height": 620,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Graph Models and Fundamentals to Operationalize\n\nRecommended stance for Twilite:\n- edge directedness should be semantic per edge type, not a single global graph choice\n- weights should exist when relationships need strength, cost, confidence, or recency signals\n- parallel edges should be allowed, either as a multigraph or as typed property-graph edges with unique IDs\n- time should be first-class enough to support version snapshots, deltas, provenance, and reproducibility\n- higher-arity relationships can be modeled either as hyperedges or, more practically for Twilite, as relationship nodes\n- a property graph is the most operational baseline because both nodes and edges need attributes\n\nOperational consequences:\n- persistence and merge logic need stable IDs and event history\n- query APIs need edge-type awareness and direction semantics\n- the AI layer needs explicit graph meaning, not just a canvas screenshot\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-algorithms",
+      "type": "markdown",
+      "label": "Algorithms and Complexity",
+      "position": {
+        "x": 1760,
+        "y": 20
+      },
+      "width": 620,
+      "height": 700,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Algorithms and Complexity in a Twilite Context\n\nAlgorithm families worth productizing:\n- traversal for neighborhood expansion, reachability, and graph-grounded context collection\n- shortest paths for explanation chains, cost-based routing, and concept navigation\n- centrality for \"start here\" and graph importance surfaces\n- community detection for clustering and workspace organization\n- matching and flow for assignment and constrained planning\n- topological sort and cycle detection for dependency validation\n- subgraph isomorphism for pattern queries and reusable templates\n\nComplexity reporting under the evidence constraint:\n- the report cannot cite external textbooks or vendor docs\n- so complexity must be tracked as a template until Twilite-published docs exist\n\nWhat should still be decided now:\n- which edge types participate in DAG constraints\n- whether negative weights have any meaning at all\n- how much explanation determinism the AI layer needs\n- which algorithms must run incrementally vs in batch\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-storage-integration",
+      "type": "markdown",
+      "label": "Data Structures, Storage, and Integration",
+      "position": {
+        "x": -160,
+        "y": 540
+      },
+      "width": 620,
+      "height": 760,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Data Structures, Storage Options, and Integration Patterns\n\nIn-memory structures to evaluate:\n- adjacency list for sparse interactive queries\n- adjacency matrix only for specific dense or edge-existence-heavy workloads\n- edge list for interchange and append-only event logs\n\nPragmatic Twilite hybrid:\n- adjacency list for live runtime and canvas interactions\n- append-only edge/event list for persistence and replay\n- derived indexes for hot query surfaces\n\nPersistence backend options:\n- in-app persisted adjacency plus event log\n- property graph storage\n- external graph database\n- RDF / triple-store style semantics if ontology becomes central\n\nIntegration pattern to favor:\n- all edits normalize into a graph-change event stream\n- indexers maintain type/property/text/embedding lookup surfaces\n- query APIs are split by budget and caller class: UI, agent, analytics\n- expensive layout and clustering work should be treated as explicit compute jobs\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-tooling",
+      "type": "markdown",
+      "label": "Libraries and Tooling Constraints",
+      "position": {
+        "x": 520,
+        "y": 700
+      },
+      "width": 620,
+      "height": 620,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Libraries and Tooling Under a Platform-Unknown Constraint\n\nWhat matters more than library brand right now:\n- incremental update support\n- predictable memory and latency\n- safe serialization of graph artifacts\n- query expressiveness with agent-safe boundaries\n- maintenance and licensing durability\n\nCross-language evaluation frame:\n- Python tools are useful for prototyping and evaluation harnesses\n- Java and Go are useful for deterministic services and batch compute\n- JavaScript / TypeScript libraries support in-app graph operations\n- Rust becomes interesting if Twilite wants a high-performance portable core, potentially via WASM\n\nThe correct near-term move is not library selection first.\nIt is defining the interfaces and benchmark workloads that any candidate must satisfy.\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-benchmarks",
+      "type": "markdown",
+      "label": "Performance and Benchmarking",
+      "position": {
+        "x": 1200,
+        "y": 760
+      },
+      "width": 620,
+      "height": 620,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Performance Considerations, Benchmarks, and Suggested Experiments\n\nPerformance is product behavior in Twilite.\n\nBenchmark dimensions:\n- memory footprint and index overhead\n- p50 / p95 / p99 latency for interactive graph queries\n- throughput for update ingestion and index maintenance\n- metric and layout stability under small edits\n- cost of producing human-readable explanations for AI suggestions\n\nSuggested benchmark suite:\n- neighborhood expansion on the canvas\n- agent-safe top-k explanation paths\n- incremental update stress under bursts and merges\n- batch analytics cadence for clustering and ranking\n- event-log replay and state-hash verification\n\nStandard metrics to record early:\n- `|V|`, `|E|`, edge-type count, average and max degree\n- update mix percentages\n- query mix percentages\n- explicit UI vs batch latency budgets\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-scenarios-roadmap",
+      "type": "markdown",
+      "label": "Use Cases, Migration Checklist, and Roadmap",
+      "position": {
+        "x": 1880,
+        "y": 800
+      },
+      "width": 680,
+      "height": 840,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Concrete Twilite Use Cases, Migration Checklist, and Roadmap\n\nScenario set:\n- graph-grounded AI assistance with constrained actions\n- semantic navigation and explanation paths\n- auto-clustering for workspace organization\n- change impact analysis on dependency-like relations\n- schema and ontology enforcement via node classes\n- collaboration and merge semantics modeled as graph constraints\n\nMigration checklist:\n- establish edge semantics and which subsets must remain acyclic\n- choose the primary graph model, likely a property graph baseline\n- treat modifications as append-only events\n- define separate UI, agent, and analytics query contracts\n- add indexes early for class, edge type, and key properties\n- build a benchmark harness before deep optimization\n\nRoadmap milestones:\n- graph semantics baseline\n- event-sourced change log\n- indexes plus query APIs\n- first user-visible graph algorithms\n- incremental analytics layer\n- storage backend evaluation and hardening\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "research-sources",
+      "type": "markdown",
+      "label": "twilite.zone Sources Used",
+      "position": {
+        "x": -820,
+        "y": 460
+      },
+      "width": 560,
+      "height": 420,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "### Sources Used\n\nAvailable public evidence from `twilite.zone` established:\n- Twilite as a persistent graph workspace where ideas connect and evolve\n- explicit graph framing: every node is a thought, every edge is a relationship\n- collaboration with an AI assistant that can understand the graph\n- the graph as durable, portable, and shared between humans and agents\n- public labels indicating deeper areas such as Core Ontology, Node Class Library, and Twilite Documentation\n\nImportant limit:\n- deeper technical docs were not retrievable in citable form under the strict site-only constraint\n- so this graph is an implementation decision framework, not a sourced benchmark sheet\n",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "research-edge-1",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-executive-summary",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "frames",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-2",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-context-assumptions",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "assumes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-3",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-graph-models",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-4",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-algorithms",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "selects",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-5",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-storage-integration",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "operationalizes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-6",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-tooling",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-7",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-benchmarks",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "measures",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-8",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-scenarios-roadmap",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "roadmaps",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-9",
+      "type": "reference",
+      "source": "research-overview",
+      "target": "research-sources",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "cites",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-10",
+      "type": "reference",
+      "source": "research-graph-models",
+      "target": "research-algorithms",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-11",
+      "type": "reference",
+      "source": "research-storage-integration",
+      "target": "research-benchmarks",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "tests",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "research-edge-12",
+      "type": "reference",
+      "source": "research-context-assumptions",
+      "target": "research-scenarios-roadmap",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "bounds",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": []
+}

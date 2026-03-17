@@ -1,0 +1,530 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Landing Page Seriousness",
+    "description": "Task graph for making the Twilite landing graph a more intentional front door.",
+    "created": "2026-03-16T12:15:00.000Z",
+    "modified": "2026-03-16T12:15:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "landing-page",
+      "ux",
+      "content"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "landing-seriousness-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -780,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "landing-page-seriousness",
+          "name": "Landing Page Seriousness",
+          "version": "0.1.0",
+          "description": "Task graph for making the Twilite landing graph a more intentional front door.",
+          "createdAt": "2026-03-16T12:15:00.000Z",
+          "updatedAt": "2026-03-16T12:15:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -780,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -780,
+        "y": 240
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "views": [],
+        "skills": []
+      }
+    },
+    {
+      "id": "landing-seriousness-overview",
+      "type": "markdown",
+      "label": "Landing Page Seriousness",
+      "position": {
+        "x": -300,
+        "y": 0
+      },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Landing Page Seriousness\n\nThe public root graph is now strong enough that it needs to become an intentional front door rather than a useful demo. This task graph defines the questions and decisions needed to reshape it.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      },
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ]
+    },
+    {
+      "id": "landing-seriousness-entry",
+      "type": "markdown",
+      "label": "Clear Entry Path",
+      "position": {
+        "x": 260,
+        "y": -180
+      },
+      "width": 360,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Clear Entry Path\n\nWhat should a first-time visitor do first?\n\nThe landing graph needs one dominant journey instead of several equally plausible ones.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-identity",
+      "type": "markdown",
+      "label": "Clear Identity",
+      "position": {
+        "x": 680,
+        "y": -180
+      },
+      "width": 360,
+      "height": 210,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Clear Identity\n\nThe public root and its linked graphs need intentional names, titles, and descriptions. `Untitled Graph` and `Untitled Project` weaken the front door immediately.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-hierarchy",
+      "type": "markdown",
+      "label": "Stronger Hierarchy",
+      "position": {
+        "x": 260,
+        "y": 80
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Stronger Hierarchy\n\nThe root graph currently mixes onboarding, philosophy, tasks, library links, and author notes. The landing page needs a clearer ordering of importance.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-signals",
+      "type": "markdown",
+      "label": "Fewer Accidental Signals",
+      "position": {
+        "x": 680,
+        "y": 80
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Fewer Accidental Signals\n\nDuplicate entries, old titles, and uneven naming make the site feel more experimental than it now deserves. The landing graph should reduce those accidental signals.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-conversion",
+      "type": "markdown",
+      "label": "Intentional Conversion",
+      "position": {
+        "x": 1100,
+        "y": 80
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Intentional Conversion\n\nDecide what a visitor should become after landing:\n- reader\n- explorer\n- builder\n- contributor\n- customer\n\nWithout this, the landing graph will stay broad instead of sharp.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-sequence",
+      "type": "markdown",
+      "label": "Suggested Sequence",
+      "position": {
+        "x": 260,
+        "y": 360
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Suggested Sequence\n\nA likely first pass for the root graph:\n\n1. What Twilite Is\n2. Why Graphs\n3. Try It\n4. Explore Library\n5. See The Task Graphs\n\nThis is a proposed visitor journey, not a final decision.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-questions",
+      "type": "markdown",
+      "label": "Questions To Answer",
+      "position": {
+        "x": 740,
+        "y": 360
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Questions To Answer\n\n- What is the primary visitor journey?\n- What should be above the fold in graph terms?\n- What gets demoted: author note, tasks, library, ontology, docs?\n- What are the exact naming fixes needed?\n- What visual/structural assets should be exported for external design tools like Canva?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "landing-seriousness-output",
+      "type": "markdown",
+      "label": "Design Export Goal",
+      "position": {
+        "x": 1220,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Design Export Goal\n\nOnce these questions are answered, the landing graph should be structured enough to export into a more polished design process or external tool without losing the graph-native reasoning behind it.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "landing-seriousness-edge-1",
+      "type": "reference",
+      "source": "landing-seriousness-overview",
+      "target": "landing-seriousness-entry",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-2",
+      "type": "reference",
+      "source": "landing-seriousness-overview",
+      "target": "landing-seriousness-identity",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-3",
+      "type": "reference",
+      "source": "landing-seriousness-overview",
+      "target": "landing-seriousness-hierarchy",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-4",
+      "type": "reference",
+      "source": "landing-seriousness-overview",
+      "target": "landing-seriousness-signals",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-5",
+      "type": "reference",
+      "source": "landing-seriousness-overview",
+      "target": "landing-seriousness-conversion",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-6",
+      "type": "reference",
+      "source": "landing-seriousness-entry",
+      "target": "landing-seriousness-sequence",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "suggests",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-7",
+      "type": "reference",
+      "source": "landing-seriousness-hierarchy",
+      "target": "landing-seriousness-questions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "raises",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-8",
+      "type": "reference",
+      "source": "landing-seriousness-identity",
+      "target": "landing-seriousness-questions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-9",
+      "type": "reference",
+      "source": "landing-seriousness-signals",
+      "target": "landing-seriousness-questions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-10",
+      "type": "reference",
+      "source": "landing-seriousness-conversion",
+      "target": "landing-seriousness-output",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "landing-seriousness-edge-11",
+      "type": "reference",
+      "source": "landing-seriousness-questions",
+      "target": "landing-seriousness-output",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ]
+}

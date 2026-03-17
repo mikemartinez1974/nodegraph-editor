@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate, { getNodeFragmentId } from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
@@ -135,6 +136,8 @@ export default function ScriptNode({
     }
   }, [node.id, nodeRefs]);
 
+  const { isExecutionActive } = useNodeExecutionGate(node);
+
   const refreshScriptLibrary = () => {
     setScriptLibrary(readScriptsFromStorage());
   };
@@ -240,7 +243,13 @@ export default function ScriptNode({
     const runner = window.__scriptRunner;
 
     try {
-      const runMeta = { dry: dryRun || meta.dry, allowMutations: allowMutations || meta.allowMutations };
+      const runMeta = {
+        dry: dryRun || meta.dry,
+        allowMutations: allowMutations || meta.allowMutations,
+        nodeId: node.id,
+        fragmentId: getNodeFragmentId(node),
+        sourceNodeId: node.id
+      };
       let scriptSource = selectedScript.source || selectedScript.script || '';
       if (!scriptSource.trim() && selectedScript.ref) {
         scriptSource = await loadScriptSourceByRef(selectedScript.ref);
@@ -293,6 +302,7 @@ export default function ScriptNode({
     if (isEmbedded) return undefined;
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       // allow passing meta via value
       const meta = (value && typeof value === 'object') ? value : {};
       runScriptRef.current?.(meta);
@@ -300,20 +310,22 @@ export default function ScriptNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, node.id]);
+  }, [isEmbedded, selectedScriptId, scriptLibrary, allowMutations, dryRun, node.id, isExecutionActive]);
 
   useEffect(() => {
     if (isEmbedded) return undefined;
     const handleExecute = ({ nodeId, meta } = {}) => {
       if (nodeId !== node.id) return;
+      if (!isExecutionActive) return;
       runScriptRef.current?.(meta || {});
     };
     eventBus.on('executeNode', handleExecute);
     return () => eventBus.off('executeNode', handleExecute);
-  }, [isEmbedded, node.id]);
+  }, [isEmbedded, node.id, isExecutionActive]);
 
   useEffect(() => {
     if (isEmbedded) return;
+    if (!isExecutionActive) return;
     if (node?.data?.autoRun && !autoRunTriggered.current && selectedScriptId) {
       if (shouldDebugScripts) {
         console.log('[ScriptNode] initial autoRun trigger', node.id);
@@ -321,11 +333,12 @@ export default function ScriptNode({
       autoRunTriggered.current = true;
       runScriptRef.current?.();
     }
-  }, [isEmbedded, node?.data?.autoRun, selectedScriptId, node.id]);
+  }, [isEmbedded, isExecutionActive, node?.data?.autoRun, selectedScriptId, node.id]);
 
   useEffect(() => {
     if (isEmbedded) return undefined;
     const shouldAutoRun =
+      isExecutionActive &&
       !!selectedScriptId &&
       !!node?.data?.autoRun &&
       node?.data?.scriptId === 'breadboard-autowire-runtime';
@@ -503,10 +516,11 @@ export default function ScriptNode({
       }
       if (typeof offDrag === 'function') offDrag();
     };
-  }, [node?.data?.autoRun, node?.data?.scriptId, selectedScriptId, node.id, shouldDebugScripts]);
+  }, [isExecutionActive, node?.data?.autoRun, node?.data?.scriptId, selectedScriptId, node.id, shouldDebugScripts]);
 
   const baseLeft = (node?.position?.x || 0) * zoom + pan.x;
   const baseTop = (node?.position?.y || 0) * zoom + pan.y;
+  const titleBarHeight = 30;
 
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;
   const unselected_gradient = `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`;
@@ -537,10 +551,6 @@ export default function ScriptNode({
         zIndex: 100,
         pointerEvents: 'auto',
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        justifyContent: 'space-between',
         ...style
       }}
       tabIndex={0}
@@ -552,83 +562,114 @@ export default function ScriptNode({
     >
       <NodeTypeBadge type={node?.type} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ fontWeight: 700 }}>{node?.label || 'Script'}</div>
-        <div style={{ fontSize: 11, opacity: 0.85 }}>{running ? 'Running…' : (lastRunAt ? new Date(lastRunAt).toLocaleTimeString() : '')}</div>
-      </div>
+      <div
+        title="Drag node"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: titleBarHeight,
+          zIndex: 1,
+          cursor: 'grab',
+          pointerEvents: 'auto',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0))'
+        }}
+      />
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-        <select
-          value={selectedScriptId}
-          onFocus={refreshScriptLibrary}
-          onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-          onChange={e => setSelectedScriptId(e.target.value)}
-          style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white' }}
-        >
-          <option value="">(select script)</option>
-          {scriptLibrary.map(s => (
-            <option key={s.id} value={s.id}>{s.name || s.id}</option>
-          ))}
-        </select>
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); runScript(); }}
-          disabled={running || !selectedScriptId}
-          style={{
-            padding: '6px 10px',
-            borderRadius: 6,
-            border: 'none',
-            background: theme.palette.primary.dark,
-            color: 'white',
-            cursor: 'pointer'
-          }}
-        >
-          RUN
-        </button>
-      </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: titleBarHeight,
+          left: 12,
+          right: 12,
+          bottom: 12,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'space-between',
+          minHeight: 0,
+          zIndex: 2
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <div style={{ fontWeight: 700 }}>{node?.label || 'Script'}</div>
+          <div style={{ fontSize: 11, opacity: 0.85 }}>{running ? 'Running…' : (lastRunAt ? new Date(lastRunAt).toLocaleTimeString() : '')}</div>
+        </div>
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
-        <label style={{ fontSize: 11, opacity: 0.85 }}>
-          <input
-            type="checkbox"
-            checked={allowMutations}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+          <select
+            value={selectedScriptId}
+            onFocus={refreshScriptLibrary}
             onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
-            onChange={e => setAllowMutations(e.target.checked)}
-          /> Allow Mutations
-        </label>
-        <label style={{ fontSize: 11, opacity: 0.85 }}>
-          <input
-            type="checkbox"
-            checked={dryRun}
+            onChange={e => setSelectedScriptId(e.target.value)}
+            style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white' }}
+          >
+            <option value="">(select script)</option>
+            {scriptLibrary.map(s => (
+              <option key={s.id} value={s.id}>{s.name || s.id}</option>
+            ))}
+          </select>
+          <button
             onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => e.stopPropagation()}
-            onChange={e => setDryRun(e.target.checked)}
-          /> Dry Run
-        </label>
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={e => { e.stopPropagation(); setShowResult(v => !v); }}
-          style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, border: 'none', background: showResult ? theme.palette.secondary.dark : theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}
-        >
-          {showResult ? 'Hide Result' : 'Show Result'}
-        </button>
-      </div>
+            onClick={(e) => { e.stopPropagation(); runScript(); }}
+            disabled={running || !selectedScriptId}
+            style={{
+              padding: '6px 10px',
+              borderRadius: 6,
+              border: 'none',
+              background: theme.palette.primary.dark,
+              color: 'white',
+              cursor: 'pointer'
+            }}
+          >
+            RUN
+          </button>
+        </div>
 
-      {showResult && lastResult && (
-        <pre style={{ marginTop: 8, fontSize: 12, background: 'rgba(0,0,0,0.18)', borderRadius: 6, padding: 8, maxHeight: 120, overflow: 'auto', color: lastResult.success === false ? theme.palette.error.main : 'inherit' }}>
-          {typeof lastResult === 'object' ? JSON.stringify(lastResult, null, 2) : String(lastResult)}
-        </pre>
-      )}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
+          <label style={{ fontSize: 11, opacity: 0.85 }}>
+            <input
+              type="checkbox"
+              checked={allowMutations}
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              onChange={e => setAllowMutations(e.target.checked)}
+            /> Allow Mutations
+          </label>
+          <label style={{ fontSize: 11, opacity: 0.85 }}>
+            <input
+              type="checkbox"
+              checked={dryRun}
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              onChange={e => setDryRun(e.target.checked)}
+            /> Dry Run
+          </label>
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); setShowResult(v => !v); }}
+            style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, border: 'none', background: showResult ? theme.palette.secondary.dark : theme.palette.primary.dark, color: 'white', cursor: 'pointer' }}
+          >
+            {showResult ? 'Hide Result' : 'Show Result'}
+          </button>
+        </div>
 
-      <div style={{ marginTop: 8, fontSize: 11, opacity: 0.85 }}>
-        {lastResult ? (lastResult.success ? 'Last run: success' : `Last run error: ${String(lastResult.error || '')}`) : 'No runs yet'}
+        {showResult && lastResult && (
+          <pre style={{ marginTop: 8, fontSize: 12, background: 'rgba(0,0,0,0.18)', borderRadius: 6, padding: 8, maxHeight: 120, overflow: 'auto', color: lastResult.success === false ? theme.palette.error.main : 'inherit' }}>
+            {typeof lastResult === 'object' ? JSON.stringify(lastResult, null, 2) : String(lastResult)}
+          </pre>
+        )}
+
+        <div style={{ marginTop: 8, fontSize: 11, opacity: 0.85 }}>
+          {lastResult ? (lastResult.success ? 'Last run: success' : `Last run error: ${String(lastResult.error || '')}`) : 'No runs yet'}
+        </div>
       </div>
     </div>
   );

@@ -45,6 +45,8 @@ const FixedNode = ({
 }) => {
   const node = useNodePortSchema(rawNode, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const theme = useTheme();
+  const semanticLevel = String(rawNode?.data?._semanticLevel || 'detail').trim().toLowerCase();
+  const isIconSemantic = semanticLevel === 'icon';
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 50) * zoom;
   const nodeRef = useRef(null);
@@ -239,6 +241,63 @@ const FixedNode = ({
     transition: (isRotating || isDragging || draggingHandle) ? 'none' : 'transform 0.1s ease-out',
     ...styleOverrides
   };
+
+  if (isIconSemantic) {
+    const dotColor = nodeColor || theme.palette.primary.light;
+    const dotBorderColor = isSelected ? theme.palette.secondary.main : alpha(dotColor, 0.7);
+    return (
+      <div
+        ref={nodeRef}
+        data-node-draggable="true"
+        className="node-or-handle"
+        title={node?.label || node?.type || 'Node'}
+        style={{
+          ...computedStyle,
+          borderWidth: isSelected ? 2 : 1,
+          borderStyle: 'solid',
+          borderColor: dotBorderColor,
+          background: dotColor,
+          borderRadius: '50%',
+          boxShadow: isSelected
+            ? `0 0 8px ${theme.palette.secondary.main}`
+            : `0 0 0 1px ${alpha('#000', 0.08)}`,
+          display: 'block'
+        }}
+        tabIndex={0}
+        onMouseDown={e => {
+          e.stopPropagation();
+          if (e.altKey) {
+            startRotation(e);
+            return;
+          }
+          if (onMouseDown) onMouseDown(e);
+          eventBus.emit('nodeMouseDown', { id: node.id, event: e });
+        }}
+        onTouchStart={e => {
+          if (e.touches && e.touches.length > 1) return;
+          if (onTouchStart) onTouchStart(e);
+          eventBus.emit('nodeMouseDown', { id: node.id, event: e });
+        }}
+        onClick={e => {
+          e.stopPropagation();
+          if (typeof onClick === 'function') onClick(e);
+        }}
+        onDoubleClick={e => {
+          e.stopPropagation();
+          if (typeof onDoubleClick === 'function') onDoubleClick(e);
+        }}
+        onContextMenu={e => {
+          if (typeof onContextMenu === 'function') onContextMenu(e);
+        }}
+        onMouseEnter={e => {
+          eventBus.emit('nodeMouseEnter', { id: node.id, event: e });
+        }}
+        onMouseLeave={e => {
+          eventBus.emit('nodeMouseLeave', { id: node.id, event: e });
+        }}
+      />
+    );
+  }
 
   return (
     <div

@@ -1,21 +1,21 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Focus Scoped Authority",
-    "description": "Task graph for navigation-local authority and fragment-local reload.",
-    "created": "2026-03-15T18:30:00.000Z",
-    "modified": "2026-03-15T18:30:00.000Z",
+    "title": "Context Grammar",
+    "description": "Task graph for connection semantics.",
+    "created": "2026-03-15T19:35:00.000Z",
+    "modified": "2026-03-15T19:35:00.000Z",
     "author": "",
     "tags": [
       "tasks",
-      "authority",
-      "reload"
+      "context",
+      "ports"
     ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "focus-auth-manifest",
+      "id": "context-grammar-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -28,12 +28,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "focus-scoped-authority-task",
-          "name": "Focus Scoped Authority",
+          "graphId": "context-grammar-task",
+          "name": "Context Grammar",
           "version": "0.1.0",
-          "description": "Navigation-local authority and fragment-local reload.",
-          "createdAt": "2026-03-15T18:30:00.000Z",
-          "updatedAt": "2026-03-15T18:30:00.000Z"
+          "description": "Semantic roles for navigate, expand, and bridge, with boundary treated as context metadata.",
+          "createdAt": "2026-03-15T19:35:00.000Z",
+          "updatedAt": "2026-03-15T19:35:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "id": "focus-auth-legend",
+      "id": "context-grammar-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -118,19 +118,19 @@
       "data": {
         "entries": [
           {
-            "key": "constraint",
+            "key": "mode",
             "intent": "discussion",
             "implementation": "markdown node",
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- constraint: runtime rule or implementation target",
+        "markdown": "## Legend\n- mode: semantic role for a connection",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "focus-auth-dictionary",
+      "id": "context-grammar-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -150,9 +150,9 @@
       }
     },
     {
-      "id": "focus-auth-overview",
+      "id": "context-grammar-overview",
       "type": "markdown",
-      "label": "Focus Scoped Authority",
+      "label": "Context Grammar",
       "position": {
         "x": -620,
         "y": 0
@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Focus Scoped Authority\n\nKeep one shared node collection, but move execution authority with navigation focus. Reload should act on the focused fragment only, in place.",
+        "markdown": "# Context Grammar\n\nStatus: implemented for this phase.\n\nPort modes are now a real grammar for `navigate`, `expand`, and `bridge`. `boundary` survives only as context metadata, not as a port mode.",
         "memo": "",
         "link": "",
         "html": "",
@@ -209,16 +209,16 @@
       }
     },
     {
-      "id": "focus-auth-structure",
+      "id": "context-grammar-navigate",
       "type": "markdown",
-      "label": "Shared Structure",
+      "label": "Navigate",
       "position": {
-        "x": -140,
-        "y": -40
+        "x": -160,
+        "y": -60
       },
       "width": 360,
       "height": 210,
-      "color": "#00897b",
+      "color": "#1565c0",
       "ports": [
         {
           "id": "in",
@@ -258,7 +258,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Shared Structure\n\n- All loaded nodes coexist in one runtime collection.\n- Graph sections stay where they were authored.\n- Navigation does not move graph features around.\n- Every materialized node carries fragment provenance.",
+        "markdown": "# Navigate\n\n- move into another graph/document context\n- host session changes intentionally\n- authority transition is allowed here\n- use when the target is a destination world",
         "memo": "",
         "link": "",
         "html": "",
@@ -268,12 +268,71 @@
       }
     },
     {
-      "id": "focus-auth-exec",
+      "id": "context-grammar-expand",
       "type": "markdown",
-      "label": "Focus-Scoped Execution",
+      "label": "Expand",
       "position": {
-        "x": 320,
-        "y": -40
+        "x": 260,
+        "y": -60
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expand\n\n- project a fragment or full graph document into the current host session\n- preserve shared structure instead of replacing the host\n- same navigational world\n- authority stays local unless focus explicitly changes",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-bridge",
+      "type": "markdown",
+      "label": "Bridge",
+      "position": {
+        "x": 680,
+        "y": -60
       },
       "width": 360,
       "height": 210,
@@ -317,7 +376,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Focus-Scoped Execution\n\n- Only the focused fragment runs scripts, hooks, and live behavior.\n- Nearby fragments may render, but stay dormant.\n- Authority moves with navigation, not with visibility alone.",
+        "markdown": "# Bridge\n\n- explicit cross-context capability inside the current session\n- does not replace the host graph or transfer ambient authority\n- current runtime: bridge loads a node-class graph, registers its dictionary entries, and creates a local instance in the source fragment\n- use this when you want controlled reach without world-merging",
         "memo": "",
         "link": "",
         "html": "",
@@ -327,71 +386,12 @@
       }
     },
     {
-      "id": "focus-auth-reload",
+      "id": "context-grammar-boundary",
       "type": "markdown",
-      "label": "Local Fragment Reload",
+      "label": "Boundary (Context Property)",
       "position": {
-        "x": 780,
-        "y": -40
-      },
-      "width": 360,
-      "height": 210,
-      "color": "#3949ab",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Local Fragment Reload\n\n- Refresh should target the focused fragment source.\n- Rematerialize only nodes from that fragment.\n- Leave the rest of the visible graph intact.\n- Preserve layout anchors and attachment edges.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "focus-auth-prov",
-      "type": "markdown",
-      "label": "Fragment Provenance Contract",
-      "position": {
-        "x": -140,
-        "y": 280
+        "x": 1100,
+        "y": -60
       },
       "width": 360,
       "height": 210,
@@ -435,7 +435,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Fragment Provenance Contract\n\nEach loaded node needs:\n- fragment id\n- source ref\n- canonical local id\n- authority domain marker\n\nWithout provenance, focus-scoped authority cannot be enforced.",
+        "markdown": "# Boundary (Context Property)\n\nBoundary is probably not an edge behavior. It is more naturally a region or fragment property:\n- it marks where one context stops and another begins\n- it lives at the perimeter of a fragment/domain\n- ports and bridges may cross it\n- but the boundary itself is not the crossing",
         "memo": "",
         "link": "",
         "html": "",
@@ -445,11 +445,70 @@
       }
     },
     {
-      "id": "focus-auth-remat",
+      "id": "context-grammar-implications",
       "type": "markdown",
-      "label": "In-Place Rematerialization",
+      "label": "Implications",
       "position": {
-        "x": 320,
+        "x": 260,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#00897b",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implications\n\nWith the current runtime:\n- `expand` means same host session for fragments and full graph documents\n- `navigate` means replace the host session\n- `bridge` means explicit capability within the current session\n- `boundary` means context metadata, not edge behavior\n\nThis layer is now real enough to treat `Context Grammar` as complete for this phase.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-ui",
+      "type": "markdown",
+      "label": "UI Consequence",
+      "position": {
+        "x": 760,
         "y": 280
       },
       "width": 360,
@@ -494,7 +553,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# In-Place Rematerialization\n\nReloading a fragment means:\n- remove nodes for fragment F\n- fetch F\n- rematerialize F\n- reconnect attach edges\n- keep surrounding graph untouched",
+        "markdown": "# UI Consequence\n\nThe select should expose only real connection semantics:\n- `navigate`\n- `expand`\n- `bridge`\n\n`boundary` belongs in context metadata, not in the port mode select.",
         "memo": "",
         "link": "",
         "html": "",
@@ -504,12 +563,12 @@
       }
     },
     {
-      "id": "focus-auth-open",
+      "id": "context-grammar-split",
       "type": "markdown",
-      "label": "Open Questions",
+      "label": "Connection vs Context",
       "position": {
-        "x": 780,
-        "y": 280
+        "x": 1100,
+        "y": 260
       },
       "width": 360,
       "height": 210,
@@ -553,125 +612,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Open Questions\n\n- What lifecycle events fire when focus enters or leaves a fragment?\n- Do scripts suspend, restart, or resume?\n- How should fragment-local history interact with document history?",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "focus-auth-lifecycle",
-      "type": "markdown",
-      "label": "Lifecycle Defaults",
-      "position": {
-        "x": 1120,
-        "y": 120
-      },
-      "width": 380,
-      "height": 230,
-      "color": "#2e7d32",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Lifecycle Defaults\n\nStart with a small fragment lifecycle:\n- `fragmentMaterialize` on first load\n- `fragmentFocusEnter` when focus enters\n- `fragmentFocusLeave` when focus leaves\n- `fragmentReload` on local reload\n\nDefault behavior:\n- reload restarts scripts\n- if the focused node still exists after reload, restore focus to it\n- otherwise focus the fragment entry/root",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "focus-auth-history",
-      "type": "markdown",
-      "label": "History Default",
-      "position": {
-        "x": 1120,
-        "y": 400
-      },
-      "width": 380,
-      "height": 220,
-      "color": "#1565c0",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# History Default\n\nUse one shared document/session history for now.\n\n- Fragment reload is a normal history event in the shared node collection.\n- Story snapshots remain document-level milestones.\n- GitHub is the durable history system.\n- Do not add fragment-local history until there is a concrete need.",
+        "markdown": "# Connection vs Context\n\nThe grammar is now:\n- connection semantics: `navigate`, `expand`, `bridge`\n- context semantics: `boundary`\n\n`boundary` is not a crossing. It only names the perimeter or limit that crossings relate to.",
         "memo": "",
         "link": "",
         "html": "",
@@ -683,13 +624,13 @@
   ],
   "edges": [
     {
-      "id": "focus-auth-edge-1",
+      "id": "context-grammar-edge-1",
       "type": "reference",
-      "source": "focus-auth-overview",
-      "target": "focus-auth-structure",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-navigate",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "requires",
+      "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
@@ -698,13 +639,13 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-2",
+      "id": "context-grammar-edge-2",
       "type": "reference",
-      "source": "focus-auth-overview",
-      "target": "focus-auth-exec",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-expand",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "requires",
+      "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
@@ -713,13 +654,13 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-3",
+      "id": "context-grammar-edge-3",
       "type": "reference",
-      "source": "focus-auth-overview",
-      "target": "focus-auth-reload",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-bridge",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "requires",
+      "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
@@ -728,13 +669,13 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-4",
+      "id": "context-grammar-edge-4",
       "type": "reference",
-      "source": "focus-auth-structure",
-      "target": "focus-auth-prov",
+      "source": "context-grammar-overview",
+      "target": "context-grammar-boundary",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "depends on",
+      "label": "defines",
       "style": {
         "width": 2,
         "dash": [],
@@ -743,40 +684,10 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-5",
+      "id": "context-grammar-edge-5",
       "type": "reference",
-      "source": "focus-auth-exec",
-      "target": "focus-auth-prov",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "depends on",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "focus-auth-edge-6",
-      "type": "reference",
-      "source": "focus-auth-reload",
-      "target": "focus-auth-remat",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "implemented by",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "focus-auth-edge-7",
-      "type": "reference",
-      "source": "focus-auth-prov",
-      "target": "focus-auth-remat",
+      "source": "context-grammar-bridge",
+      "target": "context-grammar-implications",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "enables",
@@ -788,13 +699,13 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-8",
+      "id": "context-grammar-edge-6",
       "type": "reference",
-      "source": "focus-auth-remat",
-      "target": "focus-auth-open",
+      "source": "context-grammar-boundary",
+      "target": "context-grammar-implications",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "leads to",
+      "label": "enables",
       "style": {
         "width": 2,
         "dash": [],
@@ -803,13 +714,13 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-9",
+      "id": "context-grammar-edge-7",
       "type": "reference",
-      "source": "focus-auth-open",
-      "target": "focus-auth-lifecycle",
+      "source": "context-grammar-implications",
+      "target": "context-grammar-ui",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "default answer",
+      "label": "forces",
       "style": {
         "width": 2,
         "dash": [],
@@ -818,13 +729,28 @@
       "data": {}
     },
     {
-      "id": "focus-auth-edge-10",
+      "id": "context-grammar-edge-8",
       "type": "reference",
-      "source": "focus-auth-open",
-      "target": "focus-auth-history",
+      "source": "context-grammar-boundary",
+      "target": "context-grammar-split",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "default answer",
+      "label": "reframes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-edge-9",
+      "type": "reference",
+      "source": "context-grammar-split",
+      "target": "context-grammar-ui",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "clarifies",
       "style": {
         "width": 2,
         "dash": [],

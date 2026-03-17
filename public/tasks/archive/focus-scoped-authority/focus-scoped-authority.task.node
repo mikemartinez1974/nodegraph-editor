@@ -1,21 +1,21 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Traversal And Authority",
-    "description": "Task graph for traversal, authority, and capability boundaries.",
-    "created": "2026-03-15T12:00:00.000Z",
-    "modified": "2026-03-15T12:00:00.000Z",
+    "title": "Focus Scoped Authority",
+    "description": "Task graph for navigation-local authority and fragment-local reload.",
+    "created": "2026-03-15T18:30:00.000Z",
+    "modified": "2026-03-15T18:30:00.000Z",
     "author": "",
     "tags": [
       "tasks",
-      "traversal",
-      "authority"
+      "authority",
+      "reload"
     ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
     {
-      "id": "traversal-auth-manifest",
+      "id": "focus-auth-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -28,12 +28,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "traversal-authority-task",
-          "name": "Traversal And Authority",
+          "graphId": "focus-scoped-authority-task",
+          "name": "Focus Scoped Authority",
           "version": "0.1.0",
-          "description": "Design constraints for bounded traversal, authority, and capability.",
-          "createdAt": "2026-03-15T12:00:00.000Z",
-          "updatedAt": "2026-03-15T12:00:00.000Z"
+          "description": "Navigation-local authority and fragment-local reload.",
+          "createdAt": "2026-03-15T18:30:00.000Z",
+          "updatedAt": "2026-03-15T18:30:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "id": "traversal-auth-legend",
+      "id": "focus-auth-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -124,13 +124,13 @@
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- constraint: design rule or future boundary",
+        "markdown": "## Legend\n- constraint: runtime rule or implementation target",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "traversal-auth-dictionary",
+      "id": "focus-auth-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -150,9 +150,9 @@
       }
     },
     {
-      "id": "trav-overview",
+      "id": "focus-auth-overview",
       "type": "markdown",
-      "label": "Traversal And Authority",
+      "label": "Focus Scoped Authority",
       "position": {
         "x": -620,
         "y": 0
@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Traversal And Authority\n\nTraversal, authority, and capability must be modeled together. The current system works, but future work must preserve the ability to cut scope cleanly later.",
+        "markdown": "# Focus Scoped Authority\n\nStatus: complete for this phase.\n\nTwilite now keeps one shared node collection while moving execution and reload authority with navigation focus. Focused-fragment reload happens in place instead of replacing the whole session.",
         "memo": "",
         "link": "",
         "html": "",
@@ -209,16 +209,16 @@
       }
     },
     {
-      "id": "trav-traversal",
+      "id": "focus-auth-structure",
       "type": "markdown",
-      "label": "Traversal Policy",
+      "label": "Shared Structure",
       "position": {
-        "x": -120,
+        "x": -140,
         "y": -40
       },
       "width": 360,
       "height": 210,
-      "color": "#5e35b1",
+      "color": "#00897b",
       "ports": [
         {
           "id": "in",
@@ -258,7 +258,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Traversal Policy\n\n- Fragment targets should feel like continuous traversal.\n- Non-fragment targets remain document boundaries.\n- Ring-based loading bounds growth.\n- Automatic expansion should follow graph type, not ad hoc guesses.",
+        "markdown": "# Shared Structure\n\n- All loaded nodes coexist in one runtime collection.\n- Graph sections stay where they were authored.\n- Navigation does not move graph features around.\n- Every materialized node carries fragment provenance.",
         "memo": "",
         "link": "",
         "html": "",
@@ -268,9 +268,9 @@
       }
     },
     {
-      "id": "trav-authority",
+      "id": "focus-auth-exec",
       "type": "markdown",
-      "label": "Authority Policy",
+      "label": "Focus-Scoped Execution",
       "position": {
         "x": 320,
         "y": -40
@@ -317,7 +317,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Authority Policy\n\n- Host authority remains primary inside fragment continuity.\n- Non-fragment navigation is where authority may transition.\n- The abstraction must match reality: if power is cut, it must actually be cut.",
+        "markdown": "# Focus-Scoped Execution\n\n- Only the focused fragment runs scripts, hooks, and live behavior.\n- Nearby fragments may render, but stay dormant.\n- Authority moves with navigation, not with visibility alone.",
         "memo": "",
         "link": "",
         "html": "",
@@ -327,11 +327,11 @@
       }
     },
     {
-      "id": "trav-capability",
+      "id": "focus-auth-reload",
       "type": "markdown",
-      "label": "Capability Policy",
+      "label": "Local Fragment Reload",
       "position": {
-        "x": 760,
+        "x": 780,
         "y": -40
       },
       "width": 360,
@@ -376,7 +376,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Capability Policy\n\n- Showing a node is not the same as running a node.\n- Static rendering can stay broad.\n- Live behavior, hooks, and side effects must eventually be scope-aware.",
+        "markdown": "# Local Fragment Reload\n\nImplemented:\n- Refresh targets the focused fragment source when focus is inside an expanded fragment.\n- Only that fragment is collapsed and rematerialized.\n- The rest of the visible graph stays intact.\n- Focus is restored to the previously focused node when possible, otherwise to the fragment entry/root.",
         "memo": "",
         "link": "",
         "html": "",
@@ -386,70 +386,11 @@
       }
     },
     {
-      "id": "trav-safe",
+      "id": "focus-auth-prov",
       "type": "markdown",
-      "label": "Safe To Build Now",
+      "label": "Fragment Provenance Contract",
       "position": {
-        "x": -120,
-        "y": 280
-      },
-      "width": 360,
-      "height": 210,
-      "color": "#00897b",
-      "ports": [
-        {
-          "id": "in",
-          "label": "In",
-          "direction": "input",
-          "dataType": "flow",
-          "position": {
-            "side": "left",
-            "offset": 0.5
-          }
-        },
-        {
-          "id": "out",
-          "label": "Out",
-          "direction": "output",
-          "dataType": "content",
-          "position": {
-            "side": "right",
-            "offset": 0.5
-          }
-        }
-      ],
-      "inputs": [
-        {
-          "key": "in",
-          "label": "In",
-          "type": "flow"
-        }
-      ],
-      "outputs": [
-        {
-          "key": "out",
-          "label": "Out",
-          "type": "content"
-        }
-      ],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "markdown": "# Safe To Build Now\n\n- Graph type: `fragment` vs `graph`\n- Entry surfaces\n- Focus and fragment identity\n- Provenance metadata\n- Ring-based loading and semantic views\n\nThese preserve future scope cuts without breaking current behavior.",
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "trav-avoid",
-      "type": "markdown",
-      "label": "Avoid Baking In",
-      "position": {
-        "x": 320,
+        "x": -140,
         "y": 280
       },
       "width": 360,
@@ -494,7 +435,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Avoid Baking In\n\n- Ambient global execution assumptions\n- Silent authority merging across visible graphs\n- Hooks firing everywhere because something is on screen\n- Node classes that cannot separate static render from live behavior",
+        "markdown": "# Fragment Provenance Contract\n\nEach loaded node needs:\n- fragment id\n- source ref\n- canonical local id\n- authority domain marker\n\nWithout provenance, focus-scoped authority cannot be enforced.",
         "memo": "",
         "link": "",
         "html": "",
@@ -504,11 +445,11 @@
       }
     },
     {
-      "id": "trav-boundary",
+      "id": "focus-auth-remat",
       "type": "markdown",
-      "label": "Future Boundary",
+      "label": "In-Place Rematerialization",
       "position": {
-        "x": 760,
+        "x": 320,
         "y": 280
       },
       "width": 360,
@@ -553,7 +494,228 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Future Boundary\n\nDo not harden authority cutoffs prematurely. Keep the current theory working, but avoid deepening ambient power. Tight scope enforcement comes later when render and execution can be split cleanly.",
+        "markdown": "# In-Place Rematerialization\n\nCurrent behavior:\n- remove nodes owned by fragment `F`\n- fetch `F` from provenance\n- rematerialize `F`\n- preserve the surrounding graph and the attach relationship\n- clear fragment-owned local nodes created inside `F` during reload\n\nFragment ownership is currently derived from:\n- `_expansion.expansionId`\n- `_origin.instanceId`\n- `_contextScope.fragmentId`",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-open",
+      "type": "markdown",
+      "label": "Open Questions",
+      "position": {
+        "x": 780,
+        "y": 280
+      },
+      "width": 360,
+      "height": 210,
+      "color": "#5e35b1",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Open Questions\n\nResolved enough for now:\n- Lifecycle events now include `fragmentMaterialize`, `fragmentFocusEnter`, `fragmentFocusLeave`, and `fragmentReload`.\n- Local fragment reload restores the focused node when possible, otherwise falls back to the fragment entry/root.\n- History remains document/session-level by default.\n\nLater follow-up only:\n- whether hooks/scripts should actively consume lifecycle events yet\n- whether any additional edge cases remain around focus restoration",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-lifecycle",
+      "type": "markdown",
+      "label": "Lifecycle Defaults",
+      "position": {
+        "x": 1120,
+        "y": 120
+      },
+      "width": 380,
+      "height": 230,
+      "color": "#2e7d32",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Lifecycle Defaults\n\nImplemented defaults:\n- `fragmentMaterialize` on expansion/materialization\n- `fragmentFocusEnter` when focus enters a fragment\n- `fragmentFocusLeave` when focus leaves a fragment\n- `fragmentReload` with `start`, `complete`, and `error` phases on local reload\n\nCurrent reload behavior:\n- rematerializes from fragment provenance\n- restores focus to the previous node if it still exists\n- otherwise falls back to the fragment entry/root",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-history",
+      "type": "markdown",
+      "label": "History Default",
+      "position": {
+        "x": 1120,
+        "y": 400
+      },
+      "width": 380,
+      "height": 220,
+      "color": "#1565c0",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# History Default\n\nUse one shared document/session history for now.\n\n- Fragment reload is a normal history event in the shared node collection.\n- Story snapshots remain document-level milestones.\n- GitHub is the durable history system.\n- Do not add fragment-local history until there is a concrete need.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-impl",
+      "type": "markdown",
+      "label": "Implementation Status",
+      "position": {
+        "x": 1500,
+        "y": 120
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implementation Status\n\nComplete for this phase.\n\nNow working in runtime:\n- focus enter/leave events\n- fragment materialization event\n- focused-fragment refresh path\n- in-place rematerialization\n- fragment-owned local node cleanup on reload\n- focus restoration after reload",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "focus-auth-complete",
+      "type": "markdown",
+      "label": "Phase Complete",
+      "position": {
+        "x": 1500,
+        "y": 420
+      },
+      "width": 360,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Phase Complete\n\nThe core focus-scoped authority path is implemented and validated. Remaining work is follow-up polish, not a blocker for the next authority/traversal step.",
         "memo": "",
         "link": "",
         "html": "",
@@ -565,10 +727,10 @@
   ],
   "edges": [
     {
-      "id": "trav-edge-1",
+      "id": "focus-auth-edge-1",
       "type": "reference",
-      "source": "trav-overview",
-      "target": "trav-traversal",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-structure",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "requires",
@@ -580,10 +742,10 @@
       "data": {}
     },
     {
-      "id": "trav-edge-2",
+      "id": "focus-auth-edge-2",
       "type": "reference",
-      "source": "trav-overview",
-      "target": "trav-authority",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-exec",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "requires",
@@ -595,10 +757,10 @@
       "data": {}
     },
     {
-      "id": "trav-edge-3",
+      "id": "focus-auth-edge-3",
       "type": "reference",
-      "source": "trav-overview",
-      "target": "trav-capability",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-reload",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "requires",
@@ -610,10 +772,55 @@
       "data": {}
     },
     {
-      "id": "trav-edge-4",
+      "id": "focus-auth-edge-4",
       "type": "reference",
-      "source": "trav-traversal",
-      "target": "trav-safe",
+      "source": "focus-auth-structure",
+      "target": "focus-auth-prov",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "depends on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-5",
+      "type": "reference",
+      "source": "focus-auth-exec",
+      "target": "focus-auth-prov",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "depends on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-6",
+      "type": "reference",
+      "source": "focus-auth-reload",
+      "target": "focus-auth-remat",
+      "sourcePort": "out",
+      "targetPort": "in",
+      "label": "implemented by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-7",
+      "type": "reference",
+      "source": "focus-auth-prov",
+      "target": "focus-auth-remat",
       "sourcePort": "out",
       "targetPort": "in",
       "label": "enables",
@@ -625,13 +832,13 @@
       "data": {}
     },
     {
-      "id": "trav-edge-5",
+      "id": "focus-auth-edge-8",
       "type": "reference",
-      "source": "trav-authority",
-      "target": "trav-avoid",
+      "source": "focus-auth-remat",
+      "target": "focus-auth-open",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "constrains",
+      "label": "leads to",
       "style": {
         "width": 2,
         "dash": [],
@@ -640,13 +847,13 @@
       "data": {}
     },
     {
-      "id": "trav-edge-6",
+      "id": "focus-auth-edge-9",
       "type": "reference",
-      "source": "trav-capability",
-      "target": "trav-boundary",
+      "source": "focus-auth-open",
+      "target": "focus-auth-lifecycle",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "forces",
+      "label": "default answer",
       "style": {
         "width": 2,
         "dash": [],
@@ -655,13 +862,13 @@
       "data": {}
     },
     {
-      "id": "trav-edge-7",
+      "id": "focus-auth-edge-10",
       "type": "reference",
-      "source": "trav-safe",
-      "target": "trav-boundary",
+      "source": "focus-auth-open",
+      "target": "focus-auth-history",
       "sourcePort": "out",
       "targetPort": "in",
-      "label": "preserves",
+      "label": "default answer",
       "style": {
         "width": 2,
         "dash": [],
@@ -670,13 +877,28 @@
       "data": {}
     },
     {
-      "id": "trav-edge-8",
+      "id": "focus-auth-edge-11",
       "type": "reference",
-      "source": "trav-avoid",
-      "target": "trav-boundary",
-      "sourcePort": "out",
-      "targetPort": "in",
-      "label": "protects",
+      "source": "focus-auth-overview",
+      "target": "focus-auth-impl",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implemented-as",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "focus-auth-edge-12",
+      "type": "reference",
+      "source": "focus-auth-impl",
+      "target": "focus-auth-complete",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "status",
       "style": {
         "width": 2,
         "dash": [],

@@ -1,0 +1,369 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "tasks-archive-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -620,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "tasks-archive-root",
+          "name": "Archived Tasks",
+          "version": "0.1.0",
+          "description": "Index graph for completed task work archived from the main task list.",
+          "createdAt": "2026-03-16T20:50:00.000Z",
+          "updatedAt": "2026-03-16T20:50:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "index"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -620,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "tasks-archive-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -620,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "skills": [],
+        "views": []
+      }
+    },
+    {
+      "id": "tasks-archive-overview",
+      "type": "markdown",
+      "label": "Archived Tasks",
+      "position": {
+        "x": -60,
+        "y": -140
+      },
+      "width": 520,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Archived Tasks\n\nCompleted task graphs moved out of the active task list. Use these ports for reference and regression checks.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      },
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "bottom",
+            "offset": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "tasks-archive-port-1",
+      "type": "port",
+      "label": "Branch Expansion",
+      "position": {
+        "x": -260,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed expansion and persistence semantics.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/branch-expansion/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-port-2",
+      "type": "port",
+      "label": "Traversal And Authority",
+      "position": {
+        "x": 80,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed traversal, authority, and history semantics.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/traversal-authority/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-port-3",
+      "type": "port",
+      "label": "Focus Scoped Authority",
+      "position": {
+        "x": 420,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed focus and fragment reload authority work.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/focus-scoped-authority/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-port-4",
+      "type": "port",
+      "label": "Script Scope",
+      "position": {
+        "x": 760,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed fragment-scoped script authority work.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/script-scope/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-port-5",
+      "type": "port",
+      "label": "Context Grammar",
+      "position": {
+        "x": 1100,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed traversal grammar and bridge semantics.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/context-grammar/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-archive-port-6",
+      "type": "port",
+      "label": "Script Scope Test",
+      "position": {
+        "x": 1440,
+        "y": 220
+      },
+      "width": 280,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Completed validation graph for script scope behavior.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/archive/script-scope-test.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "tasks-archive-edge-001",
+      "type": "relates",
+      "source": "tasks-archive-manifest",
+      "target": "tasks-archive-overview",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "declares"
+    },
+    {
+      "id": "tasks-archive-edge-002",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-1",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "tasks-archive-edge-003",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-2",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "tasks-archive-edge-004",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-3",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "tasks-archive-edge-005",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-4",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "tasks-archive-edge-006",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-5",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    },
+    {
+      "id": "tasks-archive-edge-007",
+      "type": "reference",
+      "source": "tasks-archive-overview",
+      "target": "tasks-archive-port-6",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "task"
+    }
+  ],
+  "timestamp": "2026-03-16T20:50:00.000Z",
+  "nodeCount": 10,
+  "edgeCount": 7
+}

@@ -125,6 +125,37 @@ export default function usePluginRuntime({
     });
   }, []);
 
+  useEffect(() => {
+    const handleRuntimeDiagnostic = (issue = {}) => {
+      if (!issue || typeof issue !== 'object') return;
+      pushScriptDiagnostic({
+        code: issue.code || 'RUNTIME_ERROR',
+        message: issue.message || 'Runtime error',
+        severity: issue.severity || 'error',
+        nodeId: issue.nodeId || null,
+        edgeId: issue.edgeId || null,
+        groupId: issue.groupId || issue.clusterId || null,
+        fragmentId: typeof issue.fragmentId === 'string' ? issue.fragmentId : '',
+        method: typeof issue.method === 'string' ? issue.method : '',
+        timestamp: Number.isFinite(issue.timestamp) ? issue.timestamp : Date.now()
+      });
+    };
+    const handleClearRuntimeDiagnostics = (payload = {}) => {
+      const nodeId = typeof payload?.nodeId === 'string' ? payload.nodeId.trim() : '';
+      if (!nodeId) {
+        setScriptDiagnostics([]);
+        return;
+      }
+      setScriptDiagnostics((prev) => prev.filter((entry) => entry?.nodeId !== nodeId));
+    };
+    eventBus.on('runtimeDiagnostic', handleRuntimeDiagnostic);
+    eventBus.on('clearRuntimeDiagnostics', handleClearRuntimeDiagnostics);
+    return () => {
+      eventBus.off('runtimeDiagnostic', handleRuntimeDiagnostic);
+      eventBus.off('clearRuntimeDiagnostics', handleClearRuntimeDiagnostics);
+    };
+  }, [pushScriptDiagnostic]);
+
   const assertNodeInActiveFragment = useCallback((node, fragmentId, action) => {
     if (!node) {
       throw new Error(`${action} target was not found`);
@@ -208,6 +239,12 @@ export default function usePluginRuntime({
     map.clear();
   }, []);
 
+  const isFragmentExecutionActive = useCallback((fragmentId = '') => {
+    const normalized = String(fragmentId || '').trim();
+    const focused = typeof state?.focusedFragmentId === 'string' ? state.focusedFragmentId.trim() : '';
+    return normalized === focused;
+  }, [state?.focusedFragmentId]);
+
   useEffect(() => {
     const handleReset = () => clearScriptEventSubscriptions();
     window.addEventListener('scriptRunnerReset', handleReset);
@@ -238,21 +275,27 @@ export default function usePluginRuntime({
       () => groupsRef?.current || groups || [],
       setGroups,
       groupsRef,
-      groupManager
+      groupManager,
+      {
+        getActiveFragmentId: () =>
+          typeof state?.focusedFragmentId === 'string' ? state.focusedFragmentId.trim() : ''
+      }
     );
-  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups, groupsRef, groupManager]);
+  }, [setNodes, setEdges, setGroups, historyHook.saveToHistory, groups, groupsRef, groupManager, state?.focusedFragmentId]);
 
   const handleScriptRequest = useCallback(async (method, args = [], meta = {}) => {
+    const runId = ensureScriptId(meta?.runId);
     try {
       const isDry = meta && meta.dry === true;
       const allowMutations = meta && meta.allowMutations === true;
-      const runId = ensureScriptId(meta?.runId);
       const activeFragmentId = getActiveFragmentId(meta);
       const scopedNodes = getScopedNodes(activeFragmentId);
       const scopedEdges = getScopedEdges(activeFragmentId);
       const scopedGroups = getScopedGroups(activeFragmentId);
+      const allNodes = nodesRef?.current || nodes || [];
       const scopedNodeById = new Map(scopedNodes.map((node) => [node?.id, node]));
       const scopedEdgeById = new Map(scopedEdges.map((edge) => [edge?.id, edge]));
+      const allNodeById = new Map(allNodes.map((node) => [node?.id, node]));
 
       if (runId) {
         const current = scriptRunStatsRef.current.get(runId) || { calls: 0, mutations: 0 };
@@ -371,7 +414,7 @@ export default function usePluginRuntime({
           if (!id) {
             throw new Error('deleteNode requires an id');
           }
-          assertNodeInActiveFragment(scopedNodeById.get(id) || null, activeFragmentId, 'deleteNode');
+          assertNodeInActiveFragment(allNodeById.get(id) || null, activeFragmentId, 'deleteNode');
           emitExecutionIntent({ action: 'deleteNode', id });
           return { id };
         }
@@ -386,7 +429,7 @@ export default function usePluginRuntime({
           if (!updates || typeof updates !== 'object') {
             throw new Error('updateNode requires an updates object');
           }
-          assertNodeInActiveFragment(scopedNodeById.get(id) || null, activeFragmentId, 'updateNode');
+          assertNodeInActiveFragment(allNodeById.get(id) || null, activeFragmentId, 'updateNode');
           emitExecutionIntent({ action: 'updateNode', id, patch: safeClone(updates) });
           return { id, ...safeClone(updates) };
         }
@@ -410,7 +453,7 @@ export default function usePluginRuntime({
           if (!nodeId || !patch) {
             throw new Error('applyScriptPatch requires nodeId and patch');
           }
-          assertNodeInActiveFragment(scopedNodeById.get(nodeId) || null, activeFragmentId, 'applyScriptPatch');
+          assertNodeInActiveFragment(allNodeById.get(nodeId) || null, activeFragmentId, 'applyScriptPatch');
           emitExecutionIntent({ action: 'updateNode', id: nodeId, patch: safeClone(patch) });
           return { nodeId };
         }
@@ -420,18 +463,23 @@ export default function usePluginRuntime({
           if (!eventName) {
             throw new Error('bridge:subscribeEvent requires an event name');
           }
+          const ownerFragmentId = getActiveFragmentId(meta);
           const map = scriptEventSubscriptionsRef.current;
           const existing = map.get(eventName);
           if (existing) {
             existing.count += 1;
+            existing.fragmentId = ownerFragmentId;
+            existing.nodeId = typeof meta?.nodeId === 'string' ? meta.nodeId : existing.nodeId || null;
             map.set(eventName, existing);
             return { subscribed: true, count: existing.count };
           }
-          const handler = (payload) =>
+          const handler = (payload) => {
+            if (!isFragmentExecutionActive(ownerFragmentId)) return;
             emitScriptEventPayload(
               eventName,
               buildScriptEventPayload(eventName, payload)
             );
+          };
           let unsubscribe = null;
           try {
             unsubscribe = eventBus.on(eventName, handler);
@@ -450,7 +498,12 @@ export default function usePluginRuntime({
               console.warn('[GraphEditor] Failed to cleanup script event listener', eventName, err);
             }
           };
-          map.set(eventName, { count: 1, off: cleanup });
+          map.set(eventName, {
+            count: 1,
+            off: cleanup,
+            fragmentId: ownerFragmentId,
+            nodeId: typeof meta?.nodeId === 'string' ? meta.nodeId : null
+          });
           return { subscribed: true, count: 1 };
         }
         case 'bridge:unsubscribeEvent': {
@@ -559,7 +612,9 @@ export default function usePluginRuntime({
 
   const pluginRuntime = usePluginRuntimeManager({
     graphApiRef: graphAPI,
-    selectionRef: selectionSnapshotRef
+    selectionRef: selectionSnapshotRef,
+    getActiveFragmentId: () =>
+      typeof state?.focusedFragmentId === 'string' ? state.focusedFragmentId.trim() : ''
   });
 
   const pluginRuntimeMemo = useMemo(

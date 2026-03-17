@@ -13,7 +13,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
     nodesRef, setNodes, edgesRef, setEdges, setGroups,
     groupsRef, groupManager, initialGraphLoadedRef,
     defaultNodeColor, defaultEdgeColor, setDefaultNodeColor, setDefaultEdgeColor,
-    zoom, setLoading, setSelectedNodeIds, setSelectedEdgeIds
+    zoom, setLoading, setSelectedNodeIds, setSelectedEdgeIds, focusedFragmentId
   } = state;
   
   const { saveToHistory } = historyHook;
@@ -32,7 +32,10 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
       () => groupsRef.current,
       setGroups,
       groupsRef,
-      groupManager
+      groupManager,
+      {
+        getActiveFragmentId: () => focusedFragmentId
+      }
     );
     
     attachSkills({ graphAPI: rawGraph, context: { eventBus } });
@@ -430,7 +433,7 @@ export function useGraphEditorSetup(state, handlers, historyHook) {
         // console.log('Graph CRUD API available at window.graphAPI');
       }
     }
-  }, [defaultNodeColor, defaultEdgeColor]);
+  }, [defaultNodeColor, defaultEdgeColor, focusedFragmentId]);
     
   // Handle drop events
   useEffect(() => {

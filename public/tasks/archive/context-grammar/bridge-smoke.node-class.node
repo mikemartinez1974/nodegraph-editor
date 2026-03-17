@@ -1,0 +1,165 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "bridge-smoke-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -520,
+        "y": -180
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "context-grammar-bridge-smoke-class",
+          "name": "Bridge Smoke Class",
+          "version": "0.1.0",
+          "description": "A conspicuous markdown node class used to smoke-test bridge behavior.",
+          "createdAt": "2026-03-16T18:35:00.000Z",
+          "updatedAt": "2026-03-16T18:35:00.000Z"
+        },
+        "intent": {
+          "kind": "node-class",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": false,
+            "allowUpdate": false,
+            "allowDelete": false,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "bridge-smoke-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -80,
+        "y": -180
+      },
+      "width": 420,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "markdown",
+            "ref": "/tasks/archive/context-grammar/bridge-smoke.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0",
+            "defaults": {
+              "label": "Bridged Smoke Node",
+              "size": {
+                "width": 340,
+                "height": 190
+              },
+              "color": "#ffb300",
+              "showLabel": true,
+              "data": {
+                "content": "# Bridged Smoke Node\n\nIf you can see this, `bridge` created a local markdown instance successfully.",
+                "markdown": "# Bridged Smoke Node\n\nIf you can see this, `bridge` created a local markdown instance successfully.",
+                "memo": "",
+                "link": "",
+                "html": "",
+                "svg": ""
+              }
+            }
+          }
+        ],
+        "views": [
+          {
+            "key": "markdown",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "markdown",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/markdown.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": []
+      }
+    },
+    {
+      "id": "bridge-smoke-notes",
+      "type": "markdown",
+      "label": "Notes",
+      "position": {
+        "x": 400,
+        "y": -140
+      },
+      "width": 420,
+      "height": 200,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Bridge Smoke Class\n\nThis artifact exists only to make `bridge` visually obvious during smoke tests.\n\nIt overrides the `markdown` node defaults with a bright color and visible content.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [],
+  "clusters": [],
+  "scripts": []
+}

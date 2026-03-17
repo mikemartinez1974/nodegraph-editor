@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
@@ -27,6 +28,7 @@ export default function GateNode({
   const theme = useTheme();
   const nodeRef = useRef(null);
   const node = useNodePortSchema(origNode, GATE_INPUTS, GATE_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
 
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 300) * zoom;
@@ -119,6 +121,7 @@ export default function GateNode({
   useEffect(() => {
     const handler = ({ targetNodeId, inputName, value } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       if (!inputName) return;
       setInputs(prev => {
         const next = { ...prev, [inputName]: !!value };
@@ -128,7 +131,7 @@ export default function GateNode({
 
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [node.id]);
+  }, [node.id, isExecutionActive]);
 
   const toggleInput = (name) => (e) => {
     e.stopPropagation();

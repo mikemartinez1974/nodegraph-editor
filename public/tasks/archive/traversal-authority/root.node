@@ -1,10 +1,10 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Focus Scoped Authority Root",
-    "description": "Index for focus scoped authority task graphs.",
-    "created": "2026-03-15T18:30:00.000Z",
-    "modified": "2026-03-15T18:30:00.000Z",
+    "title": "Traversal And Authority Root",
+    "description": "Index for traversal and authority task graphs.",
+    "created": "2026-03-15T12:00:00.000Z",
+    "modified": "2026-03-15T12:00:00.000Z",
     "author": "",
     "tags": [
       "tasks"
@@ -13,7 +13,7 @@
   },
   "nodes": [
     {
-      "id": "focus-auth-manifest",
+      "id": "traversal-auth-manifest",
       "type": "manifest",
       "label": "Manifest",
       "position": {
@@ -26,12 +26,12 @@
       "showLabel": true,
       "data": {
         "identity": {
-          "graphId": "focus-scoped-authority-task",
-          "name": "Focus Scoped Authority",
+          "graphId": "traversal-authority-task",
+          "name": "Traversal And Authority",
           "version": "0.1.0",
-          "description": "Navigation-local authority and fragment-local reload.",
-          "createdAt": "2026-03-15T18:30:00.000Z",
-          "updatedAt": "2026-03-15T18:30:00.000Z"
+          "description": "Design constraints for bounded traversal, authority, and capability.",
+          "createdAt": "2026-03-15T12:00:00.000Z",
+          "updatedAt": "2026-03-15T12:00:00.000Z"
         },
         "intent": {
           "kind": "graph",
@@ -102,7 +102,7 @@
       }
     },
     {
-      "id": "focus-auth-legend",
+      "id": "traversal-auth-legend",
       "type": "legend",
       "label": "Legend",
       "position": {
@@ -122,13 +122,13 @@
             "dictionaryKey": "default"
           }
         ],
-        "markdown": "## Legend\n- constraint: runtime rule or implementation target",
+        "markdown": "## Legend\n- constraint: design rule or future boundary",
         "isRoot": false,
         "root": false
       }
     },
     {
-      "id": "focus-auth-dictionary",
+      "id": "traversal-auth-dictionary",
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
@@ -148,9 +148,9 @@
       }
     },
     {
-      "id": "focus-auth-root-overview",
+      "id": "trav-root-overview",
       "type": "markdown",
-      "label": "Focus Scoped Authority",
+      "label": "Traversal And Authority",
       "position": {
         "x": -520,
         "y": 40
@@ -197,7 +197,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Focus Scoped Authority\n\nTask graph for navigation-local authority, shared structure, and local fragment reload.",
+        "markdown": "# Traversal And Authority\n\nTask graph for bounded traversal, authority, capability, and future execution scoping.",
         "memo": "",
         "link": "",
         "html": "",
@@ -207,9 +207,9 @@
       }
     },
     {
-      "id": "focus-auth-root-port-1",
+      "id": "trav-root-port-1",
       "type": "port",
-      "label": "Focus Scoped Authority Task",
+      "label": "Traversal And Authority Task",
       "position": {
         "x": 60,
         "y": 60
@@ -223,7 +223,7 @@
       "showLabel": true,
       "data": {
         "target": {
-          "endpoint": "/tasks/focus-scoped-authority/focus-scoped-authority.task.node:root",
+          "endpoint": "/tasks/archive/traversal-authority/traversal-authority.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -242,10 +242,10 @@
   ],
   "edges": [
     {
-      "id": "focus-auth-root-edge-1",
+      "id": "trav-root-edge-1",
       "type": "reference",
-      "source": "focus-auth-root-overview",
-      "target": "focus-auth-root-port-1",
+      "source": "trav-root-overview",
+      "target": "trav-root-port-1",
       "sourcePort": "out",
       "targetPort": "root",
       "label": "opens",

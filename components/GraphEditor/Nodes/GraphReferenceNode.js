@@ -94,7 +94,7 @@ const GraphReferenceNode = (props) => {
   const viewMode = String(node?.data?.mode || "preview").toLowerCase();
   const interactive = viewMode === "interactive";
   const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
-  const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
+  const canExpand = expansionTarget.mode === "expand" && Boolean(expansionTarget.ref);
   const [expansionBusy, setExpansionBusy] = useState(false);
   const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
   const [expansionError, setExpansionError] = useState("");

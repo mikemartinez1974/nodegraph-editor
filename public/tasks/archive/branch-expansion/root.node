@@ -173,7 +173,7 @@
         "memo": "Primary task graph for branch expansion.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/branch-expansion-resolution.task.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/branch-expansion-resolution.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -199,7 +199,7 @@
         "memo": "Simple fragment used for expansion tests.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/expansion-fragment-target.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/expansion-fragment-target.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -225,7 +225,7 @@
         "memo": "Exported fragment artifact from smoke testing.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/fragment_2026-03-13T17-43-58.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/fragment_2026-03-13T17-43-58.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -251,7 +251,7 @@
         "memo": "Trust gating smoke test.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/phase4-trust-smoke.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/phase4-trust-smoke.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -277,7 +277,7 @@
         "memo": "Save/export filtering smoke test.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/phase5-export-smoke.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/phase5-export-smoke.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -303,7 +303,7 @@
         "memo": "Design review graph for graph-level open/expand entry surfaces.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/entry-surfaces.task.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/entry-surfaces.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -329,7 +329,7 @@
         "memo": "Implementation task graph for structural-only branch expansion.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/structural-expansion-context.task.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/structural-expansion-context.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -355,7 +355,7 @@
         "memo": "Review graph for navigation-scoped authority rings.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/bullseye-authority.task.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/bullseye-authority.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -381,7 +381,7 @@
         "memo": "Review graph for preflight compatibility and block-vs-warn policy.",
         "intent": "external",
         "target": {
-          "endpoint": "/tasks/branch-expansion/context-compatibility.task.node:root",
+          "endpoint": "/tasks/archive/branch-expansion/context-compatibility.task.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",

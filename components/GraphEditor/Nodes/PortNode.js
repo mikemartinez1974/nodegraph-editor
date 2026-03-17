@@ -53,6 +53,23 @@ const buildTargetLabel = (target = {}) => {
   return "No target";
 };
 
+const emitRuntimeDiagnostic = (issue = {}) => {
+  try {
+    eventBus.emit("runtimeDiagnostic", issue);
+  } catch {}
+};
+
+const clearRuntimeDiagnosticsForNode = (nodeId) => {
+  if (!nodeId) return;
+  try {
+    eventBus.emit("clearRuntimeDiagnostics", { nodeId, source: "port-node" });
+  } catch {}
+};
+
+const TRAVERSAL_EXPANDABLE_KINDS = new Set(["fragment", "graph", "document"]);
+const BRIDGEABLE_KINDS = new Set(["node-class"]);
+const PORT_MODE_OPTIONS = ["navigate", "expand", "bridge"];
+
 const PortNode = (props) => {
   const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
   const { isSelected } = props;
@@ -87,9 +104,22 @@ const PortNode = (props) => {
   const semanticLevel = String(node?.data?._semanticLevel || "detail").trim().toLowerCase();
   const isCompactSemantic = semanticLevel === "summary" || semanticLevel === "icon";
   const expansionTarget = useMemo(() => resolveExpansionTarget(node?.data || {}), [node?.data]);
-  const canExpand = expansionTarget.mode === "expand" && expansionTarget.kind === "fragment" && Boolean(expansionTarget.ref);
-  const canBridge = expansionTarget.mode === "bridge" && Boolean(expansionTarget.ref);
-  const canNavigate = !canExpand && !canBridge;
+  const targetKind = String(expansionTarget.kind || "").trim().toLowerCase();
+  const hasRefTarget = Boolean(expansionTarget.ref);
+  const availableModes = useMemo(() => {
+    if (!hasRefTarget) return [];
+    const modes = ["navigate"];
+    if (TRAVERSAL_EXPANDABLE_KINDS.has(targetKind)) modes.push("expand");
+    if (BRIDGEABLE_KINDS.has(targetKind)) modes.push("bridge");
+    return modes;
+  }, [hasRefTarget, targetKind]);
+  const persistedMode = String(target?.mode || node?.data?.mode || expansionTarget.mode || "navigate").trim().toLowerCase();
+  const actionMode = availableModes.includes(persistedMode)
+    ? persistedMode
+    : availableModes[0] || "navigate";
+  const canBridge = actionMode === "bridge" && hasRefTarget;
+  const canExpand = actionMode === "expand" && hasRefTarget;
+  const canNavigate = actionMode === "navigate" && hasRefTarget;
   const [expansionBusy, setExpansionBusy] = useState(false);
   const [expansionState, setExpansionState] = useState({ expanded: false, expansionId: null, expansionKey: "" });
   const [expansionError, setExpansionError] = useState("");
@@ -181,16 +211,35 @@ const PortNode = (props) => {
       const api = readGraphApi();
       if (!api) return;
       if (!expansionState.expanded && compatibilityStatus === "incompatible") {
-        setExpansionError(compatibility?.summary || "Expansion is blocked by compatibility policy");
+        const message = compatibility?.summary || "Expansion is blocked by compatibility policy";
+        setExpansionError(message);
+        emitRuntimeDiagnostic({
+          code: "PORT_EXPAND_BLOCKED",
+          message,
+          severity: "error",
+          nodeId: node.id,
+          fragmentId: String(node?.data?._contextScope?.fragmentId || "").trim(),
+          method: "expandReference"
+        });
         return;
       }
       setExpansionBusy(true);
       try {
         setExpansionError("");
+        clearRuntimeDiagnosticsForNode(node.id);
         if (expansionState.expanded && expansionState.expansionId && typeof api.collapseExpansion === "function") {
           const result = await api.collapseExpansion({ expansionId: expansionState.expansionId, sourceNodeId: node.id });
           if (result && result.success === false) {
-            setExpansionError(result.error || result.data?.message || "Collapse failed");
+            const message = result.error || result.data?.message || "Collapse failed";
+            setExpansionError(message);
+            emitRuntimeDiagnostic({
+              code: "PORT_COLLAPSE_FAILED",
+              message,
+              severity: "error",
+              nodeId: node.id,
+              fragmentId: String(node?.data?._contextScope?.fragmentId || "").trim(),
+              method: "collapseExpansion"
+            });
           }
         } else if (typeof api.expandReference === "function") {
           const result = await api.expandReference({
@@ -199,7 +248,16 @@ const PortNode = (props) => {
             options: { layout: "attach-right", dedupe: true }
           });
           if (result && result.success === false) {
-            setExpansionError(result.error || result.data?.message || "Expansion failed");
+            const message = result.error || result.data?.message || "Expansion failed";
+            setExpansionError(message);
+            emitRuntimeDiagnostic({
+              code: "PORT_EXPAND_FAILED",
+              message,
+              severity: "error",
+              nodeId: node.id,
+              fragmentId: String(node?.data?._contextScope?.fragmentId || "").trim(),
+              method: "expandReference"
+            });
           } else if (result?.entryNodeId) {
             window.setTimeout(() => {
               try {
@@ -221,6 +279,7 @@ const PortNode = (props) => {
       expansionState.expanded,
       expansionState.expansionId,
       expansionTarget,
+      node?.data?._contextScope?.fragmentId,
       node?.id,
       readGraphApi,
       refreshExpansionState
@@ -233,6 +292,9 @@ const PortNode = (props) => {
   );
   const endpointData = endpointResult.ok ? endpointResult.value : null;
   const targetUrl = useMemo(() => {
+    if (typeof expansionTarget.ref === "string" && expansionTarget.ref.trim()) {
+      return endpointToUrl(expansionTarget.ref.trim());
+    }
     if (typeof target.ref === "string" && target.ref.trim()) return endpointToUrl(target.ref.trim());
     if (typeof node?.data?.src === "string" && node.data.src.trim()) return endpointToUrl(node.data.src.trim());
     if (typeof node?.data?.graphUrl === "string" && node.data.graphUrl.trim()) return endpointToUrl(node.data.graphUrl.trim());
@@ -267,6 +329,7 @@ const PortNode = (props) => {
     node?.data?.ref,
     node?.data?.url,
     node?.data?.endpoint,
+    expansionTarget.ref,
     endpointData?.filePath
   ]);
 
@@ -275,16 +338,25 @@ const PortNode = (props) => {
       event?.preventDefault?.();
       event?.stopPropagation?.();
       if (!targetUrl) return;
+      clearRuntimeDiagnosticsForNode(node?.id);
       try {
         eventBus.emit("fetchUrl", { url: targetUrl, source: "port-node" });
       } catch (err) {
         console.warn("[PortNode] Failed to emit fetchUrl", err);
+        emitRuntimeDiagnostic({
+          code: "PORT_NAVIGATE_FAILED",
+          message: err?.message || "Navigate failed",
+          severity: "error",
+          nodeId: node?.id || null,
+          fragmentId: String(node?.data?._contextScope?.fragmentId || "").trim(),
+          method: "fetchUrl"
+        });
         if (typeof window !== "undefined") {
           window.location.assign(targetUrl);
         }
       }
     },
-    [targetUrl]
+    [node?.data?._contextScope?.fragmentId, node?.id, targetUrl]
   );
 
   const handleBridge = useCallback(
@@ -294,15 +366,69 @@ const PortNode = (props) => {
       if (!node?.id) return;
       const api = readGraphApi();
       if (!api || typeof api.bridgeReference !== "function") return;
+      setExpansionError("");
+      clearRuntimeDiagnosticsForNode(node.id);
       const result = await api.bridgeReference({
         sourceNodeId: node.id,
         target: expansionTarget
       });
       if (result?.success === false) {
-        setExpansionError(result.error || "Bridge failed");
+        const message = result.error || "Bridge failed";
+        setExpansionError(message);
+        emitRuntimeDiagnostic({
+          code: "PORT_BRIDGE_FAILED",
+          message,
+          severity: "error",
+          nodeId: node.id,
+          fragmentId: String(node?.data?._contextScope?.fragmentId || "").trim(),
+          method: "bridgeReference"
+        });
       }
     },
-    [expansionTarget, node?.id, readGraphApi]
+    [expansionTarget, node?.data?._contextScope?.fragmentId, node?.id, readGraphApi]
+  );
+
+  const handleSetMode = useCallback(
+    (nextMode, event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      if (!node?.id || !availableModes.length) return;
+      const normalized = String(nextMode || "").trim().toLowerCase();
+      if (!availableModes.includes(normalized)) return;
+      if (normalized === actionMode) return;
+      setExpansionError("");
+      clearRuntimeDiagnosticsForNode(node.id);
+      eventBus.emit("nodeUpdate", {
+        id: node.id,
+        updates: {
+          data: {
+            ...(node.data || {}),
+            mode: normalized,
+            target: {
+              ...(target || {}),
+              mode: normalized
+            }
+          }
+        },
+        source: "port-node-mode-toggle"
+      });
+    },
+    [actionMode, availableModes, node?.data, node?.id, target]
+  );
+
+  const handlePrimaryAction = useCallback(
+    async (event) => {
+      if (actionMode === "bridge") {
+        await handleBridge(event);
+        return;
+      }
+      if (actionMode === "expand") {
+        await handleToggleExpansion(event);
+        return;
+      }
+      handleNavigate(event);
+    },
+    [actionMode, handleBridge, handleNavigate, handleToggleExpansion]
   );
 
   const handleOpenEditor = useCallback(
@@ -557,7 +683,7 @@ const PortNode = (props) => {
                 : "Incompatible"}
             </div>
           ) : null}
-          {canExpand && expansionError ? (
+          {(canExpand || canBridge) && expansionError ? (
             <div
               style={{
                 fontSize: 10,
@@ -572,11 +698,68 @@ const PortNode = (props) => {
           ) : null}
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          {canExpand ? (
+          {hasRefTarget ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 2,
+                padding: 2,
+                borderRadius: 999,
+                border: `1px solid ${theme.palette.divider}`,
+                background: "rgba(255,255,255,0.04)"
+              }}
+              title="Choose how this port acts on its target"
+            >
+              {PORT_MODE_OPTIONS.map((modeOption) => {
+                const available = availableModes.includes(modeOption);
+                const active = actionMode === modeOption;
+                const label =
+                  modeOption === "expand"
+                    ? "Exp"
+                    : modeOption === "bridge"
+                    ? "Brg"
+                    : "Nav";
+                return (
+                  <button
+                    key={modeOption}
+                    type="button"
+                    onClick={(event) => handleSetMode(modeOption, event)}
+                    style={{
+                      borderRadius: 999,
+                      border: "none",
+                      background: active ? theme.palette.primary.main : "transparent",
+                      color: active
+                        ? theme.palette.primary.contrastText
+                        : available
+                        ? theme.palette.text.secondary
+                        : theme.palette.text.disabled,
+                      padding: "2px 6px",
+                      fontSize: 10,
+                      lineHeight: 1.2,
+                      cursor: available ? "pointer" : "default",
+                      opacity: available ? 1 : 0.45,
+                      textTransform: "uppercase"
+                    }}
+                    disabled={!available}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          {hasRefTarget ? (
             <button
               type="button"
-              onClick={handleToggleExpansion}
-              disabled={expansionBusy || !canExecuteExpand}
+              onClick={handlePrimaryAction}
+              disabled={
+                actionMode === "expand"
+                  ? expansionBusy || !canExecuteExpand
+                  : actionMode === "navigate"
+                  ? !targetUrl
+                  : false
+              }
               style={{
                 borderRadius: 6,
                 border: `1px solid ${theme.palette.divider}`,
@@ -584,56 +767,48 @@ const PortNode = (props) => {
                 color: theme.palette.text.primary,
                 padding: "4px 8px",
                 fontSize: 11,
-                cursor: expansionBusy || !canExecuteExpand ? "default" : "pointer",
-                opacity: expansionBusy || !canExecuteExpand ? 0.6 : 1
+                cursor:
+                  actionMode === "expand"
+                    ? expansionBusy || !canExecuteExpand
+                      ? "default"
+                      : "pointer"
+                    : actionMode === "navigate"
+                    ? targetUrl
+                      ? "pointer"
+                      : "default"
+                    : "pointer",
+                opacity:
+                  actionMode === "expand"
+                    ? expansionBusy || !canExecuteExpand
+                      ? 0.6
+                      : 1
+                    : actionMode === "navigate"
+                    ? targetUrl
+                      ? 1
+                      : 0.55
+                    : 1
               }}
               title={
-                expansionState.expanded
-                  ? "Collapse expanded branch"
-                  : !canExecuteExpand
-                  ? (compatibility?.summary || "Expand is blocked")
-                  : "Expand referenced fragment"
+                actionMode === "expand"
+                  ? expansionState.expanded
+                    ? "Collapse expanded branch"
+                    : !canExecuteExpand
+                    ? (compatibility?.summary || "Expand is blocked")
+                    : "Expand referenced fragment"
+                  : actionMode === "bridge"
+                  ? "Create a local instance from this node class"
+                  : (!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : "Navigate to target")
               }
             >
-              {expansionBusy ? "..." : expansionState.expanded ? "Collapse" : "Expand"}
-            </button>
-          ) : null}
-          {canBridge ? (
-            <button
-              type="button"
-              onClick={handleBridge}
-              style={{
-                borderRadius: 6,
-                border: `1px solid ${theme.palette.divider}`,
-                background: "transparent",
-                color: theme.palette.text.primary,
-                padding: "4px 8px",
-                fontSize: 11,
-                cursor: "pointer"
-              }}
-              title="Create a local instance from this node class"
-            >
-              Create
-            </button>
-          ) : null}
-          {canNavigate ? (
-            <button
-              type="button"
-              onClick={handleNavigate}
-              disabled={!targetUrl}
-              style={{
-                borderRadius: 6,
-                border: `1px solid ${theme.palette.divider}`,
-                background: "transparent",
-                color: theme.palette.text.primary,
-                padding: "4px 8px",
-                fontSize: 11,
-                cursor: targetUrl ? "pointer" : "default",
-                opacity: targetUrl ? 1 : 0.55
-              }}
-              title={!targetUrl && target?.endpoint && !endpointResult.ok ? endpointResult.error : ""}
-            >
-              Navigate
+              {actionMode === "expand"
+                ? expansionBusy
+                  ? "..."
+                  : expansionState.expanded
+                  ? "Collapse"
+                  : "Expand"
+                : actionMode === "bridge"
+                ? "Create"
+                : "Navigate"}
             </button>
           ) : null}
           <button

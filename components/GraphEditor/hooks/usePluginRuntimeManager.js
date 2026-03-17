@@ -145,7 +145,8 @@ const syncPluginNodeDefinitions = async (plugin, host) => {
  */
 export default function usePluginRuntimeManager({
   graphApiRef,
-  selectionRef
+  selectionRef,
+  getActiveFragmentId
 }) {
   const hostsRef = useRef(new Map());
 
@@ -163,6 +164,7 @@ export default function usePluginRuntimeManager({
 
     const baseOptions = {
       getGraphApi,
+      getActiveFragmentId,
       getSelectionState,
       emitEvent: (event, payload) => {
         eventBus.emit(event, payload);
@@ -234,7 +236,7 @@ export default function usePluginRuntimeManager({
       hostsRef.current.forEach((host) => host.destroy());
       hostsRef.current.clear();
     };
-  }, [graphApiRef, selectionRef]);
+  }, [graphApiRef, selectionRef, getActiveFragmentId]);
 
   useEffect(() => {
     const handleCall = async (payload = {}) => {

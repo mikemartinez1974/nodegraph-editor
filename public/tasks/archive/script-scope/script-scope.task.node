@@ -199,7 +199,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Script Scope\n\nScripts must not see or mutate beyond the current fragment. Until script scope is real, expanding graphs safely is incomplete.",
+        "markdown": "# Script Scope\n\nStatus: implemented and validated.\n\nScripts now see and mutate only the active fragment. The core script-scope boundary is real enough to support safer expansion and focus-scoped authority work.",
         "memo": "",
         "link": "",
         "html": "",
@@ -376,7 +376,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Implementation Plan\n\n1. Identify current global script API surface.\n2. Add fragment-scoped selectors for nodes, edges, and groups.\n3. Build script APIs from `activeFragmentId`.\n4. Reject foreign-fragment reads and mutations.\n5. Keep global storage, but expose only scoped facades to scripts.",
+        "markdown": "# Implementation Plan\n\nCompleted:\n1. Identified the global script API surface.\n2. Added fragment-scoped selectors for nodes, edges, and groups.\n3. Built script APIs from `activeFragmentId`.\n4. Rejected foreign-fragment reads and mutations.\n5. Kept global storage while exposing only scoped facades to scripts.\n6. Validated the behavior with a dedicated script-scope test graph.",
         "memo": "",
         "link": "",
         "html": "",
@@ -553,7 +553,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Open Questions\n\n- Do we ever allow opt-in cross-fragment capabilities?\n\nResolved:\n- Script errors should surface on the shared diagnostics/validation surface.\n- Background tasks outside focused fragment scope are disallowed by default.",
+        "markdown": "# Open Questions\n\nResolved:\n- Do we ever allow opt-in cross-fragment capabilities? Not by default; only through an explicit future capability surface.\n- Script errors should surface on the shared diagnostics/validation surface.\n- Background tasks outside focused fragment scope are disallowed by default.\n\nFollow-up only:\n- tighten lifecycle/event subscription scope\n- improve diagnostics grouping and wording\n- add explicit delete-path coverage if needed",
         "memo": "",
         "link": "",
         "html": "",
@@ -592,6 +592,28 @@
       "showLabel": true,
       "data": {
         "markdown": "# Background Task Default\n\nNo background tasks outside the focused fragment.\n\nWhen focus leaves a fragment, its script activity is no longer allowed to continue in the background. Future exceptions, if any, must be an explicit capability rather than ambient script behavior."
+      }
+    },
+    {
+      "id": "script-scope-followup",
+      "type": "markdown",
+      "label": "Follow-Up Notes",
+      "position": {
+        "x": 1240,
+        "y": 540
+      },
+      "width": 420,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Follow-Up Notes\n\nCore scope behavior is complete for now.\n\nRemaining non-blockers:\n- scope event subscriptions and lifecycle hooks as tightly as script RPC\n- polish diagnostics presentation\n- add delete coverage if full CRUD proof becomes necessary",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
       }
     }
   ],
@@ -716,6 +738,21 @@
       "target": "script-scope-background",
       "targetPort": "root",
       "type": "relates-to"
+    },
+    {
+      "id": "script-scope-edge-10",
+      "type": "reference",
+      "source": "script-scope-open",
+      "target": "script-scope-followup",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "notes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
     }
   ],
   "clusters": [],

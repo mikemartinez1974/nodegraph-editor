@@ -1,0 +1,307 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "context-grammar-smoke-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "context-grammar-smoke",
+          "name": "Context Grammar Smoke",
+          "version": "0.1.0",
+          "description": "Smoke tests for graph expansion parity and bridge semantics.",
+          "createdAt": "2026-03-16T18:10:00.000Z",
+          "updatedAt": "2026-03-16T18:10:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-smoke-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "context-grammar-smoke-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -760,
+        "y": 240
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "views": [],
+        "skills": []
+      }
+    },
+    {
+      "id": "context-grammar-smoke-overview",
+      "type": "markdown",
+      "label": "Context Grammar Smoke",
+      "position": {
+        "x": -260,
+        "y": 20
+      },
+      "width": 460,
+      "height": 240,
+      "color": "#1976d2",
+      "visible": true,
+      "showLabel": true,
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ],
+      "data": {
+        "markdown": "# Context Grammar Smoke\n\nThis graph tests two things:\n- `expand` can project a full graph document into the current host session\n- `bridge` can instantiate a node class locally without transferring authority\n\nUse the ports below and inspect the resulting graph state.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "context-grammar-smoke-expand-port",
+      "type": "port",
+      "label": "Expand Script Scope Graph",
+      "position": {
+        "x": 300,
+        "y": 10
+      },
+      "width": 340,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/script-scope/root.node:root",
+          "mode": "expand",
+          "kind": "graph",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Expand"
+        },
+        "memo": "Projects the full Script Scope graph into the current session without changing host authority.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-smoke-bridge-port",
+      "type": "port",
+      "label": "Bridge Smoke Class",
+      "position": {
+        "x": 300,
+        "y": 190
+      },
+      "width": 340,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/archive/context-grammar/bridge-smoke.node-class.node:root",
+          "mode": "bridge",
+          "kind": "node-class",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Bridge"
+        },
+        "memo": "Creates a loud markdown node instance by bridging a node class into the current fragment.",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "context-grammar-smoke-instructions",
+      "type": "markdown",
+      "label": "Expected Results",
+      "position": {
+        "x": 720,
+        "y": 20
+      },
+      "width": 520,
+      "height": 320,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Expected Results\n\n## Expand\n- Click `Expand Script Scope Graph`.\n- The target graph should materialize in place as an expanded projection.\n- The host graph should remain the host session.\n- Imported execution nodes should remain downgraded/blocked unless authority later moves there.\n\n## Bridge\n- Click `Bridge Smoke Class`.\n- A bright yellow markdown node should appear next to the bridge port with visible content.\n- The created node should stay in this fragment.\n- Its data should include `_bridge.sourceRef` and local fragment provenance.\n\n## Quick check\n- `expand` stretches the world.\n- `bridge` imports a capability locally.\n- neither operation should replace the host graph.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "context-grammar-smoke-edge-1",
+      "type": "reference",
+      "source": "context-grammar-smoke-overview",
+      "target": "context-grammar-smoke-expand-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "expands",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-smoke-edge-2",
+      "type": "reference",
+      "source": "context-grammar-smoke-overview",
+      "target": "context-grammar-smoke-bridge-port",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "bridges",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "context-grammar-smoke-edge-3",
+      "type": "reference",
+      "source": "context-grammar-smoke-overview",
+      "target": "context-grammar-smoke-instructions",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "checks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

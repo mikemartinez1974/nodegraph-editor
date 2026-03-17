@@ -27,6 +27,7 @@ const emitTelemetry = (stage, intent, info = {}) => {
 export default function useInterpreterLayer({
   nodes = [],
   edges = [],
+  focusedFragmentId = '',
   edgeRoutes = {},
   groups = [],
   lockedNodes = new Set(),
@@ -228,9 +229,10 @@ export default function useInterpreterLayer({
   const executionRuntime = useMemo(() => {
     return createGraphExecutionRuntime({
       getNodes: () => nodes,
-      getEdges: () => edges
+      getEdges: () => edges,
+      getActiveFragmentId: () => focusedFragmentId
     });
-  }, [nodes, edges]);
+  }, [nodes, edges, focusedFragmentId]);
 
   const graphExecutionSkill = useMemo(() => ({
     id: 'graphExecution',

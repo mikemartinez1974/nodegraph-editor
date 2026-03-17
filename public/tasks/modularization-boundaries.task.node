@@ -1,0 +1,634 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Modularization Boundaries",
+    "description": "Task graph for defining replaceable subsystem seams in Twilite.",
+    "created": "2026-03-16T12:40:00.000Z",
+    "modified": "2026-03-16T12:40:00.000Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "architecture",
+      "modularity",
+      "refactor"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "mod-boundaries-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -820,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "modularization-boundaries",
+          "name": "Modularization Boundaries",
+          "version": "0.1.0",
+          "description": "Task graph for defining replaceable subsystem seams in Twilite.",
+          "createdAt": "2026-03-16T12:40:00.000Z",
+          "updatedAt": "2026-03-16T12:40:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        },
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -820,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -820,
+        "y": 240
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [],
+        "views": [],
+        "skills": []
+      }
+    },
+    {
+      "id": "mod-boundaries-overview",
+      "type": "markdown",
+      "label": "Modularization Boundaries",
+      "position": {
+        "x": -300,
+        "y": 20
+      },
+      "width": 460,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Modularization Boundaries\n\nTwilite now needs replaceable subsystem seams, not just smaller files. This graph defines the modules that should be swappable and the contracts they need between them.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      },
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "in",
+          "label": "In",
+          "direction": "input",
+          "dataType": "flow",
+          "position": {
+            "side": "left",
+            "offset": 0.5
+          }
+        },
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "key": "in",
+          "label": "In",
+          "type": "flow"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Out",
+          "type": "content"
+        }
+      ]
+    },
+    {
+      "id": "mod-boundaries-graph-shell",
+      "type": "markdown",
+      "label": "Graph Shell",
+      "position": {
+        "x": 260,
+        "y": -180
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Graph Shell\n\nOwns graph semantics, editing policy, authority, expansion, focus, semantic zoom, and orchestration.\n\nShould not be fused to one renderer implementation.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-browser-shell",
+      "type": "markdown",
+      "label": "Browser Shell",
+      "position": {
+        "x": 660,
+        "y": -180
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Browser Shell\n\nOwns address bar, navigation history, refresh semantics, browser chrome, and shell presentation.\n\nShould be replaceable without rewriting graph semantics.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-rendering",
+      "type": "markdown",
+      "label": "Rendering Engine",
+      "position": {
+        "x": 1060,
+        "y": -180
+      },
+      "width": 340,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Rendering Engine\n\nOwns canvas drawing, minimap, handles, ports, drag behavior, hit testing, and layout rendering.\n\nShould be swappable independently of GraphEditor policy.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-node-runtime",
+      "type": "markdown",
+      "label": "Node Class Runtime",
+      "position": {
+        "x": 260,
+        "y": 120
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Node Class Runtime\n\nOwns class resolution, view loading, editor.web/node.web selection, defaults, and class contracts.\n\nShould expose a stable node-render contract to the rest of the editor.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-diagnostics",
+      "type": "markdown",
+      "label": "Diagnostics Runtime",
+      "position": {
+        "x": 680,
+        "y": 120
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Diagnostics Runtime\n\nOwns validation, runtime script failures, lifecycle failures, and issue surfacing.\n\nShould be a shared service/surface, not logic spread across the UI.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-execution",
+      "type": "markdown",
+      "label": "Execution Runtime",
+      "position": {
+        "x": 1100,
+        "y": 120
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Execution Runtime\n\nOwns scripts, plugin runtime, background RPC, lifecycle hooks, and capability boundaries.\n\nMust stay isolated behind explicit scope/authority contracts.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-rules",
+      "type": "markdown",
+      "label": "Boundary Rules",
+      "position": {
+        "x": 260,
+        "y": 460
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Boundary Rules\n\nFor each subsystem define:\n- responsibilities\n- inputs\n- outputs\n- what it is allowed to know about other subsystems\n\nThis is how large sections become replaceable.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-goal",
+      "type": "markdown",
+      "label": "Replacement Goal",
+      "position": {
+        "x": 760,
+        "y": 460
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Replacement Goal\n\nThe goal is not just smaller files. The goal is to be able to swap out large sections:\n- change the graph shell\n- change the browser shell\n- change the renderer\n- change execution plumbing\n\nwithout collapsing the rest of the app.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-next",
+      "type": "markdown",
+      "label": "Next Refactor Shape",
+      "position": {
+        "x": 1260,
+        "y": 460
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Next Refactor Shape\n\nDo not start with a giant rewrite. First define the interfaces, then pull code behind them.\n\nThe first practical targets are likely:\n- GraphEditorContent\n- GraphEditor\n- DynamicViewNode",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    },
+    {
+      "id": "mod-boundaries-questions",
+      "type": "markdown",
+      "label": "Questions",
+      "position": {
+        "x": 1260,
+        "y": 760
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Questions\n\n- What are the exact module interfaces?\n- Which globals/event-bus dependencies need to move behind services?\n- Which runtime state should be owned by Graph Shell vs Browser Shell?\n- What is the minimum contract for a swappable renderer?",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": false,
+        "root": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "mod-boundaries-edge-1",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-graph-shell",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-2",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-browser-shell",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-3",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-rendering",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-4",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-node-runtime",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-5",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-diagnostics",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-6",
+      "type": "reference",
+      "source": "mod-boundaries-overview",
+      "target": "mod-boundaries-execution",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-7",
+      "type": "reference",
+      "source": "mod-boundaries-graph-shell",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-8",
+      "type": "reference",
+      "source": "mod-boundaries-browser-shell",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-9",
+      "type": "reference",
+      "source": "mod-boundaries-rendering",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-10",
+      "type": "reference",
+      "source": "mod-boundaries-node-runtime",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-11",
+      "type": "reference",
+      "source": "mod-boundaries-diagnostics",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-12",
+      "type": "reference",
+      "source": "mod-boundaries-execution",
+      "target": "mod-boundaries-rules",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-13",
+      "type": "reference",
+      "source": "mod-boundaries-rules",
+      "target": "mod-boundaries-goal",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-14",
+      "type": "reference",
+      "source": "mod-boundaries-goal",
+      "target": "mod-boundaries-next",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "mod-boundaries-edge-15",
+      "type": "reference",
+      "source": "mod-boundaries-next",
+      "target": "mod-boundaries-questions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "raises",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ]
+}

@@ -1,5 +1,12 @@
 import eventBus from '../../NodeGraph/eventBus.js';
 
+const getNodeFragmentId = (node) =>
+  String(
+    node?.data?._expansion?.expansionId ||
+    node?.data?._origin?.instanceId ||
+    ''
+  ).trim();
+
 const buildGraph = (nodes, edges) => {
   const nodeMap = new Map();
   (nodes || []).forEach((node) => {
@@ -63,9 +70,13 @@ const topoSort = (nodeIds, adjacency, reverseAdjacency) => {
   return order;
 };
 
-export const createGraphExecutionRuntime = ({ getNodes, getEdges } = {}) => {
+export const createGraphExecutionRuntime = ({ getNodes, getEdges, getActiveFragmentId } = {}) => {
   const readNodes = () => (typeof getNodes === 'function' ? getNodes() : []);
   const readEdges = () => (typeof getEdges === 'function' ? getEdges() : []);
+  const readActiveFragmentId = () =>
+    typeof getActiveFragmentId === 'function'
+      ? String(getActiveFragmentId() || '').trim()
+      : '';
 
   const resolveNodeOutput = (node, inputByHandle, fallbackValue) => {
     if (!node || typeof node !== 'object') return fallbackValue;
@@ -85,7 +96,19 @@ export const createGraphExecutionRuntime = ({ getNodes, getEdges } = {}) => {
   const executeGraph = (payload = {}) => {
     const nodes = readNodes();
     const edges = readEdges();
-    const { nodeMap, adjacency, reverseAdjacency, incomingEdges } = buildGraph(nodes, edges);
+    const activeFragmentId = String(
+      payload?.meta?.fragmentId ||
+      payload?.fragmentId ||
+      readActiveFragmentId()
+    ).trim();
+    const scopedNodes = activeFragmentId
+      ? nodes.filter((node) => getNodeFragmentId(node) === activeFragmentId)
+      : nodes;
+    const scopedNodeIds = new Set(scopedNodes.map((node) => node.id));
+    const scopedEdges = activeFragmentId
+      ? edges.filter((edge) => scopedNodeIds.has(edge?.source) && scopedNodeIds.has(edge?.target))
+      : edges;
+    const { nodeMap, adjacency, reverseAdjacency, incomingEdges } = buildGraph(scopedNodes, scopedEdges);
 
     const startNodeIds = Array.isArray(payload.startNodeIds)
       ? payload.startNodeIds.filter((id) => nodeMap.has(id))
@@ -114,6 +137,7 @@ export const createGraphExecutionRuntime = ({ getNodes, getEdges } = {}) => {
       requestedBy: 'executeGraph',
       source: payload.source || 'execution',
       startedAt: Date.now(),
+      fragmentId: activeFragmentId,
       ...payload.meta
     };
 
@@ -177,13 +201,26 @@ export const createGraphExecutionRuntime = ({ getNodes, getEdges } = {}) => {
   const executeNodes = (payload = {}) => {
     const nodes = readNodes();
     const nodeMap = new Map(nodes.map((node) => [node.id, node]));
-    const ids = Array.isArray(payload.nodeIds) ? payload.nodeIds.filter((id) => nodeMap.has(id)) : [];
+    const activeFragmentId = String(
+      payload?.meta?.fragmentId ||
+      payload?.fragmentId ||
+      readActiveFragmentId()
+    ).trim();
+    const ids = Array.isArray(payload.nodeIds)
+      ? payload.nodeIds.filter((id) => {
+          const node = nodeMap.get(id);
+          if (!node) return false;
+          if (!activeFragmentId) return true;
+          return getNodeFragmentId(node) === activeFragmentId;
+        })
+      : [];
     const value = payload.value ?? payload.input ?? payload.payload ?? {};
     const handleId = payload.handleId || 'root';
     const meta = {
       requestedBy: 'executeNodes',
       source: payload.source || 'execution',
       startedAt: Date.now(),
+      fragmentId: activeFragmentId,
       ...payload.meta
     };
 

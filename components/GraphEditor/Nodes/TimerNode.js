@@ -6,6 +6,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import TimerIcon from '@mui/icons-material/Timer';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 import NodeTypeBadge from '../components/NodeTypeBadge';
 
 // --- New schema ports ---
@@ -36,6 +37,7 @@ export default function TimerNode({
   const intervalRef = useRef(null);
   const tickIntervalRef = useRef(null);
   const node = useNodePortSchema(origNode, TIMER_INPUTS, TIMER_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
   
   const width = (node?.width || 200) * zoom;
   const height = (node?.height || 250) * zoom;
@@ -62,6 +64,14 @@ export default function TimerNode({
 
   // Update elapsed time
   useEffect(() => {
+    if (!isExecutionActive) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      setElapsed(0);
+      return undefined;
+    }
     if (isRunning && !isPaused && startTime) {
       intervalRef.current = setInterval(() => {
         setElapsed(Date.now() - startTime + pausedElapsed);
@@ -78,7 +88,7 @@ export default function TimerNode({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, startTime, pausedElapsed]);
+  }, [isRunning, isPaused, startTime, pausedElapsed, isExecutionActive]);
 
   // Format time as MM:SS.d
   const formatTime = (ms) => {
@@ -171,6 +181,9 @@ export default function TimerNode({
       clearInterval(tickIntervalRef.current);
       tickIntervalRef.current = null;
     }
+    if (!isExecutionActive) {
+      return undefined;
+    }
     if (!isRunning || isPaused || !startTime) {
       return;
     }
@@ -193,7 +206,7 @@ export default function TimerNode({
         tickIntervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, startTime, pausedElapsed, intervalMs, node.id]);
+  }, [isRunning, isPaused, startTime, pausedElapsed, intervalMs, node.id, isExecutionActive]);
 
   useEffect(() => {
     elapsedRef.current = elapsed;
@@ -208,6 +221,7 @@ export default function TimerNode({
   useEffect(() => {
     const handler = ({ targetNodeId, inputName } = {}) => {
       if (targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       const key = inputName || 'reset';
       switch (key) {
         case 'start':
@@ -230,7 +244,7 @@ export default function TimerNode({
     };
     eventBus.on('nodeInput', handler);
     return () => eventBus.off('nodeInput', handler);
-  }, [node.id, performStart, performPause, performResume, performStop]);
+  }, [node.id, performStart, performPause, performResume, performStop, isExecutionActive]);
 
   const nodeColor = node?.color || theme.palette.primary.main;
   const selected_gradient = `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`;

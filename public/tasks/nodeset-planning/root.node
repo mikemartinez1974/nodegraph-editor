@@ -369,6 +369,58 @@
         "isRoot": false,
         "root": false
       }
+    },
+    {
+      "id": "nodeset-planning-root-port-first-wave",
+      "type": "port",
+      "label": "First Wave Plan",
+      "position": {
+        "x": 980,
+        "y": 220
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Concrete v1 planning-node implementation graph.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/first-wave/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "nodeset-planning-root-port-library",
+      "type": "port",
+      "label": "Planning Class Library",
+      "position": {
+        "x": 1320,
+        "y": 220
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Existing task-planning class package in the library.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
     }
   ],
   "edges": [
@@ -446,6 +498,24 @@
         "curved": true
       },
       "data": {}
+    },
+    {
+      "id": "nodeset-planning-root-edge-first-wave",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-first-wave",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "v1"
+    },
+    {
+      "id": "nodeset-planning-root-edge-library",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "library"
     }
   ],
   "clusters": [],
@@ -462,5 +532,7 @@
       "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
       "tags": ""
     }
-  ]
+  ],
+  "nodeCount": 11,
+  "edgeCount": 7
 }

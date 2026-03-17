@@ -9,6 +9,7 @@ import { TlzLink } from '../components/TlzLink';
 import FixedNode from './FixedNode';
 import eventBus from '../../NodeGraph/eventBus';
 import useNodePortSchema from '../hooks/useNodePortSchema';
+import useNodeExecutionGate from '../hooks/useNodeExecutionGate';
 
 // Unified handle schema for display nodes
 const DEFAULT_INPUTS = [
@@ -23,6 +24,7 @@ const NON_PASSIVE_LISTENER = { passive: false };
 const MarkdownNode = (props) => {
   // Ensure node has inputs/outputs for handle system
   const node = useNodePortSchema(props.node, DEFAULT_INPUTS, DEFAULT_OUTPUTS);
+  const { isExecutionActive } = useNodeExecutionGate(node);
   const { zoom = 1, isSelected } = props;
   const theme = useTheme();
   const [isResizing, setIsResizing] = useState(false);
@@ -108,6 +110,7 @@ const MarkdownNode = (props) => {
   useEffect(() => {
     const handleNodeInput = ({ targetNodeId, value } = {}) => {
       if (!targetNodeId || targetNodeId !== node.id) return;
+      if (!isExecutionActive) return;
       const nextMarkdown =
         typeof value === 'string'
           ? value
@@ -134,7 +137,7 @@ const MarkdownNode = (props) => {
 
     eventBus.on('nodeInput', handleNodeInput);
     return () => eventBus.off('nodeInput', handleNodeInput);
-  }, [node.id, node.data]);
+  }, [node.id, node.data, isExecutionActive]);
   
   // Render FixedNode with markdown content and resize handle
   if (isCompactSemantic) {
