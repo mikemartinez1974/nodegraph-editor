@@ -145,7 +145,22 @@
             "key": "dependency",
             "ref": "/library/classes/nodes/task-planning/dependency.node-class.node",
             "source": "local",
-            "version": ">=0.1.0"
+            "version": ">=0.1.0",
+            "defaults": {
+              "label": "Dependency",
+              "size": {
+                "width": 340,
+                "height": 260
+              },
+              "color": "linear-gradient(135deg, #d5dbdf, #5f6b73)",
+              "showLabel": false,
+              "data": {
+                "body": "Describe the prerequisite or blocker.",
+                "type": "prereq",
+                "status": "open",
+                "externalId": ""
+              }
+            }
           }
         ],
         "skills": [],
@@ -309,12 +324,15 @@
               "priority": "high",
               "action": "openEditor"
             }
-          ]
+          ],
+          "html": {
+            "chrome": false
+          }
         },
         "node": {
           "web": {
             "detail": {
-              "markdown": "## Dependency: {{label}}\n\n**Type:** `{{data.type}}`  \n**Status:** `{{data.status}}`  \n**External ID:** `{{data.externalId}}`\n\n{{data.body}}"
+              "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding:0;overflow:hidden;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(240,243,245,.94));color:#23160a;position:relative;'>\n  <div style='display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:linear-gradient(135deg, #d5dbdf, #5f6b73);color:#1d2429;border-bottom:1px solid rgba(0,0,0,.08);'>\n    <div style='display:flex;align-items:center;gap:10px;min-width:0;'>\n      <div style='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.10);font:800 14px system-ui,sans-serif;flex:0 0 auto;'>\u21e2</div>\n      <div style='min-width:0;'>\n        <div style='font:700 10px system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;opacity:.68;margin-bottom:2px;'>Dependency</div>\n        <div style='font:800 18px/1.02 Georgia, \"Times New Roman\", serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>{{label}}</div>\n      </div>\n    </div>\n    <div style='display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.38);border:1px solid rgba(0,0,0,.08);font:700 10px system-ui,sans-serif;text-transform:uppercase;white-space:nowrap;'>{{data.status}}</div>\n  </div>\n  <div style='display:flex;flex-direction:column;gap:12px;padding:14px 16px 14px 16px;min-height:0;flex:1;color:#23160a;'>\n    <div style='display:flex;align-items:center;gap:7px;flex-wrap:wrap;'>\n      <div style='padding:4px 8px;border-radius:999px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);font:700 10px system-ui,sans-serif;color:#23160a;'>Type: {{data.type}}</div>\n      <div style='padding:4px 8px;border-radius:999px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);font:700 10px system-ui,sans-serif;color:#23160a;'>Status: {{data.status}}</div>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.74;color:#5b4731;'>External {{data.externalId}}</div>\n    </div>\n    <div style='padding:12px 13px 11px 13px;border-radius:14px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);color:#23160a;'>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.66;margin-bottom:6px;color:#6b533a;'>Dependency</div>\n      <div style='font:500 14px/1.42 system-ui,sans-serif;max-height:5.7em;overflow:hidden;color:#23160a;'>{{data.body}}</div>\n    </div>\n    <div style='margin-top:auto;display:flex;flex-direction:column;gap:6px;color:#23160a;'>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.66;color:#6b533a;'>External ref</div>\n      <div style='padding:8px 10px;border-radius:12px;background:rgba(95,107,115,.14);border:1px solid rgba(0,0,0,.06);font:600 11px/1.35 system-ui,sans-serif;white-space:pre-wrap;overflow:hidden;color:#23160a;'>{{data.externalId}}</div>\n    </div>\n  </div>\n</div>"
             }
           }
         }
@@ -335,12 +353,15 @@
       "data": {
         "view": {
           "intent": "node",
-          "payload": "node.web.summary"
+          "payload": "node.web.summary",
+          "html": {
+            "chrome": false
+          }
         },
         "node": {
           "web": {
             "summary": {
-              "markdown": "**Dependency** {{label}}  \n`{{data.type}}` \u00b7 `{{data.status}}`"
+              "html": "<div style='width:100%;height:100%;display:flex;align-items:center;gap:10px;box-sizing:border-box;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(240,243,245,.94));color:#23160a;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden;'>\n  <div style='position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg, #d5dbdf, #5f6b73);'></div>\n  <div style='width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(95,107,115,.14);color:#5f6b73;font:800 13px system-ui,sans-serif;flex:0 0 auto;margin-left:4px;'>\u21e2</div>\n  <div style='min-width:0;display:flex;flex-direction:column;gap:2px;flex:1;'>\n    <div style='font:800 14px/1.05 Georgia, \"Times New Roman\", serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#23160a;'>{{label}}</div>\n    <div style='display:flex;gap:6px;align-items:center;font:700 10px system-ui,sans-serif;text-transform:uppercase;opacity:.74;white-space:nowrap;overflow:hidden;color:#5b4731;'>\n      <span>{{data.status}}</span><span>\u2022</span><span>Type {{data.type}}</span>\n    </div>\n  </div>\n</div>"
             }
           }
         }
@@ -361,12 +382,15 @@
       "data": {
         "view": {
           "intent": "node",
-          "payload": "node.web.icon"
+          "payload": "node.web.icon",
+          "html": {
+            "chrome": false
+          }
         },
         "node": {
           "web": {
             "icon": {
-              "markdown": "**Dep** {{label}}"
+              "html": "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:6px;'>\n  <div style='width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(95,107,115,.14);border:2px solid #5f6b73;color:#5f6b73;font:900 16px system-ui,sans-serif;'>\u21e2</div>\n</div>"
             }
           }
         }
@@ -387,11 +411,16 @@
       "data": {
         "view": {
           "intent": "node",
-          "payload": "node.web"
+          "payload": "node.web",
+          "html": {
+            "chrome": false
+          }
         },
         "node": {
           "web": {
-            "markdown": "## Dependency: {{label}}\n\n**Type:** `{{data.type}}`  \n**Status:** `{{data.status}}`  \n**External ID:** `{{data.externalId}}`\n\n{{data.body}}"
+            "html": {
+              "html": "<div style='width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding:0;overflow:hidden;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(240,243,245,.94));color:#23160a;position:relative;'>\n  <div style='display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:linear-gradient(135deg, #d5dbdf, #5f6b73);color:#1d2429;border-bottom:1px solid rgba(0,0,0,.08);'>\n    <div style='display:flex;align-items:center;gap:10px;min-width:0;'>\n      <div style='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.10);font:800 14px system-ui,sans-serif;flex:0 0 auto;'>\u21e2</div>\n      <div style='min-width:0;'>\n        <div style='font:700 10px system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;opacity:.68;margin-bottom:2px;'>Dependency</div>\n        <div style='font:800 18px/1.02 Georgia, \"Times New Roman\", serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>{{label}}</div>\n      </div>\n    </div>\n    <div style='display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.38);border:1px solid rgba(0,0,0,.08);font:700 10px system-ui,sans-serif;text-transform:uppercase;white-space:nowrap;'>{{data.status}}</div>\n  </div>\n  <div style='display:flex;flex-direction:column;gap:12px;padding:14px 16px 14px 16px;min-height:0;flex:1;color:#23160a;'>\n    <div style='display:flex;align-items:center;gap:7px;flex-wrap:wrap;'>\n      <div style='padding:4px 8px;border-radius:999px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);font:700 10px system-ui,sans-serif;color:#23160a;'>Type: {{data.type}}</div>\n      <div style='padding:4px 8px;border-radius:999px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);font:700 10px system-ui,sans-serif;color:#23160a;'>Status: {{data.status}}</div>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.74;color:#5b4731;'>External {{data.externalId}}</div>\n    </div>\n    <div style='padding:12px 13px 11px 13px;border-radius:14px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);color:#23160a;'>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.66;margin-bottom:6px;color:#6b533a;'>Dependency</div>\n      <div style='font:500 14px/1.42 system-ui,sans-serif;max-height:5.7em;overflow:hidden;color:#23160a;'>{{data.body}}</div>\n    </div>\n    <div style='margin-top:auto;display:flex;flex-direction:column;gap:6px;color:#23160a;'>\n      <div style='font:700 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.66;color:#6b533a;'>External ref</div>\n      <div style='padding:8px 10px;border-radius:12px;background:rgba(95,107,115,.14);border:1px solid rgba(0,0,0,.06);font:600 11px/1.35 system-ui,sans-serif;white-space:pre-wrap;overflow:hidden;color:#23160a;'>{{data.externalId}}</div>\n    </div>\n  </div>\n</div>"
+            }
           }
         }
       }

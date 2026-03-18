@@ -548,21 +548,10 @@ const GraphEditorContent = () => {
   }, []);
 
   const fetchGithubRefText = useCallback(async ({ owner, repo, path, branch }) => {
-    const token = (() => {
-      try {
-        if (typeof window === 'undefined' || !window.localStorage) return '';
-        return window.localStorage.getItem('githubPat') || '';
-      } catch {
-        return '';
-      }
-    })();
     const headers = {
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28'
     };
-    if (token.trim()) {
-      headers.Authorization = `Bearer ${token.trim()}`;
-    }
     const safePath = path
       .split('/')
       .map((segment) => encodeURIComponent(segment))
@@ -1518,7 +1507,20 @@ const GraphEditorContent = () => {
 
   const validateViewSchema = useCallback((viewNodes = [], ref = '') => {
     const warnings = [];
-    const allowedTypes = new Set(['text', 'markdown', 'number', 'boolean']);
+    const allowedTypes = new Set([
+      'text',
+      'markdown',
+      'number',
+      'boolean',
+      'checkbox',
+      'toggle',
+      'select',
+      'textarea',
+      'multiline',
+      'json',
+      'html',
+      'xml'
+    ]);
     const allowedControlTypes = new Set(['button', 'toggle']);
     const allowedControlActions = new Set(['openEditor', 'navigate', 'emit', 'toggle', 'setData']);
     const allowedControlVariants = new Set(['outlined', 'contained', 'text', 'soft']);

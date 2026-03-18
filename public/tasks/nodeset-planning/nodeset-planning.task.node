@@ -1,12 +1,16 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
+    "title": "Planning Node Types Task",
+    "description": "Task graph for planning the first implementation-oriented node types for Twilite prompting and execution workflows.",
     "created": "2026-03-14T16:16:22.370Z",
     "modified": "2026-03-14T16:16:22.370Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "nodeset-planning",
+      "planning"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [

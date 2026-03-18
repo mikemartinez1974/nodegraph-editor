@@ -1,0 +1,924 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "core-loop-proof-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -780,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "core-loop-proof-task",
+          "name": "Undeniable Core Loop",
+          "version": "0.1.0",
+          "description": "Task graph for proving one undeniable Twilite flow from graph authoring to visible external result.",
+          "createdAt": "2026-03-18T14:10:00.000Z",
+          "updatedAt": "2026-03-18T14:10:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "core-loop-proof-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -780,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "core-loop-proof-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -780,
+        "y": 240
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-overview",
+      "type": "markdown",
+      "label": "Undeniable Core Loop",
+      "position": {
+        "x": -240,
+        "y": -40
+      },
+      "width": 540,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Undeniable Core Loop\n\nThe chat is directionally right about one thing: you need one crisp flow that makes Twilite feel inevitable.\n\nThe target loop is simple:\n\n`graph -> action -> GitHub -> visible result`\n\nThe job now is not to broaden the product. The job is to make that loop easy to demo, easy to trust, and hard to misinterpret.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "core-loop-proof-goal",
+      "type": "goal",
+      "label": "Prove one Twilite loop that feels inevitable",
+      "position": {
+        "x": 360,
+        "y": -120
+      },
+      "width": 380,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "A user should be able to start in a Twilite graph, trigger a meaningful action, commit or publish through GitHub, and see a visible result quickly enough that the value of the product becomes obvious.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "",
+        "successMetrics": [
+          "The loop can be demoed end to end without explanation-heavy setup",
+          "The visible result is obvious and externally legible",
+          "The path feels like one product, not a stitched-together sequence"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-constraint-focus",
+      "type": "constraint",
+      "label": "Do not broaden beyond the one proof loop",
+      "position": {
+        "x": 810,
+        "y": -120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "This work should not drift into general platform building. If a feature does not make the core loop easier to demo, easier to trust, or easier to complete, it is out of scope for this phase.",
+        "type": "resource",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "core-loop-proof-task-select-loop",
+          "core-loop-proof-task-harden-flow",
+          "core-loop-proof-task-demo"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-constraint-result",
+      "type": "constraint",
+      "label": "The result must be visible outside Twilite",
+      "position": {
+        "x": 810,
+        "y": 200
+      },
+      "width": 360,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "The loop is only convincing if it ends in something externally legible: a changed file, live page, generated artifact, or other result that proves Twilite caused a real outcome.",
+        "type": "ux",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "core-loop-proof-task-select-loop",
+          "core-loop-proof-task-visible-result",
+          "core-loop-proof-task-demo"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-decision-loop",
+      "type": "decision",
+      "label": "Optimize for one undeniable capability, not product breadth",
+      "position": {
+        "x": 1240,
+        "y": -120
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Right now the bottleneck is not missing surface area. It is the absence of one crisp proof that Twilite can carry a user from graph intent to real result. A narrower proof will create more leverage than more features.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "core-loop-proof-decision-github",
+      "type": "decision",
+      "label": "GitHub stays in the proof loop",
+      "position": {
+        "x": 1240,
+        "y": 220
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "GitHub is one of the clearest bridges between graph intent and externally visible consequence. Keeping it in the loop makes the proof more concrete and reduces ambiguity about whether anything real happened.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "core-loop-proof-question-loop",
+      "type": "open-question",
+      "label": "Which exact loop is the strongest first proof?",
+      "position": {
+        "x": 1240,
+        "y": 980
+      },
+      "width": 400,
+      "height": 290,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Choose the specific loop to optimize first. Candidates might include graph to GitHub commit to live page, graph to generated docs artifact, or graph to changed repo state with immediate preview.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before polishing any secondary flows",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "core-loop-proof-question-friction",
+      "type": "open-question",
+      "label": "What is the single biggest source of demo friction today?",
+      "position": {
+        "x": 1240,
+        "y": 1330
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Decide whether the main blocker is auth, graph authoring UX, action execution, GitHub integration, preview visibility, or instability like cursor and interaction issues.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve after an end-to-end walkthrough of the candidate loop",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "core-loop-proof-task-select-loop",
+      "type": "task",
+      "label": "Choose and name the first undeniable loop",
+      "position": {
+        "x": 80,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Pick the exact graph-to-result flow to optimize and write it down as a named product path with start state, user action, GitHub step, and visible end state.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "3",
+        "acceptanceCriteria": [
+          "One candidate loop is chosen",
+          "The loop has a clear start, action, and visible finish",
+          "Secondary loops are explicitly deferred"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-task-walkthrough",
+      "type": "task",
+      "label": "Walk the loop end to end and log friction",
+      "position": {
+        "x": 480,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Run the chosen loop exactly as a user would and capture where it becomes confusing, unstable, slow, or trust-breaking. This should include UX issues, integration gaps, and setup friction.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "4",
+        "acceptanceCriteria": [
+          "The full loop is exercised manually",
+          "Friction points are written down in sequence",
+          "Breakages are separated from polish issues"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-task-harden-flow",
+      "type": "task",
+      "label": "Fix the blockers that break trust in the loop",
+      "position": {
+        "x": 900,
+        "y": 560
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Resolve the issues that make the core loop feel shaky or stitched together. This includes interaction bugs, auth/setup friction, unstable action boundaries, and confusing state transitions.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "The chosen loop can be completed reliably",
+          "Trust-breaking glitches are removed",
+          "The user can understand what happened at each stage"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-task-visible-result",
+      "type": "task",
+      "label": "Make the outcome visibly legible",
+      "position": {
+        "x": 520,
+        "y": 700
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Ensure the final state of the loop is easy to recognize: the changed repo artifact, published page, generated output, or other externally visible proof should be obvious without explanation.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "The result is visible outside Twilite",
+          "The user can tell that Twilite caused the result",
+          "The final proof does not need narration to make sense"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-task-demo",
+      "type": "task",
+      "label": "Package the loop as a repeatable demo",
+      "position": {
+        "x": 940,
+        "y": 920
+      },
+      "width": 380,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Turn the hardened loop into a short repeatable demo path with a known starting graph, expected intermediate steps, and a visible end state that can be shown consistently.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "5",
+        "acceptanceCriteria": [
+          "A repeatable demo path exists",
+          "The demo starts from a known state",
+          "The final result is consistently reproducible"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-task-expand",
+      "type": "task",
+      "label": "Only after proof, decide what expands next",
+      "position": {
+        "x": 540,
+        "y": 1100
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Once the core loop is working cleanly, decide which adjacent capability deserves expansion next. Do not make that decision earlier.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "medium",
+        "estimateHours": "3",
+        "acceptanceCriteria": [
+          "Expansion decisions happen after the proof loop works",
+          "The next area is chosen from evidence, not energy spikes",
+          "The original loop remains intact"
+        ]
+      }
+    },
+    {
+      "id": "core-loop-proof-plan",
+      "type": "markdown",
+      "label": "Suggested Sequence",
+      "position": {
+        "x": -300,
+        "y": 980
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Suggested Sequence\n\n## Phase 1\n- choose the exact loop\n- name it clearly\n- walk it end to end\n\n## Phase 2\n- remove trust-breaking blockers\n- tighten action boundaries\n- make GitHub and the visible result feel intentional\n\n## Phase 3\n- package the loop as a repeatable demo\n- measure where the explanation burden remains\n- only then decide what expands next",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "core-loop-proof-port-github",
+      "type": "port",
+      "label": "Open GitHub App Migration",
+      "position": {
+        "x": -40,
+        "y": 1500
+      },
+      "width": 300,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/tasks/github-app/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "GitHub remains part of the proof loop.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "core-loop-proof-edge-001",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-goal",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "goal"
+    },
+    {
+      "id": "core-loop-proof-edge-002",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-constraint-focus",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "core-loop-proof-edge-003",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-constraint-result",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "core-loop-proof-edge-004",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-decision-loop",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "core-loop-proof-edge-005",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-decision-github",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "core-loop-proof-edge-006",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-question-loop",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "core-loop-proof-edge-007",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-question-friction",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "core-loop-proof-edge-008",
+      "type": "reference",
+      "source": "core-loop-proof-goal",
+      "target": "core-loop-proof-task-select-loop",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts-with"
+    },
+    {
+      "id": "core-loop-proof-edge-009",
+      "type": "reference",
+      "source": "core-loop-proof-task-select-loop",
+      "target": "core-loop-proof-task-walkthrough",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "core-loop-proof-edge-010",
+      "type": "reference",
+      "source": "core-loop-proof-question-loop",
+      "target": "core-loop-proof-task-select-loop",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "resolves-through"
+    },
+    {
+      "id": "core-loop-proof-edge-011",
+      "type": "reference",
+      "source": "core-loop-proof-task-walkthrough",
+      "target": "core-loop-proof-question-friction",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "sharpens"
+    },
+    {
+      "id": "core-loop-proof-edge-012",
+      "type": "reference",
+      "source": "core-loop-proof-task-walkthrough",
+      "target": "core-loop-proof-task-harden-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "unblocks"
+    },
+    {
+      "id": "core-loop-proof-edge-013",
+      "type": "reference",
+      "source": "core-loop-proof-constraint-focus",
+      "target": "core-loop-proof-task-harden-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "bounds"
+    },
+    {
+      "id": "core-loop-proof-edge-014",
+      "type": "reference",
+      "source": "core-loop-proof-task-harden-flow",
+      "target": "core-loop-proof-task-visible-result",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables"
+    },
+    {
+      "id": "core-loop-proof-edge-015",
+      "type": "reference",
+      "source": "core-loop-proof-constraint-result",
+      "target": "core-loop-proof-task-visible-result",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must-respect"
+    },
+    {
+      "id": "core-loop-proof-edge-016",
+      "type": "reference",
+      "source": "core-loop-proof-task-visible-result",
+      "target": "core-loop-proof-task-demo",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "packages-into"
+    },
+    {
+      "id": "core-loop-proof-edge-017",
+      "type": "reference",
+      "source": "core-loop-proof-task-demo",
+      "target": "core-loop-proof-task-expand",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "precedes"
+    },
+    {
+      "id": "core-loop-proof-edge-018",
+      "type": "reference",
+      "source": "core-loop-proof-plan",
+      "target": "core-loop-proof-task-select-loop",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-1"
+    },
+    {
+      "id": "core-loop-proof-edge-019",
+      "type": "reference",
+      "source": "core-loop-proof-plan",
+      "target": "core-loop-proof-task-harden-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-2"
+    },
+    {
+      "id": "core-loop-proof-edge-020",
+      "type": "reference",
+      "source": "core-loop-proof-plan",
+      "target": "core-loop-proof-task-demo",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-3"
+    },
+    {
+      "id": "core-loop-proof-edge-021",
+      "type": "reference",
+      "source": "core-loop-proof-overview",
+      "target": "core-loop-proof-port-github",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "github"
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

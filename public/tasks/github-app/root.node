@@ -1,0 +1,1319 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "github-app-task-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "github-app-migration-task",
+          "name": "GitHub App Migration",
+          "version": "0.1.0",
+          "description": "Replace PAT-based GitHub access with a GitHub App model.",
+          "createdAt": "2026-03-16T22:05:00.000Z",
+          "updatedAt": "2026-03-16T22:05:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "github-app-task-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "github-app-task-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -760,
+        "y": 240
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-overview",
+      "type": "markdown",
+      "label": "GitHub App Migration",
+      "position": {
+        "x": -250,
+        "y": -40
+      },
+      "width": 500,
+      "height": 230,
+      "visible": true,
+      "showLabel": true,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# GitHub App Migration\n\nReplace the GitHub Personal Access Token flow with a Twilite GitHub App backed by server-side auth.\n\nImplementation policy now:\n- GitHub login identifies the user\n- GitHub App installation defines repo scope\n- public reads continue to work\n- repo picker and manual repo/path entry must both work\n- PAT is removed rather than retained as a fallback write path",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "github-app-goal",
+      "type": "goal",
+      "label": "Replace PAT auth with GitHub login + app installation",
+      "position": {
+        "x": 340,
+        "y": -80
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Twilite should authenticate GitHub operations through GitHub login plus installed GitHub App access instead of long-lived PATs stored in the browser.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "",
+        "successMetrics": [
+          "Users connect GitHub without pasting PATs",
+          "Repo operations succeed or fail based on real GitHub access",
+          "Twilite server brokers privileged GitHub operations securely"
+        ]
+      }
+    },
+    {
+      "id": "github-app-constraint",
+      "type": "constraint",
+      "label": "Preserve working repo flows during migration",
+      "position": {
+        "x": 760,
+        "y": -80
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "The migration cannot strand existing users or break core repo read/write flows while the new GitHub App path is rolling out.",
+        "type": "policy",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "github-app-task-auth-server",
+          "github-app-task-ui-flow",
+          "github-app-task-cutover"
+        ]
+      }
+    },
+    {
+      "id": "github-app-decision",
+      "type": "decision",
+      "label": "GitHub App + user sign-in is the primary auth model",
+      "position": {
+        "x": 1180,
+        "y": -80
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "The browser should not hold long-lived GitHub credentials. GitHub login identifies the user, the app installation defines repo scope, and server-side token exchange keeps privileged operations off the client.",
+        "status": "decided",
+        "decidedAt": "2026-03-16",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "github-app-open-question",
+      "type": "open-question",
+      "label": "What is the minimum server/runtime model for local dev and hosting?",
+      "position": {
+        "x": 1180,
+        "y": 920
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Decide what server footprint is required for GitHub App auth, callback handling, session state, and local development. Resolve how this fits a project that has been comfortable as a mostly static export.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before implementing the auth server",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "github-app-task-audit",
+      "type": "task",
+      "label": "Audit PAT touchpoints",
+      "position": {
+        "x": 40,
+        "y": 320
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Inventory every server and client path that currently assumes PAT-based GitHub access.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "4",
+        "acceptanceCriteria": [
+          "List all PAT reads, writes, storage points, and GitHub API call sites"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-permissions",
+      "type": "task",
+      "label": "Design permissions, install flow, and repo selection",
+      "position": {
+        "x": 420,
+        "y": 320
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Choose the minimal GitHub App permissions, GitHub login flow, installation selection, and repo-selection rules. Twilite should not normally create repos; it should operate on repos the signed-in user can actually access.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Permission list is explicit",
+          "Install flow is documented for personal and org repos",
+          "Repo selection rules are clear and do not rely on PAT setup"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-auth-server",
+      "type": "task",
+      "label": "Implement Twilite server auth boundary",
+      "position": {
+        "x": 800,
+        "y": 640
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Add the minimum server layer required for GitHub login, app callback handling, installation token exchange, session binding, and secure repo operations.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "Server can complete GitHub login and app callback flow",
+          "Server can mint installation tokens",
+          "No PAT is required for app-backed repo operations"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-ui-flow",
+      "type": "task",
+      "label": "Update Twilite repo connection UX",
+      "position": {
+        "x": 1180,
+        "y": 320
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Replace PAT-oriented prompts and settings with GitHub login, installation status, repo picker, manual owner/repo + path entry, repo authorization feedback, and clear failure states when the user lacks write access.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Users can sign in with GitHub and see installation status",
+          "Repo picker works for installed repos",
+          "Manual owner/repo + path entry also works",
+          "PAT setup is removed from the primary UX"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-cutover",
+      "type": "task",
+      "label": "Migrate and retire PAT flow",
+      "position": {
+        "x": 1180,
+        "y": 640
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Remove PAT-based behavior, update docs, and cut the system over cleanly once server-backed GitHub App auth is stable.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "PAT storage and PAT-driven UI are removed",
+          "Docs explain the new path",
+          "GitHub writes only use the server-backed app flow"
+        ]
+      }
+    },
+    {
+      "id": "github-app-decision-user-access",
+      "type": "decision",
+      "label": "Repo access should follow the signed-in user",
+      "position": {
+        "x": 1600,
+        "y": -80
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "If the signed-in user can write to a repo through the installed GitHub App, Twilite should be able to write. If the user lacks access, the operation should fail cleanly. Twilite should rely on GitHub permissions, not invent a parallel repo authorization model.",
+        "status": "decided",
+        "decidedAt": "2026-03-17",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "github-app-decision-repo-policy",
+      "type": "decision",
+      "label": "Twilite does not create repos as a normal workflow",
+      "position": {
+        "x": 1600,
+        "y": 240
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Twilite should work with repos that already exist and that the signed-in user can access. Repo creation may happen in onboarding later, but Twilite is not in the business of spawning arbitrary GitHub repos as a core workflow.",
+        "status": "decided",
+        "decidedAt": "2026-03-17",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "github-app-decision-ref-transport",
+      "type": "decision",
+      "label": "Keep github:// as a locator, not a transport contract",
+      "position": {
+        "x": 1600,
+        "y": 560
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "The github:// scheme exists to locate graph files conveniently. Public reads can remain direct where appropriate, while authenticated writes and private reads can use the server path. Transport can vary underneath the same locator.",
+        "status": "decided",
+        "decidedAt": "2026-03-17",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "github-app-open-question-account",
+      "type": "open-question",
+      "label": "How do Twilite accounts, billing, and GitHub identity fit together?",
+      "position": {
+        "x": 720,
+        "y": 920
+      },
+      "width": 420,
+      "height": 300,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Twilite needs its own account model for payment and product ownership. Decide how Twilite accounts relate to GitHub login, what identity is canonical, and how billing and repo access are stitched together without confusing the user.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before public beta billing or account gating",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "github-app-task-session-model",
+      "type": "task",
+      "label": "Design session and identity model",
+      "position": {
+        "x": 420,
+        "y": 640
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Define the session model for GitHub login, Twilite user identity, installation state, and repo authorization checks. This is the contract the server and UI will share.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Session shape is explicit",
+          "GitHub identity vs Twilite account boundaries are named",
+          "Repo authorization checks are defined"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-port-library",
+      "type": "port",
+      "label": "Open Planning Class Library",
+      "position": {
+        "x": 40,
+        "y": 1060
+      },
+      "width": 280,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Reference planning node library used by this task graph.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "github-app-plan",
+      "type": "markdown",
+      "label": "Implementation Plan",
+      "position": {
+        "x": -260,
+        "y": 1040
+      },
+      "width": 560,
+      "height": 360,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Implementation Plan\n\n## Phase 1 \u2014 Session + Server Boundary\n- define session shape\n- add auth routes\n- establish GitHub login + callback\n\n## Phase 2 \u2014 Installation + Repo Access\n- list installations\n- select active installation\n- support repo picker and manual owner/repo entry\n\n## Phase 3 \u2014 Replace Client PAT Flows\n- route commit/load/delete through server\n- remove PAT UI and PAT storage\n- keep public reads working\n\n## Phase 4 \u2014 github:// Resolution\n- keep github:// as a locator\n- use public direct reads where allowed\n- use server-backed reads when auth is required\n\n## Phase 5 \u2014 Cutover\n- remove PAT code paths\n- update docs\n- verify write flows only use app-backed auth",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "github-app-task-session-routes",
+      "type": "task",
+      "label": "Add auth routes and session boundary",
+      "position": {
+        "x": 20,
+        "y": 1480
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Add the first server routes for GitHub login, callback, session state, installation listing, and repo lookup. This is the minimum backend boundary the app needs.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "API route contract exists",
+          "Session shape is explicit",
+          "GitHub login + callback can complete"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-installations",
+      "type": "task",
+      "label": "Implement installation and repo access flow",
+      "position": {
+        "x": 440,
+        "y": 1480
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "List installations for the signed-in user, select the active installation, and support both repo picker and manual owner/repo entry against that access model.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "User can see installations",
+          "Repo picker works",
+          "Manual owner/repo entry works",
+          "Unauthorized repos fail clearly"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-server-ops",
+      "type": "task",
+      "label": "Move commit/load/delete to server operations",
+      "position": {
+        "x": 900,
+        "y": 1480
+      },
+      "width": 420,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Replace browser-side GitHub REST writes with server-backed read, commit, and delete operations using installation tokens.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "Commit uses server route",
+          "Delete uses server route",
+          "Private load uses server route",
+          "No browser-held PAT is required"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-public-read",
+      "type": "task",
+      "label": "Preserve public read behavior",
+      "position": {
+        "x": 1360,
+        "y": 1480
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Keep public GitHub reads working while separating them from authenticated write and private-read paths. The user should still be able to open public github:// refs without friction.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Public github:// refs still load",
+          "Public class refs still resolve",
+          "Public reading does not require PAT or Twilite write auth"
+        ]
+      }
+    },
+    {
+      "id": "github-app-task-remove-pat",
+      "type": "task",
+      "label": "Remove PAT storage and PAT UI",
+      "position": {
+        "x": 1780,
+        "y": 1480
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Strip the PAT field, PAT localStorage usage, and PAT-driven write flow from the product once the app-backed path is in place.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "PAT input is removed",
+          "localStorage githubPat is no longer used",
+          "GitHub writes only use the new path"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "github-app-edge-001",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-goal",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "goal"
+    },
+    {
+      "id": "github-app-edge-002",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-constraint",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "github-app-edge-003",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-decision",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "github-app-edge-004",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-open-question",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "github-app-edge-005",
+      "type": "reference",
+      "source": "github-app-goal",
+      "target": "github-app-task-audit",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts-with"
+    },
+    {
+      "id": "github-app-edge-006",
+      "type": "reference",
+      "source": "github-app-task-audit",
+      "target": "github-app-task-permissions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "informs"
+    },
+    {
+      "id": "github-app-edge-007",
+      "type": "reference",
+      "source": "github-app-task-permissions",
+      "target": "github-app-task-auth-server",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables"
+    },
+    {
+      "id": "github-app-edge-008",
+      "type": "reference",
+      "source": "github-app-task-permissions",
+      "target": "github-app-task-ui-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides"
+    },
+    {
+      "id": "github-app-edge-009",
+      "type": "reference",
+      "source": "github-app-open-question",
+      "target": "github-app-task-permissions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must-answer"
+    },
+    {
+      "id": "github-app-edge-010",
+      "type": "reference",
+      "source": "github-app-constraint",
+      "target": "github-app-task-auth-server",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains"
+    },
+    {
+      "id": "github-app-edge-011",
+      "type": "reference",
+      "source": "github-app-constraint",
+      "target": "github-app-task-ui-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains"
+    },
+    {
+      "id": "github-app-edge-012",
+      "type": "reference",
+      "source": "github-app-task-auth-server",
+      "target": "github-app-task-cutover",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "precedes"
+    },
+    {
+      "id": "github-app-edge-013",
+      "type": "reference",
+      "source": "github-app-task-ui-flow",
+      "target": "github-app-task-cutover",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "precedes"
+    },
+    {
+      "id": "github-app-edge-014",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-task-port-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "library"
+    },
+    {
+      "id": "github-app-edge-015",
+      "type": "reference",
+      "source": "github-app-decision",
+      "target": "github-app-decision-user-access",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "refines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-016",
+      "type": "reference",
+      "source": "github-app-decision",
+      "target": "github-app-decision-repo-policy",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "refines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-017",
+      "type": "reference",
+      "source": "github-app-decision",
+      "target": "github-app-decision-ref-transport",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "refines",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-018",
+      "type": "reference",
+      "source": "github-app-open-question-account",
+      "target": "github-app-task-session-model",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-019",
+      "type": "reference",
+      "source": "github-app-open-question",
+      "target": "github-app-task-session-model",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "shapes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-020",
+      "type": "reference",
+      "source": "github-app-task-session-model",
+      "target": "github-app-task-auth-server",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "precedes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-021",
+      "type": "reference",
+      "source": "github-app-task-session-model",
+      "target": "github-app-task-ui-flow",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "grounds",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-022",
+      "type": "reference",
+      "source": "github-app-decision-user-access",
+      "target": "github-app-task-permissions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-023",
+      "type": "reference",
+      "source": "github-app-decision-repo-policy",
+      "target": "github-app-task-permissions",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-024",
+      "type": "reference",
+      "source": "github-app-decision-ref-transport",
+      "target": "github-app-task-auth-server",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-025",
+      "type": "reference",
+      "source": "github-app-task-overview",
+      "target": "github-app-plan",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phases",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-026",
+      "type": "reference",
+      "source": "github-app-task-session-model",
+      "target": "github-app-task-session-routes",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "implements",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-027",
+      "type": "reference",
+      "source": "github-app-task-session-routes",
+      "target": "github-app-task-installations",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-028",
+      "type": "reference",
+      "source": "github-app-task-installations",
+      "target": "github-app-task-server-ops",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "precedes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-029",
+      "type": "reference",
+      "source": "github-app-task-server-ops",
+      "target": "github-app-task-public-read",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "splits",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-030",
+      "type": "reference",
+      "source": "github-app-task-server-ops",
+      "target": "github-app-task-remove-pat",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "unblocks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-031",
+      "type": "reference",
+      "source": "github-app-decision-user-access",
+      "target": "github-app-task-installations",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-032",
+      "type": "reference",
+      "source": "github-app-decision-ref-transport",
+      "target": "github-app-task-public-read",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-033",
+      "type": "reference",
+      "source": "github-app-task-remove-pat",
+      "target": "github-app-task-cutover",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "completes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-034",
+      "type": "reference",
+      "source": "github-app-open-question",
+      "target": "github-app-task-session-routes",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "github-app-edge-035",
+      "type": "reference",
+      "source": "github-app-open-question-account",
+      "target": "github-app-task-session-model",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "complicates",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "timestamp": "2026-03-17T01:05:00.000Z",
+  "nodeCount": 25,
+  "edgeCount": 35
+}

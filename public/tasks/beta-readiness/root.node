@@ -1,0 +1,971 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "beta-readiness-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -260
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 360,
+      "height": 240,
+      "data": {
+        "identity": {
+          "graphId": "beta-readiness-task",
+          "name": "Beta Readiness",
+          "version": "0.1.0",
+          "description": "Release-readiness task graph for getting Twilite to beta.",
+          "createdAt": "2026-03-16T22:40:00.000Z",
+          "updatedAt": "2026-03-16T22:40:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "beta-readiness-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -760,
+        "y": 20
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 320,
+      "height": 180,
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -760,
+        "y": 240
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 360,
+      "height": 260,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-overview",
+      "type": "markdown",
+      "label": "Beta Readiness",
+      "position": {
+        "x": -280,
+        "y": 20
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 520,
+      "height": 260,
+      "data": {
+        "markdown": "# Beta Readiness\n\nBring Twilite to a beta-quality release by closing the remaining product, security, reliability, and usability gaps.\n\nThis graph tracks the minimum release work, not every future improvement.",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "beta-readiness-goal",
+      "type": "goal",
+      "label": "Ship a credible beta release",
+      "position": {
+        "x": 360,
+        "y": 0
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 300,
+      "data": {
+        "body": "Get Twilite stable, secure, legible, and usable enough for beta users.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "2026-04-30",
+        "successMetrics": [
+          "GitHub App auth replaces PAT",
+          "Diagnostics are trustworthy",
+          "Layout is stable on real task graphs",
+          "Onboarding gets new users to a useful graph quickly"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-constraint",
+      "type": "constraint",
+      "label": "Do not regress working graph authoring flows",
+      "position": {
+        "x": 840,
+        "y": 0
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 400,
+      "height": 280,
+      "data": {
+        "body": "Beta hardening cannot break the author workflows that already work: graph editing, traversal, bridge/create, save, and GitHub sync.",
+        "type": "policy",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "beta-readiness-task-github",
+          "beta-readiness-task-layout",
+          "beta-readiness-task-persistence"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-decision",
+      "type": "decision",
+      "label": "Beta means trustable core workflows, not feature completeness",
+      "position": {
+        "x": 1320,
+        "y": 0
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 280,
+      "data": {
+        "rationale": "Prioritize auth, diagnostics, layout stability, onboarding, class-system polish, and persistence clarity over deeper semantic-zoom ambition or broader ontology expansion.",
+        "status": "decided",
+        "owner": "Michael",
+        "decidedAt": "2026-03-16",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "beta-readiness-question",
+      "type": "open-question",
+      "label": "What is the minimum acceptable onboarding path?",
+      "position": {
+        "x": 980,
+        "y": 380
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 300,
+      "data": {
+        "body": "Define the shortest path from first load to a successful graph interaction for a new beta user.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before locking the public landing and onboarding flow",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "beta-readiness-task-github",
+      "type": "task",
+      "label": "Complete GitHub App migration",
+      "position": {
+        "x": -40,
+        "y": 420
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 380,
+      "height": 260,
+      "data": {
+        "body": "Replace PAT-based auth with a GitHub App and preserve working repo flows during rollout.",
+        "priority": "critical",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "PAT-based auth is replaced by the GitHub App path",
+          "Repo flows still work during rollout",
+          "Failure states are clear"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-diagnostics",
+      "type": "task",
+      "label": "Make diagnostics durable and attributable",
+      "position": {
+        "x": 380,
+        "y": 420
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 400,
+      "height": 260,
+      "data": {
+        "body": "Capture runtime, class, and validation failures in one persistent diagnostics surface with clear source attribution.",
+        "priority": "critical",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Diagnostics persist across the key failure paths",
+          "Messages identify the source clearly",
+          "Runtime, class, and validation failures share one surface"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-layout",
+      "type": "task",
+      "label": "Stabilize layout and expansion placement",
+      "position": {
+        "x": 820,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 260,
+      "data": {
+        "body": "Make expansion placement, overlap handling, and repositioning predictable on dense graphs before adding more semantic-zoom automation.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "12",
+        "acceptanceCriteria": [
+          "Expansion placement is predictable on dense graphs",
+          "Overlap handling is legible",
+          "Further semantic-zoom work is not blocked by layout instability"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-cursor",
+      "type": "task",
+      "label": "Fix erratic mouse cursor mode switching",
+      "position": {
+        "x": 1280,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 260,
+      "data": {
+        "body": "Investigate and fix the flickery cursor behavior where the pointer appears to switch interaction modes repeatedly during normal use. The cursor should communicate one stable affordance at a time.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Cursor mode changes are stable and intentional",
+          "Pointer feedback matches the actual interaction state",
+          "Normal hover, drag, and edit flows no longer flicker"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-layout-controls",
+      "type": "task",
+      "label": "Make layout controls feel correct and usable",
+      "position": {
+        "x": 1740,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 420,
+      "height": 260,
+      "data": {
+        "body": "Refine the layout controls so users can understand what each layout mode does, apply it confidently, and get predictable results. The current controls still do not feel right for beta quality.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Layout controls are easy to understand",
+          "Applying a layout produces predictable results",
+          "The controls feel coherent with the rest of the editor"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-onboarding",
+      "type": "task",
+      "label": "Build a beta onboarding path",
+      "position": {
+        "x": 1460,
+        "y": 420
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 400,
+      "height": 260,
+      "data": {
+        "body": "Provide a clear landing path, starter graph, and a small set of obvious first actions for new users.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "New users have a clear first path",
+          "A starter graph exists",
+          "The first useful action is obvious"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-classes",
+      "type": "task",
+      "label": "Polish class-system defaults",
+      "position": {
+        "x": -20,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 380,
+      "height": 260,
+      "data": {
+        "body": "Improve class authoring diagnostics, shared view tokens, and a small set of exemplar libraries so class-backed content feels reliable.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Class authoring diagnostics improve",
+          "Shared view tokens are clearer",
+          "Exemplar libraries feel reliable"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-task-persistence",
+      "type": "task",
+      "label": "Clarify save and export behavior",
+      "position": {
+        "x": 420,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 360,
+      "height": 260,
+      "data": {
+        "body": "Make fragment-scoped save/export behavior obvious, predictable, and safe for beta users.",
+        "priority": "high",
+        "status": "todo",
+        "owner": "Michael",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Save and export behavior are obvious",
+          "Fragment-scoped behavior is predictable",
+          "Beta users can avoid accidental data loss"
+        ]
+      }
+    },
+    {
+      "id": "beta-readiness-port-library",
+      "type": "port",
+      "label": "Open Planning Class Library",
+      "position": {
+        "x": 1460,
+        "y": 760
+      },
+      "visible": true,
+      "showLabel": true,
+      "width": 300,
+      "height": 140,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "kind": "graph",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Reference planning-node language used to model beta readiness.",
+        "intent": "external"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "beta-readiness-edge-1",
+      "type": "reference",
+      "source": "beta-readiness-overview",
+      "target": "beta-readiness-goal",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-2",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-constraint",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "bounded by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-3",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-decision",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guided by",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-4",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-question",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "asks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-5",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-task-github",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-6",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-task-diagnostics",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-7",
+      "type": "reference",
+      "source": "beta-readiness-goal",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-8",
+      "type": "reference",
+      "source": "beta-readiness-task-github",
+      "target": "beta-readiness-task-diagnostics",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "depends-on",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-9",
+      "type": "reference",
+      "source": "beta-readiness-task-diagnostics",
+      "target": "beta-readiness-task-layout",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "unblocks",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-10",
+      "type": "reference",
+      "source": "beta-readiness-task-diagnostics",
+      "target": "beta-readiness-task-persistence",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "clarifies",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11",
+      "type": "reference",
+      "source": "beta-readiness-task-layout",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11b",
+      "type": "reference",
+      "source": "beta-readiness-task-diagnostics",
+      "target": "beta-readiness-task-cursor",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "helps-debug",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11c",
+      "type": "reference",
+      "source": "beta-readiness-task-layout",
+      "target": "beta-readiness-task-cursor",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "related"
+      ,
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11d",
+      "type": "reference",
+      "source": "beta-readiness-task-cursor",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11e",
+      "type": "reference",
+      "source": "beta-readiness-task-layout",
+      "target": "beta-readiness-task-layout-controls",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs-ui",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-11f",
+      "type": "reference",
+      "source": "beta-readiness-task-layout-controls",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-12",
+      "type": "reference",
+      "source": "beta-readiness-task-classes",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "supports",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-13",
+      "type": "reference",
+      "source": "beta-readiness-question",
+      "target": "beta-readiness-task-onboarding",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "shapes",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "beta-readiness-edge-14",
+      "type": "reference",
+      "source": "beta-readiness-overview",
+      "target": "beta-readiness-port-library",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "references",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    }
+  ],
+  "timestamp": "2026-03-16T22:40:00.000Z",
+  "nodeCount": 17,
+  "edgeCount": 19
+}

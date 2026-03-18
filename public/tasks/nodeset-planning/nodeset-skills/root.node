@@ -1,0 +1,933 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "nodeset-skills-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -780,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "nodeset-skills-task",
+          "name": "Nodeset Skills",
+          "version": "0.1.0",
+          "description": "Planning graph for using skills to enforce nodeset contracts and repair drift.",
+          "createdAt": "2026-03-18T13:15:00.000Z",
+          "updatedAt": "2026-03-18T13:15:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "nodeset-skills-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -780,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "nodeset-skills-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -780,
+        "y": 240
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-overview",
+      "type": "markdown",
+      "label": "Nodeset Skills",
+      "position": {
+        "x": -240,
+        "y": -40
+      },
+      "width": 520,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# Nodeset Skills\n\nUse skills as the enforcement layer for nodesets so graph generation can go slightly wrong in a bounded, repairable place instead of drifting across the whole repo.\n\nThe first skill surface should enforce contract shape, canonical-vs-archive placement, and graph repair workflows for planning graphs and future nodesets.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "nodeset-skills-goal",
+      "type": "goal",
+      "label": "Make nodesets self-correcting through skills",
+      "position": {
+        "x": 360,
+        "y": -120
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Nodesets should carry enough local skill logic that agents can generate, validate, and repair graphs without relying on global memory or repo-wide cleanup passes.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "",
+        "successMetrics": [
+          "Active graphs conform to nodeset field contracts",
+          "Archive placement is consistent and explicit",
+          "Repair workflows can fix common drift automatically or semi-automatically"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-constraint-locality",
+      "type": "constraint",
+      "label": "Correction logic stays local to the nodeset",
+      "position": {
+        "x": 790,
+        "y": -120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Do not solve nodeset drift with repo-wide hidden assumptions. The skill should read the nodeset's own contract, enforce its own canonical placement rules, and report repairs in terms the nodeset itself understands.",
+        "type": "architecture",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "nodeset-skills-task-contract",
+          "nodeset-skills-task-validator",
+          "nodeset-skills-task-repair"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-constraint-audit",
+      "type": "constraint",
+      "label": "Repairs must be inspectable",
+      "position": {
+        "x": 790,
+        "y": 190
+      },
+      "width": 360,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Skill-driven cleanup cannot become silent mutation. Repairs should produce a clear diff or graph-local report so humans can see what was normalized, archived, or rejected.",
+        "type": "policy",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "nodeset-skills-task-validator",
+          "nodeset-skills-task-repair",
+          "nodeset-skills-task-reports"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-decision-skill-role",
+      "type": "decision",
+      "label": "Skills enforce the nodeset contract, not just generate graphs",
+      "position": {
+        "x": 1220,
+        "y": -120
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Generation alone is not enough. The skill should define valid shapes, placement rules, repair affordances, and the canonical workflow for moving between active, proposed, and archived graph states.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "nodeset-skills-decision-first-surface",
+      "type": "decision",
+      "label": "Planning nodesets are the first skill pilot",
+      "position": {
+        "x": 1220,
+        "y": 220
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "The planning nodeset already has enough structure, active use, and visible drift to make it the right proving ground. If skills work there, the same pattern can extend to other nodesets later.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "nodeset-skills-question-boundary",
+      "type": "open-question",
+      "label": "How much authority should a skill have to rewrite graphs?",
+      "position": {
+        "x": 1220,
+        "y": 980
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Decide whether a nodeset skill can automatically patch contract drift, move files into archive locations, and rewrite metadata, or whether those actions always need human confirmation.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before enabling automatic repair mode",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "nodeset-skills-question-portability",
+      "type": "open-question",
+      "label": "Where should the contract live for each nodeset?",
+      "position": {
+        "x": 1220,
+        "y": 1320
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Choose whether a nodeset skill reads contract rules from a graph manifest, a dictionary payload, a sibling skill file, or a mixed arrangement. The location affects portability and authoring ergonomics.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before generalizing the skill pattern beyond planning nodes",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "nodeset-skills-task-contract",
+      "type": "task",
+      "label": "Define the nodeset skill contract",
+      "position": {
+        "x": 80,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Specify what every nodeset skill must know: canonical file locations, allowed node field shapes, archive policy, validation severity levels, and repair affordances.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "5",
+        "acceptanceCriteria": [
+          "The nodeset skill contract is explicit",
+          "Canonical versus archive rules are named",
+          "Validation and repair levels are defined"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-task-planning-map",
+      "type": "task",
+      "label": "Map the planning nodeset into that contract",
+      "position": {
+        "x": 480,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Turn the planning nodeset into the first concrete skill target: define its canonical directories, active graph surfaces, field contract, archive boundaries, and allowed exceptions.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Planning nodeset canonical surfaces are listed",
+          "Field-level contract drift is named",
+          "Archive placement rules are explicit"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-task-validator",
+      "type": "task",
+      "label": "Implement validation and drift detection",
+      "position": {
+        "x": 900,
+        "y": 560
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Build the first validator pass that can inspect a nodeset graph and flag contract drift: wrong field names, wrong file placement, orphaned proposal artifacts, bad metadata, and stale index links.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Validator catches the common drift cases",
+          "Reports are specific enough to act on",
+          "Validation severity distinguishes hard errors from soft cleanup"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-task-repair",
+      "type": "task",
+      "label": "Implement bounded repair workflows",
+      "position": {
+        "x": 520,
+        "y": 700
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Define and implement safe repair flows for the planning nodeset: normalize fields, clean index metadata, move proposal artifacts to archive, and patch links without silently rewriting broader content.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "Common planning-node drift can be repaired",
+          "Repairs stay within the nodeset boundary",
+          "Humans can review the repair outcome"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-task-reports",
+      "type": "task",
+      "label": "Expose repair reports and author guidance",
+      "position": {
+        "x": 940,
+        "y": 920
+      },
+      "width": 380,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Create a graph-local reporting surface so nodeset skills can explain what they changed, what they refused to change, and what the author should fix manually.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Repairs produce an inspectable report",
+          "Manual follow-up items are explicit",
+          "Authors can tell the difference between policy and preference"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-task-generalize",
+      "type": "task",
+      "label": "Generalize the pattern to future nodesets",
+      "position": {
+        "x": 540,
+        "y": 1100
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "After the planning nodeset pilot works, extract the repeatable pattern so other nodesets can define their own skill-backed contract enforcement without re-inventing the workflow.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Reusable nodeset-skill pattern is documented",
+          "Planning-specific assumptions are separated out",
+          "A second nodeset can adopt the pattern later"
+        ]
+      }
+    },
+    {
+      "id": "nodeset-skills-plan",
+      "type": "markdown",
+      "label": "Suggested Sequence",
+      "position": {
+        "x": -300,
+        "y": 980
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Suggested Sequence\n\n## Phase 1\n- define the nodeset skill contract\n- map the planning nodeset into it\n- decide repair authority boundaries\n\n## Phase 2\n- implement validation and drift detection\n- wire reports to concrete graph-local output\n- test on real planning graphs\n\n## Phase 3\n- implement bounded repair workflows\n- normalize contract and archive issues\n- keep humans in the review loop\n\n## Phase 4\n- document the reusable pattern\n- separate planning-specific rules from generic ones\n- extend the approach to future nodesets",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "nodeset-skills-port-library",
+      "type": "port",
+      "label": "Open Planning Class Library",
+      "position": {
+        "x": -40,
+        "y": 1500
+      },
+      "width": 300,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Reference planning nodeset used as the first skill pilot.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "nodeset-skills-edge-001",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-goal",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "goal"
+    },
+    {
+      "id": "nodeset-skills-edge-002",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-constraint-locality",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "nodeset-skills-edge-003",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-constraint-audit",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "nodeset-skills-edge-004",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-decision-skill-role",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "nodeset-skills-edge-005",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-decision-first-surface",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "nodeset-skills-edge-006",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-question-boundary",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "nodeset-skills-edge-007",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-question-portability",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "nodeset-skills-edge-008",
+      "type": "reference",
+      "source": "nodeset-skills-goal",
+      "target": "nodeset-skills-task-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts-with"
+    },
+    {
+      "id": "nodeset-skills-edge-009",
+      "type": "reference",
+      "source": "nodeset-skills-task-contract",
+      "target": "nodeset-skills-task-planning-map",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives"
+    },
+    {
+      "id": "nodeset-skills-edge-010",
+      "type": "reference",
+      "source": "nodeset-skills-task-planning-map",
+      "target": "nodeset-skills-task-validator",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "nodeset-skills-edge-011",
+      "type": "reference",
+      "source": "nodeset-skills-constraint-locality",
+      "target": "nodeset-skills-task-validator",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "bounds"
+    },
+    {
+      "id": "nodeset-skills-edge-012",
+      "type": "reference",
+      "source": "nodeset-skills-task-validator",
+      "target": "nodeset-skills-task-repair",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables"
+    },
+    {
+      "id": "nodeset-skills-edge-013",
+      "type": "reference",
+      "source": "nodeset-skills-constraint-audit",
+      "target": "nodeset-skills-task-repair",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must-respect"
+    },
+    {
+      "id": "nodeset-skills-edge-014",
+      "type": "reference",
+      "source": "nodeset-skills-task-repair",
+      "target": "nodeset-skills-task-reports",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "reports-through"
+    },
+    {
+      "id": "nodeset-skills-edge-015",
+      "type": "reference",
+      "source": "nodeset-skills-task-reports",
+      "target": "nodeset-skills-question-boundary",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "sharpens"
+    },
+    {
+      "id": "nodeset-skills-edge-016",
+      "type": "reference",
+      "source": "nodeset-skills-task-contract",
+      "target": "nodeset-skills-question-portability",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "depends-on"
+    },
+    {
+      "id": "nodeset-skills-edge-017",
+      "type": "reference",
+      "source": "nodeset-skills-task-repair",
+      "target": "nodeset-skills-task-generalize",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "proves"
+    },
+    {
+      "id": "nodeset-skills-edge-018",
+      "type": "reference",
+      "source": "nodeset-skills-plan",
+      "target": "nodeset-skills-task-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-1"
+    },
+    {
+      "id": "nodeset-skills-edge-019",
+      "type": "reference",
+      "source": "nodeset-skills-plan",
+      "target": "nodeset-skills-task-validator",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-2"
+    },
+    {
+      "id": "nodeset-skills-edge-020",
+      "type": "reference",
+      "source": "nodeset-skills-plan",
+      "target": "nodeset-skills-task-repair",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-3"
+    },
+    {
+      "id": "nodeset-skills-edge-021",
+      "type": "reference",
+      "source": "nodeset-skills-plan",
+      "target": "nodeset-skills-task-generalize",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-4"
+    },
+    {
+      "id": "nodeset-skills-edge-022",
+      "type": "reference",
+      "source": "nodeset-skills-overview",
+      "target": "nodeset-skills-port-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "library"
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

@@ -187,8 +187,16 @@ export default function DocumentPropertiesDialog({
   const [browserThemeName, setBrowserThemeName] = useState('default');
   const [tagInput, setTagInput] = useState('');
   const [newCollaborator, setNewCollaborator] = useState({ name: '', email: '', role: 'Editor' });
-  const [githubPat, setGithubPat] = useState('');
   const [githubCommitMessage, setGithubCommitMessage] = useState('');
+  const [githubSessionState, setGithubSessionState] = useState({
+    configured: false,
+    authenticated: false,
+    session: null,
+    missing: []
+  });
+  const [githubInstallations, setGithubInstallations] = useState([]);
+  const [githubRepos, setGithubRepos] = useState([]);
+  const [githubStatus, setGithubStatus] = useState({ loading: false, error: '' });
   const [storySnapshotIndex, setStorySnapshotIndex] = useState(0);
   const [storyMilestoneLabel, setStoryMilestoneLabel] = useState('');
   const [liveStorySnapshots, setLiveStorySnapshots] = useState([]);
@@ -373,14 +381,82 @@ export default function DocumentPropertiesDialog({
       setTagInput('');
       setNewCollaborator({ name: '', email: '', role: 'Editor' });
     }
-    try {
-      if (typeof window !== 'undefined') {
-        setGithubPat(localStorage.getItem('githubPat') || '');
-      }
-    } catch (err) {
-      setGithubPat('');
-    }
   }, [open, projectMeta, defaultShareLink, documentSettings]);
+
+  const loadGithubSession = useCallback(async () => {
+    setGithubStatus((prev) => ({ ...prev, loading: true, error: '' }));
+    try {
+      const response = await fetch('/api/github/session', { cache: 'no-store' });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.message || 'Failed to load GitHub session.');
+      }
+      setGithubSessionState({
+        configured: payload.configured === true,
+        authenticated: payload.authenticated === true,
+        session: payload.session || null,
+        missing: Array.isArray(payload.missing) ? payload.missing : []
+      });
+      setGithubStatus((prev) => ({ ...prev, loading: false }));
+      return payload;
+    } catch (err) {
+      setGithubStatus({ loading: false, error: err?.message || 'Failed to load GitHub session.' });
+      return null;
+    }
+  }, []);
+
+  const loadGithubInstallations = useCallback(async () => {
+    try {
+      const response = await fetch('/api/github/installations', { cache: 'no-store' });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || 'Failed to load installations.');
+      setGithubInstallations(Array.isArray(payload.installations) ? payload.installations : []);
+      return payload.activeInstallationId || null;
+    } catch (err) {
+      setGithubStatus((prev) => ({ ...prev, error: err?.message || 'Failed to load installations.' }));
+      setGithubInstallations([]);
+      return null;
+    }
+  }, []);
+
+  const loadGithubRepos = useCallback(async (installationId) => {
+    if (!installationId) {
+      setGithubRepos([]);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/github/repos?installationId=${encodeURIComponent(installationId)}`, {
+        cache: 'no-store'
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || 'Failed to load repositories.');
+      setGithubRepos(Array.isArray(payload.repositories) ? payload.repositories : []);
+    } catch (err) {
+      setGithubStatus((prev) => ({ ...prev, error: err?.message || 'Failed to load repositories.' }));
+      setGithubRepos([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open || activeTab !== 'github') return;
+    let cancelled = false;
+    (async () => {
+      const sessionPayload = await loadGithubSession();
+      if (!sessionPayload || cancelled) return;
+      if (sessionPayload.authenticated !== true) return;
+      const activeInstallationId =
+        docSettings.github?.installationId ||
+        sessionPayload.session?.activeInstallationId ||
+        (await loadGithubInstallations());
+      if (cancelled) return;
+      if (activeInstallationId) {
+        await loadGithubRepos(activeInstallationId);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, activeTab, loadGithubSession, loadGithubInstallations, loadGithubRepos, docSettings.github?.installationId]);
 
   useEffect(() => {
     const handleOpenTab = ({ tab } = {}) => {
@@ -1985,31 +2061,107 @@ export default function DocumentPropertiesDialog({
           <Stack spacing={sectionSpacing} sx={contentPadding}>
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" gutterBottom>
-                GitHub Sync (PAT)
+                GitHub Connection
               </Typography>
               <Stack spacing={2}>
+                <Typography variant="body2" color="text.secondary">
+                  GitHub writes are moving behind the Twilite server. Public reads continue to work, but PAT-based write setup is being removed.
+                </Typography>
+                {githubStatus.error && (
+                  <Typography variant="body2" color="error">
+                    {githubStatus.error}
+                  </Typography>
+                )}
+                {!githubSessionState.configured && githubSessionState.missing.length > 0 && (
+                  <Typography variant="body2" color="warning.main">
+                    GitHub auth is not configured on the server yet. Missing: {githubSessionState.missing.join(', ')}
+                  </Typography>
+                )}
+                {githubSessionState.authenticated ? (
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Avatar src={githubSessionState.session?.githubUser?.avatarUrl || ''} alt={githubSessionState.session?.githubUser?.login || 'GitHub'} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                        {githubSessionState.session?.githubUser?.name || githubSessionState.session?.githubUser?.login || 'GitHub user'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        @{githubSessionState.session?.githubUser?.login || 'unknown'}
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      onClick={async () => {
+                        await fetch('/api/github/logout', { method: 'POST' }).catch(() => null);
+                        setGithubSessionState({ configured: githubSessionState.configured, authenticated: false, session: null, missing: githubSessionState.missing || [] });
+                        setGithubInstallations([]);
+                        setGithubRepos([]);
+                      }}
+                    >
+                      Disconnect
+                    </Button>
+                  </Stack>
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      if (typeof window === 'undefined') return;
+                      const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+                      window.location.href = `/api/github/login?returnTo=${encodeURIComponent(returnTo)}`;
+                    }}
+                    disabled={!githubSessionState.configured}
+                  >
+                    Sign In With GitHub
+                  </Button>
+                )}
                 <TextField
-                  label="Personal Access Token (PAT)"
-                  type="password"
-                  value={githubPat}
-                  onChange={(event) => {
-                    const next = event.target.value;
-                    setGithubPat(next);
-                    try {
-                      if (typeof window !== 'undefined') {
-                        if (next) {
-                          localStorage.setItem('githubPat', next);
-                        } else {
-                          localStorage.removeItem('githubPat');
-                        }
-                      }
-                    } catch (err) {
-                      // ignore storage errors
-                    }
+                  label="Installation"
+                  select
+                  value={docSettings.github?.installationId || ''}
+                  onChange={async (event) => {
+                    const installationId = event.target.value;
+                    handleGithubSettingsChange({ installationId });
+                    setGithubRepos([]);
+                    await fetch('/api/github/select-installation', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ installationId })
+                    }).catch(() => null);
+                    loadGithubRepos(installationId);
                   }}
                   fullWidth
-                  helperText="Stored locally in this browser. Required for commit; optional for loading public repos."
-                />
+                  disabled={!githubSessionState.authenticated || githubInstallations.length === 0}
+                  helperText={!githubSessionState.authenticated ? 'Sign in to load installations.' : 'Choose the active GitHub App installation for repo access.'}
+                >
+                  <MenuItem value="">Select installation</MenuItem>
+                  {githubInstallations.map((installation) => (
+                    <MenuItem key={installation.id} value={String(installation.id)}>
+                      {installation.account?.login || `Installation ${installation.id}`}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Repository picker"
+                  select
+                  value={docSettings.github?.repo || ''}
+                  onChange={(event) => {
+                    const fullName = event.target.value;
+                    const selectedRepo = githubRepos.find((repo) => repo.fullName === fullName);
+                    handleGithubSettingsChange({
+                      repo: fullName,
+                      branch: selectedRepo?.defaultBranch || docSettings.github?.branch || 'main'
+                    });
+                  }}
+                  fullWidth
+                  disabled={githubRepos.length === 0}
+                  helperText="Picker and manual owner/repo entry both work. Use whichever is more convenient."
+                >
+                  <MenuItem value="">Select repository</MenuItem>
+                  {githubRepos.map((repo) => (
+                    <MenuItem key={repo.id} value={repo.fullName}>
+                      {repo.fullName}{repo.private ? ' (private)' : ' (public)'}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <TextField
                   label="Repository (owner/name)"
                   value={docSettings.github?.repo || ''}
@@ -2029,51 +2181,6 @@ export default function DocumentPropertiesDialog({
                   onChange={(event) => handleGithubSettingsChange({ branch: event.target.value })}
                   fullWidth
                 />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={docSettings.github?.autoCreateRepo !== false}
-                      onChange={(event) =>
-                        handleGithubSettingsChange({ autoCreateRepo: event.target.checked })
-                      }
-                    />
-                  }
-                  label="Auto-create repo if missing"
-                />
-                <TextField
-                  label="Repository visibility (when auto-created)"
-                  select
-                  value={docSettings.github?.repoVisibility || 'private'}
-                  onChange={(event) =>
-                    handleGithubSettingsChange({ repoVisibility: event.target.value })
-                  }
-                  fullWidth
-                >
-                  <MenuItem value="private">Private</MenuItem>
-                  <MenuItem value="public">Public</MenuItem>
-                </TextField>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={docSettings.github?.seedOnCommit === true}
-                      onChange={(event) =>
-                        handleGithubSettingsChange({ seedOnCommit: event.target.checked })
-                      }
-                    />
-                  }
-                  label="Seed/overwrite landing files on commit"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={docSettings.github?.enableGithubPages === true}
-                      onChange={(event) =>
-                        handleGithubSettingsChange({ enableGithubPages: event.target.checked })
-                      }
-                    />
-                  }
-                  label="Enable GitHub Pages on commit"
-                />
                 <TextField
                   label="Commit message"
                   value={githubCommitMessage}
@@ -2084,21 +2191,20 @@ export default function DocumentPropertiesDialog({
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Button
                     variant="contained"
+                    disabled={!githubSessionState.authenticated || !(docSettings.github?.installationId || '').trim() || !(docSettings.github?.repo || '').trim() || !(docSettings.github?.path || '').trim()}
                     onClick={() => {
                       eventBus.emit('githubCommit', {
-                        token: githubPat,
                         settings: docSettings.github || {},
                         message: githubCommitMessage
                       });
                     }}
                   >
-                    Commit to GitHub
+                    Commit Via GitHub App
                   </Button>
                   <Button
                     variant="outlined"
                     onClick={() => {
                       eventBus.emit('githubLoad', {
-                        token: githubPat,
                         settings: docSettings.github || {}
                       });
                     }}
@@ -2108,17 +2214,13 @@ export default function DocumentPropertiesDialog({
                   <Button
                     variant="outlined"
                     color="error"
+                    disabled={!githubSessionState.authenticated || !(docSettings.github?.installationId || '').trim() || !(docSettings.github?.repo || '').trim() || !(docSettings.github?.path || '').trim()}
                     onClick={() => {
                       const settings = docSettings.github || {};
                       const repo = (settings.repo || '').trim();
                       const branch = (settings.branch || 'main').trim();
                       const path = (settings.path || '').trim();
-                      if (!repo || !path) {
-                        if (typeof window !== 'undefined') {
-                          window.alert('Set GitHub repo and path before deleting.');
-                        }
-                        return;
-                      }
+                      if (!repo || !path) return;
                       const confirmed = typeof window !== 'undefined'
                         ? window.confirm(
                             `Delete "${path}" from ${repo} (${branch})?\n\nThis creates a delete commit on GitHub and cannot be undone from Twilite.`
@@ -2126,15 +2228,17 @@ export default function DocumentPropertiesDialog({
                         : false;
                       if (!confirmed) return;
                       eventBus.emit('githubDelete', {
-                        token: githubPat,
                         settings,
                         message: (githubCommitMessage || '').trim() || `Delete ${path}`
                       });
                     }}
                   >
-                    Delete from GitHub
+                    Delete Via GitHub App
                   </Button>
                 </Stack>
+                <Typography variant="caption" color="text.secondary">
+                  Public reads still work. Writes now require GitHub sign-in plus a selected installation.
+                </Typography>
               </Stack>
             </Paper>
           </Stack>

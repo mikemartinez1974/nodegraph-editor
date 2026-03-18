@@ -1,12 +1,16 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
+    "title": "Nodeset Planning Root",
+    "description": "Index for nodeset planning task graphs.",
     "created": "2026-03-15T17:32:28.455Z",
     "modified": "2026-03-15T17:32:28.455Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "nodeset-planning",
+      "index"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
@@ -196,7 +200,7 @@
       "visible": true,
       "showLabel": true,
       "data": {
-        "markdown": "# Nodeset Planning\n\nIndex for task graphs in `/tasks/nodeset-planning`.",
+        "markdown": "# Nodeset Planning\n\nCurrent planning-node work lives here. Canonical surfaces stay at the top level; proposal history is grouped behind an archive entry.",
         "memo": "",
         "link": "",
         "html": "",
@@ -239,144 +243,12 @@
       }
     },
     {
-      "id": "nodeset-planning-root-port-2",
-      "type": "port",
-      "label": "Proposal By Claude",
-      "position": {
-        "x": 360,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/nodeset-planning/proposal-by-claude.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-planning-root-port-3",
-      "type": "port",
-      "label": "Proposal By Gemini",
-      "position": {
-        "x": 680,
-        "y": 40
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/nodeset-planning/proposal-by-gemini.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-planning-root-port-4",
-      "type": "port",
-      "label": "Proposal By Gpt",
-      "position": {
-        "x": 40,
-        "y": 190
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/nodeset-planning/proposal-by-gpt.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
-      "id": "nodeset-planning-root-port-5",
-      "type": "port",
-      "label": "Proposal By Grok",
-      "position": {
-        "x": 360,
-        "y": 190
-      },
-      "width": 280,
-      "height": 110,
-      "ports": [],
-      "inputs": [],
-      "outputs": [],
-      "visible": true,
-      "showLabel": true,
-      "data": {
-        "target": {
-          "endpoint": "/tasks/nodeset-planning/proposal-by-grok.node:root",
-          "mode": "navigate",
-          "url": "",
-          "graphId": "",
-          "nodeId": "",
-          "portId": "root",
-          "label": "Open"
-        },
-        "memo": "",
-        "link": "",
-        "html": "",
-        "svg": "",
-        "isRoot": false,
-        "root": false
-      }
-    },
-    {
       "id": "nodeset-planning-root-port-first-wave",
       "type": "port",
       "label": "First Wave Plan",
       "position": {
-        "x": 980,
-        "y": 220
+        "x": 360,
+        "y": 40
       },
       "width": 300,
       "height": 160,
@@ -397,12 +269,38 @@
       }
     },
     {
+      "id": "nodeset-planning-root-port-archive",
+      "type": "port",
+      "label": "Proposal Archive",
+      "position": {
+        "x": 700,
+        "y": 40
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Archived proposal variants and model-generated planning history.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/archive/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
       "id": "nodeset-planning-root-port-library",
       "type": "port",
       "label": "Planning Class Library",
       "position": {
-        "x": 1320,
-        "y": 220
+        "x": 1040,
+        "y": 40
       },
       "width": 300,
       "height": 160,
@@ -413,6 +311,32 @@
         "intent": "external",
         "target": {
           "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "nodeset-planning-root-port-skills",
+      "type": "port",
+      "label": "Nodeset Skills",
+      "position": {
+        "x": 1380,
+        "y": 40
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Skill-backed contract enforcement and repair workflows for nodesets.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/nodeset-skills/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -440,66 +364,6 @@
       "data": {}
     },
     {
-      "id": "nodeset-planning-root-edge-2",
-      "type": "reference",
-      "source": "nodeset-planning-root-overview",
-      "target": "nodeset-planning-root-port-2",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-planning-root-edge-3",
-      "type": "reference",
-      "source": "nodeset-planning-root-overview",
-      "target": "nodeset-planning-root-port-3",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-planning-root-edge-4",
-      "type": "reference",
-      "source": "nodeset-planning-root-overview",
-      "target": "nodeset-planning-root-port-4",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
-      "id": "nodeset-planning-root-edge-5",
-      "type": "reference",
-      "source": "nodeset-planning-root-overview",
-      "target": "nodeset-planning-root-port-5",
-      "sourcePort": "out",
-      "targetPort": "root",
-      "label": "opens",
-      "style": {
-        "width": 2,
-        "dash": [],
-        "curved": true
-      },
-      "data": {}
-    },
-    {
       "id": "nodeset-planning-root-edge-first-wave",
       "type": "reference",
       "source": "nodeset-planning-root-overview",
@@ -509,6 +373,15 @@
       "label": "v1"
     },
     {
+      "id": "nodeset-planning-root-edge-archive",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-archive",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "archive"
+    },
+    {
       "id": "nodeset-planning-root-edge-library",
       "type": "reference",
       "source": "nodeset-planning-root-overview",
@@ -516,23 +389,19 @@
       "sourcePort": "out",
       "targetPort": "root",
       "label": "library"
+    },
+    {
+      "id": "nodeset-planning-root-edge-skills",
+      "type": "reference",
+      "source": "nodeset-planning-root-overview",
+      "target": "nodeset-planning-root-port-skills",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "skills"
     }
   ],
   "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ],
+  "scripts": [],
   "nodeCount": 11,
   "edgeCount": 7
 }

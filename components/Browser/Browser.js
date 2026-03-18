@@ -203,7 +203,15 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     }
   };
 
-  // If an address points to a folder, load root.node from that folder.
+  const appendRootNodeIfDirectoryLike = (pathname = '') => {
+    if (!pathname || pathname === '/') return '/root.node';
+    if (pathname.endsWith('/')) return `${pathname}root.node`;
+    const lastSegment = pathname.split('/').pop() || '';
+    if (!lastSegment || !lastSegment.includes('.')) return `${pathname}/root.node`;
+    return pathname;
+  };
+
+  // If an address points to a folder-like path, load root.node from that path.
   const resolveFolderToRootNode = (url) => {
     if (typeof url !== 'string') return url;
     const trimmed = url.trim();
@@ -213,22 +221,20 @@ export default function Browser({ themeName, setThemeName, setTempTheme, theme, 
     if (/^https?:\/\//i.test(trimmed)) {
       try {
         const parsed = new URL(trimmed);
-        const pathname = parsed.pathname || '/';
-        if (pathname.endsWith('/')) {
-          parsed.pathname = `${pathname}root.node`;
-          return parsed.toString();
-        }
-        return trimmed;
+        parsed.pathname = appendRootNodeIfDirectoryLike(parsed.pathname || '/');
+        return parsed.toString();
       } catch {
         return trimmed;
       }
     }
 
     // Local/relative paths
-    if (trimmed.endsWith('/')) {
-      return `${trimmed}root.node`;
-    }
-    return trimmed;
+    const hashIndex = trimmed.indexOf('#');
+    const queryIndex = trimmed.indexOf('?');
+    const splitIndex = [hashIndex, queryIndex].filter(index => index >= 0).sort((a, b) => a - b)[0];
+    const base = splitIndex === undefined ? trimmed : trimmed.slice(0, splitIndex);
+    const suffix = splitIndex === undefined ? '' : trimmed.slice(splitIndex);
+    return `${appendRootNodeIfDirectoryLike(base)}${suffix}`;
   };
 
   const toFetchableUrl = (url) => {

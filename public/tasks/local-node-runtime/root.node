@@ -1,0 +1,1003 @@
+{
+  "fileVersion": "1.0",
+  "metadata": {
+    "title": "Local Node Runtime",
+    "description": "Task graph for making the local Node server the Twilite execution runtime.",
+    "created": "2026-03-18T00:50:10.005Z",
+    "modified": "2026-03-18T00:50:10.005Z",
+    "author": "",
+    "tags": [
+      "tasks",
+      "runtime",
+      "execution"
+    ],
+    "preferredViewer": "https://twilite.zone"
+  },
+  "nodes": [
+    {
+      "id": "local-runtime-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -760,
+        "y": -220
+      },
+      "width": 420,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "local-node-runtime",
+          "name": "Local Node Runtime",
+          "version": "0.1.0",
+          "description": "Task graph for making the local Node server the Twilite execution runtime.",
+          "createdAt": "2026-03-17T00:00:00.000Z",
+          "updatedAt": "2026-03-17T00:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port",
+            "goal",
+            "task",
+            "decision",
+            "constraint",
+            "open-question"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false,
+          "github": {
+            "repo": "",
+            "path": "",
+            "branch": "main",
+            "autoCreateRepo": true,
+            "repoVisibility": "private",
+            "seedOnCommit": false,
+            "enableGithubPages": false
+          }
+        }
+      }
+    },
+    {
+      "id": "local-runtime-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -760,
+        "y": 90
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "local-runtime-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -760,
+        "y": 360
+      },
+      "width": 360,
+      "height": 220,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-overview",
+      "type": "markdown",
+      "label": "Local Node Runtime",
+      "position": {
+        "x": -220,
+        "y": -60
+      },
+      "width": 520,
+      "height": 240,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Local Node Runtime\n\nThe local Node server becomes the execution runtime for Twilite.\n\nPhase 1 stance:\n- local-first runtime\n- explicit execution edges\n- basic executable nodes (`http`, `transform`, `log`)\n- browser remains authoring/view shell, not the execution engine\n- hosted execution is a later layer, not the starting point",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "local-runtime-goal",
+      "type": "goal",
+      "label": "Make the local Node server the execution runtime",
+      "position": {
+        "x": 380,
+        "y": -100
+      },
+      "width": 360,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Twilite should be able to execute graph behavior through a local Node server that reads graphs, resolves execution order, runs nodes, and reports state back to the authoring shell.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "",
+        "successMetrics": [
+          "A local process can load and execute a Twilite graph",
+          "Basic runtime nodes produce real outputs locally",
+          "Execution state and errors are visible in Twilite",
+          "The browser is no longer the privileged execution engine"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-constraint",
+      "type": "constraint",
+      "label": "Keep runtime local-first and explicit in phase 1",
+      "position": {
+        "x": 820,
+        "y": -100
+      },
+      "width": 360,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Do not start with emergent semantic execution. Phase 1 should use explicit executable nodes and explicit execution edges so the loop is deterministic and debuggable.",
+        "type": "architecture",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "local-runtime-task-contract",
+          "local-runtime-task-v1nodes",
+          "local-runtime-task-bridge"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-decision",
+      "type": "decision",
+      "label": "Phase 1 uses an explicit execution graph",
+      "position": {
+        "x": 1260,
+        "y": -100
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Start with n8n-like explicit flow semantics for runtime nodes. Semantic planning nodes can later promote into executable behavior, but they should not be the first runtime contract. This keeps the first runtime deterministic, local, and easier to debug while preserving room for semantic execution later.",
+        "status": "decided",
+        "owner": "Michael",
+        "decidedAt": "2026-03-17",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "local-runtime-question",
+      "type": "open-question",
+      "label": "How do semantic graphs promote into executable graphs later?",
+      "position": {
+        "x": 1836.8871846729337,
+        "y": 316.21610444579994
+      },
+      "width": 360,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "The long-term value is not just a flow runner. Twilite likely wants semantic structures that imply behavior. The open question is how planning and semantic graphs promote into explicit executable runtime graphs without blurring debugging or authority boundaries.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve after the explicit phase 1 runtime is working locally",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "local-runtime-task-contract",
+      "type": "task",
+      "label": "Define the runtime graph contract",
+      "position": {
+        "x": 140,
+        "y": 300
+      },
+      "width": 320,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Specify what the runtime consumes: node shapes, edge semantics, triggers, inputs/outputs, execution state, retries, and diagnostics.",
+        "status": "todo",
+        "priority": "critical",
+        "owner": "Michael",
+        "estimateHours": "4",
+        "acceptanceCriteria": [
+          "Runtime node and edge semantics are explicit",
+          "Execution state and diagnostics are named",
+          "The contract is specific enough for a first local runner"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-task-service",
+      "type": "task",
+      "label": "Extract execution into a local runtime service",
+      "position": {
+        "x": 520,
+        "y": 300
+      },
+      "width": 320,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Separate execution concerns from the browser/editor shell so a local Node process can own scripts, HTTP calls, file ops, and runtime state behind a clear interface.",
+        "status": "todo",
+        "priority": "critical",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Runtime responsibilities move behind a clear service boundary",
+          "Browser/editor code no longer owns privileged execution directly",
+          "The local service interface is explicit"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-task-v1nodes",
+      "type": "task",
+      "label": "Implement phase 1 executable node set",
+      "position": {
+        "x": 900,
+        "y": 300
+      },
+      "width": 320,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Start with `http`, `transform`, and `log` nodes plus explicit execution edges. Prove the loop locally before adding scheduling, agents, or semantic execution.",
+        "status": "todo",
+        "priority": "critical",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "The first executable node set is implemented",
+          "Graphs can run these nodes locally end to end",
+          "Scheduling and semantic execution remain deferred"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-task-bridge",
+      "type": "task",
+      "label": "Wire Twilite to run graphs against the local runtime",
+      "position": {
+        "x": 1280,
+        "y": 300
+      },
+      "width": 320,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Add the bridge between the authoring shell and the local runtime: start/stop execution, inspect outputs, stream logs, and surface runtime diagnostics in Twilite.",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Michael",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Authors can trigger and stop local execution",
+          "Outputs and logs are visible in Twilite",
+          "Runtime failures show up with node attribution"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-task-diag",
+      "type": "task",
+      "label": "Unify runtime logs, state, and failures in diagnostics",
+      "position": {
+        "x": 520,
+        "y": 620
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Runtime output should surface in one durable diagnostics/logging surface with node attribution, execution state, errors, and retries.",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Michael",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Logs, state, and failures land in one diagnostics surface",
+          "Messages include node attribution",
+          "Retries and execution state are visible"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-task-devx",
+      "type": "task",
+      "label": "Package the local runtime for development and install",
+      "position": {
+        "x": 920,
+        "y": 620
+      },
+      "width": 340,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Define how the local runtime is launched, discovered, configured, and updated on a user-controlled machine without turning Twilite into a hosted execution platform.",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Michael",
+        "estimateHours": "6",
+        "acceptanceCriteria": [
+          "Local runtime launch and discovery are defined",
+          "Configuration and update posture are explicit",
+          "The model stays local-first rather than hosted-by-default"
+        ]
+      }
+    },
+    {
+      "id": "local-runtime-port-mod",
+      "type": "port",
+      "label": "Open Modularization Boundaries",
+      "position": {
+        "x": -497,
+        "y": 913
+      },
+      "width": 300,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Execution runtime extraction belongs with modularization boundaries.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/modularization-boundaries.task.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "local-runtime-port-nodeset",
+      "type": "port",
+      "label": "Open Nodeset Planning",
+      "position": {
+        "x": -447,
+        "y": 744
+      },
+      "width": 300,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Semantic planning nodes are the likely long-term promotion source for executable graphs.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/nodeset-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "local-runtime-port-edge",
+      "type": "port",
+      "label": "Open Edge Classes",
+      "position": {
+        "x": -444,
+        "y": 519
+      },
+      "width": 300,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Execution edges will likely need stronger typed semantics.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/edge-classes/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "local-runtime-port-beta",
+      "type": "port",
+      "label": "Open Beta Readiness",
+      "position": {
+        "x": -8,
+        "y": 1005
+      },
+      "width": 300,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Local runtime affects shipping posture, diagnostics, and install story.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/beta-readiness/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "local-runtime-port-github",
+      "type": "port",
+      "label": "Open GitHub App Migration",
+      "position": {
+        "x": 544,
+        "y": 1064
+      },
+      "width": 320,
+      "height": 120,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "The new server/runtime boundary overlaps with GitHub App hosting and identity work.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/github-app/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "local-runtime-edge-001",
+      "type": "reference",
+      "source": "local-runtime-overview",
+      "target": "local-runtime-goal",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "goal",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-002",
+      "type": "reference",
+      "source": "local-runtime-overview",
+      "target": "local-runtime-constraint",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-003",
+      "type": "reference",
+      "source": "local-runtime-overview",
+      "target": "local-runtime-decision",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-004",
+      "type": "reference",
+      "source": "local-runtime-overview",
+      "target": "local-runtime-question",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-005",
+      "type": "reference",
+      "source": "local-runtime-goal",
+      "target": "local-runtime-task-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts-with",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-006",
+      "type": "reference",
+      "source": "local-runtime-task-contract",
+      "target": "local-runtime-task-service",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "defines",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-007",
+      "type": "reference",
+      "source": "local-runtime-task-service",
+      "target": "local-runtime-task-v1nodes",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "enables",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-008",
+      "type": "reference",
+      "source": "local-runtime-task-v1nodes",
+      "target": "local-runtime-task-bridge",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "drives",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-009",
+      "type": "reference",
+      "source": "local-runtime-task-bridge",
+      "target": "local-runtime-task-diag",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-010",
+      "type": "reference",
+      "source": "local-runtime-task-service",
+      "target": "local-runtime-task-devx",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "shapes",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-011",
+      "type": "reference",
+      "source": "local-runtime-constraint",
+      "target": "local-runtime-task-contract",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "constrains",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-012",
+      "type": "reference",
+      "source": "local-runtime-constraint",
+      "target": "local-runtime-task-v1nodes",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "limits",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-013",
+      "type": "reference",
+      "source": "local-runtime-decision",
+      "target": "local-runtime-task-v1nodes",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-014",
+      "type": "reference",
+      "source": "local-runtime-question",
+      "target": "local-runtime-port-nodeset",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "relates",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-015",
+      "type": "reference",
+      "source": "local-runtime-task-service",
+      "target": "local-runtime-port-mod",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "depends-on",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-016",
+      "type": "reference",
+      "source": "local-runtime-task-v1nodes",
+      "target": "local-runtime-port-edge",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-017",
+      "type": "reference",
+      "source": "local-runtime-task-diag",
+      "target": "local-runtime-port-beta",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-018",
+      "type": "reference",
+      "source": "local-runtime-task-devx",
+      "target": "local-runtime-port-beta",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "affects",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "local-runtime-edge-019",
+      "type": "reference",
+      "source": "local-runtime-task-service",
+      "target": "local-runtime-port-github",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "overlaps",
+      "style": {},
+      "data": {}
+    }
+  ],
+  "clusters": [],
+  "scripts": [
+    {
+      "id": "script_1761684730975",
+      "name": "New Script",
+      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
+      "tags": ""
+    },
+    {
+      "id": "script_1761684295367",
+      "name": "Mike",
+      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
+      "tags": ""
+    }
+  ]
+}

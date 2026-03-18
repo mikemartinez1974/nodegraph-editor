@@ -1,12 +1,16 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
+    "title": "Semantic Zoom Root",
+    "description": "Index for semantic zoom task graphs.",
     "created": "2026-03-15T18:58:55.321Z",
     "modified": "2026-03-15T18:58:55.321Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "semantic-zoom",
+      "index"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [

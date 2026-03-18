@@ -1692,11 +1692,7 @@ useEffect(() => {
       showMessage('GitHub Pages enabled for this repository.', 'success');
     };
 
-    const handleGithubCommit = async ({ token, settings = {}, message } = {}) => {
-      if (!token) {
-        showMessage('GitHub PAT is required.', 'error');
-        return;
-      }
+    const handleGithubCommit = async ({ settings = {}, message } = {}) => {
       const repoInfo = parseRepoString(settings.repo || '');
       if (!repoInfo) {
         showMessage('GitHub repo must be in the form owner/name.', 'error');
@@ -1707,61 +1703,35 @@ useEffect(() => {
         showMessage('GitHub file path is required.', 'error');
         return;
       }
-      const { owner, repo } = repoInfo;
-      const headers = buildGitHubHeaders(token);
-
       try {
-        showMessage('Committing graph to GitHub...', 'info');
-        const ensured = await ensureGithubRepoAndBranch({
-          owner,
-          repo,
-          branch: (settings.branch || 'main').trim(),
-          headers,
-          settings
+        showMessage('Committing graph through Twilite server...', 'info');
+        const response = await fetch('/api/github/commit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            installationId: settings.installationId || '',
+            repo: settings.repo || '',
+            path,
+            branch: (settings.branch || 'main').trim(),
+            message: (message || '').trim() || `Update ${path}`,
+            content: JSON.stringify(buildGraphSaveData(), null, 2)
+          })
         });
-        const branch = ensured.branch;
-        const resolvedOwner = ensured.owner || owner;
-        const resolvedRepo = ensured.repo || repo;
-
-        if (resolvedOwner !== owner || resolvedRepo !== repo) {
-          showMessage(
-            `Using repository ${resolvedOwner}/${resolvedRepo} (requested ${owner}/${repo}).`,
-            'warning'
-          );
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload?.message || 'Commit failed.');
         }
-
-        if (settings.seedOnCommit === true) {
-          showMessage('Seeding landing files...', 'info');
-          await seedGithubLandingFiles({ owner: resolvedOwner, repo: resolvedRepo, branch, path, headers });
-        }
-
-        await commitTextFileToGithub({
-          owner: resolvedOwner,
-          repo: resolvedRepo,
-          branch,
-          path,
-          content: JSON.stringify(buildGraphSaveData(), null, 2),
-          message: (message || '').trim() || `Update ${path}`,
-          headers
-        });
-
-        if (settings.enableGithubPages === true) {
-          await ensureGithubPages({ owner: resolvedOwner, repo: resolvedRepo, branch, headers });
-        }
-
         showMessage('GitHub commit successful.', 'success');
-        eventBus.emit('setAddress', `github://${resolvedOwner}/${resolvedRepo}/${path}`);
+        eventBus.emit('setAddress', `github://${settings.repo}/${path}`);
         captureStorySnapshot('github');
       } catch (err) {
-        const detail = err?.message || String(err);
-        const hint = detail.includes('not found')
-          ? ' Check repo owner/name and token access (repo scope).'
-          : '';
-        showMessage(`GitHub commit error: ${detail}${hint}`, 'error');
+        showMessage(`GitHub commit error: ${err?.message || String(err)}`, 'error');
       }
     };
 
-    const handleGithubLoad = async ({ token, settings = {} } = {}) => {
+    const handleGithubLoad = async ({ settings = {} } = {}) => {
       const repoInfo = parseRepoString(settings.repo || '');
       if (!repoInfo) {
         showMessage('GitHub repo must be in the form owner/name.', 'error');
@@ -1773,27 +1743,28 @@ useEffect(() => {
         return;
       }
       const branch = (settings.branch || 'main').trim();
-      const { owner, repo } = repoInfo;
-      const headers = buildGitHubHeaders(token);
 
       try {
         showMessage('Loading graph from GitHub...', 'info');
-        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
-        const readResp = await fetch(readUrl, { headers });
-        if (!readResp.ok) {
-          const errorJson = await readResp.json().catch(() => ({}));
-          showMessage(`GitHub load failed: ${errorJson.message || readResp.statusText}`, 'error');
+        const response = await fetch('/api/github/read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            installationId: settings.installationId || '',
+            repo: settings.repo || '',
+            path,
+            branch,
+            allowPublic: true
+          })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload?.content) {
+          showMessage(`GitHub load failed: ${payload?.message || response.statusText}`, 'error');
           return;
         }
-
-        const payload = await readResp.json();
-        if (!payload || payload.type !== 'file' || !payload.content) {
-          showMessage('GitHub response did not include file content.', 'error');
-          return;
-        }
-
-        const decoded = decodeBase64(payload.content.replace(/\n/g, ''));
-        const data = JSON.parse(decoded);
+        const data = JSON.parse(payload.content);
         const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
         const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
         const groupsToLoad = Array.isArray(data.clusters)
@@ -1825,17 +1796,13 @@ useEffect(() => {
         }
 
         showMessage('GitHub load successful.', 'success');
-        eventBus.emit('setAddress', `github://${owner}/${repo}/${path}`);
+        eventBus.emit('setAddress', `github://${settings.repo}/${path}`);
       } catch (err) {
         showMessage(`GitHub load error: ${err.message || String(err)}`, 'error');
       }
     };
 
-    const handleGithubDelete = async ({ token, settings = {}, message } = {}) => {
-      if (!token) {
-        showMessage('GitHub PAT is required.', 'error');
-        return;
-      }
+    const handleGithubDelete = async ({ settings = {}, message } = {}) => {
       const repoInfo = parseRepoString(settings.repo || '');
       if (!repoInfo) {
         showMessage('GitHub repo must be in the form owner/name.', 'error');
@@ -1847,51 +1814,30 @@ useEffect(() => {
         return;
       }
       const branch = (settings.branch || 'main').trim();
-      const { owner, repo } = repoInfo;
-      const headers = buildGitHubHeaders(token);
 
       try {
         showMessage(`Deleting ${path} from GitHub...`, 'info');
-        const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
-        const deleteUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: false });
-
-        const readResp = await fetch(readUrl, { headers });
-        if (!readResp.ok) {
-          const { message: readMessage } = await parseGithubError(readResp);
-          throw new Error(`GitHub read failed (${path}): ${readMessage}`);
-        }
-
-        const existing = await readResp.json();
-        const sha = existing?.sha;
-        if (!sha || existing?.type !== 'file') {
-          throw new Error(`Path "${path}" is not a file or is missing sha.`);
-        }
-
-        const deleteResp = await fetch(deleteUrl, {
-          method: 'DELETE',
+        const response = await fetch('/api/github/delete', {
+          method: 'POST',
           headers: {
-            ...headers,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            installationId: settings.installationId || '',
+            repo: settings.repo || '',
+            path,
+            branch,
             message: (message || '').trim() || `Delete ${path}`,
-            sha,
-            branch
           })
         });
-
-        if (!deleteResp.ok) {
-          const { message: deleteMessage } = await parseGithubError(deleteResp);
-          throw new Error(`GitHub delete failed (${path}): ${deleteMessage}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload?.message || 'Delete failed.');
         }
 
         showMessage('GitHub delete successful.', 'success');
       } catch (err) {
-        const detail = err?.message || String(err);
-        const hint = detail.includes('not found')
-          ? ' Check repo owner/name, path, branch, and token access (repo scope).'
-          : '';
-        showMessage(`GitHub delete error: ${detail}${hint}`, 'error');
+        showMessage(`GitHub delete error: ${err?.message || String(err)}`, 'error');
       }
     };
 
@@ -2526,43 +2472,32 @@ useEffect(() => {
           }
 
           const branch = (documentSettings?.github?.branch || 'main').trim();
-          const token = (() => {
-            try {
-              if (typeof window === 'undefined' || !window.localStorage) return '';
-              return window.localStorage.getItem('githubPat') || '';
-            } catch {
-              return '';
-            }
-          })();
 
           setSnackbar({ open: true, message: 'Loading graph from GitHub URL...', severity: 'info' });
-          const headers = buildGitHubHeaders(token);
-          const readUrl = buildGitHubContentUrl({ owner, repo, path, branch, includeRef: true });
-          const readResp = await fetch(readUrl, { headers });
-          if (!readResp.ok) {
+          const readResp = await fetch('/api/github/read', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              installationId: documentSettings?.github?.installationId || '',
+              repo: `${owner}/${repo}`,
+              path,
+              branch,
+              allowPublic: true
+            })
+          });
+          const readPayload = await readResp.json().catch(() => ({}));
+          if (!readResp.ok || !readPayload?.content) {
             clearAddressPreview();
-            const errorJson = await readResp.json().catch(() => ({}));
             setSnackbar({
               open: true,
-              message: `GitHub load failed: ${errorJson.message || readResp.statusText}`,
+              message: `GitHub load failed: ${readPayload?.message || readResp.statusText}`,
               severity: 'error'
             });
             return;
           }
-
-          const payload = await readResp.json();
-          if (!payload || payload.type !== 'file' || !payload.content) {
-            clearAddressPreview();
-            setSnackbar({
-              open: true,
-              message: 'GitHub response did not include file content.',
-              severity: 'error'
-            });
-            return;
-          }
-
-          const decoded = decodeBase64(payload.content.replace(/\n/g, ''));
-          const data = JSON.parse(decoded);
+          const data = JSON.parse(readPayload.content);
           const nodesToLoad = Array.isArray(data.nodes) ? data.nodes : [];
           const edgesToLoad = Array.isArray(data.edges) ? data.edges : [];
           const groupsToLoad = Array.isArray(data.clusters)
@@ -2700,6 +2635,24 @@ useEffect(() => {
           return `${origin}/${input}`;
         };
 
+        const appendRootNodeIfDirectoryLike = (pathname = '') => {
+          if (!pathname || pathname === '/') return '/root.node';
+          if (pathname.endsWith('/')) return `${pathname}root.node`;
+          const lastSegment = pathname.split('/').pop() || '';
+          if (!lastSegment || !lastSegment.includes('.')) return `${pathname}/root.node`;
+          return pathname;
+        };
+
+        const normalizeDirectoryLikeDocumentUrl = (input) => {
+          try {
+            const parsed = new URL(input);
+            parsed.pathname = appendRootNodeIfDirectoryLike(parsed.pathname || '/');
+            return parsed.toString();
+          } catch {
+            return input;
+          }
+        };
+
         // Normalize tlz:// to fetchable https://
         if (fullUrl.startsWith('tlz://')) {
           const rest = fullUrl.slice('tlz://'.length);
@@ -2751,6 +2704,8 @@ useEffect(() => {
             fullUrl = 'https://' + fullUrl.slice('http://'.length);
           }
         }
+
+        fullUrl = normalizeDirectoryLikeDocumentUrl(fullUrl);
 
         // Log the final URL and fetch options
         const fetchOptions = { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store' };

@@ -1,0 +1,969 @@
+{
+  "type": "nodegraph-data",
+  "nodes": [
+    {
+      "id": "chatgpt-app-manifest",
+      "type": "manifest",
+      "label": "Manifest",
+      "position": {
+        "x": -780,
+        "y": -260
+      },
+      "width": 360,
+      "height": 240,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "identity": {
+          "graphId": "chatgpt-app-task",
+          "name": "ChatGPT Interface for Twilite",
+          "version": "0.1.0",
+          "description": "Planning graph for creating a ChatGPT-style interface layer inside Twilite.",
+          "createdAt": "2026-03-18T12:00:00.000Z",
+          "updatedAt": "2026-03-18T12:00:00.000Z"
+        },
+        "intent": {
+          "kind": "task",
+          "scope": "local"
+        },
+        "dependencies": {
+          "nodeTypes": [
+            "manifest",
+            "legend",
+            "dictionary",
+            "markdown",
+            "port"
+          ],
+          "portContracts": [
+            "core"
+          ],
+          "skills": [],
+          "schemaVersions": {
+            "nodes": ">=1.0.0",
+            "ports": ">=1.0.0"
+          },
+          "optional": []
+        },
+        "authority": {
+          "mutation": {
+            "allowCreate": true,
+            "allowUpdate": true,
+            "allowDelete": true,
+            "appendOnly": false
+          },
+          "actors": {
+            "humans": true,
+            "agents": true,
+            "tools": true
+          },
+          "styleAuthority": "descriptive",
+          "history": {
+            "rewriteAllowed": false,
+            "squashAllowed": false
+          }
+        },
+        "document": {
+          "url": ""
+        },
+        "settings": {
+          "theme": null,
+          "backgroundImage": null,
+          "defaultNodeColor": "#1976d2",
+          "defaultEdgeColor": "#666666",
+          "snapToGrid": false,
+          "gridSize": 20,
+          "edgeRouting": "auto",
+          "autoSave": false
+        }
+      }
+    },
+    {
+      "id": "chatgpt-app-legend",
+      "type": "legend",
+      "label": "Legend",
+      "position": {
+        "x": -780,
+        "y": 20
+      },
+      "width": 320,
+      "height": 180,
+      "visible": true,
+      "showLabel": true,
+      "data": {}
+    },
+    {
+      "id": "chatgpt-app-dictionary",
+      "type": "dictionary",
+      "label": "Dictionary",
+      "position": {
+        "x": -780,
+        "y": 240
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "nodeDefs": [
+          {
+            "key": "goal",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ],
+        "skills": [],
+        "views": [
+          {
+            "key": "goal",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "goal",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/goal.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "task",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/task.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "decision",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/decision.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "constraint",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/constraint.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "editor",
+            "payload": "editor.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.detail",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.summary",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web.icon",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          },
+          {
+            "key": "open-question",
+            "intent": "node",
+            "payload": "node.web",
+            "ref": "/library/classes/nodes/task-planning/open-question.node-class.node",
+            "source": "local",
+            "version": ">=0.1.0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-overview",
+      "type": "markdown",
+      "label": "ChatGPT Interface for Twilite",
+      "position": {
+        "x": -240,
+        "y": -40
+      },
+      "width": 520,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "color": "#1976d2",
+      "ports": [
+        {
+          "id": "out",
+          "label": "Out",
+          "direction": "output",
+          "dataType": "content",
+          "position": {
+            "side": "right",
+            "offset": 0.5
+          }
+        }
+      ],
+      "data": {
+        "markdown": "# ChatGPT Interface for Twilite\n\nAdd a ChatGPT-style interface to Twilite so users can talk to the system in a familiar chat surface while still landing in Twilite's graph-native workflows.\n\nThe interface should support chat-first ideation, streamed replies, graph-aware context, and clear handoff from conversation into nodes, graphs, and editor actions rather than acting like a separate product.",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": "",
+        "isRoot": true,
+        "root": true
+      }
+    },
+    {
+      "id": "chatgpt-app-goal",
+      "type": "goal",
+      "label": "Ship a usable ChatGPT-style interface inside Twilite",
+      "position": {
+        "x": 360,
+        "y": -120
+      },
+      "width": 360,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Twilite users should be able to open a familiar chat interface, ask for help, receive streamed responses, and move cleanly from chat into graph creation, graph edits, and navigation without losing Twilite's graph authority.",
+        "priority": "critical",
+        "status": "open",
+        "owner": "Michael",
+        "targetDate": "",
+        "successMetrics": [
+          "First response token appears quickly in the Twilite chat surface",
+          "Chat output can create or update graph artifacts intentionally",
+          "API keys and prompt policy never ship to the browser"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-constraint-security",
+      "type": "constraint",
+      "label": "Keep model access and graph mutation authority server-side",
+      "position": {
+        "x": 790,
+        "y": -120
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "The client must never hold provider secrets, unrestricted system prompts, or uncontrolled graph mutation authority. Streaming, prompt assembly, guardrails, and any tool-backed graph actions should pass through a server boundary or explicit Twilite action layer.",
+        "type": "security",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "chatgpt-app-task-streaming-api",
+          "chatgpt-app-task-safety",
+          "chatgpt-app-task-action-bridge"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-constraint-scope",
+      "type": "constraint",
+      "label": "Chat augments Twilite instead of replacing it",
+      "position": {
+        "x": 790,
+        "y": 190
+      },
+      "width": 360,
+      "height": 250,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Do not build a detached ChatGPT clone that ignores the browser, editor, node graph, and existing Twilite workflows. The first release should strengthen onboarding, ideation, and graph authoring inside Twilite.",
+        "type": "ux",
+        "severity": "hard",
+        "scope": "subgraph",
+        "affectedNodes": [
+          "chatgpt-app-task-scope",
+          "chatgpt-app-task-ui",
+          "chatgpt-app-task-graph-context"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-decision-web-first",
+      "type": "decision",
+      "label": "The chat surface lives inside Twilite's web shell first",
+      "position": {
+        "x": 1220,
+        "y": -120
+      },
+      "width": 380,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Twilite already has a browser and editor shell. The chat interface should arrive there first so it can reuse routing, graph context, and existing user flows instead of becoming a parallel product surface.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "chatgpt-app-decision-streaming",
+      "type": "decision",
+      "label": "Use streaming responses and graph-aware prompts from day one",
+      "position": {
+        "x": 1220,
+        "y": 220
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "rationale": "Perceived latency still matters, but the bigger issue is trust and continuity. Streaming makes the interface feel alive, and graph-aware prompt assembly keeps the conversation grounded in the active Twilite context.",
+        "status": "decided",
+        "decidedAt": "2026-03-18",
+        "owner": "Michael",
+        "supersededBy": ""
+      }
+    },
+    {
+      "id": "chatgpt-app-open-question-auth",
+      "type": "open-question",
+      "label": "Where should chat history live in Twilite?",
+      "position": {
+        "x": 1220,
+        "y": 980
+      },
+      "width": 380,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Decide whether chat history is per-browser, per-graph, per-user account, or partly embedded into graph artifacts. This choice affects retrieval, persistence, navigation, and whether chat becomes part of project state.",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before locking persistence and browser navigation behavior",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "chatgpt-app-open-question-model",
+      "type": "open-question",
+      "label": "What actions can chat take versus only suggest?",
+      "position": {
+        "x": 1220,
+        "y": 1320
+      },
+      "width": 400,
+      "height": 280,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Choose the initial authority boundary for chat. Should it only draft graph JSON and node content, or can it create nodes, patch the active graph, navigate, and run bounded Twilite actions with confirmation?",
+        "status": "open",
+        "owner": "Michael",
+        "resolutionPath": "Resolve before implementing the action bridge and confirmation model",
+        "prominence": "high"
+      }
+    },
+    {
+      "id": "chatgpt-app-task-scope",
+      "type": "task",
+      "label": "Define the Twilite chat mode and authority contract",
+      "position": {
+        "x": 80,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Lock how chat fits into Twilite: where it opens, what context it sees, what it can return, when it is advisory versus action-taking, and what stays deferred.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "4",
+        "acceptanceCriteria": [
+          "Chat mode entry points are explicit",
+          "Conversation and action contract are named",
+          "Deferred capabilities are written down"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-task-ui",
+      "type": "task",
+      "label": "Build the ChatGPT-style Twilite chat surface",
+      "position": {
+        "x": 480,
+        "y": 320
+      },
+      "width": 360,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Implement a familiar chat surface in Twilite with composer, message list, streamed responses, prompt suggestions, conversation controls, and clear transitions back into graph and editor views.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "10",
+        "acceptanceCriteria": [
+          "Users can send prompts and see assistant replies inside Twilite",
+          "Streaming tokens render cleanly in the chat surface",
+          "The chat UI coexists cleanly with browser and editor layouts"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-task-graph-context",
+      "type": "task",
+      "label": "Define graph-aware context assembly",
+      "position": {
+        "x": 900,
+        "y": 560
+      },
+      "width": 400,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Decide what Twilite context is sent to chat for each turn: active graph, selected nodes, focused subgraph, route context, recent edits, and any manifest or dictionary material needed for useful answers.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "The chat context contract is explicit",
+          "Prompt assembly rules are bounded by focus and authority",
+          "Large graphs do not dump uncontrolled context into every turn"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-task-streaming-api",
+      "type": "task",
+      "label": "Implement the server-side chat API and streaming transport",
+      "position": {
+        "x": 520,
+        "y": 700
+      },
+      "width": 380,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Build the backend boundary for prompt assembly, model invocation, streaming response delivery, error handling, and rate limiting hooks for the Twilite chat surface.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "critical",
+        "estimateHours": "12",
+        "acceptanceCriteria": [
+          "The client receives streamed assistant output",
+          "Provider credentials stay server-side",
+          "Errors return stable Twilite-facing states"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-task-action-bridge",
+      "type": "task",
+      "label": "Bridge chat output into graph actions",
+      "position": {
+        "x": 940,
+        "y": 920
+      },
+      "width": 380,
+      "height": 270,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Define how chat responses become Twilite actions: create nodes, propose patches, insert markdown, navigate to graphs, or stage structured changes for user confirmation.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "At least one graph mutation path is explicit",
+          "User confirmation exists for risky actions",
+          "Chat can hand off into editor-visible artifacts"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-task-deploy",
+      "type": "task",
+      "label": "Add guardrails, evals, and observability for Twilite chat",
+      "position": {
+        "x": 540,
+        "y": 1100
+      },
+      "width": 400,
+      "height": 260,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "body": "Add prompt-injection defenses, logging policy, eval prompts, latency/error instrumentation, and a production checklist for the Twilite chat interface.",
+        "status": "todo",
+        "owner": "Michael",
+        "priority": "high",
+        "estimateHours": "8",
+        "acceptanceCriteria": [
+          "Prompt and tool failures are observable",
+          "A regression prompt set exists for Twilite-specific tasks",
+          "Launch risks are documented"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt-app-plan",
+      "type": "markdown",
+      "label": "Suggested Sequence",
+      "position": {
+        "x": -300,
+        "y": 980
+      },
+      "width": 560,
+      "height": 380,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "markdown": "# Suggested Sequence\n\n## Phase 1\n- define Twilite chat mode\n- lock context and authority rules\n- decide what chat can see and do\n\n## Phase 2\n- build chat surface in the Twilite shell\n- implement streaming API\n- make graph-aware prompt assembly work\n\n## Phase 3\n- bridge chat output into graph actions\n- add confirmation UX for mutations\n- tighten guardrails and failure states\n\n## Phase 4\n- add evals and observability\n- measure chat usefulness on real Twilite tasks\n- expand persistence only after the core loop works",
+        "memo": "",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    },
+    {
+      "id": "chatgpt-app-port-library",
+      "type": "port",
+      "label": "Open Planning Class Library",
+      "position": {
+        "x": -40,
+        "y": 1500
+      },
+      "width": 300,
+      "height": 110,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "target": {
+          "endpoint": "/library/classes/nodes/task-planning/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        },
+        "memo": "Reference planning nodeset used by this graph.",
+        "link": "",
+        "html": "",
+        "svg": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "chatgpt-app-edge-001",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-goal",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "goal"
+    },
+    {
+      "id": "chatgpt-app-edge-002",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-constraint-security",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "chatgpt-app-edge-003",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-constraint-scope",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "constraint"
+    },
+    {
+      "id": "chatgpt-app-edge-004",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-decision-web-first",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "chatgpt-app-edge-005",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-decision-streaming",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "decision"
+    },
+    {
+      "id": "chatgpt-app-edge-006",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-open-question-auth",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "chatgpt-app-edge-007",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-open-question-model",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "question"
+    },
+    {
+      "id": "chatgpt-app-edge-008",
+      "type": "reference",
+      "source": "chatgpt-app-goal",
+      "target": "chatgpt-app-task-scope",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "starts-with"
+    },
+    {
+      "id": "chatgpt-app-edge-009",
+      "type": "reference",
+      "source": "chatgpt-app-task-scope",
+      "target": "chatgpt-app-task-ui",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "defines"
+    },
+    {
+      "id": "chatgpt-app-edge-010",
+      "type": "reference",
+      "source": "chatgpt-app-task-scope",
+      "target": "chatgpt-app-task-graph-context",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "scopes"
+    },
+    {
+      "id": "chatgpt-app-edge-011",
+      "type": "reference",
+      "source": "chatgpt-app-decision-web-first",
+      "target": "chatgpt-app-task-ui",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides"
+    },
+    {
+      "id": "chatgpt-app-edge-012",
+      "type": "reference",
+      "source": "chatgpt-app-decision-streaming",
+      "target": "chatgpt-app-task-graph-context",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "guides"
+    },
+    {
+      "id": "chatgpt-app-edge-013",
+      "type": "reference",
+      "source": "chatgpt-app-constraint-security",
+      "target": "chatgpt-app-task-graph-context",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "must-respect"
+    },
+    {
+      "id": "chatgpt-app-edge-014",
+      "type": "reference",
+      "source": "chatgpt-app-task-ui",
+      "target": "chatgpt-app-task-streaming-api",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "uses"
+    },
+    {
+      "id": "chatgpt-app-edge-015",
+      "type": "reference",
+      "source": "chatgpt-app-task-graph-context",
+      "target": "chatgpt-app-task-streaming-api",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "feeds"
+    },
+    {
+      "id": "chatgpt-app-edge-016",
+      "type": "reference",
+      "source": "chatgpt-app-constraint-scope",
+      "target": "chatgpt-app-task-ui",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "limits"
+    },
+    {
+      "id": "chatgpt-app-edge-017",
+      "type": "reference",
+      "source": "chatgpt-app-task-streaming-api",
+      "target": "chatgpt-app-open-question-auth",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "depends-on"
+    },
+    {
+      "id": "chatgpt-app-edge-018",
+      "type": "reference",
+      "source": "chatgpt-app-task-action-bridge",
+      "target": "chatgpt-app-open-question-model",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "sharpens"
+    },
+    {
+      "id": "chatgpt-app-edge-019",
+      "type": "reference",
+      "source": "chatgpt-app-task-streaming-api",
+      "target": "chatgpt-app-task-action-bridge",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "requires"
+    },
+    {
+      "id": "chatgpt-app-edge-020",
+      "type": "reference",
+      "source": "chatgpt-app-task-action-bridge",
+      "target": "chatgpt-app-task-deploy",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "needs-observability"
+    },
+    {
+      "id": "chatgpt-app-edge-021",
+      "type": "reference",
+      "source": "chatgpt-app-task-streaming-api",
+      "target": "chatgpt-app-task-deploy",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "instrument"
+    },
+    {
+      "id": "chatgpt-app-edge-022",
+      "type": "reference",
+      "source": "chatgpt-app-plan",
+      "target": "chatgpt-app-task-scope",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-1"
+    },
+    {
+      "id": "chatgpt-app-edge-023",
+      "type": "reference",
+      "source": "chatgpt-app-plan",
+      "target": "chatgpt-app-task-ui",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-2"
+    },
+    {
+      "id": "chatgpt-app-edge-024",
+      "type": "reference",
+      "source": "chatgpt-app-plan",
+      "target": "chatgpt-app-task-action-bridge",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-3"
+    },
+    {
+      "id": "chatgpt-app-edge-025",
+      "type": "reference",
+      "source": "chatgpt-app-plan",
+      "target": "chatgpt-app-task-deploy",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "phase-4"
+    },
+    {
+      "id": "chatgpt-app-edge-026",
+      "type": "reference",
+      "source": "chatgpt-app-overview",
+      "target": "chatgpt-app-port-library",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "library"
+    }
+  ],
+  "clusters": [],
+  "scripts": []
+}

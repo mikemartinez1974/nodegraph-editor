@@ -1,12 +1,16 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
+    "title": "Planning Node Set First Wave",
+    "description": "Concrete first-wave implementation plan for planning node types.",
     "created": "2026-03-16T23:05:07.106Z",
     "modified": "2026-03-16T23:05:07.106Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "nodeset-planning",
+      "planning"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [

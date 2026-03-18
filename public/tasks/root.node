@@ -1,12 +1,15 @@
 {
   "fileVersion": "1.0",
   "metadata": {
-    "title": "Untitled Graph",
-    "description": "",
-    "created": "2026-03-16T22:07:13.558Z",
-    "modified": "2026-03-16T22:07:13.558Z",
+    "title": "Task Graphs Root",
+    "description": "Top-level index for task graph folders.",
+    "created": "2026-03-18T04:01:37.885Z",
+    "modified": "2026-03-18T04:01:37.885Z",
     "author": "",
-    "tags": [],
+    "tags": [
+      "tasks",
+      "index"
+    ],
     "preferredViewer": "https://twilite.zone"
   },
   "nodes": [
@@ -15,8 +18,8 @@
       "type": "manifest",
       "label": "Manifest",
       "position": {
-        "x": -225,
-        "y": -130
+        "x": 155,
+        "y": -170.94134884822688
       },
       "width": 360,
       "height": 220,
@@ -105,8 +108,8 @@
       "type": "legend",
       "label": "Legend",
       "position": {
-        "x": 255,
-        "y": -130
+        "x": 635,
+        "y": -170.94134884822688
       },
       "width": 320,
       "height": 180,
@@ -131,8 +134,8 @@
       "type": "dictionary",
       "label": "Dictionary",
       "position": {
-        "x": 695,
-        "y": -130
+        "x": 1075,
+        "y": -170.94134884822688
       },
       "width": 320,
       "height": 180,
@@ -151,8 +154,8 @@
       "type": "markdown",
       "label": "Task Graphs",
       "position": {
-        "x": -225,
-        "y": 210
+        "x": 155,
+        "y": 169.05865115177312
       },
       "width": 460,
       "height": 220,
@@ -210,8 +213,8 @@
       "type": "port",
       "label": "Nodeset Planning",
       "position": {
-        "x": 355,
-        "y": 210
+        "x": 581.5980936383378,
+        "y": -326.4118739933656
       },
       "width": 280,
       "height": 110,
@@ -243,11 +246,11 @@
       "type": "port",
       "label": "Semantic Zoom",
       "position": {
-        "x": 755,
-        "y": 210
+        "x": 902.2522800029953,
+        "y": -328.17511429637364
       },
       "width": 280,
-      "height": 110,
+      "height": 161.40406625528996,
       "ports": [],
       "inputs": [],
       "outputs": [],
@@ -276,8 +279,8 @@
       "type": "port",
       "label": "Dictionary Demotion",
       "position": {
-        "x": -225,
-        "y": 550
+        "x": 755.6477860706358,
+        "y": -139.50840187455879
       },
       "width": 280,
       "height": 110,
@@ -309,8 +312,8 @@
       "type": "port",
       "label": "Landing Page Seriousness",
       "position": {
-        "x": 175,
-        "y": 550
+        "x": 216.0697683713596,
+        "y": -383.10193414733305
       },
       "width": 300,
       "height": 110,
@@ -342,8 +345,8 @@
       "type": "port",
       "label": "Modularization Boundaries",
       "position": {
-        "x": 595,
-        "y": 550
+        "x": 1100.4456102962681,
+        "y": -118.65489671893613
       },
       "width": 320,
       "height": 110,
@@ -375,8 +378,8 @@
       "type": "port",
       "label": "Archive",
       "position": {
-        "x": 1035,
-        "y": 550
+        "x": 1513.997005751154,
+        "y": 64.72209479385509
       },
       "width": 280,
       "height": 150,
@@ -387,6 +390,162 @@
         "intent": "external",
         "target": {
           "endpoint": "/tasks/archive/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-github-app",
+      "type": "port",
+      "label": "GitHub App Migration",
+      "position": {
+        "x": 1415,
+        "y": 509.0586511517731
+      },
+      "width": 320,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Replace PAT-based GitHub access with a GitHub App.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/github-app/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-edge-classes",
+      "type": "port",
+      "label": "Edge Classes",
+      "position": {
+        "x": 668.1029281752149,
+        "y": 928.9340769074201
+      },
+      "width": 300,
+      "height": 150,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "First-class semantic model for typed edge classes.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/edge-classes/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-beta-readiness",
+      "type": "port",
+      "label": "Beta Readiness",
+      "position": {
+        "x": -64.30417431407926,
+        "y": 748.3586136839044
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Release-readiness graph for beta-quality security, reliability, and usability work.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/beta-readiness/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-local-runtime",
+      "type": "port",
+      "label": "Local Node Runtime",
+      "position": {
+        "x": 1132.5327436345938,
+        "y": 837.2455811510242
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Task graph for making the local Node server the Twilite execution runtime.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/local-node-runtime/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-chatgpt-app",
+      "type": "port",
+      "label": "ChatGPT Interface for Twilite",
+      "position": {
+        "x": 1590,
+        "y": 860
+      },
+      "width": 300,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Planning graph for adding a ChatGPT-style interface layer to Twilite.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/chat-gpt-app/root.node:root",
+          "mode": "navigate",
+          "url": "",
+          "graphId": "",
+          "nodeId": "",
+          "portId": "root",
+          "label": "Open"
+        }
+      }
+    },
+    {
+      "id": "tasks-root-port-core-loop-proof",
+      "type": "port",
+      "label": "Undeniable Core Loop",
+      "position": {
+        "x": 1910,
+        "y": 540
+      },
+      "width": 320,
+      "height": 160,
+      "visible": true,
+      "showLabel": true,
+      "data": {
+        "memo": "Focus the product on one crisp graph-to-result proof loop.",
+        "intent": "external",
+        "target": {
+          "endpoint": "/tasks/core-loop-proof/root.node:root",
           "mode": "navigate",
           "url": "",
           "graphId": "",
@@ -483,21 +642,78 @@
       "label": "archive",
       "style": {},
       "data": {}
+    },
+    {
+      "id": "tasks-root-edge-github-app",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-github-app",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "github",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-edge-classes",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-edge-classes",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "edges",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-beta-readiness",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-beta-readiness",
+      "sourcePort": "root",
+      "targetPort": "root",
+      "label": "beta",
+      "style": {
+        "width": 2,
+        "dash": [],
+        "curved": true
+      },
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-local-runtime",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-local-runtime",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "runtime",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-chatgpt-app",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-chatgpt-app",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "chat",
+      "style": {},
+      "data": {}
+    },
+    {
+      "id": "tasks-root-edge-core-loop-proof",
+      "type": "reference",
+      "source": "tasks-root-overview",
+      "target": "tasks-root-port-core-loop-proof",
+      "sourcePort": "out",
+      "targetPort": "root",
+      "label": "proof",
+      "style": {},
+      "data": {}
     }
   ],
   "clusters": [],
-  "scripts": [
-    {
-      "id": "script_1761684730975",
-      "name": "New Script",
-      "source": "// Write your script here\n// Available API:\n//   api.getNodes()\n//   api.getNode(id)\n//   api.getEdges()\n//   api.createNode(data)\n//   api.updateNode(id, patch)\n//   api.deleteNode(id)\n//   api.createEdge(data)\n//   api.deleteEdge(id)\n//   api.log(level, message)\n\nconst nodes = await api.getNodes();\nreturn { count: nodes.length };",
-      "tags": ""
-    },
-    {
-      "id": "script_1761684295367",
-      "name": "Mike",
-      "source": "console.clear();\nconst nodes = await api.getNodes();\nconsole.log(\"Mike\");\nreturn { count: nodes.length };",
-      "tags": ""
-    }
-  ]
+  "scripts": []
 }
